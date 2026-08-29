@@ -22,6 +22,7 @@ public static class SoulfireLighting
         ParticleSystem particles,
         Rectangle combatBounds,
         float presentationTime,
+        float soulSenseAmount,
         bool endingComplete,
         float endingTimer)
     {
@@ -29,10 +30,10 @@ public static class SoulfireLighting
         float breathe = 0.88f + MathF.Sin(presentationTime * 4.6f) * 0.12f;
 
         particles.DrawLighting(batch, renderer);
-        DrawSouls(batch, renderer, souls, player.SoulSenseActive, breathe);
-        DrawEnemyEnergy(batch, renderer, enemies, player.SoulSenseActive, breathe);
+        DrawSouls(batch, renderer, souls, soulSenseAmount, breathe);
+        DrawEnemyEnergy(batch, renderer, enemies, soulSenseAmount, breathe);
         DrawCannonEnergy(batch, renderer, player, cannonShots);
-        DrawPlayerEnergy(batch, renderer, player, presentationTime, breathe);
+        DrawPlayerEnergy(batch, renderer, player, presentationTime, soulSenseAmount, breathe);
         DrawEndingLight(batch, renderer, combatBounds, endingComplete, endingTimer, breathe);
 
         batch.End();
@@ -42,7 +43,7 @@ public static class SoulfireLighting
         SpriteBatch batch,
         SoulfireRenderer renderer,
         IReadOnlyList<Soul> souls,
-        bool soulSenseActive,
+        float soulSenseAmount,
         float breathe)
     {
         foreach (Soul soul in souls)
@@ -55,7 +56,7 @@ public static class SoulfireLighting
             float radius = soul.State == SoulState.Residue
                 ? SoulfireRenderSettings.SoulGlowRadius * 0.48f
                 : SoulfireRenderSettings.SoulGlowRadius * breathe;
-            float intensity = SoulfireRenderSettings.SoulGlowIntensity * (soulSenseActive ? 1.28f : 1f);
+            float intensity = SoulfireRenderSettings.SoulGlowIntensity * MathHelper.Lerp(1f, 1.42f, soulSenseAmount);
             renderer.DrawGlow(batch, soul.Position, radius, GameBalance.SoulWhite, intensity);
             renderer.DrawGlow(batch, soul.Position, radius * 0.48f, GameBalance.DeathFlameBright, intensity * 0.72f);
         }
@@ -65,14 +66,14 @@ public static class SoulfireLighting
         SpriteBatch batch,
         SoulfireRenderer renderer,
         IReadOnlyList<Enemy> enemies,
-        bool soulSenseActive,
+        float soulSenseAmount,
         float breathe)
     {
         foreach (Enemy enemy in enemies)
         {
             if (enemy is Burning burning && burning.State != BurningState.Dead)
             {
-                float fractureIntensity = soulSenseActive ? 0.24f : 0.11f;
+                float fractureIntensity = MathHelper.Lerp(0.11f, 0.27f, soulSenseAmount);
                 foreach (Vector2 fracture in burning.GetFracturePositions())
                 {
                     renderer.DrawGlow(batch, fracture, 30f * breathe, GameBalance.DeathFlame, fractureIntensity);
@@ -84,7 +85,7 @@ public static class SoulfireLighting
                 }
             }
 
-            if (!soulSenseActive)
+            if (soulSenseAmount <= 0.001f)
             {
                 continue;
             }
@@ -92,11 +93,11 @@ public static class SoulfireLighting
             switch (enemy)
             {
                 case Hollow hollow when hollow.State is not (HollowState.Dying or HollowState.Dead):
-                    renderer.DrawGlow(batch, hollow.CorePosition, 48f * breathe, GameBalance.SoulWhite, 0.34f);
+                    renderer.DrawGlow(batch, hollow.CorePosition, 50f * breathe, GameBalance.SoulWhite, 0.38f * soulSenseAmount);
                     break;
                 case Devourer devourer when devourer.State != DevourerState.Dead:
                     float torsoIntensity = 0.22f + devourer.ConsumedSoulCount * 0.07f;
-                    renderer.DrawGlow(batch, devourer.TorsoPosition, 62f, GameBalance.DeathFlameBright, torsoIntensity);
+                    renderer.DrawGlow(batch, devourer.TorsoPosition, 66f, GameBalance.DeathFlameBright, torsoIntensity * soulSenseAmount);
                     break;
             }
         }
@@ -142,6 +143,7 @@ public static class SoulfireLighting
         SoulfireRenderer renderer,
         Player player,
         float presentationTime,
+        float soulSenseAmount,
         float breathe)
     {
         Vector2 playerCore = player.Position + player.FacingDirection * 2f;
@@ -164,10 +166,10 @@ public static class SoulfireLighting
             GameBalance.DeathFlameBright,
             SoulfireRenderSettings.PlayerCoreGlowIntensity);
 
-        if (player.SoulSenseActive)
+        if (soulSenseAmount > 0.001f)
         {
             Vector2 eye = player.Position + player.FacingDirection * 26f;
-            renderer.DrawGlow(batch, eye, 34f, GameBalance.SoulWhite, 0.25f);
+            renderer.DrawGlow(batch, eye, 34f, GameBalance.SoulWhite, 0.25f * soulSenseAmount);
         }
 
         if (player.IsResonanceReady)

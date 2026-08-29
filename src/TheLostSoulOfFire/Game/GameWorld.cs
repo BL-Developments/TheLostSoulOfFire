@@ -31,6 +31,7 @@ public sealed class GameWorld : IDisposable
     private readonly ScreenEffects _screenEffects = new();
     private readonly ParticleSystem _particles = new();
     private readonly HudRenderer _hud = new();
+    private readonly SoulSensePresentation _soulSensePresentation = new();
     private readonly ArtAssets _art;
     private readonly SpriteVfxSystem _spriteVfx;
     private readonly Player _player;
@@ -105,6 +106,7 @@ public sealed class GameWorld : IDisposable
                 _loopState = ArenaLoopState.Intro;
                 _loopStateTimer = 1.05f;
             }
+            _soulSensePresentation.Update(deltaTime, false);
             _particles.Update(deltaTime);
             return;
         }
@@ -165,6 +167,7 @@ public sealed class GameWorld : IDisposable
         if (_player.IsDead)
         {
             _deathTimer = MathF.Min(6f, _deathTimer + deltaTime);
+            _soulSensePresentation.Update(deltaTime, false);
             _particles.Update(deltaTime);
             return;
         }
@@ -172,6 +175,7 @@ public sealed class GameWorld : IDisposable
         if (_loopState == ArenaLoopState.Complete)
         {
             UpdateArenaLoop(deltaTime);
+            _soulSensePresentation.Update(deltaTime, false);
             _particles.Update(deltaTime);
             float endingCameraSmoothing = 1f - MathF.Exp(-deltaTime * 4f);
             _camera.Follow(_player.Position, _arena.Bounds, viewport, endingCameraSmoothing);
@@ -182,10 +186,12 @@ public sealed class GameWorld : IDisposable
 
         if (_screenEffects.IsHitStopped)
         {
+            _soulSensePresentation.Update(deltaTime, _player.SoulSenseActive);
             return;
         }
 
         _player.Update(deltaTime, input, _lastMouseWorld, _arena.CombatBounds, _particles, _screenEffects, _forceSoulSense);
+        _soulSensePresentation.Update(deltaTime, _player.SoulSenseActive);
         if (_audioTestFatalDamageRequested)
         {
             _audioTestFatalDamageRequested = false;
@@ -315,9 +321,17 @@ public sealed class GameWorld : IDisposable
     {
         renderer.BeginScene(viewport);
         DrawScene(batch, pixel, viewport);
-        renderer.PresentScene(batch, viewport);
+        renderer.PresentScene(batch, viewport, _soulSensePresentation.WorldSuppression);
         DrawSoulfireLighting(batch, renderer, viewport);
-        renderer.DrawVignette(batch, viewport, _player.SoulSenseActive, _player.ResonanceActive);
+        _soulSensePresentation.DrawSoulLayer(
+            batch,
+            pixel,
+            _camera.GetTransform(viewport, _screenEffects.ShakeOffset),
+            _player,
+            _enemies,
+            _souls,
+            _presentationTime);
+        renderer.DrawVignette(batch, viewport, _soulSensePresentation.WorldSuppression, _player.ResonanceActive);
         DrawScreenFeedback(batch, pixel, viewport);
         DrawHud(batch, pixel, viewport);
     }
@@ -332,21 +346,16 @@ public sealed class GameWorld : IDisposable
 
         _art.DrawArena(batch);
         DrawArenaLoop(batch, pixel);
-        if (_player.SoulSenseActive)
-        {
-            batch.FillRectangle(pixel, _arena.Bounds, new Color(4, 7, 11) * 0.48f);
-            DrawSoulTraces(batch, pixel);
-        }
         _player.DrawAfterimages(batch, pixel);
         foreach (Enemy enemy in _enemies)
         {
             _art.DrawEnemy(batch, enemy);
-            enemy.Draw(batch, pixel, _debugVisible, _player.SoulSenseActive, true);
+            enemy.Draw(batch, pixel, _debugVisible, false, true);
         }
         foreach (Soul soul in _souls)
         {
             _art.DrawLostSoul(batch, soul);
-            soul.Draw(batch, pixel, _player, _player.SoulSenseActive, true);
+            soul.Draw(batch, pixel, _player, false, true);
         }
         foreach (CannonShot shot in _cannonShots)
         {
@@ -356,7 +365,7 @@ public sealed class GameWorld : IDisposable
         _particles.Draw(batch, pixel);
         batch.FillCircle(pixel, _player.Position + new Vector2(3f, 8f), 24f, new Color(3, 3, 7) * 0.55f);
         _art.DrawPlayer(batch, _player);
-        _player.Draw(batch, pixel, _art, _debugVisible);
+        _player.Draw(batch, pixel, _art, _debugVisible, _soulSensePresentation.SoulEmergence);
         if (_player.Cannon.State == SoulCannonState.Charging)
         {
             Vector2 muzzle = _player.Position + _player.FacingDirection * 74f;
@@ -403,6 +412,7 @@ public sealed class GameWorld : IDisposable
             _particles,
             _arena.CombatBounds,
             _presentationTime,
+            _soulSensePresentation.SoulEmergence,
             _loopState == ArenaLoopState.Complete,
             _endingTimer);
     }
@@ -591,6 +601,7 @@ public sealed class GameWorld : IDisposable
         _endingTimer = 0f;
         _deathTimer = 0f;
         _forceSoulSense = false;
+        _soulSensePresentation.Reset();
         _audioTestFatalDamageRequested = false;
         _audio.SetCalm(false);
         _audio.SetSoulSense(false);
@@ -849,15 +860,6 @@ public sealed class GameWorld : IDisposable
         }
 
         return Vector2.Zero;
-    }
-
-    private static void DrawSoulTraces(SpriteBatch batch, Texture2D pixel)
-    {
-        Color trace = GameBalance.DeathFlame * 0.24f;
-        batch.DrawLine(pixel, new Vector2(235f, 742f), new Vector2(490f, 665f), trace, 2f);
-        batch.DrawLine(pixel, new Vector2(490f, 665f), new Vector2(805f, 706f), trace, 2f);
-        batch.DrawLine(pixel, new Vector2(1090f, 260f), new Vector2(1345f, 355f), trace, 2f);
-        batch.DrawLine(pixel, new Vector2(1345f, 355f), new Vector2(1510f, 320f), trace, 2f);
     }
 
     private string GetScreenshotContext()

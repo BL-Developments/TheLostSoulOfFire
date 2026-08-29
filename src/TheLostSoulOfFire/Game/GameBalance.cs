@@ -120,4 +120,7 @@ public static class GameBalance
     public static readonly Color DeathFlame = new(145, 71, 255);
     public static readonly Color DeathFlameBright = new(221, 190, 255);
     public static readonly Color SoulWhite = new(246, 239, 255);
+    public static readonly Color SoulSenseWorldGrade = new(199, 204, 208);
+    public static readonly Color SoulSenseWorldVeil = new(8, 11, 15);
+    public static readonly Color SoulSenseTrace = new(170, 112, 232);
 }

@@ -16,7 +16,8 @@ public static class SoulfireRenderSettings
 
     public const float GradeShadowOpacity = 0.08f;
     public const float VignetteOpacity = 0.28f;
-    public const float SoulSenseVignetteBoost = 0.13f;
+    public const float SoulSenseVignetteBoost = 0.1f;
+    public const float SoulSenseWorldVeilOpacity = 0.25f;
     public const float ResonanceVignetteReduction = 0.05f;
 
     public const int GlowTextureSize = 128;
@@ -80,14 +81,19 @@ public sealed class SoulfireRenderer : IDisposable
         _graphicsDevice.Clear(GameBalance.VoidColor);
     }
 
-    public void PresentScene(SpriteBatch batch, Viewport viewport)
+    public void PresentScene(SpriteBatch batch, Viewport viewport, float soulSenseWorldSuppression = 0f)
     {
         _graphicsDevice.SetRenderTarget(null);
         _graphicsDevice.Clear(GameBalance.VoidColor);
 
         Rectangle destination = new(0, 0, viewport.Width, viewport.Height);
+        float suppression = MathHelper.Clamp(soulSenseWorldSuppression, 0f, 1f);
+        Color sceneGrade = Color.Lerp(
+            SoulfireRenderSettings.SceneGrade,
+            GameBalance.SoulSenseWorldGrade,
+            suppression);
         batch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp);
-        batch.Draw(_sceneTarget, destination, SoulfireRenderSettings.SceneGrade);
+        batch.Draw(_sceneTarget, destination, sceneGrade);
         batch.End();
 
         batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
@@ -95,6 +101,13 @@ public sealed class SoulfireRenderer : IDisposable
             _solidTexture,
             destination,
             SoulfireRenderSettings.GradeShadow * SoulfireRenderSettings.GradeShadowOpacity);
+        if (suppression > 0f)
+        {
+            batch.Draw(
+                _solidTexture,
+                destination,
+                GameBalance.SoulSenseWorldVeil * (SoulfireRenderSettings.SoulSenseWorldVeilOpacity * suppression));
+        }
         batch.End();
     }
 
@@ -120,13 +133,10 @@ public sealed class SoulfireRenderer : IDisposable
             0f);
     }
 
-    public void DrawVignette(SpriteBatch batch, Viewport viewport, bool soulSenseActive, bool resonanceActive)
+    public void DrawVignette(SpriteBatch batch, Viewport viewport, float soulSenseAmount, bool resonanceActive)
     {
-        float opacity = SoulfireRenderSettings.VignetteOpacity;
-        if (soulSenseActive)
-        {
-            opacity += SoulfireRenderSettings.SoulSenseVignetteBoost;
-        }
+        float opacity = SoulfireRenderSettings.VignetteOpacity +
+            SoulfireRenderSettings.SoulSenseVignetteBoost * MathHelper.Clamp(soulSenseAmount, 0f, 1f);
         if (resonanceActive)
         {
             opacity -= SoulfireRenderSettings.ResonanceVignetteReduction;
