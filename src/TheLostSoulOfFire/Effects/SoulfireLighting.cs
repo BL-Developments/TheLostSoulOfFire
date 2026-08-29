@@ -20,11 +20,11 @@ public static class SoulfireLighting
         IReadOnlyList<Soul> souls,
         IReadOnlyList<CannonShot> cannonShots,
         ParticleSystem particles,
-        Rectangle combatBounds,
         float presentationTime,
         float soulSenseAmount,
         bool endingComplete,
-        float endingTimer)
+        Vector2 lifeFlamePosition,
+        float lifeFlameAlpha)
     {
         renderer.BeginLighting(batch, worldTransform);
         float breathe = 0.88f + MathF.Sin(presentationTime * 4.6f) * 0.12f;
@@ -34,7 +34,7 @@ public static class SoulfireLighting
         DrawEnemyEnergy(batch, renderer, enemies, soulSenseAmount, breathe);
         DrawCannonEnergy(batch, renderer, player, cannonShots);
         DrawPlayerEnergy(batch, renderer, player, presentationTime, soulSenseAmount, breathe);
-        DrawEndingLight(batch, renderer, combatBounds, endingComplete, endingTimer, breathe);
+        DrawEndingLight(batch, renderer, endingComplete, lifeFlamePosition, lifeFlameAlpha, breathe);
 
         batch.End();
     }
@@ -198,18 +198,16 @@ public static class SoulfireLighting
     private static void DrawEndingLight(
         SpriteBatch batch,
         SoulfireRenderer renderer,
-        Rectangle combatBounds,
         bool endingComplete,
-        float endingTimer,
+        Vector2 lifeFlamePosition,
+        float lifeFlameAlpha,
         float breathe)
     {
-        if (!endingComplete || endingTimer < 1.35f)
+        if (!endingComplete || lifeFlameAlpha <= 0f)
         {
             return;
         }
 
-        Vector2 lifeFlame = new(combatBounds.Right - 246f, combatBounds.Top + 154f);
-        float appear = MathHelper.Clamp((endingTimer - 1.35f) / 1.2f, 0f, 1f);
-        renderer.DrawGlow(batch, lifeFlame, 86f * breathe, new Color(255, 154, 72), 0.3f * appear);
+        renderer.DrawGlow(batch, lifeFlamePosition, 86f * breathe, new Color(255, 154, 72), 0.3f * lifeFlameAlpha);
     }
 }

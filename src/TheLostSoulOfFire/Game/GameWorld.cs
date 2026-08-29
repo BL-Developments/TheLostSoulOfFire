@@ -32,6 +32,7 @@ public sealed class GameWorld : IDisposable
     private readonly ParticleSystem _particles = new();
     private readonly HudRenderer _hud = new();
     private readonly SoulSensePresentation _soulSensePresentation = new();
+    private readonly CinematicPresentation _presentation = new();
     private readonly ArtAssets _art;
     private readonly SpriteVfxSystem _spriteVfx;
     private readonly CombatPresentation _combatPresentation;
@@ -44,11 +45,8 @@ public sealed class GameWorld : IDisposable
     private bool _forceSoulSense;
     private int _waveNumber;
     private ArenaLoopState _loopState = ArenaLoopState.Title;
-    private float _loopStateTimer = 1.25f;
     private float _burningHandoffTimer;
     private int _burningCommittedLastFrame;
-    private float _endingTimer;
-    private float _deathTimer;
     private float _presentationTime;
     private float _fpsTimer;
     private int _fpsFrames;
@@ -62,13 +60,7 @@ public sealed class GameWorld : IDisposable
 
     public string WindowTitle => _debugVisible
         ? $"The Lost Soul of Fire — DEBUG | Wave {_waveNumber}/4 {_loopState.ToString().ToUpperInvariant()} | HP {_player.Health} | RES {(_player.ResonanceActive ? $"ACTIVE {_player.ResonanceRemaining:0.0}s" : $"{_player.Resonance:0}/{GameBalance.ResonanceRequired:0}")} | Player {GetPlayerState()} | Enemies {_enemies.Count(enemy => enemy.IsAlive)} | Souls {_souls.Count}"
-        : _player.IsDead
-            ? "The Lost Soul of Fire — Flame extinguished | R retry | F9 screenshot"
-            : _loopState == ArenaLoopState.Title
-                ? "The Lost Soul of Fire — Press any key"
-                : _loopState == ArenaLoopState.Complete
-                    ? "The Lost Soul of Fire — Arena cleared | R restart | F9 screenshot"
-                    : $"The Lost Soul of Fire — Wave {_waveNumber}/4 | WASD move | Mouse aim | Space dash | LMB Scythe | Q Soul Sense | RMB Cannon";
+        : "The Lost Soul of Fire";
 
     public GameWorld(Viewport viewport, ArtAssets art, ContentManager content)
     {
@@ -86,6 +78,7 @@ public sealed class GameWorld : IDisposable
     {
         float deltaTime = MathF.Min((float)gameTime.ElapsedGameTime.TotalSeconds, 1f / 20f);
         _presentationTime += deltaTime;
+        _presentation.Update(deltaTime, _loopState);
         _audio.Update(deltaTime);
         bool wasDashing = _player.IsDashing;
         bool wasResonanceActive = _player.ResonanceActive;
@@ -107,10 +100,19 @@ public sealed class GameWorld : IDisposable
             {
                 _audio.Play(AudioCue.TitleConfirm, 0.58f);
                 _loopState = ArenaLoopState.Intro;
-                _loopStateTimer = 1.05f;
+                _presentation.BeginIntro(false);
             }
             _soulSensePresentation.Update(deltaTime, false);
             _particles.Update(deltaTime);
+            _presentation.UpdateCamera(
+                _camera,
+                _loopState,
+                false,
+                _player.Position,
+                _arena.Bounds,
+                _arena.CombatBounds,
+                viewport,
+                deltaTime);
             return;
         }
 
@@ -169,9 +171,17 @@ public sealed class GameWorld : IDisposable
 
         if (_player.IsDead)
         {
-            _deathTimer = MathF.Min(6f, _deathTimer + deltaTime);
             _soulSensePresentation.Update(deltaTime, false);
             _particles.Update(deltaTime);
+            _presentation.UpdateCamera(
+                _camera,
+                _loopState,
+                true,
+                _player.Position,
+                _arena.Bounds,
+                _arena.CombatBounds,
+                viewport,
+                deltaTime);
             return;
         }
 
@@ -180,8 +190,32 @@ public sealed class GameWorld : IDisposable
             UpdateArenaLoop(deltaTime);
             _soulSensePresentation.Update(deltaTime, false);
             _particles.Update(deltaTime);
-            float endingCameraSmoothing = 1f - MathF.Exp(-deltaTime * 4f);
-            _camera.Follow(_player.Position, _arena.Bounds, viewport, endingCameraSmoothing);
+            _presentation.UpdateCamera(
+                _camera,
+                _loopState,
+                false,
+                _player.Position,
+                _arena.Bounds,
+                _arena.CombatBounds,
+                viewport,
+                deltaTime);
+            return;
+        }
+
+        if (_loopState == ArenaLoopState.Intro)
+        {
+            UpdateArenaLoop(deltaTime);
+            _soulSensePresentation.Update(deltaTime, false);
+            _particles.Update(deltaTime);
+            _presentation.UpdateCamera(
+                _camera,
+                _loopState,
+                false,
+                _player.Position,
+                _arena.Bounds,
+                _arena.CombatBounds,
+                viewport,
+                deltaTime);
             return;
         }
 
@@ -291,6 +325,7 @@ public sealed class GameWorld : IDisposable
             if (_player.IsDead)
             {
                 _audio.SetSoulSense(false);
+                _presentation.BeginDeath();
             }
             _audio.Play(_player.IsDead ? AudioCue.PlayerDeath : AudioCue.PlayerHit, _player.IsDead ? 0.78f : 0.6f);
         }
@@ -300,8 +335,15 @@ public sealed class GameWorld : IDisposable
         }
         _particles.Update(deltaTime);
 
-        float cameraSmoothing = 1f - MathF.Exp(-deltaTime * 9f);
-        _camera.Follow(_player.Position, _arena.Bounds, viewport, cameraSmoothing);
+        _presentation.UpdateCamera(
+            _camera,
+            _loopState,
+            false,
+            _player.Position,
+            _arena.Bounds,
+            _arena.CombatBounds,
+            viewport,
+            deltaTime);
     }
 
     public void Dispose()
@@ -341,7 +383,10 @@ public sealed class GameWorld : IDisposable
 
         _art.DrawArena(batch);
         DrawArenaLoop(batch, pixel);
-        _player.DrawAfterimages(batch, pixel);
+        if (_loopState != ArenaLoopState.Title)
+        {
+            _player.DrawAfterimages(batch, pixel);
+        }
         foreach (Enemy enemy in _enemies)
         {
             _art.DrawEnemy(batch, enemy);
@@ -358,38 +403,41 @@ public sealed class GameWorld : IDisposable
             _art.DrawCannonProjectile(batch, shot);
         }
         _particles.Draw(batch, pixel);
-        batch.FillCircle(pixel, _player.Position + new Vector2(3f, 8f), 24f, new Color(3, 3, 7) * 0.55f);
-        _art.DrawPlayer(batch, _player);
-        _player.Draw(batch, pixel, _art, _debugVisible, _soulSensePresentation.SoulEmergence);
-        if (_player.Cannon.State == SoulCannonState.Charging)
+        if (_presentation.ShouldDrawPlayer(_loopState, _player.IsDead))
         {
-            Vector2 muzzle = _player.Position + _player.FacingDirection * 74f;
-            float charge = _player.Cannon.ChargeProgress;
-            Color chargeColor = _player.Cannon.IsFullCharge
-                ? Color.White
-                : _player.Cannon.ChargeStage >= 3
-                    ? new Color(238, 219, 255)
-                    : _player.Cannon.ChargeStage == 2
-                        ? GameBalance.DeathFlameBright
-                        : new Color(155, 94, 220);
-            _art.DrawLoopingEffect(
-                batch,
-                _player.Cannon,
-                "cannon_charge_loop",
-                muzzle,
-                0f,
-                _player.Cannon.IsFullCharge ? 0.68f : MathHelper.Lerp(0.28f, 0.61f, charge),
-                chargeColor);
+            batch.FillCircle(pixel, _player.Position + new Vector2(3f, 8f), 24f, new Color(3, 3, 7) * 0.55f);
+            _art.DrawPlayer(batch, _player);
+            _player.Draw(batch, pixel, _art, _debugVisible, _soulSensePresentation.SoulEmergence);
+            if (_player.Cannon.State == SoulCannonState.Charging)
+            {
+                Vector2 muzzle = _player.Position + _player.FacingDirection * 74f;
+                float charge = _player.Cannon.ChargeProgress;
+                Color chargeColor = _player.Cannon.IsFullCharge
+                    ? Color.White
+                    : _player.Cannon.ChargeStage >= 3
+                        ? new Color(238, 219, 255)
+                        : _player.Cannon.ChargeStage == 2
+                            ? GameBalance.DeathFlameBright
+                            : new Color(155, 94, 220);
+                _art.DrawLoopingEffect(
+                    batch,
+                    _player.Cannon,
+                    "cannon_charge_loop",
+                    muzzle,
+                    0f,
+                    _player.Cannon.IsFullCharge ? 0.68f : MathHelper.Lerp(0.28f, 0.61f, charge),
+                    chargeColor);
+            }
         }
-        if (_player.IsDead)
-        {
-            _art.DrawDeathFlame(batch, _player, _player.Position);
-        }
+        _presentation.DrawWorldAccents(batch, pixel, _art, _loopState, _player.IsDead, _player, _arena.CombatBounds);
         _spriteVfx.Draw(batch);
 
-        batch.DrawCircle(pixel, _lastMouseWorld, 9f, GameBalance.DeathFlameBright * 0.75f, 2f, 16);
-        batch.DrawLine(pixel, _lastMouseWorld - Vector2.UnitX * 13f, _lastMouseWorld + Vector2.UnitX * 13f, GameBalance.DeathFlame * 0.6f, 1f);
-        batch.DrawLine(pixel, _lastMouseWorld - Vector2.UnitY * 13f, _lastMouseWorld + Vector2.UnitY * 13f, GameBalance.DeathFlame * 0.6f, 1f);
+        if (_presentation.ShouldDrawAim(_loopState, _player.IsDead))
+        {
+            batch.DrawCircle(pixel, _lastMouseWorld, 9f, GameBalance.DeathFlameBright * 0.75f, 2f, 16);
+            batch.DrawLine(pixel, _lastMouseWorld - Vector2.UnitX * 13f, _lastMouseWorld + Vector2.UnitX * 13f, GameBalance.DeathFlame * 0.6f, 1f);
+            batch.DrawLine(pixel, _lastMouseWorld - Vector2.UnitY * 13f, _lastMouseWorld + Vector2.UnitY * 13f, GameBalance.DeathFlame * 0.6f, 1f);
+        }
 
         if (_debugVisible)
         {
@@ -413,11 +461,11 @@ public sealed class GameWorld : IDisposable
             _souls,
             _cannonShots,
             _particles,
-            _arena.CombatBounds,
             _presentationTime,
             _soulSensePresentation.SoulEmergence,
             _loopState == ArenaLoopState.Complete,
-            _endingTimer);
+            _presentation.GetLifeFlamePosition(_arena.CombatBounds),
+            _presentation.GetLifeFlameAlpha());
     }
 
     private void DrawScreenFeedback(SpriteBatch batch, Texture2D pixel, Viewport viewport)
@@ -447,28 +495,14 @@ public sealed class GameWorld : IDisposable
     {
         batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
 
-        if (_loopState == ArenaLoopState.Title)
+        if (_presentation.ShouldDrawCombatHud(_loopState, _player.IsDead))
         {
-            DrawTitleHud(batch, pixel, viewport);
-            batch.End();
-            return;
-        }
-        if (_player.IsDead)
-        {
-            DrawDeathHud(batch, pixel, viewport);
-            batch.End();
-            return;
-        }
-        if (_loopState == ArenaLoopState.Complete)
-        {
-            DrawEndingHud(batch, pixel, viewport);
-            batch.End();
-            return;
+            _hud.Draw(batch, pixel, viewport, _player);
         }
 
-        _hud.Draw(batch, pixel, viewport, _player);
+        _presentation.DrawOverlay(batch, pixel, viewport, _loopState, _player.IsDead, _waveNumber);
 
-        if (_debugVisible)
+        if (_debugVisible && _loopState != ArenaLoopState.Title)
         {
             DrawDebugOverlay(batch, pixel, viewport);
         }
@@ -593,11 +627,9 @@ public sealed class GameWorld : IDisposable
         _screenEffects.Clear();
         _waveNumber = 0;
         _loopState = ArenaLoopState.Intro;
-        _loopStateTimer = 1.05f;
+        _presentation.BeginIntro(true);
         _burningHandoffTimer = 0f;
         _burningCommittedLastFrame = 0;
-        _endingTimer = 0f;
-        _deathTimer = 0f;
         _forceSoulSense = false;
         _soulSensePresentation.Reset();
         _audioTestFatalDamageRequested = false;
@@ -652,9 +684,14 @@ public sealed class GameWorld : IDisposable
         switch (_loopState)
         {
             case ArenaLoopState.Intro:
+                if (_presentation.TransitionComplete)
+                {
+                    SpawnWave(_waveNumber + 1);
+                }
+                break;
+
             case ArenaLoopState.Transition:
-                _loopStateTimer = MathF.Max(0f, _loopStateTimer - deltaTime);
-                if (_loopStateTimer <= 0f)
+                if (_presentation.WaveTransitionComplete)
                 {
                     SpawnWave(_waveNumber + 1);
                 }
@@ -667,25 +704,15 @@ public sealed class GameWorld : IDisposable
                     if (_waveNumber >= 4)
                     {
                         _loopState = ArenaLoopState.Complete;
-                        _endingTimer = 0f;
-                        _screenEffects.Flash(0.16f, 0.3f);
+                        _presentation.BeginCompletion();
                         _audio.SetCalm(true);
                     }
                     else
                     {
                         _loopState = ArenaLoopState.Transition;
-                        _loopStateTimer = 1.35f;
+                        _presentation.BeginWaveTransition();
                         _particles.EmitDeathFlame(_arena.CombatBounds.Center.ToVector2(), 12, 0.8f);
                     }
-                }
-                break;
-
-            case ArenaLoopState.Complete:
-                float previousEndingTimer = _endingTimer;
-                _endingTimer = MathF.Min(12f, _endingTimer + deltaTime);
-                if (previousEndingTimer < 1.35f && _endingTimer >= 1.35f)
-                {
-                    _audio.Play(AudioCue.EndingReveal, 0.7f);
                 }
                 break;
         }
@@ -706,69 +733,8 @@ public sealed class GameWorld : IDisposable
 
         if (_loopState is ArenaLoopState.Intro or ArenaLoopState.Transition)
         {
-            float pulse = 0.5f + 0.5f * MathF.Sin(_loopStateTimer * 12f);
+            float pulse = 0.5f + 0.5f * MathF.Sin(_presentation.StateTime * 8f);
             batch.DrawCircle(pixel, _arena.CombatBounds.Center.ToVector2(), 118f + pulse * 14f, GameBalance.DeathFlame * (0.18f + pulse * 0.18f), 5f, 40);
-        }
-        else if (_loopState == ArenaLoopState.Complete)
-        {
-            DrawLifeFlame(batch, pixel);
-        }
-    }
-
-    private void DrawLifeFlame(SpriteBatch batch, Texture2D pixel)
-    {
-        if (_endingTimer < 1.35f)
-        {
-            return;
-        }
-
-        float appear = MathHelper.Clamp((_endingTimer - 1.35f) / 1.2f, 0f, 1f);
-        Vector2 origin = new(_arena.CombatBounds.Right - 246f, _arena.CombatBounds.Top + 154f);
-        float breathe = 0.96f + 0.05f * MathF.Sin(_endingTimer * 2.2f);
-        _art.DrawLifeFlame(batch, origin, appear, breathe);
-    }
-
-    private void DrawEndingHud(SpriteBatch batch, Texture2D pixel, Viewport viewport)
-    {
-        float quiet = MathHelper.Clamp(_endingTimer / 1.4f, 0f, 1f);
-        batch.FillRectangle(pixel, new Rectangle(0, 0, viewport.Width, viewport.Height), Color.Black * (quiet * 0.38f));
-
-        if (_endingTimer >= 2.7f)
-        {
-            float titleAlpha = MathHelper.Clamp((_endingTimer - 2.7f) / 0.9f, 0f, 1f);
-            PixelText.DrawCentered(batch, pixel, "THE LOST SOUL OF FIRE", viewport.Width * 0.5f, viewport.Height * 0.39f, 5, GameBalance.SoulWhite * titleAlpha);
-        }
-        if (_endingTimer >= 3.7f)
-        {
-            float completeAlpha = MathHelper.Clamp((_endingTimer - 3.7f) / 0.8f, 0f, 1f);
-            PixelText.DrawCentered(batch, pixel, "PROTOTYPE COMPLETE", viewport.Width * 0.5f, viewport.Height * 0.51f, 3, new Color(215, 205, 224) * completeAlpha);
-        }
-        if (_endingTimer >= 4.7f)
-        {
-            float promptPulse = 0.48f + 0.22f * MathF.Sin(_endingTimer * 2.4f);
-            PixelText.DrawCentered(batch, pixel, "R TO RESTART", viewport.Width * 0.5f, viewport.Height * 0.62f, 2, GameBalance.DeathFlameBright * promptPulse);
-        }
-    }
-
-    private static void DrawTitleHud(SpriteBatch batch, Texture2D pixel, Viewport viewport)
-    {
-        batch.FillRectangle(pixel, new Rectangle(0, 0, viewport.Width, viewport.Height), Color.Black * 0.62f);
-        PixelText.DrawCentered(batch, pixel, "THE LOST SOUL OF FIRE", viewport.Width * 0.5f, viewport.Height * 0.39f, 5, GameBalance.SoulWhite);
-        PixelText.DrawCentered(batch, pixel, "PRESS ANY KEY", viewport.Width * 0.5f, viewport.Height * 0.56f, 2, GameBalance.DeathFlameBright * 0.78f);
-    }
-
-    private void DrawDeathHud(SpriteBatch batch, Texture2D pixel, Viewport viewport)
-    {
-        float fade = MathHelper.Clamp(_deathTimer / 1.1f, 0.2f, 0.82f);
-        batch.FillRectangle(pixel, new Rectangle(0, 0, viewport.Width, viewport.Height), Color.Black * fade);
-        if (_deathTimer >= 0.35f)
-        {
-            float titleAlpha = MathHelper.Clamp((_deathTimer - 0.35f) / 0.55f, 0f, 1f);
-            PixelText.DrawCentered(batch, pixel, "FLAME EXTINGUISHED", viewport.Width * 0.5f, viewport.Height * 0.44f, 4, GameBalance.DeathFlameBright * titleAlpha);
-        }
-        if (_deathTimer >= 1f)
-        {
-            PixelText.DrawCentered(batch, pixel, "R TO RETRY", viewport.Width * 0.5f, viewport.Height * 0.57f, 2, GameBalance.SoulWhite * 0.72f);
         }
     }
 
@@ -864,7 +830,7 @@ public sealed class GameWorld : IDisposable
     {
         if (_player.IsDead) return "phase05_player_down";
         if (_loopState == ArenaLoopState.Title) return "phase15_title";
-        if (_loopState == ArenaLoopState.Complete) return "phase15_prototype_complete";
+        if (_loopState == ArenaLoopState.Complete) return "phase15_soul_free";
         if (_loopState == ArenaLoopState.Transition) return $"phase12_wave_{_waveNumber}_clear";
         if (_loopState == ArenaLoopState.Intro) return "phase12_arena_intro";
         if (_player.ResonanceActive) return "phase11_resonance_active";
