@@ -30,6 +30,7 @@ public sealed class GameWorld : IDisposable
     private readonly Camera2D _camera;
     private readonly ScreenEffects _screenEffects = new();
     private readonly ParticleSystem _particles = new();
+    private readonly HudRenderer _hud = new();
     private readonly ArtAssets _art;
     private readonly SpriteVfxSystem _spriteVfx;
     private readonly Player _player;
@@ -401,60 +402,6 @@ public sealed class GameWorld : IDisposable
             return;
         }
 
-        Rectangle healthBack = new(28, 28, 264, 20);
-        batch.FillRectangle(pixel, healthBack, new Color(7, 6, 12) * 0.9f);
-        batch.FillRectangle(pixel, new Rectangle(32, 32, (int)(256f * _player.Health / GameBalance.PlayerMaxHealth), 12), new Color(194, 203, 216));
-        batch.DrawRectangle(pixel, healthBack, new Color(87, 74, 106), 2f);
-
-        float dashReady = 1f - MathHelper.Clamp(_player.DashCooldownRemaining / GameBalance.DashCooldown, 0f, 1f);
-        batch.FillRectangle(pixel, new Rectangle(32, 53, (int)(96f * dashReady), 4), GameBalance.DeathFlame * 0.9f);
-        batch.DrawRectangle(pixel, new Rectangle(30, 51, 100, 8), new Color(87, 74, 106), 1f);
-
-        Rectangle resonanceBack = new(28, 82, 184, 12);
-        batch.FillRectangle(pixel, resonanceBack, new Color(7, 6, 12) * 0.9f);
-        float resonanceFill = _player.ResonanceActive
-            ? _player.ResonanceRemaining / GameBalance.ResonanceDuration
-            : _player.Resonance / GameBalance.ResonanceRequired;
-        Color resonanceColor = _player.ResonanceActive || _player.IsResonanceReady
-            ? GameBalance.SoulWhite
-            : GameBalance.DeathFlame;
-        batch.FillRectangle(pixel, new Rectangle(31, 85, (int)(178f * resonanceFill), 6), resonanceColor);
-        batch.DrawRectangle(pixel, resonanceBack, _player.IsResonanceReady ? GameBalance.SoulWhite : new Color(87, 74, 106), _player.IsResonanceReady ? 3f : 1f);
-        if (_player.IsResonanceReady)
-        {
-            batch.FillCircle(pixel, new Vector2(222f, 88f), 5f, GameBalance.SoulWhite);
-            batch.DrawCircle(pixel, new Vector2(222f, 88f), 10f, GameBalance.DeathFlameBright * 0.8f, 2f, 16);
-        }
-
-        for (int i = 0; i < 4; i++)
-        {
-            Color waveColor = i < _waveNumber
-                ? i == _waveNumber - 1 && _loopState == ArenaLoopState.Combat ? GameBalance.SoulWhite : GameBalance.DeathFlame
-                : new Color(45, 40, 53);
-            batch.FillRectangle(pixel, new Rectangle(viewport.Width / 2 - 38 + i * 22, 28, 14, 6), waveColor);
-        }
-
-        if (_loopState is ArenaLoopState.Intro or ArenaLoopState.Transition)
-        {
-            batch.DrawRectangle(pixel, new Rectangle(viewport.Width / 2 - 58, 48, 116, 8), GameBalance.DeathFlameBright * 0.72f, 2f);
-        }
-        else if (_loopState == ArenaLoopState.Complete)
-        {
-            batch.DrawLine(pixel, new Vector2(viewport.Width / 2 - 58f, 51f), new Vector2(viewport.Width / 2 + 58f, 51f), GameBalance.SoulWhite, 5f);
-        }
-
-        // Minimal controller legend without requiring a font asset.
-        batch.FillRectangle(pixel, new Rectangle(28, viewport.Height - 26, 186, 4), GameBalance.DeepViolet * 0.65f);
-
-        for (int i = 0; i < 3; i++)
-        {
-            Color comboColor = _player.Scythe.ActiveStep == i + 1
-                ? (i == 2 ? GameBalance.SoulWhite : GameBalance.DeathFlameBright)
-                : new Color(55, 48, 66);
-            int size = i == 2 ? 14 : 10;
-            batch.FillRectangle(pixel, new Rectangle(32 + i * 20, 68 - (size - 10) / 2, size, size), comboColor);
-        }
-
         if (_screenEffects.FlashAlpha > 0f)
         {
             batch.FillRectangle(pixel, new Rectangle(0, 0, viewport.Width, viewport.Height), GameBalance.DeathFlameBright * _screenEffects.FlashAlpha);
@@ -480,14 +427,7 @@ public sealed class GameWorld : IDisposable
             batch.FillRectangle(pixel, new Rectangle(viewport.Width - 54, 54, 54, viewport.Height - 108), vignette);
         }
 
-        for (int i = 0; i < 3; i++)
-        {
-            Color stageColor = _player.Cannon.ChargeStage > i
-                ? i == 2 && _player.Cannon.IsFullCharge ? GameBalance.SoulWhite : GameBalance.DeathFlameBright
-                : new Color(45, 40, 53);
-            int width = i == 2 ? 20 : 14;
-            batch.FillRectangle(pixel, new Rectangle(viewport.Width - 86 + i * 22, 32, width, 7), stageColor);
-        }
+        _hud.Draw(batch, pixel, viewport, _player);
 
         if (_debugVisible)
         {
