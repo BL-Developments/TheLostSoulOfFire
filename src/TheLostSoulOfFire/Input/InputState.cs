@@ -33,4 +33,9 @@ public sealed class InputState
         _mouse.LeftButton == ButtonState.Pressed && _previousMouse.LeftButton == ButtonState.Released;
     public bool WasLeftMouseReleased =>
         _mouse.LeftButton == ButtonState.Released && _previousMouse.LeftButton == ButtonState.Pressed;
+    public bool IsRightMouseDown => _mouse.RightButton == ButtonState.Pressed;
+    public bool WasRightMousePressed =>
+        _mouse.RightButton == ButtonState.Pressed && _previousMouse.RightButton == ButtonState.Released;
+    public bool WasRightMouseReleased =>
+        _mouse.RightButton == ButtonState.Released && _previousMouse.RightButton == ButtonState.Pressed;
 }

@@ -12,12 +12,17 @@ public sealed class ScreenEffects
     private float _flashTimer;
     private float _flashDuration;
     private float _flashStrength;
+    private float _impactFrameTimer;
+    private float _impactFrameDuration;
 
     public Vector2 ShakeOffset { get; private set; }
     public bool IsHitStopped => _hitstopTimer > 0f;
     public float FlashAlpha => _flashDuration <= 0f
         ? 0f
         : _flashStrength * MathHelper.Clamp(_flashTimer / _flashDuration, 0f, 1f);
+    public float ImpactFrameAlpha => _impactFrameDuration <= 0f
+        ? 0f
+        : MathHelper.Clamp(_impactFrameTimer / _impactFrameDuration, 0f, 1f);
 
     public void AddShake(float duration, float magnitude)
     {
@@ -37,10 +42,21 @@ public sealed class ScreenEffects
         _flashStrength = MathF.Max(_flashStrength, strength);
     }
 
+    public void BeginImpactFrame(float duration)
+    {
+        _impactFrameTimer = MathF.Max(_impactFrameTimer, duration);
+        _impactFrameDuration = MathF.Max(_impactFrameDuration, duration);
+    }
+
     public void Update(float deltaTime)
     {
         _hitstopTimer = MathF.Max(0f, _hitstopTimer - deltaTime);
         _flashTimer = MathF.Max(0f, _flashTimer - deltaTime);
+        _impactFrameTimer = MathF.Max(0f, _impactFrameTimer - deltaTime);
+        if (_impactFrameTimer <= 0f)
+        {
+            _impactFrameDuration = 0f;
+        }
         if (_flashTimer <= 0f)
         {
             _flashDuration = 0f;
