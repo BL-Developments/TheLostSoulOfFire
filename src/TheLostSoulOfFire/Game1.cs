@@ -17,6 +17,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     private InputState _input = null!;
     private GameWorld _world = null!;
     private ArtAssets _art = null!;
+    private SoulfireRenderer _soulfireRenderer = null!;
     private readonly bool _audioGameplayTest;
     private readonly bool _audioDeathRestartTest;
     private bool _screenshotRequested;
@@ -60,6 +61,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         _pixel.SetData([Color.White]);
         _art = new ArtAssets(Content);
         _world = new GameWorld(GraphicsDevice.Viewport, _art, Content);
+        _soulfireRenderer = new SoulfireRenderer(GraphicsDevice);
     }
 
     protected override void Update(GameTime gameTime)
@@ -95,7 +97,8 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     protected override void Draw(GameTime gameTime)
     {
         GraphicsDevice.Clear(GameBalance.VoidColor);
-        _world.Draw(_spriteBatch, _pixel, GraphicsDevice.Viewport);
+        Viewport viewport = GraphicsDevice.Viewport;
+        _world.Draw(_spriteBatch, _pixel, viewport, _soulfireRenderer);
 
         if (_screenshotRequested)
         {
@@ -114,6 +117,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     protected override void UnloadContent()
     {
         _world.Dispose();
+        _soulfireRenderer.Dispose();
         _pixel.Dispose();
         _spriteBatch.Dispose();
         base.UnloadContent();

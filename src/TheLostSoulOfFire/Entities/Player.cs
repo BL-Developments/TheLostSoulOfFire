@@ -238,10 +238,10 @@ public sealed class Player
         batch.DrawLine(pixel, eye - right * 4f, eye + right * 4f, eyeColor, SoulSenseActive ? 3f : 2f);
 
         bool coreReady = IsResonanceReady;
-        Color coreColor = ResonanceActive || coreReady ? GameBalance.SoulWhite : GameBalance.DeathFlameBright;
         float coreRadius = coreReady ? 9f + pulse * 2.4f : 7f + pulse * 1.3f;
         batch.FillCircle(pixel, Position + FacingDirection * 2f, coreRadius, GameBalance.DeepViolet * 0.75f);
-        batch.FillCircle(pixel, Position + FacingDirection * 2f, 3.2f + pulse * (coreReady ? 1.8f : 0.6f), coreColor * (ResonanceActive || coreReady ? 1f : 0.78f));
+        float coreAlpha = ResonanceActive || coreReady || SoulSenseActive ? 1f : 0.88f;
+        batch.FillCircle(pixel, Position + FacingDirection * 2f, 3.2f + pulse * (coreReady ? 1.8f : 0.6f), GameBalance.SoulWhite * coreAlpha);
         if (coreReady)
         {
             batch.DrawCircle(pixel, Position + FacingDirection * 2f, 14f + pulse * 5f, GameBalance.DeathFlameBright * 0.78f, 3f, 20);
