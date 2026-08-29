@@ -20,6 +20,7 @@ public static class SoulfireLighting
         IReadOnlyList<Soul> souls,
         IReadOnlyList<CannonShot> cannonShots,
         ParticleSystem particles,
+        ArenaAtmosphere arenaAtmosphere,
         Rectangle combatBounds,
         float presentationTime,
         float soulSenseAmount,
@@ -29,6 +30,7 @@ public static class SoulfireLighting
         renderer.BeginLighting(batch, worldTransform);
         float breathe = 0.88f + MathF.Sin(presentationTime * 4.6f) * 0.12f;
 
+        arenaAtmosphere.DrawLighting(batch, renderer, soulSenseAmount);
         particles.DrawLighting(batch, renderer);
         DrawSouls(batch, renderer, souls, soulSenseAmount, breathe);
         DrawEnemyEnergy(batch, renderer, enemies, soulSenseAmount, breathe);
