@@ -46,6 +46,7 @@ public sealed class GameWorld : IDisposable
     private int _burningCommittedLastFrame;
     private float _endingTimer;
     private float _deathTimer;
+    private float _presentationTime;
     private float _fpsTimer;
     private int _fpsFrames;
     private int _fps = 60;
@@ -80,6 +81,7 @@ public sealed class GameWorld : IDisposable
     public void Update(GameTime gameTime, InputState input, Viewport viewport)
     {
         float deltaTime = MathF.Min((float)gameTime.ElapsedGameTime.TotalSeconds, 1f / 20f);
+        _presentationTime += deltaTime;
         _audio.Update(deltaTime);
         bool wasDashing = _player.IsDashing;
         bool wasResonanceActive = _player.ResonanceActive;
@@ -308,7 +310,18 @@ public sealed class GameWorld : IDisposable
 
     internal void RequestAudioTestFatalDamage() => _audioTestFatalDamageRequested = true;
 
-    public void Draw(SpriteBatch batch, Texture2D pixel, Viewport viewport)
+    public void Draw(SpriteBatch batch, Texture2D pixel, Viewport viewport, SoulfireRenderer renderer)
+    {
+        renderer.BeginScene(viewport);
+        DrawScene(batch, pixel, viewport);
+        renderer.PresentScene(batch, viewport);
+        DrawSoulfireLighting(batch, renderer, viewport);
+        renderer.DrawVignette(batch, viewport, _player.SoulSenseActive, _player.ResonanceActive);
+        DrawScreenFeedback(batch, pixel, viewport);
+        DrawHud(batch, pixel, viewport);
+    }
+
+    private void DrawScene(SpriteBatch batch, Texture2D pixel, Viewport viewport)
     {
         batch.Begin(
             SpriteSortMode.Deferred,
@@ -374,8 +387,46 @@ public sealed class GameWorld : IDisposable
         }
 
         batch.End();
+    }
 
-        DrawHud(batch, pixel, viewport);
+    private void DrawSoulfireLighting(SpriteBatch batch, SoulfireRenderer renderer, Viewport viewport)
+    {
+        SoulfireLighting.Draw(
+            batch,
+            renderer,
+            _camera.GetTransform(viewport, _screenEffects.ShakeOffset),
+            _player,
+            _enemies,
+            _souls,
+            _cannonShots,
+            _particles,
+            _arena.CombatBounds,
+            _presentationTime,
+            _loopState == ArenaLoopState.Complete,
+            _endingTimer);
+    }
+
+    private void DrawScreenFeedback(SpriteBatch batch, Texture2D pixel, Viewport viewport)
+    {
+        batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
+
+        if (_screenEffects.FlashAlpha > 0f)
+        {
+            batch.FillRectangle(pixel, new Rectangle(0, 0, viewport.Width, viewport.Height), GameBalance.DeathFlameBright * _screenEffects.FlashAlpha);
+        }
+
+        if (_screenEffects.ImpactFrameAlpha > 0f)
+        {
+            batch.FillRectangle(pixel, new Rectangle(0, 0, viewport.Width, viewport.Height), Color.Black * (_screenEffects.ImpactFrameAlpha * 0.82f));
+        }
+
+        if (_player.ResonanceActivationRemaining > 0f)
+        {
+            float activationFade = MathHelper.Clamp(_player.ResonanceActivationRemaining / 0.5f, 0f, 1f);
+            batch.FillRectangle(pixel, new Rectangle(0, 0, viewport.Width, viewport.Height), Color.Black * (activationFade * 0.38f));
+        }
+
+        batch.End();
     }
 
     private void DrawHud(SpriteBatch batch, Texture2D pixel, Viewport viewport)
@@ -453,31 +504,6 @@ public sealed class GameWorld : IDisposable
                 : new Color(55, 48, 66);
             int size = i == 2 ? 14 : 10;
             batch.FillRectangle(pixel, new Rectangle(32 + i * 20, 68 - (size - 10) / 2, size, size), comboColor);
-        }
-
-        if (_screenEffects.FlashAlpha > 0f)
-        {
-            batch.FillRectangle(pixel, new Rectangle(0, 0, viewport.Width, viewport.Height), GameBalance.DeathFlameBright * _screenEffects.FlashAlpha);
-        }
-
-        if (_screenEffects.ImpactFrameAlpha > 0f)
-        {
-            batch.FillRectangle(pixel, new Rectangle(0, 0, viewport.Width, viewport.Height), Color.Black * (_screenEffects.ImpactFrameAlpha * 0.82f));
-        }
-
-        if (_player.ResonanceActivationRemaining > 0f)
-        {
-            float activationFade = MathHelper.Clamp(_player.ResonanceActivationRemaining / 0.5f, 0f, 1f);
-            batch.FillRectangle(pixel, new Rectangle(0, 0, viewport.Width, viewport.Height), Color.Black * (activationFade * 0.38f));
-        }
-
-        if (_player.SoulSenseActive)
-        {
-            Color vignette = new Color(2, 3, 7) * 0.72f;
-            batch.FillRectangle(pixel, new Rectangle(0, 0, viewport.Width, 54), vignette);
-            batch.FillRectangle(pixel, new Rectangle(0, viewport.Height - 54, viewport.Width, 54), vignette);
-            batch.FillRectangle(pixel, new Rectangle(0, 54, 54, viewport.Height - 108), vignette);
-            batch.FillRectangle(pixel, new Rectangle(viewport.Width - 54, 54, 54, viewport.Height - 108), vignette);
         }
 
         for (int i = 0; i < 3; i++)

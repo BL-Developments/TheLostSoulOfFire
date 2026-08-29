@@ -120,6 +120,22 @@ public sealed class ParticleSystem
         }
     }
 
+    public void DrawLighting(SpriteBatch batch, SoulfireRenderer renderer)
+    {
+        foreach (Particle particle in _particles)
+        {
+            float normalized = particle.Remaining / particle.Lifetime;
+            float size = MathHelper.Lerp(particle.EndSize, particle.StartSize, normalized);
+            float radius = MathF.Max(10f, size * SoulfireRenderSettings.ParticleGlowRadiusMultiplier);
+            renderer.DrawGlow(
+                batch,
+                particle.Position,
+                radius,
+                particle.Color,
+                normalized * SoulfireRenderSettings.ParticleGlowIntensity);
+        }
+    }
+
     private void Add(Vector2 position, Vector2 velocity, float lifetime, float startSize, float endSize, Color color, ParticleShape shape)
     {
         _particles.Add(new Particle
