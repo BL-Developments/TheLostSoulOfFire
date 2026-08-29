@@ -108,7 +108,7 @@ public sealed class Player
 
         if (!IsDead && IsResonanceReady && input.WasKeyPressed(Keys.R))
         {
-            StartResonance(particles, screenEffects);
+            StartResonance();
         }
 
         SoulSenseActive = !IsDead && (ResonanceActive || forceSoulSense || input.IsKeyDown(Keys.Q));
@@ -355,19 +355,13 @@ public sealed class Player
         });
     }
 
-    private void StartResonance(ParticleSystem particles, ScreenEffects screenEffects)
+    private void StartResonance()
     {
         Resonance = 0f;
         ResonanceActive = true;
         _resonanceTimer = GameBalance.ResonanceDuration;
         _resonanceActivationTimer = 0.5f;
         SoulSenseActive = true;
-        particles.EmitBurst(Position, -Vector2.UnitY, 42, GameBalance.SoulWhite, 330f, 11f);
-        particles.EmitDeathFlame(Position, 30, 1.8f);
-        screenEffects.BeginHitstop(0.1f);
-        screenEffects.BeginImpactFrame(0.11f);
-        screenEffects.AddShake(0.36f, 15f);
-        screenEffects.Flash(0.14f, 0.52f);
         AddAfterimage();
     }
 

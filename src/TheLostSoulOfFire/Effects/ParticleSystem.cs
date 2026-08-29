@@ -15,6 +15,12 @@ public sealed class ParticleSystem
         Shard
     }
 
+    private enum ParticleMotion
+    {
+        Free,
+        Converge
+    }
+
     private sealed class Particle
     {
         public Vector2 Position;
@@ -27,6 +33,9 @@ public sealed class ParticleSystem
         public ParticleShape Shape;
         public float Rotation;
         public float AngularVelocity;
+        public ParticleMotion Motion;
+        public Vector2 StartPosition;
+        public Vector2 TargetPosition;
     }
 
     private readonly List<Particle> _particles = [];
@@ -74,6 +83,32 @@ public sealed class ParticleSystem
         }
     }
 
+    public void EmitConvergence(
+        Vector2 target,
+        int count,
+        float radius,
+        Color color,
+        float lifetime = 0.24f,
+        float size = 4f)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            float angle = RandomRange(-MathHelper.Pi, MathHelper.Pi);
+            float distance = RandomRange(radius * 0.62f, radius);
+            Vector2 start = target + new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * distance;
+            Add(
+                start,
+                Vector2.Zero,
+                lifetime * RandomRange(0.82f, 1.12f),
+                size * RandomRange(0.65f, 1.08f),
+                0.45f,
+                color,
+                i % 3 == 0 ? ParticleShape.Shard : ParticleShape.Orb,
+                ParticleMotion.Converge,
+                target + RandomVector(2.5f));
+        }
+    }
+
     public void EmitSoulRelease(Vector2 position)
     {
         for (int i = 0; i < 18; i++)
@@ -96,8 +131,17 @@ public sealed class ParticleSystem
                 continue;
             }
 
-            particle.Position += particle.Velocity * deltaTime;
-            particle.Velocity *= MathF.Pow(0.08f, deltaTime);
+            if (particle.Motion == ParticleMotion.Converge)
+            {
+                float progress = 1f - particle.Remaining / particle.Lifetime;
+                float eased = 1f - MathF.Pow(1f - MathHelper.Clamp(progress, 0f, 1f), 2.4f);
+                particle.Position = Vector2.Lerp(particle.StartPosition, particle.TargetPosition, eased);
+            }
+            else
+            {
+                particle.Position += particle.Velocity * deltaTime;
+                particle.Velocity *= MathF.Pow(0.08f, deltaTime);
+            }
             particle.Rotation += particle.AngularVelocity * deltaTime;
         }
     }
@@ -136,11 +180,22 @@ public sealed class ParticleSystem
         }
     }
 
-    private void Add(Vector2 position, Vector2 velocity, float lifetime, float startSize, float endSize, Color color, ParticleShape shape)
+    private void Add(
+        Vector2 position,
+        Vector2 velocity,
+        float lifetime,
+        float startSize,
+        float endSize,
+        Color color,
+        ParticleShape shape,
+        ParticleMotion motion = ParticleMotion.Free,
+        Vector2 targetPosition = default)
     {
         _particles.Add(new Particle
         {
             Position = position,
+            StartPosition = position,
+            TargetPosition = targetPosition,
             Velocity = velocity,
             Lifetime = lifetime,
             Remaining = lifetime,
@@ -148,6 +203,7 @@ public sealed class ParticleSystem
             EndSize = endSize,
             Color = color,
             Shape = shape,
+            Motion = motion,
             Rotation = RandomRange(-MathHelper.Pi, MathHelper.Pi),
             AngularVelocity = RandomRange(-8f, 8f)
         });

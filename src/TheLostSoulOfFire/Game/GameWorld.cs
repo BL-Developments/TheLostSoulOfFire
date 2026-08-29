@@ -33,6 +33,7 @@ public sealed class GameWorld : IDisposable
     private readonly HudRenderer _hud = new();
     private readonly ArtAssets _art;
     private readonly SpriteVfxSystem _spriteVfx;
+    private readonly CombatPresentation _combatPresentation;
     private readonly Player _player;
     private readonly List<Enemy> _enemies = [];
     private readonly List<Soul> _souls = [];
@@ -73,6 +74,7 @@ public sealed class GameWorld : IDisposable
         _art = art;
         _audio = new AudioDirector(content);
         _spriteVfx = new SpriteVfxSystem(art);
+        _combatPresentation = new CombatPresentation(_particles, _screenEffects, _spriteVfx);
         _camera = new Camera2D(_arena.CombatBounds.Center.ToVector2());
         _player = new Player(_arena.CombatBounds.Center.ToVector2());
         _lastMouseWorld = _player.Position + Vector2.UnitX * 200f;
@@ -95,6 +97,7 @@ public sealed class GameWorld : IDisposable
         _spriteVfx.Update(deltaTime);
         UpdateFps(deltaTime);
         _screenEffects.Update(deltaTime);
+        _combatPresentation.Update(deltaTime);
         _arena.Update(deltaTime, _loopState == ArenaLoopState.Complete);
 
         if (_loopState == ArenaLoopState.Title)
@@ -193,18 +196,10 @@ public sealed class GameWorld : IDisposable
         }
         if (_player.Scythe.StartedThisFrame)
         {
-            string effect = _player.Scythe.ActiveStep switch
-            {
-                2 => "scythe_slash_02",
-                3 => "scythe_cleave",
-                _ => "scythe_slash_01"
-            };
-            float scale = _player.Scythe.ActiveStep == 3 ? 0.86f : 0.68f;
-            _spriteVfx.Spawn(
-                effect,
-                _player.Position + _player.FacingDirection * 22f,
-                MathF.Atan2(_player.FacingDirection.Y, _player.FacingDirection.X),
-                scale);
+            _combatPresentation.PresentScytheSwing(
+                _player.Scythe.ActiveStep,
+                _player.Position,
+                _player.Scythe.AttackDirection);
         }
         if (!wasDashing && _player.IsDashing)
         {
@@ -216,7 +211,7 @@ public sealed class GameWorld : IDisposable
         }
         if (!wasResonanceActive && _player.ResonanceActive)
         {
-            _spriteVfx.Spawn("resonance_activate", _player.Position, 0f, 0.76f);
+            _combatPresentation.BeginResonance(_player.Position);
         }
         PlayPlayerActionAudio(wasDashing, wasResonanceActive, wasSoulSenseActive, wasCannonFull, previousCannonState);
         SpawnCannonShot();
@@ -328,7 +323,7 @@ public sealed class GameWorld : IDisposable
             SpriteSortMode.Deferred,
             BlendState.AlphaBlend,
             SamplerState.PointClamp,
-            transformMatrix: _camera.GetTransform(viewport, _screenEffects.ShakeOffset));
+            transformMatrix: _camera.GetTransform(viewport, _screenEffects.CameraOffset));
 
         _art.DrawArena(batch);
         DrawArenaLoop(batch, pixel);
@@ -360,14 +355,22 @@ public sealed class GameWorld : IDisposable
         if (_player.Cannon.State == SoulCannonState.Charging)
         {
             Vector2 muzzle = _player.Position + _player.FacingDirection * 74f;
+            float charge = _player.Cannon.ChargeProgress;
+            Color chargeColor = _player.Cannon.IsFullCharge
+                ? Color.White
+                : _player.Cannon.ChargeStage >= 3
+                    ? new Color(238, 219, 255)
+                    : _player.Cannon.ChargeStage == 2
+                        ? GameBalance.DeathFlameBright
+                        : new Color(155, 94, 220);
             _art.DrawLoopingEffect(
                 batch,
                 _player.Cannon,
                 "cannon_charge_loop",
                 muzzle,
                 0f,
-                0.34f + _player.Cannon.ChargeProgress * 0.46f,
-                Color.White);
+                _player.Cannon.IsFullCharge ? 0.68f : MathHelper.Lerp(0.28f, 0.61f, charge),
+                chargeColor);
         }
         if (_player.IsDead)
         {
@@ -395,7 +398,7 @@ public sealed class GameWorld : IDisposable
         SoulfireLighting.Draw(
             batch,
             renderer,
-            _camera.GetTransform(viewport, _screenEffects.ShakeOffset),
+            _camera.GetTransform(viewport, _screenEffects.CameraOffset),
             _player,
             _enemies,
             _souls,
@@ -411,14 +414,14 @@ public sealed class GameWorld : IDisposable
     {
         batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
 
-        if (_screenEffects.FlashAlpha > 0f)
-        {
-            batch.FillRectangle(pixel, new Rectangle(0, 0, viewport.Width, viewport.Height), GameBalance.DeathFlameBright * _screenEffects.FlashAlpha);
-        }
-
         if (_screenEffects.ImpactFrameAlpha > 0f)
         {
             batch.FillRectangle(pixel, new Rectangle(0, 0, viewport.Width, viewport.Height), Color.Black * (_screenEffects.ImpactFrameAlpha * 0.82f));
+        }
+
+        if (_screenEffects.FlashAlpha > 0f)
+        {
+            batch.FillRectangle(pixel, new Rectangle(0, 0, viewport.Width, viewport.Height), GameBalance.DeathFlameBright * _screenEffects.FlashAlpha);
         }
 
         if (_player.ResonanceActivationRemaining > 0f)
@@ -496,14 +499,17 @@ public sealed class GameWorld : IDisposable
                 targetDirection * strike.Knockback,
                 coreHit ? weakPoint : enemy.Position,
                 coreHit));
-            Color impactColor = coreHit || strike.Step == 3 ? GameBalance.SoulWhite : GameBalance.DeathFlameBright;
-            int particleCount = coreHit ? 20 : strike.Step == 3 ? 24 : 10;
-            _particles.EmitBurst(coreHit ? weakPoint : enemy.Position - targetDirection * enemy.Radius * 0.35f, targetDirection, particleCount, impactColor, strike.Step == 3 ? 260f : 150f, coreHit ? 8f : strike.Step == 3 ? 9f : 5f);
+            Vector2 contactPosition = coreHit
+                ? weakPoint
+                : enemy.Position - targetDirection * enemy.Radius * 0.35f;
+            _combatPresentation.SpawnScytheContact(
+                strike.Step,
+                contactPosition,
+                targetDirection,
+                coreHit);
             if (coreHit)
             {
-                _spriteVfx.Spawn("core_hit", weakPoint, 0f, 0.62f);
                 _player.AddResonance(GameBalance.ResonancePerCoreHit);
-                _screenEffects.Flash(0.075f, 0.2f);
                 _audio.Play(AudioCue.CoreHit, 0.7f);
             }
             hitAnything = true;
@@ -514,18 +520,8 @@ public sealed class GameWorld : IDisposable
             return;
         }
 
-        _screenEffects.BeginHitstop(strike.Hitstop);
+        _combatPresentation.PresentScytheImpact(strike.Step, strike.Direction);
         _audio.Play(AudioCue.ScytheHit, strike.Step == 3 ? 0.72f : 0.48f, strike.Step == 2 ? 0.08f : 0f);
-        if (strike.Step == 3)
-        {
-            _screenEffects.AddShake(0.18f, 8f);
-            _screenEffects.Flash(0.09f, 0.24f);
-        }
-        else
-        {
-            _screenEffects.AddShake(0.07f, strike.Step == 2 ? 2.5f : 1.6f);
-            _screenEffects.Flash(0.045f, 0.08f);
-        }
     }
 
     private void SpawnWave(int waveNumber)
@@ -583,6 +579,8 @@ public sealed class GameWorld : IDisposable
         _souls.Clear();
         _cannonShots.Clear();
         _spriteVfx.Clear();
+        _combatPresentation.Clear();
+        _screenEffects.Clear();
         _waveNumber = 0;
         _loopState = ArenaLoopState.Intro;
         _loopStateTimer = 1.05f;
@@ -900,23 +898,9 @@ public sealed class GameWorld : IDisposable
 
         Vector2 origin = _player.Position + request.Direction * 74f;
         _cannonShots.Add(new CannonShot(origin, request));
-        _spriteVfx.Spawn(
-            "cannon_muzzle_full",
-            origin,
-            MathF.Atan2(request.Direction.Y, request.Direction.X),
-            request.IsFullCharge ? 0.72f : 0.46f,
-            request.IsFullCharge ? Color.White : new Color(205, 164, 242));
+        _combatPresentation.PresentCannonFire(origin, request);
         _audio.Play(AudioCue.CannonFire, request.IsFullCharge ? 0.9f : 0.58f, request.IsFullCharge ? -0.08f : 0.08f);
         _player.ApplyCannonRecoil(request.Direction, request.Charge);
-        _particles.EmitBurst(origin, request.Direction, request.IsFullCharge ? 30 : 14, request.IsFullCharge ? GameBalance.SoulWhite : GameBalance.DeathFlameBright, request.IsFullCharge ? 360f : 190f, request.IsFullCharge ? 11f : 6f);
-        _particles.EmitDeathFlame(origin, request.IsFullCharge ? 18 : 8, request.IsFullCharge ? 1.55f : 0.9f);
-        _screenEffects.AddShake(request.IsFullCharge ? 0.32f : 0.14f, request.IsFullCharge ? 12f : 5f);
-        _screenEffects.Flash(request.IsFullCharge ? 0.1f : 0.055f, request.IsFullCharge ? 0.34f : 0.13f);
-        if (request.IsFullCharge)
-        {
-            _screenEffects.BeginHitstop(0.105f);
-            _screenEffects.BeginImpactFrame(0.05f);
-        }
     }
 
     private void UpdateCannonShots(float deltaTime)
@@ -940,6 +924,7 @@ public sealed class GameWorld : IDisposable
                 if (enemy is Burning chargingBurning && chargingBurning.IsCharging)
                 {
                     chargingBurning.Detonate();
+                    _combatPresentation.BeginBurningCompression(chargingBurning.Position, shot.Direction);
                     shot.MarkHit();
                     break;
                 }
@@ -957,19 +942,14 @@ public sealed class GameWorld : IDisposable
                     coreHit,
                     shot.IsFullCharge));
 
-                Color impact = coreHit || shot.IsFullCharge ? GameBalance.SoulWhite : GameBalance.DeathFlameBright;
-                _particles.EmitBurst(coreHit ? weakPoint : enemy.Position, shot.Direction, shot.IsFullCharge ? 34 : 18, impact, shot.IsFullCharge ? 390f : 220f, shot.IsFullCharge ? 12f : 7f);
-                _particles.EmitDeathFlame(enemy.Position, shot.IsFullCharge ? 15 : 7, shot.IsFullCharge ? 1.4f : 0.85f);
-                _screenEffects.BeginHitstop(shot.IsFullCharge ? 0.12f : 0.065f);
-                _screenEffects.AddShake(shot.IsFullCharge ? 0.24f : 0.12f, shot.IsFullCharge ? 11f : 5f);
-                _screenEffects.Flash(shot.IsFullCharge ? 0.1f : 0.06f, shot.IsFullCharge ? 0.34f : 0.16f);
-                if (shot.IsFullCharge)
-                {
-                    _screenEffects.BeginImpactFrame(0.055f);
-                }
+                Vector2 impactPosition = coreHit ? weakPoint : enemy.Position;
+                _combatPresentation.PresentCannonImpact(
+                    impactPosition,
+                    shot.Direction,
+                    shot.IsFullCharge,
+                    coreHit);
                 if (coreHit)
                 {
-                    _spriteVfx.Spawn("core_hit", weakPoint, 0f, shot.IsFullCharge ? 0.78f : 0.58f);
                     _player.AddResonance(GameBalance.ResonancePerCoreHit * (shot.IsFullCharge ? 2f : 1f));
                     _audio.Play(AudioCue.CoreHit, shot.IsFullCharge ? 0.86f : 0.66f);
                 }
@@ -1029,13 +1009,7 @@ public sealed class GameWorld : IDisposable
 
     private void ResolveBurningDetonation(Burning source, Vector2 position)
     {
-        _spriteVfx.Spawn("burning_detonation", position, 0f, 0.88f);
-        _particles.EmitBurst(position, Vector2.UnitX, 54, GameBalance.DeathFlameBright, 430f, 13f);
-        _particles.EmitDeathFlame(position, 32, 1.65f);
-        _screenEffects.BeginHitstop(0.1f);
-        _screenEffects.BeginImpactFrame(0.065f);
-        _screenEffects.AddShake(0.3f, 13f);
-        _screenEffects.Flash(0.12f, 0.42f);
+        _combatPresentation.PresentBurningDetonation(position);
         _audio.Play(AudioCue.BurningDetonation, 0.9f);
 
         foreach (Enemy enemy in _enemies.Where(enemy => enemy != source && enemy.IsAlive))

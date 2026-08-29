@@ -14,7 +14,6 @@ public readonly record struct ScytheStrike(
     float Range,
     float ArcRadians,
     float Knockback,
-    float Hitstop,
     Vector2 Direction);
 
 public sealed class ScytheCombat
@@ -156,22 +155,29 @@ public sealed class ScytheCombat
 
         (_attackDuration, _strikeTime) = ActiveStep switch
         {
-            1 => (0.225f, 0.075f),
+            1 => (0.205f, 0.062f),
             2 => (0.255f, 0.085f),
-            _ => (0.405f, 0.145f)
+            _ => (0.42f, 0.155f)
         };
 
         Color flame = ActiveStep == 3 ? GameBalance.DeathFlameBright : GameBalance.DeathFlame;
-        particles.EmitBurst(playerPosition + _attackDirection * 42f, _attackDirection, ActiveStep == 3 ? 10 : 4, flame, ActiveStep == 3 ? 105f : 60f, ActiveStep == 3 ? 6f : 3f);
+        int ignitionParticles = ActiveStep switch { 1 => 2, 2 => 4, _ => 8 };
+        particles.EmitBurst(
+            playerPosition + _attackDirection * 42f,
+            _attackDirection,
+            ignitionParticles,
+            flame,
+            ActiveStep == 3 ? 115f : 60f,
+            ActiveStep == 3 ? 6f : 3f);
     }
 
     private static ScytheStrike BuildStrike(int step, Vector2 direction, bool resonanceActive)
     {
         ScytheStrike strike = step switch
         {
-            1 => new ScytheStrike(1, GameBalance.ScytheDamage1, GameBalance.ScytheRange1, MathHelper.ToRadians(120f), 170f, 0.038f, direction),
-            2 => new ScytheStrike(2, GameBalance.ScytheDamage2, GameBalance.ScytheRange2, MathHelper.ToRadians(140f), 220f, 0.048f, direction),
-            _ => new ScytheStrike(3, GameBalance.ScytheDamage3, GameBalance.ScytheRange3, MathHelper.ToRadians(198f), 410f, 0.09f, direction)
+            1 => new ScytheStrike(1, GameBalance.ScytheDamage1, GameBalance.ScytheRange1, MathHelper.ToRadians(120f), 170f, direction),
+            2 => new ScytheStrike(2, GameBalance.ScytheDamage2, GameBalance.ScytheRange2, MathHelper.ToRadians(140f), 220f, direction),
+            _ => new ScytheStrike(3, GameBalance.ScytheDamage3, GameBalance.ScytheRange3, MathHelper.ToRadians(198f), 410f, direction)
         };
 
         if (!resonanceActive)
@@ -215,7 +221,11 @@ public sealed class ScytheCombat
         bool debugVisible)
     {
         float aim = MathF.Atan2(_attackDirection.Y, _attackDirection.X);
-        float eased = 1f - MathF.Pow(1f - NormalizedProgress, ActiveStep == 3 ? 2.2f : 3f);
+        float attackProgress = NormalizedProgress;
+        float swingProgress = ActiveStep == 3
+            ? MathHelper.Clamp((attackProgress - 0.2f) / 0.58f, 0f, 1f)
+            : attackProgress;
+        float eased = 1f - MathF.Pow(1f - swingProgress, ActiveStep == 3 ? 2.35f : 3f);
         float totalArc = ActiveStep switch
         {
             1 => MathHelper.ToRadians(120f),
@@ -224,8 +234,8 @@ public sealed class ScytheCombat
         };
         float start = aim - totalArc * 0.5f;
         float current = start + totalArc * eased;
-        float radius = ActiveStep switch { 1 => 90f, 2 => 98f, _ => 116f };
-        float thickness = ActiveStep switch { 1 => 7f, 2 => 11f, _ => 21f };
+        float radius = ActiveStep switch { 1 => 88f, 2 => 99f, _ => 119f };
+        float thickness = ActiveStep switch { 1 => 3f, 2 => 7f, _ => 16f };
         if (_resonanceActive)
         {
             radius *= GameBalance.ResonanceScytheRangeMultiplier;
@@ -233,17 +243,20 @@ public sealed class ScytheCombat
         }
         Color trail = ActiveStep switch
         {
-            1 => GameBalance.DeathFlame * 0.62f,
-            2 => GameBalance.DeathFlame * 0.82f,
-            _ => GameBalance.DeathFlameBright * 0.92f
+            1 => GameBalance.DeathFlame * 0.58f,
+            2 => GameBalance.DeathFlameBright * 0.78f,
+            _ => GameBalance.DeathFlameBright * 0.94f
         };
 
+        float fadeStart = ActiveStep == 3 ? 0.7f : 0.62f;
+        float trailAlpha = 1f - MathHelper.Clamp((attackProgress - fadeStart) / (1f - fadeStart), 0f, 1f);
         float visibleSweep = totalArc * MathHelper.Clamp(eased, 0.08f, 1f);
-        batch.DrawArc(pixel, playerPosition, radius, start, visibleSweep, GameBalance.DeepViolet * 0.7f, thickness + 8f, ActiveStep == 3 ? 34 : 24);
-        batch.DrawArc(pixel, playerPosition, radius, start, visibleSweep, trail, thickness, ActiveStep == 3 ? 34 : 24);
+        float outerThickness = thickness + (ActiveStep switch { 1 => 3f, 2 => 6f, _ => 10f });
+        batch.DrawArc(pixel, playerPosition, radius, start, visibleSweep, GameBalance.DeepViolet * (0.62f * trailAlpha), outerThickness, ActiveStep == 3 ? 34 : 24);
+        batch.DrawArc(pixel, playerPosition, radius, start, visibleSweep, trail * trailAlpha, thickness, ActiveStep == 3 ? 34 : 24);
         if (ActiveStep == 3)
         {
-            batch.DrawArc(pixel, playerPosition, radius + 3f, start, visibleSweep, GameBalance.SoulWhite * 0.72f, 5f, 34);
+            batch.DrawArc(pixel, playerPosition, radius + 3f, start, visibleSweep, GameBalance.SoulWhite * (0.82f * trailAlpha), 4.5f, 34);
         }
 
         Vector2 bladeDirection = new(MathF.Cos(current), MathF.Sin(current));
@@ -254,7 +267,7 @@ public sealed class ScytheCombat
             Color.White,
             current,
             new Vector2(physicalScythe.Width, physicalScythe.Height) * 0.5f,
-            ActiveStep == 3 ? 0.68f : 0.58f,
+            ActiveStep switch { 1 => 0.55f, 2 => 0.6f, _ => 0.7f },
             SpriteEffects.None,
             0f);
 

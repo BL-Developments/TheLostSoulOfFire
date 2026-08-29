@@ -28,6 +28,7 @@ public sealed class Burning : Enemy
     private bool _chargeDamagePending;
     private bool _soulSpawnPending;
     private bool _detonationPending;
+    private bool _detonationReleased;
     private bool _hasAggressionSlot;
     private Vector2 _facing = Vector2.UnitX;
     private Vector2 _chargeDirection = Vector2.UnitX;
@@ -137,8 +138,9 @@ public sealed class Burning : Enemy
         Health = 0;
         State = BurningState.Detonating;
         _stateTimer = GameBalance.BurningDeathDuration;
-        _detonationPending = true;
-        _soulSpawnPending = true;
+        _detonationPending = false;
+        _detonationReleased = false;
+        _soulSpawnPending = false;
     }
 
     public bool TryConsumeDetonation(out Vector2 position)
@@ -195,9 +197,28 @@ public sealed class Burning : Enemy
 
         if (State == BurningState.Detonating)
         {
-            float progress = 1f - _stateTimer / GameBalance.BurningDeathDuration;
-            batch.FillCircle(pixel, Position, 32f + progress * 118f, GameBalance.DeepViolet * (0.7f * (1f - progress)));
-            batch.DrawCircle(pixel, Position, 45f + progress * 125f, GameBalance.DeathFlameBright * (1f - progress), 9f, 30);
+            float releaseRemaining = GameBalance.BurningDeathDuration - CombatFeedbackTuning.BurningCompressionDuration;
+            if (!_detonationReleased)
+            {
+                float compression = MathHelper.Clamp(
+                    (GameBalance.BurningDeathDuration - _stateTimer) / CombatFeedbackTuning.BurningCompressionDuration,
+                    0f,
+                    1f);
+                float instability = 0.5f + 0.5f * MathF.Sin(_visualTime * 42f);
+                float outerRadius = MathHelper.Lerp(62f, 18f, compression);
+                batch.FillCircle(pixel, Position, outerRadius, GameBalance.DeepViolet * (0.18f + compression * 0.35f));
+                batch.DrawCircle(pixel, Position, outerRadius + instability * 5f, GameBalance.DeathFlameBright * (0.58f + compression * 0.36f), 4f + compression * 5f, 30);
+                batch.FillCircle(pixel, Position, 6f + compression * 8f, GameBalance.SoulWhite * (0.62f + compression * 0.38f));
+                foreach (Vector2 fracture in GetFracturePositions())
+                {
+                    batch.DrawLine(pixel, fracture, Vector2.Lerp(fracture, Position, compression), GameBalance.DeathFlameBright * 0.82f, 3f + compression * 2f);
+                }
+                return;
+            }
+
+            float progress = 1f - MathHelper.Clamp(_stateTimer / releaseRemaining, 0f, 1f);
+            batch.FillCircle(pixel, Position, 28f + progress * 118f, GameBalance.DeepViolet * (0.62f * (1f - progress)));
+            batch.DrawCircle(pixel, Position, 40f + progress * 132f, GameBalance.DeathFlameBright * (1f - progress), 8f, 30);
             return;
         }
 
@@ -307,6 +328,17 @@ public sealed class Burning : Enemy
     {
         float previous = _stateTimer;
         _stateTimer = MathF.Max(0f, _stateTimer - deltaTime);
+        float detonationReleaseRemaining = GameBalance.BurningDeathDuration - CombatFeedbackTuning.BurningCompressionDuration;
+        if (State == BurningState.Detonating &&
+            !_detonationReleased &&
+            previous > detonationReleaseRemaining &&
+            _stateTimer <= detonationReleaseRemaining)
+        {
+            _detonationReleased = true;
+            _detonationPending = true;
+            _soulSpawnPending = true;
+        }
+
         if (State == BurningState.Dying && previous > 0.28f && _stateTimer <= 0.28f)
         {
             particles.EmitBurst(Position, -_facing, 22, new Color(45, 36, 46), 190f, 7f);
