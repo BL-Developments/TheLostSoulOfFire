@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using TheLostSoulOfFire.Audio;
@@ -25,7 +26,7 @@ public enum ArenaLoopState
 public sealed class GameWorld : IDisposable
 {
     private readonly Arena _arena = new();
-    private readonly AudioDirector _audio = new();
+    private readonly AudioDirector _audio;
     private readonly Camera2D _camera;
     private readonly ScreenEffects _screenEffects = new();
     private readonly ParticleSystem _particles = new();
@@ -61,9 +62,10 @@ public sealed class GameWorld : IDisposable
                     ? "The Lost Soul of Fire — Arena cleared | R restart | F9 screenshot"
                     : $"The Lost Soul of Fire — Wave {_waveNumber}/4 | WASD move | Mouse aim | Space dash | LMB Scythe | Q Soul Sense | RMB Cannon";
 
-    public GameWorld(Viewport viewport, ArtAssets art)
+    public GameWorld(Viewport viewport, ArtAssets art, ContentManager content)
     {
         _art = art;
+        _audio = new AudioDirector(content);
         _spriteVfx = new SpriteVfxSystem(art);
         _camera = new Camera2D(_arena.CombatBounds.Center.ToVector2());
         _player = new Player(_arena.CombatBounds.Center.ToVector2());
