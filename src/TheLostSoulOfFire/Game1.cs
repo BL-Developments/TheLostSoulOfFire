@@ -45,7 +45,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         IsMouseVisible = true;
         IsFixedTimeStep = true;
         TargetElapsedTime = TimeSpan.FromSeconds(1d / 60d);
-        Window.Title = "The Lost Soul of Fire — Prototype";
+        Window.Title = "The Lost Soul of Fire";
     }
 
     protected override void Initialize()
