@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TheLostSoulOfFire.Combat;
@@ -31,7 +32,7 @@ public sealed class Hollow : Enemy
     private Vector2 _facing = -Vector2.UnitY;
 
     public HollowState State { get; private set; } = HollowState.Approach;
-    public string StateLabel => State.ToString().ToUpperInvariant();
+    public override string StateLabel => State.ToString().ToUpperInvariant();
     public Vector2 CorePosition => Position + new Vector2(0f, -5f);
 
     public Hollow(Vector2 position, int movementSeed)
@@ -41,9 +42,10 @@ public sealed class Hollow : Enemy
         _brokenStepTimer = 0.55f + movementSeed * 0.11f;
     }
 
-    public void Update(
+    public override void Update(
         float deltaTime,
         Player player,
+        IReadOnlyList<Soul> souls,
         Rectangle movementBounds,
         ParticleSystem particles,
         ScreenEffects screenEffects)
@@ -121,7 +123,7 @@ public sealed class Hollow : Enemy
         }
     }
 
-    public bool TryConsumeSoulSpawn(out Vector2 position)
+    public override bool TryConsumeSoulSpawn(out Vector2 position)
     {
         if (!_soulSpawnPending)
         {
@@ -134,7 +136,7 @@ public sealed class Hollow : Enemy
         return true;
     }
 
-    public void Draw(SpriteBatch batch, Texture2D pixel, bool debugVisible, bool soulSenseActive)
+    public override void Draw(SpriteBatch batch, Texture2D pixel, bool debugVisible, bool soulSenseActive)
     {
         if (State == HollowState.Dead)
         {

@@ -33,9 +33,10 @@ public sealed class SoulCannon
     private bool _fullCueCreated;
     private CannonShotRequest _pendingShot;
     private Vector2 _aimDirection = Vector2.UnitX;
+    private bool _resonanceActive;
 
     public SoulCannonState State { get; private set; } = SoulCannonState.Stored;
-    public float ChargeProgress => MathHelper.Clamp(_chargeTime / GameBalance.CannonFullChargeTime, 0f, 1f);
+    public float ChargeProgress => MathHelper.Clamp(_chargeTime / GetFullChargeTime(), 0f, 1f);
     public bool IsFullCharge => ChargeProgress >= 1f;
     public bool IsHandling => State != SoulCannonState.Stored;
     public bool CanUseScythe => State == SoulCannonState.Stored;
@@ -58,6 +59,7 @@ public sealed class SoulCannon
         _shotPending = false;
         _fullCueCreated = false;
         _aimDirection = Vector2.UnitX;
+        _resonanceActive = false;
     }
 
     public void Update(
@@ -67,8 +69,10 @@ public sealed class SoulCannon
         Vector2 facingDirection,
         bool canStart,
         bool soulSenseActive,
-        ParticleSystem particles)
+        ParticleSystem particles,
+        bool resonanceActive)
     {
+        _resonanceActive = resonanceActive;
         _aimDirection = facingDirection.LengthSquared() > 0.001f ? Vector2.Normalize(facingDirection) : Vector2.UnitX;
 
         switch (State)
@@ -97,7 +101,7 @@ public sealed class SoulCannon
                 break;
 
             case SoulCannonState.Charging:
-                _chargeTime = MathF.Min(GameBalance.CannonFullChargeTime, _chargeTime + deltaTime);
+                _chargeTime = MathF.Min(GetFullChargeTime(), _chargeTime + deltaTime);
                 EmitChargeParticles(deltaTime, playerPosition, particles);
                 if (IsFullCharge && !_fullCueCreated)
                 {
@@ -191,13 +195,19 @@ public sealed class SoulCannon
         float charge = ChargeProgress;
         bool full = IsFullCharge;
         int damage = (int)MathF.Round(MathHelper.Lerp(GameBalance.CannonWeakDamage, GameBalance.CannonFullDamage, charge));
+        float radius = MathHelper.Lerp(11f, 25f, charge);
+        if (_resonanceActive)
+        {
+            damage = (int)MathF.Round(damage * GameBalance.ResonanceCannonDamageMultiplier);
+            radius *= GameBalance.ResonanceCannonSizeMultiplier;
+        }
         _pendingShot = new CannonShotRequest(
             _aimDirection,
             charge,
             full,
             soulSenseActive,
             damage,
-            MathHelper.Lerp(11f, 25f, charge));
+            radius);
         _shotPending = true;
         State = SoulCannonState.Returning;
         _stateTimer = GameBalance.CannonReturnDuration;
@@ -215,6 +225,10 @@ public sealed class SoulCannon
         Vector2 muzzle = playerPosition + _aimDirection * 68f;
         particles.EmitDeathFlame(muzzle, ChargeStage, 0.55f + ChargeProgress * 0.75f);
     }
+
+    private float GetFullChargeTime() => _resonanceActive
+        ? GameBalance.CannonFullChargeTime / GameBalance.ResonanceCannonChargeSpeedMultiplier
+        : GameBalance.CannonFullChargeTime;
 
     private static void DrawWeapon(
         SpriteBatch batch,

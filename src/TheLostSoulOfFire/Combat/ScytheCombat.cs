@@ -28,6 +28,7 @@ public sealed class ScytheCombat
     private bool _queuedAttack;
     private int _nextStep = 1;
     private Vector2 _attackDirection = Vector2.UnitX;
+    private bool _resonanceActive;
 
     public int ActiveStep { get; private set; }
     public bool StartedThisFrame { get; private set; }
@@ -53,9 +54,11 @@ public sealed class ScytheCombat
         Vector2 facingDirection,
         Vector2 playerPosition,
         ParticleSystem particles,
-        bool canStartAttack)
+        bool canStartAttack,
+        bool resonanceActive)
     {
         StartedThisFrame = false;
+        _resonanceActive = resonanceActive;
 
         if (ActiveStep == 0)
         {
@@ -109,17 +112,21 @@ public sealed class ScytheCombat
         }
 
         _strikePending = false;
-        strike = BuildStrike(ActiveStep, _attackDirection);
+        strike = BuildStrike(ActiveStep, _attackDirection, _resonanceActive);
         return true;
     }
 
-    public float GetForwardImpulse() => ActiveStep switch
+    public float GetForwardImpulse()
     {
-        1 => 105f,
-        2 => 132f,
-        3 => 225f,
-        _ => 0f
-    };
+        float impulse = ActiveStep switch
+        {
+            1 => 105f,
+            2 => 132f,
+            3 => 225f,
+            _ => 0f
+        };
+        return impulse * (_resonanceActive ? 1.18f : 1f);
+    }
 
     public void Draw(SpriteBatch batch, Texture2D pixel, Vector2 playerPosition, Vector2 facingDirection, bool debugVisible)
     {
@@ -152,12 +159,27 @@ public sealed class ScytheCombat
         particles.EmitBurst(playerPosition + _attackDirection * 42f, _attackDirection, ActiveStep == 3 ? 10 : 4, flame, ActiveStep == 3 ? 105f : 60f, ActiveStep == 3 ? 6f : 3f);
     }
 
-    private static ScytheStrike BuildStrike(int step, Vector2 direction) => step switch
+    private static ScytheStrike BuildStrike(int step, Vector2 direction, bool resonanceActive)
     {
-        1 => new ScytheStrike(1, GameBalance.ScytheDamage1, GameBalance.ScytheRange1, MathHelper.ToRadians(120f), 170f, 0.038f, direction),
-        2 => new ScytheStrike(2, GameBalance.ScytheDamage2, GameBalance.ScytheRange2, MathHelper.ToRadians(140f), 220f, 0.048f, direction),
-        _ => new ScytheStrike(3, GameBalance.ScytheDamage3, GameBalance.ScytheRange3, MathHelper.ToRadians(198f), 410f, 0.09f, direction)
-    };
+        ScytheStrike strike = step switch
+        {
+            1 => new ScytheStrike(1, GameBalance.ScytheDamage1, GameBalance.ScytheRange1, MathHelper.ToRadians(120f), 170f, 0.038f, direction),
+            2 => new ScytheStrike(2, GameBalance.ScytheDamage2, GameBalance.ScytheRange2, MathHelper.ToRadians(140f), 220f, 0.048f, direction),
+            _ => new ScytheStrike(3, GameBalance.ScytheDamage3, GameBalance.ScytheRange3, MathHelper.ToRadians(198f), 410f, 0.09f, direction)
+        };
+
+        if (!resonanceActive)
+        {
+            return strike;
+        }
+
+        return strike with
+        {
+            Damage = (int)MathF.Round(strike.Damage * GameBalance.ResonanceScytheDamageMultiplier),
+            Range = strike.Range * GameBalance.ResonanceScytheRangeMultiplier,
+            Knockback = strike.Knockback * GameBalance.ResonanceScytheKnockbackMultiplier
+        };
+    }
 
     private static void DrawRestingScythe(SpriteBatch batch, Texture2D pixel, Vector2 playerPosition, Vector2 facingDirection)
     {
@@ -186,6 +208,11 @@ public sealed class ScytheCombat
         float current = start + totalArc * eased;
         float radius = ActiveStep switch { 1 => 90f, 2 => 98f, _ => 116f };
         float thickness = ActiveStep switch { 1 => 7f, 2 => 11f, _ => 21f };
+        if (_resonanceActive)
+        {
+            radius *= GameBalance.ResonanceScytheRangeMultiplier;
+            thickness *= 1.22f;
+        }
         Color trail = ActiveStep switch
         {
             1 => GameBalance.DeathFlame * 0.62f,
@@ -212,7 +239,7 @@ public sealed class ScytheCombat
 
         if (debugVisible)
         {
-            ScytheStrike strike = BuildStrike(ActiveStep, _attackDirection);
+            ScytheStrike strike = BuildStrike(ActiveStep, _attackDirection, _resonanceActive);
             batch.DrawArc(pixel, playerPosition, strike.Range, aim - strike.ArcRadians * 0.5f, strike.ArcRadians, new Color(80, 220, 210) * 0.65f, 2f, 28);
         }
     }

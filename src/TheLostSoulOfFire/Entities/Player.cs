@@ -28,6 +28,10 @@ public sealed class Player
     private float _dashCooldownTimer;
     private float _dashTrailTimer;
     private float _afterimageTimer;
+    private float _resonanceTimer;
+    private float _resonanceActivationTimer;
+    private float _resonanceAfterimageTimer;
+    private float _activeDashDistance = GameBalance.DashDistance;
     private Vector2 _dashDirection = Vector2.UnitX;
     private Vector2 _attackImpulse;
     private Vector2 _damageKnockback;
@@ -43,6 +47,10 @@ public sealed class Player
     public bool IsInvulnerable => InvulnerabilityRemaining > 0f;
     public bool IsDead => Health <= 0;
     public float Resonance { get; private set; }
+    public bool IsResonanceReady => !ResonanceActive && Resonance >= GameBalance.ResonanceRequired;
+    public bool ResonanceActive { get; private set; }
+    public float ResonanceRemaining => _resonanceTimer;
+    public float ResonanceActivationRemaining => _resonanceActivationTimer;
     public bool SoulSenseActive { get; private set; }
     public ScytheCombat Scythe { get; } = new();
     public SoulCannon Cannon { get; } = new();
@@ -65,6 +73,11 @@ public sealed class Player
         _attackImpulse = Vector2.Zero;
         _damageKnockback = Vector2.Zero;
         Resonance = 0f;
+        ResonanceActive = false;
+        _resonanceTimer = 0f;
+        _resonanceActivationTimer = 0f;
+        _resonanceAfterimageTimer = 0f;
+        _activeDashDistance = GameBalance.DashDistance;
         SoulSenseActive = false;
         _afterimages.Clear();
         Scythe.Reset();
@@ -80,13 +93,31 @@ public sealed class Player
         ScreenEffects screenEffects)
     {
         _visualTime += deltaTime;
-        SoulSenseActive = !IsDead && input.IsKeyDown(Keys.Q);
+        _resonanceActivationTimer = MathF.Max(0f, _resonanceActivationTimer - deltaTime);
+        if (ResonanceActive)
+        {
+            _resonanceTimer = MathF.Max(0f, _resonanceTimer - deltaTime);
+            if (_resonanceTimer <= 0f)
+            {
+                ResonanceActive = false;
+                particles.EmitDeathFlame(Position, 10, 0.72f);
+            }
+        }
+
+        if (!IsDead && IsResonanceReady && input.WasKeyPressed(Keys.R))
+        {
+            StartResonance(particles, screenEffects);
+        }
+
+        SoulSenseActive = !IsDead && (ResonanceActive || input.IsKeyDown(Keys.Q));
         _dashCooldownTimer = MathF.Max(0f, _dashCooldownTimer - deltaTime);
         InvulnerabilityRemaining = MathF.Max(0f, InvulnerabilityRemaining - deltaTime);
         UpdateAfterimages(deltaTime);
 
         if (IsDead)
         {
+            ResonanceActive = false;
+            _resonanceTimer = 0f;
             Velocity = Vector2.Zero;
             return;
         }
@@ -106,9 +137,10 @@ public sealed class Player
             FacingDirection,
             !IsDashing && Scythe.ActiveStep == 0,
             SoulSenseActive,
-            particles);
+            particles,
+            ResonanceActive);
 
-        Scythe.Update(deltaTime, input, FacingDirection, Position, particles, !IsDashing && Cannon.CanUseScythe);
+        Scythe.Update(deltaTime, input, FacingDirection, Position, particles, !IsDashing && Cannon.CanUseScythe, ResonanceActive);
         if (Scythe.StartedThisFrame)
         {
             _attackImpulse = Scythe.AttackDirection * Scythe.GetForwardImpulse();
@@ -125,7 +157,8 @@ public sealed class Player
         }
         else
         {
-            float movementMultiplier = SoulSenseActive ? GameBalance.SoulSenseMovementMultiplier : 1f;
+            float movementMultiplier = SoulSenseActive && !ResonanceActive ? GameBalance.SoulSenseMovementMultiplier : 1f;
+            movementMultiplier *= ResonanceActive ? GameBalance.ResonanceMovementMultiplier : 1f;
             movementMultiplier *= Cannon.GetMovementMultiplier();
             Velocity = movement * GameBalance.PlayerMoveSpeed * movementMultiplier + _attackImpulse + _damageKnockback;
             _attackImpulse *= MathF.Pow(0.002f, deltaTime);
@@ -134,6 +167,16 @@ public sealed class Player
 
         Position += Velocity * deltaTime;
         ClampTo(movementBounds);
+
+        if (ResonanceActive && movement.LengthSquared() > 0.001f && !IsDashing)
+        {
+            _resonanceAfterimageTimer -= deltaTime;
+            if (_resonanceAfterimageTimer <= 0f)
+            {
+                _resonanceAfterimageTimer = 0.16f;
+                AddAfterimage();
+            }
+        }
 
         _idleParticleTimer -= deltaTime;
         if (_idleParticleTimer <= 0f && !IsDashing)
@@ -173,6 +216,14 @@ public sealed class Player
 
         batch.FillCircle(pixel, Position + new Vector2(3f, 8f), 24f, new Color(3, 3, 7) * 0.55f);
 
+        if (ResonanceActive)
+        {
+            float flare = 0.5f + 0.5f * MathF.Sin(_visualTime * 11f);
+            batch.DrawCircle(pixel, Position, 34f + flare * 6f, GameBalance.DeathFlame * 0.72f, 8f, 28);
+            batch.DrawLine(pixel, Position - right * 20f, Position - right * 32f - Vector2.UnitY * (30f + flare * 15f), GameBalance.DeathFlame * 0.62f, 8f);
+            batch.DrawLine(pixel, Position + right * 18f, Position + right * 29f - Vector2.UnitY * (37f + flare * 11f), GameBalance.DeathFlameBright * 0.7f, 6f);
+        }
+
         Cannon.DrawBack(batch, pixel, Position, FacingDirection);
         Scythe.Draw(batch, pixel, Position, FacingDirection, debugVisible);
 
@@ -195,8 +246,21 @@ public sealed class Player
         }
         batch.DrawLine(pixel, eye - right * 4f, eye + right * 4f, eyeColor, SoulSenseActive ? 3f : 2f);
 
-        batch.FillCircle(pixel, Position + FacingDirection * 2f, 7f + pulse * 1.3f, GameBalance.DeepViolet * 0.75f);
-        batch.FillCircle(pixel, Position + FacingDirection * 2f, 3.2f + pulse * 0.6f, GameBalance.DeathFlameBright * 0.78f);
+        bool coreReady = IsResonanceReady;
+        Color coreColor = ResonanceActive || coreReady ? GameBalance.SoulWhite : GameBalance.DeathFlameBright;
+        float coreRadius = coreReady ? 9f + pulse * 2.4f : 7f + pulse * 1.3f;
+        batch.FillCircle(pixel, Position + FacingDirection * 2f, coreRadius, GameBalance.DeepViolet * 0.75f);
+        batch.FillCircle(pixel, Position + FacingDirection * 2f, 3.2f + pulse * (coreReady ? 1.8f : 0.6f), coreColor * (ResonanceActive || coreReady ? 1f : 0.78f));
+        if (coreReady)
+        {
+            batch.DrawCircle(pixel, Position + FacingDirection * 2f, 14f + pulse * 5f, GameBalance.DeathFlameBright * 0.78f, 3f, 20);
+        }
+
+        if (ResonanceActive)
+        {
+            batch.DrawLine(pixel, Position + FacingDirection * 2f, Position - right * 14f - Vector2.UnitY * 15f, GameBalance.DeathFlameBright * 0.72f, 3f);
+            batch.DrawLine(pixel, Position + FacingDirection * 2f, Position + right * 13f + Vector2.UnitY * 13f, GameBalance.DeathFlame * 0.72f, 3f);
+        }
 
         Cannon.DrawActive(batch, pixel, Position, FacingDirection);
 
@@ -218,11 +282,12 @@ public sealed class Player
     {
         _dashDirection = movement.LengthSquared() > 0.001f ? Vector2.Normalize(movement) : FacingDirection;
         _dashTimer = GameBalance.DashDuration;
-        _dashCooldownTimer = GameBalance.DashCooldown;
+        _activeDashDistance = GameBalance.DashDistance * (ResonanceActive ? GameBalance.ResonanceDashDistanceMultiplier : 1f);
+        _dashCooldownTimer = GameBalance.DashCooldown * (ResonanceActive ? GameBalance.ResonanceDashCooldownMultiplier : 1f);
         InvulnerabilityRemaining = GameBalance.DashInvulnerability;
         _dashTrailTimer = 0f;
         _afterimageTimer = 0f;
-        Velocity = _dashDirection * (GameBalance.DashDistance / GameBalance.DashDuration);
+        Velocity = _dashDirection * (_activeDashDistance / GameBalance.DashDuration);
 
         AddAfterimage();
         particles.EmitBurst(Position - _dashDirection * 12f, -_dashDirection, 12, GameBalance.DeathFlameBright, 145f, 6f);
@@ -250,6 +315,14 @@ public sealed class Player
         Resonance = MathHelper.Clamp(Resonance + amount, 0f, GameBalance.ResonanceRequired);
     }
 
+    public void FillResonance()
+    {
+        if (!ResonanceActive)
+        {
+            Resonance = GameBalance.ResonanceRequired;
+        }
+    }
+
     public void ApplyCannonRecoil(Vector2 shotDirection, float charge)
     {
         _damageKnockback -= shotDirection * MathHelper.Lerp(180f, 520f, charge);
@@ -258,7 +331,7 @@ public sealed class Player
     private void UpdateDash(float deltaTime, ParticleSystem particles)
     {
         _dashTimer = MathF.Max(0f, _dashTimer - deltaTime);
-        Velocity = _dashDirection * (GameBalance.DashDistance / GameBalance.DashDuration);
+        Velocity = _dashDirection * (_activeDashDistance / GameBalance.DashDuration);
 
         _dashTrailTimer -= deltaTime;
         if (_dashTrailTimer <= 0f)
@@ -268,7 +341,7 @@ public sealed class Player
         }
 
         _afterimageTimer -= deltaTime;
-        if (_afterimageTimer <= 0f && _afterimages.Count < 3)
+        if (_afterimageTimer <= 0f && _afterimages.Count < (ResonanceActive ? 5 : 3))
         {
             _afterimageTimer = 0.045f;
             AddAfterimage();
@@ -289,6 +362,22 @@ public sealed class Player
             Remaining = 0.19f,
             Lifetime = 0.19f
         });
+    }
+
+    private void StartResonance(ParticleSystem particles, ScreenEffects screenEffects)
+    {
+        Resonance = 0f;
+        ResonanceActive = true;
+        _resonanceTimer = GameBalance.ResonanceDuration;
+        _resonanceActivationTimer = 0.5f;
+        SoulSenseActive = true;
+        particles.EmitBurst(Position, -Vector2.UnitY, 42, GameBalance.SoulWhite, 330f, 11f);
+        particles.EmitDeathFlame(Position, 30, 1.8f);
+        screenEffects.BeginHitstop(0.1f);
+        screenEffects.BeginImpactFrame(0.11f);
+        screenEffects.AddShake(0.36f, 15f);
+        screenEffects.Flash(0.14f, 0.52f);
+        AddAfterimage();
     }
 
     private void UpdateAfterimages(float deltaTime)

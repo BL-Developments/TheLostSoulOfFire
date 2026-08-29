@@ -19,7 +19,7 @@ public enum SoulState
 
 public sealed class Soul
 {
-    private readonly Vector2 _origin;
+    private Vector2 _origin;
     private float _stateTimer;
     private float _visualTime;
     private bool _releaseBurstCreated;
@@ -27,6 +27,7 @@ public sealed class Soul
     public SoulState State { get; private set; } = SoulState.Exposed;
     public Vector2 Position { get; private set; }
     public bool IsFinished => State == SoulState.Released;
+    public bool CanBeDevoured => State is SoulState.Exposed or SoulState.Releasing or SoulState.BeingDevoured;
 
     public Soul(Vector2 position)
     {
@@ -61,6 +62,54 @@ public sealed class Soul
         }
     }
 
+    public void BeginDevour()
+    {
+        if (State is SoulState.Exposed or SoulState.Releasing)
+        {
+            State = SoulState.BeingDevoured;
+        }
+    }
+
+    public void PullToward(Vector2 target, float deltaTime)
+    {
+        if (State != SoulState.BeingDevoured)
+        {
+            return;
+        }
+
+        float pull = 1f - MathF.Exp(-deltaTime * 4.8f);
+        Position = Vector2.Lerp(Position, target, pull);
+    }
+
+    public void CancelDevour()
+    {
+        if (State != SoulState.BeingDevoured)
+        {
+            return;
+        }
+
+        _origin = Position + new Vector2(0f, 24f);
+        State = SoulState.Exposed;
+        _stateTimer = GameBalance.SoulExposedDuration;
+    }
+
+    public void Consume()
+    {
+        if (State == SoulState.BeingDevoured)
+        {
+            State = SoulState.Consumed;
+        }
+    }
+
+    public void Expel(Vector2 position)
+    {
+        Position = position;
+        _origin = position;
+        State = SoulState.Exposed;
+        _stateTimer = GameBalance.SoulExposedDuration;
+        _releaseBurstCreated = false;
+    }
+
     public void Draw(SpriteBatch batch, Texture2D pixel, Player player, bool soulSenseActive)
     {
         if (State is SoulState.Released or SoulState.Consumed)
@@ -85,6 +134,11 @@ public sealed class Soul
         batch.FillCircle(pixel, Position, (16f + pulse * 2f) * emphasis, GameBalance.DeepViolet * 0.54f);
         batch.FillCircle(pixel, Position, (10f + pulse) * emphasis, glow * 0.92f);
         batch.FillCircle(pixel, Position, 4f * emphasis, GameBalance.SoulWhite);
+
+        if (State == SoulState.BeingDevoured)
+        {
+            batch.DrawCircle(pixel, Position, 25f + pulse * 5f, GameBalance.DeathFlameBright * 0.85f, 4f, 22);
+        }
 
         if (State == SoulState.Releasing)
         {

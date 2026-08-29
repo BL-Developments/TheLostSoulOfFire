@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using TheLostSoulOfFire.Combat;
+using TheLostSoulOfFire.Effects;
 
 namespace TheLostSoulOfFire.Entities;
 
@@ -23,6 +26,24 @@ public abstract class Enemy
     public bool IsAlive => Health > 0;
     public bool IsFinished { get; protected set; }
     public float HitFlashRemaining { get; private set; }
+
+    public abstract string StateLabel { get; }
+
+    public abstract void Update(
+        float deltaTime,
+        Player player,
+        IReadOnlyList<Soul> souls,
+        Rectangle movementBounds,
+        ParticleSystem particles,
+        ScreenEffects screenEffects);
+
+    public abstract void Draw(SpriteBatch batch, Texture2D pixel, bool debugVisible, bool soulSenseActive);
+
+    public virtual bool TryConsumeSoulSpawn(out Vector2 position)
+    {
+        position = default;
+        return false;
+    }
 
     public virtual void ApplyDamage(DamageInfo damage)
     {
