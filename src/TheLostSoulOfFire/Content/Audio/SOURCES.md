@@ -1,56 +1,85 @@
 # Audio Sources and Production Ledger
 
-Generated on **2026-08-29** for *The Lost Soul of Fire*.
+Authored and downloaded on **2026-08-29** for *The Lost Soul of Fire*.
 
-## Release status
+## Release and license status
 
-- **Source / generation service:** local deterministic synthesis in `tools/audio/generate_audio.py`; no remote service and no third-party recordings, samples, voices, or model outputs were used.
-- **Creator / model:** OpenAI Codex-authored synthesis and composition code; no audio-generation model.
-- **Sound ID:** not applicable to every asset.
-- **License and plan status:** original project-authored material; cleared for inclusion and commercial release with this project, with no attribution, account plan, credential, or network dependency. No Freesound or ElevenLabs asset was used because neither a configured Freesound API/MCP nor an official ElevenLabs skill with licensed credentials was callable during production.
-- **Mastering:** 48 kHz; effects are mono 16-bit PCM WAV, ambience is stereo 16-bit PCM WAV, and music is stereo Ogg Vorbis. Short anti-click fades, deterministic filtering/layering, silence trimming, and category peak normalization were applied. All final peaks are below -1 dBFS.
-- **Music encode:** `oggenc` 1.4.3, Vorbis quality 5, from the generator's temporary 48 kHz/16-bit stereo PCM render. The PCM intermediary is deleted after encoding and is not committed.
+- **Generation service:** [Ludo.ai game audio tools](https://ludo.ai/tools/game-sound-effects-generator), used only during authoring. The released game loads the committed files below and has no network, API-key, or Ludo dependency.
+- **Creator / model:** Ludo.ai Sound Effects, Ambiance, and Music generators. The API does not expose a model name/version, so this ledger records **Ludo audio model (undisclosed)** rather than guessing.
+- **License:** Ludo states that generated assets may be used in commercial games and grants a nonexclusive worldwide right to use, modify, distribute, and create derivatives. See [Game Asset Generation](https://ludo.ai/docs/game-asset-generation) and the [current Terms of Service and EULA](https://ludo.ai/documents/Jet%20Play%20Terms%20of%20Service%20and%20EULA%20%284%20Dec%202025%29.pdf).
+- **Plan status:** the connected API key was validated and every listed request completed through the metered Ludo MCP/API. The named account tier is not exposed by the service. Ludo states commercial-use rights for generated assets on every plan. No ElevenLabs free-plan output, Freesound material, third-party recordings, voices, or recognizable copyrighted material is present.
+- **Source retention:** Ludo URLs expire after seven days. Approved results were downloaded immediately, mastered locally, and committed. Request IDs below are the durable generation identifiers; temporary MP3/WAV inputs are intentionally not committed.
+- **Mastering:** `tools/audio/master_ludo_audio.py` selects the useful physical transient/texture, removes DC, adds 6 ms anti-click fades, and peak-normalizes by category. Effects are mono 48 kHz/16-bit PCM WAV; ambience is stereo 48 kHz/16-bit PCM WAV; music is stereo 48 kHz Ogg Vorbis q5. All peaks are below -1 dBFS.
 
-Run `python3 tools/audio/generate_audio.py` to reproduce the bank and `python3 tools/audio/validate_audio.py` to verify it.
+Run `python3 tools/audio/validate_audio.py` to verify formats, durations, levels, loop endpoints, manifests, and cue coverage.
 
-Runtime verification modes are available after building:
+## Approved generation catalog
 
-- `--audio-runtime-test` loads and plays every cue, exercises ducking, and stress-tests cooldown/polyphony limits.
-- `--audio-loop-runtime-test` additionally remains active for 102 seconds to cross the 100-second music boundary and four ambience boundaries.
-- `--audio-gameplay-test` runs the real arena loop through all four waves, ending reveal, completion, and restart.
-- `--audio-death-restart-test` verifies fatal damage, the death cue/state, and encounter restart.
-- Add `--expect-audio-fallback` to the runtime test after temporarily making one built SFX XNB unavailable; the test fails unless a synthesized fallback was created.
+All prompts requested original game audio and excluded voices, recognizable melodies, arcade bleeps, and electronic-laser styling where relevant. Returned sources were downloaded on 2026-08-29.
 
-## Asset ledger
+| ID / request ID | Service / model | Exact generation prompt |
+|---|---|---|
+| SFX-01 `lost-soul-fire-organic-scythe-20260829` | Ludo Sound Effects / undisclosed | Original dark-fantasy game sound effect: a tight curved steel scythe slicing through air, dry sharp organic cloth-and-metal swish, fast physical motion, subtle low body, no impact, no melody, no voice, no arcade synth, no electronic laser, clean isolated studio sound |
+| SFX-02 `lost-soul-fire-organic-soul-magic-20260829` | Ludo Sound Effects / undisclosed | Original dark-fantasy game sound effect: a massive spectral scythe arc opening with a deep physical air whoom, followed by brittle ghostly ash crack and a soft breathy soul wake, organic layered texture, no melody, no voice, no arcade synth, no electronic laser, isolated |
+| SFX-03 `lost-soul-fire-organic-impact-20260829` | Ludo Sound Effects / undisclosed | Original dark-fantasy game sound effect: a compact scythe blade striking ash-covered bone and battered iron armor, dry crunchy fracture with dull metal body, no clean sword ring, no voice, no music, no arcade synth, isolated close impact |
+| SFX-04 `lost-soul-fire-organic-dash-20260829` | Ludo Sound Effects / undisclosed | Original dark-fantasy game sound effect: a short deep fire ignition whump and fast directional cloth-and-air whoosh for a supernatural dash, organic flame texture, not a jet engine, no voice, no music, no arcade synth, isolated |
+| SFX-05 `lost-soul-fire-organic-cannon-charge-20260829` | Ludo Sound Effects / undisclosed | Original dark-fantasy game sound effect: supernatural soul cannon charging, low occult mechanical vibration rising steadily into tense glassy energy, tactile metal resonance and breathy spectral texture, no electronic laser, no arcade synth, no melody, no voice, isolated |
+| SFX-06 `lost-soul-fire-organic-cannon-fire-20260829` | Ludo Sound Effects / undisclosed | Original dark-fantasy game sound effect: heavy soul cannon discharge with brutal physical transient, deep pressure, occult battered-metal character, ash debris and very short stone-room tail, no gunshot realism, no electronic laser, no arcade synth, no music, no voice |
+| SFX-07 `lost-soul-fire-organic-fire-20260829` | Ludo Sound Effects / undisclosed | Original dark-fantasy game sound effect: unstable magical furnace flame rapidly escalating through dense crackle and pressure into a compact violent ash detonation, deep physical fire texture, aggressive but controlled, no cinematic trailer boom, no voice, no music, no arcade synth |
+| SFX-08 `lost-soul-fire-organic-soul-release-20260829` | Ludo Sound Effects / undisclosed | Original dark-fantasy game sound effect: a trapped soul gently released after battle, quiet humanless breath of air, delicate struck-glass shimmer rising into a warm spectral bloom and fading residue, mournful relief, no voice, no melody, no arcade bleep, isolated |
+| SFX-09 `lost-soul-fire-organic-death-flame-20260829` | Ludo Sound Effects / undisclosed | Original dark-fantasy game sound effect: supernatural life flame collapsing inward and extinguishing, low organic implosion, dry ash fall, small dying ember crackles and a brief mournful room tail, no voice, no music, no electronic synth, isolated |
+| SFX-10 `lost-soul-fire-organic-devourer-slam-20260829` | Ludo Sound Effects / undisclosed | Original dark-fantasy game sound effect: enormous ash creature slams both arms into a ruined stone furnace floor, massive low physical impact, stone grit and debris, short heavy room tail, no roar, no voice, no music, no cinematic trailer boom |
+| SFX-11 `lost-soul-fire-organic-devourer-devour-20260829` | Ludo Sound Effects / undisclosed | Original dark-fantasy game sound effect: disturbing supernatural soul suction, hollow inhaling wind through bone and wet ash, deep pressure pulling inward then snapping shut, creature has no voice, no growl, no music, no electronic synth, isolated |
+| SFX-12 `lost-soul-fire-organic-wave-start-20260829` | Ludo Sound Effects / undisclosed | Original dark-fantasy game sound effect: a distant furnace gate dropping shut followed by one low ritual bronze bell announcing danger, heavy physical metal and stone, restrained short arena tail, no melody, no voice, no electronic synth, isolated |
+| SFX-13 `lost-soul-fire-organic-title-confirm-20260829` | Ludo Sound Effects / undisclosed | Original dark-fantasy game UI sound: restrained tactile confirmation made from a tiny ember ignition and one delicate dark glass tap, warm and confident, extremely short, no arcade bleep, no melody, no voice, no electronic button tone |
+| SFX-14 `lost-soul-fire-organic-wave-clear-20260829` | Ludo Sound Effects / undisclosed | Original dark-fantasy game sound effect: brief relief after surviving combat, soft ash settling followed by three natural struck-glass and small bronze resonances forming an original unresolved minor-color cadence, subtle and physical, no orchestra, no voice, no arcade synth |
+| SFX-15 `lost-soul-fire-organic-ending-reveal-20260829` | Ludo Sound Effects / undisclosed | Original dark-fantasy game sound effect: a tiny living flame revealed in darkness, quiet ember breath blossoms into warm glass and bronze harmonics with an original hopeful resolution, intimate physical textures, no orchestra, no voice, no recognizable melody, no electronic synth |
+| SFX-16 `lost-soul-fire-organic-burning-charge-20260829` | Ludo Sound Effects / undisclosed | Original dark-fantasy game warning sound: unstable enemy furnace flame pressure rises continuously from a low ember into furious crackling over exactly one second, clearly escalating and stopping before any explosion, threatening organic fire telegraph, no detonation, no voice, no music, no synth |
+| SFX-17 `lost-soul-fire-organic-cannon-full-20260829` | Ludo Sound Effects / undisclosed | Original dark-fantasy game readiness cue: unmistakable soul cannon reaches full charge, one tactile battered-metal latch clack immediately followed by a compact struck-glass soul resonance and deep core thump, short and decisive, no laser, no arcade bleep, no melody, no voice |
+| SFX-18 `lost-soul-fire-organic-core-hit-20260829` | Ludo Sound Effects / undisclosed | Original dark-fantasy game weak-point hit sound: bright crystalline soul core cracking under a physical projectile impact, sharp glassy fracture with a compact rewarding low body, very short and readable, no arcade bleep, no melody, no voice, no electronic laser |
+| AMB-01 `lost-soul-fire-organic-ambience-20260829` | Ludo Ambiance / undisclosed | Original seamless dark-fantasy ruined furnace arena ambience for a game: deep natural stone-room rumble, cold wind through broken masonry, sparse distant heavy chain movement, occasional tiny ember crackle, extremely faint nonverbal spectral breath texture, lots of quiet negative space, no music, no voices, no industrial machine rhythm, no melody, seamless loop |
+| MUS-01 `lost-soul-fire-organic-music-20260829` | Ludo Music / undisclosed | Original seamless-loop dark Gothic industrial combat underscore for an indie action game, 72 BPM, D minor atmosphere, restrained low bowed strings, distant wordless choir-like texture used as pad not melody, sparse frame drums and furnace pulse, evolving dynamics with generous space for combat sound effects, ominous and mournful rather than heroic, no vocals, no lyrics, no recognizable melody or imitation of any existing soundtrack, clean loop-compatible ending |
 
-| Final filename | Source / service | Creator / model | Sound ID | License / plan status | Date | Production prompt | Edits performed |
-|---|---|---|---|---|---|---|---|
-| `Audio/Sfx/scythe_swing_1.wav` | Local deterministic synthesis | Codex synthesis; no model | N/A | Original / no plan dependency | 2026-08-29 | Tight curved steel scythe air slice; dry, sharp, dark; no impact or music | Layered high-passed noise and descending metallic chirp; 2 ms attack, 25 ms release; mono; normalized to -2.2 dBFS |
-| `Audio/Sfx/scythe_swing_2.wav` | Local deterministic synthesis | Codex synthesis; no model | N/A | Original / no plan dependency | 2026-08-29 | Wider, heavier scythe swoosh with low-mid anime-combat body | Layered lower filtered air and harmonic down-chirp; anti-click fades; mono; normalized to -2.2 dBFS |
-| `Audio/Sfx/soul_cleave.wav` | Local deterministic synthesis | Codex synthesis; no model | N/A | Original / no plan dependency | 2026-08-29 | Massive spectral arc: deep whoom into brittle soul crack | Layered sub chirp, air, seeded crackle, crystalline partial, and two short echoes; controlled 450 ms tail; normalized |
-| `Audio/Sfx/scythe_hit.wav` | Local deterministic synthesis | Codex synthesis; no model | N/A | Original / no plan dependency | 2026-08-29 | Compact scythe hit on ash-covered bone and armor; no sword ring | Layered pitch-dropping body, filtered grit, and dry seeded fracture; 150 ms mono transient; normalized |
-| `Audio/Sfx/dash.wav` | Local deterministic synthesis | Codex synthesis; no model | N/A | Original / no plan dependency | 2026-08-29 | Short deep flame whump plus directional whoosh; not a jet | Combined compact low impact, filtered air, and descending flame chirp; trimmed to 250 ms; normalized |
-| `Audio/Sfx/cannon_charge.wav` | Local deterministic synthesis | Codex synthesis; no model | N/A | Original / no plan dependency | 2026-08-29 | Supernatural-mechanical charge rising from hum to soul vibration | Layered rising fundamental, harmonic whine, and shaped high-frequency energy; 800 ms; anti-click fades; normalized |
-| `Audio/Sfx/cannon_full.wav` | Local deterministic synthesis | Codex synthesis; no model | N/A | Original / no plan dependency | 2026-08-29 | Unmistakable charge lock: bright soul ping and compact core pulse | Layered low lock pulse with 960/1440 Hz crystalline partials; 220 ms; normalized |
-| `Audio/Sfx/cannon_fire.wav` | Local deterministic synthesis | Codex synthesis; no model | N/A | Original / no plan dependency | 2026-08-29 | Heavy soul cannon discharge with sub weight and occult metal | Layered sub impact, wide-band transient, ash crack, low bell partials, and short dual echo; 550 ms; normalized |
-| `Audio/Sfx/burning_charge.wav` | Local deterministic synthesis | Codex synthesis; no model | N/A | Original / no plan dependency | 2026-08-29 | Unstable flame escalating rapidly with crackle and pressure | Rising harmonic body, seeded fire crackle, and filtered hiss; 550 ms; normalized |
-| `Audio/Sfx/burning_detonation.wav` | Local deterministic synthesis | Codex synthesis; no model | N/A | Original / no plan dependency | 2026-08-29 | Dense magical fire burst with bass pressure and ash crack | Layered low impact, filtered flame, fracture impulses, and restrained short reflection; 700 ms; normalized |
-| `Audio/Sfx/core_hit.wav` | Local deterministic synthesis | Codex synthesis; no model | N/A | Original / no plan dependency | 2026-08-29 | Bright crystalline soul-core crack with strong weak-point readability | Layered seeded crack, inharmonic bell partials, and fast descending glass chirp; 180 ms; normalized |
-| `Audio/Sfx/soul_release.wav` | Local deterministic synthesis | Codex synthesis; no model | N/A | Original / no plan dependency | 2026-08-29 | Gentle ascending soul tone, soft bell, and quiet residue whoosh | Layered ascending tone, 620 Hz bell, restrained air, and two quiet echoes; 900 ms; normalized |
-| `Audio/Sfx/resonance_ready.wav` | Local deterministic synthesis | Codex synthesis; no model | N/A | Original / no plan dependency | 2026-08-29 | One deep heartbeat/core pulse with bright soul overtone | Layered compact 48 Hz body and restrained 510 Hz partial; 350 ms; normalized |
-| `Audio/Sfx/resonance_activate.wav` | Local deterministic synthesis | Codex synthesis; no model | N/A | Original / no plan dependency | 2026-08-29 | Heartbeat, brief vacuum, deep impact, and supernatural eruption | 140 ms pulse, ~75 ms gap, layered impact/flame/rising energy, and short echo; 800 ms; normalized |
-| `Audio/Sfx/player_hit.wav` | Local deterministic synthesis | Codex synthesis; no model | N/A | Original / no plan dependency | 2026-08-29 | Muted armored body hit with ember crack; no voice | Layered low-mid body and seeded dry ember fracture; 200 ms; normalized |
-| `Audio/Sfx/player_death.wav` | Local deterministic synthesis | Codex synthesis; no model | N/A | Original / no plan dependency | 2026-08-29 | Death Flame collapsing into ash with a mournful, voiceless tail | Layered falling implosion, low ash noise, sparse crackle, bell partial, and restrained reflections; 1.2 s; normalized |
-| `Audio/Sfx/soul_sense_on.wav` | Local deterministic synthesis | Codex synthesis; no model | N/A | Original / no plan dependency | 2026-08-29 | Reverse-feeling whoosh into a high, pure soul tone | Swelling high-passed air plus rising 260–1120 Hz tone; restrained 450 ms transition; normalized |
-| `Audio/Sfx/soul_sense_off.wav` | Local deterministic synthesis | Codex synthesis; no model | N/A | Original / no plan dependency | 2026-08-29 | High soul tone folding down into ordinary space | Descending 980–240 Hz tone and contracting filtered air; 300 ms; normalized |
-| `Audio/Sfx/wave_start.wav` | Local deterministic synthesis | Codex synthesis; no model | N/A | Original / no plan dependency | 2026-08-29 | Distant furnace gate impact and low ritual bell | Layered heavy gate body, 118 Hz bell, metal grit, and one distant reflection; 650 ms; normalized |
-| `Audio/Sfx/hollow_swipe.wav` | Local deterministic synthesis | Codex synthesis; no model | N/A | Original / no plan dependency | 2026-08-29 | Ragged Hollow arm swipe: fast air tear with a dry bone edge | Layered shaped air, descending rasp chirp, and subtle fracture; 320 ms; mono; normalized |
-| `Audio/Sfx/devourer_slam.wav` | Local deterministic synthesis | Codex synthesis; no model | N/A | Original / no plan dependency | 2026-08-29 | Devourer ground slam: massive low impact with short debris tail | Layered 38 Hz-class impact, ground noise, grit, and one restrained reflection; 650 ms; normalized |
-| `Audio/Sfx/devourer_devour.wav` | Local deterministic synthesis | Codex synthesis; no model | N/A | Original / no plan dependency | 2026-08-29 | Unpleasant supernatural soul suction; wet/low but not vocal | Falling harmonic suction, low filtered turbulence, and 67 Hz pressure tone; 850 ms; no voice; normalized |
-| `Audio/Sfx/enemy_death.wav` | Local deterministic synthesis | Codex synthesis; no model | N/A | Original / no plan dependency | 2026-08-29 | Generic enemy ash collapse with a short escaping soul sputter | Layered falling body, ash-filtered noise, sparse fractures, and one quiet reflection; 550 ms; normalized |
-| `Audio/Sfx/cannon_impact.wav` | Local deterministic synthesis | Codex synthesis; no model | N/A | Original / no plan dependency | 2026-08-29 | Cannon non-core impact: compact occult-metal body hit | Layered 66 Hz-class impact, low metallic partial, and ash crack; 320 ms; normalized |
-| `Audio/Sfx/title_confirm.wav` | Local deterministic synthesis | Codex synthesis; no model | N/A | Original / no plan dependency | 2026-08-29 | Restrained soul confirmation chime for leaving the title | Layered 440/660 Hz bell partials with a short quiet reflection; 320 ms; normalized to -4 dBFS |
-| `Audio/Sfx/wave_clear.wav` | Local deterministic synthesis | Codex synthesis; no model | N/A | Original / no plan dependency | 2026-08-29 | Short relieving minor-color wave-clear cadence | Staggered D4/F4/A4 bell partials and a restrained reflection; 750 ms; normalized to -4 dBFS |
-| `Audio/Sfx/ending_reveal.wav` | Local deterministic synthesis | Codex synthesis; no model | N/A | Original / no plan dependency | 2026-08-29 | Quiet life-flame reveal: rising soul bloom and resolving bells | Layered D3–D4 rise, D4/A4 bells, very light air, and two quiet reflections; 1.6 s; normalized to -4 dBFS |
-| `Audio/Ambience/arena_ambience.wav` | Local deterministic synthesis | Codex synthesis; no model | N/A | Original / no plan dependency | 2026-08-29 | Seamless ruined furnace arena: deep rumble, sparse chain, wind, distant bell, extremely faint soul whisper | Composed as a 24 s periodic stereo field with circular value-noise wind, cycle-quantized rumble, three placed chain events, one distant bell, and non-vocal whisper partials; 20 ms seam fades; normalized to -8 dBFS |
-| `Audio/Music/arena_loop.ogg` | Local deterministic composition and synthesis; Ogg Vorbis encode | Codex composition; no model | N/A | Original / no plan dependency | 2026-08-29 | Seamless dark Gothic-industrial underscore at 72 BPM in D minor; low strings, wordless synthetic choir texture, restrained percussion, furnace pulse; no borrowed melody | Composed as 30 complete 4/4 bars (100 s), six-bar harmonic cycle, frequency-quantized loop phases, stereo pad/choir offsets, low industrial pulse, periodic furnace texture, conservative soft limiting; encoded Vorbis q5 |
+## Final asset ledger
+
+Every entry uses the Ludo commercial-use license and verified metered API entitlement described above.
+
+| Final filename | Source ID | Date | Edits performed |
+|---|---|---|---|
+| `Audio/Sfx/scythe_swing_1.wav` | SFX-01 | 2026-08-29 | First tight air transient; mono; 180 ms; fades; peak -3.0 dBFS |
+| `Audio/Sfx/scythe_swing_2.wav` | SFX-01 | 2026-08-29 | Wider later motion; mono; 240 ms; fades; peak -3.0 dBFS |
+| `Audio/Sfx/soul_cleave.wav` | SFX-02 | 2026-08-29 | Physical whoom/ash-crack body; 450 ms; peak -2.4 dBFS |
+| `Audio/Sfx/scythe_hit.wav` | SFX-03 | 2026-08-29 | Removed lead silence; isolated crunchy impact; 150 ms; peak -2.6 dBFS |
+| `Audio/Sfx/dash.wav` | SFX-04 | 2026-08-29 | Ignition/air peak; 250 ms; peak -3.0 dBFS |
+| `Audio/Sfx/cannon_charge.wav` | SFX-05 | 2026-08-29 | Rising second half; 800 ms; peak -4.0 dBFS |
+| `Audio/Sfx/cannon_full.wav` | SFX-17 | 2026-08-29 | Isolated latch/glass/core transient; 220 ms; peak -2.4 dBFS |
+| `Audio/Sfx/cannon_fire.wav` | SFX-06 | 2026-08-29 | Discharge transient and short room body; 550 ms; peak -2.0 dBFS |
+| `Audio/Sfx/burning_charge.wav` | SFX-16 | 2026-08-29 | Reversed approved organic flame so energy rises; 550 ms; peak -4.0 dBFS |
+| `Audio/Sfx/burning_detonation.wav` | SFX-07 | 2026-08-29 | Dense opening detonation; 700 ms; peak -2.2 dBFS |
+| `Audio/Sfx/core_hit.wav` | SFX-18 | 2026-08-29 | Glass fracture/impact transient; 180 ms; peak -2.3 dBFS |
+| `Audio/Sfx/soul_release.wav` | SFX-08 | 2026-08-29 | Organic breath and struck-glass bloom; 900 ms; peak -4.0 dBFS |
+| `Audio/Sfx/resonance_ready.wav` | SFX-10 | 2026-08-29 | Low-passed slam transient as non-vocal core heartbeat; 350 ms; peak -4.0 dBFS |
+| `Audio/Sfx/resonance_activate.wav` | SFX-10 + SFX-02 | 2026-08-29 | Layered low slam with delayed spectral ash crack; 800 ms; peak -1.8 dBFS |
+| `Audio/Sfx/player_hit.wav` | SFX-03 | 2026-08-29 | Low-passed armor/bone impact variant; 200 ms; peak -3.0 dBFS |
+| `Audio/Sfx/player_death.wav` | SFX-09 | 2026-08-29 | Flame collapse, ash, and mournful room tail; 1.2 s; peak -2.8 dBFS |
+| `Audio/Sfx/soul_sense_on.wav` | SFX-02 | 2026-08-29 | Reversed breathy spectral section into perception swell; 450 ms; peak -4.5 dBFS |
+| `Audio/Sfx/soul_sense_off.wav` | SFX-02 | 2026-08-29 | Contracting spectral tail; 300 ms; peak -4.5 dBFS |
+| `Audio/Sfx/wave_start.wav` | SFX-12 | 2026-08-29 | Furnace gate and ritual bell body; 650 ms; peak -4.0 dBFS |
+| `Audio/Sfx/hollow_swipe.wav` | SFX-01 | 2026-08-29 | Rougher later cloth/metal air texture; 320 ms; peak -4.0 dBFS |
+| `Audio/Sfx/devourer_slam.wav` | SFX-10 | 2026-08-29 | Ground transient, grit, and short room; 650 ms; peak -1.8 dBFS |
+| `Audio/Sfx/devourer_devour.wav` | SFX-11 | 2026-08-29 | Bone-wind/wet-ash suction and close; 850 ms; peak -2.8 dBFS |
+| `Audio/Sfx/enemy_death.wav` | SFX-09 | 2026-08-29 | Short flame-collapse/ash variant; 550 ms; peak -4.0 dBFS |
+| `Audio/Sfx/cannon_impact.wav` | SFX-06 | 2026-08-29 | Compact body/debris variant without long tail; 320 ms; peak -3.2 dBFS |
+| `Audio/Sfx/title_confirm.wav` | SFX-13 | 2026-08-29 | Isolated ember/glass confirmation; 320 ms; peak -5.0 dBFS |
+| `Audio/Sfx/wave_clear.wav` | SFX-14 | 2026-08-29 | Natural glass/bronze cadence; 750 ms; peak -5.0 dBFS |
+| `Audio/Sfx/ending_reveal.wav` | SFX-15 | 2026-08-29 | Ember breath and warm harmonic bloom; 1.6 s; peak -4.5 dBFS |
+| `Audio/Ambience/arena_ambience.wav` | AMB-01 | 2026-08-29 | Core Audio resample 44.1 to 48 kHz; stereo; full 20 s generated loop; click-free endpoints; peak -11.0 dBFS |
+| `Audio/Music/arena_loop.ogg` | MUS-01 | 2026-08-29 | MP3 decoded to 48 kHz stereo PCM; returned 80 s performance uniformly resampled to 100 s; 20 ms loop-edge fades; peak -6.0 dBFS pre-encode; Vorbis q5 |
+
+## Runtime verification modes
+
+- `--audio-runtime-test` plays every cue and exercises ducking, cooldowns, and polyphony limits.
+- `--audio-loop-runtime-test` crosses the music boundary and multiple ambience boundaries.
+- `--audio-gameplay-test` runs all four waves, ending reveal, completion, and restart.
+- `--audio-death-restart-test` verifies fatal damage, death cue/state, and restart.
+- Add `--expect-audio-fallback` after making one built SFX XNB unavailable; the test fails unless the synthesized emergency fallback was created.
