@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Input;
 using TheLostSoulOfFire.Debugging;
 using TheLostSoulOfFire.Game;
 using TheLostSoulOfFire.Input;
+using TheLostSoulOfFire.Rendering;
 
 namespace TheLostSoulOfFire;
 
@@ -15,6 +16,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     private Texture2D _pixel = null!;
     private InputState _input = null!;
     private GameWorld _world = null!;
+    private ArtAssets _art = null!;
     private bool _screenshotRequested;
     private string _screenshotStatus = string.Empty;
 
@@ -45,7 +47,8 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         _pixel = new Texture2D(GraphicsDevice, 1, 1);
         _pixel.SetData([Color.White]);
-        _world = new GameWorld(GraphicsDevice.Viewport);
+        _art = new ArtAssets(Content);
+        _world = new GameWorld(GraphicsDevice.Viewport, _art);
     }
 
     protected override void Update(GameTime gameTime)
@@ -91,6 +94,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
 
     protected override void UnloadContent()
     {
+        _world.Dispose();
         _pixel.Dispose();
         _spriteBatch.Dispose();
         base.UnloadContent();

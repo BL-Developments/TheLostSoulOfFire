@@ -128,15 +128,21 @@ public sealed class ScytheCombat
         return impulse * (_resonanceActive ? 1.18f : 1f);
     }
 
-    public void Draw(SpriteBatch batch, Texture2D pixel, Vector2 playerPosition, Vector2 facingDirection, bool debugVisible)
+    public void Draw(
+        SpriteBatch batch,
+        Texture2D pixel,
+        Texture2D physicalScythe,
+        Vector2 playerPosition,
+        Vector2 facingDirection,
+        bool debugVisible)
     {
         if (ActiveStep == 0)
         {
-            DrawRestingScythe(batch, pixel, playerPosition, facingDirection);
+            DrawRestingScythe(batch, physicalScythe, playerPosition, facingDirection);
             return;
         }
 
-        DrawAttackingScythe(batch, pixel, playerPosition, debugVisible);
+        DrawAttackingScythe(batch, pixel, physicalScythe, playerPosition, debugVisible);
     }
 
     private void StartAttack(Vector2 facingDirection, Vector2 playerPosition, ParticleSystem particles)
@@ -181,20 +187,32 @@ public sealed class ScytheCombat
         };
     }
 
-    private static void DrawRestingScythe(SpriteBatch batch, Texture2D pixel, Vector2 playerPosition, Vector2 facingDirection)
+    private static void DrawRestingScythe(
+        SpriteBatch batch,
+        Texture2D physicalScythe,
+        Vector2 playerPosition,
+        Vector2 facingDirection)
     {
         Vector2 right = new(-facingDirection.Y, facingDirection.X);
-        Vector2 handleStart = playerPosition - facingDirection * 31f - right * 15f;
-        Vector2 handleEnd = playerPosition + facingDirection * 52f + right * 19f;
-        Vector2 bladeTip = handleEnd + facingDirection * 18f + right * 26f;
-
-        batch.DrawLine(pixel, handleStart, handleEnd, new Color(20, 18, 24), 7f);
-        batch.DrawLine(pixel, handleStart, handleEnd, new Color(102, 98, 112), 2f);
-        batch.DrawLine(pixel, handleEnd, bladeTip, new Color(151, 151, 161), 8f);
-        batch.DrawLine(pixel, handleEnd + right * 8f, bladeTip + right * 8f, GameBalance.DeathFlame * 0.62f, 5f);
+        float rotation = MathF.Atan2(facingDirection.Y, facingDirection.X);
+        batch.Draw(
+            physicalScythe,
+            playerPosition + facingDirection * 10f + right * 3f,
+            null,
+            Color.White,
+            rotation,
+            new Vector2(physicalScythe.Width, physicalScythe.Height) * 0.5f,
+            0.52f,
+            SpriteEffects.None,
+            0f);
     }
 
-    private void DrawAttackingScythe(SpriteBatch batch, Texture2D pixel, Vector2 playerPosition, bool debugVisible)
+    private void DrawAttackingScythe(
+        SpriteBatch batch,
+        Texture2D pixel,
+        Texture2D physicalScythe,
+        Vector2 playerPosition,
+        bool debugVisible)
     {
         float aim = MathF.Atan2(_attackDirection.Y, _attackDirection.X);
         float eased = 1f - MathF.Pow(1f - NormalizedProgress, ActiveStep == 3 ? 2.2f : 3f);
@@ -229,13 +247,16 @@ public sealed class ScytheCombat
         }
 
         Vector2 bladeDirection = new(MathF.Cos(current), MathF.Sin(current));
-        Vector2 tangent = new Vector2(-bladeDirection.Y, bladeDirection.X) * MathF.Sign(totalArc);
-        Vector2 handleStart = playerPosition - bladeDirection * 28f;
-        Vector2 handleEnd = playerPosition + bladeDirection * (radius - 13f);
-        batch.DrawLine(pixel, handleStart, handleEnd, new Color(20, 18, 24), 8f);
-        batch.DrawLine(pixel, handleStart, handleEnd, new Color(119, 112, 129), 2f);
-        batch.DrawLine(pixel, handleEnd, handleEnd + tangent * (ActiveStep == 3 ? 48f : 36f), new Color(167, 165, 176), ActiveStep == 3 ? 10f : 8f);
-        batch.DrawLine(pixel, handleEnd + tangent * 15f, handleEnd + tangent * (ActiveStep == 3 ? 58f : 43f), trail, ActiveStep == 3 ? 10f : 6f);
+        batch.Draw(
+            physicalScythe,
+            playerPosition + bladeDirection * 29f,
+            null,
+            Color.White,
+            current,
+            new Vector2(physicalScythe.Width, physicalScythe.Height) * 0.5f,
+            ActiveStep == 3 ? 0.68f : 0.58f,
+            SpriteEffects.None,
+            0f);
 
         if (debugVisible)
         {

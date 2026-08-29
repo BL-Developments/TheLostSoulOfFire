@@ -40,7 +40,7 @@ public sealed class CannonShot
 
     public void MarkHit() => IsFinished = true;
 
-    public void Draw(SpriteBatch batch, Texture2D pixel)
+    public void Draw(SpriteBatch batch, Texture2D pixel, bool useSpriteArt)
     {
         if (IsFinished)
         {
@@ -50,7 +50,10 @@ public sealed class CannonShot
         Color glow = IsFullCharge ? GameBalance.SoulWhite : GameBalance.DeathFlameBright;
         batch.DrawLine(pixel, Position - Direction * (24f + Charge * 42f), Position, GameBalance.DeepViolet * 0.75f, Radius * 1.8f);
         batch.DrawLine(pixel, Position - Direction * (18f + Charge * 34f), Position, glow * 0.9f, Radius * 0.72f);
-        batch.FillCircle(pixel, Position, Radius, GameBalance.DeathFlame * 0.88f);
-        batch.FillCircle(pixel, Position, Radius * 0.48f, glow);
+        if (!useSpriteArt)
+        {
+            batch.FillCircle(pixel, Position, Radius, GameBalance.DeathFlame * 0.88f);
+            batch.FillCircle(pixel, Position, Radius * 0.48f, glow);
+        }
     }
 }

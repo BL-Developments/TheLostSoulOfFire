@@ -36,6 +36,7 @@ public sealed class Burning : Enemy
     public override string StateLabel => State.ToString().ToUpperInvariant();
     public bool IsCharging => State == BurningState.Charge;
     public bool IsAggressionCommitted => State is BurningState.Telegraph or BurningState.Charge;
+    public Vector2 FacingDirection => _facing;
 
     public Burning(Vector2 position, int movementSeed)
         : base(position, GameBalance.BurningMaxHealth, GameBalance.BurningRadius)
@@ -173,7 +174,12 @@ public sealed class Burning : Enemy
         Position + new Vector2(-7f, 16f)
     ];
 
-    public override void Draw(SpriteBatch batch, Texture2D pixel, bool debugVisible, bool soulSenseActive)
+    public override void Draw(
+        SpriteBatch batch,
+        Texture2D pixel,
+        bool debugVisible,
+        bool soulSenseActive,
+        bool useSpriteArt)
     {
         if (State == BurningState.Dead)
         {
@@ -195,11 +201,14 @@ public sealed class Burning : Enemy
             return;
         }
 
-        batch.FillCircle(pixel, Position + new Vector2(4f, 21f), 29f, new Color(3, 3, 6) * 0.62f);
-        batch.DrawLine(pixel, Position + new Vector2(0f, -31f), Position + new Vector2(0f, 27f), body, 28f);
-        batch.DrawLine(pixel, Position - right * 10f + new Vector2(0f, 6f), Position - right * 22f + _facing * 24f, body, 12f);
-        batch.DrawLine(pixel, Position + right * 10f + new Vector2(0f, 6f), Position + right * 23f + _facing * 21f, body, 12f);
-        batch.FillCircle(pixel, Position + new Vector2(0f, -37f), 12f, new Color(24, 20, 27));
+        if (!useSpriteArt)
+        {
+            batch.FillCircle(pixel, Position + new Vector2(4f, 21f), 29f, new Color(3, 3, 6) * 0.62f);
+            batch.DrawLine(pixel, Position + new Vector2(0f, -31f), Position + new Vector2(0f, 27f), body, 28f);
+            batch.DrawLine(pixel, Position - right * 10f + new Vector2(0f, 6f), Position - right * 22f + _facing * 24f, body, 12f);
+            batch.DrawLine(pixel, Position + right * 10f + new Vector2(0f, 6f), Position + right * 23f + _facing * 21f, body, 12f);
+            batch.FillCircle(pixel, Position + new Vector2(0f, -37f), 12f, new Color(24, 20, 27));
+        }
 
         foreach (Vector2 fracture in GetFracturePositions())
         {

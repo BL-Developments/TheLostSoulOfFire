@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using TheLostSoulOfFire.Audio;
 using TheLostSoulOfFire.Combat;
 using TheLostSoulOfFire.Effects;
 using TheLostSoulOfFire.Entities;
@@ -14,29 +15,39 @@ namespace TheLostSoulOfFire.Game;
 
 public enum ArenaLoopState
 {
+    Title,
     Intro,
     Combat,
     Transition,
     Complete
 }
 
-public sealed class GameWorld
+public sealed class GameWorld : IDisposable
 {
     private readonly Arena _arena = new();
+    private readonly AudioDirector _audio = new();
     private readonly Camera2D _camera;
     private readonly ScreenEffects _screenEffects = new();
     private readonly ParticleSystem _particles = new();
+    private readonly ArtAssets _art;
+    private readonly SpriteVfxSystem _spriteVfx;
     private readonly Player _player;
     private readonly List<Enemy> _enemies = [];
     private readonly List<Soul> _souls = [];
     private readonly List<CannonShot> _cannonShots = [];
     private Vector2 _lastMouseWorld;
     private bool _debugVisible;
+    private bool _forceSoulSense;
     private int _waveNumber;
-    private ArenaLoopState _loopState = ArenaLoopState.Intro;
+    private ArenaLoopState _loopState = ArenaLoopState.Title;
     private float _loopStateTimer = 1.25f;
     private float _burningHandoffTimer;
     private int _burningCommittedLastFrame;
+    private float _endingTimer;
+    private float _deathTimer;
+    private float _fpsTimer;
+    private int _fpsFrames;
+    private int _fps = 60;
 
     public string ScreenshotContext => GetScreenshotContext();
 
@@ -44,12 +55,16 @@ public sealed class GameWorld
         ? $"The Lost Soul of Fire — DEBUG | Wave {_waveNumber}/4 {_loopState.ToString().ToUpperInvariant()} | HP {_player.Health} | RES {(_player.ResonanceActive ? $"ACTIVE {_player.ResonanceRemaining:0.0}s" : $"{_player.Resonance:0}/{GameBalance.ResonanceRequired:0}")} | Player {GetPlayerState()} | Enemies {_enemies.Count(enemy => enemy.IsAlive)} | Souls {_souls.Count}"
         : _player.IsDead
             ? "The Lost Soul of Fire — Flame extinguished | R retry | F9 screenshot"
-            : _loopState == ArenaLoopState.Complete
-                ? "The Lost Soul of Fire — Arena cleared | R restart | F9 screenshot"
-                : $"The Lost Soul of Fire — Wave {_waveNumber}/4 | WASD move | Mouse aim | Space dash | LMB Scythe | Q Soul Sense | RMB Cannon";
+            : _loopState == ArenaLoopState.Title
+                ? "The Lost Soul of Fire — Press any key"
+                : _loopState == ArenaLoopState.Complete
+                    ? "The Lost Soul of Fire — Arena cleared | R restart | F9 screenshot"
+                    : $"The Lost Soul of Fire — Wave {_waveNumber}/4 | WASD move | Mouse aim | Space dash | LMB Scythe | Q Soul Sense | RMB Cannon";
 
-    public GameWorld(Viewport viewport)
+    public GameWorld(Viewport viewport, ArtAssets art)
     {
+        _art = art;
+        _spriteVfx = new SpriteVfxSystem(art);
         _camera = new Camera2D(_arena.CombatBounds.Center.ToVector2());
         _player = new Player(_arena.CombatBounds.Center.ToVector2());
         _lastMouseWorld = _player.Position + Vector2.UnitX * 200f;
@@ -59,7 +74,29 @@ public sealed class GameWorld
     public void Update(GameTime gameTime, InputState input, Viewport viewport)
     {
         float deltaTime = MathF.Min((float)gameTime.ElapsedGameTime.TotalSeconds, 1f / 20f);
+        bool wasDashing = _player.IsDashing;
+        bool wasResonanceActive = _player.ResonanceActive;
+        bool wasResonanceReady = _player.IsResonanceReady;
+        bool wasSoulSenseActive = _player.SoulSenseActive;
+        bool wasCannonFull = _player.Cannon.IsFullCharge;
+        SoulCannonState previousCannonState = _player.Cannon.State;
+        int previousHealth = _player.Health;
+        _art.Update(deltaTime);
+        _spriteVfx.Update(deltaTime);
+        UpdateFps(deltaTime);
         _screenEffects.Update(deltaTime);
+        _arena.Update(deltaTime, _loopState == ArenaLoopState.Complete);
+
+        if (_loopState == ArenaLoopState.Title)
+        {
+            if (input.AnyInputPressed)
+            {
+                _loopState = ArenaLoopState.Intro;
+                _loopStateTimer = 1.05f;
+            }
+            _particles.Update(deltaTime);
+            return;
+        }
 
         if (input.WasKeyPressed(Keys.F1))
         {
@@ -86,6 +123,19 @@ public sealed class GameWorld
             _player.FillResonance();
         }
 
+        if (input.WasKeyPressed(Keys.F6))
+        {
+            foreach (Enemy enemy in _enemies.Where(enemy => enemy.IsAlive))
+            {
+                enemy.ApplyDamage(new DamageInfo(enemy.Health + enemy.MaxHealth, Vector2.Zero, enemy.Position));
+            }
+        }
+
+        if (input.WasKeyPressed(Keys.F7))
+        {
+            _forceSoulSense = !_forceSoulSense;
+        }
+
         if (input.WasKeyPressed(Keys.F8))
         {
             ResetEncounter();
@@ -101,6 +151,22 @@ public sealed class GameWorld
             ResetEncounter();
         }
 
+        if (_player.IsDead)
+        {
+            _deathTimer = MathF.Min(6f, _deathTimer + deltaTime);
+            _particles.Update(deltaTime);
+            return;
+        }
+
+        if (_loopState == ArenaLoopState.Complete)
+        {
+            UpdateArenaLoop(deltaTime);
+            _particles.Update(deltaTime);
+            float endingCameraSmoothing = 1f - MathF.Exp(-deltaTime * 4f);
+            _camera.Follow(_player.Position, _arena.Bounds, viewport, endingCameraSmoothing);
+            return;
+        }
+
         _lastMouseWorld = _camera.ScreenToWorld(input.MousePosition, viewport);
 
         if (_screenEffects.IsHitStopped)
@@ -108,7 +174,35 @@ public sealed class GameWorld
             return;
         }
 
-        _player.Update(deltaTime, input, _lastMouseWorld, _arena.CombatBounds, _particles, _screenEffects);
+        _player.Update(deltaTime, input, _lastMouseWorld, _arena.CombatBounds, _particles, _screenEffects, _forceSoulSense);
+        if (_player.Scythe.StartedThisFrame)
+        {
+            string effect = _player.Scythe.ActiveStep switch
+            {
+                2 => "scythe_slash_02",
+                3 => "scythe_cleave",
+                _ => "scythe_slash_01"
+            };
+            float scale = _player.Scythe.ActiveStep == 3 ? 0.86f : 0.68f;
+            _spriteVfx.Spawn(
+                effect,
+                _player.Position + _player.FacingDirection * 22f,
+                MathF.Atan2(_player.FacingDirection.Y, _player.FacingDirection.X),
+                scale);
+        }
+        if (!wasDashing && _player.IsDashing)
+        {
+            _spriteVfx.Spawn(
+                "dash_ignition",
+                _player.Position - _player.DashDirection * 24f,
+                MathF.Atan2(_player.DashDirection.Y, _player.DashDirection.X),
+                0.72f);
+        }
+        if (!wasResonanceActive && _player.ResonanceActive)
+        {
+            _spriteVfx.Spawn("resonance_activate", _player.Position, 0f, 0.76f);
+        }
+        PlayPlayerActionAudio(wasDashing, wasResonanceActive, wasSoulSenseActive, wasCannonFull, previousCannonState);
         SpawnCannonShot();
         ResolveScytheStrike();
         UpdateCannonShots(deltaTime);
@@ -116,7 +210,12 @@ public sealed class GameWorld
         ConfigureBurningAggression(deltaTime);
         foreach (Enemy enemy in _enemies)
         {
+            BurningState? previousBurningState = enemy is Burning burningBefore ? burningBefore.State : null;
             enemy.Update(deltaTime, _player, _souls, _arena.CombatBounds, _particles, _screenEffects);
+            if (enemy is Burning burningAfter && previousBurningState != BurningState.Charge && burningAfter.State == BurningState.Charge)
+            {
+                _audio.Play(AudioCue.BurningCharge, 0.72f);
+            }
             if (enemy.TryConsumeSoulSpawn(out Vector2 soulPosition))
             {
                 _souls.Add(new Soul(soulPosition));
@@ -129,6 +228,7 @@ public sealed class GameWorld
 
             if (enemy is Devourer devourer && devourer.TryConsumeExtractionEffect(out Vector2 extractionPosition))
             {
+                _spriteVfx.Spawn("soul_release", extractionPosition, 0f, 0.72f);
                 _particles.EmitBurst(extractionPosition, Vector2.UnitY, 28, GameBalance.SoulWhite, 260f, 9f);
                 _particles.EmitDeathFlame(extractionPosition, 18, 1.25f);
                 _screenEffects.AddShake(0.18f, 8f);
@@ -141,15 +241,35 @@ public sealed class GameWorld
         _enemies.RemoveAll(enemy => enemy.IsFinished);
         foreach (Soul soul in _souls)
         {
+            SoulState previousSoulState = soul.State;
             soul.Update(deltaTime, _player, _particles);
+            if (previousSoulState != SoulState.Releasing && soul.State == SoulState.Releasing)
+            {
+                _spriteVfx.Spawn("soul_release", soul.Position, 0f, 0.62f);
+                _audio.Play(AudioCue.SoulRelease, 0.62f);
+            }
         }
 
         _souls.RemoveAll(soul => soul.IsFinished);
         UpdateArenaLoop(deltaTime);
+        if (previousHealth > _player.Health)
+        {
+            _audio.Play(_player.IsDead ? AudioCue.PlayerDeath : AudioCue.PlayerHit, _player.IsDead ? 0.78f : 0.6f);
+        }
+        if (!wasResonanceReady && _player.IsResonanceReady)
+        {
+            _audio.Play(AudioCue.ResonanceReady, 0.72f);
+        }
         _particles.Update(deltaTime);
 
         float cameraSmoothing = 1f - MathF.Exp(-deltaTime * 9f);
         _camera.Follow(_player.Position, _arena.Bounds, viewport, cameraSmoothing);
+    }
+
+    public void Dispose()
+    {
+        _audio.Dispose();
+        GC.SuppressFinalize(this);
     }
 
     public void Draw(SpriteBatch batch, Texture2D pixel, Viewport viewport)
@@ -160,7 +280,7 @@ public sealed class GameWorld
             SamplerState.PointClamp,
             transformMatrix: _camera.GetTransform(viewport, _screenEffects.ShakeOffset));
 
-        _arena.Draw(batch, pixel);
+        _art.DrawArena(batch);
         DrawArenaLoop(batch, pixel);
         if (_player.SoulSenseActive)
         {
@@ -170,18 +290,40 @@ public sealed class GameWorld
         _player.DrawAfterimages(batch, pixel);
         foreach (Enemy enemy in _enemies)
         {
-            enemy.Draw(batch, pixel, _debugVisible, _player.SoulSenseActive);
+            _art.DrawEnemy(batch, enemy);
+            enemy.Draw(batch, pixel, _debugVisible, _player.SoulSenseActive, true);
         }
         foreach (Soul soul in _souls)
         {
-            soul.Draw(batch, pixel, _player, _player.SoulSenseActive);
+            _art.DrawLostSoul(batch, soul);
+            soul.Draw(batch, pixel, _player, _player.SoulSenseActive, true);
         }
         foreach (CannonShot shot in _cannonShots)
         {
-            shot.Draw(batch, pixel);
+            shot.Draw(batch, pixel, true);
+            _art.DrawCannonProjectile(batch, shot);
         }
         _particles.Draw(batch, pixel);
-        _player.Draw(batch, pixel, _debugVisible);
+        batch.FillCircle(pixel, _player.Position + new Vector2(3f, 8f), 24f, new Color(3, 3, 7) * 0.55f);
+        _art.DrawPlayer(batch, _player);
+        _player.Draw(batch, pixel, _art, _debugVisible);
+        if (_player.Cannon.State == SoulCannonState.Charging)
+        {
+            Vector2 muzzle = _player.Position + _player.FacingDirection * 74f;
+            _art.DrawLoopingEffect(
+                batch,
+                _player.Cannon,
+                "cannon_charge_loop",
+                muzzle,
+                0f,
+                0.34f + _player.Cannon.ChargeProgress * 0.46f,
+                Color.White);
+        }
+        if (_player.IsDead)
+        {
+            _art.DrawDeathFlame(batch, _player, _player.Position);
+        }
+        _spriteVfx.Draw(batch);
 
         batch.DrawCircle(pixel, _lastMouseWorld, 9f, GameBalance.DeathFlameBright * 0.75f, 2f, 16);
         batch.DrawLine(pixel, _lastMouseWorld - Vector2.UnitX * 13f, _lastMouseWorld + Vector2.UnitX * 13f, GameBalance.DeathFlame * 0.6f, 1f);
@@ -203,6 +345,25 @@ public sealed class GameWorld
     private void DrawHud(SpriteBatch batch, Texture2D pixel, Viewport viewport)
     {
         batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
+
+        if (_loopState == ArenaLoopState.Title)
+        {
+            DrawTitleHud(batch, pixel, viewport);
+            batch.End();
+            return;
+        }
+        if (_player.IsDead)
+        {
+            DrawDeathHud(batch, pixel, viewport);
+            batch.End();
+            return;
+        }
+        if (_loopState == ArenaLoopState.Complete)
+        {
+            DrawEndingHud(batch, pixel, viewport);
+            batch.End();
+            return;
+        }
 
         Rectangle healthBack = new(28, 28, 264, 20);
         batch.FillRectangle(pixel, healthBack, new Color(7, 6, 12) * 0.9f);
@@ -292,6 +453,11 @@ public sealed class GameWorld
             batch.FillRectangle(pixel, new Rectangle(viewport.Width - 86 + i * 22, 32, width, 7), stageColor);
         }
 
+        if (_debugVisible)
+        {
+            DrawDebugOverlay(batch, pixel, viewport);
+        }
+
         batch.End();
     }
 
@@ -333,8 +499,10 @@ public sealed class GameWorld
             _particles.EmitBurst(coreHit ? weakPoint : enemy.Position - targetDirection * enemy.Radius * 0.35f, targetDirection, particleCount, impactColor, strike.Step == 3 ? 260f : 150f, coreHit ? 8f : strike.Step == 3 ? 9f : 5f);
             if (coreHit)
             {
+                _spriteVfx.Spawn("core_hit", weakPoint, 0f, 0.62f);
                 _player.AddResonance(GameBalance.ResonancePerCoreHit);
                 _screenEffects.Flash(0.075f, 0.2f);
+                _audio.Play(AudioCue.CoreHit, 0.7f);
             }
             hitAnything = true;
         }
@@ -345,6 +513,7 @@ public sealed class GameWorld
         }
 
         _screenEffects.BeginHitstop(strike.Hitstop);
+        _audio.Play(AudioCue.ScytheHit, strike.Step == 3 ? 0.72f : 0.48f, strike.Step == 2 ? 0.08f : 0f);
         if (strike.Step == 3)
         {
             _screenEffects.AddShake(0.18f, 8f);
@@ -401,6 +570,8 @@ public sealed class GameWorld
         _particles.EmitDeathFlame(center, 18 + waveNumber * 5, 1f + waveNumber * 0.12f);
         _screenEffects.AddShake(0.16f, 4f + waveNumber);
         _screenEffects.Flash(0.08f, 0.12f + waveNumber * 0.035f);
+        _audio.SetCalm(false);
+        _audio.Play(AudioCue.WaveStart, 0.62f, MathF.Min(0.18f, waveNumber * 0.03f));
     }
 
     private void ResetEncounter()
@@ -409,11 +580,16 @@ public sealed class GameWorld
         _enemies.Clear();
         _souls.Clear();
         _cannonShots.Clear();
+        _spriteVfx.Clear();
         _waveNumber = 0;
         _loopState = ArenaLoopState.Intro;
         _loopStateTimer = 1.05f;
         _burningHandoffTimer = 0f;
         _burningCommittedLastFrame = 0;
+        _endingTimer = 0f;
+        _deathTimer = 0f;
+        _forceSoulSense = false;
+        _audio.SetCalm(false);
     }
 
     private void ConfigureBurningAggression(float deltaTime)
@@ -477,7 +653,9 @@ public sealed class GameWorld
                     if (_waveNumber >= 4)
                     {
                         _loopState = ArenaLoopState.Complete;
+                        _endingTimer = 0f;
                         _screenEffects.Flash(0.16f, 0.3f);
+                        _audio.SetCalm(true);
                     }
                     else
                     {
@@ -486,6 +664,10 @@ public sealed class GameWorld
                         _particles.EmitDeathFlame(_arena.CombatBounds.Center.ToVector2(), 12, 0.8f);
                     }
                 }
+                break;
+
+            case ArenaLoopState.Complete:
+                _endingTimer = MathF.Min(12f, _endingTimer + deltaTime);
                 break;
         }
     }
@@ -507,6 +689,100 @@ public sealed class GameWorld
         {
             float pulse = 0.5f + 0.5f * MathF.Sin(_loopStateTimer * 12f);
             batch.DrawCircle(pixel, _arena.CombatBounds.Center.ToVector2(), 118f + pulse * 14f, GameBalance.DeathFlame * (0.18f + pulse * 0.18f), 5f, 40);
+        }
+        else if (_loopState == ArenaLoopState.Complete)
+        {
+            DrawLifeFlame(batch, pixel);
+        }
+    }
+
+    private void DrawLifeFlame(SpriteBatch batch, Texture2D pixel)
+    {
+        if (_endingTimer < 1.35f)
+        {
+            return;
+        }
+
+        float appear = MathHelper.Clamp((_endingTimer - 1.35f) / 1.2f, 0f, 1f);
+        Vector2 origin = new(_arena.CombatBounds.Right - 246f, _arena.CombatBounds.Top + 154f);
+        float breathe = 0.96f + 0.05f * MathF.Sin(_endingTimer * 2.2f);
+        _art.DrawLifeFlame(batch, origin, appear, breathe);
+    }
+
+    private void DrawEndingHud(SpriteBatch batch, Texture2D pixel, Viewport viewport)
+    {
+        float quiet = MathHelper.Clamp(_endingTimer / 1.4f, 0f, 1f);
+        batch.FillRectangle(pixel, new Rectangle(0, 0, viewport.Width, viewport.Height), Color.Black * (quiet * 0.38f));
+
+        if (_endingTimer >= 2.7f)
+        {
+            float titleAlpha = MathHelper.Clamp((_endingTimer - 2.7f) / 0.9f, 0f, 1f);
+            PixelText.DrawCentered(batch, pixel, "THE LOST SOUL OF FIRE", viewport.Width * 0.5f, viewport.Height * 0.39f, 5, GameBalance.SoulWhite * titleAlpha);
+        }
+        if (_endingTimer >= 3.7f)
+        {
+            float completeAlpha = MathHelper.Clamp((_endingTimer - 3.7f) / 0.8f, 0f, 1f);
+            PixelText.DrawCentered(batch, pixel, "PROTOTYPE COMPLETE", viewport.Width * 0.5f, viewport.Height * 0.51f, 3, new Color(215, 205, 224) * completeAlpha);
+        }
+        if (_endingTimer >= 4.7f)
+        {
+            float promptPulse = 0.48f + 0.22f * MathF.Sin(_endingTimer * 2.4f);
+            PixelText.DrawCentered(batch, pixel, "R TO RESTART", viewport.Width * 0.5f, viewport.Height * 0.62f, 2, GameBalance.DeathFlameBright * promptPulse);
+        }
+    }
+
+    private static void DrawTitleHud(SpriteBatch batch, Texture2D pixel, Viewport viewport)
+    {
+        batch.FillRectangle(pixel, new Rectangle(0, 0, viewport.Width, viewport.Height), Color.Black * 0.62f);
+        PixelText.DrawCentered(batch, pixel, "THE LOST SOUL OF FIRE", viewport.Width * 0.5f, viewport.Height * 0.39f, 5, GameBalance.SoulWhite);
+        PixelText.DrawCentered(batch, pixel, "PRESS ANY KEY", viewport.Width * 0.5f, viewport.Height * 0.56f, 2, GameBalance.DeathFlameBright * 0.78f);
+    }
+
+    private void DrawDeathHud(SpriteBatch batch, Texture2D pixel, Viewport viewport)
+    {
+        float fade = MathHelper.Clamp(_deathTimer / 1.1f, 0.2f, 0.82f);
+        batch.FillRectangle(pixel, new Rectangle(0, 0, viewport.Width, viewport.Height), Color.Black * fade);
+        if (_deathTimer >= 0.35f)
+        {
+            float titleAlpha = MathHelper.Clamp((_deathTimer - 0.35f) / 0.55f, 0f, 1f);
+            PixelText.DrawCentered(batch, pixel, "FLAME EXTINGUISHED", viewport.Width * 0.5f, viewport.Height * 0.44f, 4, GameBalance.DeathFlameBright * titleAlpha);
+        }
+        if (_deathTimer >= 1f)
+        {
+            PixelText.DrawCentered(batch, pixel, "R TO RETRY", viewport.Width * 0.5f, viewport.Height * 0.57f, 2, GameBalance.SoulWhite * 0.72f);
+        }
+    }
+
+    private void DrawDebugOverlay(SpriteBatch batch, Texture2D pixel, Viewport viewport)
+    {
+        int x = viewport.Width - 324;
+        int y = 24;
+        batch.FillRectangle(pixel, new Rectangle(x - 14, y - 12, 308, 216), new Color(5, 5, 9) * 0.9f);
+        batch.DrawRectangle(pixel, new Rectangle(x - 14, y - 12, 308, 216), new Color(80, 220, 210) * 0.72f, 2f);
+
+        Color label = new(189, 231, 226);
+        PixelText.Draw(batch, pixel, $"FPS: {_fps}", new Vector2(x, y), 2, label);
+        PixelText.Draw(batch, pixel, $"HP: {_player.Health}/{GameBalance.PlayerMaxHealth}", new Vector2(x, y + 24), 2, label);
+        string resonance = _player.ResonanceActive
+            ? $"RESONANCE: {_player.ResonanceRemaining:0.0}"
+            : $"RESONANCE: {_player.Resonance:0}/{GameBalance.ResonanceRequired:0}";
+        PixelText.Draw(batch, pixel, resonance, new Vector2(x, y + 48), 2, label);
+        PixelText.Draw(batch, pixel, $"WAVE: {_waveNumber}/4 {_loopState}", new Vector2(x, y + 72), 2, label);
+        PixelText.Draw(batch, pixel, $"ENEMIES: {_enemies.Count(enemy => enemy.IsAlive)}", new Vector2(x, y + 96), 2, label);
+        PixelText.Draw(batch, pixel, $"SOULS: {_souls.Count}", new Vector2(x, y + 120), 2, label);
+        PixelText.Draw(batch, pixel, $"PLAYER: {GetPlayerState()}", new Vector2(x, y + 144), 2, label);
+        PixelText.Draw(batch, pixel, $"SENSE FORCE: {(_forceSoulSense ? "ON" : "OFF")}", new Vector2(x, y + 168), 2, label);
+    }
+
+    private void UpdateFps(float deltaTime)
+    {
+        _fpsFrames++;
+        _fpsTimer += deltaTime;
+        if (_fpsTimer >= 0.5f)
+        {
+            _fps = (int)MathF.Round(_fpsFrames / _fpsTimer);
+            _fpsFrames = 0;
+            _fpsTimer = 0f;
         }
     }
 
@@ -577,7 +853,8 @@ public sealed class GameWorld
     private string GetScreenshotContext()
     {
         if (_player.IsDead) return "phase05_player_down";
-        if (_loopState == ArenaLoopState.Complete) return "phase12_arena_complete";
+        if (_loopState == ArenaLoopState.Title) return "phase15_title";
+        if (_loopState == ArenaLoopState.Complete) return "phase15_prototype_complete";
         if (_loopState == ArenaLoopState.Transition) return $"phase12_wave_{_waveNumber}_clear";
         if (_loopState == ArenaLoopState.Intro) return "phase12_arena_intro";
         if (_player.ResonanceActive) return "phase11_resonance_active";
@@ -613,6 +890,13 @@ public sealed class GameWorld
 
         Vector2 origin = _player.Position + request.Direction * 74f;
         _cannonShots.Add(new CannonShot(origin, request));
+        _spriteVfx.Spawn(
+            "cannon_muzzle_full",
+            origin,
+            MathF.Atan2(request.Direction.Y, request.Direction.X),
+            request.IsFullCharge ? 0.72f : 0.46f,
+            request.IsFullCharge ? Color.White : new Color(205, 164, 242));
+        _audio.Play(AudioCue.CannonFire, request.IsFullCharge ? 0.9f : 0.58f, request.IsFullCharge ? -0.08f : 0.08f);
         _player.ApplyCannonRecoil(request.Direction, request.Charge);
         _particles.EmitBurst(origin, request.Direction, request.IsFullCharge ? 30 : 14, request.IsFullCharge ? GameBalance.SoulWhite : GameBalance.DeathFlameBright, request.IsFullCharge ? 360f : 190f, request.IsFullCharge ? 11f : 6f);
         _particles.EmitDeathFlame(origin, request.IsFullCharge ? 18 : 8, request.IsFullCharge ? 1.55f : 0.9f);
@@ -675,7 +959,9 @@ public sealed class GameWorld
                 }
                 if (coreHit)
                 {
+                    _spriteVfx.Spawn("core_hit", weakPoint, 0f, shot.IsFullCharge ? 0.78f : 0.58f);
                     _player.AddResonance(GameBalance.ResonancePerCoreHit * (shot.IsFullCharge ? 2f : 1f));
+                    _audio.Play(AudioCue.CoreHit, shot.IsFullCharge ? 0.86f : 0.66f);
                 }
 
                 shot.MarkHit();
@@ -729,12 +1015,14 @@ public sealed class GameWorld
 
     private void ResolveBurningDetonation(Burning source, Vector2 position)
     {
+        _spriteVfx.Spawn("burning_detonation", position, 0f, 0.88f);
         _particles.EmitBurst(position, Vector2.UnitX, 54, GameBalance.DeathFlameBright, 430f, 13f);
         _particles.EmitDeathFlame(position, 32, 1.65f);
         _screenEffects.BeginHitstop(0.1f);
         _screenEffects.BeginImpactFrame(0.065f);
         _screenEffects.AddShake(0.3f, 13f);
         _screenEffects.Flash(0.12f, 0.42f);
+        _audio.Play(AudioCue.BurningDetonation, 0.9f);
 
         foreach (Enemy enemy in _enemies.Where(enemy => enemy != source && enemy.IsAlive))
         {
@@ -765,5 +1053,49 @@ public sealed class GameWorld
 
         float amount = MathHelper.Clamp(Vector2.Dot(point - start, segment) / lengthSquared, 0f, 1f);
         return Vector2.DistanceSquared(point, start + segment * amount);
+    }
+
+    private void PlayPlayerActionAudio(
+        bool wasDashing,
+        bool wasResonanceActive,
+        bool wasSoulSenseActive,
+        bool wasCannonFull,
+        SoulCannonState previousCannonState)
+    {
+        if (_player.Scythe.StartedThisFrame)
+        {
+            AudioCue cue = _player.Scythe.ActiveStep switch
+            {
+                2 => AudioCue.ScytheSwing2,
+                3 => AudioCue.SoulCleave,
+                _ => AudioCue.ScytheSwing1
+            };
+            _audio.Play(cue, _player.Scythe.ActiveStep == 3 ? 0.78f : 0.5f);
+        }
+
+        if (!wasDashing && _player.IsDashing)
+        {
+            _audio.Play(AudioCue.Dash, 0.62f);
+        }
+        if (previousCannonState != SoulCannonState.Charging && _player.Cannon.State == SoulCannonState.Charging)
+        {
+            _audio.Play(AudioCue.CannonCharge, 0.42f);
+        }
+        if (!wasCannonFull && _player.Cannon.IsFullCharge)
+        {
+            _audio.Play(AudioCue.CannonFull, 0.72f);
+        }
+        if (!wasResonanceActive && _player.ResonanceActive)
+        {
+            _audio.Play(AudioCue.ResonanceActivate, 0.88f);
+        }
+        if (!wasSoulSenseActive && _player.SoulSenseActive && !_player.ResonanceActive)
+        {
+            _audio.Play(AudioCue.SoulSenseOn, 0.38f);
+        }
+        else if (wasSoulSenseActive && !_player.SoulSenseActive)
+        {
+            _audio.Play(AudioCue.SoulSenseOff, 0.3f);
+        }
     }
 }

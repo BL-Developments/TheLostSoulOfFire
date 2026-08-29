@@ -148,7 +148,12 @@ public sealed class SoulCannon
         _ => 1f
     };
 
-    public void DrawBack(SpriteBatch batch, Texture2D pixel, Vector2 playerPosition, Vector2 facingDirection)
+    public void DrawBack(
+        SpriteBatch batch,
+        Texture2D pixel,
+        Texture2D weaponTexture,
+        Vector2 playerPosition,
+        Vector2 facingDirection)
     {
         if (State != SoulCannonState.Stored)
         {
@@ -158,10 +163,15 @@ public sealed class SoulCannon
         Vector2 right = new(-facingDirection.Y, facingDirection.X);
         Vector2 stock = playerPosition - facingDirection * 24f - right * 22f;
         Vector2 barrel = playerPosition + facingDirection * 34f + right * 20f;
-        DrawWeapon(batch, pixel, stock, barrel, 0f, false);
+        DrawWeapon(batch, pixel, weaponTexture, stock, barrel, 0f, false);
     }
 
-    public void DrawActive(SpriteBatch batch, Texture2D pixel, Vector2 playerPosition, Vector2 facingDirection)
+    public void DrawActive(
+        SpriteBatch batch,
+        Texture2D pixel,
+        Texture2D weaponTexture,
+        Vector2 playerPosition,
+        Vector2 facingDirection)
     {
         if (State == SoulCannonState.Stored)
         {
@@ -181,7 +191,7 @@ public sealed class SoulCannon
         Vector2 activeBarrel = playerPosition + facingDirection * 72f + right * 6f;
         Vector2 stock = Vector2.Lerp(storedStock, activeStock, transition);
         Vector2 barrel = Vector2.Lerp(storedBarrel, activeBarrel, transition);
-        DrawWeapon(batch, pixel, stock, barrel, ChargeProgress, IsFullCharge);
+        DrawWeapon(batch, pixel, weaponTexture, stock, barrel, ChargeProgress, IsFullCharge);
 
         if (State == SoulCannonState.Charging)
         {
@@ -233,19 +243,25 @@ public sealed class SoulCannon
     private static void DrawWeapon(
         SpriteBatch batch,
         Texture2D pixel,
+        Texture2D weaponTexture,
         Vector2 stock,
         Vector2 barrel,
         float charge,
         bool full)
     {
         Vector2 direction = Vector2.Normalize(barrel - stock);
-        Vector2 right = new(-direction.Y, direction.X);
-        batch.DrawLine(pixel, stock, barrel, new Color(12, 12, 17), 25f);
-        batch.DrawLine(pixel, stock + right * 9f, barrel + right * 9f, new Color(85, 82, 92), 4f);
-        batch.DrawLine(pixel, stock - right * 8f, barrel - right * 8f, new Color(46, 44, 54), 6f);
-        batch.FillCircle(pixel, stock + direction * 26f, 13f, new Color(28, 26, 34));
-        batch.DrawCircle(pixel, stock + direction * 26f, 13f, new Color(126, 120, 132), 3f, 18);
-        batch.FillRectangle(pixel, new Rectangle((int)(barrel.X - 8f), (int)(barrel.Y - 8f), 16, 16), new Color(19, 18, 24));
+        float rotation = MathF.Atan2(direction.Y, direction.X) + MathF.PI;
+        float displayLength = Vector2.Distance(stock, barrel) + 36f;
+        batch.Draw(
+            weaponTexture,
+            Vector2.Lerp(stock, barrel, 0.52f),
+            null,
+            Color.White,
+            rotation,
+            new Vector2(weaponTexture.Width, weaponTexture.Height) * 0.5f,
+            displayLength / weaponTexture.Width,
+            SpriteEffects.None,
+            0f);
 
         if (charge <= 0f)
         {

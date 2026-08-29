@@ -37,6 +37,7 @@ public sealed class Devourer : Enemy
     public DevourerState State { get; private set; } = DevourerState.ApproachPlayer;
     public override string StateLabel => State.ToString().ToUpperInvariant();
     public int ConsumedSoulCount => _consumedSouls.Count;
+    public Vector2 FacingDirection => _facing;
     public Vector2 TorsoPosition => Position + new Vector2(0f, -8f);
 
     public Devourer(Vector2 position)
@@ -189,7 +190,12 @@ public sealed class Devourer : Enemy
         return true;
     }
 
-    public override void Draw(SpriteBatch batch, Texture2D pixel, bool debugVisible, bool soulSenseActive)
+    public override void Draw(
+        SpriteBatch batch,
+        Texture2D pixel,
+        bool debugVisible,
+        bool soulSenseActive,
+        bool useSpriteArt)
     {
         if (State == DevourerState.Dead)
         {
@@ -214,13 +220,16 @@ public sealed class Devourer : Enemy
             return;
         }
 
-        batch.FillCircle(pixel, Position + new Vector2(7f, 30f), 54f * stackScale, new Color(3, 3, 7) * 0.66f);
-        batch.FillCircle(pixel, Position, 48f * stackScale, body);
-        batch.DrawLine(pixel, Position - right * 32f, Position - right * 56f + _facing * 25f, body, 25f);
-        batch.DrawLine(pixel, Position + right * 32f, Position + right * 57f + _facing * 22f, body, 25f);
-        batch.DrawLine(pixel, Position - right * 21f + new Vector2(0f, 30f), Position - right * 26f + new Vector2(0f, 59f), new Color(20, 19, 25), 25f);
-        batch.DrawLine(pixel, Position + right * 21f + new Vector2(0f, 30f), Position + right * 27f + new Vector2(0f, 57f), new Color(20, 19, 25), 25f);
-        batch.FillCircle(pixel, Position + new Vector2(0f, -52f), 18f, new Color(20, 19, 26));
+        if (!useSpriteArt)
+        {
+            batch.FillCircle(pixel, Position + new Vector2(7f, 30f), 54f * stackScale, new Color(3, 3, 7) * 0.66f);
+            batch.FillCircle(pixel, Position, 48f * stackScale, body);
+            batch.DrawLine(pixel, Position - right * 32f, Position - right * 56f + _facing * 25f, body, 25f);
+            batch.DrawLine(pixel, Position + right * 32f, Position + right * 57f + _facing * 22f, body, 25f);
+            batch.DrawLine(pixel, Position - right * 21f + new Vector2(0f, 30f), Position - right * 26f + new Vector2(0f, 59f), new Color(20, 19, 25), 25f);
+            batch.DrawLine(pixel, Position + right * 21f + new Vector2(0f, 30f), Position + right * 27f + new Vector2(0f, 57f), new Color(20, 19, 25), 25f);
+            batch.FillCircle(pixel, Position + new Vector2(0f, -52f), 18f, new Color(20, 19, 26));
+        }
 
         batch.FillCircle(pixel, TorsoPosition, 28f, new Color(7, 5, 10));
         batch.DrawCircle(pixel, TorsoPosition, 29f + pulse * 3f, GameBalance.DeepViolet * (0.55f + ConsumedSoulCount * 0.12f), 6f, 24);

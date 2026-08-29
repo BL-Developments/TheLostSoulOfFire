@@ -39,6 +39,7 @@ public sealed class Player
     public Vector2 Position { get; private set; }
     public Vector2 Velocity { get; private set; }
     public Vector2 FacingDirection { get; private set; } = Vector2.UnitX;
+    public Vector2 DashDirection => _dashDirection;
     public int Health { get; private set; } = GameBalance.PlayerMaxHealth;
     public float Radius => GameBalance.PlayerRadius;
     public float InvulnerabilityRemaining { get; private set; }
@@ -90,7 +91,8 @@ public sealed class Player
         Vector2 mouseWorld,
         Rectangle movementBounds,
         ParticleSystem particles,
-        ScreenEffects screenEffects)
+        ScreenEffects screenEffects,
+        bool forceSoulSense = false)
     {
         _visualTime += deltaTime;
         _resonanceActivationTimer = MathF.Max(0f, _resonanceActivationTimer - deltaTime);
@@ -109,7 +111,7 @@ public sealed class Player
             StartResonance(particles, screenEffects);
         }
 
-        SoulSenseActive = !IsDead && (ResonanceActive || input.IsKeyDown(Keys.Q));
+        SoulSenseActive = !IsDead && (ResonanceActive || forceSoulSense || input.IsKeyDown(Keys.Q));
         _dashCooldownTimer = MathF.Max(0f, _dashCooldownTimer - deltaTime);
         InvulnerabilityRemaining = MathF.Max(0f, InvulnerabilityRemaining - deltaTime);
         UpdateAfterimages(deltaTime);
@@ -200,7 +202,7 @@ public sealed class Player
         }
     }
 
-    public void Draw(SpriteBatch batch, Texture2D pixel, bool debugVisible)
+    public void Draw(SpriteBatch batch, Texture2D pixel, ArtAssets art, bool debugVisible)
     {
         if (IsDead)
         {
@@ -211,10 +213,7 @@ public sealed class Player
         }
 
         Vector2 right = new(-FacingDirection.Y, FacingDirection.X);
-        Vector2 rear = Position - FacingDirection * 16f;
         float pulse = 0.5f + 0.5f * MathF.Sin(_visualTime * 4f);
-
-        batch.FillCircle(pixel, Position + new Vector2(3f, 8f), 24f, new Color(3, 3, 7) * 0.55f);
 
         if (ResonanceActive)
         {
@@ -224,18 +223,10 @@ public sealed class Player
             batch.DrawLine(pixel, Position + right * 18f, Position + right * 29f - Vector2.UnitY * (37f + flare * 11f), GameBalance.DeathFlameBright * 0.7f, 6f);
         }
 
-        Cannon.DrawBack(batch, pixel, Position, FacingDirection);
-        Scythe.Draw(batch, pixel, Position, FacingDirection, debugVisible);
-
-        // Long asymmetrical coat and narrow silhouette.
-        batch.DrawLine(pixel, rear - right * 7f, Position - FacingDirection * 34f - right * 15f, new Color(20, 18, 28), 12f);
-        batch.DrawLine(pixel, rear + right * 7f, Position - FacingDirection * 39f + right * 7f, new Color(28, 24, 38), 10f);
-        batch.DrawLine(pixel, Position - FacingDirection * 10f, Position + FacingDirection * 11f, new Color(30, 28, 39), 31f);
-        batch.DrawLine(pixel, Position - right * 10f, Position + right * 10f, new Color(41, 37, 52), 7f);
+        Cannon.DrawBack(batch, pixel, art.SoulCannon, Position, FacingDirection);
+        Scythe.Draw(batch, pixel, art.PhysicalScythe, Position, FacingDirection, debugVisible);
 
         Vector2 head = Position + FacingDirection * 18f;
-        batch.FillCircle(pixel, head, 11f, new Color(22, 21, 29));
-        batch.DrawLine(pixel, head + right * 7f - FacingDirection * 6f, head - right * 8f - FacingDirection * 3f, new Color(15, 14, 20), 5f);
 
         Vector2 eye = head + FacingDirection * 8f;
         Color eyeColor = SoulSenseActive ? GameBalance.SoulWhite : new Color(174, 166, 183);
@@ -262,7 +253,7 @@ public sealed class Player
             batch.DrawLine(pixel, Position + FacingDirection * 2f, Position + right * 13f + Vector2.UnitY * 13f, GameBalance.DeathFlame * 0.72f, 3f);
         }
 
-        Cannon.DrawActive(batch, pixel, Position, FacingDirection);
+        Cannon.DrawActive(batch, pixel, art.SoulCannon, Position, FacingDirection);
 
         if (IsDashing)
         {

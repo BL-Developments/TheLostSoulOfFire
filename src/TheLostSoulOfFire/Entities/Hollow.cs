@@ -33,6 +33,7 @@ public sealed class Hollow : Enemy
 
     public HollowState State { get; private set; } = HollowState.Approach;
     public override string StateLabel => State.ToString().ToUpperInvariant();
+    public Vector2 FacingDirection => _facing;
     public Vector2 CorePosition => Position + new Vector2(0f, -5f);
 
     public Hollow(Vector2 position, int movementSeed)
@@ -136,7 +137,12 @@ public sealed class Hollow : Enemy
         return true;
     }
 
-    public override void Draw(SpriteBatch batch, Texture2D pixel, bool debugVisible, bool soulSenseActive)
+    public override void Draw(
+        SpriteBatch batch,
+        Texture2D pixel,
+        bool debugVisible,
+        bool soulSenseActive,
+        bool useSpriteArt)
     {
         if (State == HollowState.Dead)
         {
@@ -155,20 +161,23 @@ public sealed class Hollow : Enemy
             : 0f;
         Color body = HitFlashRemaining > 0f ? GameBalance.SoulWhite : new Color(35, 34, 42);
 
-        batch.FillCircle(pixel, Position + new Vector2(5f, 25f), 31f, new Color(3, 3, 7) * 0.6f);
-        batch.DrawLine(pixel, Position + new Vector2(0f, -47f), Position + new Vector2(0f, 31f), body, 18f);
-        batch.DrawLine(pixel, Position + new Vector2(-11f, 12f), Position + new Vector2(-20f, 42f), new Color(26, 25, 33), 11f);
-        batch.DrawLine(pixel, Position + new Vector2(11f, 12f), Position + new Vector2(17f, 45f), new Color(26, 25, 33), 10f);
+        if (!useSpriteArt)
+        {
+            batch.FillCircle(pixel, Position + new Vector2(5f, 25f), 31f, new Color(3, 3, 7) * 0.6f);
+            batch.DrawLine(pixel, Position + new Vector2(0f, -47f), Position + new Vector2(0f, 31f), body, 18f);
+            batch.DrawLine(pixel, Position + new Vector2(-11f, 12f), Position + new Vector2(-20f, 42f), new Color(26, 25, 33), 11f);
+            batch.DrawLine(pixel, Position + new Vector2(11f, 12f), Position + new Vector2(17f, 45f), new Color(26, 25, 33), 10f);
 
-        Vector2 shoulder = Position + new Vector2(0f, -24f);
-        Vector2 armBack = shoulder - _facing * (20f + telegraph * 24f) + right * 18f;
-        Vector2 armFront = shoulder + _facing * (State == HollowState.Swipe ? 55f : 15f) - right * 17f;
-        batch.DrawLine(pixel, shoulder + right * 7f, armBack, body, 10f);
-        batch.DrawLine(pixel, shoulder - right * 7f, armFront, body, 10f);
+            Vector2 shoulder = Position + new Vector2(0f, -24f);
+            Vector2 armBack = shoulder - _facing * (20f + telegraph * 24f) + right * 18f;
+            Vector2 armFront = shoulder + _facing * (State == HollowState.Swipe ? 55f : 15f) - right * 17f;
+            batch.DrawLine(pixel, shoulder + right * 7f, armBack, body, 10f);
+            batch.DrawLine(pixel, shoulder - right * 7f, armFront, body, 10f);
 
-        Vector2 mask = Position + new Vector2(0f, -48f) + _facing * 2f;
-        batch.FillCircle(pixel, mask, 13f, new Color(216, 211, 203));
-        batch.DrawLine(pixel, mask - right * 5f, mask + right * 5f, new Color(130, 124, 128), 1.5f);
+            Vector2 mask = Position + new Vector2(0f, -48f) + _facing * 2f;
+            batch.FillCircle(pixel, mask, 13f, new Color(216, 211, 203));
+            batch.DrawLine(pixel, mask - right * 5f, mask + right * 5f, new Color(130, 124, 128), 1.5f);
+        }
 
         if (State == HollowState.Telegraph)
         {

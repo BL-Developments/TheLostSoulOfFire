@@ -11,6 +11,21 @@ public sealed class InputState
     private MouseState _mouse;
 
     public Point MousePosition => _mouse.Position;
+    public bool AnyInputPressed
+    {
+        get
+        {
+            foreach (Keys key in _keyboard.GetPressedKeys())
+            {
+                if (_previousKeyboard.IsKeyUp(key))
+                {
+                    return true;
+                }
+            }
+
+            return WasLeftMousePressed || WasRightMousePressed;
+        }
+    }
 
     public void Update()
     {

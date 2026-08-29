@@ -110,7 +110,12 @@ public sealed class Soul
         _releaseBurstCreated = false;
     }
 
-    public void Draw(SpriteBatch batch, Texture2D pixel, Player player, bool soulSenseActive)
+    public void Draw(
+        SpriteBatch batch,
+        Texture2D pixel,
+        Player player,
+        bool soulSenseActive,
+        bool useSpriteArt)
     {
         if (State is SoulState.Released or SoulState.Consumed)
         {
@@ -131,9 +136,12 @@ public sealed class Soul
         Color glow = Color.Lerp(GameBalance.DeathFlame, GameBalance.SoulWhite, releaseProgress);
         float emphasis = soulSenseActive ? 1.25f : 1f;
 
-        batch.FillCircle(pixel, Position, (16f + pulse * 2f) * emphasis, GameBalance.DeepViolet * 0.54f);
-        batch.FillCircle(pixel, Position, (10f + pulse) * emphasis, glow * 0.92f);
-        batch.FillCircle(pixel, Position, 4f * emphasis, GameBalance.SoulWhite);
+        if (!useSpriteArt)
+        {
+            batch.FillCircle(pixel, Position, (16f + pulse * 2f) * emphasis, GameBalance.DeepViolet * 0.54f);
+            batch.FillCircle(pixel, Position, (10f + pulse) * emphasis, glow * 0.92f);
+            batch.FillCircle(pixel, Position, 4f * emphasis, GameBalance.SoulWhite);
+        }
 
         if (State == SoulState.BeingDevoured)
         {
@@ -166,6 +174,7 @@ public sealed class Soul
         if (_stateTimer <= 0f)
         {
             particles.EmitBurst(Position, -Vector2.UnitY, 14, GameBalance.SoulWhite, 92f, 5f);
+            particles.EmitSoulRelease(Position);
             State = SoulState.Residue;
             _stateTimer = GameBalance.SoulResidueTravelTime;
         }

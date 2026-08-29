@@ -37,7 +37,12 @@ public abstract class Enemy
         ParticleSystem particles,
         ScreenEffects screenEffects);
 
-    public abstract void Draw(SpriteBatch batch, Texture2D pixel, bool debugVisible, bool soulSenseActive);
+    public abstract void Draw(
+        SpriteBatch batch,
+        Texture2D pixel,
+        bool debugVisible,
+        bool soulSenseActive,
+        bool useSpriteArt);
 
     public virtual bool TryConsumeSoulSpawn(out Vector2 position)
     {
