@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
@@ -9,12 +10,17 @@ public sealed class InputState
     private KeyboardState _keyboard;
     private MouseState _previousMouse;
     private MouseState _mouse;
+    private readonly HashSet<Keys> _injectedPresses = [];
 
     public Point MousePosition => _mouse.Position;
     public bool AnyInputPressed
     {
         get
         {
+            if (_injectedPresses.Count > 0)
+            {
+                return true;
+            }
             foreach (Keys key in _keyboard.GetPressedKeys())
             {
                 if (_previousKeyboard.IsKeyUp(key))
@@ -29,6 +35,7 @@ public sealed class InputState
 
     public void Update()
     {
+        _injectedPresses.Clear();
         _previousKeyboard = _keyboard;
         _previousMouse = _mouse;
         _keyboard = Keyboard.GetState();
@@ -38,7 +45,7 @@ public sealed class InputState
     public bool IsKeyDown(Keys key) => _keyboard.IsKeyDown(key);
 
     public bool WasKeyPressed(Keys key) =>
-        _keyboard.IsKeyDown(key) && _previousKeyboard.IsKeyUp(key);
+        _injectedPresses.Contains(key) || _keyboard.IsKeyDown(key) && _previousKeyboard.IsKeyUp(key);
 
     public bool WasKeyReleased(Keys key) =>
         _keyboard.IsKeyUp(key) && _previousKeyboard.IsKeyDown(key);
@@ -53,4 +60,6 @@ public sealed class InputState
         _mouse.RightButton == ButtonState.Pressed && _previousMouse.RightButton == ButtonState.Released;
     public bool WasRightMouseReleased =>
         _mouse.RightButton == ButtonState.Released && _previousMouse.RightButton == ButtonState.Pressed;
+
+    internal void InjectKeyPress(Keys key) => _injectedPresses.Add(key);
 }

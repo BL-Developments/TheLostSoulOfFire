@@ -49,8 +49,12 @@ public sealed class GameWorld : IDisposable
     private float _fpsTimer;
     private int _fpsFrames;
     private int _fps = 60;
+    private bool _audioTestFatalDamageRequested;
 
     public string ScreenshotContext => GetScreenshotContext();
+    public ArenaLoopState LoopState => _loopState;
+    public int WaveNumber => _waveNumber;
+    public bool PlayerDead => _player.IsDead;
 
     public string WindowTitle => _debugVisible
         ? $"The Lost Soul of Fire — DEBUG | Wave {_waveNumber}/4 {_loopState.ToString().ToUpperInvariant()} | HP {_player.Health} | RES {(_player.ResonanceActive ? $"ACTIVE {_player.ResonanceRemaining:0.0}s" : $"{_player.Resonance:0}/{GameBalance.ResonanceRequired:0}")} | Player {GetPlayerState()} | Enemies {_enemies.Count(enemy => enemy.IsAlive)} | Souls {_souls.Count}"
@@ -76,6 +80,7 @@ public sealed class GameWorld : IDisposable
     public void Update(GameTime gameTime, InputState input, Viewport viewport)
     {
         float deltaTime = MathF.Min((float)gameTime.ElapsedGameTime.TotalSeconds, 1f / 20f);
+        _audio.Update(deltaTime);
         bool wasDashing = _player.IsDashing;
         bool wasResonanceActive = _player.ResonanceActive;
         bool wasResonanceReady = _player.IsResonanceReady;
@@ -93,6 +98,7 @@ public sealed class GameWorld : IDisposable
         {
             if (input.AnyInputPressed)
             {
+                _audio.Play(AudioCue.TitleConfirm, 0.58f);
                 _loopState = ArenaLoopState.Intro;
                 _loopStateTimer = 1.05f;
             }
@@ -129,7 +135,7 @@ public sealed class GameWorld : IDisposable
         {
             foreach (Enemy enemy in _enemies.Where(enemy => enemy.IsAlive))
             {
-                enemy.ApplyDamage(new DamageInfo(enemy.Health + enemy.MaxHealth, Vector2.Zero, enemy.Position));
+                ApplyEnemyDamage(enemy, new DamageInfo(enemy.Health + enemy.MaxHealth, Vector2.Zero, enemy.Position));
             }
         }
 
@@ -177,6 +183,11 @@ public sealed class GameWorld : IDisposable
         }
 
         _player.Update(deltaTime, input, _lastMouseWorld, _arena.CombatBounds, _particles, _screenEffects, _forceSoulSense);
+        if (_audioTestFatalDamageRequested)
+        {
+            _audioTestFatalDamageRequested = false;
+            _player.ApplyDamage(GameBalance.PlayerMaxHealth, Vector2.Zero, _screenEffects);
+        }
         if (_player.Scythe.StartedThisFrame)
         {
             string effect = _player.Scythe.ActiveStep switch
@@ -212,11 +223,28 @@ public sealed class GameWorld : IDisposable
         ConfigureBurningAggression(deltaTime);
         foreach (Enemy enemy in _enemies)
         {
+            HollowState? previousHollowState = enemy is Hollow hollowBefore ? hollowBefore.State : null;
             BurningState? previousBurningState = enemy is Burning burningBefore ? burningBefore.State : null;
+            DevourerState? previousDevourerState = enemy is Devourer devourerBefore ? devourerBefore.State : null;
             enemy.Update(deltaTime, _player, _souls, _arena.CombatBounds, _particles, _screenEffects);
+            if (enemy is Hollow hollowAfter && previousHollowState != HollowState.Swipe && hollowAfter.State == HollowState.Swipe)
+            {
+                _audio.Play(AudioCue.HollowSwipe, 0.48f);
+            }
             if (enemy is Burning burningAfter && previousBurningState != BurningState.Charge && burningAfter.State == BurningState.Charge)
             {
                 _audio.Play(AudioCue.BurningCharge, 0.72f);
+            }
+            if (enemy is Devourer devourerAfter)
+            {
+                if (previousDevourerState != DevourerState.Slam && devourerAfter.State == DevourerState.Slam)
+                {
+                    _audio.Play(AudioCue.DevourerSlam, 0.76f);
+                }
+                if (previousDevourerState != DevourerState.Devour && devourerAfter.State == DevourerState.Devour)
+                {
+                    _audio.Play(AudioCue.DevourerDevour, 0.6f);
+                }
             }
             if (enemy.TryConsumeSoulSpawn(out Vector2 soulPosition))
             {
@@ -256,6 +284,10 @@ public sealed class GameWorld : IDisposable
         UpdateArenaLoop(deltaTime);
         if (previousHealth > _player.Health)
         {
+            if (_player.IsDead)
+            {
+                _audio.SetSoulSense(false);
+            }
             _audio.Play(_player.IsDead ? AudioCue.PlayerDeath : AudioCue.PlayerHit, _player.IsDead ? 0.78f : 0.6f);
         }
         if (!wasResonanceReady && _player.IsResonanceReady)
@@ -273,6 +305,8 @@ public sealed class GameWorld : IDisposable
         _audio.Dispose();
         GC.SuppressFinalize(this);
     }
+
+    internal void RequestAudioTestFatalDamage() => _audioTestFatalDamageRequested = true;
 
     public void Draw(SpriteBatch batch, Texture2D pixel, Viewport viewport)
     {
@@ -491,7 +525,7 @@ public sealed class GameWorld : IDisposable
             int damage = coreHit
                 ? (int)MathF.Round(strike.Damage * GameBalance.SoulSenseCoreDamageMultiplier)
                 : strike.Damage;
-            enemy.ApplyDamage(new DamageInfo(
+            ApplyEnemyDamage(enemy, new DamageInfo(
                 damage,
                 targetDirection * strike.Knockback,
                 coreHit ? weakPoint : enemy.Position,
@@ -591,7 +625,9 @@ public sealed class GameWorld : IDisposable
         _endingTimer = 0f;
         _deathTimer = 0f;
         _forceSoulSense = false;
+        _audioTestFatalDamageRequested = false;
         _audio.SetCalm(false);
+        _audio.SetSoulSense(false);
     }
 
     private void ConfigureBurningAggression(float deltaTime)
@@ -652,6 +688,7 @@ public sealed class GameWorld : IDisposable
             case ArenaLoopState.Combat:
                 if (_enemies.Count == 0 && _souls.Count == 0)
                 {
+                    _audio.Play(AudioCue.WaveClear, _waveNumber >= 4 ? 0.74f : 0.62f);
                     if (_waveNumber >= 4)
                     {
                         _loopState = ArenaLoopState.Complete;
@@ -669,7 +706,12 @@ public sealed class GameWorld : IDisposable
                 break;
 
             case ArenaLoopState.Complete:
+                float previousEndingTimer = _endingTimer;
                 _endingTimer = MathF.Min(12f, _endingTimer + deltaTime);
+                if (previousEndingTimer < 1.35f && _endingTimer >= 1.35f)
+                {
+                    _audio.Play(AudioCue.EndingReveal, 0.7f);
+                }
                 break;
         }
     }
@@ -942,7 +984,7 @@ public sealed class GameWorld : IDisposable
                     ? (int)MathF.Round(shot.Damage * GameBalance.CannonCoreDamageMultiplier)
                     : shot.Damage;
                 float knockback = MathHelper.Lerp(330f, 760f, shot.Charge);
-                enemy.ApplyDamage(new DamageInfo(
+                ApplyEnemyDamage(enemy, new DamageInfo(
                     damage,
                     shot.Direction * knockback,
                     coreHit ? weakPoint : enemy.Position,
@@ -964,6 +1006,10 @@ public sealed class GameWorld : IDisposable
                     _spriteVfx.Spawn("core_hit", weakPoint, 0f, shot.IsFullCharge ? 0.78f : 0.58f);
                     _player.AddResonance(GameBalance.ResonancePerCoreHit * (shot.IsFullCharge ? 2f : 1f));
                     _audio.Play(AudioCue.CoreHit, shot.IsFullCharge ? 0.86f : 0.66f);
+                }
+                else
+                {
+                    _audio.Play(AudioCue.CannonImpact, shot.IsFullCharge ? 0.72f : 0.48f);
                 }
 
                 shot.MarkHit();
@@ -1036,7 +1082,7 @@ public sealed class GameWorld : IDisposable
             }
 
             Vector2 direction = away.LengthSquared() > 0.001f ? Vector2.Normalize(away) : Vector2.UnitX;
-            enemy.ApplyDamage(new DamageInfo(
+            ApplyEnemyDamage(enemy, new DamageInfo(
                 GameBalance.BurningDetonationDamage,
                 direction * GameBalance.BurningDetonationKnockback,
                 enemy.Position));
@@ -1098,6 +1144,22 @@ public sealed class GameWorld : IDisposable
         else if (wasSoulSenseActive && !_player.SoulSenseActive)
         {
             _audio.Play(AudioCue.SoulSenseOff, 0.3f);
+        }
+
+        if (wasSoulSenseActive != _player.SoulSenseActive)
+        {
+            _audio.SetSoulSense(_player.SoulSenseActive);
+        }
+    }
+
+    private void ApplyEnemyDamage(Enemy enemy, DamageInfo damage)
+    {
+        bool wasAlive = enemy.IsAlive;
+        enemy.ApplyDamage(damage);
+        if (wasAlive && !enemy.IsAlive)
+        {
+            float volume = enemy is Devourer ? 0.72f : 0.52f;
+            _audio.Play(AudioCue.EnemyDeath, volume);
         }
     }
 }

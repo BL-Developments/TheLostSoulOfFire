@@ -1,2 +1,13 @@
-using var game = new TheLostSoulOfFire.Game1();
+using System;
+using TheLostSoulOfFire.Debugging;
+
+bool audioRuntimeTest = Array.Exists(args, argument => argument == "--audio-runtime-test");
+bool audioLoopRuntimeTest = Array.Exists(args, argument => argument == "--audio-loop-runtime-test");
+bool audioGameplayTest = Array.Exists(args, argument => argument == "--audio-gameplay-test");
+bool audioDeathRestartTest = Array.Exists(args, argument => argument == "--audio-death-restart-test");
+bool expectAudioFallback = Array.Exists(args, argument => argument == "--expect-audio-fallback");
+
+using Microsoft.Xna.Framework.Game game = audioRuntimeTest || audioLoopRuntimeTest
+    ? new AudioRuntimeTestGame(expectAudioFallback, audioLoopRuntimeTest)
+    : new TheLostSoulOfFire.Game1(audioGameplayTest, audioDeathRestartTest);
 game.Run();
