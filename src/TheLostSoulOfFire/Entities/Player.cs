@@ -202,7 +202,7 @@ public sealed class Player
         }
     }
 
-    public void Draw(SpriteBatch batch, Texture2D pixel, ArtAssets art, bool debugVisible)
+    public void Draw(SpriteBatch batch, Texture2D pixel, ArtAssets art, bool debugVisible, float soulSenseAmount = 0f)
     {
         if (IsDead)
         {
@@ -229,13 +229,14 @@ public sealed class Player
         Vector2 head = Position + FacingDirection * 18f;
 
         Vector2 eye = head + FacingDirection * 8f;
-        Color eyeColor = SoulSenseActive ? GameBalance.SoulWhite : new Color(174, 166, 183);
-        if (SoulSenseActive)
+        float sense = MathHelper.Clamp(soulSenseAmount, 0f, 1f);
+        Color eyeColor = Color.Lerp(new Color(174, 166, 183), GameBalance.SoulWhite, sense);
+        if (sense > 0.001f)
         {
-            batch.FillCircle(pixel, eye, 8f, GameBalance.DeepViolet * 0.68f);
-            batch.DrawLine(pixel, Position + FacingDirection * 4f, head, GameBalance.DeathFlame * 0.5f, 4f);
+            batch.FillCircle(pixel, eye, 8f, GameBalance.DeepViolet * (0.68f * sense));
+            batch.DrawLine(pixel, Position + FacingDirection * 4f, head, GameBalance.DeathFlame * (0.5f * sense), 4f);
         }
-        batch.DrawLine(pixel, eye - right * 4f, eye + right * 4f, eyeColor, SoulSenseActive ? 3f : 2f);
+        batch.DrawLine(pixel, eye - right * 4f, eye + right * 4f, eyeColor, MathHelper.Lerp(2f, 3f, sense));
 
         bool coreReady = IsResonanceReady;
         float coreRadius = coreReady ? 9f + pulse * 2.4f : 7f + pulse * 1.3f;
