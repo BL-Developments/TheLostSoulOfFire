@@ -1,0 +1,62 @@
+# .NET build results
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+[Xx]64/
+[Xx]86/
+[Ll]og/
+[Ll]ogs/
+
+# MonoGame Content Pipeline build cache
+Content/bin/
+Content/obj/
+*.mgcb.log
+*.xnb
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code
+# (launch.json / settings.json are useful to share; keep them tracked)
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Rider / JetBrains
+.idea/
+*.sln.iml
+
+# NuGet
+*.nupkg
+*.snupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# ASP.NET / general MSBuild
+*.pdb
+*.cache
+*.ilk
+*.meta
+*.tlog
+*.lastbuildstate
+*.dll
+*.exe
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# OpenSpec / editor scratch
+*.swp
+*~

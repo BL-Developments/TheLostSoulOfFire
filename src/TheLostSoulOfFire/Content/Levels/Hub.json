@@ -1,0 +1,16 @@
+{
+  "name": "EmberSanctum",
+  "bounds": { "x": 0, "y": 0, "width": 1200, "height": 800 },
+  "playerSpawn": { "x": 260, "y": 400 },
+  "walls": [
+    { "x": 0, "y": 0, "width": 1200, "height": 32 },
+    { "x": 0, "y": 768, "width": 1200, "height": 32 },
+    { "x": 0, "y": 0, "width": 32, "height": 800 },
+    { "x": 1168, "y": 0, "width": 32, "height": 800 },
+    { "x": 520, "y": 180, "width": 64, "height": 260 },
+    { "x": 520, "y": 560, "width": 64, "height": 120 }
+  ],
+  "portal": { "x": 790, "y": 300, "width": 140, "height": 200 },
+  "altar": { "x": 0, "y": 0, "width": 0, "height": 0 },
+  "enemySpawns": []
+}
