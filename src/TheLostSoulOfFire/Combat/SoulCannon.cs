@@ -29,6 +29,7 @@ public sealed class SoulCannon
     private float _stateTimer;
     private float _chargeTime;
     private float _chargeParticleTimer;
+    private float _visualTime;
     private bool _shotPending;
     private bool _fullCueCreated;
     private CannonShotRequest _pendingShot;
@@ -56,6 +57,8 @@ public sealed class SoulCannon
         State = SoulCannonState.Stored;
         _stateTimer = 0f;
         _chargeTime = 0f;
+        _chargeParticleTimer = 0f;
+        _visualTime = 0f;
         _shotPending = false;
         _fullCueCreated = false;
         _aimDirection = Vector2.UnitX;
@@ -72,6 +75,7 @@ public sealed class SoulCannon
         ParticleSystem particles,
         bool resonanceActive)
     {
+        _visualTime += deltaTime;
         _resonanceActive = resonanceActive;
         _aimDirection = facingDirection.LengthSquared() > 0.001f ? Vector2.Normalize(facingDirection) : Vector2.UnitX;
 
@@ -107,8 +111,8 @@ public sealed class SoulCannon
                 {
                     _fullCueCreated = true;
                     Vector2 muzzle = playerPosition + _aimDirection * 68f;
-                    particles.EmitBurst(muzzle, -_aimDirection, 22, GameBalance.SoulWhite, 150f, 7f);
-                    particles.EmitDeathFlame(muzzle, 15, 1.3f);
+                    particles.EmitConvergence(muzzle, 18, 82f, GameBalance.SoulWhite, 0.2f, 5.5f);
+                    particles.EmitBurst(muzzle, -_aimDirection, 7, GameBalance.SoulWhite, 105f, 5f);
                 }
 
                 if (input.WasRightMouseReleased || !input.IsRightMouseDown)
@@ -163,7 +167,7 @@ public sealed class SoulCannon
         Vector2 right = new(-facingDirection.Y, facingDirection.X);
         Vector2 stock = playerPosition - facingDirection * 24f - right * 22f;
         Vector2 barrel = playerPosition + facingDirection * 34f + right * 20f;
-        DrawWeapon(batch, pixel, weaponTexture, stock, barrel, 0f, false);
+        DrawWeapon(batch, pixel, weaponTexture, stock, barrel, 0f, false, 0f);
     }
 
     public void DrawActive(
@@ -191,7 +195,14 @@ public sealed class SoulCannon
         Vector2 activeBarrel = playerPosition + facingDirection * 72f + right * 6f;
         Vector2 stock = Vector2.Lerp(storedStock, activeStock, transition);
         Vector2 barrel = Vector2.Lerp(storedBarrel, activeBarrel, transition);
-        DrawWeapon(batch, pixel, weaponTexture, stock, barrel, ChargeProgress, IsFullCharge);
+        float pulse = 0.5f + 0.5f * MathF.Sin(_visualTime * (IsFullCharge ? 28f : 17f));
+        float vibrationStrength = State == SoulCannonState.Charging && ChargeStage >= 3
+            ? MathHelper.Lerp(0.65f, 1.8f, MathHelper.Clamp((ChargeProgress - 0.67f) / 0.33f, 0f, 1f))
+            : 0f;
+        Vector2 vibration = right * MathF.Sin(_visualTime * 53f) * vibrationStrength;
+        stock += vibration * 0.35f;
+        barrel += vibration;
+        DrawWeapon(batch, pixel, weaponTexture, stock, barrel, ChargeProgress, IsFullCharge, pulse);
 
         if (State == SoulCannonState.Charging)
         {
@@ -231,9 +242,27 @@ public sealed class SoulCannon
             return;
         }
 
-        _chargeParticleTimer = MathHelper.Lerp(0.12f, 0.025f, ChargeProgress);
+        _chargeParticleTimer = ChargeStage switch
+        {
+            1 => 0.12f,
+            2 => 0.075f,
+            _ => IsFullCharge ? 0.045f : 0.055f
+        };
         Vector2 muzzle = playerPosition + _aimDirection * 68f;
-        particles.EmitDeathFlame(muzzle, ChargeStage, 0.55f + ChargeProgress * 0.75f);
+        int particleCount = ChargeStage switch { 1 => 1, 2 => 2, _ => 3 };
+        float convergenceRadius = ChargeStage switch { 1 => 38f, 2 => 56f, _ => 72f };
+        Color color = IsFullCharge
+            ? GameBalance.SoulWhite
+            : ChargeStage >= 3
+                ? GameBalance.DeathFlameBright
+                : GameBalance.DeathFlame;
+        particles.EmitConvergence(
+            muzzle,
+            particleCount,
+            convergenceRadius,
+            color,
+            MathHelper.Lerp(0.16f, 0.11f, ChargeProgress),
+            2.8f + ChargeProgress * 2.1f);
     }
 
     private float GetFullChargeTime() => _resonanceActive
@@ -247,7 +276,8 @@ public sealed class SoulCannon
         Vector2 stock,
         Vector2 barrel,
         float charge,
-        bool full)
+        bool full,
+        float pulse)
     {
         Vector2 direction = Vector2.Normalize(barrel - stock);
         float rotation = MathF.Atan2(direction.Y, direction.X) + MathF.PI;
@@ -268,13 +298,21 @@ public sealed class SoulCannon
             return;
         }
 
-        Color energy = full ? GameBalance.SoulWhite : Color.Lerp(GameBalance.DeepViolet, GameBalance.DeathFlameBright, charge);
-        batch.FillCircle(pixel, stock + direction * 28f, 4f + charge * 10f, energy * (0.55f + charge * 0.4f));
-        batch.DrawCircle(pixel, barrel, 10f + charge * 17f, GameBalance.DeathFlame * (0.4f + charge * 0.5f), 3f + charge * 3f, 24);
+        int stage = charge < 0.25f ? 1 : charge < 0.67f ? 2 : 3;
+        Color energy = full
+            ? GameBalance.SoulWhite
+            : Color.Lerp(GameBalance.DeepViolet, GameBalance.DeathFlameBright, charge);
+        float chamberRadius = stage switch { 1 => 5f, 2 => 8f, _ => 10f };
+        float barrelRadius = stage switch { 1 => 10f, 2 => 16f, _ => 21f };
+        batch.FillCircle(pixel, stock + direction * 28f, chamberRadius + pulse * 1.5f, energy * (0.58f + charge * 0.38f));
+        batch.DrawCircle(pixel, barrel, barrelRadius + pulse * 2f, energy * (0.48f + charge * 0.42f), 2.5f + stage, 24);
+        if (stage >= 3)
+        {
+            batch.FillCircle(pixel, barrel, full ? 10f + pulse * 1.5f : 6f + pulse, full ? GameBalance.SoulWhite : GameBalance.DeathFlameBright * 0.9f);
+        }
         if (full)
         {
-            batch.FillCircle(pixel, barrel, 10f, GameBalance.SoulWhite);
-            batch.DrawCircle(pixel, barrel, 34f, GameBalance.SoulWhite * 0.8f, 3f, 28);
+            batch.DrawCircle(pixel, barrel, 29f + pulse * 5f, GameBalance.SoulWhite * (0.68f + pulse * 0.18f), 3f, 28);
         }
     }
 }
