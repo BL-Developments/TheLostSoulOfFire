@@ -7,18 +7,8 @@ namespace TheLostSoulOfFire.Game;
 
 public sealed class Arena
 {
-    private float _visualTime;
-    private float _soulEnergy = 1f;
-
     public Rectangle Bounds => GameBalance.ArenaBounds;
     public Rectangle CombatBounds => GameBalance.CombatBounds;
-
-    public void Update(float deltaTime, bool calming = false)
-    {
-        _visualTime += deltaTime;
-        float target = calming ? 0.12f : 1f;
-        _soulEnergy = MathHelper.Lerp(_soulEnergy, target, 1f - MathF.Exp(-deltaTime * 1.4f));
-    }
 
     public void Draw(SpriteBatch batch, Texture2D pixel)
     {
@@ -33,7 +23,6 @@ public sealed class Arena
         DrawBrokenMachinery(batch, pixel);
         DrawCentralSeal(batch, pixel);
         DrawForegroundShapes(batch, pixel);
-        DrawAmbientSoulLight(batch, pixel, _visualTime, _soulEnergy);
     }
 
     private static void DrawBackgroundMasses(SpriteBatch batch, Texture2D pixel)
@@ -283,19 +272,4 @@ public sealed class Arena
         batch.DrawLine(pixel, new Vector2(1712, 963), new Vector2(1760, 876), new Color(51, 47, 60), 10f);
     }
 
-    private static void DrawAmbientSoulLight(SpriteBatch batch, Texture2D pixel, float visualTime, float energy)
-    {
-        DrawSoulWisp(batch, pixel, new Vector2(232, 432), visualTime, 0f, energy);
-        DrawSoulWisp(batch, pixel, new Vector2(1480, 480), visualTime, 1.7f, energy);
-        DrawSoulWisp(batch, pixel, new Vector2(1040, 168), visualTime, 3.1f, energy);
-    }
-
-    private static void DrawSoulWisp(SpriteBatch batch, Texture2D pixel, Vector2 origin, float visualTime, float phase, float energy)
-    {
-        float pulse = 0.5f + 0.5f * MathF.Sin(visualTime * 1.35f + phase);
-        Vector2 drift = new(MathF.Sin(visualTime * 0.7f + phase) * 7f, MathF.Cos(visualTime * 0.55f + phase) * 5f);
-        Color faintViolet = GameBalance.DeepViolet * ((0.1f + pulse * 0.08f) * energy);
-        batch.FillCircle(pixel, origin + drift, 18f + pulse * 5f, faintViolet);
-        batch.DrawLine(pixel, origin + drift, origin + drift + new Vector2(-11f, 20f), GameBalance.DeathFlame * ((0.08f + pulse * 0.08f) * energy), 3f);
-    }
 }

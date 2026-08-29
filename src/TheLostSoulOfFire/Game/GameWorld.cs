@@ -30,6 +30,7 @@ public sealed class GameWorld : IDisposable
     private readonly Camera2D _camera;
     private readonly ScreenEffects _screenEffects = new();
     private readonly ParticleSystem _particles = new();
+    private readonly ArenaAtmosphere _arenaAtmosphere = new();
     private readonly HudRenderer _hud = new();
     private readonly SoulSensePresentation _soulSensePresentation = new();
     private readonly ArtAssets _art;
@@ -99,7 +100,7 @@ public sealed class GameWorld : IDisposable
         UpdateFps(deltaTime);
         _screenEffects.Update(deltaTime);
         _combatPresentation.Update(deltaTime);
-        _arena.Update(deltaTime, _loopState == ArenaLoopState.Complete);
+        _arenaAtmosphere.Update(deltaTime, _loopState == ArenaLoopState.Complete);
 
         if (_loopState == ArenaLoopState.Title)
         {
@@ -218,6 +219,7 @@ public sealed class GameWorld : IDisposable
         if (!wasResonanceActive && _player.ResonanceActive)
         {
             _combatPresentation.BeginResonance(_player.Position);
+            _arenaAtmosphere.ReactToResonance();
         }
         PlayPlayerActionAudio(wasDashing, wasResonanceActive, wasSoulSenseActive, wasCannonFull, previousCannonState);
         SpawnCannonShot();
@@ -340,6 +342,7 @@ public sealed class GameWorld : IDisposable
             transformMatrix: _camera.GetTransform(viewport, _screenEffects.CameraOffset));
 
         _art.DrawArena(batch);
+        _arenaAtmosphere.DrawBackground(batch, pixel, _soulSensePresentation.WorldSuppression);
         DrawArenaLoop(batch, pixel);
         _player.DrawAfterimages(batch, pixel);
         foreach (Enemy enemy in _enemies)
@@ -413,6 +416,7 @@ public sealed class GameWorld : IDisposable
             _souls,
             _cannonShots,
             _particles,
+            _arenaAtmosphere,
             _arena.CombatBounds,
             _presentationTime,
             _soulSensePresentation.SoulEmergence,
@@ -591,6 +595,7 @@ public sealed class GameWorld : IDisposable
         _spriteVfx.Clear();
         _combatPresentation.Clear();
         _screenEffects.Clear();
+        _arenaAtmosphere.Reset();
         _waveNumber = 0;
         _loopState = ArenaLoopState.Intro;
         _loopStateTimer = 1.05f;
@@ -901,6 +906,10 @@ public sealed class GameWorld : IDisposable
         Vector2 origin = _player.Position + request.Direction * 74f;
         _cannonShots.Add(new CannonShot(origin, request));
         _combatPresentation.PresentCannonFire(origin, request);
+        if (request.IsFullCharge)
+        {
+            _arenaAtmosphere.ReactToForce(origin, 460f, 135f);
+        }
         _audio.Play(AudioCue.CannonFire, request.IsFullCharge ? 0.9f : 0.58f, request.IsFullCharge ? -0.08f : 0.08f);
         _player.ApplyCannonRecoil(request.Direction, request.Charge);
     }
@@ -1012,6 +1021,7 @@ public sealed class GameWorld : IDisposable
     private void ResolveBurningDetonation(Burning source, Vector2 position)
     {
         _combatPresentation.PresentBurningDetonation(position);
+        _arenaAtmosphere.ReactToForce(position, 560f, 190f);
         _audio.Play(AudioCue.BurningDetonation, 0.9f);
 
         foreach (Enemy enemy in _enemies.Where(enemy => enemy != source && enemy.IsAlive))
