@@ -53,6 +53,7 @@ public sealed class GameWorld : IDisposable
     private int _fpsFrames;
     private int _fps = 60;
     private bool _audioTestFatalDamageRequested;
+    private bool _endingRevealPlayed;
 
     public string ScreenshotContext => GetScreenshotContext();
     public ArenaLoopState LoopState => _loopState;
@@ -188,6 +189,11 @@ public sealed class GameWorld : IDisposable
 
         if (_loopState == ArenaLoopState.Complete)
         {
+            if (!_endingRevealPlayed && _presentation.StateTime >= CinematicPresentation.LifeFlameRevealTime)
+            {
+                _endingRevealPlayed = true;
+                _audio.Play(AudioCue.EndingReveal, 0.72f);
+            }
             UpdateArenaLoop(deltaTime);
             _soulSensePresentation.Update(deltaTime, false);
             _particles.Update(deltaTime);
@@ -271,7 +277,7 @@ public sealed class GameWorld : IDisposable
             {
                 _audio.Play(AudioCue.HollowSwipe, 0.48f);
             }
-            if (enemy is Burning burningAfter && previousBurningState != BurningState.Charge && burningAfter.State == BurningState.Charge)
+            if (enemy is Burning burningAfter && previousBurningState != BurningState.Telegraph && burningAfter.State == BurningState.Telegraph)
             {
                 _audio.Play(AudioCue.BurningCharge, 0.72f);
             }
@@ -638,6 +644,7 @@ public sealed class GameWorld : IDisposable
         _forceSoulSense = false;
         _soulSensePresentation.Reset();
         _audioTestFatalDamageRequested = false;
+        _endingRevealPlayed = false;
         _audio.SetCalm(false);
         _audio.SetSoulSense(false);
     }
@@ -709,8 +716,12 @@ public sealed class GameWorld : IDisposable
                     if (_waveNumber >= 4)
                     {
                         _loopState = ArenaLoopState.Complete;
+                        _player.SettleForCompletion();
+                        _cannonShots.Clear();
                         _presentation.BeginCompletion();
+                        _endingRevealPlayed = false;
                         _audio.SetCalm(true);
+                        _audio.SetSoulSense(false);
                     }
                     else
                     {

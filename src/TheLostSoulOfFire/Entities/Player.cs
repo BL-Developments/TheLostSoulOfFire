@@ -43,6 +43,7 @@ public sealed class Player
     public int Health { get; private set; } = GameBalance.PlayerMaxHealth;
     public float Radius => GameBalance.PlayerRadius;
     public float InvulnerabilityRemaining { get; private set; }
+    public float HitFlashRemaining { get; private set; }
     public float DashCooldownRemaining => _dashCooldownTimer;
     public bool IsDashing => _dashTimer > 0f;
     public bool IsInvulnerable => InvulnerabilityRemaining > 0f;
@@ -71,6 +72,7 @@ public sealed class Player
         _dashTimer = 0f;
         _dashCooldownTimer = 0f;
         InvulnerabilityRemaining = 0f;
+        HitFlashRemaining = 0f;
         _attackImpulse = Vector2.Zero;
         _damageKnockback = Vector2.Zero;
         Resonance = 0f;
@@ -79,6 +81,23 @@ public sealed class Player
         _resonanceActivationTimer = 0f;
         _resonanceAfterimageTimer = 0f;
         _activeDashDistance = GameBalance.DashDistance;
+        SoulSenseActive = false;
+        _afterimages.Clear();
+        Scythe.Reset();
+        Cannon.Reset();
+    }
+
+    public void SettleForCompletion()
+    {
+        Velocity = Vector2.Zero;
+        _dashTimer = 0f;
+        _attackImpulse = Vector2.Zero;
+        _damageKnockback = Vector2.Zero;
+        Resonance = 0f;
+        ResonanceActive = false;
+        _resonanceTimer = 0f;
+        _resonanceActivationTimer = 0f;
+        _resonanceAfterimageTimer = 0f;
         SoulSenseActive = false;
         _afterimages.Clear();
         Scythe.Reset();
@@ -96,6 +115,7 @@ public sealed class Player
     {
         _visualTime += deltaTime;
         _resonanceActivationTimer = MathF.Max(0f, _resonanceActivationTimer - deltaTime);
+        HitFlashRemaining = MathF.Max(0f, HitFlashRemaining - deltaTime);
         if (ResonanceActive)
         {
             _resonanceTimer = MathF.Max(0f, _resonanceTimer - deltaTime);
@@ -256,6 +276,13 @@ public sealed class Player
 
         Cannon.DrawActive(batch, pixel, art.SoulCannon, Position, FacingDirection);
 
+        if (HitFlashRemaining > 0f)
+        {
+            float flash = MathHelper.Clamp(HitFlashRemaining / 0.14f, 0f, 1f);
+            batch.DrawCircle(pixel, Position, 29f, GameBalance.SoulWhite * (0.72f * flash), 4f, 24);
+            batch.FillCircle(pixel, Position + FacingDirection * 2f, 7f, GameBalance.SoulWhite * (0.88f * flash));
+        }
+
         if (IsDashing)
         {
             Vector2 ignitionOrigin = Position - _dashDirection * 15f;
@@ -295,6 +322,7 @@ public sealed class Player
         }
 
         Health = Math.Max(0, Health - damage);
+        HitFlashRemaining = Health == 0 ? 0.24f : 0.14f;
         _damageKnockback += knockback;
         InvulnerabilityRemaining = 0.5f;
         screenEffects.BeginHitstop(Health == 0 ? 0.12f : 0.045f);

@@ -16,6 +16,7 @@ public sealed class CinematicPresentation
     public const float FullIntroDuration = 1.55f;
     public const float RetryIntroDuration = 0.52f;
     public const float WaveTransitionDuration = 1.05f;
+    public const float LifeFlameRevealTime = 1.05f;
 
     private float _titleTime;
     private float _stateTime;
@@ -233,7 +234,7 @@ public sealed class CinematicPresentation
         PixelText.DrawCentered(
             batch,
             pixel,
-            "ENTER OR CLICK TO BEGIN",
+            "PRESS ANY KEY OR CLICK",
             centerX,
             viewport.Height * 0.72f,
             2,
@@ -310,11 +311,12 @@ public sealed class CinematicPresentation
         float endingReveal = Ease((_stateTime - 2.8f) / 1.05f);
         DrawTitleRules(batch, pixel, viewport, viewport.Height * 0.39f - 34f, endingReveal * 0.66f);
         PixelText.DrawCentered(batch, pixel, "THE LOST SOUL OF FIRE", viewport.Width * 0.5f, viewport.Height * 0.39f, 5, GameBalance.SoulWhite * endingReveal);
-        PixelText.DrawCentered(batch, pixel, "THE SOUL IS FREE", viewport.Width * 0.5f, viewport.Height * 0.46f, 2, GameBalance.DeathFlameBright * (0.62f * Ease((_stateTime - 3.8f) / 0.7f)));
+        Color lifeFlame = new(255, 178, 82);
+        PixelText.DrawCentered(batch, pixel, "PROTOTYPE COMPLETE", viewport.Width * 0.5f, viewport.Height * 0.46f, 2, lifeFlame * (0.76f * Ease((_stateTime - 3.8f) / 0.7f)));
 
         float promptReveal = Ease((_stateTime - 5.2f) / 0.65f);
         float promptBreathe = 0.56f + MathF.Sin(_stateTime * 2f) * 0.1f;
-        PixelText.DrawCentered(batch, pixel, "R TO RETURN", viewport.Width * 0.5f, viewport.Height * 0.82f, 2, GameBalance.SoulWhite * (promptReveal * promptBreathe));
+        PixelText.DrawCentered(batch, pixel, "R TO RESTART", viewport.Width * 0.5f, viewport.Height * 0.82f, 2, GameBalance.SoulWhite * (promptReveal * promptBreathe));
     }
 
     private void DrawLifeFlame(SpriteBatch batch, Texture2D pixel, ArtAssets art, Rectangle combatBounds)
