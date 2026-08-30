@@ -180,6 +180,8 @@ public sealed class ParticleSystem
         }
     }
 
+    public void Clear() => _particles.Clear();
+
     private void Add(
         Vector2 position,
         Vector2 velocity,

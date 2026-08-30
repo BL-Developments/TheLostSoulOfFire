@@ -98,7 +98,7 @@ public sealed class GameWorld : IDisposable
 
         if (_loopState == ArenaLoopState.Title)
         {
-            if (input.AnyInputPressed)
+            if (input.AnyInputPressed && !input.WasKeyPressed(Keys.F9))
             {
                 _audio.Play(AudioCue.TitleConfirm, 0.58f);
                 _loopState = ArenaLoopState.Intro;
@@ -332,6 +332,7 @@ public sealed class GameWorld : IDisposable
         {
             if (_player.IsDead)
             {
+                _audio.SetCalm(true);
                 _audio.SetSoulSense(false);
                 _presentation.BeginDeath();
             }
@@ -632,6 +633,7 @@ public sealed class GameWorld : IDisposable
         _enemies.Clear();
         _souls.Clear();
         _cannonShots.Clear();
+        _particles.Clear();
         _spriteVfx.Clear();
         _combatPresentation.Clear();
         _screenEffects.Clear();
