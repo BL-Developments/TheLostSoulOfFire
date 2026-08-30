@@ -1,16 +1,16 @@
 # The Lost Soul of Fire — Final Audio Package
 
-**Status:** authored and integrated for feature freeze on 2026-08-30.
+**Status:** the approved pre-ElevenLabs authored bank was restored on 2026-08-30 after the replacement pass failed subjective quality review.
 
-## Locked scope
+## Shipped scope
 
-The final package is **sound effects and arena ambience only**. It contains no music, adaptive score, menu music, battle loop, or Techno Mode. Silence remains part of the presentation.
+The package contains **sound effects, arena ambience, and a restrained arena music loop**. It contains no adaptive score, menu music, or Techno Mode. Silence and dynamic headroom remain part of the presentation.
 
 The released game has no authoring-service dependency. It loads local Content Pipeline assets through `AudioDirector`, which retains synthetic emergency fallbacks if an authored asset is absent or unloadable.
 
 ## Audio audit
 
-The current runtime expects 27 named `AudioCue` one-shots and one arena ambience loop.
+The current runtime expects 27 named `AudioCue` one-shots, one arena ambience loop, and one arena music loop.
 
 ### MUST HAVE
 
@@ -23,7 +23,7 @@ The current runtime expects 27 named `AudioCue` one-shots and one arena ambience
 - Player: `player_hit`, `player_death`
 - Perception: `soul_sense_on`, `soul_sense_off`
 - Encounter: `wave_start`
-- World: `arena_ambience`
+- World: `arena_ambience`, `arena_loop`
 
 ### SHOULD HAVE
 
@@ -55,6 +55,7 @@ Every audited cue is currently routed on a real state transition, so all 27 one-
 3. Player damage and enemy-state feedback
 4. Soul Sense, Soul Release, completion transitions
 5. Arena ambience
+6. Restrained arena music bed
 
 Normal Scythe swings are intentionally leaner than Soul Cleave. Cannon is directed and occult-mechanical; Burning is erratic containment failure. Soul Release and death avoid explosion language. Soul Sense is a brief perceptual transition only.
 
@@ -62,18 +63,26 @@ Normal Scythe swings are intentionally leaner than Soul Cleave. Cannon is direct
 
 - `AudioDirector` remains the sole playback and mix owner.
 - Cue cooldown, polyphony, enemy-voice cap, subtle pitch variation, and fallback behavior remain intact.
-- Soul Sense suppresses ambience without adding a continuous tone.
-- Resonance, Soul Release, wave clear, and ending reveal duck ambience briefly.
+- Soul Sense suppresses ambience and music without adding a continuous tone.
+- Resonance, Soul Release, wave clear, and ending reveal duck ambience and music briefly.
 - Ambience runs at 0.12 gameplay gain and 0.035 calm gain before event ducking.
-- The previous arena music asset and `MediaPlayer` path were removed.
+- Music runs at 0.50 gameplay gain and 0.26 calm gain before perception and event ducking, keeping it audible beneath the denser restored effects.
+- The complete organic Ludo bank—27 one-shots, ambience, and arena music—and its `MediaPlayer` path were restored byte-for-byte from commit `6f61fc4`.
+
+## Quality decision
+
+The ElevenLabs replacement pass is not shipped. Its production script accepted one take per cue without an audition/selection stage, generated overly short source clips, used whole-clip reversal to manufacture several transitions, peak-normalized every result regardless of source quality, and collapsed ambience to mono before artificial stereo decorrelation. Those choices produced thin, generic effects that did not clear the approved bank's quality bar.
+
+Future generated replacements must be auditioned as multiple full-length candidates, selected in context against the current cue, and layered or edited where one generated take cannot provide the required transient, body, and supernatural tail. A replacement is accepted only when it is clearly stronger in gameplay; otherwise the approved Ludo asset remains authoritative.
 
 ## Asset contract
 
 - One-shots: mono 48 kHz, 16-bit PCM WAV.
 - Ambience: stereo 48 kHz, 16-bit PCM WAV, 20-second seamless loop.
+- Music: stereo 48 kHz Ogg Vorbis, 100-second seamless loop.
 - All peaks remain below -1 dBFS.
 - Cue durations match the real gameplay windows; no large silence pads are shipped.
-- Exact source/model/prompt/mastering records live in `Content/Audio/SOURCES.md` and `tools/audio/generate_elevenlabs_audio.py`.
+- Exact source/model/prompt/mastering records live in `Content/Audio/SOURCES.md` and `tools/audio/master_ludo_audio.py`.
 
 ## Validation
 
@@ -87,4 +96,4 @@ dotnet run --no-build --project src/TheLostSoulOfFire/TheLostSoulOfFire.csproj -
 dotnet run --no-build --project src/TheLostSoulOfFire/TheLostSoulOfFire.csproj -- --audio-death-restart-test
 ```
 
-The long-loop runtime mode (`--audio-loop-runtime-test`) now runs for 42 seconds, crossing two 20-second ambience boundaries without depending on music.
+The long-loop runtime mode (`--audio-loop-runtime-test`) runs for 102 seconds, crossing the music boundary and multiple 20-second ambience boundaries.

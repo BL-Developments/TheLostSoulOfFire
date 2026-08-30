@@ -5,6 +5,9 @@ from __future__ import annotations
 
 import argparse
 import math
+import shutil
+import subprocess
+import tempfile
 import wave
 from array import array
 from pathlib import Path
@@ -88,11 +91,26 @@ def inspect_wav(path: Path) -> dict[str, float | int]:
     }
 
 
+def inspect_ogg(path: Path) -> dict[str, float | int]:
+    ogginfo = shutil.which("ogginfo")
+    oggdec = shutil.which("oggdec")
+    if ogginfo is None or oggdec is None:
+        raise RuntimeError("ogginfo and oggdec (vorbis-tools) are required for full music validation")
+    info = subprocess.run([ogginfo, str(path)], check=True, capture_output=True, text=True).stdout
+    if "Vorbis stream" not in info or "Channels: 2" not in info or "Rate: 48000" not in info:
+        raise ValueError("music is not 48 kHz stereo Vorbis")
+    with tempfile.TemporaryDirectory(prefix="soulfire-audio-") as temporary:
+        decoded = Path(temporary) / "music.wav"
+        subprocess.run([oggdec, "--quiet", "-o", str(decoded), str(path)], check=True)
+        return inspect_wav(decoded)
+
+
 def expected_manifest_block(relative_path: str, processor: str) -> str:
+    importer = "WavImporter" if relative_path.endswith(".wav") else "OggImporter"
     return "\n".join(
         (
             f"#begin {relative_path}",
-            "/importer:WavImporter",
+            f"/importer:{importer}",
             f"/processor:{processor}",
             f"/build:{relative_path}",
         )
@@ -114,8 +132,11 @@ def main() -> int:
         (sfx_root / filename, "SoundEffectProcessor", duration)
         for filename, duration in SFX_DURATIONS.items()
     ]
-    expected_paths.append(
-        (args.content_root / "Audio" / "Ambience" / "arena_ambience.wav", "SoundEffectProcessor", None)
+    expected_paths.extend(
+        (
+            (args.content_root / "Audio" / "Ambience" / "arena_ambience.wav", "SoundEffectProcessor", None),
+            (args.content_root / "Audio" / "Music" / "arena_loop.ogg", "SongProcessor", None),
+        )
     )
 
     manifest_path = args.content_root / "Content.mgcb"
@@ -134,7 +155,7 @@ def main() -> int:
             failures.append(f"missing asset: {path.relative_to(args.content_root)}")
             continue
         try:
-            metrics = inspect_wav(path)
+            metrics = inspect_ogg(path) if path.suffix == ".ogg" else inspect_wav(path)
         except Exception as exc:  # Keep a complete failure report.
             failures.append(f"cannot inspect {path.name}: {exc}")
             continue
@@ -151,7 +172,7 @@ def main() -> int:
             failures.append(f"{relative}: expected 16-bit PCM after decode")
         if path.parent == sfx_root and metrics["channels"] != 1:
             failures.append(f"{relative}: effects must be mono")
-        if path.name == "arena_ambience.wav" and metrics["channels"] != 2:
+        if path.name in {"arena_ambience.wav", "arena_loop.ogg"} and metrics["channels"] != 2:
             failures.append(f"{relative}: loop must be stereo")
         if metrics["peak_db"] >= -1.0:
             failures.append(f"{relative}: peak {metrics['peak_db']:.2f} dBFS is not below -1 dBFS")
@@ -161,7 +182,9 @@ def main() -> int:
             failures.append(f"{relative}: duration differs from {expected_duration:.3f}s")
         if path.name == "arena_ambience.wav" and not 20.0 <= metrics["duration"] <= 30.0:
             failures.append(f"{relative}: ambience duration must be 20–30s")
-        if path.name == "arena_ambience.wav" and metrics["seam_db"] > -45.0:
+        if path.name == "arena_loop.ogg" and not 90.0 <= metrics["duration"] <= 150.0:
+            failures.append(f"{relative}: music duration must be 90–150s")
+        if path.name in {"arena_ambience.wav", "arena_loop.ogg"} and metrics["seam_db"] > -45.0:
             failures.append(f"{relative}: endpoint discontinuity is {metrics['seam_db']:.1f} dBFS")
 
         block = expected_manifest_block(relative, processor)
@@ -174,8 +197,8 @@ def main() -> int:
 
     if not sources_path.exists():
         failures.append("missing Audio/SOURCES.md")
-    if "ElevenLabs" not in sources or "eleven_text_to_sound_v2" not in sources:
-        failures.append("SOURCES.md is missing the ElevenLabs service/model record")
+    if "Ludo.ai" not in sources or "Ludo audio model (undisclosed)" not in sources:
+        failures.append("SOURCES.md is missing the approved Ludo service/model record")
     for cue in sorted(GAMEPLAY_CUES):
         if f"AudioCue.{cue}" not in game_world:
             failures.append(f"gameplay has no event wiring for AudioCue.{cue}")
@@ -184,10 +207,8 @@ def main() -> int:
     actual_sfx = {path.name for path in sfx_root.glob("*.wav")}
     for filename in sorted(actual_sfx - expected_sfx):
         failures.append(f"unexpected shipped SFX candidate: Audio/Sfx/{filename}")
-    if "Audio/Music" in manifest or (args.content_root / "Audio" / "Music").exists():
-        failures.append("music is outside the final SFX + ambience package")
-    if "MediaPlayer" in audio_director or "Song" in audio_director:
-        failures.append("AudioDirector still contains music playback")
+    if "MediaPlayer" not in audio_director or "Song" not in audio_director:
+        failures.append("AudioDirector is missing arena music playback")
 
     if failures:
         print("\nFAIL")

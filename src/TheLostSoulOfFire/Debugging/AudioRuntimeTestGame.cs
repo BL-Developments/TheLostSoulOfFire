@@ -27,7 +27,7 @@ public sealed class AudioRuntimeTestGame : Microsoft.Xna.Framework.Game
     {
         _expectFallback = expectFallback;
         _verifyLongLoops = verifyLongLoops;
-        _exitTime = verifyLongLoops ? 42f : 8.2f;
+        _exitTime = verifyLongLoops ? 102f : 8.2f;
         _graphics = new GraphicsDeviceManager(this)
         {
             PreferredBackBufferWidth = 480,
@@ -43,7 +43,7 @@ public sealed class AudioRuntimeTestGame : Microsoft.Xna.Framework.Game
     protected override void LoadContent()
     {
         _audio = new AudioDirector(Content);
-        Console.WriteLine($"AUDIO_RUNTIME_LOAD fallbacks={_audio.FallbackSoundCount} cues={_cues.Length}");
+        Console.WriteLine($"AUDIO_RUNTIME_LOAD fallbacks={_audio.FallbackSoundCount} music={_audio.MusicPlaying} cues={_cues.Length}");
     }
 
     protected override void Update(GameTime gameTime)
@@ -85,8 +85,11 @@ public sealed class AudioRuntimeTestGame : Microsoft.Xna.Framework.Game
         }
         if (_elapsed >= _exitTime)
         {
-            bool passed = !_expectFallback || _audio.FallbackSoundCount > 0;
-            Console.WriteLine($"AUDIO_RUNTIME_TEST_{(passed ? "PASS" : "FAIL")} fallbacks={_audio.FallbackSoundCount} cues={_cues.Length} longLoop={_verifyLongLoops}");
+            bool fallbackStateValid = _expectFallback
+                ? _audio.FallbackSoundCount > 0
+                : _audio.FallbackSoundCount == 0;
+            bool passed = fallbackStateValid && _audio.MusicPlaying;
+            Console.WriteLine($"AUDIO_RUNTIME_TEST_{(passed ? "PASS" : "FAIL")} fallbacks={_audio.FallbackSoundCount} music={_audio.MusicPlaying} cues={_cues.Length} longLoop={_verifyLongLoops}");
             Environment.ExitCode = passed ? 0 : 1;
             Exit();
         }

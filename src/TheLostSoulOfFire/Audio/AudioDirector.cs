@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Media;
 
 namespace TheLostSoulOfFire.Audio;
 
@@ -44,6 +45,8 @@ public sealed class AudioDirector : IDisposable
 {
     private const int FallbackSampleRate = 22050;
     private const int EnemyVoiceLimit = 4;
+    private const float MusicGameplayVolume = 0.5f;
+    private const float MusicCalmVolume = 0.26f;
 
     private enum CueGroup
     {
@@ -94,6 +97,8 @@ public sealed class AudioDirector : IDisposable
     private readonly HashSet<SoundEffect> _ownedFallbackSounds = [];
     private SoundEffect _ambienceSound;
     private SoundEffectInstance _ambience;
+    private Song _music;
+    private bool _musicPlaying;
     private bool _calm;
     private bool _soulSense;
     private float _duckTimer;
@@ -102,6 +107,7 @@ public sealed class AudioDirector : IDisposable
     private bool _available = true;
 
     public int FallbackSoundCount => _ownedFallbackSounds.Count;
+    public bool MusicPlaying => _musicPlaying && MediaPlayer.State == MediaState.Playing;
 
     public AudioDirector(ContentManager content)
     {
@@ -140,6 +146,7 @@ public sealed class AudioDirector : IDisposable
             _ambience.IsLooped = true;
             _ambience.Play();
 
+            TryStartMusic(content);
             ApplyMix();
         }
         catch
@@ -171,6 +178,7 @@ public sealed class AudioDirector : IDisposable
         {
             _duckAmount = MathF.Max(0f, _duckAmount - deltaTime * 2.4f);
         }
+        EnsureMusicPlaying();
         ApplyMix();
     }
 
@@ -252,6 +260,41 @@ public sealed class AudioDirector : IDisposable
         }
     }
 
+    private void TryStartMusic(ContentManager content)
+    {
+        const string assetName = "Audio/Music/arena_loop";
+        try
+        {
+            _music = content.Load<Song>(assetName);
+            MediaPlayer.IsMuted = false;
+            MediaPlayer.IsRepeating = true;
+            MediaPlayer.Play(_music);
+            _musicPlaying = true;
+        }
+        catch (ContentLoadException exception)
+        {
+            Console.Error.WriteLine($"AUDIO_MUSIC_LOAD_FAILED asset={assetName} message={exception.Message}");
+        }
+    }
+
+    private void EnsureMusicPlaying()
+    {
+        if (!_musicPlaying || _music is null || MediaPlayer.State != MediaState.Stopped)
+        {
+            return;
+        }
+
+        try
+        {
+            MediaPlayer.Play(_music);
+        }
+        catch (Exception exception)
+        {
+            _musicPlaying = false;
+            Console.Error.WriteLine($"AUDIO_MUSIC_PLAYBACK_FAILED message={exception.Message}");
+        }
+    }
+
     private void ApplyCueDuck(AudioCue cue)
     {
         switch (cue)
@@ -281,14 +324,20 @@ public sealed class AudioDirector : IDisposable
     private void ApplyMix()
     {
         float ambienceBase = _calm ? 0.035f : 0.12f;
+        float musicBase = _calm ? MusicCalmVolume : MusicGameplayVolume;
         if (_soulSense)
         {
             ambienceBase *= 0.52f;
+            musicBase *= 0.68f;
         }
 
         if (_ambience is not null)
         {
             _ambience.Volume = Math.Clamp(ambienceBase * (1f - _duckAmount * 0.72f), 0f, 1f);
+        }
+        if (_musicPlaying)
+        {
+            MediaPlayer.Volume = Math.Clamp(musicBase * (1f - _duckAmount * 0.62f), 0f, 1f);
         }
     }
 
@@ -363,6 +412,11 @@ public sealed class AudioDirector : IDisposable
 
     private void DisposeSounds()
     {
+        if (_musicPlaying)
+        {
+            MediaPlayer.Stop();
+            _musicPlaying = false;
+        }
         _ambience?.Stop();
         _ambience?.Dispose();
         _ambience = null;
