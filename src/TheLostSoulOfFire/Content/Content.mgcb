@@ -152,12 +152,6 @@
 /processor:SoundEffectProcessor
 /build:Audio/Ambience/arena_ambience.wav
 
-#begin Audio/Music/arena_loop.ogg
-/importer:OggImporter
-/processor:SongProcessor
-/build:Audio/Music/arena_loop.ogg
-
-
 #begin Textures/Effects/fx_burning_detonation.png
 /importer:TextureImporter
 /processor:TextureProcessor

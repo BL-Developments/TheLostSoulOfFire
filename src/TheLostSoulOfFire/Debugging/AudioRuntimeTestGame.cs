@@ -14,6 +14,7 @@ public sealed class AudioRuntimeTestGame : Microsoft.Xna.Framework.Game
 {
     private readonly GraphicsDeviceManager _graphics;
     private readonly bool _expectFallback;
+    private readonly bool _verifyLongLoops;
     private readonly float _exitTime;
     private readonly AudioCue[] _cues = Enum.GetValues<AudioCue>();
     private AudioDirector _audio;
@@ -25,7 +26,8 @@ public sealed class AudioRuntimeTestGame : Microsoft.Xna.Framework.Game
     public AudioRuntimeTestGame(bool expectFallback, bool verifyLongLoops = false)
     {
         _expectFallback = expectFallback;
-        _exitTime = verifyLongLoops ? 102f : 8.2f;
+        _verifyLongLoops = verifyLongLoops;
+        _exitTime = verifyLongLoops ? 42f : 8.2f;
         _graphics = new GraphicsDeviceManager(this)
         {
             PreferredBackBufferWidth = 480,
@@ -84,7 +86,7 @@ public sealed class AudioRuntimeTestGame : Microsoft.Xna.Framework.Game
         if (_elapsed >= _exitTime)
         {
             bool passed = !_expectFallback || _audio.FallbackSoundCount > 0;
-            Console.WriteLine($"AUDIO_RUNTIME_TEST_{(passed ? "PASS" : "FAIL")} fallbacks={_audio.FallbackSoundCount} cues={_cues.Length} longLoop={_exitTime > 100f}");
+            Console.WriteLine($"AUDIO_RUNTIME_TEST_{(passed ? "PASS" : "FAIL")} fallbacks={_audio.FallbackSoundCount} cues={_cues.Length} longLoop={_verifyLongLoops}");
             Environment.ExitCode = passed ? 0 : 1;
             Exit();
         }

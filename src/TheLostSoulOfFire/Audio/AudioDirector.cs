@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Media;
 
 namespace TheLostSoulOfFire.Audio;
 
@@ -95,8 +94,6 @@ public sealed class AudioDirector : IDisposable
     private readonly HashSet<SoundEffect> _ownedFallbackSounds = [];
     private SoundEffect _ambienceSound;
     private SoundEffectInstance _ambience;
-    private Song _music;
-    private bool _musicPlaying;
     private bool _calm;
     private bool _soulSense;
     private float _duckTimer;
@@ -143,7 +140,6 @@ public sealed class AudioDirector : IDisposable
             _ambience.IsLooped = true;
             _ambience.Play();
 
-            TryStartMusic(content);
             ApplyMix();
         }
         catch
@@ -256,21 +252,6 @@ public sealed class AudioDirector : IDisposable
         }
     }
 
-    private void TryStartMusic(ContentManager content)
-    {
-        try
-        {
-            _music = content.Load<Song>("Audio/Music/arena_loop");
-            MediaPlayer.IsRepeating = true;
-            MediaPlayer.Play(_music);
-            _musicPlaying = true;
-        }
-        catch (ContentLoadException)
-        {
-            // Music remains optional so a missing file never stops gameplay.
-        }
-    }
-
     private void ApplyCueDuck(AudioCue cue)
     {
         switch (cue)
@@ -300,20 +281,14 @@ public sealed class AudioDirector : IDisposable
     private void ApplyMix()
     {
         float ambienceBase = _calm ? 0.035f : 0.12f;
-        float musicBase = _calm ? 0.12f : 0.28f;
         if (_soulSense)
         {
             ambienceBase *= 0.52f;
-            musicBase *= 0.68f;
         }
 
         if (_ambience is not null)
         {
             _ambience.Volume = Math.Clamp(ambienceBase * (1f - _duckAmount * 0.72f), 0f, 1f);
-        }
-        if (_musicPlaying)
-        {
-            MediaPlayer.Volume = Math.Clamp(musicBase * (1f - _duckAmount * 0.62f), 0f, 1f);
         }
     }
 
@@ -388,11 +363,6 @@ public sealed class AudioDirector : IDisposable
 
     private void DisposeSounds()
     {
-        if (_musicPlaying)
-        {
-            MediaPlayer.Stop();
-            _musicPlaying = false;
-        }
         _ambience?.Stop();
         _ambience?.Dispose();
         _ambience = null;
