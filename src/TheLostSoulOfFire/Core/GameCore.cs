@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace TheLostSoulOfFire.Core;
 
-public abstract class GameCore : Game
+public abstract class GameCore : Microsoft.Xna.Framework.Game
 {
     private readonly GraphicsDeviceManager _graphics;
     private readonly int _virtualWidth;
