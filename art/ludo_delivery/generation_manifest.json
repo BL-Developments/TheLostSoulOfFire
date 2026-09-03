@@ -1,0 +1,804 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-08-29T22:20:00+02:00",
+  "projectRoot": "/Users/user/repos/TheLostSoulOfFire",
+  "productionAssetRoot": "src/TheLostSoulOfFire/Content/Textures",
+  "ludo": {
+    "serverCallable": true,
+    "transportReachable": true,
+    "status": "complete_required_set",
+    "diagnosticAttempts": [
+      "validateApiKeyEndpoint:204",
+      "listAnimationPresets:200"
+    ],
+    "generationCalls": 162,
+    "creditsConsumed": 469.5,
+    "startingBalance": null,
+    "endingBalance": null,
+    "balanceNote": "No balance endpoint is exposed. 469.5 is calculated from MCP-advertised per-call pricing, not a balance reading. Optional polish was not generated.",
+    "creditsConsumedIsEstimate": true
+  },
+  "lockedReferences": [
+    {
+      "assetId": "reference.style_anchor",
+      "required": true,
+      "path": "art/ludo_delivery/00_reference/style_anchor_gameplay.png",
+      "sha256": "7651721ff0bcf4d806dbfcd0d3c2ae9e7de8c227032160c203bdba214bcebba8",
+      "dimensions": {
+        "width": 1344,
+        "height": 768,
+        "mode": "RGBA"
+      },
+      "transparency": "alpha channel present; all pixels opaque",
+      "palette": "black, anthracite, cold gray, dirty off-white, sparse violet",
+      "silhouette": "Gothic-industrial perimeter framing with clear central combat floor",
+      "viewingAngle": "high three-quarter/top-down gameplay",
+      "pixelDensity": "coarse 32-bit-inspired clustered pixels",
+      "generationStatus": "locked_existing",
+      "selectionDecision": "approved_source_of_truth",
+      "reviewNotes": "Never regenerate, edit, or overwrite."
+    },
+    {
+      "assetId": "character.player.master",
+      "required": true,
+      "path": "art/ludo_delivery/02_characters/player/player_master_128.png",
+      "sha256": "537c624dcdcc2eab2a6d7aa1c1d7a8e122963429143392c2ca27d5742aecec64",
+      "dimensions": {
+        "width": 768,
+        "height": 768,
+        "mode": "RGBA",
+        "occupiedBounds": [
+          249,
+          24,
+          533,
+          734
+        ]
+      },
+      "transparency": {
+        "transparentPixels": 461097,
+        "partialAlphaPixels": 3357,
+        "opaquePixels": 125370
+      },
+      "palette": "black, anthracite, very dark neutral violet, restrained pale accents",
+      "silhouette": "slender asymmetric long coat/mantle",
+      "viewingAngle": "high-angle directional master",
+      "pixelDensity": "coarse high-detail sprite clusters on oversized transparent canvas",
+      "generationStatus": "locked_existing",
+      "selectionDecision": "approved_source_of_truth",
+      "reviewNotes": "Do not bake a Core into derived animation; Core remains runtime overlay."
+    },
+    {
+      "assetId": "weapon.scythe.physical",
+      "required": true,
+      "path": "art/ludo_delivery/03_weapons/scythe_physical_256.png",
+      "sha256": "864b0dbe3c204e36a7bcebca4bcb02d7139e29f047ccf2994d27874641959eb3",
+      "dimensions": {
+        "width": 1024,
+        "height": 1024,
+        "mode": "RGBA",
+        "occupiedBounds": [
+          44,
+          316,
+          975,
+          735
+        ]
+      },
+      "transparency": {
+        "transparentPixels": 983408,
+        "partialAlphaPixels": 560,
+        "opaquePixels": 64608
+      },
+      "palette": "dark segmented metal, silver incomplete blades, restrained violet",
+      "silhouette": "long horizontal industrial handle with incomplete double blade",
+      "viewingAngle": "orthographic/high-angle weapon asset",
+      "pixelDensity": "coarse high-detail sprite clusters on oversized transparent canvas",
+      "generationStatus": "locked_existing",
+      "selectionDecision": "approved_source_of_truth",
+      "reviewNotes": "Preserve source. Mask detached far-right purple point only in a derived integration copy."
+    }
+  ],
+  "defaults": {
+    "blockedGenerationStatus": "queued",
+    "selectionDecision": "not_generated",
+    "originalDownloadedFile": null,
+    "normalizedIntegrationFile": null,
+    "directions": [
+      "n",
+      "ne",
+      "e",
+      "se",
+      "s",
+      "sw",
+      "w",
+      "nw"
+    ]
+  },
+  "staticAssets": [
+    {
+      "assetId": "environment.arena_base",
+      "required": true,
+      "sourceReferences": [
+        "reference.style_anchor",
+        "docs/mvp/14_ARENA.md"
+      ],
+      "ludoTool": "generateWithStyle:fixed_background",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted",
+      "originalDownloadedFile": "art/ludo_delivery/01_environment/candidates/arena_base_ludo_original.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/01_environment/arena_base_1800x1000.png",
+      "dimensions": "1800x1000",
+      "frameLayout": "static",
+      "direction": "high_three_quarter",
+      "animationFps": null,
+      "loopingBehavior": null,
+      "reviewNotes": "Clear center; perimeter detail; no false obstacles.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Environment/arena_base_1800x1000.png"
+    },
+    {
+      "assetId": "character.hollow.master",
+      "required": true,
+      "sourceReferences": [
+        "reference.style_anchor",
+        "docs/mvp/10_ENEMY_HOLLOW.md"
+      ],
+      "ludoTool": "generateWithStyle:sprite",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted",
+      "originalDownloadedFile": "art/ludo_delivery/02_characters/hollow/candidates/hollow_master_ludo_reroll.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/02_characters/hollow/hollow_master_128.png",
+      "dimensions": "128x128",
+      "frameLayout": "static",
+      "direction": "s_master",
+      "animationFps": null,
+      "loopingBehavior": null,
+      "reviewNotes": "Thin, angular, off-white mask, almost no purple.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/hollow_master_128.png"
+    },
+    {
+      "assetId": "character.burning.master",
+      "required": true,
+      "sourceReferences": [
+        "reference.style_anchor",
+        "docs/mvp/11_ENEMY_BURNING.md"
+      ],
+      "ludoTool": "generateWithStyle:sprite",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted",
+      "originalDownloadedFile": "art/ludo_delivery/02_characters/burning/candidates/burning_master_ludo_original.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/02_characters/burning/burning_master_128.png",
+      "dimensions": "128x128",
+      "frameLayout": "static",
+      "direction": "s_master",
+      "animationFps": null,
+      "loopingBehavior": null,
+      "reviewNotes": "Dark compact body with localized fractures only.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/burning_master_128.png"
+    },
+    {
+      "assetId": "character.devourer.master",
+      "required": true,
+      "sourceReferences": [
+        "reference.style_anchor",
+        "docs/mvp/12_ENEMY_DEVOURER.md"
+      ],
+      "ludoTool": "generateWithStyle:sprite",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted",
+      "originalDownloadedFile": "art/ludo_delivery/02_characters/devourer/candidates/devourer_master_ludo_original.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/02_characters/devourer/devourer_master_192.png",
+      "dimensions": "192x192",
+      "frameLayout": "static",
+      "direction": "s_master",
+      "animationFps": null,
+      "loopingBehavior": null,
+      "reviewNotes": "Heavy non-generic silhouette; torso soul prison remains fixed.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/devourer_master_192.png"
+    },
+    {
+      "assetId": "weapon.soul_cannon",
+      "required": true,
+      "sourceReferences": [
+        "weapon.scythe.physical",
+        "reference.style_anchor",
+        "docs/mvp/07_SOUL_CANNON.md"
+      ],
+      "ludoTool": "generateWithStyle:asset",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted",
+      "originalDownloadedFile": "art/ludo_delivery/03_weapons/candidates/soul_cannon_ludo_original.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/03_weapons/soul_cannon_256.png",
+      "dimensions": "256x256",
+      "frameLayout": "static",
+      "direction": "e",
+      "animationFps": null,
+      "loopingBehavior": null,
+      "reviewNotes": "Distinct angular silhouette and constrained chamber.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Weapons/soul_cannon_256.png"
+    },
+    {
+      "assetId": "pickup.lost_soul",
+      "required": true,
+      "sourceReferences": [
+        "reference.style_anchor",
+        "docs/mvp/13_SOUL_RELEASE.md"
+      ],
+      "ludoTool": "generateWithStyle:sprite",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted",
+      "originalDownloadedFile": "art/ludo_delivery/05_pickups/candidates/lost_soul_ludo_original.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/05_pickups/lost_soul_64.png",
+      "dimensions": "64x64",
+      "frameLayout": "static",
+      "direction": "camera_facing",
+      "animationFps": null,
+      "loopingBehavior": null,
+      "reviewNotes": "Bright white/pale violet and brighter than world accents.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Pickups/lost_soul_64.png"
+    },
+    {
+      "assetId": "ending.life_flame",
+      "required": true,
+      "sourceReferences": [
+        "reference.style_anchor",
+        "docs/mvp/14_ARENA.md"
+      ],
+      "ludoTool": "generateWithStyle:sprite-vfx",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted",
+      "originalDownloadedFile": "art/ludo_delivery/06_ending/candidates/life_flame_ludo_original.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/06_ending/life_flame_128.png",
+      "dimensions": "128x128",
+      "frameLayout": "static_master",
+      "direction": "camera_facing",
+      "animationFps": null,
+      "loopingBehavior": null,
+      "reviewNotes": "Warm orange/gold ending payoff; distinct from combat VFX.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Ending/life_flame_128.png"
+    }
+  ],
+  "animationPacks": [
+    {
+      "assetId": "anim.player.idle",
+      "character": "player",
+      "action": "idle",
+      "required": true,
+      "sourceReferences": [
+        "character.player.master"
+      ],
+      "ludoTool": "rotateSprite+animateSprite:forge-pixel",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted_all_8_directions",
+      "originalDownloadedFile": "art/ludo_delivery/02_characters/player/candidates/animations/idle/{direction}.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/02_characters/player/animations/idle/{direction}.png",
+      "dimensions": "384x384 sheet; 128x128 frames",
+      "frameLayout": "9 frames; 3 columns x 3 rows; row-major",
+      "direction": "n,ne,e,se,s,sw,w,nw",
+      "animationFps": 9,
+      "loopingBehavior": "loop",
+      "reviewNotes": "No Core baked in; no mirroring.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle/{direction}.png"
+    },
+    {
+      "assetId": "anim.player.move",
+      "character": "player",
+      "action": "move",
+      "required": true,
+      "sourceReferences": [
+        "character.player.master"
+      ],
+      "ludoTool": "rotateSprite+animateSprite:forge-pixel",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted_all_8_directions",
+      "originalDownloadedFile": "art/ludo_delivery/02_characters/player/candidates/animations/move/{direction}.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/02_characters/player/animations/move/{direction}.png",
+      "dimensions": "384x384 sheet; 128x128 frames",
+      "frameLayout": "9 frames; 3 columns x 3 rows; row-major",
+      "direction": "n,ne,e,se,s,sw,w,nw",
+      "animationFps": 12,
+      "loopingBehavior": "loop",
+      "reviewNotes": "Stable foot contact; no mirroring or identity drift.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move/{direction}.png"
+    },
+    {
+      "assetId": "anim.hollow.idle",
+      "character": "hollow",
+      "action": "idle",
+      "required": true,
+      "sourceReferences": [
+        "character.hollow.master"
+      ],
+      "ludoTool": "rotateSprite+animateSprite:forge-pixel",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted_all_8_directions",
+      "originalDownloadedFile": "art/ludo_delivery/02_characters/hollow/candidates/animations/idle/{direction}.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/02_characters/hollow/animations/idle/{direction}.png",
+      "dimensions": "384x384 sheet; 128x128 frames",
+      "frameLayout": "9 frames; 3 columns x 3 rows; row-major",
+      "direction": "n,ne,e,se,s,sw,w,nw",
+      "animationFps": 8,
+      "loopingBehavior": "loop",
+      "reviewNotes": "Mask and proportions remain fixed.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle/{direction}.png"
+    },
+    {
+      "assetId": "anim.hollow.move",
+      "character": "hollow",
+      "action": "move",
+      "required": true,
+      "sourceReferences": [
+        "character.hollow.master"
+      ],
+      "ludoTool": "rotateSprite+animateSprite:forge-pixel",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted_all_8_directions",
+      "originalDownloadedFile": "art/ludo_delivery/02_characters/hollow/candidates/animations/move/{direction}.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/02_characters/hollow/animations/move/{direction}.png",
+      "dimensions": "384x384 sheet; 128x128 frames",
+      "frameLayout": "9 frames; 3 columns x 3 rows; row-major",
+      "direction": "n,ne,e,se,s,sw,w,nw",
+      "animationFps": 12,
+      "loopingBehavior": "loop",
+      "reviewNotes": "Irregular read comes from runtime pauses; animation stays readable.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move/{direction}.png"
+    },
+    {
+      "assetId": "anim.hollow.swipe",
+      "character": "hollow",
+      "action": "swipe",
+      "required": true,
+      "sourceReferences": [
+        "character.hollow.master"
+      ],
+      "ludoTool": "rotateSprite+animateSprite:forge-pixel",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted_all_8_directions",
+      "originalDownloadedFile": "art/ludo_delivery/02_characters/hollow/candidates/animations/swipe/{direction}.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/02_characters/hollow/animations/swipe/{direction}.png",
+      "dimensions": "384x384 sheet; 128x128 frames",
+      "frameLayout": "9 frames; 3 columns x 3 rows; row-major",
+      "direction": "n,ne,e,se,s,sw,w,nw",
+      "animationFps": 18,
+      "loopingBehavior": "one_shot",
+      "reviewNotes": "Runtime hit event preserves 0.42 s telegraph and 0.13 s swipe.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/{direction}.png"
+    },
+    {
+      "assetId": "anim.burning.idle",
+      "character": "burning",
+      "action": "idle",
+      "required": true,
+      "sourceReferences": [
+        "character.burning.master"
+      ],
+      "ludoTool": "rotateSprite+animateSprite:forge-pixel",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted_all_8_directions",
+      "originalDownloadedFile": "art/ludo_delivery/02_characters/burning/candidates/animations/idle/{direction}.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/02_characters/burning/animations/idle/{direction}.png",
+      "dimensions": "384x384 sheet; 128x128 frames",
+      "frameLayout": "9 frames; 3 columns x 3 rows; row-major",
+      "direction": "n,ne,e,se,s,sw,w,nw",
+      "animationFps": 9,
+      "loopingBehavior": "loop",
+      "reviewNotes": "Localized fractures stay fixed and do not flood purple.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Animations/idle/{direction}.png"
+    },
+    {
+      "assetId": "anim.burning.move",
+      "character": "burning",
+      "action": "move",
+      "required": true,
+      "sourceReferences": [
+        "character.burning.master"
+      ],
+      "ludoTool": "rotateSprite+animateSprite:forge-pixel",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted_all_8_directions",
+      "originalDownloadedFile": "art/ludo_delivery/02_characters/burning/candidates/animations/move/{direction}.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/02_characters/burning/animations/move/{direction}.png",
+      "dimensions": "384x384 sheet; 128x128 frames",
+      "frameLayout": "9 frames; 3 columns x 3 rows; row-major",
+      "direction": "n,ne,e,se,s,sw,w,nw",
+      "animationFps": 14,
+      "loopingBehavior": "loop",
+      "reviewNotes": "Fast aggressive silhouette; stable crop.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Animations/move/{direction}.png"
+    },
+    {
+      "assetId": "anim.burning.charge",
+      "character": "burning",
+      "action": "charge",
+      "required": true,
+      "sourceReferences": [
+        "character.burning.master"
+      ],
+      "ludoTool": "rotateSprite+animateSprite:forge-pixel",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted_all_8_directions",
+      "originalDownloadedFile": "art/ludo_delivery/02_characters/burning/candidates/animations/charge/{direction}.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/02_characters/burning/animations/charge/{direction}.png",
+      "dimensions": "384x384 sheet; 128x128 frames",
+      "frameLayout": "9 frames; 3 columns x 3 rows; row-major",
+      "direction": "n,ne,e,se,s,sw,w,nw",
+      "animationFps": 15,
+      "loopingBehavior": "one_shot_or_state_clamped",
+      "reviewNotes": "Runtime telegraph and 0.58 s charge remain authoritative.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Animations/charge/{direction}.png"
+    },
+    {
+      "assetId": "anim.devourer.idle",
+      "character": "devourer",
+      "action": "idle",
+      "required": true,
+      "sourceReferences": [
+        "character.devourer.master"
+      ],
+      "ludoTool": "rotateSprite+animateSprite:forge-pixel",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted_all_8_directions",
+      "originalDownloadedFile": "art/ludo_delivery/02_characters/devourer/candidates/animations/idle/{direction}.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/02_characters/devourer/animations/idle/{direction}.png",
+      "dimensions": "576x576 sheet; 192x192 frames",
+      "frameLayout": "9 frames; 3 columns x 3 rows; row-major",
+      "direction": "n,ne,e,se,s,sw,w,nw",
+      "animationFps": 7,
+      "loopingBehavior": "loop",
+      "reviewNotes": "Torso prison position and contents remain coherent.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Animations/idle/{direction}.png"
+    },
+    {
+      "assetId": "anim.devourer.move",
+      "character": "devourer",
+      "action": "move",
+      "required": true,
+      "sourceReferences": [
+        "character.devourer.master"
+      ],
+      "ludoTool": "rotateSprite+animateSprite:forge-pixel",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted_all_8_directions",
+      "originalDownloadedFile": "art/ludo_delivery/02_characters/devourer/candidates/animations/move/{direction}.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/02_characters/devourer/animations/move/{direction}.png",
+      "dimensions": "576x576 sheet; 192x192 frames",
+      "frameLayout": "9 frames; 3 columns x 3 rows; row-major",
+      "direction": "n,ne,e,se,s,sw,w,nw",
+      "animationFps": 9,
+      "loopingBehavior": "loop",
+      "reviewNotes": "Heavy foot contact and stable prison layout.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Animations/move/{direction}.png"
+    },
+    {
+      "assetId": "anim.devourer.slam",
+      "character": "devourer",
+      "action": "slam",
+      "required": true,
+      "sourceReferences": [
+        "character.devourer.master"
+      ],
+      "ludoTool": "rotateSprite+animateSprite:forge-pixel",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted_all_8_directions",
+      "originalDownloadedFile": "art/ludo_delivery/02_characters/devourer/candidates/animations/slam/{direction}.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/02_characters/devourer/animations/slam/{direction}.png",
+      "dimensions": "768x768 sheet; 192x192 frames",
+      "frameLayout": "16 frames; 4 columns x 4 rows; row-major",
+      "direction": "n,ne,e,se,s,sw,w,nw",
+      "animationFps": 16,
+      "loopingBehavior": "one_shot",
+      "reviewNotes": "Runtime contact event preserves 0.88 s telegraph and 0.18 s slam.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Animations/slam/{direction}.png"
+    },
+    {
+      "assetId": "anim.devourer.devour",
+      "character": "devourer",
+      "action": "devour",
+      "required": true,
+      "sourceReferences": [
+        "character.devourer.master"
+      ],
+      "ludoTool": "rotateSprite+animateSprite:forge-pixel",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted_all_8_directions",
+      "originalDownloadedFile": "art/ludo_delivery/02_characters/devourer/candidates/animations/devour/{direction}.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/02_characters/devourer/animations/devour/{direction}.png",
+      "dimensions": "576x576 sheet; 192x192 frames",
+      "frameLayout": "9 frames; 3 columns x 3 rows; row-major",
+      "direction": "n,ne,e,se,s,sw,w,nw",
+      "animationFps": 9,
+      "loopingBehavior": "loop_while_state_active",
+      "reviewNotes": "Runtime completion preserves 1.1 s devour window.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Animations/devour/{direction}.png"
+    }
+  ],
+  "vfxAssets": [
+    {
+      "assetId": "vfx.scythe_slash_01",
+      "required": true,
+      "path": "art/ludo_delivery/04_vfx/fx_scythe_slash_01.png",
+      "sourceReferences": [
+        "weapon.scythe.physical"
+      ],
+      "ludoTool": "createImage:sprite-vfx+animateSprite:forge-pixel",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted",
+      "originalDownloadedFile": "art/ludo_delivery/04_vfx/candidates/fx_scythe_slash_01_sheet.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/04_vfx/fx_scythe_slash_01.png",
+      "dimensions": "768x768 sheet; 256x256 frames",
+      "frameLayout": "9 frames; 3 columns x 3 rows; row-major",
+      "direction": "attack_facing",
+      "animationFps": 24,
+      "loopingBehavior": "one_shot",
+      "reviewNotes": "Thin 120-degree blade-following arc.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Effects/fx_scythe_slash_01.png"
+    },
+    {
+      "assetId": "vfx.scythe_slash_02",
+      "required": true,
+      "path": "art/ludo_delivery/04_vfx/fx_scythe_slash_02.png",
+      "sourceReferences": [
+        "weapon.scythe.physical",
+        "vfx.scythe_slash_01"
+      ],
+      "ludoTool": "createImage:sprite-vfx+animateSprite:forge-pixel",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted",
+      "originalDownloadedFile": "art/ludo_delivery/04_vfx/candidates/fx_scythe_slash_02_sheet.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/04_vfx/fx_scythe_slash_02.png",
+      "dimensions": "768x768 sheet; 256x256 frames",
+      "frameLayout": "9 frames; 3 columns x 3 rows; row-major",
+      "direction": "attack_facing_reverse",
+      "animationFps": 24,
+      "loopingBehavior": "one_shot",
+      "reviewNotes": "Brighter 140-degree reverse arc.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Effects/fx_scythe_slash_02.png"
+    },
+    {
+      "assetId": "vfx.scythe_cleave",
+      "required": true,
+      "path": "art/ludo_delivery/04_vfx/fx_scythe_cleave.png",
+      "sourceReferences": [
+        "weapon.scythe.physical",
+        "vfx.scythe_slash_01"
+      ],
+      "ludoTool": "createImage:sprite-vfx+animateSprite:forge-pixel",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted_quality_reroll",
+      "originalDownloadedFile": "art/ludo_delivery/04_vfx/candidates/fx_scythe_cleave_sheet_reroll.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/04_vfx/fx_scythe_cleave.png",
+      "dimensions": "768x768 sheet; 256x256 frames",
+      "frameLayout": "9 frames; 3 columns x 3 rows; row-major",
+      "direction": "attack_facing",
+      "animationFps": 22,
+      "loopingBehavior": "one_shot",
+      "reviewNotes": "Initial explosion-like sheet rejected; one crescent-only quality reroll accepted.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Effects/fx_scythe_cleave.png"
+    },
+    {
+      "assetId": "vfx.core_hit",
+      "required": true,
+      "path": "art/ludo_delivery/04_vfx/fx_core_hit.png",
+      "sourceReferences": [
+        "reference.style_anchor"
+      ],
+      "ludoTool": "createImage:sprite-vfx+animateSprite:forge-pixel",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted_quality_reroll",
+      "originalDownloadedFile": "art/ludo_delivery/04_vfx/candidates/fx_core_hit_sheet_reroll.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/04_vfx/fx_core_hit.png",
+      "dimensions": "384x384 sheet; 128x128 frames",
+      "frameLayout": "9 frames; 3 columns x 3 rows; row-major",
+      "direction": "radial",
+      "animationFps": 30,
+      "loopingBehavior": "one_shot",
+      "reviewNotes": "Initial checker-field sheet rejected; one quality reroll accepted with clean alpha.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Effects/fx_core_hit.png"
+    },
+    {
+      "assetId": "vfx.dash_ignition",
+      "required": true,
+      "path": "art/ludo_delivery/04_vfx/fx_dash_ignition.png",
+      "sourceReferences": [
+        "character.player.master",
+        "reference.style_anchor"
+      ],
+      "ludoTool": "createImage:sprite-vfx+animateSprite:forge-pixel",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted",
+      "originalDownloadedFile": "art/ludo_delivery/04_vfx/candidates/fx_dash_ignition_sheet.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/04_vfx/fx_dash_ignition.png",
+      "dimensions": "384x384 sheet; 128x128 frames",
+      "frameLayout": "9 frames; 3 columns x 3 rows; row-major",
+      "direction": "dash_facing",
+      "animationFps": 30,
+      "loopingBehavior": "one_shot",
+      "reviewNotes": "Directional ignition; procedural trail retained.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Effects/fx_dash_ignition.png"
+    },
+    {
+      "assetId": "vfx.cannon_charge_loop",
+      "required": true,
+      "path": "art/ludo_delivery/04_vfx/fx_cannon_charge_loop.png",
+      "sourceReferences": [
+        "weapon.soul_cannon"
+      ],
+      "ludoTool": "createImage:sprite-vfx+animateSprite:forge-pixel",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted",
+      "originalDownloadedFile": "art/ludo_delivery/04_vfx/candidates/fx_cannon_charge_loop_sheet.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/04_vfx/fx_cannon_charge_loop.png",
+      "dimensions": "384x384 sheet; 128x128 frames",
+      "frameLayout": "9 frames; 3 columns x 3 rows; row-major",
+      "direction": "inward",
+      "animationFps": 12,
+      "loopingBehavior": "loop",
+      "reviewNotes": "Energy converges into chamber rather than exploding.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Effects/fx_cannon_charge_loop.png"
+    },
+    {
+      "assetId": "vfx.cannon_muzzle_full",
+      "required": true,
+      "path": "art/ludo_delivery/04_vfx/fx_cannon_muzzle_full.png",
+      "sourceReferences": [
+        "weapon.soul_cannon",
+        "vfx.cannon_charge_loop"
+      ],
+      "ludoTool": "createImage:sprite-vfx+animateSprite:forge-pixel",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted",
+      "originalDownloadedFile": "art/ludo_delivery/04_vfx/candidates/fx_cannon_muzzle_full_sheet.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/04_vfx/fx_cannon_muzzle_full.png",
+      "dimensions": "768x768 sheet; 256x256 frames",
+      "frameLayout": "9 frames; 3 columns x 3 rows; row-major",
+      "direction": "shot_facing",
+      "animationFps": 24,
+      "loopingBehavior": "one_shot",
+      "reviewNotes": "White-violet eruption with readable recoil.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Effects/fx_cannon_muzzle_full.png"
+    },
+    {
+      "assetId": "vfx.cannon_projectile_full",
+      "required": true,
+      "path": "art/ludo_delivery/04_vfx/fx_cannon_projectile_full.png",
+      "sourceReferences": [
+        "weapon.soul_cannon",
+        "vfx.cannon_muzzle_full"
+      ],
+      "ludoTool": "createImage:sprite-vfx+animateSprite:forge-pixel",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted",
+      "originalDownloadedFile": "art/ludo_delivery/04_vfx/candidates/fx_cannon_projectile_full_sheet.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/04_vfx/fx_cannon_projectile_full.png",
+      "dimensions": "384x384 sheet; 128x128 frames",
+      "frameLayout": "9 frames; 3 columns x 3 rows; row-major",
+      "direction": "horizontal",
+      "animationFps": 18,
+      "loopingBehavior": "loop_while_projectile_alive",
+      "reviewNotes": "Near-white core, violet body, fragmented edges.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Effects/fx_cannon_projectile_full.png"
+    },
+    {
+      "assetId": "vfx.burning_detonation",
+      "required": true,
+      "path": "art/ludo_delivery/04_vfx/fx_burning_detonation.png",
+      "sourceReferences": [
+        "character.burning.master"
+      ],
+      "ludoTool": "createImage:sprite-vfx+animateSprite:forge-pixel",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted",
+      "originalDownloadedFile": "art/ludo_delivery/04_vfx/candidates/fx_burning_detonation_sheet.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/04_vfx/fx_burning_detonation.png",
+      "dimensions": "1024x1024 sheet; 256x256 frames",
+      "frameLayout": "16 frames; 4 columns x 4 rows; row-major",
+      "direction": "radial",
+      "animationFps": 24,
+      "loopingBehavior": "one_shot",
+      "reviewNotes": "Collapse then detonate; purple remains localized around white core.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Effects/fx_burning_detonation.png"
+    },
+    {
+      "assetId": "vfx.soul_release",
+      "required": true,
+      "path": "art/ludo_delivery/04_vfx/fx_soul_release.png",
+      "sourceReferences": [
+        "pickup.lost_soul",
+        "reference.style_anchor"
+      ],
+      "ludoTool": "createImage:sprite-vfx+animateSprite:forge-pixel",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted_after_deterministic_transparency_repair",
+      "originalDownloadedFile": "art/ludo_delivery/04_vfx/candidates/fx_soul_release_base_reroll.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/04_vfx/fx_soul_release.png",
+      "dimensions": "512x512 sheet; 128x128 frames",
+      "frameLayout": "16 frames; 4 columns x 4 rows; row-major",
+      "direction": "upward",
+      "animationFps": 12,
+      "loopingBehavior": "one_shot",
+      "reviewNotes": "Ludo animation reroll retained a baked checker field; rebuilt from the accepted transparent reroll master with deterministic nearest-neighbor rise/fade. Rejected sheets preserved.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Effects/fx_soul_release.png"
+    },
+    {
+      "assetId": "vfx.resonance_activate",
+      "required": true,
+      "path": "art/ludo_delivery/04_vfx/fx_resonance_activate.png",
+      "sourceReferences": [
+        "character.player.master",
+        "reference.style_anchor"
+      ],
+      "ludoTool": "createImage:sprite-vfx+animateSprite:forge-pixel",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted",
+      "originalDownloadedFile": "art/ludo_delivery/04_vfx/candidates/fx_resonance_activate_sheet.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/04_vfx/fx_resonance_activate.png",
+      "dimensions": "1024x1024 sheet; 256x256 frames",
+      "frameLayout": "16 frames; 4 columns x 4 rows; row-major",
+      "direction": "radial_character_centered",
+      "animationFps": 24,
+      "loopingBehavior": "one_shot",
+      "reviewNotes": "No character baked in; procedural impact/outline/cracks retained.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Effects/fx_resonance_activate.png"
+    },
+    {
+      "assetId": "vfx.death_flame_loop",
+      "required": true,
+      "path": "art/ludo_delivery/04_vfx/fx_death_flame_loop.png",
+      "sourceReferences": [
+        "reference.style_anchor"
+      ],
+      "ludoTool": "createImage:sprite-vfx+animateSprite:forge-pixel",
+      "generationStatus": "complete",
+      "selectionDecision": "accepted",
+      "originalDownloadedFile": "art/ludo_delivery/04_vfx/candidates/fx_death_flame_loop_sheet.webp",
+      "normalizedIntegrationFile": "art/ludo_delivery/04_vfx/fx_death_flame_loop.png",
+      "dimensions": "384x384 sheet; 128x128 frames",
+      "frameLayout": "9 frames; 3 columns x 3 rows; row-major",
+      "direction": "sideways_downward",
+      "animationFps": 12,
+      "loopingBehavior": "loop",
+      "reviewNotes": "Small violet Death Flame, visually distinct from orange Life Flame.",
+      "integrationDestination": "src/TheLostSoulOfFire/Content/Textures/Effects/fx_death_flame_loop.png"
+    }
+  ],
+  "counts": {
+    "lockedReferencesInspected": 3,
+    "requiredStaticAssets": 7,
+    "requiredDirectionalAnimationSheets": 96,
+    "requiredVfxSheets": 12,
+    "generatedStaticAssets": 7,
+    "generatedAnimationSheets": 96,
+    "generatedVfxSheets": 12
+  },
+  "integration": {
+    "status": "complete",
+    "contentPipelineUpdated": true,
+    "runtimeUpdated": true,
+    "buildAfterIntegration": "passed_0_warnings_0_errors",
+    "testsAfterIntegration": "no_test_project_found",
+    "proceduralEquivalentsToRetain": [
+      "screen shake",
+      "hit pause",
+      "screen flashes and impact frames",
+      "afterimages",
+      "small particles and trails",
+      "Soul Sense overlay and highlights",
+      "player Core runtime overlay/pulse",
+      "Soul pull lines",
+      "ambient lighting"
+    ],
+    "productionPngCount": 116
+  },
+  "baselineVerification": {
+    "restore": "passed",
+    "build": "passed_0_warnings_0_errors",
+    "testProjectsFound": 0,
+    "gameplayLaunch": "passed_desktopgl_content_loaded_first_wave_captured",
+    "reviewArtifacts": [
+      "art/ludo_delivery/review/01_locked_references.png",
+      "art/ludo_delivery/review/02_static_cast_and_weapons.png",
+      "art/ludo_delivery/review/03_arena_and_gameplay.png",
+      "art/ludo_delivery/review/04_character_animations.png",
+      "art/ludo_delivery/review/05_vfx.png",
+      "art/ludo_delivery/review/06_final_ingame.png"
+    ]
+  }
+}
