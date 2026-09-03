@@ -2,20 +2,28 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
     <RollForward>Major</RollForward>
     <PublishReadyToRun>false</PublishReadyToRun>
     <TieredCompilation>false</TieredCompilation>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.5.1" />
-    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.5.1" />
-    <PackageReference Include="MonoGame.Extended" Version="6.0.0" />
+    <None Remove="Icon.ico" />
+    <None Remove="Icon.bmp" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="Content\Levels\*.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <EmbeddedResource Include="Icon.ico">
+      <LogicalName>Icon.ico</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icon.bmp">
+      <LogicalName>Icon.bmp</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.*" />
+    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.*" />
   </ItemGroup>
 </Project>

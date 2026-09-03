@@ -1,38 +1,26 @@
 # The Lost Soul of Fire
 
-Ein kleiner 2D-Top-Down-Roguelite-Prototyp mit MonoGame. Die spielbare Vertical Slice umfasst das **Ember Sanctum** als Hub und einen **Fire-Raid**: Portal betreten, Glutwesen besiegen, den Feueraltar aktivieren und in den Hub zurückkehren. Beim Tod wird der laufende Raid vollständig verworfen.
+Ein 2D-Top-down-Roguelike auf Basis von C# und MonoGame.
 
 ## Voraussetzungen
 
-- Windows, Linux oder macOS mit OpenGL-Unterstützung
 - [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
 
-Die MonoGame- und Content-Pipeline-Pakete werden beim Restore automatisch bezogen. Die Solution verwendet MonoGame DesktopGL 3.8.5.1 und MonoGame.Extended 6.0.0.
-
-## Starten und testen
+## Entwicklung
 
 ```powershell
-dotnet restore TheLostSoulOfFire.sln
-dotnet run --project src/TheLostSoulOfFire/TheLostSoulOfFire.csproj
-dotnet test TheLostSoulOfFire.sln
+dotnet restore
+dotnet build
+dotnet run --project src/TheLostSoulOfFire
 ```
 
-## Steuerung
+Mit `Escape` oder der Zurück-Taste eines Controllers wird das Spiel beendet.
 
-- `WASD` oder Pfeiltasten: bewegen
-- Maus: zielen
-- Linke Maustaste halten: Feuerprojektile schießen
-- `E`: Portal oder aktiven Abschlussaltar benutzen
-- `Esc`: Spiel beenden
+## Projektstruktur
 
-## Enthaltene Systeme
+- `src/TheLostSoulOfFire` – DesktopGL-Spielprojekt
+- `src/TheLostSoulOfFire/Content` – MonoGame-Content-Pipeline
 
-- Hub → Raid → Hub-Schleife mit frischem Run-Zustand
-- Acht-Richtungs-Bewegung, Kamera und AABB-Wandkollision
-- Feuerprojektile aus einem festen Pool, einfache Verfolger und Kontaktschaden
-- Gesperrter Abschlussaltar bis zum letzten besiegten Gegner
-- Tod mit kurzer Niederlagenphase und vollständigem Raid-Reset
-- Virtuelle Auflösung (960×540), Letterboxing und getrennte Welt-/Effekt-/UI-Pässe
-- Generiertes dunkles Pixel-Art-Atlas und gepoolte Feuer-/Glutpartikel
-
-Bewusst noch nicht enthalten sind Meta-Upgrades, Händler und Inventar, Speichern/Laden, prozedurale Level, mehrere Raids, Bosse sowie finale Audio- und Grafikassets.
+DesktopGL erlaubt Builds für Windows, Linux und macOS. Spielinhalte werden in
+`Content/Content.mgcb` eingetragen und beim Build durch die Content-Pipeline
+verarbeitet.
