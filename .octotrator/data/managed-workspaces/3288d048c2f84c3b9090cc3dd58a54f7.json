@@ -1,0 +1,16 @@
+{
+  "id": "3288d048-c2f8-4c3b-9090-cc3dd58a54f7",
+  "workItemName": "w-1",
+  "externalWorkItemId": null,
+  "reefId": {
+    "value": "0117e121-6e78-4dad-ab25-74d94147d049"
+  },
+  "reefRoot": "/Users/user/repos/TheLostSoulOfFire",
+  "branchName": "work/w-1",
+  "worktreePath": "/Users/user/repos/TheLostSoulOfFire.worktrees/w-1",
+  "baseReference": "prototype/soulfire-mvp",
+  "baseCommit": "16bbdaacc1b95dc1640b21e2af9d34e6d0d6dc86",
+  "harnessProfile": "codex",
+  "createdAt": "2026-08-30T18:49:10.458194+00:00",
+  "huntId": null
+}
