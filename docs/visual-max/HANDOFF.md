@@ -1,6 +1,6 @@
 # Visual Max handoff
 
-Latest visual-polish results: [Astra final handoff](ASTRA-FINAL-HANDOFF.md), [review](ASTRA-VISUAL-REVIEW.md), and [remaining polish backlog](ASTRA-POLISH-BACKLOG.md). These supersede the renderer-only visual assessment and fixture limitations below. The historical verification record is retained.
+> **Historical renderer/VFX handoff.** The previously referenced Astra handoff, review and backlog files are not present on `prototype/design-polish`. For current direction use [`../current/HANDOFF.md`](../current/HANDOFF.md), and for existing capture tooling use [`SCREENSHOT-WORKFLOW.md`](SCREENSHOT-WORKFLOW.md).
 
 Status: **IN_PROGRESS** · renderer/VFX and asset/capture baseline implemented 2026-09-05.
 

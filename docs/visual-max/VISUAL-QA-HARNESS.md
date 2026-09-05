@@ -1,6 +1,6 @@
 # Screenshot and visual QA harness
 
-Status: PARTIALLY IMPLEMENTED. The current twelve-scenario runner, exact-tick sequences, state sidecars, isolated threat fixtures and missing-world/repeat checks are documented in [Astra final handoff](ASTRA-FINAL-HANDOFF.md). Run `bash tools/visual-max/capture-astra-review.sh`. The broader sixteen-scenario catalog, resolution/seed CLI, full performance metrics and cross-driver golden suite below remain design targets; do not treat them as implemented flags.
+Status: PARTIALLY IMPLEMENTED. The current twelve-scenario runner is available through `bash tools/visual-max/capture-renderer-review.sh`; see the [screenshot workflow](SCREENSHOT-WORKFLOW.md). Older Astra handoff and script references described files not present on `prototype/design-polish`. The broader sixteen-scenario catalog, resolution/seed CLI, full performance metrics and cross-driver golden suite below remain design targets; do not treat them as implemented flags.
 
 ## Goal and architecture
 

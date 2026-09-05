@@ -1,12 +1,14 @@
 # CODEX AUTOPILOT — CURRENT REPO ADDENDUM
 
+> **Historical.** The repository is no longer a minimal starter or greenfield implementation. See [`../current/CURRENT-SLICE.md`](../current/CURRENT-SLICE.md) and the root `AGENTS.md` before making changes.
+
 Apply this addendum together with `docs/mvp/CODEX_AUTOPILOT.md`.
 
 ## Current Main Baseline
 
-The current repository's actual game implementation is still a minimal MonoGame starter.
+At the time this addendum was written, the repository's actual game implementation was still a minimal MonoGame starter.
 
-Treat this as a greenfield gameplay implementation inside the existing project.
+Do not treat the current branch as greenfield gameplay implementation.
 
 Do not waste time trying to preserve nonexistent gameplay architecture.
 

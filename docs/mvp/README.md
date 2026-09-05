@@ -1,6 +1,6 @@
 # The Lost Soul of Fire — MVP Specification Index
 
-This directory is the authoritative specification for the MVP prototype.
+> **Historical prototype specification.** For current product, lore, combat and visual authority, start with [`../current/README.md`](../current/README.md). These files remain useful records of the arena MVP but no longer override newer owner decisions.
 
 ## Start Here
 

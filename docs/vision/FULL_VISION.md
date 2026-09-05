@@ -1,6 +1,8 @@
 # The Lost Soul of Fire — Full Vision
 
-**VISION STATUS: NORTH STAR**
+**VISION STATUS: HISTORICAL NORTH STAR**
+
+> This document predates the current Death Flame, Warden, Keeper, Stillness, cooperative story and art-direction decisions. Use [`../current/README.md`](../current/README.md) as the current source of truth.
 
 This document defines the creative space of **The Lost Soul of Fire** beyond the current MVP.
 

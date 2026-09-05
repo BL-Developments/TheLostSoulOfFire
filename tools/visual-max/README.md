@@ -17,11 +17,7 @@ the historical Ludo delivery audit or its fixed 116-file claim.
 Native visual review (requires a DesktopGL graphics host and a Release build):
 
 ```bash
-bash tools/visual-max/capture-astra-review.sh artifacts/visual-review/astra/final
-python3 tools/visual-max/check-captures.py artifacts/visual-review/astra/final --require-suite
+bash tools/visual-max/capture-renderer-review.sh
 ```
 
-The checker uses Pillow, also required by the historical art audit. Add `quick`
-as the capture script's second argument for twelve scenarios and three quality
-comparisons without the event matrix. See [the handoff](../../docs/visual-max/ASTRA-FINAL-HANDOFF.md)
-for exact flags, semantic evidence, current limits and this host's interpreter.
+This is the capture runner currently present on `prototype/design-polish`. Older Astra script and handoff references describe files not present on this branch. See the [current product handoff](../../docs/current/HANDOFF.md) and the [screenshot workflow](../../docs/visual-max/SCREENSHOT-WORKFLOW.md).
