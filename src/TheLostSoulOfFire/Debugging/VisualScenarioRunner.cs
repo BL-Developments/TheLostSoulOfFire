@@ -30,7 +30,11 @@ public sealed class VisualScenarioRunner
             ["resonance-busy"] = 156,
             ["soul-release"] = 206,
             ["death-retry"] = 220,
-            ["ending"] = 2100
+            ["ending"] = 2100,
+            ["golden-encounter"] = 1400,
+            ["severance-window"] = 320,
+            ["severance-cut"] = 340,
+            ["final-release"] = 2100
         };
 
     private readonly string _scenario;
@@ -39,16 +43,23 @@ public sealed class VisualScenarioRunner
     private readonly bool _forceSense;
     private readonly bool _forceResonance;
     private readonly bool _semanticEnding;
+    private readonly bool _semanticSeverance;
+    private readonly bool _semanticGoldenBeat;
+    private readonly bool _semanticFinalRelease;
     private int _tick;
     private int _combatTicks;
     private int _completedWave;
+    private int _severanceDashTick = -1;
+    private int _severanceCutTick = -1;
+    private int _beatReachedTick = -1;
 
     public static string KnownScenarioList => string.Join(", ", CaptureTicks.Keys);
     public bool CaptureRequested { get; private set; }
     public bool TimedOut => _tick > _captureTick + 180;
+    public bool IsSemantic => _semanticEnding || _semanticSeverance || _semanticGoldenBeat || _semanticFinalRelease;
     public int Tick => _tick;
     public string Scenario => _scenario;
-    public bool IsLastCapture => _semanticEnding || _tick >= _captureTick;
+    public bool IsLastCapture => IsSemantic || _tick >= _captureTick;
     public string OutputName => _captureTicks.Length > 1 ? $"{_scenario}-{_tick:D4}" : _scenario;
 
     public VisualScenarioRunner(VisualRunOptions options)
@@ -56,7 +67,11 @@ public sealed class VisualScenarioRunner
         _scenario = options.VisualScenario;
         _forceSense = options.ForceSoulSense;
         _forceResonance = options.ForceResonance;
-        _semanticEnding = _scenario == "ending" && options.CaptureTicks.Length == 0 && options.CaptureAfterTicks < 0;
+        bool defaultTiming = options.CaptureTicks.Length == 0 && options.CaptureAfterTicks < 0;
+        _semanticEnding = _scenario == "ending" && defaultTiming;
+        _semanticSeverance = _scenario is "severance-window" or "severance-cut" && defaultTiming;
+        _semanticGoldenBeat = _scenario == "golden-encounter" && defaultTiming;
+        _semanticFinalRelease = _scenario == "final-release" && defaultTiming;
         _captureTicks = options.CaptureTicks.Length > 0 ? options.CaptureTicks :
             [options.CaptureAfterTicks >= 0 ? options.CaptureAfterTicks : CaptureTicks[_scenario]];
         _captureTick = _captureTicks.Last();
@@ -151,7 +166,17 @@ public sealed class VisualScenarioRunner
                 }
                 break;
 
+            case "severance-window":
+            case "severance-cut":
+                AdvanceSeverance(input, world);
+                break;
+
+            case "golden-encounter":
+                AdvanceToBeat(input, world, 3);
+                break;
+
             case "ending":
+            case "final-release":
                 AdvanceEnding(input, world);
                 break;
         }
@@ -164,10 +189,40 @@ public sealed class VisualScenarioRunner
             if (_tick == 114) input.InjectKeyPress(Keys.R);
         }
 
-        if (_semanticEnding ? world.LoopState == ArenaLoopState.Complete && world.PresentationStateTime >= 6f : _captureTicks.Contains(_tick))
+        if (ShouldCapture(world))
         {
             CaptureRequested = true;
         }
+    }
+
+    private bool ShouldCapture(GameWorld world)
+    {
+        if (_semanticEnding)
+        {
+            return world.LoopState == ArenaLoopState.Complete && world.PresentationStateTime >= 6f;
+        }
+
+        if (_semanticFinalRelease)
+        {
+            // The quiet beat: Souls have gone and the Life Flame is rising.
+            return world.LoopState == ArenaLoopState.Complete && world.PresentationStateTime >= 1.9f;
+        }
+
+        if (_semanticSeverance)
+        {
+            // Window fixture: the frame the read is confirmed on.
+            // Cut fixture: eight ticks into the committed swing.
+            return _scenario == "severance-window"
+                ? _severanceDashTick >= 0 && _tick == _severanceDashTick + 3
+                : _severanceCutTick >= 0 && _tick == _severanceCutTick + 8;
+        }
+
+        if (_semanticGoldenBeat)
+        {
+            return _beatReachedTick >= 0 && _tick == _beatReachedTick + 260;
+        }
+
+        return _captureTicks.Contains(_tick);
     }
 
     public void MarkCaptureHandled() => CaptureRequested = false;
@@ -180,6 +235,68 @@ public sealed class VisualScenarioRunner
         }
     }
 
+    /// <summary>
+    /// Reacts to the real Severance opportunity instead of a hard-coded tick: the
+    /// fixture dashes on the frame the enemy's commitment enters the read window,
+    /// then swings. If the timing values are re-tuned the evidence still lands.
+    /// </summary>
+    private void AdvanceSeverance(InputState input, GameWorld world)
+    {
+        if (_tick == 100)
+        {
+            world.ArrangeVisualSubject(_scenario);
+            return;
+        }
+
+        if (_tick < 104)
+        {
+            return;
+        }
+
+        if (_severanceDashTick < 0)
+        {
+            if (world.SeveranceOpportunityReady)
+            {
+                _severanceDashTick = _tick;
+                input.InjectKeyPress(Keys.Space);
+            }
+            return;
+        }
+
+        if (_scenario == "severance-cut" && _severanceCutTick < 0 && _tick >= _severanceDashTick + 14 && world.SeveranceWindowOpen)
+        {
+            _severanceCutTick = _tick;
+            input.InjectLeftMouseDown();
+        }
+    }
+
+    private void AdvanceToBeat(InputState input, GameWorld world, int targetBeat)
+    {
+        if (world.WaveNumber >= targetBeat)
+        {
+            if (_beatReachedTick < 0 && world.LoopState == ArenaLoopState.Combat)
+            {
+                _beatReachedTick = _tick;
+            }
+            return;
+        }
+
+        if (world.LoopState != ArenaLoopState.Combat)
+        {
+            _combatTicks = 0;
+            return;
+        }
+
+        _combatTicks++;
+        if (_combatTicks < 22)
+        {
+            return;
+        }
+
+        _combatTicks = 0;
+        input.InjectKeyPress(Keys.F6);
+    }
+
     private void AdvanceEnding(InputState input, GameWorld world)
     {
         if (world.LoopState != ArenaLoopState.Combat)
@@ -188,12 +305,15 @@ public sealed class VisualScenarioRunner
             return;
         }
 
+        // Beats stage arrivals, so the ending fixture clears the floor on a cadence
+        // rather than once per beat.
         _combatTicks++;
-        if (_completedWave == world.WaveNumber || _combatTicks < 26)
+        if (_combatTicks < 24)
         {
             return;
         }
 
+        _combatTicks = 0;
         _completedWave = world.WaveNumber;
         input.InjectKeyPress(Keys.F6);
     }

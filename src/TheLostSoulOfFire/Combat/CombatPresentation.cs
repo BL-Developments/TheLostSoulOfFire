@@ -15,6 +15,7 @@ public static class CombatFeedbackTuning
     public const float BurningCompressionDuration = 0.18f;
     public const float BurningDetonationHitstop = 0.1f;
     public const float ResonanceSilenceDuration = 0.075f;
+    public const float SeveranceWindowHitstop = 0.055f;
 }
 
 public sealed class CombatPresentation
@@ -227,6 +228,51 @@ public sealed class CombatPresentation
         _screenEffects.BeginImpactFrame(0.058f);
         _screenEffects.AddShake(0.3f, 12.5f);
         _screenEffects.Flash(0.11f, 0.4f, GameBalance.SoulWhite);
+    }
+
+    /// <summary>
+    /// Confirms the read. Short, quiet and legible: a held beat plus a thread of
+    /// light between the Warden and the Anchor they have just found.
+    /// </summary>
+    public void PresentSeveranceWindow(Vector2 playerPosition, Vector2 anchorPosition)
+    {
+        _screenEffects.BeginHitstop(CombatFeedbackTuning.SeveranceWindowHitstop);
+        _screenEffects.Flash(0.05f, 0.08f, GameBalance.SoulWhite);
+        _particles.EmitConvergence(playerPosition, 12, 74f, GameBalance.SoulWhite, 0.24f, 4f, VisualEffectPriority.Critical);
+        _particles.EmitBurst(
+            Vector2.Lerp(playerPosition, anchorPosition, 0.5f),
+            Vector2.Normalize(SafeDelta(anchorPosition, playerPosition)),
+            7,
+            GameBalance.DeathFlameBright,
+            120f,
+            3.5f,
+            VisualEffectPriority.Critical);
+    }
+
+    /// <summary>
+    /// The payoff. The Anchor comes apart: a white cleave, a converging collapse
+    /// and a hard held frame. It reads as separation rather than as a bigger hit.
+    /// </summary>
+    public void PresentSeveranceCut(Vector2 anchorPosition, Vector2 direction)
+    {
+        float rotation = MathF.Atan2(direction.Y, direction.X);
+        _spriteVfx.Spawn("scythe_cleave", anchorPosition, rotation, 1.12f, Color.White * 0.52f);
+        _spriteVfx.Spawn("core_hit", anchorPosition, rotation, 0.94f, GameBalance.SoulWhite);
+        _spriteVfx.Spawn("soul_release", anchorPosition, 0f, 0.52f, GameBalance.DeathFlameBright * 0.7f);
+        _particles.EmitBurst(anchorPosition, direction, 26, GameBalance.SoulWhite, 340f, 9f, VisualEffectPriority.Critical);
+        _particles.EmitBurst(anchorPosition, -direction, 14, GameBalance.DeathFlameBright, 210f, 6f, VisualEffectPriority.Critical);
+        _particles.EmitDeathFlame(anchorPosition, 14, 1.32f, VisualEffectPriority.Critical);
+        _screenEffects.BeginHitstop(GameBalance.SeveranceHitstop);
+        _screenEffects.BeginImpactFrame(0.062f);
+        _screenEffects.AddShake(0.2f, 8.5f);
+        _screenEffects.AddCameraKick(direction, 6.5f);
+        _screenEffects.Flash(0.095f, 0.31f, GameBalance.SoulWhite);
+    }
+
+    private static Vector2 SafeDelta(Vector2 to, Vector2 from)
+    {
+        Vector2 delta = to - from;
+        return delta.LengthSquared() > 0.0001f ? delta : Vector2.UnitX;
     }
 
     public void BeginResonance(Vector2 position)

@@ -29,6 +29,34 @@ public abstract class Enemy
 
     public abstract string StateLabel { get; }
 
+    /// <summary>
+    /// Seconds until this enemy's committed attack lands, or a negative value if
+    /// it is not currently committed to one. Severance reads this instead of
+    /// inspecting concrete states, so every family keeps its own timing while
+    /// sharing one honest contract.
+    /// </summary>
+    public virtual float CommitmentRemaining => -1f;
+
+    /// <summary>
+    /// The Anchor a Severance cut separates: the emotional attachment holding the
+    /// manifestation together. Soul Sense reveals the same points.
+    /// </summary>
+    public virtual Vector2 AnchorPosition => Position;
+
+    /// <summary>
+    /// Range at which this enemy's committed attack threatens the Player. The
+    /// reaction has to be taken inside real danger, never from safety.
+    /// </summary>
+    public virtual float CommitmentThreatRange => Radius + 96f;
+
+    /// <summary>
+    /// Applied when a Severance cut lands. Each family answers in its own way so
+    /// the reaction never collapses into a generic universal counter.
+    /// </summary>
+    public virtual void ApplySeverance()
+    {
+    }
+
     public abstract void Update(
         float deltaTime,
         Player player,

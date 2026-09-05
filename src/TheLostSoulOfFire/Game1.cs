@@ -28,7 +28,6 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     private float _audioTestTotalTime;
     private float _audioTestStateTime;
     private int _audioTestWave;
-    private bool _audioTestWaveKilled;
     private bool _audioTestCompleteSeen;
     private bool _audioTestRestartInjected;
     private bool _audioTestDeathRequested;
@@ -240,13 +239,15 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
             {
                 _audioTestWave = _world.WaveNumber;
                 _audioTestStateTime = 0f;
-                _audioTestWaveKilled = false;
-                Console.WriteLine($"AUDIO_GAMEPLAY_WAVE {_audioTestWave}");
+                Console.WriteLine($"AUDIO_GAMEPLAY_BEAT {_audioTestWave}");
             }
 
-            if (!_audioTestWaveKilled && _audioTestStateTime >= 0.65f)
+            // Beats stage their arrivals over time, so the lifecycle check clears
+            // the floor repeatedly instead of once. This still exercises the real
+            // beat-advance, completion and restart path.
+            if (_audioTestStateTime >= 0.5f)
             {
-                _audioTestWaveKilled = true;
+                _audioTestStateTime = 0f;
                 _input.InjectKeyPress(Keys.F6);
             }
             return;
@@ -289,9 +290,9 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
             return;
         }
 
-        if (_world.PlayerDead || _audioTestTotalTime >= 35f)
+        if (_world.PlayerDead || _audioTestTotalTime >= 50f)
         {
-            Console.WriteLine($"AUDIO_GAMEPLAY_TEST_FAIL dead={_world.PlayerDead} state={_world.LoopState} wave={_world.WaveNumber}");
+            Console.WriteLine($"ENCOUNTER_LIFECYCLE_TEST_FAIL dead={_world.PlayerDead} state={_world.LoopState} beat={_world.WaveNumber}");
             Environment.ExitCode = 1;
             Exit();
             return;
@@ -299,7 +300,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
 
         if (_audioTestRestartInjected && _world.LoopState == ArenaLoopState.Intro && _world.WaveNumber == 0)
         {
-            Console.WriteLine("AUDIO_GAMEPLAY_TEST_PASS waves=4 completion=true restart=true");
+            Console.WriteLine($"ENCOUNTER_LIFECYCLE_TEST_PASS beats={EncounterDirector.BeatCount} completion=true restart=true");
             Environment.ExitCode = 0;
             Exit();
         }

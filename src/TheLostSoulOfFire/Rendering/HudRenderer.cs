@@ -69,14 +69,33 @@ public sealed class HudRenderer
         const int y = 54;
         const int width = 48;
         float ready = 1f - MathHelper.Clamp(player.DashCooldownRemaining / GameBalance.DashCooldown, 0f, 1f);
-        Color dashColor = ready >= 0.999f ? GameBalance.DeathFlameBright : GameBalance.DeathFlame * 0.62f;
+        bool severance = player.SeveranceReady;
+        Color dashColor = severance
+            ? GameBalance.SoulWhite
+            : ready >= 0.999f ? GameBalance.DeathFlameBright : GameBalance.DeathFlame * 0.62f;
 
-        PixelText.Draw(batch, pixel, "DASH", new Vector2(x, y), 1, ready >= 0.999f ? BoundSoulDim : Frame);
+        // While a Severance Window is open the dash track becomes its timer. The
+        // read is confirmed on the character; the HUD only reports how long it holds.
+        float track = severance
+            ? MathHelper.Clamp(player.SeveranceRemaining / GameBalance.SeveranceWindowDuration, 0f, 1f)
+            : ready;
+
+        PixelText.Draw(
+            batch,
+            pixel,
+            severance ? "SEVER" : "DASH",
+            new Vector2(x, y),
+            1,
+            severance ? GameBalance.SoulWhite : ready >= 0.999f ? BoundSoulDim : Frame);
         batch.FillRectangle(pixel, new Rectangle(x + 29, y + 3, width, 2), Empty);
-        batch.FillRectangle(pixel, new Rectangle(x + 29, y + 3, (int)MathF.Round(width * ready), 2), dashColor);
+        batch.FillRectangle(pixel, new Rectangle(x + 29, y + 3, (int)MathF.Round(width * track), 2), dashColor);
 
         Vector2 marker = new(x + 84, y + 4);
-        if (ready >= 0.999f)
+        if (severance)
+        {
+            DrawDiamond(batch, pixel, marker, 4, GameBalance.SoulWhite);
+        }
+        else if (ready >= 0.999f)
         {
             DrawDiamond(batch, pixel, marker, 3, GameBalance.DeathFlameBright);
         }

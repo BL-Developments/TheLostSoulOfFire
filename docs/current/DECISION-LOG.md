@@ -2,6 +2,28 @@
 
 Record owner-approved, rejected or revised product decisions here. Newer dated entries override older conflicting entries.
 
+## 2026-09-06 — Owner revision: no hard lines in combat
+
+### Revised
+
+- **Combat feedback must be animation and VFX only.** Hard, shiny vector lines in
+  the fighting plane are rejected: they read as interface laid over the pixel art
+  and make the game feel inorganic.
+- Applies to telegraphs, swing trails, auras, tethers, weak-point markers,
+  detonations and death effects. Environment/prop linework and debug overlays
+  (F1) are not affected.
+
+### Implemented in response
+
+All combat cues are painted with a feathered brush in a dedicated additive,
+linear-filtered pass (`Rendering/SoftShapes.cs`, `GameWorld.DrawCombatLight`).
+Telegraphs became gathering light instead of outlines. The arena centre pulse
+ring and the aim crosshair were removed.
+
+### Still open
+
+Owner has not yet judged the Golden Combat Slice as a whole.
+
 ## 2026-09-05 — Current foundation
 
 ### Approved direction

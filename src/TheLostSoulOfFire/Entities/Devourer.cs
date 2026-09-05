@@ -42,9 +42,32 @@ public sealed class Devourer : Enemy
     public float TelegraphProgress => MathHelper.Clamp(1f - _stateTimer / GameBalance.DevourerSlamTelegraph, 0f, 1f);
     public float StrikeProgress => MathHelper.Clamp(1f - _stateTimer / GameBalance.DevourerSlamDuration, 0f, 1f);
 
+    // The Devourer's Anchor is the torso cavity where it holds what it has taken.
+    public override Vector2 AnchorPosition => TorsoPosition;
+    public override float CommitmentThreatRange => GameBalance.DevourerSlamRange;
+    public override float CommitmentRemaining => State switch
+    {
+        DevourerState.SlamTelegraph => _stateTimer,
+        DevourerState.Slam => 0f,
+        _ => -1f
+    };
+
     public Devourer(Vector2 position)
         : base(position, GameBalance.DevourerMaxHealth, GameBalance.DevourerRadius)
     {
+    }
+
+    /// <summary>
+    /// Places a Soul the Devourer swallowed before the Player arrived. It is held,
+    /// not destroyed: Soul Sense shows it, a full Cannon shot or a Severance cut
+    /// frees it, and killing the manifestation releases whatever is left. The
+    /// caller keeps ownership of the Soul so the world still updates and draws it.
+    /// </summary>
+    public void SeedHeldSoul(Soul soul)
+    {
+        soul.BeginDevour();
+        soul.Consume();
+        _consumedSouls.Add(soul);
     }
 
     public override void Update(
@@ -166,6 +189,30 @@ public sealed class Devourer : Enemy
         }
     }
 
+    /// <summary>
+    /// Severing the Devourer's Anchor tears the cavity open: the slam is cancelled
+    /// and one held Soul is released. This is the moment the mechanic exists for —
+    /// a correct read rescues a Soul that damage alone could not reach.
+    /// </summary>
+    public override void ApplySeverance()
+    {
+        if (!IsAlive || State is DevourerState.Dying or DevourerState.Dead)
+        {
+            return;
+        }
+
+        _slamDamagePending = false;
+        if (_targetSoul?.State == SoulState.BeingDevoured)
+        {
+            _targetSoul.CancelDevour();
+            _targetSoul = null;
+        }
+
+        State = DevourerState.Staggered;
+        _stateTimer = GameBalance.SeveranceDevourerStagger;
+        ExpelOneSoul();
+    }
+
     public override bool TryConsumeSoulSpawn(out Vector2 position)
     {
         if (!_soulSpawnPending)
@@ -209,16 +256,9 @@ public sealed class Devourer : Enemy
         Color body = HitFlashRemaining > 0f ? GameBalance.SoulWhite : new Color(27, 25, 33);
         Vector2 right = new(-_facing.Y, _facing.X);
 
+        // The collapse is light, drawn in the additive combat pass.
         if (State == DevourerState.Dying)
         {
-            float progress = 1f - _stateTimer / GameBalance.DevourerDeathDuration;
-            batch.FillCircle(pixel, Position, (55f + progress * 18f) * stackScale, body * (1f - progress * 0.8f));
-            for (int i = 0; i < 7; i++)
-            {
-                float angle = i * MathHelper.TwoPi / 7f;
-                Vector2 crack = new(MathF.Cos(angle), MathF.Sin(angle));
-                batch.DrawLine(pixel, TorsoPosition, TorsoPosition + crack * (22f + progress * 45f), GameBalance.DeathFlameBright * (1f - progress), 4f);
-            }
             return;
         }
 
@@ -235,37 +275,86 @@ public sealed class Devourer : Enemy
 
         if (!useSpriteArt)
             batch.FillCircle(pixel, TorsoPosition, 28f, new Color(7, 5, 10));
-        // Keep the painted torso cavity visible; a solid primitive disk erased it.
-        batch.DrawArc(pixel, TorsoPosition, 22f + pulse, 0.25f, 1.7f,
-            GameBalance.DeepViolet * (0.38f + ConsumedSoulCount * 0.07f), 2f, 16);
-
-        if (State == DevourerState.ApproachSoul && _targetSoul is not null)
-        {
-            batch.DrawLine(pixel, TorsoPosition, _targetSoul.Position, GameBalance.DeathFlame * 0.48f, 4f);
-            batch.DrawCircle(pixel, _targetSoul.Position, 31f + pulse * 8f, GameBalance.DeathFlameBright * 0.72f, 4f, 24);
-        }
-        else if (State == DevourerState.Devour && _targetSoul is not null)
-        {
-            batch.DrawLine(pixel, TorsoPosition, _targetSoul.Position, GameBalance.DeepViolet * 0.9f, 15f);
-            batch.DrawLine(pixel, TorsoPosition, _targetSoul.Position, GameBalance.DeathFlameBright * 0.8f, 4f);
-        }
-
-        if (soulSenseActive)
-        {
-            batch.FillCircle(pixel, TorsoPosition, GameBalance.DevourerTorsoRadius, GameBalance.DeepViolet * 0.72f);
-            int visibleSouls = Math.Max(1, ConsumedSoulCount);
-            for (int i = 0; i < visibleSouls; i++)
-            {
-                float angle = _visualTime * (1.2f + i * 0.16f) + i * MathHelper.TwoPi / visibleSouls;
-                Vector2 trappedPosition = TorsoPosition + new Vector2(MathF.Cos(angle) * 13f, MathF.Sin(angle) * 10f);
-                batch.FillCircle(pixel, trappedPosition, ConsumedSoulCount > 0 ? 5f : 3f, ConsumedSoulCount > 0 ? GameBalance.SoulWhite : GameBalance.DeathFlame * 0.45f);
-            }
-        }
 
         if (debugVisible)
         {
             batch.DrawCircle(pixel, Position, Radius, new Color(80, 220, 210), 2f);
             batch.DrawCircle(pixel, TorsoPosition, GameBalance.DevourerTorsoRadius, new Color(255, 210, 80), 2f);
+        }
+    }
+
+    /// <summary>
+    /// The cavity light and the pull it exerts on a Soul. Everything that used to
+    /// be a drawn tether line is now a stream of light between the Soul and the
+    /// torso, so the theft reads as force rather than as a connector.
+    /// </summary>
+    public void DrawCombatLight(SpriteBatch batch, Texture2D brush, bool soulSenseActive)
+    {
+        if (State == DevourerState.Dead)
+        {
+            return;
+        }
+
+        if (State == DevourerState.Dying)
+        {
+            // The cavity fails and everything it was holding comes apart. Soft
+            // light spilling out of the seams, not drawn cracks.
+            float collapse = 1f - _stateTimer / GameBalance.DevourerDeathDuration;
+            float fade = 1f - collapse;
+            SoftShapes.Blob(batch, brush, TorsoPosition, (58f + collapse * 46f), GameBalance.DeepViolet * (0.4f * fade));
+            for (int i = 0; i < 7; i++)
+            {
+                float angle = i * MathHelper.TwoPi / 7f + _visualTime * 0.4f;
+                Vector2 seam = new(MathF.Cos(angle), MathF.Sin(angle) * 0.72f);
+                Vector2 point = TorsoPosition + seam * (24f + collapse * 52f);
+                SoftShapes.Blob(batch, brush, point, 15f + collapse * 8f, GameBalance.DeathFlameBright * (0.34f * fade));
+            }
+            SoftShapes.Blob(batch, brush, TorsoPosition, 20f + collapse * 14f, Color.White * (0.3f * fade));
+            return;
+        }
+
+        float pulse = 0.5f + 0.5f * MathF.Sin(_visualTime * 4.2f);
+        float held = 0.24f + ConsumedSoulCount * 0.09f;
+        SoftShapes.Blob(batch, brush, TorsoPosition, 30f + pulse * 5f, GameBalance.DeepViolet * held);
+
+        if (_targetSoul is not null && State is DevourerState.ApproachSoul or DevourerState.Devour)
+        {
+            bool feeding = State == DevourerState.Devour;
+            Vector2 delta = TorsoPosition - _targetSoul.Position;
+            float distance = delta.Length();
+            if (distance > 1f)
+            {
+                Vector2 direction = delta / distance;
+                int steps = Math.Max(3, (int)(distance / 22f));
+                for (int i = 0; i < steps; i++)
+                {
+                    // Motes stream toward the cavity, faster and denser while feeding.
+                    float amount = (i + 0.5f) / steps;
+                    float flow = (amount + _visualTime * (feeding ? 1.5f : 0.55f)) % 1f;
+                    Vector2 point = _targetSoul.Position + direction * (distance * flow);
+                    float taper = MathF.Sin(flow * MathHelper.Pi);
+                    SoftShapes.Blob(batch, brush, point, (feeding ? 13f : 7f) * taper,
+                        (feeding ? GameBalance.DeathFlameBright : GameBalance.DeathFlame) * ((feeding ? 0.3f : 0.16f) * taper));
+                }
+            }
+
+            SoftShapes.Blob(batch, brush, _targetSoul.Position, 34f + pulse * 8f,
+                GameBalance.DeathFlameBright * (feeding ? 0.26f : 0.16f));
+        }
+
+        if (!soulSenseActive)
+        {
+            return;
+        }
+
+        SoftShapes.Blob(batch, brush, TorsoPosition, GameBalance.DevourerTorsoRadius * 1.6f, GameBalance.DeepViolet * 0.34f);
+        int visibleSouls = Math.Max(1, ConsumedSoulCount);
+        for (int i = 0; i < visibleSouls; i++)
+        {
+            float angle = _visualTime * (1.2f + i * 0.16f) + i * MathHelper.TwoPi / visibleSouls;
+            Vector2 trapped = TorsoPosition + new Vector2(MathF.Cos(angle) * 13f, MathF.Sin(angle) * 10f);
+            SoftShapes.Blob(batch, brush, trapped, ConsumedSoulCount > 0 ? 12f : 7f,
+                (ConsumedSoulCount > 0 ? GameBalance.SoulWhite : GameBalance.DeathFlame) * 0.44f);
         }
     }
 

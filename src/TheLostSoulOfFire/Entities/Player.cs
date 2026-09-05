@@ -32,6 +32,8 @@ public sealed class Player
     private float _resonanceActivationTimer;
     private float _resonanceAfterimageTimer;
     private float _activeDashDistance = GameBalance.DashDistance;
+    private float _severanceTimer;
+    private float _severanceFlareTimer;
     private Vector2 _dashDirection = Vector2.UnitX;
     private Vector2 _attackImpulse;
     private Vector2 _damageKnockback;
@@ -54,8 +56,30 @@ public sealed class Player
     public float ResonanceRemaining => _resonanceTimer;
     public float ResonanceActivationRemaining => _resonanceActivationTimer;
     public bool SoulSenseActive { get; private set; }
+
+    /// <summary>
+    /// Severance is a short, per-Player advantage opened by reading a committed
+    /// enemy attack. It is deliberately owned here rather than in a shared combat
+    /// service so a second Warden can hold their own window later.
+    /// </summary>
+    public bool SeveranceReady => _severanceTimer > 0f;
+    public float SeveranceRemaining => _severanceTimer;
+    public float SeveranceFlare => MathHelper.Clamp(_severanceFlareTimer / 0.28f, 0f, 1f);
+    public bool DashStartedThisFrame { get; private set; }
     public ScytheCombat Scythe { get; } = new();
     public SoulCannon Cannon { get; } = new();
+
+    public void OpenSeveranceWindow()
+    {
+        _severanceTimer = GameBalance.SeveranceWindowDuration;
+        _severanceFlareTimer = 0.28f;
+    }
+
+    public void ConsumeSeveranceWindow()
+    {
+        _severanceTimer = 0f;
+        _severanceFlareTimer = 0f;
+    }
 
     public Player(Vector2 position)
     {
@@ -81,6 +105,9 @@ public sealed class Player
         _resonanceActivationTimer = 0f;
         _resonanceAfterimageTimer = 0f;
         _activeDashDistance = GameBalance.DashDistance;
+        _severanceTimer = 0f;
+        _severanceFlareTimer = 0f;
+        DashStartedThisFrame = false;
         SoulSenseActive = false;
         _afterimages.Clear();
         Scythe.Reset();
@@ -98,6 +125,8 @@ public sealed class Player
         _resonanceTimer = 0f;
         _resonanceActivationTimer = 0f;
         _resonanceAfterimageTimer = 0f;
+        _severanceTimer = 0f;
+        _severanceFlareTimer = 0f;
         SoulSenseActive = false;
         _afterimages.Clear();
         Scythe.Reset();
@@ -114,7 +143,10 @@ public sealed class Player
         bool forceSoulSense = false)
     {
         _visualTime += deltaTime;
+        DashStartedThisFrame = false;
         _resonanceActivationTimer = MathF.Max(0f, _resonanceActivationTimer - deltaTime);
+        _severanceTimer = MathF.Max(0f, _severanceTimer - deltaTime);
+        _severanceFlareTimer = MathF.Max(0f, _severanceFlareTimer - deltaTime);
         HitFlashRemaining = MathF.Max(0f, HitFlashRemaining - deltaTime);
         if (ResonanceActive)
         {
@@ -162,7 +194,7 @@ public sealed class Player
             particles,
             ResonanceActive);
 
-        Scythe.Update(deltaTime, input, FacingDirection, Position, particles, !IsDashing && Cannon.CanUseScythe, ResonanceActive);
+        Scythe.Update(deltaTime, input, FacingDirection, Position, particles, !IsDashing && Cannon.CanUseScythe, ResonanceActive, SeveranceReady);
         if (Scythe.StartedThisFrame)
         {
             _attackImpulse = Scythe.AttackDirection * Scythe.GetForwardImpulse();
@@ -208,17 +240,24 @@ public sealed class Player
         }
     }
 
-    public void DrawAfterimages(SpriteBatch batch, Texture2D pixel)
+    /// <summary>
+    /// Dash afterimages as soft residue rather than stamped silhouettes. Drawn in
+    /// the additive combat-light pass with the rest of the Warden's flame.
+    /// </summary>
+    public void DrawAfterimages(SpriteBatch batch, Texture2D brush)
     {
         foreach (Afterimage afterimage in _afterimages)
         {
             float alpha = afterimage.Remaining / afterimage.Lifetime;
-            Vector2 right = new(-afterimage.Facing.Y, afterimage.Facing.X);
-            Color silhouette = new Color(69, 28, 112) * (alpha * 0.48f);
-            batch.DrawLine(pixel, afterimage.Position - afterimage.Facing * 15f, afterimage.Position + afterimage.Facing * 14f, silhouette, 28f);
-            batch.DrawLine(pixel, afterimage.Position - afterimage.Facing * 13f, afterimage.Position - afterimage.Facing * 35f + right * 9f, silhouette, 11f);
-            batch.FillCircle(pixel, afterimage.Position + afterimage.Facing * 18f, 10f, silhouette);
-            batch.FillCircle(pixel, afterimage.Position, 4f, GameBalance.DeathFlameBright * (alpha * 0.35f));
+            SoftShapes.Streak(
+                batch,
+                brush,
+                afterimage.Position,
+                afterimage.Facing,
+                30f,
+                17f,
+                new Color(96, 42, 156) * (alpha * 0.3f));
+            SoftShapes.Blob(batch, brush, afterimage.Position, 11f, GameBalance.DeathFlameBright * (alpha * 0.2f));
         }
     }
 
@@ -226,71 +265,14 @@ public sealed class Player
     {
         if (IsDead)
         {
-            float deathPulse = 0.5f + 0.5f * MathF.Sin(_visualTime * 5f);
-            batch.FillCircle(pixel, Position, 13f + deathPulse * 3f, GameBalance.DeepViolet * 0.8f);
-            batch.FillCircle(pixel, Position, 6f + deathPulse, GameBalance.SoulWhite * 0.8f);
             return;
         }
 
-        Vector2 right = new(-FacingDirection.Y, FacingDirection.X);
-        float pulse = 0.5f + 0.5f * MathF.Sin(_visualTime * 4f);
-
-        if (ResonanceActive)
-        {
-            float flare = 0.5f + 0.5f * MathF.Sin(_visualTime * 3.8f);
-            // Broken, quiet crown leaves the coat and current attack legible.
-            for (int i = 0; i < 3; i++)
-                batch.DrawArc(pixel, Position, 30f + flare * 2f,
-                    i * MathHelper.TwoPi / 3f + 0.2f, 0.75f,
-                    GameBalance.DeathFlame * 0.42f, 2f, 8);
-        }
-
-        // The directional body sheet already includes the stored cannon.
+        // The directional body sheet already includes the stored cannon. All of
+        // the Warden's Death Flame now lives in the additive combat-light pass;
+        // nothing here strokes an outline over the pixel art.
         Scythe.Draw(batch, pixel, art.PhysicalScythe, Position, FacingDirection, debugVisible);
-
-        Vector2 head = Position + FacingDirection * 18f;
-
-        Vector2 eye = head + FacingDirection * 8f;
-        float sense = MathHelper.Clamp(soulSenseAmount, 0f, 1f);
-        Color eyeColor = Color.Lerp(new Color(174, 166, 183), GameBalance.SoulWhite, sense);
-        if (sense > 0.001f)
-        {
-            batch.FillCircle(pixel, eye, 8f, GameBalance.DeepViolet * (0.68f * sense));
-            batch.DrawLine(pixel, Position + FacingDirection * 4f, head, GameBalance.DeathFlame * (0.5f * sense), 4f);
-        }
-        batch.DrawLine(pixel, eye - right * 4f, eye + right * 4f, eyeColor, MathHelper.Lerp(2f, 3f, sense));
-
-        bool coreReady = IsResonanceReady;
-        float coreRadius = coreReady ? 9f + pulse * 2.4f : 7f + pulse * 1.3f;
-        batch.FillCircle(pixel, Position + FacingDirection * 2f, coreRadius, GameBalance.DeepViolet * 0.75f);
-        float coreAlpha = ResonanceActive || coreReady || SoulSenseActive ? 1f : 0.88f;
-        batch.FillCircle(pixel, Position + FacingDirection * 2f, 3.2f + pulse * (coreReady ? 1.8f : 0.6f), GameBalance.SoulWhite * coreAlpha);
-        if (coreReady)
-        {
-            batch.DrawCircle(pixel, Position + FacingDirection * 2f, 14f + pulse * 5f, GameBalance.DeathFlameBright * 0.78f, 3f, 20);
-        }
-
-        if (ResonanceActive)
-        {
-            batch.DrawLine(pixel, Position + FacingDirection * 2f, Position - right * 14f - Vector2.UnitY * 15f, GameBalance.DeathFlameBright * 0.72f, 3f);
-            batch.DrawLine(pixel, Position + FacingDirection * 2f, Position + right * 13f + Vector2.UnitY * 13f, GameBalance.DeathFlame * 0.72f, 3f);
-        }
-
         Cannon.DrawActive(batch, pixel, art.SoulCannon, Position, FacingDirection);
-
-        if (HitFlashRemaining > 0f)
-        {
-            float flash = MathHelper.Clamp(HitFlashRemaining / 0.14f, 0f, 1f);
-            batch.DrawCircle(pixel, Position, 29f, GameBalance.SoulWhite * (0.72f * flash), 4f, 24);
-            batch.FillCircle(pixel, Position + FacingDirection * 2f, 7f, GameBalance.SoulWhite * (0.88f * flash));
-        }
-
-        if (IsDashing)
-        {
-            Vector2 ignitionOrigin = Position - _dashDirection * 15f;
-            batch.DrawLine(pixel, ignitionOrigin - right * 8f, ignitionOrigin - _dashDirection * 23f - right * 11f, GameBalance.DeathFlame, 7f);
-            batch.DrawLine(pixel, ignitionOrigin + right * 8f, ignitionOrigin - _dashDirection * 27f + right * 12f, GameBalance.DeathFlameBright, 5f);
-        }
 
         if (debugVisible)
         {
@@ -299,8 +281,84 @@ public sealed class Player
         }
     }
 
+    /// <summary>
+    /// The Warden's own light: core, Soul Sense, Resonance, Severance, dash
+    /// ignition and hit response. Drawn additively with the feathered brush so
+    /// the character glows rather than being circled.
+    /// </summary>
+    public void DrawCombatLight(SpriteBatch batch, Texture2D brush, float soulSenseAmount)
+    {
+        if (IsDead)
+        {
+            float deathPulse = 0.5f + 0.5f * MathF.Sin(_visualTime * 5f);
+            SoftShapes.Blob(batch, brush, Position, 46f + deathPulse * 10f, GameBalance.DeepViolet * 0.34f);
+            SoftShapes.Blob(batch, brush, Position, 17f + deathPulse * 4f, GameBalance.SoulWhite * 0.4f);
+            return;
+        }
+
+        float pulse = 0.5f + 0.5f * MathF.Sin(_visualTime * 4f);
+        Vector2 core = Position + FacingDirection * 2f;
+        bool coreReady = IsResonanceReady;
+
+        // Bound Soul core.
+        SoftShapes.Blob(batch, brush, core, (coreReady ? 26f : 19f) + pulse * 4f, GameBalance.DeepViolet * 0.4f);
+        SoftShapes.Blob(batch, brush, core, (coreReady ? 11f : 7.5f) + pulse * 2f, GameBalance.SoulWhite * 0.5f);
+        if (coreReady)
+        {
+            SoftShapes.Blob(batch, brush, core, 40f + pulse * 12f, GameBalance.DeathFlameBright * 0.2f);
+        }
+
+        // Soul Sense opens the Warden's sight forward.
+        float sense = MathHelper.Clamp(soulSenseAmount, 0f, 1f);
+        if (sense > 0.001f)
+        {
+            Vector2 eye = Position + FacingDirection * 24f;
+            SoftShapes.Blob(batch, brush, eye, 20f, GameBalance.DeepViolet * (0.4f * sense));
+            SoftShapes.Blob(batch, brush, eye, 8f, GameBalance.SoulWhite * (0.4f * sense));
+        }
+
+        if (ResonanceActive)
+        {
+            float flare = 0.5f + 0.5f * MathF.Sin(_visualTime * 3.8f);
+            SoftShapes.Blob(batch, brush, core, 62f + flare * 10f, GameBalance.DeathFlame * 0.2f);
+            SoftShapes.Ring(batch, brush, Position, 34f + flare * 3f, 13f, GameBalance.DeathFlame * 0.16f, 16, _visualTime * 1.6f);
+        }
+
+        // Severance: the guttering flame draws into one taut, white-hot body of
+        // light. A pose change in the light, not an interface ring.
+        if (SeveranceReady)
+        {
+            float life = MathHelper.Clamp(_severanceTimer / GameBalance.SeveranceWindowDuration, 0f, 1f);
+            float flare = SeveranceFlare;
+            float taut = 0.5f + 0.5f * MathF.Sin(_visualTime * 15f);
+
+            SoftShapes.Blob(batch, brush, core, 78f + flare * 46f, GameBalance.DeathFlameBright * (0.2f * life + flare * 0.22f));
+            SoftShapes.Blob(batch, brush, core, 30f + taut * 5f, GameBalance.SoulWhite * (0.44f * life));
+            SoftShapes.Ring(batch, brush, Position, 30f + taut * 4f, 11f,
+                GameBalance.SoulWhite * (0.2f * life), 14, _visualTime * 3.2f);
+            SoftShapes.Streak(batch, brush, Position + FacingDirection * 26f, FacingDirection,
+                40f + taut * 8f, 12f, GameBalance.SoulWhite * (0.24f * life));
+        }
+
+        Scythe.DrawTrail(batch, brush, Position);
+
+        if (HitFlashRemaining > 0f)
+        {
+            float flash = MathHelper.Clamp(HitFlashRemaining / 0.14f, 0f, 1f);
+            SoftShapes.Blob(batch, brush, Position, 44f * flash, GameBalance.SoulWhite * (0.34f * flash));
+        }
+
+        if (IsDashing)
+        {
+            Vector2 origin = Position - _dashDirection * 22f;
+            SoftShapes.Streak(batch, brush, origin, _dashDirection, 42f, 17f, GameBalance.DeathFlame * 0.44f);
+            SoftShapes.Streak(batch, brush, origin - _dashDirection * 8f, _dashDirection, 27f, 8f, GameBalance.DeathFlameBright * 0.34f);
+        }
+    }
+
     private void StartDash(Vector2 movement, ParticleSystem particles, ScreenEffects screenEffects)
     {
+        DashStartedThisFrame = true;
         _dashDirection = movement.LengthSquared() > 0.001f ? Vector2.Normalize(movement) : FacingDirection;
         _dashTimer = GameBalance.DashDuration;
         _activeDashDistance = GameBalance.DashDistance * (ResonanceActive ? GameBalance.ResonanceDashDistanceMultiplier : 1f);

@@ -35,6 +35,16 @@ public sealed class Hollow : Enemy
     public override string StateLabel => State.ToString().ToUpperInvariant();
     public Vector2 FacingDirection => _facing;
     public Vector2 CorePosition => Position + new Vector2(0f, -5f);
+
+    // The Hollow's Anchor is the Soul Core it still clutches.
+    public override Vector2 AnchorPosition => CorePosition;
+    public override float CommitmentThreatRange => GameBalance.HollowSwipeRange;
+    public override float CommitmentRemaining => State switch
+    {
+        HollowState.Telegraph => _stateTimer,
+        HollowState.Swipe => 0f,
+        _ => -1f
+    };
     public float TelegraphProgress => MathHelper.Clamp(1f - _stateTimer / GameBalance.HollowSwipeTelegraph, 0f, 1f);
     public float StrikeProgress => MathHelper.Clamp(1f - _stateTimer / GameBalance.HollowSwipeDuration, 0f, 1f);
     public float RecoveryProgress => MathHelper.Clamp(1f - _stateTimer / GameBalance.HollowRecoveryDuration, 0f, 1f);
@@ -127,6 +137,22 @@ public sealed class Hollow : Enemy
         }
     }
 
+    /// <summary>
+    /// Cutting the Hollow's grip drops the raised arm and leaves the Core open.
+    /// The swipe is cancelled outright, which is what makes the read worth taking.
+    /// </summary>
+    public override void ApplySeverance()
+    {
+        if (!IsAlive || State is HollowState.Dying or HollowState.Dead)
+        {
+            return;
+        }
+
+        _swipeDamagePending = false;
+        State = HollowState.Staggered;
+        _stateTimer = GameBalance.SeveranceHollowStagger;
+    }
+
     public override bool TryConsumeSoulSpawn(out Vector2 position)
     {
         if (!_soulSpawnPending)
@@ -199,6 +225,22 @@ public sealed class Hollow : Enemy
         batch.FillCircle(pixel, CorePosition, 13f, GameBalance.DeepViolet * 0.8f);
         batch.FillCircle(pixel, CorePosition, 8f, GameBalance.DeathFlameBright);
         batch.FillCircle(pixel, CorePosition, 4f, GameBalance.SoulWhite);
+    }
+
+    /// <summary>
+    /// The Soul the Hollow still clutches, shown as light under Soul Sense rather
+    /// than as stacked discs.
+    /// </summary>
+    public void DrawCombatLight(SpriteBatch batch, Texture2D brush, bool soulSenseActive)
+    {
+        if (!soulSenseActive || State is HollowState.Dying or HollowState.Dead)
+        {
+            return;
+        }
+
+        SoftShapes.Blob(batch, brush, CorePosition, 26f, GameBalance.DeepViolet * 0.4f);
+        SoftShapes.Blob(batch, brush, CorePosition, 13f, GameBalance.DeathFlameBright * 0.44f);
+        SoftShapes.Blob(batch, brush, CorePosition, 5f, GameBalance.SoulWhite * 0.52f);
     }
 
     protected override void OnDeath()

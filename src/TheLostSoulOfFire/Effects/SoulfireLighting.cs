@@ -31,6 +31,7 @@ public static class SoulfireLighting
         renderer.BeginLighting(batch, worldTransform);
         float breathe = 0.88f + MathF.Sin(presentationTime * 4.6f) * 0.12f;
 
+        ArenaComposition.DrawLighting(batch, renderer, presentationTime, soulSenseAmount);
         arenaAtmosphere.DrawLighting(batch, renderer, soulSenseAmount);
         particles.DrawLighting(batch, renderer);
         spriteVfx.DrawLighting(batch, renderer);
@@ -174,6 +175,13 @@ public static class SoulfireLighting
         {
             Vector2 eye = player.Position + player.FacingDirection * 26f;
             renderer.DrawGlow(batch, eye, 34f, GameBalance.SoulWhite, 0.25f * soulSenseAmount);
+        }
+
+        if (player.SeveranceReady)
+        {
+            float life = MathHelper.Clamp(player.SeveranceRemaining / GameBalance.SeveranceWindowDuration, 0f, 1f);
+            renderer.DrawGlow(batch, playerCore, 74f * breathe, GameBalance.SoulWhite, 0.3f * life);
+            renderer.DrawGlow(batch, playerCore, 148f * breathe, GameBalance.DeathFlameBright, 0.14f * life + player.SeveranceFlare * 0.2f);
         }
 
         if (player.IsResonanceReady)

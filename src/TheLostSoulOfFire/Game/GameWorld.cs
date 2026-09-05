@@ -42,6 +42,8 @@ public sealed class GameWorld : IDisposable
     private readonly List<Enemy> _enemies = [];
     private readonly List<Soul> _souls = [];
     private readonly List<CannonShot> _cannonShots = [];
+    private readonly EncounterDirector _director = new();
+    private readonly List<EncounterSpawn> _releasedSpawns = [];
     private Vector2 _lastMouseWorld;
     private bool _debugVisible;
     private bool _forceSoulSense;
@@ -72,12 +74,63 @@ public sealed class GameWorld : IDisposable
             "scythe-combo" => new Hollow(_player.Position + new Vector2(94f, 0f), 1),
             "burning-charge" => new Burning(_player.Position + new Vector2(310f, 0f), 1),
             "devourer-slam" => new Devourer(_player.Position + new Vector2(210f, 0f)),
+            "severance-window" or "severance-cut" => new Devourer(_player.Position + new Vector2(205f, 0f)),
             _ => throw new ArgumentOutOfRangeException(nameof(scenario))
         };
         _enemies.Clear();
         _souls.Clear();
+
+        // The Severance fixtures use a Devourer that already holds a Soul, because
+        // freeing it is the point of the mechanic being captured.
+        if (subject is Devourer carrier && scenario.StartsWith("severance", StringComparison.Ordinal))
+        {
+            Soul held = new(carrier.Position);
+            carrier.SeedHeldSoul(held);
+            _souls.Add(held);
+        }
+
         _enemies.Add(subject);
     }
+
+    /// <summary>
+    /// Read-only capture seam: true on the frames where a dash would open a
+    /// Severance Window. Fixtures react to the real combat state instead of
+    /// hard-coded tick numbers, so the evidence stays honest if timings change.
+    /// </summary>
+    internal bool SeveranceOpportunityReady
+    {
+        get
+        {
+            if (_player.IsDead || _loopState != ArenaLoopState.Combat)
+            {
+                return false;
+            }
+
+            foreach (Enemy enemy in _enemies)
+            {
+                if (!enemy.IsAlive)
+                {
+                    continue;
+                }
+
+                float remaining = enemy.CommitmentRemaining;
+                if (remaining < 0f || remaining > GameBalance.SeveranceReadTime)
+                {
+                    continue;
+                }
+
+                float threat = enemy.CommitmentThreatRange + _player.Radius + GameBalance.SeveranceThreatPadding;
+                if (Vector2.DistanceSquared(enemy.Position, _player.Position) <= threat * threat)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    internal bool SeveranceWindowOpen => _player.SeveranceReady;
 
     public object VisualSnapshot => new
     {
@@ -275,6 +328,7 @@ public sealed class GameWorld : IDisposable
         }
 
         _player.Update(deltaTime, input, _lastMouseWorld, _arena.CombatBounds, _particles, _screenEffects, _forceSoulSense);
+        TryOpenSeveranceWindow();
         _soulSensePresentation.Update(deltaTime, _player.SoulSenseActive);
         if (_audioTestFatalDamageRequested)
         {
@@ -419,9 +473,11 @@ public sealed class GameWorld : IDisposable
             _enemies,
             _souls,
             _presentationTime);
-        batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp,
+        // Threat cues are light, so they use the same additive path and linear
+        // filtering as the emission layer rather than crisp PointClamp geometry.
+        batch.Begin(SpriteSortMode.Deferred, SoftShapes.AdditiveLight, SamplerState.LinearClamp,
             transformMatrix: _camera.GetTransform(viewport, _screenEffects.CameraOffset));
-        ThreatPresentation.Draw(batch, pixel, _enemies);
+        ThreatPresentation.Draw(batch, _art.SoftBrush, _enemies, _presentationTime);
         batch.End();
         DrawHud(batch, pixel, viewport);
     }
@@ -436,19 +492,16 @@ public sealed class GameWorld : IDisposable
             transformMatrix: worldTransform);
 
         _art.DrawArena(batch);
+        ArenaComposition.DrawGround(batch, pixel, _presentationTime, _soulSensePresentation.WorldSuppression);
+        ArenaComposition.DrawProps(batch, pixel, _presentationTime, _soulSensePresentation.WorldSuppression);
         _arenaAtmosphere.DrawBackground(batch, pixel, _soulSensePresentation.WorldSuppression);
         DrawArenaLoop(batch, pixel);
         foreach (Enemy enemy in _enemies)
         {
             if (!enemy.IsAlive) continue;
-            float width = enemy is Devourer ? 43f : enemy is Burning ? 23f : 19f;
+            float width = enemy is Devourer ? 46f : enemy is Burning ? 25f : 21f;
             float foot = enemy is Devourer ? 65f : 43f;
-            batch.FillEllipse(pixel, enemy.Position + new Vector2(0f, foot), width, width * 0.24f,
-                new Color(3, 3, 7) * 0.52f);
-        }
-        if (_loopState != ArenaLoopState.Title)
-        {
-            _player.DrawAfterimages(batch, pixel);
+            ArenaComposition.DrawContactShadow(batch, pixel, enemy.Position + new Vector2(0f, foot), width);
         }
         foreach (Enemy enemy in _enemies)
         {
@@ -468,7 +521,7 @@ public sealed class GameWorld : IDisposable
         _particles.Draw(batch, pixel);
         if (_presentation.ShouldDrawPlayer(_loopState, _player.IsDead))
         {
-            batch.FillEllipse(pixel, _player.Position + new Vector2(0f, 40f), 20f, 5f, new Color(3, 3, 7) * 0.58f);
+            ArenaComposition.DrawContactShadow(batch, pixel, _player.Position + new Vector2(0f, 40f), 21f);
             _art.DrawPlayer(batch, _player);
             _player.Draw(batch, pixel, _art, _debugVisible, _soulSensePresentation.SoulEmergence);
             if (_player.Cannon.State == SoulCannonState.Charging)
@@ -496,6 +549,7 @@ public sealed class GameWorld : IDisposable
         _spriteVfx.DrawAlpha(batch);
         batch.End();
 
+        DrawCombatLight(batch, worldTransform);
         _spriteVfx.DrawAdditive(batch, worldTransform);
 
         batch.Begin(
@@ -504,12 +558,7 @@ public sealed class GameWorld : IDisposable
             SamplerState.PointClamp,
             transformMatrix: worldTransform);
 
-        if (_presentation.ShouldDrawAim(_loopState, _player.IsDead))
-        {
-            batch.DrawCircle(pixel, _lastMouseWorld, 9f, GameBalance.DeathFlameBright * 0.75f, 2f, 16);
-            batch.DrawLine(pixel, _lastMouseWorld - Vector2.UnitX * 13f, _lastMouseWorld + Vector2.UnitX * 13f, GameBalance.DeathFlame * 0.6f, 1f);
-            batch.DrawLine(pixel, _lastMouseWorld - Vector2.UnitY * 13f, _lastMouseWorld + Vector2.UnitY * 13f, GameBalance.DeathFlame * 0.6f, 1f);
-        }
+        ArenaComposition.DrawForeground(batch, pixel);
 
         if (_debugVisible)
         {
@@ -517,6 +566,65 @@ public sealed class GameWorld : IDisposable
             Vector2 center = _arena.CombatBounds.Center.ToVector2();
             batch.DrawLine(pixel, center - Vector2.UnitX * 28f, center + Vector2.UnitX * 28f, new Color(80, 220, 210), 2f);
             batch.DrawLine(pixel, center - Vector2.UnitY * 28f, center + Vector2.UnitY * 28f, new Color(80, 220, 210), 2f);
+        }
+
+        batch.End();
+    }
+
+    /// <summary>
+    /// Every piece of combat feedback that used to be a hard vector stroke is
+    /// painted here with the feathered brush, additively, in world space. Keeping
+    /// it in one pass means combat light can never be point-sampled into crisp
+    /// edges by the pixel-art sampler used for sprites and the floor.
+    /// </summary>
+    private void DrawCombatLight(SpriteBatch batch, Matrix worldTransform)
+    {
+        batch.Begin(
+            SpriteSortMode.Deferred,
+            SoftShapes.AdditiveLight,
+            SamplerState.LinearClamp,
+            transformMatrix: worldTransform);
+
+        Texture2D brush = _art.SoftBrush;
+        bool sense = _player.SoulSenseActive;
+
+        foreach (Enemy enemy in _enemies)
+        {
+            switch (enemy)
+            {
+                case Hollow hollow:
+                    hollow.DrawCombatLight(batch, brush, sense);
+                    break;
+                case Burning burning:
+                    burning.DrawCombatLight(batch, brush, sense);
+                    break;
+                case Devourer devourer:
+                    devourer.DrawCombatLight(batch, brush, sense);
+                    break;
+            }
+        }
+
+        foreach (Soul soul in _souls)
+        {
+            soul.DrawCombatLight(batch, brush, sense);
+        }
+
+        if (_loopState != ArenaLoopState.Title)
+        {
+            _player.DrawAfterimages(batch, brush);
+        }
+
+        if (_presentation.ShouldDrawPlayer(_loopState, _player.IsDead))
+        {
+            _player.DrawCombatLight(batch, brush, _soulSensePresentation.SoulEmergence);
+        }
+
+        // Aim mark: a soft ember where the Warden is looking, not a crosshair.
+        if (_presentation.ShouldDrawAim(_loopState, _player.IsDead))
+        {
+            float breathe = 0.72f + 0.28f * MathF.Sin(_presentationTime * 5.4f);
+            SoftShapes.Blob(batch, brush, _lastMouseWorld, 17f * breathe, GameBalance.DeathFlame * 0.22f);
+            SoftShapes.Blob(batch, brush, _lastMouseWorld, 5f * breathe, GameBalance.DeathFlameBright * 0.4f);
         }
 
         batch.End();
@@ -586,14 +694,58 @@ public sealed class GameWorld : IDisposable
         batch.End();
     }
 
+    /// <summary>
+    /// Opens a Severance Window when the Player dashes into a committed attack
+    /// late enough to be a read. The window is granted by the enemy's commitment,
+    /// not by a global cooldown, which keeps it valid for a second Warden later.
+    /// </summary>
+    private void TryOpenSeveranceWindow()
+    {
+        if (!_player.DashStartedThisFrame || _player.IsDead)
+        {
+            return;
+        }
+
+        foreach (Enemy enemy in _enemies)
+        {
+            if (!enemy.IsAlive)
+            {
+                continue;
+            }
+
+            float remaining = enemy.CommitmentRemaining;
+            if (remaining < -GameBalance.SeveranceLateGrace || remaining > GameBalance.SeveranceReadTime)
+            {
+                continue;
+            }
+
+            float threat = enemy.CommitmentThreatRange + _player.Radius + GameBalance.SeveranceThreatPadding;
+            if (Vector2.DistanceSquared(enemy.Position, _player.Position) > threat * threat)
+            {
+                continue;
+            }
+
+            _player.OpenSeveranceWindow();
+            _combatPresentation.PresentSeveranceWindow(_player.Position, enemy.AnchorPosition);
+            _audio.Play(AudioCue.ResonanceReady, 0.5f, 0.28f);
+            return;
+        }
+    }
+
     private void ResolveScytheStrike()
     {
+        if (_player.Scythe.ConsumedSeveranceThisFrame)
+        {
+            _player.ConsumeSeveranceWindow();
+        }
+
         if (!_player.Scythe.TryConsumeStrike(out ScytheStrike strike))
         {
             return;
         }
 
         bool hitAnything = false;
+        bool severedAnything = false;
         foreach (Enemy enemy in _enemies.Where(enemy => enemy.IsAlive))
         {
             Vector2 toTarget = enemy.Position - _player.Position;
@@ -609,9 +761,12 @@ public sealed class GameWorld : IDisposable
                 continue;
             }
 
-            Vector2 weakPoint = FindStrikeWeakPoint(enemy, strike);
-            bool coreHit = _player.SoulSenseActive && weakPoint != Vector2.Zero;
-            int damage = coreHit
+            // A Severance cut finds the Anchor without Soul Sense. That is the
+            // reward: the read replaces the resource the Player would otherwise
+            // have to be already spending.
+            Vector2 weakPoint = strike.IsSeverance ? enemy.AnchorPosition : FindStrikeWeakPoint(enemy, strike);
+            bool coreHit = strike.IsSeverance || (_player.SoulSenseActive && weakPoint != Vector2.Zero);
+            int damage = coreHit && !strike.IsSeverance
                 ? (int)MathF.Round(strike.Damage * GameBalance.SoulSenseCoreDamageMultiplier)
                 : strike.Damage;
             ApplyEnemyDamage(enemy, new DamageInfo(
@@ -619,6 +774,16 @@ public sealed class GameWorld : IDisposable
                 targetDirection * strike.Knockback,
                 coreHit ? weakPoint : enemy.Position,
                 coreHit));
+
+            if (strike.IsSeverance)
+            {
+                enemy.ApplySeverance();
+                _combatPresentation.PresentSeveranceCut(weakPoint, targetDirection);
+                _player.AddResonance(GameBalance.SeveranceResonanceGain);
+                _arenaAtmosphere.ReactToForce(weakPoint, 300f, 88f);
+                severedAnything = true;
+            }
+
             Vector2 contactPosition = coreHit
                 ? weakPoint
                 : enemy.Position - targetDirection * enemy.Radius * 0.35f;
@@ -627,12 +792,19 @@ public sealed class GameWorld : IDisposable
                 contactPosition,
                 targetDirection,
                 coreHit);
-            if (coreHit)
+            if (coreHit && !strike.IsSeverance)
             {
                 _player.AddResonance(GameBalance.ResonancePerCoreHit);
                 _audio.Play(AudioCue.CoreHit, 0.7f);
             }
             hitAnything = true;
+        }
+
+        if (severedAnything)
+        {
+            _audio.Play(AudioCue.SoulCleave, 0.94f, -0.22f);
+            _audio.Play(AudioCue.CoreHit, 0.86f, 0.14f);
+            return;
         }
 
         if (!hitAnything)
@@ -644,52 +816,68 @@ public sealed class GameWorld : IDisposable
         _audio.Play(AudioCue.ScytheHit, strike.Step == 3 ? 0.72f : 0.48f, strike.Step == 2 ? 0.08f : 0f);
     }
 
-    private void SpawnWave(int waveNumber)
+    private void BeginBeat(int beatNumber)
     {
-        Vector2 center = _arena.CombatBounds.Center.ToVector2();
-        int seed = waveNumber * 10;
-        switch (waveNumber)
-        {
-            case 1:
-                _enemies.Add(new Hollow(center + new Vector2(360f, -195f), seed + 1));
-                _enemies.Add(new Hollow(center + new Vector2(-390f, -125f), seed + 2));
-                _enemies.Add(new Hollow(center + new Vector2(235f, 265f), seed + 3));
-                break;
-
-            case 2:
-                _enemies.Add(new Hollow(center + new Vector2(-470f, -210f), seed + 1));
-                _enemies.Add(new Hollow(center + new Vector2(430f, 235f), seed + 2));
-                _enemies.Add(new Burning(center + new Vector2(445f, -170f), seed + 3));
-                _enemies.Add(new Burning(center + new Vector2(-420f, 225f), seed + 4));
-                break;
-
-            case 3:
-                _enemies.Add(new Hollow(center + new Vector2(-500f, -230f), seed + 1));
-                _enemies.Add(new Hollow(center + new Vector2(480f, 235f), seed + 2));
-                _enemies.Add(new Burning(center + new Vector2(420f, -250f), seed + 3));
-                _enemies.Add(new Burning(center + new Vector2(-420f, 260f), seed + 4));
-                _enemies.Add(new Devourer(center + new Vector2(560f, 10f)));
-                break;
-
-            case 4:
-                _enemies.Add(new Devourer(center + new Vector2(575f, -35f)));
-                _enemies.Add(new Burning(center + new Vector2(-500f, -265f), seed + 1));
-                _enemies.Add(new Burning(center + new Vector2(-525f, 40f), seed + 2));
-                _enemies.Add(new Burning(center + new Vector2(390f, 275f), seed + 3));
-                _enemies.Add(new Hollow(center + new Vector2(455f, -245f), seed + 4));
-                _enemies.Add(new Hollow(center + new Vector2(-320f, 285f), seed + 5));
-                break;
-        }
-
-        _waveNumber = waveNumber;
+        _waveNumber = beatNumber;
         _loopState = ArenaLoopState.Combat;
+        _director.BeginBeat(beatNumber);
         _burningHandoffTimer = 0f;
         _burningCommittedLastFrame = 0;
-        _particles.EmitDeathFlame(center, 18 + waveNumber * 5, 1f + waveNumber * 0.12f);
-        _screenEffects.AddShake(0.16f, 4f + waveNumber);
-        _screenEffects.Flash(0.08f, 0.12f + waveNumber * 0.035f);
+        _screenEffects.AddShake(0.14f, 3f + beatNumber);
+        _screenEffects.Flash(0.07f, 0.09f + beatNumber * 0.025f);
         _audio.SetCalm(false);
-        _audio.Play(AudioCue.WaveStart, 0.62f, MathF.Min(0.18f, waveNumber * 0.03f));
+        _audio.Play(AudioCue.WaveStart, 0.6f, MathF.Min(0.18f, beatNumber * 0.03f));
+        UpdateEncounterSpawns(0f);
+    }
+
+    /// <summary>
+    /// Releases the beat's staged arrivals. Each Lost Soul enters through its own
+    /// Death Flame rather than appearing, so the Player can read where pressure is
+    /// coming from before it is on top of them.
+    /// </summary>
+    private void UpdateEncounterSpawns(float deltaTime)
+    {
+        bool floorEmpty = !_enemies.Any(enemy => enemy.IsAlive) && _souls.Count == 0;
+        _director.Update(deltaTime, floorEmpty, _releasedSpawns);
+        if (_releasedSpawns.Count == 0)
+        {
+            return;
+        }
+
+        Vector2 center = _arena.CombatBounds.Center.ToVector2();
+        foreach (EncounterSpawn spawn in _releasedSpawns)
+        {
+            Vector2 position = center + spawn.Offset;
+            Enemy arrival = spawn.Role switch
+            {
+                EncounterRole.Hollow => new Hollow(position, spawn.Seed),
+                EncounterRole.Burning => new Burning(position, spawn.Seed),
+                _ => new Devourer(position)
+            };
+
+            if (arrival is Devourer devourer && spawn.HeldSouls > 0)
+            {
+                for (int i = 0; i < spawn.HeldSouls; i++)
+                {
+                    Soul held = new(position);
+                    devourer.SeedHeldSoul(held);
+                    _souls.Add(held);
+                }
+            }
+
+            _enemies.Add(arrival);
+            PresentArrival(position, arrival);
+        }
+    }
+
+    private void PresentArrival(Vector2 position, Enemy arrival)
+    {
+        bool heavy = arrival is Devourer;
+        _spriteVfx.Spawn("dash_ignition", position, 0f, heavy ? 1.15f : 0.7f, GameBalance.DeathFlame * 0.6f);
+        _particles.EmitDeathFlame(position, heavy ? 22 : 11, heavy ? 1.45f : 1f);
+        _particles.EmitConvergence(position, heavy ? 20 : 12, heavy ? 128f : 84f, GameBalance.DeathFlameBright, 0.3f, heavy ? 6f : 4f);
+        _arenaAtmosphere.ReactToForce(position, heavy ? 320f : 190f, heavy ? 96f : 54f);
+        _screenEffects.AddShake(heavy ? 0.2f : 0.07f, heavy ? 6.5f : 1.6f);
     }
 
     private void ResetEncounter()
@@ -703,6 +891,8 @@ public sealed class GameWorld : IDisposable
         _combatPresentation.Clear();
         _screenEffects.Clear();
         _arenaAtmosphere.Reset();
+        _director.Reset();
+        _releasedSpawns.Clear();
         _waveNumber = 0;
         _loopState = ArenaLoopState.Intro;
         _presentation.BeginIntro(true);
@@ -765,22 +955,23 @@ public sealed class GameWorld : IDisposable
             case ArenaLoopState.Intro:
                 if (_presentation.TransitionComplete)
                 {
-                    SpawnWave(_waveNumber + 1);
+                    BeginBeat(_waveNumber + 1);
                 }
                 break;
 
             case ArenaLoopState.Transition:
                 if (_presentation.WaveTransitionComplete)
                 {
-                    SpawnWave(_waveNumber + 1);
+                    BeginBeat(_waveNumber + 1);
                 }
                 break;
 
             case ArenaLoopState.Combat:
-                if (_enemies.Count == 0 && _souls.Count == 0)
+                UpdateEncounterSpawns(deltaTime);
+                if (_enemies.Count == 0 && _souls.Count == 0 && _director.AllSpawnsReleased)
                 {
-                    _audio.Play(AudioCue.WaveClear, _waveNumber >= 4 ? 0.74f : 0.62f);
-                    if (_waveNumber >= 4)
+                    _audio.Play(AudioCue.WaveClear, _waveNumber >= EncounterDirector.BeatCount ? 0.74f : 0.62f);
+                    if (_waveNumber >= EncounterDirector.BeatCount)
                     {
                         _loopState = ArenaLoopState.Complete;
                         _player.SettleForCompletion();
@@ -803,21 +994,21 @@ public sealed class GameWorld : IDisposable
 
     private void DrawArenaLoop(SpriteBatch batch, Texture2D pixel)
     {
-        if (_loopState != ArenaLoopState.Complete)
+        // The gate is part of the room, so it stays as authored geometry. The old
+        // pulsing ring that marked the arena centre was a hard vector circle over
+        // the combat plane and has been removed; the encounter's staged arrivals
+        // now carry that beat instead.
+        if (_loopState == ArenaLoopState.Complete)
         {
-            Rectangle gate = new(_arena.CombatBounds.Center.X - 92, _arena.CombatBounds.Bottom - 14, 184, 20);
-            batch.FillRectangle(pixel, gate, new Color(24, 22, 30));
-            batch.DrawRectangle(pixel, gate, GameBalance.MetalColor, 5f);
-            for (int x = gate.Left + 18; x < gate.Right; x += 24)
-            {
-                batch.DrawLine(pixel, new Vector2(x, gate.Top - 17), new Vector2(x, gate.Bottom + 17), GameBalance.StoneColor, 7f);
-            }
+            return;
         }
 
-        if (_loopState is ArenaLoopState.Intro or ArenaLoopState.Transition)
+        Rectangle gate = new(_arena.CombatBounds.Center.X - 92, _arena.CombatBounds.Bottom - 14, 184, 20);
+        batch.FillRectangle(pixel, gate, new Color(24, 22, 30));
+        batch.DrawRectangle(pixel, gate, GameBalance.MetalColor, 5f);
+        for (int x = gate.Left + 18; x < gate.Right; x += 24)
         {
-            float pulse = 0.5f + 0.5f * MathF.Sin(_presentation.StateTime * 8f);
-            batch.DrawCircle(pixel, _arena.CombatBounds.Center.ToVector2(), 118f + pulse * 14f, GameBalance.DeathFlame * (0.18f + pulse * 0.18f), 5f, 40);
+            batch.DrawLine(pixel, new Vector2(x, gate.Top - 17), new Vector2(x, gate.Bottom + 17), GameBalance.StoneColor, 7f);
         }
     }
 

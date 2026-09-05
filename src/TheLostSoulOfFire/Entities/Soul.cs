@@ -124,37 +124,54 @@ public sealed class Soul
             return;
         }
 
-        if (State == SoulState.Residue)
+        if (State == SoulState.Residue || !useSpriteArt)
         {
-            batch.DrawLine(pixel, Position - new Vector2(7f, 0f), Position + new Vector2(7f, 0f), GameBalance.DeathFlameBright * 0.8f, 3f);
-            batch.FillCircle(pixel, Position, 4f, GameBalance.SoulWhite);
+            // Residue and the primitive fallback are light only; see DrawCombatLight.
+            return;
+        }
+    }
+
+    /// <summary>
+    /// The Soul's own light. Painted softly so a Soul always reads as something
+    /// alive and fragile rather than as a marked object.
+    /// </summary>
+    public void DrawCombatLight(SpriteBatch batch, Texture2D brush, bool soulSenseActive)
+    {
+        if (State is SoulState.Released or SoulState.Consumed)
+        {
             return;
         }
 
         float pulse = 0.5f + 0.5f * MathF.Sin(_visualTime * 5f);
-        float releaseProgress = State == SoulState.Releasing
-            ? 1f - MathHelper.Clamp(_stateTimer / GameBalance.SoulReleaseDuration, 0f, 1f)
-            : 0f;
-        Color glow = Color.Lerp(GameBalance.DeathFlame, GameBalance.SoulWhite, releaseProgress);
         float emphasis = soulSenseActive ? 1.25f : 1f;
 
-        if (!useSpriteArt)
+        if (State == SoulState.Residue)
         {
-            batch.FillCircle(pixel, Position, (16f + pulse * 2f) * emphasis, GameBalance.DeepViolet * 0.54f);
-            batch.FillCircle(pixel, Position, (10f + pulse) * emphasis, glow * 0.92f);
-            batch.FillCircle(pixel, Position, 4f * emphasis, GameBalance.SoulWhite);
+            SoftShapes.Blob(batch, brush, Position, 18f, GameBalance.DeathFlameBright * 0.26f);
+            SoftShapes.Blob(batch, brush, Position, 6f, GameBalance.SoulWhite * 0.5f);
+            return;
         }
+
+        float releaseProgress = ReleaseProgress;
+        Color glow = Color.Lerp(GameBalance.DeathFlame, GameBalance.SoulWhite, releaseProgress);
+
+        SoftShapes.Blob(batch, brush, Position, (30f + pulse * 5f) * emphasis, GameBalance.DeepViolet * 0.24f);
+        SoftShapes.Blob(batch, brush, Position, (15f + pulse * 2f) * emphasis, glow * 0.3f);
+        SoftShapes.Blob(batch, brush, Position, 6f * emphasis, GameBalance.SoulWhite * 0.42f);
 
         if (State == SoulState.BeingDevoured)
         {
-            batch.DrawCircle(pixel, Position, 25f + pulse * 5f, GameBalance.DeathFlameBright * 0.85f, 4f, 22);
+            // Being pulled apart: the light strains outward and flickers.
+            float strain = 0.5f + 0.5f * MathF.Sin(_visualTime * 19f);
+            SoftShapes.Ring(batch, brush, Position, 26f + pulse * 5f, 10f,
+                GameBalance.DeathFlameBright * (0.2f + strain * 0.2f), 14, _visualTime * 4f);
         }
-
-        if (State == SoulState.Releasing)
+        else if (State == SoulState.Releasing)
         {
-            // The intact Soul departs freely. Only the later residue returns;
-            // a tether to the Player falsely implied Soul consumption.
-            batch.DrawCircle(pixel, Position, 22f + releaseProgress * 18f, glow * (1f - releaseProgress) * 0.24f, 1.5f, 24);
+            // The intact Soul departs freely. Only the later residue returns; a
+            // tether to the Player would falsely imply Soul consumption.
+            float departure = 1f - releaseProgress;
+            SoftShapes.Blob(batch, brush, Position, 34f + releaseProgress * 44f, glow * (0.16f * departure));
         }
     }
 

@@ -7,6 +7,13 @@ public static class GameBalance
     public const int BackBufferWidth = 1280;
     public const int BackBufferHeight = 720;
 
+    // Actor presence. At 1.0 the Player read ~6% of frame height and the arena
+    // looked like a diagram. Combat is framed closer so characters, telegraphs
+    // and the environment carry equal weight.
+    public const float CombatCameraZoom = 1.3f;
+    public const float IntroCameraZoom = 1.16f;
+    public const float TitleCameraZoom = 1.1f;
+
     public const float PlayerMoveSpeed = 310f;
     public const float PlayerRadius = 22f;
     public const int PlayerMaxHealth = 100;
@@ -16,7 +23,10 @@ public static class GameBalance
     public const float DashDistance = 170f;
     public const float DashDuration = 0.14f;
     public const float DashCooldown = 0.62f;
-    public const float DashInvulnerability = 0.18f;
+    // Invulnerability must fully cover the Severance read window, otherwise a
+    // correct read is still punished by the attack it read. Verified in capture:
+    // at 0.18s the fixture took the slam it had just answered.
+    public const float DashInvulnerability = 0.24f;
 
     public const float ComboResetTime = 0.6f;
     public const int ScytheDamage1 = 20;
@@ -79,6 +89,25 @@ public static class GameBalance
     public const float DevourerFullCannonStagger = 1.4f;
     public const float DevourerDeathDuration = 0.82f;
     public const float DevourerTorsoRadius = 26f;
+
+    // --- Severance Window -------------------------------------------------
+    // The reaction thesis. A dash taken inside a committed attack, late enough
+    // to be a read rather than a guess, opens a short window in which the next
+    // Scythe strike cuts the enemy's Anchor instead of its body.
+    public const float SeveranceReadTime = 0.18f;
+    public const float SeveranceLateGrace = 0.1f;
+    public const float SeveranceThreatPadding = 54f;
+    public const float SeveranceWindowDuration = 0.9f;
+    public const float SeveranceMarkLead = 0.42f;
+    public const float SeveranceDamageMultiplier = 2.35f;
+    public const float SeveranceRangeMultiplier = 1.32f;
+    public const float SeveranceArcRadians = 4.36f;
+    public const float SeveranceKnockbackMultiplier = 1.45f;
+    public const float SeveranceResonanceGain = 24f;
+    public const float SeveranceHollowStagger = 1.3f;
+    public const float SeveranceDevourerStagger = 1.75f;
+    public const float SeveranceBurningStagger = 1.1f;
+    public const float SeveranceHitstop = 0.135f;
 
     public const float SoulExposedDuration = 0.5f;
     public const float SoulReleaseDuration = 1.25f;

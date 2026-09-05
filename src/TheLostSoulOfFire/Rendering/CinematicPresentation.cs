@@ -79,38 +79,41 @@ public sealed class CinematicPresentation
     {
         Vector2 arenaCenter = combatBounds.Center.ToVector2();
         Vector2 target = playerPosition;
-        float targetZoom = 1f;
+        float targetZoom = GameBalance.CombatCameraZoom;
         float followSpeed = 9f;
 
         if (loopState == ArenaLoopState.Title)
         {
-            target = arenaCenter + new Vector2(0f, -36f);
-            targetZoom = 0.9f;
+            target = arenaCenter + new Vector2(-330f, -6f);
+            targetZoom = GameBalance.TitleCameraZoom;
             followSpeed = 2.4f;
         }
         else if (playerDead)
         {
             target = playerPosition;
-            targetZoom = 1.055f;
+            targetZoom = GameBalance.CombatCameraZoom * 1.055f;
             followSpeed = 3.2f;
         }
         else if (loopState == ArenaLoopState.Intro)
         {
             float settle = Ease(_stateTime / MathF.Max(0.01f, _introDuration));
-            target = Vector2.Lerp(arenaCenter + new Vector2(0f, -46f), playerPosition, settle);
-            targetZoom = MathHelper.Lerp(_quickIntro ? 0.97f : 0.9f, 1f, settle);
+            target = Vector2.Lerp(arenaCenter + new Vector2(-180f, -46f), playerPosition, settle);
+            targetZoom = MathHelper.Lerp(
+                _quickIntro ? GameBalance.CombatCameraZoom * 0.97f : GameBalance.IntroCameraZoom,
+                GameBalance.CombatCameraZoom,
+                settle);
             followSpeed = _quickIntro ? 10f : 4.5f;
         }
         else if (loopState == ArenaLoopState.Transition)
         {
             target = Vector2.Lerp(playerPosition, arenaCenter, 0.12f);
-            targetZoom = 0.975f;
+            targetZoom = GameBalance.CombatCameraZoom * 0.975f;
             followSpeed = 5f;
         }
         else if (loopState == ArenaLoopState.Complete)
         {
             target = Vector2.Lerp(playerPosition, GetLifeFlamePosition(combatBounds), 0.2f) + new Vector2(70f, -72f);
-            targetZoom = 0.92f;
+            targetZoom = GameBalance.CombatCameraZoom * 0.94f;
             followSpeed = 2.8f;
         }
 
@@ -265,7 +268,7 @@ public sealed class CinematicPresentation
         PixelText.DrawCentered(batch, pixel, "THE FURNACE WAKES", viewport.Width * 0.5f, viewport.Height * 0.78f, 2, GameBalance.DeathFlameBright * (0.76f * warning));
     }
 
-    private void DrawWaveTransition(SpriteBatch batch, Texture2D pixel, Viewport viewport, int nextWave)
+    private void DrawWaveTransition(SpriteBatch batch, Texture2D pixel, Viewport viewport, int nextBeat)
     {
         float open = Ease(_stateTime / 0.2f);
         float close = 1f - Ease((_stateTime - 0.82f) / 0.23f);
@@ -273,9 +276,13 @@ public sealed class CinematicPresentation
         batch.FillRectangle(pixel, viewport.Bounds, Color.Black * (0.18f * alpha));
         DrawLetterbox(batch, pixel, viewport, 13, 0.54f * alpha);
 
-        string label = nextWave >= 4 ? "FINAL WAVE" : $"WAVE {ToRoman(nextWave)}";
-        DrawTitleRules(batch, pixel, viewport, viewport.Height * 0.5f - 28f, alpha * 0.62f);
-        PixelText.DrawCentered(batch, pixel, label, viewport.Width * 0.5f, viewport.Height * 0.5f - 9f, 3, GameBalance.SoulWhite * (0.88f * alpha));
+        // Beats are named after what the furnace remembers, not numbered waves.
+        float centerX = viewport.Width * 0.5f;
+        float centerY = viewport.Height * 0.5f;
+        DrawTitleRules(batch, pixel, viewport, centerY - 32f, alpha * 0.62f);
+        PixelText.DrawCentered(batch, pixel, ToRoman(nextBeat), centerX, centerY - 22f, 2, GameBalance.DeathFlameBright * (0.6f * alpha));
+        PixelText.DrawCentered(batch, pixel, EncounterDirector.GetTitle(nextBeat), centerX, centerY, 3, GameBalance.SoulWhite * (0.9f * alpha));
+        PixelText.DrawCentered(batch, pixel, EncounterDirector.GetLine(nextBeat), centerX, centerY + 30f, 1, new Color(168, 152, 186) * (0.8f * alpha));
     }
 
     private void DrawDeath(SpriteBatch batch, Texture2D pixel, Viewport viewport)
@@ -306,7 +313,7 @@ public sealed class CinematicPresentation
         float stillIn = Ease((_stateTime - 0.48f) / 0.7f);
         float stillOut = 1f - Ease((_stateTime - 2.15f) / 0.7f);
         float stillAlpha = stillIn * stillOut;
-        PixelText.DrawCentered(batch, pixel, "THE ARENA IS STILL", viewport.Width * 0.5f, viewport.Height * 0.48f, 3, GameBalance.SoulWhite * (0.72f * stillAlpha));
+        PixelText.DrawCentered(batch, pixel, "THE FURNACE IS STILL", viewport.Width * 0.5f, viewport.Height * 0.48f, 3, GameBalance.SoulWhite * (0.72f * stillAlpha));
 
         float endingReveal = Ease((_stateTime - 2.8f) / 1.05f);
         DrawTitleRules(batch, pixel, viewport, viewport.Height * 0.39f - 34f, endingReveal * 0.66f);

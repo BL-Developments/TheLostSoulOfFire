@@ -1,6 +1,6 @@
 # Current Slice
 
-Status: repository snapshot at commit `6eb4335` before the next implementation session.
+Status: Golden Combat Slice implemented on `work/golden-combat`, awaiting owner review.
 
 ## What exists
 
@@ -12,28 +12,42 @@ Status: repository snapshot at commit `6eb4335` before the next implementation s
 - Soul states for exposure, devouring, release, residue and consumption.
 - Hollow, Burning and Devourer enemy roles.
 - Burning detonation through the Cannon.
-- Four-wave arena lifecycle with completion and restart.
 - Scene rendering, emission, halos and reduced-effects presentation.
 - Deterministic visual scenario capture system.
 - Directional character animation, VFX and audio asset base.
 
+### Added by the Golden Slice
+
+- **Severance Window.** Dashing into a committed enemy attack opens a short
+  per-Player window; the next Scythe swing cuts the enemy's Anchor rather than
+  its body. Each family answers differently; the Devourer releases a held Soul.
+- **Authored four-beat encounter** (`EncounterDirector`) with named beats and
+  staged arrivals, replacing the anonymous four-wave loop.
+- **Generated casting floor** and **authored arena composition**: recessed basin,
+  the Fallen Ladle landmark, grounded props, local light pools, foreground frame.
+- **All combat feedback painted as light** (`SoftShapes`) instead of vector
+  strokes, per owner revision 2026-09-06.
+
 ## Verified baseline
 
 - Release build passes with zero warnings and zero errors.
-- Automated four-wave gameplay lifecycle passes through completion and restart.
-- All twelve current visual scenarios capture successfully.
+- Encounter lifecycle passes through four beats, completion and restart.
+- Death and restart check passes.
+- Thirteen visual scenarios capture successfully, plus reduced-effects and
+  baseline-quality variants.
+- Play-area black coverage reduced from 90–96% to under 2.5%.
 
 ## Current limitations
 
-- `GameWorld` owns one hard-coded arena loop and one player.
+- `GameWorld` owns one arena and one player.
 - Input, camera, HUD, enemy targeting and Soul interactions assume a single player.
 - The environment is one fixed 1800×1000 arena.
 - No story flow, zones, dialogue, homebase, co-op, items, save or progression exists yet.
-- The visual frame lacks floor detail, grounding, architectural depth and strong actor scale.
 - Several older design documents predate the current Warden cosmology and product direction.
 
 ## Active objective
 
-The next implementation target is [`../agent-prompts/01-GOLDEN-COMBAT-SLICE.md`](../agent-prompts/01-GOLDEN-COMBAT-SLICE.md).
+Owner review of the Golden Combat Slice. On approval, continue with
+[`../agent-prompts/02-COOP-BROTHER-PROOF.md`](../agent-prompts/02-COOP-BROTHER-PROOF.md).
 
 Do not multiply content until the owner approves the resulting combat and visual direction.

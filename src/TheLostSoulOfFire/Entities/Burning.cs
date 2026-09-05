@@ -42,6 +42,16 @@ public sealed class Burning : Enemy
     public float TelegraphProgress => MathHelper.Clamp(1f - _stateTimer / GameBalance.BurningChargeTelegraph, 0f, 1f);
     public float ChargeProgress => MathHelper.Clamp(1f - _stateTimer / GameBalance.BurningChargeDuration, 0f, 1f);
 
+    // The Burning's Anchor is the widest fracture in its shell.
+    public override Vector2 AnchorPosition => Position + new Vector2(11f, -3f);
+    public override float CommitmentThreatRange => Radius + 62f;
+    public override float CommitmentRemaining => State switch
+    {
+        BurningState.Telegraph => _stateTimer,
+        BurningState.Charge => 0f,
+        _ => -1f
+    };
+
     public Burning(Vector2 position, int movementSeed)
         : base(position, GameBalance.BurningMaxHealth, GameBalance.BurningRadius)
     {
@@ -131,6 +141,30 @@ public sealed class Burning : Enemy
         }
     }
 
+    /// <summary>
+    /// A Burning that is already committed is unstable. Severing its fracture
+    /// during the charge collapses it into the same detonation the Cannon causes,
+    /// so the reaction reinforces the Burning's existing identity instead of
+    /// replacing it. Outside the charge it is only broken open and staggered.
+    /// </summary>
+    public override void ApplySeverance()
+    {
+        if (!IsAlive || State is BurningState.Dying or BurningState.Detonating or BurningState.Dead)
+        {
+            return;
+        }
+
+        if (State == BurningState.Charge)
+        {
+            Detonate();
+            return;
+        }
+
+        _chargeDamagePending = false;
+        State = BurningState.Recovery;
+        _stateTimer = GameBalance.SeveranceBurningStagger;
+    }
+
     public void Detonate()
     {
         if (!IsAlive || State != BurningState.Charge)
@@ -198,30 +232,9 @@ public sealed class Burning : Enemy
         Color body = HitFlashRemaining > 0f ? GameBalance.SoulWhite : new Color(29, 24, 31);
         Vector2 right = new(-_facing.Y, _facing.X);
 
+        // Detonation is pure light; it is drawn in the additive combat pass.
         if (State == BurningState.Detonating)
         {
-            float releaseRemaining = GameBalance.BurningDeathDuration - CombatFeedbackTuning.BurningCompressionDuration;
-            if (!_detonationReleased)
-            {
-                float compression = MathHelper.Clamp(
-                    (GameBalance.BurningDeathDuration - _stateTimer) / CombatFeedbackTuning.BurningCompressionDuration,
-                    0f,
-                    1f);
-                float instability = 0.5f + 0.5f * MathF.Sin(_visualTime * 42f);
-                float outerRadius = MathHelper.Lerp(62f, 18f, compression);
-                batch.FillCircle(pixel, Position, outerRadius, GameBalance.DeepViolet * (0.18f + compression * 0.35f));
-                batch.DrawCircle(pixel, Position, outerRadius + instability * 5f, GameBalance.DeathFlameBright * (0.58f + compression * 0.36f), 4f + compression * 5f, 30);
-                batch.FillCircle(pixel, Position, 6f + compression * 8f, GameBalance.SoulWhite * (0.62f + compression * 0.38f));
-                foreach (Vector2 fracture in GetFracturePositions())
-                {
-                    batch.DrawLine(pixel, fracture, Vector2.Lerp(fracture, Position, compression), GameBalance.DeathFlameBright * 0.82f, 3f + compression * 2f);
-                }
-                return;
-            }
-
-            float progress = 1f - MathHelper.Clamp(_stateTimer / releaseRemaining, 0f, 1f);
-            batch.FillCircle(pixel, Position, 28f + progress * 118f, GameBalance.DeepViolet * (0.62f * (1f - progress)));
-            batch.DrawCircle(pixel, Position, 40f + progress * 132f, GameBalance.DeathFlameBright * (1f - progress), 8f, 30);
             return;
         }
 
@@ -234,26 +247,6 @@ public sealed class Burning : Enemy
             batch.FillCircle(pixel, Position + new Vector2(0f, -37f), 12f, new Color(24, 20, 27));
         }
 
-        foreach (Vector2 fracture in GetFracturePositions())
-        {
-            batch.DrawLine(pixel, fracture - right * 7f, fracture + right * 7f + _facing * 5f, GameBalance.DeathFlame * (0.42f + pulse * 0.38f), 3f);
-        }
-
-        if (State == BurningState.Charge)
-        {
-            batch.DrawLine(pixel, Position - _chargeDirection * 78f, Position, GameBalance.DeepViolet * 0.82f, 28f);
-            batch.DrawLine(pixel, Position - _chargeDirection * 58f, Position, GameBalance.DeathFlameBright * 0.72f, 8f);
-        }
-
-        if (soulSenseActive)
-        {
-            foreach (Vector2 fracture in GetFracturePositions())
-            {
-                batch.FillCircle(pixel, fracture, 10f, GameBalance.DeepViolet * 0.78f);
-                batch.FillCircle(pixel, fracture, 5f, GameBalance.SoulWhite);
-            }
-        }
-
         if (debugVisible)
         {
             batch.DrawCircle(pixel, Position, Radius, new Color(80, 220, 210), 2f);
@@ -262,6 +255,84 @@ public sealed class Burning : Enemy
                 batch.DrawCircle(pixel, Position, GameBalance.BurningDetonationRadius, new Color(255, 190, 70) * 0.45f, 2f, 32);
             }
         }
+    }
+
+    /// <summary>
+    /// Light bleeding out of the shell's fractures, and the wake behind a commited
+    /// charge. Both used to be stroked lines across the sprite.
+    /// </summary>
+    public void DrawCombatLight(SpriteBatch batch, Texture2D brush, bool soulSenseActive)
+    {
+        if (State == BurningState.Detonating)
+        {
+            DrawDetonationLight(batch, brush);
+            return;
+        }
+
+        if (State is BurningState.Dead or BurningState.Dying)
+        {
+            return;
+        }
+
+        float pulse = 0.5f + 0.5f * MathF.Sin(_visualTime * (Health <= MaxHealth / 4 ? 13f : 8f));
+        float unstable = 0.16f + pulse * 0.16f;
+
+        foreach (Vector2 fracture in GetFracturePositions())
+        {
+            SoftShapes.Blob(batch, brush, fracture, 15f + pulse * 4f, GameBalance.DeathFlame * unstable);
+            if (soulSenseActive)
+            {
+                SoftShapes.Blob(batch, brush, fracture, 20f, GameBalance.DeepViolet * 0.42f);
+                SoftShapes.Blob(batch, brush, fracture, 8f, GameBalance.SoulWhite * 0.5f);
+            }
+        }
+
+        if (State != BurningState.Charge)
+        {
+            return;
+        }
+
+        SoftShapes.Streak(batch, brush, Position - _chargeDirection * 44f, _chargeDirection, 62f, 25f, GameBalance.DeepViolet * 0.4f);
+        SoftShapes.Streak(batch, brush, Position - _chargeDirection * 30f, _chargeDirection, 42f, 10f, GameBalance.DeathFlameBright * 0.34f);
+    }
+
+    /// <summary>
+    /// The shell pulls its Death Flame inward, holds, and lets go. Built entirely
+    /// from feathered light so the detonation blooms instead of expanding a ring.
+    /// </summary>
+    private void DrawDetonationLight(SpriteBatch batch, Texture2D brush)
+    {
+        float releaseRemaining = GameBalance.BurningDeathDuration - CombatFeedbackTuning.BurningCompressionDuration;
+
+        if (!_detonationReleased)
+        {
+            float compression = MathHelper.Clamp(
+                (GameBalance.BurningDeathDuration - _stateTimer) / CombatFeedbackTuning.BurningCompressionDuration,
+                0f,
+                1f);
+            float instability = 0.5f + 0.5f * MathF.Sin(_visualTime * 42f);
+            float radius = MathHelper.Lerp(62f, 18f, compression);
+
+            SoftShapes.Blob(batch, brush, Position, radius * 1.5f, GameBalance.DeepViolet * (0.16f + compression * 0.28f));
+            SoftShapes.Ring(batch, brush, Position, radius + instability * 5f, 14f + compression * 10f,
+                GameBalance.DeathFlameBright * (0.24f + compression * 0.24f), 20, _visualTime * 6f);
+            SoftShapes.Blob(batch, brush, Position, 10f + compression * 12f, Color.White * (0.4f + compression * 0.4f));
+
+            // The fractures are drawn shut as the flame is forced inward.
+            foreach (Vector2 fracture in GetFracturePositions())
+            {
+                Vector2 point = Vector2.Lerp(fracture, Position, compression);
+                SoftShapes.Blob(batch, brush, point, 11f + compression * 5f, GameBalance.DeathFlameBright * 0.4f);
+            }
+            return;
+        }
+
+        float progress = 1f - MathHelper.Clamp(_stateTimer / releaseRemaining, 0f, 1f);
+        float fade = 1f - progress;
+        SoftShapes.Blob(batch, brush, Position, 34f + progress * 128f, GameBalance.DeepViolet * (0.34f * fade));
+        SoftShapes.Ring(batch, brush, Position, 40f + progress * 132f, 30f * fade,
+            GameBalance.DeathFlameBright * (0.44f * fade), 30, _visualTime * 2f);
+        SoftShapes.Blob(batch, brush, Position, 22f + progress * 40f, Color.White * (0.4f * fade * fade));
     }
 
     protected override void OnDeath()

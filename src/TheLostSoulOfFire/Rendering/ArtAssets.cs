@@ -66,6 +66,14 @@ public sealed class ArtAssets : IDisposable
     private float _time;
 
     public Texture2D Arena { get; }
+
+    /// <summary>
+    /// Feathered radial brush used for every piece of combat feedback that used
+    /// to be a hard vector stroke. Telegraphs are light in this world, so they
+    /// are painted, never outlined.
+    /// </summary>
+    public Texture2D SoftBrush { get; }
+
     private readonly Texture2D _floorSurface;
     public Texture2D PhysicalScythe { get; }
     public Texture2D SoulCannon { get; }
@@ -76,6 +84,7 @@ public sealed class ArtAssets : IDisposable
     {
         Arena = content.Load<Texture2D>("Textures/Environment/arena_base_1800x1000");
         _floorSurface = ArenaFloorSurface.Create(Arena);
+        SoftBrush = SoftShapes.CreateBrush(Arena.GraphicsDevice);
         // Delivery filenames are inverted: visual inspection shows the curved
         // scythe in soul_cannon_256 and the straight barrel in scythe_physical_256.
         // Keep original assets/provenance intact and bind by actual silhouette.
@@ -124,7 +133,11 @@ public sealed class ArtAssets : IDisposable
         batch.Draw(_floorSurface, new Rectangle(0, 0, 1800, 1000), Color.White);
     }
 
-    public void Dispose() => _floorSurface.Dispose();
+    public void Dispose()
+    {
+        _floorSurface.Dispose();
+        SoftBrush.Dispose();
+    }
 
     public void DrawPlayer(SpriteBatch batch, Player player)
     {
@@ -134,7 +147,7 @@ public sealed class ArtAssets : IDisposable
         }
 
         string action = player.Velocity.LengthSquared() > 120f ? "move" : "idle";
-        DrawDirectional(batch, player, "player", action, player.FacingDirection, player.Position, 100f, Color.White);
+        DrawDirectional(batch, player, "player", action, player.FacingDirection, player.Position, 108f, Color.White);
     }
 
     public void DrawEnemy(SpriteBatch batch, Enemy enemy)
@@ -155,7 +168,7 @@ public sealed class ArtAssets : IDisposable
                     _ => "idle"
                 };
                 facing = hollow.FacingDirection;
-                size = 112f;
+                size = 118f;
                 break;
 
             case Burning burning when burning.State is not (BurningState.Dying or BurningState.Detonating or BurningState.Dead):
@@ -167,7 +180,7 @@ public sealed class ArtAssets : IDisposable
                     _ => "idle"
                 };
                 facing = burning.FacingDirection;
-                size = 104f;
+                size = 110f;
                 break;
 
             case Devourer devourer when devourer.State is not (DevourerState.Dying or DevourerState.Dead):
@@ -180,7 +193,7 @@ public sealed class ArtAssets : IDisposable
                     _ => "idle"
                 };
                 facing = devourer.FacingDirection;
-                size = 174f * (1f + devourer.ConsumedSoulCount * 0.035f);
+                size = 202f * (1f + devourer.ConsumedSoulCount * 0.035f);
                 break;
 
             default:
