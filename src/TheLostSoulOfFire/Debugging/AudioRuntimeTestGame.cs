@@ -53,6 +53,15 @@ public sealed class AudioRuntimeTestGame : Microsoft.Xna.Framework.Game
         _cueTimer -= deltaTime;
         _audio.Update(deltaTime);
 
+        // Exercise every authored prologue bed as a real looping SoundEffect,
+        // including the quiet threshold mix, during the short runtime pass.
+        if (_elapsed >= 0.25f && _elapsed - deltaTime < 0.25f) _audio.SetSoundscape(AudioSoundscape.Emergence);
+        if (_elapsed >= 1.25f && _elapsed - deltaTime < 1.25f) _audio.SetSoundscape(AudioSoundscape.Search);
+        if (_elapsed >= 2.25f && _elapsed - deltaTime < 2.25f) _audio.SetSoundscape(AudioSoundscape.Escape);
+        if (_elapsed >= 3.25f && _elapsed - deltaTime < 3.25f) _audio.SetSoundscape(AudioSoundscape.Transit);
+        if (_elapsed >= 4.25f && _elapsed - deltaTime < 4.25f) _audio.SetSoundscape(AudioSoundscape.Threshold);
+        if (_elapsed >= 5.25f && _elapsed - deltaTime < 5.25f) _audio.SetSoundscape(AudioSoundscape.Arena);
+
         if (_cueIndex < _cues.Length && _cueTimer <= 0f)
         {
             AudioCue cue = _cues[_cueIndex++];

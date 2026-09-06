@@ -146,6 +146,9 @@ def main() -> int:
     expected_paths.extend(
         (
             (args.content_root / "Audio" / "Ambience" / "arena_ambience.wav", "SoundEffectProcessor", None),
+            (args.content_root / "Audio" / "Ambience" / "prologue_emergence.wav", "SoundEffectProcessor", None),
+            (args.content_root / "Audio" / "Ambience" / "prologue_search.wav", "SoundEffectProcessor", None),
+            (args.content_root / "Audio" / "Ambience" / "prologue_transit.wav", "SoundEffectProcessor", None),
             (args.content_root / "Audio" / "Music" / "arena_loop.ogg", "SongProcessor", None),
         )
     )
@@ -183,7 +186,8 @@ def main() -> int:
             failures.append(f"{relative}: expected 16-bit PCM after decode")
         if path.parent == sfx_root and metrics["channels"] != 1:
             failures.append(f"{relative}: effects must be mono")
-        if path.name in {"arena_ambience.wav", "arena_loop.ogg"} and metrics["channels"] != 2:
+        is_loop = path.parent.name == "Ambience" or path.name == "arena_loop.ogg"
+        if is_loop and metrics["channels"] != 2:
             failures.append(f"{relative}: loop must be stereo")
         if metrics["peak_db"] >= -1.0:
             failures.append(f"{relative}: peak {metrics['peak_db']:.2f} dBFS is not below -1 dBFS")
@@ -191,11 +195,11 @@ def main() -> int:
             failures.append(f"{relative}: file is effectively silent at {metrics['rms_db']:.2f} dBFS RMS")
         if expected_duration is not None and abs(metrics["duration"] - expected_duration) > 0.012:
             failures.append(f"{relative}: duration differs from {expected_duration:.3f}s")
-        if path.name == "arena_ambience.wav" and not 20.0 <= metrics["duration"] <= 30.0:
-            failures.append(f"{relative}: ambience duration must be 20–30s")
+        if path.parent.name == "Ambience" and not 18.0 <= metrics["duration"] <= 30.0:
+            failures.append(f"{relative}: ambience duration must be 18–30s")
         if path.name == "arena_loop.ogg" and not 90.0 <= metrics["duration"] <= 150.0:
             failures.append(f"{relative}: music duration must be 90–150s")
-        if path.name in {"arena_ambience.wav", "arena_loop.ogg"} and metrics["seam_db"] > -45.0:
+        if is_loop and metrics["seam_db"] > -45.0:
             failures.append(f"{relative}: endpoint discontinuity is {metrics['seam_db']:.1f} dBFS")
 
         block = expected_manifest_block(relative, processor)

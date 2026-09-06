@@ -46,6 +46,16 @@ public sealed class GameWorld : IDisposable
     private readonly List<CannonShot> _cannonShots = [];
     private readonly EncounterDirector _director = new();
     private readonly List<EncounterSpawn> _releasedSpawns = [];
+    private readonly PrologueDirector _prologue = new();
+    private readonly bool _prologueMode;
+    private readonly int _requestedLocalPlayers;
+    private ScriptedInput _soloBrotherInput;
+    private float _companionActionTimer;
+    private int _transitWave;
+    private float _transitSpawnTimer;
+    private bool _prologueEncounterArmed;
+    private bool _prologueReleaseObserved;
+    private bool _transitArrivalCuePlayed;
     private Vector2 _lastMouseWorld;
     private bool _debugVisible;
     private bool _forceSoulSense;
@@ -78,8 +88,8 @@ public sealed class GameWorld : IDisposable
     private Player _player => _roster.Lead;
 
     public string ScreenshotContext => GetScreenshotContext();
-    public bool IsCooperative => _roster.IsCooperative;
-    public int LocalPlayerCount => _roster.Count;
+    public bool IsCooperative => _prologueMode ? _requestedLocalPlayers > 1 : _roster.IsCooperative;
+    public int LocalPlayerCount => _prologueMode ? _requestedLocalPlayers : _roster.Count;
     public ArenaLoopState LoopState => _loopState;
     public int WaveNumber => _waveNumber;
     /// <summary>
@@ -89,6 +99,8 @@ public sealed class GameWorld : IDisposable
     /// </summary>
     public bool PlayerDead => _roster.AllDown();
     public float PresentationStateTime => _presentation.StateTime;
+    internal bool IsPrologue => _prologueMode;
+    internal PrologueStage PrologueStage => _prologue.Stage;
 
     // Used only by VisualScenarioRunner. Arrange actual entities; their normal
     // Update methods still own AI, damage, timings and knockback.
@@ -132,6 +144,96 @@ public sealed class GameWorld : IDisposable
         }
 
         _enemies.Add(subject);
+    }
+
+    /// <summary>
+    /// Deterministic first-playable evidence. Each fixture arranges the same real
+    /// sector state used by the route; only travel time is removed.
+    /// </summary>
+    internal void ArrangePrologueSubject(string scenario)
+    {
+        if (!_prologueMode)
+        {
+            throw new InvalidOperationException("Prologue fixtures require prologue mode.");
+        }
+
+        ClearPrologueActivity(true);
+        _loopState = ArenaLoopState.Combat;
+        switch (scenario)
+        {
+            case "prologue-emergence":
+                _roster.RemoveSecond();
+                _soloBrotherInput = null;
+                _roster.Reset(new Vector2(470f, 610f));
+                _prologue.Enter(PrologueStage.FindTrace);
+                _audio.SetCalm(true);
+                break;
+
+            case "prologue-trace":
+                _roster.RemoveSecond();
+                _soloBrotherInput = null;
+                _roster.Reset(new Vector2(680f, 620f));
+                _prologue.Enter(PrologueStage.TraceWitnessed);
+                _forceSoulSense = true;
+                _audio.SetCalm(true);
+                break;
+
+            case "prologue-search":
+                _roster.RemoveSecond();
+                _soloBrotherInput = null;
+                _roster.Reset(new Vector2(665f, 600f));
+                _prologue.Enter(PrologueStage.HollowLesson);
+                _prologueEncounterArmed = true;
+                SpawnPrologueEnemy(new Hollow(new Vector2(820f, 470f), 141));
+                SpawnPrologueEnemy(new Hollow(new Vector2(900f, 670f), 142));
+                _audio.SetCalm(false);
+                break;
+
+            case "prologue-brother":
+                _roster.RemoveSecond();
+                _soloBrotherInput = null;
+                _roster.Reset(PrologueDirector.BrotherMeetingPoint + new Vector2(-105f, 24f));
+                EnsurePrologueBrother(null);
+                PlaceWarden(0, PrologueDirector.BrotherMeetingPoint + new Vector2(-105f, 24f));
+                PlaceWarden(1, PrologueDirector.BrotherMeetingPoint + new Vector2(74f, 0f));
+                _prologue.Enter(PrologueStage.BrotherMeeting);
+                _audio.SetCalm(true);
+                break;
+
+            case "prologue-release":
+                EnsurePrologueBrother(null);
+                EnterEscapeSector();
+                _forceSoulSense = true;
+                break;
+
+            case "prologue-transit":
+                EnsurePrologueBrother(null);
+                BeginTransit();
+                SpawnTransitWave(0);
+                break;
+
+            case "prologue-threshold":
+                EnsurePrologueBrother(null);
+                EnterThreshold();
+                break;
+
+            case "prologue-complete":
+                EnsurePrologueBrother(null);
+                EnterThreshold();
+                PlaceWarden(0, new Vector2(845f, 595f));
+                PlaceWarden(1, new Vector2(955f, 608f));
+                _prologue.Enter(PrologueStage.Complete);
+                _loopState = ArenaLoopState.Complete;
+                foreach (PlayerSlot slot in _roster.Slots)
+                {
+                    slot.Warden.SettleForCompletion();
+                }
+                _presentation.BeginCompletion();
+                break;
+
+            default:
+                throw new ArgumentOutOfRangeException(nameof(scenario));
+        }
     }
 
     /// <summary>
@@ -215,15 +317,33 @@ public sealed class GameWorld : IDisposable
         player = new { x = _player.Position.X, y = _player.Position.Y, health = _player.Health,
             scythe = _player.Scythe.StateLabel, cannon = _player.Cannon.State.ToString(),
             resonance = _player.ResonanceActive, sense = _player.SoulSenseActive },
+        wardens = _roster.Slots.Select(slot => new
+        {
+            identity = slot.Identity.Name,
+            x = slot.Warden.Position.X,
+            y = slot.Warden.Position.Y,
+            health = slot.Warden.Health,
+            downed = slot.Warden.IsDowned,
+            controls = slot.Source.ControlSummary
+        }).ToArray(),
         enemies = _enemies.Select(enemy => new { family = enemy.GetType().Name, state = enemy.StateLabel,
             x = enemy.Position.X, y = enemy.Position.Y }).ToArray(),
         souls = _souls.Select(soul => new { state = soul.State.ToString(), x = soul.Position.X, y = soul.Position.Y }).ToArray(),
         particles = _particles.ActiveCount, spriteEffects = _spriteVfx.ActiveCount,
-        settings = _presentationSettings.Summary
+        settings = _presentationSettings.Summary,
+        prologue = _prologueMode ? new
+        {
+            sector = _prologue.Sector.ToString(),
+            stage = _prologue.Stage.ToString(),
+            stateTime = _prologue.StateTime,
+            runTime = _prologue.RunTime
+        } : null
     };
 
     public string WindowTitle => _debugVisible
-        ? $"The Lost Soul of Fire — DEBUG | Wave {_waveNumber}/4 {_loopState.ToString().ToUpperInvariant()} | HP {_player.Health} | RES {(_player.ResonanceActive ? $"ACTIVE {_player.ResonanceRemaining:0.0}s" : $"{_player.Resonance:0}/{GameBalance.ResonanceRequired:0}")} | Player {GetPlayerState()} | Enemies {_enemies.Count(enemy => enemy.IsAlive)} | Souls {_souls.Count}"
+        ? _prologueMode
+            ? $"The Lost Soul of Fire — DEBUG | {_prologue.Sector.ToString().ToUpperInvariant()} / {_prologue.Stage.ToString().ToUpperInvariant()} | HP {_player.Health} | Enemies {_enemies.Count(enemy => enemy.IsAlive)} | Souls {_souls.Count}"
+            : $"The Lost Soul of Fire — DEBUG | Wave {_waveNumber}/4 {_loopState.ToString().ToUpperInvariant()} | HP {_player.Health} | RES {(_player.ResonanceActive ? $"ACTIVE {_player.ResonanceRemaining:0.0}s" : $"{_player.Resonance:0}/{GameBalance.ResonanceRequired:0}")} | Player {GetPlayerState()} | Enemies {_enemies.Count(enemy => enemy.IsAlive)} | Souls {_souls.Count}"
         : "The Lost Soul of Fire";
 
     public GameWorld(
@@ -231,22 +351,33 @@ public sealed class GameWorld : IDisposable
         ArtAssets art,
         ContentManager content,
         PresentationSettings presentationSettings,
-        int localPlayers = 1)
+        int localPlayers = 1,
+        bool prologueMode = false)
     {
         _art = art;
+        _prologueMode = prologueMode;
+        _requestedLocalPlayers = Math.Clamp(localPlayers, 1, GameBalance.MaxLocalPlayers);
         _presentationSettings = presentationSettings;
         _audio = new AudioDirector(content);
+        if (_prologueMode)
+        {
+            _audio.SetSoundscape(AudioSoundscape.Emergence);
+        }
         _screenEffects = new ScreenEffects(presentationSettings);
         _particles = new ParticleSystem(presentationSettings);
         _spriteVfx = new SpriteVfxSystem(art, presentationSettings);
         _combatPresentation = new CombatPresentation(_particles, _screenEffects, _spriteVfx);
-        _camera = new Camera2D(_arena.CombatBounds.Center.ToVector2());
-        _roster = new WardenRoster(_arena.CombatBounds.Center.ToVector2());
-        _autoJoinSecond = localPlayers >= GameBalance.MaxLocalPlayers;
+        Vector2 initialSpawn = _prologueMode ? PrologueDirector.EmergenceSpawn : _arena.CombatBounds.Center.ToVector2();
+        _camera = new Camera2D(initialSpawn);
+        _roster = new WardenRoster(initialSpawn);
+        _autoJoinSecond = !_prologueMode && localPlayers >= GameBalance.MaxLocalPlayers;
         _lastMouseWorld = _player.Position + Vector2.UnitX * 200f;
         Array.Fill(_healthLastFrame, GameBalance.PlayerMaxHealth);
-        _camera.SnapTo(_arena.CombatBounds.Center.ToVector2(), _arena.Bounds, viewport);
+        _camera.SnapTo(initialSpawn, ActiveWorldBounds, viewport);
     }
+
+    private Rectangle ActiveWorldBounds => _prologueMode ? PrologueDirector.WorldBounds : _arena.Bounds;
+    private Rectangle ActiveCombatBounds => _prologueMode ? _prologue.MovementBounds : _arena.CombatBounds;
 
     /// <summary>
     /// Brings the brother into the encounter. Called from the join input, from
@@ -371,7 +502,7 @@ public sealed class GameWorld : IDisposable
         }
 
         Player warden = _roster.Slots[index].Warden;
-        warden.Nudge(position - warden.Position, _arena.CombatBounds);
+        warden.Nudge(position - warden.Position, ActiveCombatBounds);
     }
 
     internal bool AnyWardenDowned
@@ -403,6 +534,14 @@ public sealed class GameWorld : IDisposable
     /// </summary>
     private void UpdateSecondWardenJoin(InputState input)
     {
+        // In the prologue the brother enters at the authored recovery beat. A
+        // launch flag selects who controls him, not whether he materialises on
+        // the title screen before the brothers have met.
+        if (_prologueMode)
+        {
+            return;
+        }
+
         if (_roster.IsCooperative)
         {
             return;
@@ -439,6 +578,10 @@ public sealed class GameWorld : IDisposable
         float deltaTime = MathF.Min((float)gameTime.ElapsedGameTime.TotalSeconds, 1f / 20f);
         _presentationTime += deltaTime;
         _presentation.Update(deltaTime, _loopState);
+        if (_prologueMode && _loopState != ArenaLoopState.Title)
+        {
+            _prologue.Update(deltaTime);
+        }
         _audio.Update(deltaTime);
         _art.Update(deltaTime);
         _spriteVfx.Update(deltaTime);
@@ -455,8 +598,15 @@ public sealed class GameWorld : IDisposable
                 !input.WasKeyPressed(Keys.F11))
             {
                 _audio.Play(AudioCue.TitleConfirm, 0.58f);
-                _loopState = ArenaLoopState.Intro;
-                _presentation.BeginIntro(false);
+                if (_prologueMode)
+                {
+                    BeginPrologue();
+                }
+                else
+                {
+                    _loopState = ArenaLoopState.Intro;
+                    _presentation.BeginIntro(false);
+                }
             }
             _soulSensePresentation.Update(deltaTime, false);
             _particles.Update(deltaTime);
@@ -505,19 +655,30 @@ public sealed class GameWorld : IDisposable
 
         if (input.WasKeyPressed(Keys.F8))
         {
-            ResetEncounter();
+            if (_prologueMode) RestartPrologueSector();
+            else ResetEncounter();
+        }
+
+        if (_prologueMode)
+        {
+            if (input.WasKeyPressed(Keys.D1)) DebugEnterPrologueStage(PrologueStage.FindTrace, input);
+            if (input.WasKeyPressed(Keys.D2)) DebugEnterPrologueStage(PrologueStage.SearchApproach, input);
+            if (input.WasKeyPressed(Keys.D3)) DebugEnterPrologueStage(PrologueStage.DevourerPressure, input);
+            if (input.WasKeyPressed(Keys.D4)) DebugEnterPrologueStage(PrologueStage.Transit, input);
         }
 
         UpdateSecondWardenJoin(input);
 
         if (PlayerDead && input.WasKeyPressed(Keys.R))
         {
-            ResetEncounter();
+            if (_prologueMode) RestartPrologueSector();
+            else ResetEncounter();
         }
 
         if (_loopState == ArenaLoopState.Complete && input.WasKeyPressed(Keys.R))
         {
-            ResetEncounter();
+            if (_prologueMode) BeginPrologue();
+            else ResetEncounter();
         }
 
         if (PlayerDead)
@@ -530,6 +691,14 @@ public sealed class GameWorld : IDisposable
 
         if (_loopState == ArenaLoopState.Complete)
         {
+            if (_prologueMode)
+            {
+                _soulSensePresentation.Update(deltaTime, false);
+                _particles.Update(deltaTime);
+                UpdateCamera(deltaTime, false, viewport);
+                return;
+            }
+
             if (!_endingRevealPlayed && _presentation.StateTime >= CinematicPresentation.LifeFlameRevealTime)
             {
                 _endingRevealPlayed = true;
@@ -544,13 +713,18 @@ public sealed class GameWorld : IDisposable
 
         if (_loopState == ArenaLoopState.Intro)
         {
-            UpdateArenaLoop(deltaTime);
+            if (_prologueMode) UpdatePrologueFlow(deltaTime, input);
+            else UpdateArenaLoop(deltaTime);
             _soulSensePresentation.Update(deltaTime, false);
             _particles.Update(deltaTime);
             UpdateCamera(deltaTime, false, viewport);
             return;
         }
 
+        if (_prologueMode)
+        {
+            ConfigureSoloBrotherInput(deltaTime);
+        }
         _roster.ReadCommands(input, _camera, viewport);
         _lastMouseWorld = _roster.LeadSlot.AimPoint;
 
@@ -575,7 +749,7 @@ public sealed class GameWorld : IDisposable
             BurningState? previousBurningState = enemy is Burning burningBefore ? burningBefore.State : null;
             DevourerState? previousDevourerState = enemy is Devourer devourerBefore ? devourerBefore.State : null;
             _roster.Field.SetTarget(_targeting.TargetFor(enemy, _roster.Field));
-            enemy.Update(deltaTime, _roster.Field, _souls, _arena.CombatBounds, _particles, _screenEffects);
+            enemy.Update(deltaTime, _roster.Field, _souls, ActiveCombatBounds, _particles, _screenEffects);
             if (enemy is Hollow hollowAfter && previousHollowState != HollowState.Swipe && hollowAfter.State == HollowState.Swipe)
             {
                 _audio.Play(AudioCue.HollowSwipe, 0.48f);
@@ -638,7 +812,8 @@ public sealed class GameWorld : IDisposable
 
         _souls.RemoveAll(soul => soul.IsFinished);
         ResolveWardenCasualties(deltaTime);
-        UpdateArenaLoop(deltaTime);
+        if (_prologueMode) UpdatePrologueFlow(deltaTime, input);
+        else UpdateArenaLoop(deltaTime);
         _particles.Update(deltaTime);
         UpdateCamera(deltaTime, false, viewport);
     }
@@ -699,7 +874,7 @@ public sealed class GameWorld : IDisposable
             warden.Update(
                 deltaTime,
                 slot.Command,
-                _arena.CombatBounds,
+                ActiveCombatBounds,
                 _particles,
                 _screenEffects,
                 _forceSoulSense,
@@ -985,16 +1160,16 @@ public sealed class GameWorld : IDisposable
         // A guttering Warden cannot be shoved around; the standing brother yields.
         if (first.IsDowned)
         {
-            second.Nudge(push * step, _arena.CombatBounds);
+            second.Nudge(push * step, ActiveCombatBounds);
         }
         else if (second.IsDowned)
         {
-            first.Nudge(-push * step, _arena.CombatBounds);
+            first.Nudge(-push * step, ActiveCombatBounds);
         }
         else
         {
-            first.Nudge(-push * (step * 0.5f), _arena.CombatBounds);
-            second.Nudge(push * (step * 0.5f), _arena.CombatBounds);
+            first.Nudge(-push * (step * 0.5f), ActiveCombatBounds);
+            second.Nudge(push * (step * 0.5f), ActiveCombatBounds);
         }
     }
 
@@ -1029,11 +1204,11 @@ public sealed class GameWorld : IDisposable
         float pull = GameBalance.CoopTetherPull * deltaTime;
         if (first.CanBeTargeted)
         {
-            first.Nudge(direction * (pull * 0.5f), _arena.CombatBounds);
+            first.Nudge(direction * (pull * 0.5f), ActiveCombatBounds);
         }
         if (second.CanBeTargeted)
         {
-            second.Nudge(-direction * (pull * 0.5f), _arena.CombatBounds);
+            second.Nudge(-direction * (pull * 0.5f), ActiveCombatBounds);
         }
     }
 
@@ -1065,8 +1240,8 @@ public sealed class GameWorld : IDisposable
             FrameVelocity(),
             FrameFacing(),
             ThreatCentre(),
-            _arena.Bounds,
-            _arena.CombatBounds,
+            ActiveWorldBounds,
+            ActiveCombatBounds,
             viewport,
             deltaTime,
             groupZoom,
@@ -1173,11 +1348,19 @@ public sealed class GameWorld : IDisposable
             SamplerState.PointClamp,
             transformMatrix: worldTransform);
 
-        _art.DrawArena(batch);
-        ArenaComposition.DrawGround(batch, pixel, _presentationTime, _soulSensePresentation.WorldSuppression);
-        ArenaComposition.DrawProps(batch, pixel, _presentationTime, _soulSensePresentation.WorldSuppression);
-        _arenaAtmosphere.DrawBackground(batch, pixel, _soulSensePresentation.WorldSuppression);
-        DrawArenaLoop(batch, pixel);
+        if (_prologueMode)
+        {
+            PrologueEnvironment.DrawGround(batch, pixel, _prologue, _presentationTime, _soulSensePresentation.WorldSuppression);
+            PrologueEnvironment.DrawProps(batch, pixel, _prologue, _presentationTime, _soulSensePresentation.WorldSuppression);
+        }
+        else
+        {
+            _art.DrawArena(batch);
+            ArenaComposition.DrawGround(batch, pixel, _presentationTime, _soulSensePresentation.WorldSuppression);
+            ArenaComposition.DrawProps(batch, pixel, _presentationTime, _soulSensePresentation.WorldSuppression);
+            _arenaAtmosphere.DrawBackground(batch, pixel, _soulSensePresentation.WorldSuppression);
+            DrawArenaLoop(batch, pixel);
+        }
         foreach (Enemy enemy in _enemies)
         {
             if (!enemy.IsAlive) continue;
@@ -1242,7 +1425,10 @@ public sealed class GameWorld : IDisposable
                 if (!slot.Warden.IsDowned) DrawWarden(batch, pixel, slot.Warden);
             }
         }
-        _presentation.DrawWorldAccents(batch, pixel, _art, _loopState, PlayerDead, _player, _arena.CombatBounds);
+        if (!_prologueMode)
+        {
+            _presentation.DrawWorldAccents(batch, pixel, _art, _loopState, PlayerDead, _player, _arena.CombatBounds);
+        }
         _spriteVfx.DrawAlpha(batch);
         batch.End();
 
@@ -1255,12 +1441,13 @@ public sealed class GameWorld : IDisposable
             SamplerState.PointClamp,
             transformMatrix: worldTransform);
 
-        ArenaComposition.DrawForeground(batch, pixel);
+        if (_prologueMode) PrologueEnvironment.DrawForeground(batch, pixel, _prologue);
+        else ArenaComposition.DrawForeground(batch, pixel);
 
         if (_debugVisible)
         {
-            batch.DrawRectangle(pixel, _arena.CombatBounds, new Color(80, 220, 210) * 0.8f, 3f);
-            Vector2 center = _arena.CombatBounds.Center.ToVector2();
+            batch.DrawRectangle(pixel, ActiveCombatBounds, new Color(80, 220, 210) * 0.8f, 3f);
+            Vector2 center = ActiveCombatBounds.Center.ToVector2();
             batch.DrawLine(pixel, center - Vector2.UnitX * 28f, center + Vector2.UnitX * 28f, new Color(80, 220, 210), 2f);
             batch.DrawLine(pixel, center - Vector2.UnitY * 28f, center + Vector2.UnitY * 28f, new Color(80, 220, 210), 2f);
         }
@@ -1388,6 +1575,16 @@ public sealed class GameWorld : IDisposable
         Texture2D brush = _art.SoftBrush;
         bool sense = AnySoulSenseActive();
 
+        if (_prologueMode)
+        {
+            PrologueEnvironment.DrawLight(
+                batch,
+                brush,
+                _prologue,
+                _presentationTime,
+                _soulSensePresentation.SoulEmergence);
+        }
+
         foreach (Enemy enemy in _enemies)
         {
             switch (enemy)
@@ -1460,9 +1657,10 @@ public sealed class GameWorld : IDisposable
             _arenaAtmosphere,
             _presentationTime,
             _soulSensePresentation.SoulEmergence,
-            _loopState == ArenaLoopState.Complete,
+            _loopState == ArenaLoopState.Complete && !_prologueMode,
             _presentation.GetLifeFlamePosition(_arena.CombatBounds),
-            _presentation.GetLifeFlameAlpha());
+            _presentation.GetLifeFlameAlpha(),
+            !_prologueMode);
         renderer.CompositeEmission(batch, viewport, _soulSensePresentation.WorldSuppression);
     }
 
@@ -1493,12 +1691,28 @@ public sealed class GameWorld : IDisposable
     {
         batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
 
-        if (_presentation.ShouldDrawCombatHud(_loopState, PlayerDead))
+        bool showPrologueHud = _prologueMode && !PlayerDead && _loopState == ArenaLoopState.Combat &&
+            _prologue.Stage is not (PrologueStage.BrotherMeeting or PrologueStage.Arrival or PrologueStage.Complete);
+        if (_prologueMode ? showPrologueHud : _presentation.ShouldDrawCombatHud(_loopState, PlayerDead))
         {
             _hud.Draw(batch, pixel, viewport, _roster, _team);
         }
 
-        _presentation.DrawOverlay(batch, pixel, viewport, _loopState, PlayerDead, _waveNumber);
+        if (_prologueMode)
+        {
+            ProloguePresentation.DrawOverlay(
+                batch,
+                pixel,
+                viewport,
+                _prologue,
+                PlayerDead,
+                _roster.Count,
+                _loopState == ArenaLoopState.Title);
+        }
+        else
+        {
+            _presentation.DrawOverlay(batch, pixel, viewport, _loopState, PlayerDead, _waveNumber);
+        }
 
         if (_debugVisible && _loopState != ArenaLoopState.Title)
         {
@@ -1728,6 +1942,555 @@ public sealed class GameWorld : IDisposable
         _audio.SetSoulSense(false);
     }
 
+    /// <summary>
+    /// Starts the authored route in its only valid opening state: the younger
+    /// brother alone, newly coherent, with no combat residue from a prior run.
+    /// </summary>
+    private void BeginPrologue()
+    {
+        _roster.RemoveSecond();
+        _soloBrotherInput = null;
+        ClearPrologueActivity(true);
+        _roster.Reset(PrologueDirector.EmergenceSpawn);
+        _prologue.Start();
+        _loopState = ArenaLoopState.Intro;
+        _presentation.BeginIntro(false);
+        _audio.SetCalm(true);
+        _audio.SetSoundscape(AudioSoundscape.Emergence);
+        _audio.SetSoulSense(false);
+        _particles.EmitDeathFlame(PrologueDirector.EmergenceSpawn, 18, 1.15f);
+    }
+
+    /// <summary>
+    /// Sector retry is deliberately authored rather than inferred from arbitrary
+    /// story flags. Before the meeting it restores the solo route; afterwards it
+    /// keeps the brother, so failure never erases the relationship beat.
+    /// </summary>
+    private void RestartPrologueSector()
+    {
+        PrologueStage failedAt = _prologue.Stage;
+        switch (_prologue.Sector)
+        {
+            case PrologueSector.Emergence:
+                BeginPrologue();
+                break;
+
+            case PrologueSector.Search:
+                if (failedAt >= PrologueStage.BrotherMeeting)
+                {
+                    ClearPrologueActivity(true);
+                    EnsurePrologueBrother(null);
+                    _roster.Reset(PrologueDirector.BrotherMeetingPoint + new Vector2(-70f, 30f));
+                    _prologue.Enter(PrologueStage.LeaveSearch);
+                    _loopState = ArenaLoopState.Combat;
+                    _audio.SetCalm(true);
+                }
+                else
+                {
+                    _roster.RemoveSecond();
+                    _soloBrotherInput = null;
+                    ClearPrologueActivity(true);
+                    _roster.Reset(PrologueDirector.SearchSpawn);
+                    _prologue.Enter(PrologueStage.SearchApproach);
+                    _loopState = ArenaLoopState.Combat;
+                    _audio.SetCalm(true);
+                }
+                break;
+
+            case PrologueSector.Escape:
+                ClearPrologueActivity(true);
+                EnsurePrologueBrother(null);
+                EnterEscapeSector();
+                break;
+
+            case PrologueSector.Threshold:
+                ClearPrologueActivity(true);
+                EnsurePrologueBrother(null);
+                EnterThreshold();
+                break;
+        }
+    }
+
+    /// <summary>Developer review shortcuts for the four authored checkpoints.</summary>
+    private void DebugEnterPrologueStage(PrologueStage stage, InputState input)
+    {
+        ClearPrologueActivity(true);
+        switch (stage)
+        {
+            case PrologueStage.FindTrace:
+                _roster.RemoveSecond();
+                _soloBrotherInput = null;
+                _roster.Reset(PrologueDirector.EmergenceSpawn);
+                _prologue.Enter(stage);
+                _loopState = ArenaLoopState.Combat;
+                _audio.SetCalm(true);
+                break;
+
+            case PrologueStage.SearchApproach:
+                _roster.RemoveSecond();
+                _soloBrotherInput = null;
+                _roster.Reset(PrologueDirector.SearchSpawn);
+                _prologue.Enter(stage);
+                _loopState = ArenaLoopState.Combat;
+                _audio.SetCalm(true);
+                break;
+
+            case PrologueStage.DevourerPressure:
+                EnsurePrologueBrother(input);
+                EnterEscapeSector();
+                break;
+
+            case PrologueStage.Transit:
+                EnsurePrologueBrother(input);
+                BeginTransit();
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Drives only the authored story spine. It composes the existing concrete
+    /// enemies, Soul lifecycle and co-op roster; it is intentionally not a quest
+    /// system or a reusable cutscene graph.
+    /// </summary>
+    private void UpdatePrologueFlow(float deltaTime, InputState input)
+    {
+        switch (_prologue.Stage)
+        {
+            case PrologueStage.Waking:
+                if (_prologue.StateTime >= 3.6f)
+                {
+                    _prologue.Enter(PrologueStage.FindTrace);
+                    _loopState = ArenaLoopState.Combat;
+                }
+                break;
+
+            case PrologueStage.FindTrace:
+                if (Vector2.DistanceSquared(_player.Position, PrologueDirector.SoulTrace) <= 185f * 185f &&
+                    (AnySoulSenseActive() || _forceSoulSense))
+                {
+                    _prologue.Enter(PrologueStage.TraceWitnessed);
+                    _audio.Play(AudioCue.SoulSenseOn, 0.58f);
+                    _particles.EmitConvergence(PrologueDirector.SoulTrace, 18, 118f, GameBalance.DeathFlameBright, 0.45f, 5f);
+                }
+                break;
+
+            case PrologueStage.TraceWitnessed:
+                if (_prologue.StateTime >= 5.6f)
+                {
+                    SpawnPrologueEnemy(new Hollow(new Vector2(1160f, 545f), 31));
+                    _prologueEncounterArmed = true;
+                    _prologue.Enter(PrologueStage.EmergenceThreat);
+                    _audio.SetCalm(false);
+                    _audio.Play(AudioCue.WaveStart, 0.48f);
+                }
+                break;
+
+            case PrologueStage.EmergenceThreat:
+                if (_prologueEncounterArmed && PrologueFloorClear())
+                {
+                    _prologue.Enter(PrologueStage.LeaveEmergence);
+                    _audio.SetCalm(true);
+                    _audio.Play(AudioCue.WaveClear, 0.54f);
+                }
+                break;
+
+            case PrologueStage.LeaveEmergence:
+                if (_player.Position.X >= 1550f)
+                {
+                    EnterSearchSector();
+                }
+                break;
+
+            case PrologueStage.SearchApproach:
+                if (_player.Position.X >= 520f)
+                {
+                    SpawnPrologueEnemy(new Hollow(new Vector2(760f, 470f), 41));
+                    SpawnPrologueEnemy(new Hollow(new Vector2(805f, 650f), 42));
+                    _prologueEncounterArmed = true;
+                    _prologue.Enter(PrologueStage.HollowLesson);
+                    _audio.SetCalm(false);
+                    _audio.Play(AudioCue.WaveStart, 0.52f);
+                }
+                break;
+
+            case PrologueStage.HollowLesson:
+                if (_prologueEncounterArmed && PrologueFloorClear())
+                {
+                    _prologueEncounterArmed = false;
+                    _prologue.Enter(PrologueStage.BurningLesson);
+                    _audio.SetCalm(true);
+                }
+                break;
+
+            case PrologueStage.BurningLesson:
+                if (!_prologueEncounterArmed && _player.Position.X >= 930f)
+                {
+                    SpawnPrologueEnemy(new Burning(new Vector2(1145f, 540f), 51));
+                    SpawnPrologueEnemy(new Hollow(new Vector2(1215f, 680f), 52));
+                    _prologueEncounterArmed = true;
+                    _audio.SetCalm(false);
+                    _audio.Play(AudioCue.WaveStart, 0.56f);
+                }
+                else if (_prologueEncounterArmed && PrologueFloorClear())
+                {
+                    _prologue.Enter(PrologueStage.FindBrother);
+                    _audio.SetCalm(true);
+                    _audio.Play(AudioCue.WaveClear, 0.54f);
+                }
+                break;
+
+            case PrologueStage.FindBrother:
+                if (_player.Position.X >= 1245f)
+                {
+                    EnsurePrologueBrother(input);
+                    PlaceWarden(0, PrologueDirector.BrotherMeetingPoint + new Vector2(-105f, 24f));
+                    PlaceWarden(1, PrologueDirector.BrotherMeetingPoint + new Vector2(74f, 0f));
+                    _prologue.Enter(PrologueStage.BrotherMeeting);
+                    _audio.Play(AudioCue.WardenStabilize, 0.62f);
+                }
+                break;
+
+            case PrologueStage.BrotherMeeting:
+                if (_prologue.StateTime >= 8.2f)
+                {
+                    _prologue.Enter(PrologueStage.LeaveSearch);
+                }
+                break;
+
+            case PrologueStage.LeaveSearch:
+                if (_roster.FrameCentre().X >= 1550f)
+                {
+                    EnterEscapeSector();
+                }
+                break;
+
+            case PrologueStage.DevourerPressure:
+                if (_souls.Any(soul => soul.State is SoulState.Exposed or SoulState.Releasing or SoulState.Residue))
+                {
+                    _prologueReleaseObserved = true;
+                }
+                if (_prologueEncounterArmed && _prologueReleaseObserved && PrologueFloorClear())
+                {
+                    _prologue.Enter(PrologueStage.ReleaseWitness);
+                    _audio.SetCalm(true);
+                    _audio.Play(AudioCue.WaveClear, 0.6f);
+                }
+                break;
+
+            case PrologueStage.ReleaseWitness:
+                if (_prologue.StateTime >= 5.2f)
+                {
+                    _prologue.Enter(PrologueStage.BoardVehicle);
+                }
+                break;
+
+            case PrologueStage.BoardVehicle:
+                if (Vector2.DistanceSquared(_roster.FrameCentre(), PrologueDirector.VehicleDock) <= 175f * 175f)
+                {
+                    BeginTransit();
+                }
+                break;
+
+            case PrologueStage.Transit:
+                UpdateTransit(deltaTime);
+                break;
+
+            case PrologueStage.Arrival:
+                // The lead must actually enter the inset door. The group-centre
+                // check also makes the second player advance, while allowing the
+                // solo companion's deliberate trailing shoulder offset.
+                bool partyCrossed = _player.Position.Y <= 620f && _roster.FrameCentre().Y <= 650f;
+                if (_prologue.StateTime >= 4.5f && partyCrossed)
+                {
+                    _prologue.Enter(PrologueStage.Complete);
+                    _loopState = ArenaLoopState.Complete;
+                    foreach (PlayerSlot slot in _roster.Slots)
+                    {
+                        slot.Warden.SettleForCompletion();
+                    }
+                    _presentation.BeginCompletion();
+                    _audio.Play(AudioCue.EndingReveal, 0.7f);
+                }
+                break;
+        }
+    }
+
+    private void EnterSearchSector()
+    {
+        ClearPrologueActivity(false);
+        _roster.Reset(PrologueDirector.SearchSpawn);
+        _prologue.Enter(PrologueStage.SearchApproach);
+        _loopState = ArenaLoopState.Combat;
+        _audio.SetCalm(true);
+        _audio.SetSoundscape(AudioSoundscape.Search);
+        _screenEffects.Flash(0.13f, 0.1f);
+        _particles.EmitDeathFlame(new Vector2(548f, 432f), 10, 0.75f);
+    }
+
+    private void EnterEscapeSector()
+    {
+        ClearPrologueActivity(false);
+        _roster.Reset(PrologueDirector.EscapeSpawn);
+        _prologue.Enter(PrologueStage.DevourerPressure);
+        _loopState = ArenaLoopState.Combat;
+        _prologueEncounterArmed = true;
+        _prologueReleaseObserved = false;
+        _audio.SetCalm(false);
+        _audio.SetSoundscape(AudioSoundscape.Escape);
+        _screenEffects.Flash(0.15f, 0.12f);
+
+        Devourer carrier = new(new Vector2(880f, 545f));
+        Soul held = new(carrier.Position);
+        carrier.SeedHeldSoul(held);
+        _souls.Add(held);
+        SpawnPrologueEnemy(carrier);
+        SpawnPrologueEnemy(new Hollow(new Vector2(690f, 690f), 61));
+        SpawnPrologueEnemy(new Burning(new Vector2(1050f, 410f), 62));
+        _audio.Play(AudioCue.WaveStart, 0.66f);
+    }
+
+    private void BeginTransit()
+    {
+        ClearPrologueActivity(false);
+        _roster.Reset(PrologueDirector.VehicleSpawn);
+        _prologue.Enter(PrologueStage.Transit);
+        _loopState = ArenaLoopState.Combat;
+        _transitWave = 0;
+        _transitSpawnTimer = 4.5f;
+        _transitArrivalCuePlayed = false;
+        _audio.SetCalm(false);
+        _audio.SetSoundscape(AudioSoundscape.Transit);
+        _screenEffects.AddShake(0.36f, 4.5f);
+        _audio.Play(AudioCue.WaveStart, 0.62f, -0.08f);
+    }
+
+    private void UpdateTransit(float deltaTime)
+    {
+        _transitSpawnTimer -= deltaTime;
+        if (_transitWave < 5 && _transitSpawnTimer <= 0f)
+        {
+            SpawnTransitWave(_transitWave);
+            _transitWave++;
+            _transitSpawnTimer = _transitWave switch
+            {
+                1 => 10.5f,
+                2 => 11.5f,
+                3 => 11.5f,
+                _ => 11f
+            };
+        }
+
+        if (!_transitArrivalCuePlayed && _prologue.StateTime >= 54f)
+        {
+            _transitArrivalCuePlayed = true;
+            _audio.Play(AudioCue.WaveClear, 0.48f);
+        }
+
+        if (_prologue.StateTime >= 62f && PrologueFloorClear())
+        {
+            EnterThreshold();
+        }
+    }
+
+    private void SpawnTransitWave(int wave)
+    {
+        switch (wave)
+        {
+            case 0:
+                SpawnPrologueEnemy(new Hollow(new Vector2(560f, 430f), 71));
+                SpawnPrologueEnemy(new Hollow(new Vector2(1240f, 650f), 72));
+                break;
+            case 1:
+                SpawnPrologueEnemy(new Burning(new Vector2(1235f, 460f), 73));
+                break;
+            case 2:
+                SpawnPrologueEnemy(new Hollow(new Vector2(560f, 650f), 74));
+                SpawnPrologueEnemy(new Hollow(new Vector2(1240f, 430f), 75));
+                break;
+            case 3:
+                SpawnPrologueEnemy(new Burning(new Vector2(570f, 450f), 76));
+                SpawnPrologueEnemy(new Hollow(new Vector2(1220f, 650f), 77));
+                break;
+            default:
+                Devourer pressure = new(new Vector2(1190f, 535f));
+                SpawnPrologueEnemy(pressure);
+                break;
+        }
+
+        _audio.Play(AudioCue.WaveStart, 0.42f, MathF.Min(0.16f, wave * 0.03f));
+    }
+
+    private void EnterThreshold()
+    {
+        ClearPrologueActivity(false);
+        _roster.Reset(PrologueDirector.ThresholdSpawn);
+        _prologue.Enter(PrologueStage.Arrival);
+        _loopState = ArenaLoopState.Combat;
+        _audio.SetCalm(true);
+        _audio.SetSoundscape(AudioSoundscape.Threshold);
+        _screenEffects.Flash(0.18f, 0.16f);
+        _particles.EmitConvergence(new Vector2(900f, 334f), 28, 180f, GameBalance.DeathFlameBright, 0.65f, 6f);
+    }
+
+    private void SpawnPrologueEnemy(Enemy enemy)
+    {
+        _enemies.Add(enemy);
+        PresentArrival(enemy.Position, enemy);
+    }
+
+    private bool PrologueFloorClear() =>
+        !_enemies.Any(enemy => enemy.IsAlive) && _souls.Count == 0;
+
+    private void ClearPrologueActivity(bool resetTeam)
+    {
+        if (resetTeam)
+        {
+            _team.Reset();
+        }
+        _targeting.Reset();
+        _teamWiped = false;
+        Array.Fill(_healthLastFrame, GameBalance.PlayerMaxHealth);
+        SyncTeamResonance();
+        _enemies.Clear();
+        _souls.Clear();
+        _cannonShots.Clear();
+        _particles.Clear();
+        _spriteVfx.Clear();
+        _combatPresentation.Clear();
+        _screenEffects.Clear();
+        _releasedSpawns.Clear();
+        _burningHandoffTimer = 0f;
+        _burningCommittedLastFrame = 0;
+        _forceSoulSense = false;
+        _soulSensePresentation.Reset();
+        _audioTestFatalDamageRequested = false;
+        _endingRevealPlayed = false;
+        _prologueEncounterArmed = false;
+        _prologueReleaseObserved = false;
+    }
+
+    /// <summary>
+    /// Joins the elder Warden under the control requested at launch. A solo run
+    /// receives a modest authored companion; a two-player run uses the first pad
+    /// or the documented second-keyboard layout.
+    /// </summary>
+    private void EnsurePrologueBrother(InputState input)
+    {
+        if (_roster.IsCooperative)
+        {
+            return;
+        }
+
+        IPlayerInputSource source;
+        if (_requestedLocalPlayers > 1)
+        {
+            PlayerIndex? pad = input is null ? null : WardenRoster.FindFreeGamePad(input);
+            source = pad.HasValue ? new GamePadInput(pad.Value) : new SecondaryKeyboardInput();
+        }
+        else
+        {
+            _soloBrotherInput = new ScriptedInput();
+            source = _soloBrotherInput;
+        }
+
+        TryJoinSecondWarden(source);
+        _healthLastFrame[1] = GameBalance.PlayerMaxHealth;
+    }
+
+    /// <summary>
+    /// A small combat companion, not a general AI controller. He follows the
+    /// protagonist, attacks the nearest manifestation and takes an obvious late
+    /// dash when a commitment threatens him. This keeps solo and co-op on the
+    /// same authored route without pretending the brother is a passive summon.
+    /// </summary>
+    private void ConfigureSoloBrotherInput(float deltaTime)
+    {
+        if (_soloBrotherInput is null || _roster.Count < 2)
+        {
+            return;
+        }
+
+        Player brother = _roster.Slots[1].Warden;
+        if (!brother.CanBeTargeted || _prologue.Stage == PrologueStage.BrotherMeeting)
+        {
+            _soloBrotherInput.Set(PlayerCommand.Idle(_roster.Slots[1].AimPoint));
+            return;
+        }
+
+        if (_player.IsDowned)
+        {
+            Vector2 toLead = _player.Position - brother.Position;
+            float rescueDistance = toLead.Length();
+            Vector2 rescueMove = rescueDistance > 58f && rescueDistance > 0.001f
+                ? toLead / rescueDistance
+                : Vector2.Zero;
+            _soloBrotherInput.Set(new PlayerCommand(
+                rescueMove,
+                _player.Position,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                rescueDistance <= GameBalance.StabilizeRange - 8f));
+            return;
+        }
+
+        _companionActionTimer = MathF.Max(0f, _companionActionTimer - deltaTime);
+        Enemy target = _enemies
+            .Where(enemy => enemy.IsAlive)
+            .OrderBy(enemy => Vector2.DistanceSquared(enemy.Position, brother.Position))
+            .FirstOrDefault();
+
+        Vector2 destination;
+        Vector2 aim;
+        bool strike = false;
+        bool dash = false;
+        if (target is not null)
+        {
+            Vector2 toTarget = target.Position - brother.Position;
+            float distance = toTarget.Length();
+            Vector2 direction = distance > 0.001f ? toTarget / distance : Vector2.UnitX;
+            destination = distance > 112f ? direction : distance < 78f ? -direction : Vector2.Zero;
+            aim = target.Position;
+            strike = distance <= 158f && _companionActionTimer <= 0f;
+            if (strike)
+            {
+                _companionActionTimer = 0.62f;
+            }
+
+            if (target.CommitmentRemaining is >= 0f and <= 0.2f &&
+                distance <= target.CommitmentThreatRange + 58f)
+            {
+                destination = new Vector2(-direction.Y, direction.X);
+                dash = true;
+            }
+        }
+        else
+        {
+            Vector2 followPoint = _player.Position + new Vector2(-96f, 38f);
+            Vector2 toFollow = followPoint - brother.Position;
+            float distance = toFollow.Length();
+            float followDistance = _prologue.Stage == PrologueStage.Arrival ? 54f : 105f;
+            destination = distance > followDistance && distance > 0.001f ? toFollow / distance : Vector2.Zero;
+            aim = destination.LengthSquared() > 0f
+                ? brother.Position + destination * 240f
+                : _roster.Slots[1].AimPoint;
+        }
+
+        _soloBrotherInput.Set(new PlayerCommand(
+            destination,
+            aim,
+            dash,
+            strike,
+            false,
+            false,
+            false,
+            false,
+            false));
+    }
+
     private void ConfigureBurningAggression(float deltaTime)
     {
         _burningHandoffTimer = MathF.Max(0f, _burningHandoffTimer - deltaTime);
@@ -1943,6 +2706,10 @@ public sealed class GameWorld : IDisposable
 
     private string GetScreenshotContext()
     {
+        if (_prologueMode)
+        {
+            return $"prologue_{_prologue.Sector.ToString().ToLowerInvariant()}_{_prologue.Stage.ToString().ToLowerInvariant()}";
+        }
         if (_player.IsDead) return "phase05_player_down";
         if (_loopState == ArenaLoopState.Title) return "phase15_title";
         if (_loopState == ArenaLoopState.Complete) return "phase15_soul_free";
@@ -1994,7 +2761,7 @@ public sealed class GameWorld : IDisposable
     {
         foreach (CannonShot shot in _cannonShots)
         {
-            shot.Update(deltaTime, _arena.Bounds);
+            shot.Update(deltaTime, ActiveWorldBounds);
             if (shot.IsFinished)
             {
                 continue;

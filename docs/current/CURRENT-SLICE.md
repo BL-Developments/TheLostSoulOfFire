@@ -1,8 +1,8 @@
 # Current Slice
 
-Status: Golden Combat Slice, local two-player co-op proof and the Session 3
-character/animation/pixel-language reset implemented on `prototype/design-polish`,
-awaiting owner review.
+Status: owner-reviewable first playable implemented on `prototype/design-polish`.
+The refined Golden Combat Slice remains available with `--golden-slice`; normal
+launch now starts the authored Death-Layer prologue.
 
 ## What exists
 
@@ -17,6 +17,26 @@ awaiting owner review.
 - Scene rendering, emission, halos and reduced-effects presentation.
 - Deterministic visual scenario capture system.
 - Directional character animation, VFX and audio asset base.
+
+### Added by the first playable prologue
+
+- A complete authored route with a beginning, middle and ending: death memory,
+  Emergence, Search/Recovery, the already-Warden brother, Escape/Transit and the
+  Warden homebase threshold.
+- Three distinct combat/exploration compositions plus the exterior threshold,
+  using one clean slab/stone/iron material grammar, human residue and restrained
+  violet-white Death Flame.
+- The real Hollow, Burning, Devourer, Severance and Soul Release systems teach
+  the route; no parallel tutorial combat was created.
+- Solo receives a bounded combat/rescue companion after the meeting. Two-player
+  launch hands the brother to a gamepad or the documented second-keyboard map.
+- Sector-scoped retry, full-party failure, clean replay and D1–D4 review jumps.
+- A 62-second Death-Flame skiff defense which keeps normal movement, Scythe,
+  Cannon, reaction combat and co-op roles rather than becoming a minigame.
+- Three authored soundscape derivatives from the approved AMB-01 ambience,
+  with sector-specific silence/music balance and no new external generation.
+- Ten deterministic prologue fixtures plus semantic solo and two-player full-
+  route smoke runs.
 
 ### Added by Session 5 — the held scythe, the chain, and the dash
 
@@ -123,16 +143,18 @@ awaiting owner review.
   and restart.
 - Solo death/restart and two-player both-down failure/restart both pass.
 - All 32 audio cues load real content (`fallbacks=0`); `validate_audio.py` passes
-  on 34 assets.
+  on 37 assets, including all three prologue ambience loops.
 - Twelve solo and eleven co-op visual scenarios capture successfully, including
   reduced-effects and baseline-quality variants.
+- The semantic prologue route reaches the real completion state with no enemy,
+  Soul or checkpoint soft-lock; its force-cleared lower-bound run is 107.8 s.
+- The two-player semantic route also reaches completion through the shipped
+  second-keyboard control source in 105.9 s.
 
 ## Current limitations
 
-- `GameWorld` owns one arena.
-- The environment is one fixed 1800×1000 arena.
-- The attack is one clip for all three combo steps plus Severance, sampled by the
-  Scythe's own progress; per-step poses are the next animation step.
+- The route uses four authored 1800×1000 compositions and instant sector cuts;
+  it is not a streaming world or a general scene framework.
 - The particle system still draws filled circles rather than authored sprites;
   it was tuned down rather than re-authored this session.
 - No dash, hurt or death clips. The downed pose is still the idle frame rotated
@@ -143,15 +165,18 @@ awaiting owner review.
 - The exact 1:1 pixel scale holds at combat zoom only; the title, intro and
   co-op group zooms resample.
 - No controller hardware was available for verification.
-- The new audio cues have not been auditioned by ear.
-- No story flow, zones, dialogue, homebase, co-op, items, save or progression exists yet.
+- The new prologue ambience mixes were validated technically and heard only
+  through runtime playback, not approved by the owner on a reference system.
+- Human playtime has not been stopwatch-verified; 8–12 minutes is the intended
+  first-run pace, while the automated force-clear smoke run is deliberately much
+  faster.
+- Homebase stops at the exterior threshold. There is no interior hub, save slot,
+  dialogue tree, item system or broader progression yet.
 - Several older design documents predate the current Warden cosmology and product direction.
 
 ## Active objective
 
-Owner judgement of the corrected character, animation and facing **in motion**,
-plus the still-outstanding review of the refined Golden Slice, the co-op proof
-and the audio audition. On approval, continue with
-[`../agent-prompts/03-DEATH-LAYER-PROLOGUE.md`](../agent-prompts/03-DEATH-LAYER-PROLOGUE.md).
-
-Do not multiply content until the owner approves the resulting combat and visual direction.
+Owner playthrough of the complete prologue, with particular attention to first-
+run duration, character motion in the larger spaces, the brother handoff, held-
+Soul release, vehicle pressure and sector soundscape contrast. Revise this route
+before starting items, hub interiors or Content Factory work.

@@ -61,7 +61,20 @@ public sealed class VisualScenarioRunner
 
             // Session 5 — the chain, and the dash cutting out of it.
             ["combo-chain"] = 276,
-            ["dash-cancel"] = 262
+            ["dash-cancel"] = 262,
+
+            // First playable — one honest frame for each major authored beat.
+            ["prologue-emergence"] = 210,
+            ["prologue-title"] = 90,
+            ["prologue-trace"] = 240,
+            ["prologue-search"] = 205,
+            ["prologue-brother"] = 230,
+            ["prologue-release"] = 220,
+            ["prologue-transit"] = 205,
+            ["prologue-threshold"] = 250,
+            ["prologue-complete"] = 220,
+            ["prologue-restart"] = 310,
+            ["prologue-route"] = 7000
         };
 
     /// <summary>
@@ -88,6 +101,7 @@ public sealed class VisualScenarioRunner
     private readonly bool _semanticSeverance;
     private readonly bool _semanticGoldenBeat;
     private readonly bool _semanticFinalRelease;
+    private readonly bool _semanticPrologueRoute;
     private int _tick;
     private int _combatTicks;
     private int _completedWave;
@@ -97,11 +111,12 @@ public sealed class VisualScenarioRunner
     private int _detonationTick = -1;
     private ScriptedInput _second;
     private bool _coopArranged;
+    private bool _prologueRestarted;
 
     public static string KnownScenarioList => string.Join(", ", CaptureTicks.Keys);
     public bool CaptureRequested { get; private set; }
     public bool TimedOut => _tick > _captureTick + (_scenario == "burning-detonation" ? 400 : 180);
-    public bool IsSemantic => _semanticEnding || _semanticSeverance || _semanticGoldenBeat || _semanticFinalRelease;
+    public bool IsSemantic => _semanticEnding || _semanticSeverance || _semanticGoldenBeat || _semanticFinalRelease || _semanticPrologueRoute;
     public int Tick => _tick;
     public string Scenario => _scenario;
     public bool IsLastCapture => _scenario == "burning-detonation"
@@ -123,6 +138,7 @@ public sealed class VisualScenarioRunner
         _semanticSeverance = _scenario is "severance-window" or "severance-cut" or "coop-severance" && defaultTiming;
         _semanticGoldenBeat = _scenario is "golden-encounter" or "coop-golden-encounter" && defaultTiming;
         _semanticFinalRelease = _scenario == "final-release" && defaultTiming;
+        _semanticPrologueRoute = _scenario == "prologue-route" && defaultTiming;
         _captureTicks = options.CaptureTicks.Length > 0 ? options.CaptureTicks
             : options.CaptureAfterTicks >= 0 ? [options.CaptureAfterTicks]
             : SequenceTicks.TryGetValue(_scenario, out int[] sequence) ? sequence
@@ -139,18 +155,47 @@ public sealed class VisualScenarioRunner
     public void Update(InputState input, GameWorld world, Viewport viewport)
     {
         _tick++;
-        if (!string.Equals(_scenario, "title-arrival", StringComparison.OrdinalIgnoreCase))
+        bool titleFixture = _scenario is "title-arrival" or "prologue-title";
+        if (!titleFixture)
         {
             input.InjectMousePosition(new Point(viewport.Width / 2 + 280, viewport.Height / 2));
         }
 
-        if (_tick == 2 && !string.Equals(_scenario, "title-arrival", StringComparison.OrdinalIgnoreCase))
+        if (_tick == 2 && !titleFixture)
         {
             input.InjectKeyPress(Keys.Space);
         }
 
         switch (_scenario)
         {
+            case "prologue-route":
+                AdvancePrologueRoute(input, world);
+                break;
+
+            case "prologue-restart":
+                if (_tick == 100) world.ArrangePrologueSubject("prologue-search");
+                if (_tick == 130) world.RequestAudioTestFatalDamage();
+                if (!_prologueRestarted && world.PlayerDead)
+                {
+                    _prologueRestarted = true;
+                    input.InjectKeyPress(Keys.R);
+                }
+                break;
+
+            case "prologue-emergence":
+            case "prologue-trace":
+            case "prologue-search":
+            case "prologue-brother":
+            case "prologue-release":
+            case "prologue-transit":
+            case "prologue-threshold":
+            case "prologue-complete":
+                if (_tick == 100)
+                {
+                    world.ArrangePrologueSubject(_scenario);
+                }
+                break;
+
             case "dash":
                 if (_tick is >= 116 and <= 124)
                 {
@@ -331,6 +376,11 @@ public sealed class VisualScenarioRunner
 
     private bool ShouldCapture(GameWorld world)
     {
+        if (_semanticPrologueRoute)
+        {
+            return world.PrologueStage == PrologueStage.Complete && world.PresentationStateTime >= 2f;
+        }
+
         if (_semanticEnding)
         {
             return world.LoopState == ArenaLoopState.Complete && world.PresentationStateTime >= 6f;
@@ -604,5 +654,51 @@ public sealed class VisualScenarioRunner
         _combatTicks = 0;
         _completedWave = world.WaveNumber;
         input.InjectKeyPress(Keys.F6);
+    }
+
+    /// <summary>
+    /// A semantic smoke run through the actual authored gates. It walks the
+    /// route, reveals the trace and lets the normal Soul timers complete; F6
+    /// only stands in for combat skill so verification remains bounded.
+    /// </summary>
+    private void AdvancePrologueRoute(InputState input, GameWorld world)
+    {
+        switch (world.PrologueStage)
+        {
+            case PrologueStage.FindTrace:
+                input.InjectHeldKey(Keys.D);
+                input.InjectHeldKey(Keys.Q);
+                break;
+            case PrologueStage.LeaveEmergence:
+            case PrologueStage.SearchApproach:
+            case PrologueStage.FindBrother:
+            case PrologueStage.LeaveSearch:
+            case PrologueStage.BoardVehicle:
+                input.InjectHeldKey(Keys.D);
+                input.InjectHeldKey(Keys.Right);
+                break;
+            case PrologueStage.Arrival:
+                input.InjectHeldKey(Keys.W);
+                input.InjectHeldKey(Keys.Up);
+                break;
+            case PrologueStage.BurningLesson:
+                input.InjectHeldKey(Keys.D);
+                KillOnCadence(input);
+                break;
+            case PrologueStage.EmergenceThreat:
+            case PrologueStage.HollowLesson:
+            case PrologueStage.DevourerPressure:
+            case PrologueStage.Transit:
+                KillOnCadence(input);
+                break;
+        }
+    }
+
+    private void KillOnCadence(InputState input)
+    {
+        if (_tick % 24 == 0)
+        {
+            input.InjectKeyPress(Keys.F6);
+        }
     }
 }

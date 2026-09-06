@@ -4,6 +4,112 @@
 
 `prototype/design-polish`
 
+## Completed objective — Phase 0 gate and first playable prologue
+
+Normal launch is now a complete authored Death-Layer first playable. The refined
+Golden Slice remains runnable with `--golden-slice`.
+
+### Phase 0 result
+
+- Fresh before and final native captures: `artifacts/phase0/baseline/` and
+  `artifacts/phase0/final/`.
+- The current Session 3–5 reset, not the superseded Session 2 sheets, resolves
+  the fundamental gate: human-first design, one eight-direction rig, bounded
+  mouse-facing with hysteresis, distance-driven gait, per-step attack poses and
+  one coherent Warden/scythe construction.
+- Final captures re-verified the 360° facing sweep, six-frame run sample,
+  backpedal read, three-hit chain, dash cancel, solo Golden encounter and co-op
+  Golden encounter. No prologue code regressed them.
+- Remaining character gaps are polish: no bespoke hurt/collapse clips and an
+  enemy/environment drawing hand that remains less pixel-disciplined than the
+  Warden.
+- Ludo MCP was actively tested with a bounded two-candidate human-Warden brief.
+  The configured credential was rejected, so no candidate was generated or
+  promoted. The current authored Warden remained the stronger available result.
+
+### Implemented first playable
+
+- `Game/PrologueDirector.cs`: concrete sector/stage state, objectives, story
+  lines, movement bounds and authored coordinates.
+- `Rendering/PrologueEnvironment.cs`: Emergence memory platform, Searchway,
+  Warden signs, extraction causeway, moving Death-Flame skiff and homebase
+  exterior/threshold, all using broad clustered pixel value groups.
+- `Rendering/ProloguePresentation.cs`: restrained in-world story captions,
+  objectives, title, failure and completion presentation.
+- `GameWorld`: actual route gates, encounter composition, held-Soul Devourer,
+  Soul Release wait, brother meeting, solo combat/rescue companion, two-player
+  control handoff, sector retry, full-party failure, 62-second transit defense,
+  threshold crossing and replay.
+- Normal start enters the prologue; `--golden-slice` retains the benchmark.
+- D1 Emergence, D2 Search, D3 Escape and D4 Transit provide review access; F8
+  restarts the current authored checkpoint.
+
+### Audio / soundscape
+
+- `tools/audio/build_prologue_ambience.py` derives three 19.5-second stereo loops
+  from approved AMB-01 only. No new AI/generated audio was used.
+- Emergence is narrow and sparse; Search adds lateral environmental movement;
+  Escape/Transit adds moving air and low vehicle body; the threshold returns to
+  deliberate quiet.
+- The approved `arena_loop.ogg` is used provisionally at very low level during
+  Emergence/threshold and raised only for danger/transit. It remains subordinate
+  to combat cues.
+- The runtime soundscape switch, all 32 cues and music load with `fallbacks=0`.
+
+### Visual quality loop and evidence
+
+- Pass 1: `artifacts/prologue/pass1/`.
+- Native review found repeating sector titles, objective/HUD collision, weak
+  floor material rhythm, a blocky skiff and an over-large threshold door.
+- Pass 2 correction: persistent sector timing, separated UI, large hand-set slab
+  clusters, grounded rubble, coherent skiff ribs/rail/prow, and a human-scale
+  door nested inside the monumental gate.
+- Final captures: `artifacts/prologue/final/` for title, Emergence, trace, Search,
+  brother, held-Soul pressure, transit, threshold, completion and sector retry.
+- Semantic full route: `artifacts/prologue/end-to-end/prologue-route.*`; reached
+  `Complete` at tick 6590 with `runTime=107.8s`, zero enemies and zero Souls. This
+  force-cleared run proves sequence plumbing and is not a human duration claim.
+- Semantic two-player route:
+  `artifacts/prologue/end-to-end-coop/prologue-route.*`; reached `Complete` at
+  tick 6479 with `runTime=105.9s`, and records the second-keyboard control source.
+
+### Verification
+
+| Check | Result |
+|---|---|
+| Release build, zero warnings/errors | PASS |
+| `git diff --check` | PASS |
+| `python3 tools/audio/validate_audio.py` (37 assets) | PASS |
+| Audio runtime, every soundscape/cue, zero fallbacks | PASS |
+| Semantic solo + two-player routes to real completion | PASS |
+| Ten final prologue native capture fixtures | PASS |
+| Fatal damage → Search checkpoint restart at full health | PASS |
+| Phase 0 motion + solo/co-op Golden regression captures | PASS |
+| Native-resolution agent inspection | PASS |
+| Physical controller test | NOT_RUN — no controller hardware |
+| Stopwatch human 8–12 minute playthrough | NOT_RUN — owner review gate |
+| Owner reference-system audio audition | NOT_RUN — owner review gate |
+
+### Known defects / limitations
+
+- Sector transitions are authored cuts with brief light/audio punctuation, not
+  streaming traversal.
+- The solo brother is deliberately bounded follow/attack/dodge/rescue logic, not
+  a tactical companion system.
+- Transit uses the Wardens' normal Soul Cannons beside mounted-cannon housings;
+  there is no unrelated turret minigame.
+- No hurt or bespoke collapse clip; the existing rotated/darkened down pose
+  remains temporary.
+- No controller hardware was available. Two-player keyboard mapping and the
+  pre-existing deterministic co-op command path were regression-captured.
+- Ludo access remains blocked by the configured credential.
+
+### Exact next action
+
+Owner plays from normal launch in solo and, if possible, `--players 2`, checks
+the 8–12 minute pace and listens to sector transitions. Revise this route before
+starting items, Content Factory, a hub interior or broader progression.
+
 ## Current objective
 
 Session 5 responds to owner review of Session 4. The camera, the whole-body

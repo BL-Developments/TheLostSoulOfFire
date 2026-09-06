@@ -46,6 +46,16 @@ public enum AudioCue
     WardenStabilize
 }
 
+public enum AudioSoundscape
+{
+    Arena,
+    Emergence,
+    Search,
+    Escape,
+    Transit,
+    Threshold
+}
+
 /// <summary>
 /// Central authored sound bank and mix policy. Real content-pipeline assets are
 /// preferred; generated tones remain a non-fatal fallback for missing content.
@@ -109,12 +119,13 @@ public sealed class AudioDirector : IDisposable
     private readonly Dictionary<AudioCue, List<SoundEffectInstance>> _activeInstances = [];
     private readonly Dictionary<AudioCue, float> _cooldowns = [];
     private readonly HashSet<SoundEffect> _ownedFallbackSounds = [];
-    private SoundEffect _ambienceSound;
+    private readonly Dictionary<AudioSoundscape, SoundEffect> _ambienceSounds = [];
     private SoundEffectInstance _ambience;
     private Song _music;
     private bool _musicPlaying;
     private bool _calm;
     private bool _soulSense;
+    private AudioSoundscape _soundscape = AudioSoundscape.Arena;
     private float _duckTimer;
     private float _duckAmount;
     private uint _random = 0xA17D3C5Bu;
@@ -160,10 +171,17 @@ public sealed class AudioDirector : IDisposable
             Add(content, AudioCue.WardenDown, "Audio/Sfx/warden_down", 70f, 1.1f, 0.56f, 0.36f);
             Add(content, AudioCue.WardenStabilize, "Audio/Sfx/warden_stabilize", 196f, 1.2f, 0.5f, 0.05f, rising: true);
 
-            _ambienceSound = LoadOrCreateFallback(content, "Audio/Ambience/arena_ambience", 43f, 2.4f, 0.2f, 0.16f, false);
-            _ambience = _ambienceSound.CreateInstance();
-            _ambience.IsLooped = true;
-            _ambience.Play();
+            SoundEffect arenaAmbience = LoadOrCreateFallback(content, "Audio/Ambience/arena_ambience", 43f, 2.4f, 0.2f, 0.16f, false);
+            SoundEffect emergenceAmbience = LoadOrCreateFallback(content, "Audio/Ambience/prologue_emergence", 38f, 2.4f, 0.16f, 0.11f, false);
+            SoundEffect searchAmbience = LoadOrCreateFallback(content, "Audio/Ambience/prologue_search", 48f, 2.4f, 0.18f, 0.15f, false);
+            SoundEffect transitAmbience = LoadOrCreateFallback(content, "Audio/Ambience/prologue_transit", 55f, 2.4f, 0.22f, 0.2f, false);
+            _ambienceSounds[AudioSoundscape.Arena] = arenaAmbience;
+            _ambienceSounds[AudioSoundscape.Emergence] = emergenceAmbience;
+            _ambienceSounds[AudioSoundscape.Search] = searchAmbience;
+            _ambienceSounds[AudioSoundscape.Escape] = searchAmbience;
+            _ambienceSounds[AudioSoundscape.Transit] = transitAmbience;
+            _ambienceSounds[AudioSoundscape.Threshold] = emergenceAmbience;
+            StartAmbience(AudioSoundscape.Arena);
 
             TryStartMusic(content);
             ApplyMix();
@@ -250,6 +268,17 @@ public sealed class AudioDirector : IDisposable
     public void SetSoulSense(bool active)
     {
         _soulSense = active;
+        ApplyMix();
+    }
+
+    public void SetSoundscape(AudioSoundscape soundscape)
+    {
+        if (!_available || soundscape == _soundscape && _ambience is not null)
+        {
+            return;
+        }
+
+        StartAmbience(soundscape);
         ApplyMix();
     }
 
@@ -352,8 +381,17 @@ public sealed class AudioDirector : IDisposable
 
     private void ApplyMix()
     {
-        float ambienceBase = _calm ? 0.035f : 0.12f;
-        float musicBase = _calm ? MusicCalmVolume : MusicGameplayVolume;
+        (float calmAmbience, float activeAmbience, float calmMusic, float activeMusic, float pitch) = _soundscape switch
+        {
+            AudioSoundscape.Emergence => (0.045f, 0.09f, 0.045f, 0.16f, -0.08f),
+            AudioSoundscape.Search => (0.065f, 0.125f, 0.10f, 0.32f, -0.025f),
+            AudioSoundscape.Escape => (0.075f, 0.145f, 0.13f, 0.40f, 0.025f),
+            AudioSoundscape.Transit => (0.105f, 0.175f, 0.18f, 0.46f, 0.04f),
+            AudioSoundscape.Threshold => (0.032f, 0.064f, 0.055f, 0.14f, -0.1f),
+            _ => (0.035f, 0.12f, MusicCalmVolume, MusicGameplayVolume, 0f)
+        };
+        float ambienceBase = _calm ? calmAmbience : activeAmbience;
+        float musicBase = _calm ? calmMusic : activeMusic;
         if (_soulSense)
         {
             ambienceBase *= 0.52f;
@@ -362,11 +400,36 @@ public sealed class AudioDirector : IDisposable
 
         if (_ambience is not null)
         {
+            _ambience.Pitch = pitch;
             _ambience.Volume = Math.Clamp(ambienceBase * (1f - _duckAmount * 0.72f), 0f, 1f);
         }
         if (_musicPlaying)
         {
             MediaPlayer.Volume = Math.Clamp(musicBase * (1f - _duckAmount * 0.62f), 0f, 1f);
+        }
+    }
+
+    private void StartAmbience(AudioSoundscape soundscape)
+    {
+        if (!_ambienceSounds.TryGetValue(soundscape, out SoundEffect sound))
+        {
+            return;
+        }
+
+        try
+        {
+            _ambience?.Stop();
+            _ambience?.Dispose();
+            _ambience = sound.CreateInstance();
+            _ambience.IsLooped = true;
+            _ambience.Play();
+            _soundscape = soundscape;
+        }
+        catch
+        {
+            // A lost audio device must never take gameplay down with it.
+            _available = false;
+            DisposeSounds();
         }
     }
 
@@ -449,7 +512,7 @@ public sealed class AudioDirector : IDisposable
         _ambience?.Stop();
         _ambience?.Dispose();
         _ambience = null;
-        _ambienceSound = null;
+        _ambienceSounds.Clear();
 
         foreach (List<SoundEffectInstance> instances in _activeInstances.Values)
         {

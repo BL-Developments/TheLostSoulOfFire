@@ -76,6 +76,23 @@ Every entry uses the Ludo commercial-use license and verified metered API entitl
 | `Audio/Ambience/arena_ambience.wav` | AMB-01 | 2026-08-29 | Core Audio resample 44.1 to 48 kHz; stereo; full 20 s generated loop; click-free endpoints; peak -11.0 dBFS |
 | `Audio/Music/arena_loop.ogg` | MUS-01 | 2026-08-29 | MP3 decoded to 48 kHz stereo PCM; returned 80 s performance uniformly resampled to 100 s; 20 ms loop-edge fades; peak -6.0 dBFS pre-encode; Vorbis q5 |
 
+## First playable soundscapes — 2026-09-06
+
+No new external generation was used. `tools/audio/build_prologue_ambience.py`
+derives three restrained loops from the already-approved AMB-01 master. Broad
+filtering, stereo width and dynamics are the only sources of variation; no raw
+candidate, procedural noise, voice or new musical material is introduced.
+
+| Final filename | Source | Edits performed |
+|---|---|---|
+| `Audio/Ambience/prologue_emergence.wav` | AMB-01 | Two-pole 1.05 kHz low-pass, narrowed stereo field, 0.5 s loop fold; 19.5 s; peak -13.5 dBFS |
+| `Audio/Ambience/prologue_search.wav` | AMB-01 | 58 Hz high-pass, 2.6 kHz low-pass, restrained 115 ms cross-channel movement, 0.5 s loop fold; 19.5 s; peak -12.5 dBFS |
+| `Audio/Ambience/prologue_transit.wav` | AMB-01 | High moving-air band over low stone/engine body with loop-periodic gain movement, 0.5 s loop fold; 19.5 s; peak -11.5 dBFS |
+
+The approved `arena_loop.ogg` remains a provisional underscore. Runtime mixing
+keeps it nearly absent during Emergence, raises it only under combat and transit,
+then returns it below the ambience at the Warden threshold.
+
 ## Session 2 additions — 2026-09-06
 
 ### Service and license status

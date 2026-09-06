@@ -23,6 +23,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     private readonly VisualScenarioRunner _visualScenarioRunner = null!;
     private readonly bool _audioGameplayTest;
     private readonly bool _audioDeathRestartTest;
+    private readonly bool _goldenSlice;
     private bool _screenshotRequested;
     private string _screenshotStatus = string.Empty;
     private float _audioTestTotalTime;
@@ -37,11 +38,13 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     public Game1(
         bool audioGameplayTest = false,
         bool audioDeathRestartTest = false,
-        VisualRunOptions visualOptions = null!)
+        VisualRunOptions visualOptions = null!,
+        bool goldenSlice = false)
     {
         _audioGameplayTest = audioGameplayTest;
         _audioDeathRestartTest = audioDeathRestartTest;
         _visualOptions = visualOptions ?? new VisualRunOptions();
+        _goldenSlice = goldenSlice;
         if (_visualOptions.HasQuality)
         {
             _presentationSettings.SetQuality(_visualOptions.Quality);
@@ -80,7 +83,16 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         _pixel = new Texture2D(GraphicsDevice, 1, 1);
         _pixel.SetData([Color.White]);
         _art = new ArtAssets(Content);
-        _world = new GameWorld(GraphicsDevice.Viewport, _art, Content, _presentationSettings, _visualOptions.LocalPlayers);
+        bool prologueMode = !_goldenSlice && !_audioGameplayTest && !_audioDeathRestartTest &&
+            (string.IsNullOrEmpty(_visualOptions.VisualScenario) ||
+             _visualOptions.VisualScenario.StartsWith("prologue-", StringComparison.Ordinal));
+        _world = new GameWorld(
+            GraphicsDevice.Viewport,
+            _art,
+            Content,
+            _presentationSettings,
+            _visualOptions.LocalPlayers,
+            prologueMode);
         _soulfireRenderer = new SoulfireRenderer(GraphicsDevice, _presentationSettings);
     }
 

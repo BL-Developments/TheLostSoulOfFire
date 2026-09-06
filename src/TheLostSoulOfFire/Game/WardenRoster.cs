@@ -90,6 +90,22 @@ public sealed class WardenRoster
         return true;
     }
 
+    /// <summary>
+    /// Returns the authored prologue to its opening solo state. This is used
+    /// only when replaying or jumping back before the brothers meet; normal
+    /// encounter resets deliberately preserve the current local roster.
+    /// </summary>
+    public void RemoveSecond()
+    {
+        if (_slots.Count <= 1)
+        {
+            return;
+        }
+
+        _slots.RemoveRange(1, _slots.Count - 1);
+        _field.Configure(Wardens());
+    }
+
     public void ReadCommands(InputState input, Camera2D camera, Viewport viewport)
     {
         foreach (PlayerSlot slot in _slots)

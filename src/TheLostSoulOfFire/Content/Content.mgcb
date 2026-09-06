@@ -152,6 +152,21 @@
 /processor:SoundEffectProcessor
 /build:Audio/Ambience/arena_ambience.wav
 
+#begin Audio/Ambience/prologue_emergence.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Ambience/prologue_emergence.wav
+
+#begin Audio/Ambience/prologue_search.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Ambience/prologue_search.wav
+
+#begin Audio/Ambience/prologue_transit.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Ambience/prologue_transit.wav
+
 #begin Audio/Music/arena_loop.ogg
 /importer:OggImporter
 /processor:SongProcessor

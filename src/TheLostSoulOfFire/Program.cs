@@ -13,8 +13,9 @@ bool audioLoopRuntimeTest = Array.Exists(args, argument => argument == "--audio-
 bool audioGameplayTest = Array.Exists(args, argument => argument == "--audio-gameplay-test");
 bool audioDeathRestartTest = Array.Exists(args, argument => argument == "--audio-death-restart-test");
 bool expectAudioFallback = Array.Exists(args, argument => argument == "--expect-audio-fallback");
+bool goldenSlice = Array.Exists(args, argument => argument == "--golden-slice");
 
 using Microsoft.Xna.Framework.Game game = audioRuntimeTest || audioLoopRuntimeTest
     ? new AudioRuntimeTestGame(expectAudioFallback, audioLoopRuntimeTest)
-    : new TheLostSoulOfFire.Game1(audioGameplayTest, audioDeathRestartTest, visualOptions);
+    : new TheLostSoulOfFire.Game1(audioGameplayTest, audioDeathRestartTest, visualOptions, goldenSlice);
 game.Run();
