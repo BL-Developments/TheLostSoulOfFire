@@ -41,6 +41,7 @@ public sealed class Player
     // None of this feeds combat. FacingDirection stays the raw aim vector, so
     // every hitbox, telegraph and light is exactly what it was; these values
     // only decide which frame is drawn.
+    private float _phase;
     private float _bodyAngle;
     private int _facingSector = 2;
     private float _gaitPhase;
@@ -89,6 +90,16 @@ public sealed class Player
 
     /// <summary>Moving against the way the body is pointed.</summary>
     public bool IsBackpedalling => _backpedalling;
+
+    /// <summary>
+    /// 0..1 how far out of the world the Warden currently is.
+    ///
+    /// Dash invulnerability was invisible: the Player had no way to see that the
+    /// frames were live, so a correct read looked identical to a lucky one. He
+    /// now thins into Death Flame for exactly as long as he cannot be hit, and
+    /// resolves as the window closes.
+    /// </summary>
+    public float PhaseAmount => _phase;
 
     public Vector2 DashDirection => _dashDirection;
     public int Health { get; private set; } = GameBalance.PlayerMaxHealth;
@@ -184,6 +195,7 @@ public sealed class Player
         _activeDashDistance = GameBalance.DashDistance;
         _severanceTimer = 0f;
         _severanceFlareTimer = 0f;
+        _phase = 0f;
         DashStartedThisFrame = false;
         SoulSenseActive = false;
         IsDowned = false;
@@ -245,6 +257,7 @@ public sealed class Player
 
         _dashCooldownTimer = MathF.Max(0f, _dashCooldownTimer - deltaTime);
         InvulnerabilityRemaining = MathF.Max(0f, InvulnerabilityRemaining - deltaTime);
+        UpdatePhase(deltaTime);
         UpdateAfterimages(deltaTime);
 
         if (IsDowned)
@@ -312,8 +325,14 @@ public sealed class Player
                 _attackImpulse = Scythe.AttackDirection * Scythe.GetForwardImpulse();
             }
 
-            if (command.DashPressed && _dashCooldownTimer <= 0f && Scythe.ActiveStep == 0)
+            // The dash interrupts anything. Waiting out a swing before you are
+            // allowed to move is the single most common thing that makes an
+            // action game feel stiff, and reading an attack is supposed to be
+            // rewarded rather than gated by your own recovery frames.
+            if (command.DashPressed && _dashCooldownTimer <= 0f)
             {
+                Scythe.CancelForDash();
+                _attackImpulse = Vector2.Zero;
                 StartDash(movement, particles, screenEffects);
             }
         }
@@ -352,6 +371,24 @@ public sealed class Player
         {
             _idleParticleTimer = 0.16f;
             particles.EmitDeathFlame(Position - FacingDirection * 2f, 1, 0.55f);
+        }
+    }
+
+    /// <summary>
+    /// Tracks the dash i-frames. It rises almost instantly and falls with the
+    /// window, so what the Player sees is exactly how long he is untouchable —
+    /// never a flourish that outlives the rule it is describing.
+    /// </summary>
+    private void UpdatePhase(float deltaTime)
+    {
+        float target = IsDashing || InvulnerabilityRemaining > 0f && _dashCooldownTimer > GameBalance.DashCooldown - GameBalance.DashInvulnerability - 0.02f
+            ? MathHelper.Clamp(InvulnerabilityRemaining / GameBalance.DashInvulnerability, 0f, 1f)
+            : 0f;
+        float rate = target > _phase ? 26f : 9f;
+        _phase = MathHelper.Lerp(_phase, target, 1f - MathF.Exp(-rate * deltaTime));
+        if (_phase < 0.004f)
+        {
+            _phase = 0f;
         }
     }
 
@@ -616,6 +653,7 @@ public sealed class Player
     private void StartDash(Vector2 movement, ParticleSystem particles, ScreenEffects screenEffects)
     {
         DashStartedThisFrame = true;
+        _phase = 1f;
         _dashDirection = movement.LengthSquared() > 0.001f ? Vector2.Normalize(movement) : FacingDirection;
         _dashTimer = GameBalance.DashDuration;
         _activeDashDistance = GameBalance.DashDistance * (ResonanceActive ? GameBalance.ResonanceDashDistanceMultiplier : 1f);

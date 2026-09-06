@@ -6,7 +6,60 @@
 
 ## Current objective
 
-Session 4 responds to owner review of Session 3. The character was accepted; the
+Session 5 responds to owner review of Session 4. The camera, the whole-body
+motion, the weapon shapes and the VFX were accepted. Two things were named.
+
+### Session 5 — what changed
+
+**The scythe is held.** The real fault was structural: the hands and the weapon
+were posed independently, so the carry could never flow into a swing because
+they were never connected. A pose now describes **where the scythe is** — two
+body-space endpoints — and the hands are placed *on the haft*. Everything else
+follows from that.
+
+The guard went through three readings before it was right. Planted upright like
+a staff was wrong. Hanging down at the floor like a farm tool was wrong. It now
+sits **level across the body at chest height, blade out ahead of the leading
+shoulder** — a combat guard, seen side-on. It sits at about −56° from the aim,
+which is exactly where the first hit of the chain winds up from, so the hold *is*
+the start of the swing.
+
+**The chain**, three hits, choreographed as asked:
+
+| hit | arc | body |
+|---|---|---|
+| 1 | 120° left to right | winds up on the left, drives across |
+| 2 | 140° right back to left | answers from where hit 1 finished |
+| 3 | 198° | the whole body turns through a full revolution and arrives back where it started |
+
+Each clip places the hands on the overlay's haft using **the runtime's own swing
+angle**, copied from `ScytheCombat.BuildSwingArc`, so the Warden is always
+holding the weapon being drawn for him. Each then eases its grip back onto the
+carry over the last 30%, so the chain resolves into the hold instead of cutting
+to it. A Severance cut borrows the third hit's turning body.
+
+The overlay is now **lifted to chest height** (`ScytheCombat.GripRise`). This is
+the one place the flat combat plane and the three-quarter character view have to
+agree, and the constant is shared by the runtime and the forge. Without the lift
+the weapon was drawn on the floor while the hands were at chest height, and it
+never looked held.
+
+**The dash interrupts anything.** `ScytheCombat.CancelForDash`: a strike already
+created still lands — the blade was through the enemy before he moved — and
+everything after it is abandoned. The chain position is kept, so dashing out of
+a swing and swinging again continues the combo rather than restarting it; the
+dash becomes part of the rhythm instead of a punishment for using it.
+
+**The dash is visibly invulnerable.** `Player.PhaseAmount` rises almost instantly
+and falls with the i-frame window, darkening the body toward its own flame and
+thinning it. What the Player sees is exactly how long he cannot be hit — never a
+flourish that outlives the rule it describes. He stays a readable pose the whole
+way through; the point is to show the frames, not to remove the character from
+his own dodge.
+
+The Soul Cannon was left alone, as instructed.
+
+### Session 4 — the previous job The character was accepted; the
 camera, the animation's whole-body motion, the weapons' shape language and every
 VFX were rejected as still below a professional bar. Enemy behaviour was
 explicitly out of scope — only how it looks.
@@ -288,6 +341,16 @@ dotnet run -c Release --no-build --project src/TheLostSoulOfFire -- \
 
 Debug keys are unchanged.
 
+## What the owner should look at first (Session 5)
+
+1. `artifacts/session5/compare/combo-chain.png` — hold, right sweep, left sweep,
+   spin, hold. Ten frames of one continuous chain.
+2. `artifacts/session5/compare/dash-cancel.png` — the dash cutting out of the
+   middle of the third hit, and the Warden going shadowy for the i-frames.
+3. `artifacts/session5/compare/facing-sweep-session4-session5.png` — the guard in
+   all eight directions.
+4. The game, swinging and dashing.
+
 ## What the owner should look at first (Session 4)
 
 1. `artifacts/session4/compare/burning-detonation-before-after.png` — the square,
@@ -314,6 +377,9 @@ Debug keys are unchanged.
 
 ## Capture locations
 
+- `artifacts/session5/after/` — 21 solo scenarios.
+- `artifacts/session5/after-coop/` — 10 two-player scenarios.
+- `artifacts/session5/compare/` — 30 boards.
 - `artifacts/session4/before/` — the detonation, with the old effect sheets.
 - `artifacts/session4/after/` — 19 solo scenarios.
 - `artifacts/session4/after-coop/` — 10 two-player scenarios.
@@ -328,8 +394,8 @@ Debug keys are unchanged.
 | Check | Result |
 |---|---|
 | Release build, zero warnings, zero errors | PASS |
-| 19 solo visual scenarios at HIGH FULL | PASS |
-| No authored character frame clips its 128px cell (240 frames checked) | PASS |
+| 21 solo visual scenarios at HIGH FULL | PASS |
+| No authored character frame clips its 128px cell (768 frames checked) | PASS |
 | Every effect sheet under the 0.34 coverage ceiling | PASS |
 | Audio loop runtime (music + ambience boundaries) | PASS |
 | 18 solo visual scenarios at HIGH FULL (Session 3) | PASS |
@@ -353,13 +419,18 @@ Debug keys are unchanged.
   one model for the whole game; large regions will want more.
 - **Ludo could not be reached**, so no external concept exploration supported the
   weapon shapes. They are authored judgement calls.
-- **The attack is one clip for all three combo steps**, sampled by the Scythe's
-  own progress. Step 1, step 2, step 3 and a Severance cut therefore share a
-  pose vocabulary and differ only in timing and in the light arc. Distinct poses
-  per step are the obvious next animation step, and they are cheap now that the
-  rig exists.
-- **No dash, hurt or death clips.** Dash uses the run frames plus the existing
-  streak; the downed pose is still the idle frame rotated and darkened.
+- **A Severance cut reuses the third hit's clip.** It reaches much further than
+  a normal third hit, so the body is right but the reach is carried entirely by
+  the overlay and the light.
+- **No dash, hurt or death clips.** Dash uses the run frames plus the phase-out
+  and the existing streak; the downed pose is still the idle frame rotated and
+  darkened.
+- **Dash-cancelling removes commitment from the third hit.** That is what was
+  asked for, but it is a real combat change and wants play-testing: the heavy
+  swing no longer costs anything to throw out.
+- **On the diagonals the blade's reach is bounded by the 128px cell**, because
+  forward and lateral offsets both project onto screen x there. The weapon is
+  sized to fit rather than to a free artistic choice.
 - **The exact 1:1 pixel scale only holds at combat zoom.** The title and intro
   cameras (1.10 and 1.16) and the co-op group zoom (0.92–1.30) resample. Combat
   at full zoom, which is the overwhelming majority of play, is exact.

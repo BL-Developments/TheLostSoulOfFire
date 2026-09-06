@@ -18,6 +18,22 @@ awaiting owner review.
 - Deterministic visual scenario capture system.
 - Directional character animation, VFX and audio asset base.
 
+### Added by Session 5 — the held scythe, the chain, and the dash
+
+- **The scythe is held, not attached.** The pose describes where the weapon is
+  and the hands are placed on the haft, so the carry and the swing are the same
+  rig at two moments. The guard is level across the body at chest height.
+- **Three choreographed hits**: a sweep to the right, an answer back to the left,
+  and a full body turn on the third. Each is sampled by the Scythe's own progress
+  and eases its grip back onto the carry, so the chain resolves into the hold.
+- **The swing overlay is lifted to the grip**, so the blade leaves the Warden's
+  hands instead of sweeping along the floor beneath them.
+- **The dash interrupts any attack.** A strike already created still lands; the
+  chain position survives, so dashing mid-combo and swinging again continues it.
+- **Dash invulnerability is visible.** The Warden darkens and thins for exactly
+  as long as the i-frames are live.
+- New fixtures: `combo-chain` and `dash-cancel`.
+
 ### Added by Session 4 — camera, whole-body motion, weapons and VFX
 
 - **Camera follow rebuilt.** Look-ahead from velocity and facing, a soft zone, a

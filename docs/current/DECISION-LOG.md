@@ -2,6 +2,55 @@
 
 Record owner-approved, rejected or revised product decisions here. Newer dated entries override older conflicting entries.
 
+## 2026-09-06 — Owner revision: the scythe is a held weapon, and the dash is a real out
+
+### Reviewed
+
+Camera, whole-body motion, weapons and VFX accepted. Two things named, then one
+correction on the first.
+
+### Revised
+
+- **The scythe must read as a weapon someone is holding, not a prop attached to
+  him.** First it was planted upright like a staff; corrected, it hung down at
+  the floor like a farm tool; corrected again, it is now level across the body —
+  a combat guard, seen side-on.
+- **The chain keeps three hits**, choreographed: a sweep to the right, an answer
+  back to the left, and a full turn on the third.
+- **Every attack must resolve back into the hold**, not cut to it.
+- **The dash interrupts any attack.** Waiting out a swing before being allowed to
+  move was rejected outright.
+- **Dash invulnerability must be visible.** The Warden goes "a little shadowy"
+  for exactly as long as he cannot be hit.
+- The Soul Cannon is finished.
+
+### Implemented in response
+
+- The pose now describes **where the scythe is**, and the hands are placed *on
+  the haft*. Before this the hands and the weapon were posed independently,
+  which is the reason the carry never flowed into a swing — they were never
+  connected.
+- The guard sits at about −56° from the aim, which is **exactly where the first
+  hit winds up from**, so the hold is the start of the swing rather than a pose
+  it has to leave.
+- Three attack clips, each placing the hands on the overlay's haft using the
+  runtime's own swing angle, so the Warden always holds the weapon being drawn
+  for him. The third turns the whole body through a full revolution and arrives
+  back where it started. All three ease their grip back onto the carry.
+- The overlay is lifted to chest height so the blade and the hands meet; this is
+  the one place the flat combat plane and the three-quarter character view are
+  made to agree, and the constant is shared by the runtime and the forge.
+- `ScytheCombat.CancelForDash` — a strike already created still lands, everything
+  after it is abandoned, and the chain position is kept so dashing out of a swing
+  and swinging again continues the combo.
+- `Player.PhaseAmount` drives a darkening and thinning of the body that rises
+  with the dash and falls with the i-frame window, so what is seen is exactly how
+  long he is untouchable.
+
+### Still open
+
+Owner has not judged the guard, the chain choreography or the dash.
+
 ## 2026-09-06 — Owner revision: camera, whole-body motion, weapons and VFX
 
 ### Reviewed

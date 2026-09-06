@@ -98,7 +98,7 @@ public sealed class GameWorld : IDisposable
         // floor: the only thing being judged is the Warden, his gait and his
         // facing. The beat loop is held open so no banner, arrival or transition
         // can wander into the frame.
-        if (scenario is "facing-sweep" or "run-cycle" or "strafe-read")
+        if (scenario is "facing-sweep" or "run-cycle" or "strafe-read" or "combo-chain" or "dash-cancel")
         {
             _visualSandbox = true;
             _waveNumber = 1;

@@ -19,6 +19,12 @@ public readonly record struct ScytheStrike(
 
 public sealed class ScytheCombat
 {
+    /// <summary>World units from the Warden to the butt of the haft.</summary>
+    public const float GripReach = 14f;
+
+    /// <summary>World units the whole weapon is lifted, to reach chest height.</summary>
+    public const float GripRise = 13f;
+
     private float _attackElapsed;
     private float _attackDuration;
     private float _strikeTime;
@@ -52,6 +58,30 @@ public sealed class ScytheCombat
     public string StateLabel => ActiveStep == 0
         ? _comboTimer > 0f ? $"CHAIN {_nextStep}" : "READY"
         : _severanceArmed ? $"SEVER {ActiveStep}" : $"HIT {ActiveStep}";
+
+    /// <summary>
+    /// Dropped because the Warden dashed.
+    ///
+    /// A strike that has already been created still lands — the blade was
+    /// through the enemy before he moved — but everything after it is
+    /// abandoned. The chain position is kept, so dashing out of a swing and
+    /// swinging again continues the combo rather than restarting it: the dash
+    /// becomes part of the rhythm instead of a punishment for using it.
+    /// </summary>
+    public void CancelForDash()
+    {
+        if (ActiveStep == 0)
+        {
+            return;
+        }
+
+        ActiveStep = 0;
+        _attackElapsed = 0f;
+        _attackDuration = 0f;
+        _queuedAttack = false;
+        _severanceArmed = false;
+        _comboTimer = GameBalance.ComboResetTime;
+    }
 
     public void Reset()
     {
@@ -357,12 +387,18 @@ public sealed class ScytheCombat
         // the same reach instead of two different ones.
         // Sprite geometry, measured from the authored file: the butt of the haft
         // sits at (96, 176) and the blade's furthest point is 124px along it.
+        //
+        // GripReach and GripRise are shared with tools/visual-max/warden_forge.py,
+        // which places the Warden's hands at exactly this point. That is the only
+        // place the flat combat plane and the three-quarter character view are
+        // allowed to disagree, so it is the one place they are made to line up:
+        // without the lift the weapon was drawn on the floor while the hands were
+        // at chest height, and it never looked held.
         const float haftToTip = 124f;
-        const float gripOffset = 14f;
-        float scale = MathF.Max(0.34f, (arc.Radius - gripOffset) / haftToTip);
+        float scale = MathF.Max(0.34f, (arc.Radius - GripReach) / haftToTip);
         batch.Draw(
             physicalScythe,
-            playerPosition + bladeDirection * gripOffset,
+            playerPosition + bladeDirection * GripReach - new Vector2(0f, GripRise),
             null,
             Color.White,
             arc.Current + MathHelper.PiOver2,

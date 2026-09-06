@@ -110,11 +110,19 @@ public sealed class ArtAssets : IDisposable
         // wall-clock time; see ResolvePlayerFrame.
         LoadDirectional(content, "warden", "Textures/Player/Animations", "idle", 128, 12, 8f, true);
         LoadDirectional(content, "warden", "Textures/Player/Animations", "move", 128, 12, 26f, true);
-        LoadDirectional(content, "warden", "Textures/Player/Animations", "attack", 128, 6, 18f, false);
+        // One clip per hit of the chain. They are sampled by the Scythe's own
+        // progress, so the pose and the hitbox can never disagree, and each one
+        // settles back onto the carried grip so the chain resolves into the
+        // hold instead of snapping to it.
+        LoadDirectional(content, "warden", "Textures/Player/Animations", "attack1", 128, 8, 18f, false);
+        LoadDirectional(content, "warden", "Textures/Player/Animations", "attack2", 128, 8, 18f, false);
+        LoadDirectional(content, "warden", "Textures/Player/Animations", "attack3", 128, 8, 18f, false);
 
         LoadDirectional(content, "warden_elder", "Textures/PlayerElder/Animations", "idle", 128, 12, 8f, true);
         LoadDirectional(content, "warden_elder", "Textures/PlayerElder/Animations", "move", 128, 12, 26f, true);
-        LoadDirectional(content, "warden_elder", "Textures/PlayerElder/Animations", "attack", 128, 6, 18f, false);
+        LoadDirectional(content, "warden_elder", "Textures/PlayerElder/Animations", "attack1", 128, 8, 18f, false);
+        LoadDirectional(content, "warden_elder", "Textures/PlayerElder/Animations", "attack2", 128, 8, 18f, false);
+        LoadDirectional(content, "warden_elder", "Textures/PlayerElder/Animations", "attack3", 128, 8, 18f, false);
 
         LoadDirectional(content, "hollow", "Textures/Enemies/Hollow/Animations", "idle", 128, 9, 8f, true);
         LoadDirectional(content, "hollow", "Textures/Enemies/Hollow/Animations", "move", 128, 9, 12f, true);
@@ -181,6 +189,25 @@ public sealed class ArtAssets : IDisposable
                 (int)(player.BodyTint.G * 0.55f),
                 (int)(player.BodyTint.B * 0.6f))
             : player.BodyTint;
+
+        // Dashing, the Warden is briefly not quite here. The body darkens toward
+        // its own flame and thins out; the alpha multiply is correct because the
+        // content pipeline premultiplies.
+        float phase = player.PhaseAmount;
+        if (phase > 0.001f)
+        {
+            // "A little shadowy", not gone. He has to stay a readable pose the
+            // whole way through the dash — the point is to show the i-frames,
+            // not to remove the character from his own dodge.
+            Color shade = player.Identity.Flame;
+            tint = new Color(
+                (int)MathHelper.Lerp(tint.R, shade.R * 0.55f, phase),
+                (int)MathHelper.Lerp(tint.G, shade.G * 0.55f, phase),
+                (int)MathHelper.Lerp(tint.B, shade.B * 0.70f, phase),
+                tint.A);
+            tint *= 1f - phase * 0.38f;
+        }
+
         DrawClip(batch, frame.Clip, frame.Elapsed, frame.Position, frame.Rotation, frame.Scale, tint);
     }
 
@@ -222,7 +249,10 @@ public sealed class ArtAssets : IDisposable
 
         if (player.Scythe.ActiveStep != 0)
         {
-            SpriteClip swing = _characterClips[$"{family}/attack/{direction}"];
+            // A Severance cut reaches furthest and is the most committed, so it
+            // borrows the third hit's turning body.
+            int step = player.Scythe.SeveranceArmed ? 3 : player.Scythe.ActiveStep;
+            SpriteClip swing = _characterClips[$"{family}/attack{step}/{direction}"];
             float progress = MathHelper.Clamp(player.Scythe.NormalizedProgress, 0f, 0.999f);
             return new ActorFrame(swing, progress * swing.Duration, player.Position, size / swing.FrameWidth);
         }

@@ -109,7 +109,11 @@ public static class ActorLighting
             strength += 0.28f * life;
         }
 
-        strength *= identity.LightScale;
+        // Phasing out takes the body light with it, but leaves a little more
+        // flame: what is left of him while he is gone is the flame itself.
+        float phase = player.PhaseAmount;
+        strength *= identity.LightScale * (1f - phase * 0.25f);
+        radius *= 1f + phase * 0.45f;
         DrawContactPool(batch, brush, player.Position, 58f * breathe, identity.Flame * (0.085f * identity.LightScale));
         art.DrawSilhouetteLight(batch, frame, identity.Flame * (strength * 0.62f), radius * 1.55f);
         art.DrawSilhouetteLight(batch, frame, identity.FlameBright * (strength * 0.5f), radius);

@@ -97,8 +97,33 @@ FIGURE = 1.15
 
 IDLE_FRAMES = 12
 MOVE_FRAMES = 12
-ATTACK_FRAMES = 6
+ATTACK_FRAMES = 8
 SHEET_COLUMNS = 4
+
+# --- the seam with the runtime -------------------------------------------
+# The swing overlay lives in the flat combat plane; the character is drawn in a
+# squashed three-quarter view. The two can only agree at one place, and that
+# place has to be the grip, or the weapon does not look held.
+#
+# ScytheCombat draws the haft's butt at playerPosition + direction * GRIP_REACH,
+# lifted by GRIP_RISE. These numbers are the same on both sides.
+WORLD_TO_SPRITE = 1.3          # camera zoom: one world unit is 1.3 sprite pixels
+GRIP_REACH = 14.0              # world units from the Warden to the butt of the haft
+GRIP_RISE = 13.0               # world units the whole weapon is lifted to chest height
+SECOND_HAND_REACH = 24.0
+
+# Swing geometry, copied from ScytheCombat.BuildSwingArc so the hands and the
+# blade are always on the same angle. If those numbers change, these must too.
+SWING_ARC = {1: math.radians(120.0), 2: math.radians(-140.0), 3: math.radians(198.0)}
+SWING_EASE = {1: 3.0, 2: 3.0, 3: 2.35}
+
+
+def swing_angle(step: int, t: float) -> float:
+    """Blade angle relative to the aim, matching the runtime exactly."""
+    total = SWING_ARC[step]
+    progress = min(max((t - 0.2) / 0.58, 0.0), 1.0) if step == 3 else min(max(t, 0.0), 1.0)
+    eased = 1.0 - (1.0 - progress) ** SWING_EASE[step]
+    return -total * 0.5 + total * eased
 
 DIRECTIONS: dict[str, tuple[float, float]] = {
     "e": (1.0, 0.0),
@@ -419,36 +444,76 @@ class Pose:
     coat_trail: float = 0.0
     scarf_trail: float = 0.0
     head_tilt: float = 0.0
-    weapon: str = "rest"
-    weapon_angle: float = 0.0
-    weapon_raise: float = 0.0
-    # Body-space (a, b, h) hand targets. When set they override the swing arms,
-    # so the hands travel along the same arc the weapon does.
-    hand_body: list[tuple[float, float, float]] | None = None
+
+    # --- weapon -----------------------------------------------------------
+    # The scythe is described by where its two ends are, and the hands are then
+    # placed *on the haft*. Before this the hands and the weapon were posed
+    # independently, which is why the carry never flowed into a swing: they were
+    # never actually connected.
+    weapon_butt: tuple[float, float, float] | None = None
+    weapon_tip: tuple[float, float, float] | None = None
+    grip: tuple[float, float] = (0.20, 0.58)
+    draw_weapon: bool = True
+
+    # Attack frames instead place the hands in flat screen space, on the haft of
+    # the overlay sprite, because during a swing the weapon belongs to the combat
+    # plane rather than to the sheet.
+    hand_screen: list[tuple[float, float]] | None = None
+
+    # 0..1 blend of the hands back onto the carry grip, used by the tail of every
+    # attack so the swing resolves into the hold instead of snapping to it.
+    settle: float = 0.0
+
+    # Body rotation baked into the frame. Only the third hit uses it.
+    facing_spin: float = 0.0
+
+
+# --- the carried scythe ---------------------------------------------------
+# A real scythe is not held up in the air. It hangs across the body with the
+# blade low and out to the Warden's left, which is also exactly where the first
+# swing winds up from — so the hold *is* the start of the attack.
+# A combat guard, not a carry.
+#
+# Owner note, in order: it was planted upright like a staff (wrong), then it hung
+# down at the floor like a farm tool (also wrong). Held for a fight, a scythe is
+# level across the body — butt back at the near hip, blade out ahead of the
+# leading shoulder at chest height, both hands on the haft.
+#
+# Note the axes: +b is the Warden's LEFT. The blade sits at about -56 degrees
+# from the aim, which is exactly where the first hit of the chain winds up from,
+# so the hold *is* the start of the swing rather than a pose it has to leave.
+CARRY_BUTT = (-6.0, -14.0, 44.0)
+# Reach is bounded by the 128px cell: on the diagonals the forward and
+# lateral offsets both project onto screen x, so the blade runs out of frame
+# fastest there. Verified by the cell-clipping check in the build.
+CARRY_TIP = (9.0, 14.0, 38.0)
+
+# Running, the guard tucks in so the blade is not thrown around.
+RUN_BUTT = (-10.0, -12.0, 46.0)
+RUN_TIP = (8.0, 13.0, 42.0)
+
+
+def _lerp3(a, b, t):
+    return (a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t)
 
 
 def idle_pose(t: float) -> Pose:
-    """Breathing only. Feet planted, no drift: an idle that wanders is the
-    single fastest way to make a character look cheap."""
+    """Breathing and a slow shift of weight. Feet planted, no drift."""
     breathe = math.sin(t * math.tau)
     settle = math.sin(t * math.tau * 2.0)
+    drift = breathe * 0.7
     return Pose(
         leg=[(1.4, 0.0), (-1.6, 0.0)],
-        arm=[
-            (0.4 + breathe * 0.25, -17.0 + breathe * 0.5, 0.6),
-            (0.2 + breathe * 0.25, -17.0 + breathe * 0.5, 0.5),
-        ],
+        arm=[(0.4, -17.0, 0.6), (0.2, -17.0, 0.5)],
         bob=breathe * 0.6 + settle * 0.15,
-        # A slow shift of weight from one foot to the other. Without it an idle
-        # reads as a paused frame rather than as someone waiting.
         sway=math.sin(t * math.tau) * 0.9,
         twist=math.sin(t * math.tau - 0.6) * 0.045,
         lean=0.5,
         coat_trail=1.2 + breathe * 0.7,
         scarf_trail=2.4 + breathe * 1.2,
         head_tilt=breathe * 0.35,
-        weapon="rest",
-        weapon_raise=breathe * 0.5,
+        weapon_butt=(CARRY_BUTT[0], CARRY_BUTT[1], CARRY_BUTT[2] + drift * 0.35),
+        weapon_tip=(CARRY_TIP[0] + drift * 0.6, CARRY_TIP[1] + drift * 0.4, CARRY_TIP[2] + drift * 0.8),
     )
 
 
@@ -488,58 +553,85 @@ def run_pose(t: float) -> Pose:
         coat_trail=5.0 + math.sin(t * math.tau * 2.0) * 1.4,
         scarf_trail=6.0 + math.sin(t * math.tau * 2.0 + 0.8) * 1.8,
         head_tilt=-0.5,
-        weapon="carry",
-        weapon_raise=math.sin(t * math.tau * 2.0) * 1.2,
+        weapon_butt=(RUN_BUTT[0], RUN_BUTT[1], RUN_BUTT[2] + contact * 0.8),
+        weapon_tip=(RUN_TIP[0] + contact * 0.8, RUN_TIP[1], RUN_TIP[2] + contact * 1.4),
+        grip=(0.20, 0.56),
     )
 
 
-def attack_pose(t: float) -> Pose:
-    """Wind up, plant, cut, recover. Six frames, so every one has to be a pose
-    the Player can read rather than an in-between.
+def attack_pose(step: int, t: float) -> Pose:
+    """One hit of the chain.
 
-    The hands travel along the same ground-plane arc the swing overlay does, so
-    the weapon always leaves the Warden's grip instead of orbiting near him.
+    All three place the hands on the overlay's haft using the runtime's own
+    swing angle, so the Warden is always holding the weapon that is being drawn
+    for him. All three then settle back onto the carry grip, so the chain
+    resolves into the hold rather than snapping to it.
+
+      1  winds up on the left and sweeps across to the right
+      2  answers from the right back to the left
+      3  turns the whole body through a full revolution
     """
-    coil = max(0.0, 1.0 - abs(t - 0.16) / 0.30)
-    drive = max(0.0, 1.0 - abs(t - 0.52) / 0.36)
-    recover = max(0.0, (t - 0.66) / 0.34)
+    angle = swing_angle(step, t)
+    drive = {1: 0.45, 2: 0.50, 3: 0.62}[step]
+    coil = max(0.0, 1.0 - t / 0.22)
+    through = min(1.0, max(0.0, (t - 0.06) / drive))
+    recover = min(1.0, max(0.0, (t - 0.70) / 0.30))
 
-    # -1.15 rad behind the shoulder to +1.15 rad past it.
-    swing = -1.15 + 2.30 * min(1.0, max(0.0, (t - 0.14) / 0.50))
-    reach = 13.0 + drive * 4.0
-    lead = (math.cos(swing) * reach, math.sin(swing) * reach, 54.0 - coil * 3.0 + drive * 1.5)
-    trail_hand = (math.cos(swing + 0.55) * reach * 0.62,
-                  math.sin(swing + 0.55) * reach * 0.62,
-                  50.0 - coil * 2.0)
+    reach = GRIP_REACH * (0.82 + 0.18 * through)
+    second = SECOND_HAND_REACH * (0.80 + 0.20 * through)
+    rise = GRIP_RISE * WORLD_TO_SPRITE
+    hands = [
+        (math.cos(angle) * reach * WORLD_TO_SPRITE, math.sin(angle) * reach * WORLD_TO_SPRITE - rise),
+        (math.cos(angle) * second * WORLD_TO_SPRITE, math.sin(angle) * second * WORLD_TO_SPRITE - rise),
+    ]
+
+    # The body turns with the cut. On the third hit it turns all the way round
+    # and arrives back where it started, so the frame after the swing is right.
+    if step == 3:
+        spin_t = min(1.0, max(0.0, (t - 0.12) / 0.66))
+        spin = math.tau * (spin_t * spin_t * (3.0 - 2.0 * spin_t))
+        twist = 0.10 * math.sin(angle)
+    else:
+        spin = 0.0
+        twist = 0.42 * math.sin(angle) * (1.0 - recover * 0.8)
 
     return Pose(
         leg=[
-            (5.0 + drive * 6.5 - coil * 3.5, 0.0),
-            (-5.5 - coil * 2.5 + drive * 1.5, 0.0),
+            (6.5 + through * 9.0 - coil * 4.0, 0.0),
+            (-7.0 - coil * 3.0 + through * 1.5, 0.0),
         ],
         arm=[(0.0, -6.0, 1.0), (0.0, -6.0, 1.0)],
-        hand_body=[trail_hand, lead],
-        bob=-1.2 * coil - 2.4 * drive + recover * 1.1,
-        # The whole body turns through the cut. This is most of the difference
-        # between a swing and an arm being waved.
-        sway=-2.2 * coil + 3.0 * drive,
-        twist=-0.34 * coil + 0.30 * min(1.0, max(0.0, (t - 0.18) / 0.42)) * 2.0,
-        lean=-2.0 * coil + 7.5 * drive + 2.0 * recover,
-        coat_trail=2.5 + coil * 3.0 + drive * 5.0,
-        scarf_trail=3.0 + coil * 3.5 + drive * 6.0,
-        head_tilt=-0.9 * coil + 1.4 * drive,
-        weapon="swing",
-        weapon_angle=swing,
+        hand_screen=hands,
+        settle=recover,
+        bob=-1.0 * coil - 2.8 * through + recover * 1.2,
+        sway=-2.0 * coil + 2.6 * through * math.cos(angle),
+        twist=twist,
+        lean=-2.8 * coil + 9.0 * through + 1.5 * recover,
+        coat_trail=2.2 + coil * 2.6 + through * (6.5 if step != 3 else 9.0),
+        scarf_trail=2.8 + coil * 3.0 + through * (5.5 if step != 3 else 8.5),
+        head_tilt=-0.8 * coil + 1.2 * through,
+        facing_spin=spin,
+        draw_weapon=False,
+        weapon_butt=CARRY_BUTT,
+        weapon_tip=CARRY_TIP,
     )
 
 
-# --------------------------------------------------------------------------
+# ---------------------------# --------------------------------------------------------------------------
 # Drawing
 # --------------------------------------------------------------------------
 
 
-def draw_frame(build: Build, facing: tuple[float, float], pose: Pose, *, carry_weapon: bool) -> Image.Image:
+def draw_frame(build: Build, facing: tuple[float, float], pose: Pose, *, carry_weapon: bool = True) -> Image.Image:
     canvas = Canvas()
+    # The third hit turns the Warden all the way round. Rotating the facing here
+    # means the spin goes through the same rig as everything else, so the body,
+    # the coat and the legs all turn together rather than the sprite being
+    # rotated as a picture.
+    if pose.facing_spin != 0.0:
+        ca, sa = math.cos(pose.facing_spin), math.sin(pose.facing_spin)
+        facing = (facing[0] * ca - facing[1] * sa, facing[0] * sa + facing[1] * ca)
+
     rig = Rig(build, facing)
     rig.bob = pose.bob
     rig.sway = pose.sway
@@ -547,6 +639,25 @@ def draw_frame(build: Build, facing: tuple[float, float], pose: Pose, *, carry_w
 
     coat_dk, coat_md, coat_lt, coat_hi = build.coat
     parts: list[tuple[float, object]] = []
+
+    show_weapon = carry_weapon and pose.draw_weapon and pose.weapon_butt is not None
+
+    # --- where the hands are ------------------------------------------------
+    hands: list[tuple[float, float]]
+    if pose.hand_screen is not None:
+        # Frame centre is the Warden's world position, which is also the
+        # origin the overlay weapon is drawn from.
+        hands = [(CENTER_X + dx, 64.0 + dy + pose.bob) for dx, dy in pose.hand_screen]
+        if pose.settle > 0.0 and pose.weapon_butt is not None:
+            # Ease the grip back onto the carried pose so the swing resolves
+            # into the hold instead of cutting to it.
+            rest = _grip_points(rig, pose)
+            k = pose.settle * pose.settle * (3.0 - 2.0 * pose.settle)
+            hands = [(h[0] + (r[0] - h[0]) * k, h[1] + (r[1] - h[1]) * k) for h, r in zip(hands, rest)]
+    elif pose.weapon_butt is not None:
+        hands = _grip_points(rig, pose)
+    else:
+        hands = []
 
     # ---- legs -----------------------------------------------------------
     for index, (along, lift) in enumerate(pose.leg):
@@ -559,18 +670,24 @@ def draw_frame(build: Build, facing: tuple[float, float], pose: Pose, *, carry_w
     parts.append((rig.depth(0.0, 0.0), _torso_drawer(canvas, rig, pose, coat_dk, coat_md, coat_lt, coat_hi)))
 
     # ---- weapon ---------------------------------------------------------
-    if carry_weapon:
-        hand_a, hand_lift, _ = pose.arm[1]
-        anchor_b = rig.shoulder_b * 1.32
-        parts.append((rig.depth(hand_a, anchor_b) - 0.35, _weapon_drawer(canvas, rig, pose, hand_a, hand_lift, anchor_b)))
+    if show_weapon:
+        parts.append((rig.depth(pose.weapon_tip[0] * 0.5, pose.weapon_tip[1] * 0.5) - 0.35,
+                      _weapon_drawer(canvas, rig, pose)))
 
     # ---- arms -----------------------------------------------------------
-    for index, (along, lift, out) in enumerate(pose.arm):
+    for index in range(2):
         side = -1.0 if index == 0 else 1.0
         b = side * rig.shoulder_b * 0.86
-        target = pose.hand_body[index] if pose.hand_body else None
-        depth = rig.depth(target[0], target[1]) if target else rig.depth(along * 0.6, b * (1.0 + out * 0.05))
-        parts.append((depth, _arm_drawer(canvas, rig, along, lift, out, b, target)))
+        target = hands[index] if index < len(hands) else None
+        if target is None:
+            along, lift, out = pose.arm[index]
+            depth = rig.depth(along * 0.6, b * (1.0 + out * 0.05))
+            parts.append((depth, _arm_drawer(canvas, rig, along, lift, out, b, None)))
+        else:
+            # Screen-space hands cannot report a ground depth, so the arm holding
+            # the weapon is ordered by the weapon it is holding.
+            depth = rig.depth(pose.weapon_tip[0] * 0.4, pose.weapon_tip[1] * 0.4) if pose.weapon_tip else 0.5
+            parts.append((depth + index * 0.05, _arm_drawer(canvas, rig, 0.0, 0.0, 0.0, b, target)))
 
     # ---- head -----------------------------------------------------------
     parts.append((rig.depth(pose.lean * 0.35 + 1.0, 0.0) + 0.4, _head_drawer(canvas, rig, pose)))
@@ -586,6 +703,12 @@ def draw_frame(build: Build, facing: tuple[float, float], pose: Pose, *, carry_w
     _soul_ember(canvas, rig, pose)
     _hem_flame(canvas, rig, pose, coat_dk)
     return canvas.to_image()
+
+
+def _grip_points(rig: Rig, pose: Pose) -> list[tuple[float, float]]:
+    """Screen positions of the two hands on the haft."""
+    butt, tip = pose.weapon_butt, pose.weapon_tip
+    return [rig.project(*_lerp3(butt, tip, g)) for g in pose.grip]
 
 
 def _leg_drawer(canvas: Canvas, rig: Rig, along: float, lift: float, b: float):
@@ -615,20 +738,24 @@ def _arm_drawer(
     lift: float,
     out: float,
     b: float,
-    target: tuple[float, float, float] | None = None,
+    target: tuple[float, float] | None = None,
 ):
     """Sleeves are a value darker than the coat body, so the arms stay separate
-    masses instead of dissolving into the torso."""
+    masses instead of dissolving into the torso.
+
+    `target` is a screen position, because the hand's job is to be on the haft
+    and the haft is not always in the sheet's projection."""
 
     def draw() -> None:
         shoulder = rig.project(0.0, b, rig.shoulder_h - 1.5)
         if target is not None:
-            hand = rig.project(*target)
-            elbow = rig.project(
-                (target[0] + 0.0) * 0.5,
-                (target[1] + b) * 0.5,
-                (target[2] + rig.shoulder_h - 1.5) * 0.5 - 1.5,
-            )
+            hand = target
+            # Elbow pushed outboard off the shoulder-to-hand line, so the arm
+            # bends instead of being a straight rod.
+            mx, my = (shoulder[0] + hand[0]) * 0.5, (shoulder[1] + hand[1]) * 0.5
+            dx, dy = hand[0] - shoulder[0], hand[1] - shoulder[1]
+            length = math.hypot(dx, dy) or 1.0
+            elbow = (mx - dy / length * rig.s(2.6), my + dx / length * rig.s(2.6) + rig.s(1.2))
         else:
             hand = rig.project(along, b * (1.0 + out * 0.14), rig.shoulder_h + lift)
             elbow = rig.project(along * 0.42, b * (1.0 + out * 0.22), rig.shoulder_h + lift * 0.52)
@@ -784,52 +911,49 @@ def _head_drawer(canvas: Canvas, rig: Rig, pose: Pose):
     return draw
 
 
-def _weapon_drawer(canvas: Canvas, rig: Rig, pose: Pose, hand_a: float, hand_lift: float, b: float):
-    """The scythe, placed in body space so it rotates with the character instead
-    of being pasted on per direction.
+def _weapon_drawer(canvas: Canvas, rig: Rig, pose: Pose):
+    """The scythe, drawn between the two body-space points the pose specifies.
 
-    Owner note: the first pass read as a farm tool. The shape language is now
-    deliberately imposing — a deep recurved blade with a back-spur, an iron
-    collar carrying a bound Soul, and a counterweight spike at the butt — while
-    the *detail* level stays exactly where the body is. Imposing comes from
-    silhouette, not from ornament.
+    Owner note: it used to be planted upright like a staff, which is not how a
+    scythe is carried and gave the swing nothing to grow out of. It now hangs
+    across the body with the blade low and out to the Warden's left — which is
+    also where the first hit winds up from, so the hold and the attack are the
+    same pose at two moments.
     """
 
     def draw() -> None:
-        raise_h = pose.weapon_raise
-        if pose.weapon == "carry":
-            butt_a, butt_h, tip_a, tip_h = 8.0, 6.0 + raise_h, -8.0, 62.0 + raise_h
-        else:
-            butt_a, butt_h, tip_a, tip_h = 2.5, -2.0, -3.0, 56.0 + raise_h
+        butt, tip = pose.weapon_butt, pose.weapon_tip
+        p_butt = rig.project(*butt)
+        p_tip = rig.project(*tip)
+        # A shallow bow in the haft. A straight stick reads as a broom handle.
+        bowed = _lerp3(butt, tip, 0.5)
+        bowed = (bowed[0] + 2.0, bowed[1] - 1.2, bowed[2])
+        p_mid = rig.project(*bowed)
 
-        butt = rig.project(butt_a, b, butt_h)
-        tip = rig.project(tip_a, b, tip_h)
-        # A shallow S in the haft. A straight stick reads as a broom handle.
-        bow_a = (butt_a + tip_a) * 0.5 + 2.2
-        mid = rig.project(bow_a, b, (butt_h + tip_h) * 0.5)
-        haft = canvas.capsule(butt, mid, rig.s(2.1)) | canvas.capsule(mid, tip, rig.s(2.0))
+        haft = canvas.capsule(p_butt, p_mid, rig.s(2.1)) | canvas.capsule(p_mid, p_tip, rig.s(2.0))
         canvas.paint_shaded(haft, "wood_dk", "wood_md", "leather_lt")
 
-        # Counterweight spike at the butt: the asymmetry that makes it a weapon.
-        spur = rig.project(butt_a + 1.0, b, butt_h - 7.0)
-        canvas.paint_shaded(canvas.capsule(butt, spur, rig.s(1.6)), "iron_dk", "iron_md", "iron_hi")
-        ferrule = rig.project(butt_a, b, butt_h + 4.0)
-        canvas.paint_shaded(canvas.capsule(butt, ferrule, rig.s(2.6)), "iron_dk", "iron_md", "iron_hi")
+        # Counterweight spike past the butt: the asymmetry that makes it a weapon.
+        spur = rig.project(*_lerp3(butt, tip, -0.13))
+        canvas.paint_shaded(canvas.capsule(p_butt, spur, rig.s(1.6)), "iron_dk", "iron_md", "iron_hi")
+        canvas.paint_shaded(
+            canvas.capsule(p_butt, rig.project(*_lerp3(butt, tip, 0.06)), rig.s(2.6)),
+            "iron_dk", "iron_md", "iron_hi")
 
-        # Two chunky grip bands where the hands sit.
-        for t in (0.42, 0.58):
-            a = butt_a + (tip_a - butt_a) * t
-            h = butt_h + (tip_h - butt_h) * t
-            p0 = rig.project(a, b, h - 3.0)
-            p1 = rig.project(a, b, h + 3.0)
-            canvas.paint_shaded(canvas.capsule(p0, p1, rig.s(2.5)), "leather_dk", "leather_md", "leather_lt")
+        # Grip bands exactly where the hands are.
+        for g in pose.grip:
+            centre = _lerp3(butt, tip, g)
+            canvas.paint_shaded(
+                canvas.capsule(rig.project(*_lerp3(butt, tip, g - 0.05)),
+                               rig.project(*_lerp3(butt, tip, g + 0.05)), rig.s(2.5)),
+                "leather_dk", "leather_md", "leather_lt")
 
-        _blade(canvas, rig, tip_a, b, tip_h)
+        _blade(canvas, rig, tip)
 
     return draw
 
 
-# Blade control points in body space, relative to the socket: (forward, up, radius).
+# Blade control points# Blade control points in body space, relative to the socket: (forward, up, radius).
 # A long reach, a deep belly and a hooked point — read as a threat at a glance,
 # and still only three values of iron.
 _BLADE_ARC = [
@@ -852,8 +976,9 @@ _BLADE_SPUR = [(0.0, 0.0, 2.4), (-6.5, 4.8, 1.6), (-10.0, 10.0, 0.9)]
 BLADE_YAW = 0.78
 
 
-def _blade(canvas: Canvas, rig: Rig, tip_a: float, b: float, tip_h: float) -> None:
+def _blade(canvas: Canvas, rig: Rig, socket: tuple[float, float, float]) -> None:
     """One deep recurved reaping blade, a back-spur and an iron collar."""
+    tip_a, b, tip_h = socket
     yaw_a = math.cos(BLADE_YAW)
     yaw_b = math.sin(BLADE_YAW)
 
@@ -875,12 +1000,12 @@ def _blade(canvas: Canvas, rig: Rig, tip_a: float, b: float, tip_h: float) -> No
     canvas.paint(sweep(_BLADE_ARC, 0.42) & body, PALETTE["iron_hi"])
     canvas.paint_shaded(sweep(_BLADE_SPUR), "iron_dk", "iron_md", "iron_hi")
 
-    socket = rig.project(tip_a, b, tip_h)
-    collar = canvas.ellipse(socket[0], socket[1], rig.s(3.2), rig.s(3.2))
+    joint = rig.project(tip_a, b, tip_h)
+    collar = canvas.ellipse(joint[0], joint[1], rig.s(3.2), rig.s(3.2))
     canvas.paint_shaded(collar, "iron_dk", "iron_md", "iron_hi")
     # One bound Soul in the collar. The weapon's entire supernatural budget.
-    canvas.paint(canvas.ellipse(socket[0], socket[1], rig.s(1.3), rig.s(1.3)), "flame")
-    canvas.paint(canvas.ellipse(socket[0], socket[1], rig.s(0.7), rig.s(0.7)), "flame_hi")
+    canvas.paint(canvas.ellipse(joint[0], joint[1], rig.s(1.3), rig.s(1.3)), "flame")
+    canvas.paint(canvas.ellipse(joint[0], joint[1], rig.s(0.7), rig.s(0.7)), "flame_hi")
 
 
 def _soul_ember(canvas: Canvas, rig: Rig, pose: Pose) -> None:
@@ -914,18 +1039,29 @@ def _hem_flame(canvas: Canvas, rig: Rig, pose: Pose, dk: str) -> None:
 # --------------------------------------------------------------------------
 
 
-def build_sheet(build: Build, facing: tuple[float, float], action: str) -> Image.Image:
+ACTIONS = ["idle", "move", "attack1", "attack2", "attack3"]
+
+
+def poser_for(action: str):
     if action == "idle":
-        count, poser, carry = IDLE_FRAMES, idle_pose, True
-    elif action == "move":
-        count, poser, carry = MOVE_FRAMES, run_pose, True
-    else:
-        count, poser, carry = ATTACK_FRAMES, attack_pose, False
+        return IDLE_FRAMES, idle_pose
+    if action == "move":
+        return MOVE_FRAMES, run_pose
+    step = int(action[-1])
+    return ATTACK_FRAMES, lambda t: attack_pose(step, t)
+
+
+def build_sheet(build: Build, facing: tuple[float, float], action: str) -> Image.Image:
+    count, poser = poser_for(action)
+    carry = True
 
     rows = (count + SHEET_COLUMNS - 1) // SHEET_COLUMNS
     sheet = Image.new("RGBA", (SHEET_COLUMNS * FRAME, rows * FRAME), (0, 0, 0, 0))
     for index in range(count):
-        pose = poser(index / count)
+        # Attacks are sampled across the whole clip including the final frame,
+        # because the last frame is the one that has to hand over to the hold.
+        denominator = count if action in ("idle", "move") else max(count - 1, 1)
+        pose = poser(index / denominator)
         frame = draw_frame(build, facing, pose, carry_weapon=carry)
         sheet.paste(frame, ((index % SHEET_COLUMNS) * FRAME, (index // SHEET_COLUMNS) * FRAME))
     return sheet
@@ -959,7 +1095,7 @@ def build_swing_weapon() -> Image.Image:
         canvas.paint_shaded(
             canvas.capsule(rig.project(0.0, 0.0, h - 4.0), rig.project(0.0, 0.0, h + 4.0), rig.s(3.0)),
             "leather_dk", "leather_md", "leather_lt")
-    _blade(canvas, rig, 0.0, 0.0, 108.0)
+    _blade(canvas, rig, (0.0, 0.0, 108.0))
     return canvas.to_image()
 
 
@@ -1026,7 +1162,7 @@ def main() -> int:
     selected = [catalogue[name] for name in args.builds.split(",") if name in catalogue]
 
     for build in selected:
-        for action in ("idle", "move", "attack"):
+        for action in ACTIONS:
             folder = args.out / build.name / action
             folder.mkdir(parents=True, exist_ok=True)
             for direction, facing in DIRECTIONS.items():
@@ -1049,16 +1185,15 @@ def main() -> int:
 def _contact_sheet(build: Build, path: Path) -> None:
     """One board with every direction of every action, for inspection."""
     order = ["n", "ne", "e", "se", "s", "sw", "w", "nw"]
-    actions = [("idle", IDLE_FRAMES, idle_pose, True), ("move", MOVE_FRAMES, run_pose, True),
-               ("attack", ATTACK_FRAMES, attack_pose, False)]
-    cols = max(count for _, count, _, _ in actions)
+    actions = [(name, *poser_for(name)) for name in ACTIONS]
+    cols = max(count for _, count, _ in actions)
     rows = sum(len(order) for _ in actions)
     board = Image.new("RGBA", (cols * FRAME, rows * FRAME), (26, 24, 32, 255))
     row = 0
-    for _, count, poser, carry in actions:
+    for _, count, poser in actions:
         for direction in order:
             for index in range(count):
-                frame = draw_frame(build, DIRECTIONS[direction], poser(index / count), carry_weapon=carry)
+                frame = draw_frame(build, DIRECTIONS[direction], poser(index / max(count - 1, 1)))
                 board.alpha_composite(frame, (index * FRAME, row * FRAME))
             row += 1
     path.parent.mkdir(parents=True, exist_ok=True)

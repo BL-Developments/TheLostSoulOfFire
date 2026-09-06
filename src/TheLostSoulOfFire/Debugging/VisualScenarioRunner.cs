@@ -57,7 +57,11 @@ public sealed class VisualScenarioRunner
             ["strafe-read"] = 272,
 
             // Session 4 — the effect the owner reported as "a square at the end".
-            ["burning-detonation"] = 214
+            ["burning-detonation"] = 214,
+
+            // Session 5 — the chain, and the dash cutting out of it.
+            ["combo-chain"] = 276,
+            ["dash-cancel"] = 262
         };
 
     /// <summary>
@@ -70,7 +74,9 @@ public sealed class VisualScenarioRunner
             ["facing-sweep"] = [220, 230, 240, 250, 260, 270, 280, 290],
             ["run-cycle"] = [228, 234, 240, 246, 252, 258],
             ["strafe-read"] = [248, 256, 264, 272],
-            ["burning-detonation"] = [0, 4, 9, 15, 22, 32]
+            ["burning-detonation"] = [0, 4, 9, 15, 22, 32],
+            ["combo-chain"] = [208, 214, 220, 228, 236, 244, 252, 260, 268, 276],
+            ["dash-cancel"] = [240, 244, 247, 250, 253, 257, 262]
         };
 
     private readonly string _scenario;
@@ -265,6 +271,33 @@ public sealed class VisualScenarioRunner
             case "run-cycle":
                 if (_tick == 100) world.ArrangeVisualSubject(_scenario);
                 if (_tick >= 204) input.InjectHeldKey(Keys.D);
+                break;
+
+            // The three-hit chain, alone on a cleared floor: right sweep, left
+            // sweep, spin, and back to the carried hold.
+            case "combo-chain":
+                if (_tick == 100) world.ArrangeVisualSubject(_scenario);
+                if (_tick is 210 or 222 or 240)
+                {
+                    input.InjectLeftMouseDown();
+                }
+                break;
+
+            // The dash cutting out of the middle of the third hit.
+            case "dash-cancel":
+                if (_tick == 100) world.ArrangeVisualSubject(_scenario);
+                if (_tick is 210 or 222 or 240)
+                {
+                    input.InjectLeftMouseDown();
+                }
+                if (_tick is >= 246 and <= 252)
+                {
+                    input.InjectHeldKey(Keys.D);
+                }
+                if (_tick == 248)
+                {
+                    input.InjectKeyPress(Keys.Space);
+                }
                 break;
 
             case "strafe-read":
