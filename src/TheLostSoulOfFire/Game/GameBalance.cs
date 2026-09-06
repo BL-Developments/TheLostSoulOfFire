@@ -109,6 +109,48 @@ public static class GameBalance
     public const float SeveranceBurningStagger = 1.1f;
     public const float SeveranceHitstop = 0.135f;
 
+    // --- Local co-op ------------------------------------------------------
+    // Two brothers on one screen. Everything here exists to keep the encounter
+    // readable and fair for one or two Wardens; none of it assumes more.
+    public const int MaxLocalPlayers = 2;
+
+    /// <summary>Camera cannot pull further out than this, whatever the separation.</summary>
+    public const float CoopMinCameraZoom = 0.92f;
+
+    /// <summary>Screen fraction the pair must stay inside before the camera reacts.</summary>
+    public const float CoopFramePadding = 300f;
+
+    /// <summary>Beyond this the shared Death Flame between the brothers strains.</summary>
+    public const float CoopTetherRange = 760f;
+
+    /// <summary>Hard limit: past this the trailing Warden is drawn back, never teleported.</summary>
+    public const float CoopTetherLimit = 980f;
+    public const float CoopTetherPull = 260f;
+
+    /// <summary>How long a guttering Warden has before his flame goes out.</summary>
+    public const float WardenDownDuration = 15f;
+    public const float StabilizeRange = 118f;
+    public const float StabilizeDuration = 2.1f;
+
+    /// <summary>Each stabilisation in an encounter costs more time than the last.</summary>
+    public const float StabilizeEscalation = 0.6f;
+    public const float StabilizeMoveMultiplier = 0.42f;
+    public const int StabilizeRestoredHealth = 45;
+    public const float StabilizeGrace = 1.2f;
+
+    /// <summary>Relighting a brother spends the team's gathered Resonance.</summary>
+    public const float StabilizeResonanceCost = 55f;
+
+    /// <summary>Enemies hold a target for at least this long before reconsidering.</summary>
+    public const float TargetCommitTime = 1.15f;
+
+    /// <summary>A new target must be this much closer before a switch is allowed.</summary>
+    public const float TargetSwitchAdvantage = 0.68f;
+
+    /// <summary>Wardens push each other apart at close range so melee never body-blocks.</summary>
+    public const float WardenSeparationRadius = 34f;
+    public const float WardenSeparationStrength = 190f;
+
     public const float SoulExposedDuration = 0.5f;
     public const float SoulReleaseDuration = 1.25f;
     public const float SoulResidueTravelTime = 0.85f;

@@ -118,28 +118,33 @@ public static class ThreatPresentation
     {
         if (devourer.State == DevourerState.SlamTelegraph)
         {
-            // Pressure gathers under it and the reach closes inward. The ring is
-            // a band of light with wobble, not a drawn circle.
+            // Pressure gathers under it and the reach closes inward.
+            //
+            // Session 1 painted this as an even ring at 0.27 alpha; every dab
+            // overlapped, additive blending clipped it to pure violet, and the
+            // frame was dominated by what looked like a UI marker. The area now
+            // carries the warning and the edge only confirms the reach, so the
+            // creature stays the thing you are looking at.
             float progress = devourer.TelegraphProgress;
             float radius = MathHelper.Lerp(GameBalance.DevourerSlamRange * 1.16f, GameBalance.DevourerSlamRange * 0.94f, progress);
             float pulse = 0.86f + 0.14f * MathF.Sin(time * 13f);
 
-            SoftShapes.Pool(batch, brush, devourer.Position, GameBalance.DevourerSlamRange * 0.95f,
-                GameBalance.DevourerSlamRange * 0.44f, GameBalance.DeepViolet * (0.1f + progress * 0.2f));
-            SoftShapes.Ring(batch, brush, devourer.Position, radius, (13f + progress * 9f) * pulse,
-                GameBalance.DeathFlame * (0.07f + progress * 0.2f), 0, time * 0.6f);
-            SoftShapes.Ring(batch, brush, devourer.Position, radius * 0.97f, (5f + progress * 4f) * pulse,
-                GameBalance.DeathFlameBright * (0.05f + progress * 0.15f), 0, -time * 0.4f);
+            SoftShapes.Pool(batch, brush, devourer.Position, GameBalance.DevourerSlamRange * 0.92f,
+                GameBalance.DevourerSlamRange * 0.42f, GameBalance.DeepViolet * (0.07f + progress * 0.15f));
+            SoftShapes.PressureBand(batch, brush, devourer.Position, radius, (11f + progress * 7f) * pulse,
+                GameBalance.DeathFlame * (0.022f + progress * 0.062f), time * 0.9f);
+            SoftShapes.PressureBand(batch, brush, devourer.Position, radius * 0.94f, (4.5f + progress * 3f) * pulse,
+                GameBalance.DeathFlameBright * (0.016f + progress * 0.04f), -time * 0.6f, 0.07f);
             return;
         }
 
         if (devourer.State == DevourerState.Slam)
         {
             float strike = 1f - devourer.StrikeProgress;
-            SoftShapes.Ring(batch, brush, devourer.Position, GameBalance.DevourerSlamRange, 22f * strike,
-                GameBalance.SoulWhite * (0.3f * strike), 0, time);
+            SoftShapes.PressureBand(batch, brush, devourer.Position, GameBalance.DevourerSlamRange, 20f * strike,
+                GameBalance.SoulWhite * (0.075f * strike), time, 0.14f);
             SoftShapes.Pool(batch, brush, devourer.Position, GameBalance.DevourerSlamRange * 1.05f,
-                GameBalance.DevourerSlamRange * 0.5f, Color.White * (0.16f * strike));
+                GameBalance.DevourerSlamRange * 0.5f, Color.White * (0.13f * strike));
         }
     }
 

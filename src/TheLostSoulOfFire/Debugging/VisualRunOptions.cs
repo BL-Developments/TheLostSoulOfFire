@@ -22,6 +22,9 @@ public sealed class VisualRunOptions
     public bool ForceSoulSense { get; private set; }
     public bool ForceResonance { get; private set; }
 
+    /// <summary>Local Wardens to start with. 1 keeps the solo Golden Slice path.</summary>
+    public int LocalPlayers { get; private set; } = 1;
+
     public bool HasCaptureRequest => CaptureAfterTicks >= 0 || !string.IsNullOrEmpty(VisualScenario);
 
     public static bool TryParse(string[] args, out VisualRunOptions options, out string error)
@@ -43,6 +46,16 @@ public sealed class VisualRunOptions
                         return false;
                     }
                     options.CaptureTicks = entries.Select(int.Parse).Distinct().OrderBy(tick => tick).ToArray();
+                    break;
+
+                case "--players":
+                    if (!TryTakePositiveInt(args, ref index, argument, out int players, out error)) return false;
+                    if (players is < 1 or > 2)
+                    {
+                        error = "--players requires 1 or 2.";
+                        return false;
+                    }
+                    options.LocalPlayers = players;
                     break;
 
                 case "--soul-sense":

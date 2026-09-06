@@ -80,7 +80,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         _pixel = new Texture2D(GraphicsDevice, 1, 1);
         _pixel.SetData([Color.White]);
         _art = new ArtAssets(Content);
-        _world = new GameWorld(GraphicsDevice.Viewport, _art, Content, _presentationSettings);
+        _world = new GameWorld(GraphicsDevice.Viewport, _art, Content, _presentationSettings, _visualOptions.LocalPlayers);
         _soulfireRenderer = new SoulfireRenderer(GraphicsDevice, _presentationSettings);
     }
 

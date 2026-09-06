@@ -58,7 +58,7 @@ public sealed class Hollow : Enemy
 
     public override void Update(
         float deltaTime,
-        Player player,
+        WardenField wardens,
         IReadOnlyList<Soul> souls,
         Rectangle movementBounds,
         ParticleSystem particles,
@@ -77,11 +77,12 @@ public sealed class Hollow : Enemy
             return;
         }
 
-        Vector2 toPlayer = player.Position - Position;
-        float distance = toPlayer.Length();
+        Player target = wardens.Target;
+        Vector2 toTarget = target.Position - Position;
+        float distance = toTarget.Length();
         if (distance > 0.001f)
         {
-            _facing = toPlayer / distance;
+            _facing = toTarget / distance;
         }
 
         _stateTimer = MathF.Max(0f, _stateTimer - deltaTime);
@@ -105,7 +106,7 @@ public sealed class Hollow : Enemy
                 }
                 break;
             case HollowState.Swipe:
-                ResolveSwipe(player, screenEffects);
+                ResolveSwipe(wardens, screenEffects);
                 if (_stateTimer <= 0f)
                 {
                     State = HollowState.Recovery;
@@ -276,7 +277,12 @@ public sealed class Hollow : Enemy
         Position += _facing * GameBalance.HollowMoveSpeed * speedMultiplier * deltaTime;
     }
 
-    private void ResolveSwipe(Player player, ScreenEffects screenEffects)
+    /// <summary>
+    /// The swipe reaches whoever is inside it. The Hollow commits to one brother,
+    /// but a second Warden standing in the same arc is not spared by the fiction
+    /// that the attack was "aimed" elsewhere.
+    /// </summary>
+    private void ResolveSwipe(WardenField wardens, ScreenEffects screenEffects)
     {
         if (!_swipeDamagePending)
         {
@@ -284,14 +290,13 @@ public sealed class Hollow : Enemy
         }
 
         _swipeDamagePending = false;
-        Vector2 toPlayer = player.Position - Position;
-        if (toPlayer.LengthSquared() > MathF.Pow(GameBalance.HollowSwipeRange + player.Radius, 2f))
-        {
-            return;
-        }
-
-        Vector2 direction = toPlayer.LengthSquared() > 0.001f ? Vector2.Normalize(toPlayer) : _facing;
-        player.ApplyDamage(GameBalance.HollowSwipeDamage, direction * GameBalance.HollowSwipeKnockback, screenEffects);
+        wardens.StrikeCircle(
+            Position,
+            GameBalance.HollowSwipeRange,
+            GameBalance.HollowSwipeDamage,
+            GameBalance.HollowSwipeKnockback,
+            screenEffects,
+            _facing);
     }
 
     private void UpdateDying(float deltaTime, ParticleSystem particles)

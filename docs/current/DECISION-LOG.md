@@ -2,6 +2,56 @@
 
 Record owner-approved, rejected or revised product decisions here. Newer dated entries override older conflicting entries.
 
+## 2026-09-06 — Owner revision: generated audio must not ship raw
+
+### Revised
+
+- **Raw ElevenLabs output is rejected.** Reviewed during Session 2 and described
+  as sounding "raw and not professional" next to the existing bank.
+- Generated audio is **source material only**. Every shipped cue must be produced
+  locally: an already-approved sample carries the body, generated material sits
+  underneath as texture, and the result must measure inside the existing bank's
+  duration, level, brightness and noise-floor band.
+
+### Implemented in response
+
+`tools/audio/generate_soulfire_sfx.py` now requests seconds of headroom and
+lossless PCM with short foley-brief prompts. `tools/audio/build_session2_sfx.py`
+performs onset trimming, downward expansion, brightness matching, transient
+shaping, explicit decay, layering and category peak normalisation. Six cues were
+produced this way; ten existing cues were reviewed and deliberately left alone.
+
+### Still open
+
+The new cues have **not been auditioned by ear** — the agent cannot listen.
+`artifacts/session2/audio-audition/` holds the shipped `hybrid` build and a
+`bank-only` build for A/B. Owner approval required.
+
+## 2026-09-06 — Session 2 direction (implemented, not yet approved)
+
+### Proposed and implemented
+
+- **Soulfire actor light grammar.** Living Death Flame light — violet-white —
+  belongs to Wardens and Souls. Manifestations are separated by cold ash light
+  only; their violet appears at the Anchor and the fractures. Introduced because
+  measurement showed the Warden sheet and the casting floor sat at the same
+  luminance, leaving the protagonist with no figure/ground separation at all.
+- **Local co-op is a team, not two soloists.** Resonance is one shared pool;
+  earning it credits the team, either brother may spend it, and spending it
+  lights both. Residue feeds the same pool, so there is no pickup to race for.
+- **The brothers share one Death Flame tether.** Separation is expressed as
+  strain on that tether and a gradual draw-back, never a teleport, never
+  split-screen.
+- **Going down is not dying.** A Warden whose flame gutters while a brother
+  stands cannot act, cannot be hit, and cannot be finished off. Both down ends
+  the encounter. Solo death is unchanged.
+- **Brother identity is temperature, tint and mass** over the same Warden sheet
+  and the same kit — no second class.
+
+### Still open
+
+Owner has not judged the refined Golden Slice, the co-op proof, or the audio.
+
 ## 2026-09-06 — Owner revision: no hard lines in combat
 
 ### Revised

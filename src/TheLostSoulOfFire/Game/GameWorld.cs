@@ -38,7 +38,9 @@ public sealed class GameWorld : IDisposable
     private readonly ArtAssets _art;
     private readonly SpriteVfxSystem _spriteVfx;
     private readonly CombatPresentation _combatPresentation;
-    private readonly Player _player;
+    private readonly WardenRoster _roster;
+    private readonly TargetDirector _targeting = new();
+    private readonly TeamResonance _team = new();
     private readonly List<Enemy> _enemies = [];
     private readonly List<Soul> _souls = [];
     private readonly List<CannonShot> _cannonShots = [];
@@ -57,11 +59,28 @@ public sealed class GameWorld : IDisposable
     private int _fps = 60;
     private bool _audioTestFatalDamageRequested;
     private bool _endingRevealPlayed;
+    private bool _teamWiped;
+    private readonly bool _autoJoinSecond;
+    private readonly int[] _healthLastFrame = new int[GameBalance.MaxLocalPlayers];
+
+    /// <summary>
+    /// The protagonist. Solo paths, the HUD's primary read and every existing
+    /// single-player check still speak through him; co-op only adds a second slot
+    /// beside him rather than replacing this.
+    /// </summary>
+    private Player _player => _roster.Lead;
 
     public string ScreenshotContext => GetScreenshotContext();
+    public bool IsCooperative => _roster.IsCooperative;
+    public int LocalPlayerCount => _roster.Count;
     public ArenaLoopState LoopState => _loopState;
     public int WaveNumber => _waveNumber;
-    public bool PlayerDead => _player.IsDead;
+    /// <summary>
+    /// True when no Warden can continue. Solo: the protagonist died. Co-op: both
+    /// brothers are down or out. Everything that used to branch on the single
+    /// player's death now branches on this, so retry behaves identically.
+    /// </summary>
+    public bool PlayerDead => _roster.AllDown();
     public float PresentationStateTime => _presentation.StateTime;
 
     // Used only by VisualScenarioRunner. Arrange actual entities; their normal
@@ -101,7 +120,7 @@ public sealed class GameWorld : IDisposable
     {
         get
         {
-            if (_player.IsDead || _loopState != ArenaLoopState.Combat)
+            if (PlayerDead || _loopState != ArenaLoopState.Combat)
             {
                 return false;
             }
@@ -119,8 +138,32 @@ public sealed class GameWorld : IDisposable
                     continue;
                 }
 
-                float threat = enemy.CommitmentThreatRange + _player.Radius + GameBalance.SeveranceThreatPadding;
-                if (Vector2.DistanceSquared(enemy.Position, _player.Position) <= threat * threat)
+                foreach (PlayerSlot slot in _roster.Slots)
+                {
+                    if (!slot.Warden.CanBeTargeted)
+                    {
+                        continue;
+                    }
+
+                    float threat = enemy.CommitmentThreatRange + slot.Warden.Radius + GameBalance.SeveranceThreatPadding;
+                    if (Vector2.DistanceSquared(enemy.Position, slot.Warden.Position) <= threat * threat)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+    }
+
+    internal bool SeveranceWindowOpen
+    {
+        get
+        {
+            foreach (PlayerSlot slot in _roster.Slots)
+            {
+                if (slot.Warden.SeveranceReady)
                 {
                     return true;
                 }
@@ -129,8 +172,6 @@ public sealed class GameWorld : IDisposable
             return false;
         }
     }
-
-    internal bool SeveranceWindowOpen => _player.SeveranceReady;
 
     public object VisualSnapshot => new
     {
@@ -151,7 +192,12 @@ public sealed class GameWorld : IDisposable
         ? $"The Lost Soul of Fire — DEBUG | Wave {_waveNumber}/4 {_loopState.ToString().ToUpperInvariant()} | HP {_player.Health} | RES {(_player.ResonanceActive ? $"ACTIVE {_player.ResonanceRemaining:0.0}s" : $"{_player.Resonance:0}/{GameBalance.ResonanceRequired:0}")} | Player {GetPlayerState()} | Enemies {_enemies.Count(enemy => enemy.IsAlive)} | Souls {_souls.Count}"
         : "The Lost Soul of Fire";
 
-    public GameWorld(Viewport viewport, ArtAssets art, ContentManager content, PresentationSettings presentationSettings)
+    public GameWorld(
+        Viewport viewport,
+        ArtAssets art,
+        ContentManager content,
+        PresentationSettings presentationSettings,
+        int localPlayers = 1)
     {
         _art = art;
         _presentationSettings = presentationSettings;
@@ -161,9 +207,197 @@ public sealed class GameWorld : IDisposable
         _spriteVfx = new SpriteVfxSystem(art, presentationSettings);
         _combatPresentation = new CombatPresentation(_particles, _screenEffects, _spriteVfx);
         _camera = new Camera2D(_arena.CombatBounds.Center.ToVector2());
-        _player = new Player(_arena.CombatBounds.Center.ToVector2());
+        _roster = new WardenRoster(_arena.CombatBounds.Center.ToVector2());
+        _autoJoinSecond = localPlayers >= GameBalance.MaxLocalPlayers;
         _lastMouseWorld = _player.Position + Vector2.UnitX * 200f;
+        Array.Fill(_healthLastFrame, GameBalance.PlayerMaxHealth);
         _camera.Follow(_arena.CombatBounds.Center.ToVector2(), _arena.Bounds, viewport);
+    }
+
+    /// <summary>
+    /// Brings the brother into the encounter. Called from the join input, from
+    /// the two-player launch flag and from deterministic co-op scenarios.
+    /// </summary>
+    public bool TryJoinSecondWarden(IPlayerInputSource source)
+    {
+        Vector2 spawn = _player.Position + new Vector2(-118f, 26f);
+        if (!_roster.TryJoinSecond(spawn, source))
+        {
+            return false;
+        }
+
+        _combatPresentation.PresentArrivalFlame(spawn);
+        _spriteVfx.Spawn("dash_ignition", spawn, 0f, 0.8f, WardenIdentity.Elder.FlameBright * 0.6f);
+        _particles.EmitDeathFlame(spawn, 16, 1.2f);
+        _audio.Play(AudioCue.WardenStabilize, 0.6f);
+        return true;
+    }
+
+    internal PlayerSlot GetSlot(int index) => _roster.Slots[index];
+
+    /// <summary>
+    /// Joins the brother under scenario control. Used only by deterministic
+    /// captures; real play goes through <see cref="UpdateSecondWardenJoin"/>.
+    /// </summary>
+    internal ScriptedInput JoinScriptedSecondWarden()
+    {
+        ScriptedInput scripted = new();
+        return TryJoinSecondWarden(scripted) ? scripted : null;
+    }
+
+    /// <summary>Capture seam: force a Warden into the guttering state.</summary>
+    internal void ForceWardenDown(int index)
+    {
+        if (index < 0 || index >= _roster.Count)
+        {
+            return;
+        }
+
+        Player warden = _roster.Slots[index].Warden;
+        warden.ApplyDamage(GameBalance.PlayerMaxHealth, Vector2.Zero, _screenEffects);
+        if (_roster.IsCooperative && AnyOtherStanding(index))
+        {
+            warden.Down();
+            _healthLastFrame[index] = warden.Health;
+            _combatPresentation.PresentWardenDown(warden.Position, warden.Identity.Flame);
+        }
+    }
+
+    internal Vector2 SecondWardenPosition => _roster.Count > 1 ? _roster.Slots[1].Warden.Position : _player.Position;
+
+    /// <summary>
+    /// Arranges a deterministic co-op fixture. Real entities and real positions;
+    /// combat timings, AI and damage remain owned by the systems under test.
+    /// </summary>
+    internal void ArrangeCoopSubject(string scenario)
+    {
+        _enemies.Clear();
+        _souls.Clear();
+        Vector2 centre = _arena.CombatBounds.Center.ToVector2();
+
+        switch (scenario)
+        {
+            case "coop-idle":
+            case "coop-reduced":
+                PlaceWarden(0, centre + new Vector2(70f, 20f));
+                PlaceWarden(1, centre + new Vector2(-70f, 20f));
+                _enemies.Add(new Hollow(centre + new Vector2(300f, -60f), 1));
+                _enemies.Add(new Devourer(centre + new Vector2(-330f, -40f)));
+                break;
+
+            case "coop-split-targets":
+                PlaceWarden(0, centre + new Vector2(150f, 40f));
+                PlaceWarden(1, centre + new Vector2(-150f, 40f));
+                _enemies.Add(new Hollow(centre + new Vector2(255f, 30f), 1));
+                _enemies.Add(new Hollow(centre + new Vector2(-255f, 30f), 2));
+                break;
+
+            case "coop-severance":
+                PlaceWarden(0, centre + new Vector2(120f, 30f));
+                PlaceWarden(1, centre + new Vector2(-120f, 30f));
+                _enemies.Add(new Devourer(centre + new Vector2(0f, -20f)));
+                break;
+
+            case "coop-down":
+            case "coop-stabilize":
+                PlaceWarden(0, centre + new Vector2(150f, 30f));
+                PlaceWarden(1, centre + new Vector2(-40f, 30f));
+                _enemies.Add(new Hollow(centre + new Vector2(360f, -70f), 1));
+                break;
+
+            case "coop-separation":
+                // Deliberately past the tether range, to show the strain and the
+                // bounded zoom rather than a comfortable frame.
+                PlaceWarden(0, centre + new Vector2(430f, -120f));
+                PlaceWarden(1, centre + new Vector2(-430f, 150f));
+                _enemies.Add(new Hollow(centre + new Vector2(520f, -80f), 1));
+                _enemies.Add(new Hollow(centre + new Vector2(-520f, 190f), 2));
+                break;
+
+            case "coop-soul-release":
+                PlaceWarden(0, centre + new Vector2(110f, 40f));
+                PlaceWarden(1, centre + new Vector2(-110f, 40f));
+                _enemies.Add(new Hollow(centre + new Vector2(0f, -110f), 1));
+                break;
+
+            case "coop-resonance":
+                PlaceWarden(0, centre + new Vector2(90f, 30f));
+                PlaceWarden(1, centre + new Vector2(-90f, 30f));
+                _enemies.Add(new Devourer(centre + new Vector2(340f, -60f)));
+                break;
+        }
+    }
+
+    /// <summary>Capture seam: place both brothers at fixed points in the arena.</summary>
+    internal void PlaceWarden(int index, Vector2 position)
+    {
+        if (index < 0 || index >= _roster.Count)
+        {
+            return;
+        }
+
+        Player warden = _roster.Slots[index].Warden;
+        warden.Nudge(position - warden.Position, _arena.CombatBounds);
+    }
+
+    internal bool AnyWardenDowned
+    {
+        get
+        {
+            foreach (PlayerSlot slot in _roster.Slots)
+            {
+                if (slot.Warden.IsDowned)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    internal float StabilizeProgress => _roster.Count > 1
+        ? MathF.Max(_roster.Slots[0].Warden.StabilizeProgress, _roster.Slots[1].Warden.StabilizeProgress)
+        : 0f;
+
+    internal bool TeamResonanceReady => _team.IsReady;
+
+    /// <summary>
+    /// How the brother arrives during real play: any connected gamepad's Start or
+    /// A button brings him in, and F12 brings him in on the number-pad layout so
+    /// the design can be reviewed without controller hardware.
+    /// </summary>
+    private void UpdateSecondWardenJoin(InputState input)
+    {
+        if (_roster.IsCooperative)
+        {
+            return;
+        }
+
+        if (_autoJoinSecond)
+        {
+            PlayerIndex? autoPad = WardenRoster.FindFreeGamePad(input);
+            TryJoinSecondWarden(autoPad.HasValue
+                ? new GamePadInput(autoPad.Value)
+                : new SecondaryKeyboardInput());
+            return;
+        }
+
+        for (int index = 0; index < 4; index++)
+        {
+            PlayerIndex pad = (PlayerIndex)index;
+            if (input.IsGamePadConnected(pad) &&
+                (input.WasGamePadPressed(pad, Buttons.Start) || input.WasGamePadPressed(pad, Buttons.A)))
+            {
+                TryJoinSecondWarden(new GamePadInput(pad));
+                return;
+            }
+        }
+
+        if (input.WasKeyPressed(Keys.F12))
+        {
+            TryJoinSecondWarden(new SecondaryKeyboardInput());
+        }
     }
 
     public void Update(GameTime gameTime, InputState input, Viewport viewport)
@@ -172,13 +406,6 @@ public sealed class GameWorld : IDisposable
         _presentationTime += deltaTime;
         _presentation.Update(deltaTime, _loopState);
         _audio.Update(deltaTime);
-        bool wasDashing = _player.IsDashing;
-        bool wasResonanceActive = _player.ResonanceActive;
-        bool wasResonanceReady = _player.IsResonanceReady;
-        bool wasSoulSenseActive = _player.SoulSenseActive;
-        bool wasCannonFull = _player.Cannon.IsFullCharge;
-        SoulCannonState previousCannonState = _player.Cannon.State;
-        int previousHealth = _player.Health;
         _art.Update(deltaTime);
         _spriteVfx.Update(deltaTime);
         UpdateFps(deltaTime);
@@ -199,15 +426,7 @@ public sealed class GameWorld : IDisposable
             }
             _soulSensePresentation.Update(deltaTime, false);
             _particles.Update(deltaTime);
-            _presentation.UpdateCamera(
-                _camera,
-                _loopState,
-                false,
-                _player.Position,
-                _arena.Bounds,
-                _arena.CombatBounds,
-                viewport,
-                deltaTime);
+            UpdateCamera(deltaTime, false, viewport);
             return;
         }
 
@@ -233,7 +452,8 @@ public sealed class GameWorld : IDisposable
 
         if (input.WasKeyPressed(Keys.F5))
         {
-            _player.FillResonance();
+            _team.Fill();
+            SyncTeamResonance();
         }
 
         if (input.WasKeyPressed(Keys.F6))
@@ -254,7 +474,9 @@ public sealed class GameWorld : IDisposable
             ResetEncounter();
         }
 
-        if (_player.IsDead && input.WasKeyPressed(Keys.R))
+        UpdateSecondWardenJoin(input);
+
+        if (PlayerDead && input.WasKeyPressed(Keys.R))
         {
             ResetEncounter();
         }
@@ -264,19 +486,11 @@ public sealed class GameWorld : IDisposable
             ResetEncounter();
         }
 
-        if (_player.IsDead)
+        if (PlayerDead)
         {
             _soulSensePresentation.Update(deltaTime, false);
             _particles.Update(deltaTime);
-            _presentation.UpdateCamera(
-                _camera,
-                _loopState,
-                true,
-                _player.Position,
-                _arena.Bounds,
-                _arena.CombatBounds,
-                viewport,
-                deltaTime);
+            UpdateCamera(deltaTime, true, viewport);
             return;
         }
 
@@ -290,15 +504,7 @@ public sealed class GameWorld : IDisposable
             UpdateArenaLoop(deltaTime);
             _soulSensePresentation.Update(deltaTime, false);
             _particles.Update(deltaTime);
-            _presentation.UpdateCamera(
-                _camera,
-                _loopState,
-                false,
-                _player.Position,
-                _arena.Bounds,
-                _arena.CombatBounds,
-                viewport,
-                deltaTime);
+            UpdateCamera(deltaTime, false, viewport);
             return;
         }
 
@@ -307,67 +513,35 @@ public sealed class GameWorld : IDisposable
             UpdateArenaLoop(deltaTime);
             _soulSensePresentation.Update(deltaTime, false);
             _particles.Update(deltaTime);
-            _presentation.UpdateCamera(
-                _camera,
-                _loopState,
-                false,
-                _player.Position,
-                _arena.Bounds,
-                _arena.CombatBounds,
-                viewport,
-                deltaTime);
+            UpdateCamera(deltaTime, false, viewport);
             return;
         }
 
-        _lastMouseWorld = _camera.ScreenToWorld(input.MousePosition, viewport);
+        _roster.ReadCommands(input, _camera, viewport);
+        _lastMouseWorld = _roster.LeadSlot.AimPoint;
 
         if (_screenEffects.IsHitStopped)
         {
-            _soulSensePresentation.Update(deltaTime, _player.SoulSenseActive);
+            _soulSensePresentation.Update(deltaTime, AnySoulSenseActive());
             return;
         }
 
-        _player.Update(deltaTime, input, _lastMouseWorld, _arena.CombatBounds, _particles, _screenEffects, _forceSoulSense);
-        TryOpenSeveranceWindow();
-        _soulSensePresentation.Update(deltaTime, _player.SoulSenseActive);
-        if (_audioTestFatalDamageRequested)
-        {
-            _audioTestFatalDamageRequested = false;
-            _player.ApplyDamage(GameBalance.PlayerMaxHealth, Vector2.Zero, _screenEffects);
-        }
-        if (_player.Scythe.StartedThisFrame)
-        {
-            _combatPresentation.PresentScytheSwing(
-                _player.Scythe.ActiveStep,
-                _player.Position,
-                _player.Scythe.AttackDirection);
-        }
-        if (!wasDashing && _player.IsDashing)
-        {
-            _spriteVfx.Spawn(
-                "dash_ignition",
-                _player.Position - _player.DashDirection * 24f,
-                MathF.Atan2(_player.DashDirection.Y, _player.DashDirection.X),
-                0.5f,
-                GameBalance.DeathFlameBright * 0.65f);
-        }
-        if (!wasResonanceActive && _player.ResonanceActive)
-        {
-            _combatPresentation.BeginResonance(_player.Position);
-            _arenaAtmosphere.ReactToResonance();
-        }
-        PlayPlayerActionAudio(wasDashing, wasResonanceActive, wasSoulSenseActive, wasCannonFull, previousCannonState);
-        SpawnCannonShot();
-        ResolveScytheStrike();
+        UpdateWardens(deltaTime);
+        _soulSensePresentation.Update(deltaTime, AnySoulSenseActive());
         UpdateCannonShots(deltaTime);
         UpdateBurningHandoff();
         ConfigureBurningAggression(deltaTime);
+
+        // Targets are chosen once for the whole floor, before any enemy acts, so
+        // the choice cannot depend on iteration order.
+        _targeting.Update(deltaTime, _enemies, _roster.Field);
         foreach (Enemy enemy in _enemies)
         {
             HollowState? previousHollowState = enemy is Hollow hollowBefore ? hollowBefore.State : null;
             BurningState? previousBurningState = enemy is Burning burningBefore ? burningBefore.State : null;
             DevourerState? previousDevourerState = enemy is Devourer devourerBefore ? devourerBefore.State : null;
-            enemy.Update(deltaTime, _player, _souls, _arena.CombatBounds, _particles, _screenEffects);
+            _roster.Field.SetTarget(_targeting.TargetFor(enemy, _roster.Field));
+            enemy.Update(deltaTime, _roster.Field, _souls, _arena.CombatBounds, _particles, _screenEffects);
             if (enemy is Hollow hollowAfter && previousHollowState != HollowState.Swipe && hollowAfter.State == HollowState.Swipe)
             {
                 _audio.Play(AudioCue.HollowSwipe, 0.48f);
@@ -390,6 +564,7 @@ public sealed class GameWorld : IDisposable
             if (enemy.TryConsumeSoulSpawn(out Vector2 soulPosition))
             {
                 _souls.Add(new Soul(soulPosition));
+                _audio.Play(AudioCue.SoulExposed, 0.5f);
             }
 
             if (enemy is Burning burning && burning.TryConsumeDetonation(out Vector2 detonationPosition))
@@ -413,41 +588,451 @@ public sealed class GameWorld : IDisposable
         foreach (Soul soul in _souls)
         {
             SoulState previousSoulState = soul.State;
-            soul.Update(deltaTime, _player, _particles);
+            soul.Update(deltaTime, _roster.Field, _particles);
             if (previousSoulState != SoulState.Releasing && soul.State == SoulState.Releasing)
             {
                 _spriteVfx.Spawn("soul_release", soul.Position, 0f, 0.62f);
                 _audio.Play(AudioCue.SoulRelease, 0.62f);
             }
+            if (soul.TryConsumeResidueReceiver(out Player _))
+            {
+                // Residue always feeds the brothers' shared pool, so there is
+                // nothing for two Players to race each other for.
+                AddTeamResonance(GameBalance.ResonancePerSoulRelease);
+            }
         }
 
         _souls.RemoveAll(soul => soul.IsFinished);
+        ResolveWardenCasualties(deltaTime);
         UpdateArenaLoop(deltaTime);
-        if (previousHealth > _player.Health)
+        _particles.Update(deltaTime);
+        UpdateCamera(deltaTime, false, viewport);
+    }
+
+    private readonly record struct WardenSnapshot(
+        bool Dashing,
+        bool ResonanceActive,
+        bool ResonanceReady,
+        bool SoulSense,
+        bool CannonFull,
+        SoulCannonState CannonState,
+        int Health,
+        bool Downed,
+        bool Dead);
+
+    private static WardenSnapshot Snapshot(Player warden) => new(
+        warden.IsDashing,
+        warden.ResonanceActive,
+        warden.IsResonanceReady,
+        warden.SoulSenseActive,
+        warden.Cannon.IsFullCharge,
+        warden.Cannon.State,
+        warden.Health,
+        warden.IsDowned,
+        warden.IsDead);
+
+    private bool AnySoulSenseActive()
+    {
+        foreach (PlayerSlot slot in _roster.Slots)
         {
-            if (_player.IsDead)
+            if (slot.Warden.SoulSenseActive)
             {
-                _audio.SetCalm(true);
-                _audio.SetSoulSense(false);
-                _presentation.BeginDeath();
+                return true;
             }
-            _audio.Play(_player.IsDead ? AudioCue.PlayerDeath : AudioCue.PlayerHit, _player.IsDead ? 0.78f : 0.6f);
         }
-        if (!wasResonanceReady && _player.IsResonanceReady)
+
+        return false;
+    }
+
+    /// <summary>
+    /// Runs every local Warden through one frame: intent, stabilisation, combat
+    /// resolution and feedback. Solo is the one-slot case of exactly this loop,
+    /// so there is no separate single-player path to drift out of sync.
+    /// </summary>
+    private void UpdateWardens(float deltaTime)
+    {
+        bool teamResonanceReadyBefore = _team.IsReady;
+
+        foreach (PlayerSlot slot in _roster.Slots)
+        {
+            Player warden = slot.Warden;
+            WardenSnapshot before = Snapshot(warden);
+
+            Player rescue = FindStabilizeTarget(slot);
+            slot.StabilizeTarget = rescue;
+            bool stabilizing = rescue is not null && slot.Command.StabilizeHeld;
+
+            warden.Update(
+                deltaTime,
+                slot.Command,
+                _arena.CombatBounds,
+                _particles,
+                _screenEffects,
+                _forceSoulSense,
+                stabilizing);
+
+            if (rescue is not null)
+            {
+                AdvanceStabilization(deltaTime, warden, rescue, stabilizing);
+            }
+
+            if (_audioTestFatalDamageRequested)
+            {
+                // Applied to every Warden, so the check exercises the real
+                // failure condition in both modes: solo death, or both brothers
+                // down at once.
+                warden.ApplyDamage(GameBalance.PlayerMaxHealth, Vector2.Zero, _screenEffects);
+            }
+
+            TryOpenSeveranceWindow(warden);
+            SpawnCannonShot(warden);
+            ResolveScytheStrike(warden);
+            PresentWardenFrame(slot, before);
+        }
+
+        _audioTestFatalDamageRequested = false;
+        ResolveTeamResonanceRequests();
+        UpdateWardenSeparation(deltaTime);
+        UpdateWardenTether(deltaTime);
+        SyncTeamResonance();
+
+        if (!teamResonanceReadyBefore && _team.IsReady)
         {
             _audio.Play(AudioCue.ResonanceReady, 0.72f);
         }
-        _particles.Update(deltaTime);
+    }
+
+    /// <summary>
+    /// Feedback for one Warden's frame. Kept per slot so a second brother's dash,
+    /// charge and Resonance read as his own rather than doubling Player 1's.
+    /// </summary>
+    private void PresentWardenFrame(PlayerSlot slot, WardenSnapshot before)
+    {
+        Player warden = slot.Warden;
+
+        if (warden.Scythe.StartedThisFrame)
+        {
+            _combatPresentation.PresentScytheSwing(
+                warden.Scythe.ActiveStep,
+                warden.Position,
+                warden.Scythe.AttackDirection);
+        }
+
+        if (!before.Dashing && warden.IsDashing)
+        {
+            _spriteVfx.Spawn(
+                "dash_ignition",
+                warden.Position - warden.DashDirection * 30f,
+                MathF.Atan2(warden.DashDirection.Y, warden.DashDirection.X),
+                0.46f,
+                warden.Identity.FlameBright * 0.5f);
+        }
+
+        if (!before.ResonanceActive && warden.ResonanceActive)
+        {
+            _combatPresentation.BeginResonance(warden.Position);
+            _arenaAtmosphere.ReactToResonance();
+        }
+
+        PlayWardenActionAudio(slot, before);
+
+    }
+
+    /// <summary>
+    /// Either brother may spend the shared pool, and spending it lights both.
+    /// This is the cooperative shape of the mechanic: Resonance is agreement, so
+    /// it cannot be hoarded by one Warden.
+    /// </summary>
+    private void ResolveTeamResonanceRequests()
+    {
+        bool requested = false;
+        foreach (PlayerSlot slot in _roster.Slots)
+        {
+            requested |= slot.Warden.ResonanceRequestedThisFrame && !slot.Warden.ResonanceActive;
+        }
+
+        if (!requested || !_team.TrySpendForResonance())
+        {
+            return;
+        }
+
+        foreach (PlayerSlot slot in _roster.Slots)
+        {
+            if (slot.Warden.CanBeTargeted)
+            {
+                slot.Warden.StartResonance();
+            }
+        }
+
+        _audio.Play(AudioCue.ResonanceActivate, 0.88f);
+    }
+
+    private void SyncTeamResonance()
+    {
+        foreach (PlayerSlot slot in _roster.Slots)
+        {
+            slot.Warden.SyncResonance(_team.Charge);
+        }
+    }
+
+    private void AddTeamResonance(float amount)
+    {
+        _team.Add(amount);
+        SyncTeamResonance();
+    }
+
+    /// <summary>
+    /// The downed brother this Warden is standing over, or null. Only one brother
+    /// can be reached at a time and never himself.
+    /// </summary>
+    private Player FindStabilizeTarget(PlayerSlot slot)
+    {
+        if (!slot.Warden.CanBeTargeted)
+        {
+            return null;
+        }
+
+        foreach (PlayerSlot other in _roster.Slots)
+        {
+            if (other.Index == slot.Index || !other.Warden.IsDowned)
+            {
+                continue;
+            }
+
+            float reach = GameBalance.StabilizeRange;
+            if (Vector2.DistanceSquared(slot.Warden.Position, other.Warden.Position) <= reach * reach)
+            {
+                return other.Warden;
+            }
+        }
+
+        return null;
+    }
+
+    private void AdvanceStabilization(float deltaTime, Player rescuer, Player downed, bool held)
+    {
+        if (held)
+        {
+            // The danger window made visible: a thin line of the rescuer's own
+            // flame poured into his brother while he cannot fight.
+            _combatPresentation.PresentStabilizeHold(
+                rescuer.Position,
+                downed.Position,
+                rescuer.Identity.FlameBright,
+                downed.StabilizeProgress);
+        }
+
+        if (!downed.AdvanceStabilization(deltaTime, held, _team.StabilizeSeconds))
+        {
+            return;
+        }
+
+        _team.ChargeStabilization();
+        SyncTeamResonance();
+        _combatPresentation.PresentStabilizeComplete(downed.Position, downed.Identity.FlameBright);
+        _audio.Play(AudioCue.WardenStabilize, 0.86f);
+    }
+
+    /// <summary>
+    /// End-of-frame casualty pass. Damage is applied by enemies after the Wardens
+    /// have already run, so health is compared here against the previous frame —
+    /// the same ordering the single-player version used.
+    ///
+    /// A Warden who runs out of health while a brother is still standing goes
+    /// down instead of dying. Both down ends the encounter. Solo never enters the
+    /// downed state at all, so death and retry are unchanged.
+    /// </summary>
+    private void ResolveWardenCasualties(float deltaTime)
+    {
+        for (int index = 0; index < _roster.Count; index++)
+        {
+            Player warden = _roster.Slots[index].Warden;
+            int previousHealth = _healthLastFrame[index];
+            _healthLastFrame[index] = warden.Health;
+
+            if (warden.Health >= previousHealth)
+            {
+                continue;
+            }
+
+            if (warden.Health > 0)
+            {
+                _audio.Play(AudioCue.PlayerHit, 0.6f);
+                continue;
+            }
+
+            if (_roster.IsCooperative && AnyOtherStanding(index))
+            {
+                warden.Down();
+                _healthLastFrame[index] = warden.Health;
+                _combatPresentation.PresentWardenDown(warden.Position, warden.Identity.Flame);
+                _audio.Play(AudioCue.WardenDown, 0.8f);
+            }
+        }
+
+        foreach (PlayerSlot slot in _roster.Slots)
+        {
+            Player warden = slot.Warden;
+            if (warden.IsDowned && warden.DownRemaining <= 0f)
+            {
+                warden.ExtinguishFlame();
+            }
+        }
+
+        if (_teamWiped || !_roster.AllDown())
+        {
+            return;
+        }
+
+        // Both flames are out or going out. The encounter is over; the lead
+        // Warden carries the existing death presentation so retry is unchanged.
+        _teamWiped = true;
+        foreach (PlayerSlot slot in _roster.Slots)
+        {
+            if (slot.Warden.IsDowned)
+            {
+                slot.Warden.ExtinguishFlame();
+            }
+        }
+
+        _audio.SetCalm(true);
+        _audio.SetSoulSense(false);
+        _presentation.BeginDeath();
+        _audio.Play(AudioCue.PlayerDeath, 0.78f);
+    }
+
+    private bool AnyOtherStanding(int index)
+    {
+        for (int other = 0; other < _roster.Count; other++)
+        {
+            if (other != index && _roster.Slots[other].Warden.CanBeTargeted)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Keeps two brothers from occupying the same point. Without this, melee in
+    /// co-op degenerates into body blocking: both Wardens end up inside each
+    /// other and neither can read which silhouette is theirs.
+    /// </summary>
+    private void UpdateWardenSeparation(float deltaTime)
+    {
+        if (!_roster.IsCooperative)
+        {
+            return;
+        }
+
+        Player first = _roster.Slots[0].Warden;
+        Player second = _roster.Slots[1].Warden;
+        if (first.IsDead || second.IsDead)
+        {
+            return;
+        }
+
+        Vector2 delta = second.Position - first.Position;
+        float distance = delta.Length();
+        // A brother on the floor still occupies space. Without this the rescuer
+        // stands exactly on top of him and the whole rescue is invisible.
+        bool eitherDowned = first.IsDowned || second.IsDowned;
+        float minimum = eitherDowned
+            ? GameBalance.WardenSeparationRadius * 2.4f
+            : GameBalance.WardenSeparationRadius * 2f;
+        if (distance >= minimum || distance <= 0.0001f)
+        {
+            return;
+        }
+
+        Vector2 push = delta / distance * (minimum - distance);
+        float step = MathHelper.Clamp(deltaTime * GameBalance.WardenSeparationStrength, 0f, 1f);
+        // A guttering Warden cannot be shoved around; the standing brother yields.
+        if (first.IsDowned)
+        {
+            second.Nudge(push * step, _arena.CombatBounds);
+        }
+        else if (second.IsDowned)
+        {
+            first.Nudge(-push * step, _arena.CombatBounds);
+        }
+        else
+        {
+            first.Nudge(-push * (step * 0.5f), _arena.CombatBounds);
+            second.Nudge(push * (step * 0.5f), _arena.CombatBounds);
+        }
+    }
+
+    /// <summary>
+    /// The brothers share one Death Flame. Past the tether range it strains, and
+    /// past the limit the trailing Warden is drawn back — gradually, never
+    /// teleported — which is what keeps the group camera inside a readable zoom.
+    /// </summary>
+    private void UpdateWardenTether(float deltaTime)
+    {
+        if (!_roster.IsCooperative)
+        {
+            TetherStrain = 0f;
+            return;
+        }
+
+        Player first = _roster.Slots[0].Warden;
+        Player second = _roster.Slots[1].Warden;
+        Vector2 delta = second.Position - first.Position;
+        float distance = delta.Length();
+        TetherStrain = MathHelper.Clamp(
+            (distance - GameBalance.CoopTetherRange) / (GameBalance.CoopTetherLimit - GameBalance.CoopTetherRange),
+            0f,
+            1f);
+
+        if (distance <= GameBalance.CoopTetherLimit || distance <= 0.0001f)
+        {
+            return;
+        }
+
+        Vector2 direction = delta / distance;
+        float pull = GameBalance.CoopTetherPull * deltaTime;
+        if (first.CanBeTargeted)
+        {
+            first.Nudge(direction * (pull * 0.5f), _arena.CombatBounds);
+        }
+        if (second.CanBeTargeted)
+        {
+            second.Nudge(-direction * (pull * 0.5f), _arena.CombatBounds);
+        }
+    }
+
+    /// <summary>Strain on the shared flame, 0 to 1. Drives the tether presentation.</summary>
+    public float TetherStrain { get; private set; }
+
+    /// <summary>
+    /// Group camera. One Warden behaves exactly as Session 1 did; two Wardens
+    /// share a frame whose zoom is bounded on both ends, so the pair is always
+    /// visible without the arena ever becoming a diagram again.
+    /// </summary>
+    private void UpdateCamera(float deltaTime, bool anyoneDead, Viewport viewport)
+    {
+        float groupZoom = GameBalance.CombatCameraZoom;
+        if (_roster.IsCooperative)
+        {
+            Vector2 span = _roster.FrameSpan();
+            float needX = span.X + GameBalance.CoopFramePadding;
+            float needY = span.Y + GameBalance.CoopFramePadding;
+            float fit = MathF.Min(viewport.Width / MathF.Max(needX, 1f), viewport.Height / MathF.Max(needY, 1f));
+            groupZoom = MathHelper.Clamp(fit, GameBalance.CoopMinCameraZoom, GameBalance.CombatCameraZoom);
+        }
 
         _presentation.UpdateCamera(
             _camera,
             _loopState,
-            false,
-            _player.Position,
+            anyoneDead,
+            _roster.FrameCentre(),
             _arena.Bounds,
             _arena.CombatBounds,
             viewport,
-            deltaTime);
+            deltaTime,
+            groupZoom);
     }
 
     public void Dispose()
@@ -503,6 +1088,26 @@ public sealed class GameWorld : IDisposable
             float foot = enemy is Devourer ? 65f : 43f;
             ArenaComposition.DrawContactShadow(batch, pixel, enemy.Position + new Vector2(0f, foot), width);
         }
+        if (_presentation.ShouldDrawPlayer(_loopState, PlayerDead))
+        {
+            foreach (PlayerSlot slot in _roster.Slots)
+            {
+                if (slot.Warden.IsDead) continue;
+                ArenaComposition.DrawContactShadow(batch, pixel, slot.Warden.Position + new Vector2(0f, 40f), 21f);
+            }
+        }
+        batch.End();
+
+        // Actor light sits between the room and the fighting plane, so every
+        // silhouette is lit from behind rather than pasted onto the floor.
+        DrawActorLight(batch, worldTransform);
+
+        batch.Begin(
+            SpriteSortMode.Deferred,
+            BlendState.AlphaBlend,
+            SamplerState.PointClamp,
+            transformMatrix: worldTransform);
+
         foreach (Enemy enemy in _enemies)
         {
             _art.DrawEnemy(batch, enemy);
@@ -511,7 +1116,7 @@ public sealed class GameWorld : IDisposable
         foreach (Soul soul in _souls)
         {
             _art.DrawLostSoul(batch, soul);
-            soul.Draw(batch, pixel, _player, false, true);
+            soul.Draw(batch, pixel, false, true);
         }
         foreach (CannonShot shot in _cannonShots)
         {
@@ -519,33 +1124,18 @@ public sealed class GameWorld : IDisposable
             _art.DrawCannonProjectile(batch, shot);
         }
         _particles.Draw(batch, pixel);
-        if (_presentation.ShouldDrawPlayer(_loopState, _player.IsDead))
+        if (_presentation.ShouldDrawPlayer(_loopState, PlayerDead))
         {
-            ArenaComposition.DrawContactShadow(batch, pixel, _player.Position + new Vector2(0f, 40f), 21f);
-            _art.DrawPlayer(batch, _player);
-            _player.Draw(batch, pixel, _art, _debugVisible, _soulSensePresentation.SoulEmergence);
-            if (_player.Cannon.State == SoulCannonState.Charging)
+            foreach (PlayerSlot slot in _roster.Slots)
             {
-                Vector2 muzzle = _player.Position + _player.FacingDirection * 74f;
-                float charge = _player.Cannon.ChargeProgress;
-                Color chargeColor = _player.Cannon.IsFullCharge
-                    ? Color.White
-                    : _player.Cannon.ChargeStage >= 3
-                        ? new Color(238, 219, 255)
-                        : _player.Cannon.ChargeStage == 2
-                            ? GameBalance.DeathFlameBright
-                            : new Color(155, 94, 220);
-                _art.DrawLoopingEffect(
-                    batch,
-                    _player.Cannon,
-                    "cannon_charge_loop",
-                    muzzle,
-                    0f,
-                    _player.Cannon.IsFullCharge ? 0.68f : MathHelper.Lerp(0.28f, 0.61f, charge),
-                    chargeColor);
+                if (slot.Warden.IsDowned) DrawWarden(batch, pixel, slot.Warden);
+            }
+            foreach (PlayerSlot slot in _roster.Slots)
+            {
+                if (!slot.Warden.IsDowned) DrawWarden(batch, pixel, slot.Warden);
             }
         }
-        _presentation.DrawWorldAccents(batch, pixel, _art, _loopState, _player.IsDead, _player, _arena.CombatBounds);
+        _presentation.DrawWorldAccents(batch, pixel, _art, _loopState, PlayerDead, _player, _arena.CombatBounds);
         _spriteVfx.DrawAlpha(batch);
         batch.End();
 
@@ -572,6 +1162,109 @@ public sealed class GameWorld : IDisposable
     }
 
     /// <summary>
+    /// One Warden's body, weapon and charge glow. Both brothers use the same
+    /// sheet; the body tint and the Cannon's charge colour come from the
+    /// identity, which is the whole of the visual difference in the alpha pass.
+    /// </summary>
+    private void DrawWarden(SpriteBatch batch, Texture2D pixel, Player warden)
+    {
+        if (warden.IsDead)
+        {
+            return;
+        }
+
+        _art.DrawPlayer(batch, warden);
+        warden.Draw(batch, pixel, _art, _debugVisible, _soulSensePresentation.SoulEmergence);
+        if (warden.Cannon.State != SoulCannonState.Charging)
+        {
+            return;
+        }
+
+        Vector2 muzzle = warden.Position + warden.FacingDirection * 74f;
+        float charge = warden.Cannon.ChargeProgress;
+        Color chargeColor = warden.Cannon.IsFullCharge
+            ? Color.White
+            : warden.Cannon.ChargeStage >= 3
+                ? warden.Identity.FlameBright
+                : warden.Cannon.ChargeStage == 2
+                    ? warden.Identity.Accent
+                    : warden.Identity.Flame;
+        _art.DrawLoopingEffect(
+            batch,
+            warden.Cannon,
+            "cannon_charge_loop",
+            muzzle,
+            0f,
+            warden.Cannon.IsFullCharge ? 0.68f : MathHelper.Lerp(0.28f, 0.61f, charge),
+            chargeColor);
+    }
+
+    /// <summary>
+    /// Silhouette and contact light for every actor, drawn under the sprites.
+    /// See <see cref="ActorLighting"/> for the grammar this establishes.
+    /// </summary>
+    private void DrawActorLight(SpriteBatch batch, Matrix worldTransform)
+    {
+        batch.Begin(
+            SpriteSortMode.Deferred,
+            SoftShapes.AdditiveLight,
+            SamplerState.LinearClamp,
+            transformMatrix: worldTransform);
+
+        ActorLighting.DrawManifestations(batch, _art, _enemies, _presentationTime);
+        if (_presentation.ShouldDrawPlayer(_loopState, PlayerDead))
+        {
+            foreach (PlayerSlot slot in _roster.Slots)
+            {
+                if (slot.Warden.IsDead) continue;
+                ActorLighting.DrawWarden(batch, _art, _art.SoftBrush, slot.Warden, _presentationTime);
+            }
+        }
+
+        batch.End();
+    }
+
+    /// <summary>
+    /// The shared Death Flame between the brothers. Invisible while they fight
+    /// together; it only appears as it strains, which is how separation is
+    /// communicated without a marker or an off-screen arrow.
+    /// </summary>
+    private void DrawWardenTether(SpriteBatch batch, Texture2D brush)
+    {
+        if (!_roster.IsCooperative || TetherStrain <= 0.01f)
+        {
+            return;
+        }
+
+        Player first = _roster.Slots[0].Warden;
+        Player second = _roster.Slots[1].Warden;
+        if (!first.CanBeTargeted || !second.CanBeTargeted)
+        {
+            return;
+        }
+
+        Vector2 delta = second.Position - first.Position;
+        float distance = delta.Length();
+        if (distance < 1f)
+        {
+            return;
+        }
+
+        Vector2 direction = delta / distance;
+        int steps = Math.Max(8, (int)(distance / 34f));
+        float strain = TetherStrain;
+        for (int i = 0; i < steps; i++)
+        {
+            float amount = (i + 0.5f) / steps;
+            float taper = MathF.Sin(amount * MathHelper.Pi);
+            Vector2 point = first.Position + direction * (distance * amount)
+                + new Vector2(-direction.Y, direction.X) * MathF.Sin(amount * 9f + _presentationTime * 3f) * (7f * strain);
+            Color flame = Color.Lerp(first.Identity.Flame, second.Identity.Flame, amount);
+            SoftShapes.Blob(batch, brush, point, (5f + strain * 5f) * taper, flame * (0.3f * strain * taper));
+        }
+    }
+
+    /// <summary>
     /// Every piece of combat feedback that used to be a hard vector stroke is
     /// painted here with the feathered brush, additively, in world space. Keeping
     /// it in one pass means combat light can never be point-sampled into crisp
@@ -586,7 +1279,7 @@ public sealed class GameWorld : IDisposable
             transformMatrix: worldTransform);
 
         Texture2D brush = _art.SoftBrush;
-        bool sense = _player.SoulSenseActive;
+        bool sense = AnySoulSenseActive();
 
         foreach (Enemy enemy in _enemies)
         {
@@ -611,20 +1304,34 @@ public sealed class GameWorld : IDisposable
 
         if (_loopState != ArenaLoopState.Title)
         {
-            _player.DrawAfterimages(batch, brush);
+            foreach (PlayerSlot slot in _roster.Slots)
+            {
+                slot.Warden.DrawAfterimages(batch, brush);
+            }
         }
 
-        if (_presentation.ShouldDrawPlayer(_loopState, _player.IsDead))
+        if (_presentation.ShouldDrawPlayer(_loopState, PlayerDead))
         {
-            _player.DrawCombatLight(batch, brush, _soulSensePresentation.SoulEmergence);
+            foreach (PlayerSlot slot in _roster.Slots)
+            {
+                slot.Warden.DrawCombatLight(batch, brush, _soulSensePresentation.SoulEmergence);
+            }
         }
+
+        DrawWardenTether(batch, brush);
+        _combatPresentation.DrawStabilizeLink(batch, brush, _presentationTime);
 
         // Aim mark: a soft ember where the Warden is looking, not a crosshair.
-        if (_presentation.ShouldDrawAim(_loopState, _player.IsDead))
+        if (_presentation.ShouldDrawAim(_loopState, PlayerDead))
         {
             float breathe = 0.72f + 0.28f * MathF.Sin(_presentationTime * 5.4f);
-            SoftShapes.Blob(batch, brush, _lastMouseWorld, 17f * breathe, GameBalance.DeathFlame * 0.22f);
-            SoftShapes.Blob(batch, brush, _lastMouseWorld, 5f * breathe, GameBalance.DeathFlameBright * 0.4f);
+            foreach (PlayerSlot slot in _roster.Slots)
+            {
+                if (!slot.Warden.CanBeTargeted) continue;
+                Vector2 mark = slot.AimPoint;
+                SoftShapes.Blob(batch, brush, mark, 17f * breathe, slot.Identity.Flame * 0.2f);
+                SoftShapes.Blob(batch, brush, mark, 5f * breathe, slot.Identity.FlameBright * 0.38f);
+            }
         }
 
         batch.End();
@@ -679,12 +1386,12 @@ public sealed class GameWorld : IDisposable
     {
         batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
 
-        if (_presentation.ShouldDrawCombatHud(_loopState, _player.IsDead))
+        if (_presentation.ShouldDrawCombatHud(_loopState, PlayerDead))
         {
-            _hud.Draw(batch, pixel, viewport, _player);
+            _hud.Draw(batch, pixel, viewport, _roster, _team);
         }
 
-        _presentation.DrawOverlay(batch, pixel, viewport, _loopState, _player.IsDead, _waveNumber);
+        _presentation.DrawOverlay(batch, pixel, viewport, _loopState, PlayerDead, _waveNumber);
 
         if (_debugVisible && _loopState != ArenaLoopState.Title)
         {
@@ -699,9 +1406,9 @@ public sealed class GameWorld : IDisposable
     /// late enough to be a read. The window is granted by the enemy's commitment,
     /// not by a global cooldown, which keeps it valid for a second Warden later.
     /// </summary>
-    private void TryOpenSeveranceWindow()
+    private void TryOpenSeveranceWindow(Player warden)
     {
-        if (!_player.DashStartedThisFrame || _player.IsDead)
+        if (!warden.DashStartedThisFrame || !warden.CanBeTargeted)
         {
             return;
         }
@@ -719,27 +1426,30 @@ public sealed class GameWorld : IDisposable
                 continue;
             }
 
-            float threat = enemy.CommitmentThreatRange + _player.Radius + GameBalance.SeveranceThreatPadding;
-            if (Vector2.DistanceSquared(enemy.Position, _player.Position) > threat * threat)
+            float threat = enemy.CommitmentThreatRange + warden.Radius + GameBalance.SeveranceThreatPadding;
+            if (Vector2.DistanceSquared(enemy.Position, warden.Position) > threat * threat)
             {
                 continue;
             }
 
-            _player.OpenSeveranceWindow();
-            _combatPresentation.PresentSeveranceWindow(_player.Position, enemy.AnchorPosition);
-            _audio.Play(AudioCue.ResonanceReady, 0.5f, 0.28f);
+            // Each Warden holds his own window against the same telegraph, so two
+            // brothers can both read one Devourer slam without stealing it from
+            // each other.
+            warden.OpenSeveranceWindow();
+            _combatPresentation.PresentSeveranceWindow(warden.Position, enemy.AnchorPosition);
+            _audio.Play(AudioCue.SeveranceWindow, 0.62f);
             return;
         }
     }
 
-    private void ResolveScytheStrike()
+    private void ResolveScytheStrike(Player warden)
     {
-        if (_player.Scythe.ConsumedSeveranceThisFrame)
+        if (warden.Scythe.ConsumedSeveranceThisFrame)
         {
-            _player.ConsumeSeveranceWindow();
+            warden.ConsumeSeveranceWindow();
         }
 
-        if (!_player.Scythe.TryConsumeStrike(out ScytheStrike strike))
+        if (!warden.Scythe.TryConsumeStrike(out ScytheStrike strike))
         {
             return;
         }
@@ -748,7 +1458,7 @@ public sealed class GameWorld : IDisposable
         bool severedAnything = false;
         foreach (Enemy enemy in _enemies.Where(enemy => enemy.IsAlive))
         {
-            Vector2 toTarget = enemy.Position - _player.Position;
+            Vector2 toTarget = enemy.Position - warden.Position;
             float combinedRange = strike.Range + enemy.Radius;
             if (toTarget.LengthSquared() > combinedRange * combinedRange)
             {
@@ -764,8 +1474,8 @@ public sealed class GameWorld : IDisposable
             // A Severance cut finds the Anchor without Soul Sense. That is the
             // reward: the read replaces the resource the Player would otherwise
             // have to be already spending.
-            Vector2 weakPoint = strike.IsSeverance ? enemy.AnchorPosition : FindStrikeWeakPoint(enemy, strike);
-            bool coreHit = strike.IsSeverance || (_player.SoulSenseActive && weakPoint != Vector2.Zero);
+            Vector2 weakPoint = strike.IsSeverance ? enemy.AnchorPosition : FindStrikeWeakPoint(warden, enemy, strike);
+            bool coreHit = strike.IsSeverance || (warden.SoulSenseActive && weakPoint != Vector2.Zero);
             int damage = coreHit && !strike.IsSeverance
                 ? (int)MathF.Round(strike.Damage * GameBalance.SoulSenseCoreDamageMultiplier)
                 : strike.Damage;
@@ -779,7 +1489,7 @@ public sealed class GameWorld : IDisposable
             {
                 enemy.ApplySeverance();
                 _combatPresentation.PresentSeveranceCut(weakPoint, targetDirection);
-                _player.AddResonance(GameBalance.SeveranceResonanceGain);
+                AddTeamResonance(GameBalance.SeveranceResonanceGain);
                 _arenaAtmosphere.ReactToForce(weakPoint, 300f, 88f);
                 severedAnything = true;
             }
@@ -794,7 +1504,7 @@ public sealed class GameWorld : IDisposable
                 coreHit);
             if (coreHit && !strike.IsSeverance)
             {
-                _player.AddResonance(GameBalance.ResonancePerCoreHit);
+                AddTeamResonance(GameBalance.ResonancePerCoreHit);
                 _audio.Play(AudioCue.CoreHit, 0.7f);
             }
             hitAnything = true;
@@ -802,8 +1512,7 @@ public sealed class GameWorld : IDisposable
 
         if (severedAnything)
         {
-            _audio.Play(AudioCue.SoulCleave, 0.94f, -0.22f);
-            _audio.Play(AudioCue.CoreHit, 0.86f, 0.14f);
+            _audio.Play(AudioCue.SeveranceCut, 0.92f);
             return;
         }
 
@@ -882,7 +1591,12 @@ public sealed class GameWorld : IDisposable
 
     private void ResetEncounter()
     {
-        _player.Reset(_arena.CombatBounds.Center.ToVector2());
+        _roster.Reset(_arena.CombatBounds.Center.ToVector2());
+        _team.Reset();
+        _targeting.Reset();
+        _teamWiped = false;
+        Array.Fill(_healthLastFrame, GameBalance.PlayerMaxHealth);
+        SyncTeamResonance();
         _enemies.Clear();
         _souls.Clear();
         _cannonShots.Clear();
@@ -928,11 +1642,17 @@ public sealed class GameWorld : IDisposable
 
         foreach (Burning burning in burnings
             .Where(burning => burning.State == BurningState.Approach)
-            .OrderBy(burning => Vector2.DistanceSquared(burning.Position, _player.Position))
+            .OrderBy(burning => Vector2.DistanceSquared(burning.Position, NearestWardenPosition(burning.Position)))
             .Take(maximumCommitments - committed))
         {
             burning.SetAggressionSlot(true);
         }
+    }
+
+    private Vector2 NearestWardenPosition(Vector2 from)
+    {
+        Player nearest = _roster.Field.ClosestStanding(from);
+        return nearest?.Position ?? _player.Position;
     }
 
     private void UpdateBurningHandoff()
@@ -974,7 +1694,10 @@ public sealed class GameWorld : IDisposable
                     if (_waveNumber >= EncounterDirector.BeatCount)
                     {
                         _loopState = ArenaLoopState.Complete;
-                        _player.SettleForCompletion();
+                        foreach (PlayerSlot slot in _roster.Slots)
+                        {
+                            slot.Warden.SettleForCompletion();
+                        }
                         _cannonShots.Clear();
                         _presentation.BeginCompletion();
                         _endingRevealPlayed = false;
@@ -1059,9 +1782,9 @@ public sealed class GameWorld : IDisposable
         return "NORMAL";
     }
 
-    private bool IsPointInsideStrike(Vector2 point, ScytheStrike strike)
+    private static bool IsPointInsideStrike(Player warden, Vector2 point, ScytheStrike strike)
     {
-        Vector2 toPoint = point - _player.Position;
+        Vector2 toPoint = point - warden.Position;
         if (toPoint.LengthSquared() > MathF.Pow(strike.Range + GameBalance.HollowCoreRadius, 2f))
         {
             return false;
@@ -1071,14 +1794,14 @@ public sealed class GameWorld : IDisposable
         return Vector2.Dot(strike.Direction, direction) >= MathF.Cos(strike.ArcRadians * 0.5f);
     }
 
-    private Vector2 FindStrikeWeakPoint(Enemy enemy, ScytheStrike strike)
+    private static Vector2 FindStrikeWeakPoint(Player warden, Enemy enemy, ScytheStrike strike)
     {
-        if (!_player.SoulSenseActive)
+        if (!warden.SoulSenseActive)
         {
             return Vector2.Zero;
         }
 
-        if (enemy is Hollow hollow && IsPointInsideStrike(hollow.CorePosition, strike))
+        if (enemy is Hollow hollow && IsPointInsideStrike(warden, hollow.CorePosition, strike))
         {
             return hollow.CorePosition;
         }
@@ -1087,7 +1810,7 @@ public sealed class GameWorld : IDisposable
         {
             foreach (Vector2 fracture in burning.GetFracturePositions())
             {
-                if (IsPointInsideStrike(fracture, strike))
+                if (IsPointInsideStrike(warden, fracture, strike))
                 {
                     return fracture;
                 }
@@ -1095,7 +1818,7 @@ public sealed class GameWorld : IDisposable
         }
 
 
-        if (enemy is Devourer devourer && IsPointInsideStrike(devourer.TorsoPosition, strike))
+        if (enemy is Devourer devourer && IsPointInsideStrike(warden, devourer.TorsoPosition, strike))
         {
             return devourer.TorsoPosition;
         }
@@ -1134,14 +1857,14 @@ public sealed class GameWorld : IDisposable
         return _debugVisible ? $"phase12_wave_{_waveNumber}_debug" : $"phase12_wave_{_waveNumber}_combat";
     }
 
-    private void SpawnCannonShot()
+    private void SpawnCannonShot(Player warden)
     {
-        if (!_player.Cannon.TryConsumeShot(out CannonShotRequest request))
+        if (!warden.Cannon.TryConsumeShot(out CannonShotRequest request))
         {
             return;
         }
 
-        Vector2 origin = _player.Position + request.Direction * 74f;
+        Vector2 origin = warden.Position + request.Direction * 74f;
         _cannonShots.Add(new CannonShot(origin, request));
         _combatPresentation.PresentCannonFire(origin, request);
         if (request.IsFullCharge)
@@ -1149,7 +1872,7 @@ public sealed class GameWorld : IDisposable
             _arenaAtmosphere.ReactToForce(origin, 460f, 135f);
         }
         _audio.Play(AudioCue.CannonFire, request.IsFullCharge ? 0.9f : 0.58f, request.IsFullCharge ? -0.08f : 0.08f);
-        _player.ApplyCannonRecoil(request.Direction, request.Charge);
+        warden.ApplyCannonRecoil(request.Direction, request.Charge);
     }
 
     private void UpdateCannonShots(float deltaTime)
@@ -1199,7 +1922,7 @@ public sealed class GameWorld : IDisposable
                     coreHit);
                 if (coreHit)
                 {
-                    _player.AddResonance(GameBalance.ResonancePerCoreHit * (shot.IsFullCharge ? 2f : 1f));
+                    AddTeamResonance(GameBalance.ResonancePerCoreHit * (shot.IsFullCharge ? 2f : 1f));
                     _audio.Play(AudioCue.CoreHit, shot.IsFullCharge ? 0.86f : 0.66f);
                 }
                 else
@@ -1293,52 +2016,47 @@ public sealed class GameWorld : IDisposable
         return Vector2.DistanceSquared(point, start + segment * amount);
     }
 
-    private void PlayPlayerActionAudio(
-        bool wasDashing,
-        bool wasResonanceActive,
-        bool wasSoulSenseActive,
-        bool wasCannonFull,
-        SoulCannonState previousCannonState)
+    private void PlayWardenActionAudio(PlayerSlot slot, WardenSnapshot before)
     {
-        if (_player.Scythe.StartedThisFrame)
+        Player warden = slot.Warden;
+
+        if (warden.Scythe.StartedThisFrame)
         {
-            AudioCue cue = _player.Scythe.ActiveStep switch
+            AudioCue cue = warden.Scythe.ActiveStep switch
             {
                 2 => AudioCue.ScytheSwing2,
                 3 => AudioCue.SoulCleave,
                 _ => AudioCue.ScytheSwing1
             };
-            _audio.Play(cue, _player.Scythe.ActiveStep == 3 ? 0.78f : 0.5f);
+            // The brother's flame is older and steadier; pitching his weapon
+            // slightly down keeps two simultaneous swings from phasing into one.
+            _audio.Play(cue, warden.Scythe.ActiveStep == 3 ? 0.78f : 0.5f, slot.Index == 0 ? 0f : -0.09f);
         }
 
-        if (!wasDashing && _player.IsDashing)
+        if (!before.Dashing && warden.IsDashing)
         {
-            _audio.Play(AudioCue.Dash, 0.62f);
+            _audio.Play(AudioCue.Dash, 0.62f, slot.Index == 0 ? 0f : -0.07f);
         }
-        if (previousCannonState != SoulCannonState.Charging && _player.Cannon.State == SoulCannonState.Charging)
+        if (before.CannonState != SoulCannonState.Charging && warden.Cannon.State == SoulCannonState.Charging)
         {
             _audio.Play(AudioCue.CannonCharge, 0.42f);
         }
-        if (!wasCannonFull && _player.Cannon.IsFullCharge)
+        if (!before.CannonFull && warden.Cannon.IsFullCharge)
         {
             _audio.Play(AudioCue.CannonFull, 0.72f);
         }
-        if (!wasResonanceActive && _player.ResonanceActive)
-        {
-            _audio.Play(AudioCue.ResonanceActivate, 0.88f);
-        }
-        if (!wasSoulSenseActive && _player.SoulSenseActive && !_player.ResonanceActive)
+        if (!before.SoulSense && warden.SoulSenseActive && !warden.ResonanceActive)
         {
             _audio.Play(AudioCue.SoulSenseOn, 0.38f);
         }
-        else if (wasSoulSenseActive && !_player.SoulSenseActive)
+        else if (before.SoulSense && !warden.SoulSenseActive)
         {
             _audio.Play(AudioCue.SoulSenseOff, 0.3f);
         }
 
-        if (wasSoulSenseActive != _player.SoulSenseActive)
+        if (slot.Index == 0 && before.SoulSense != warden.SoulSenseActive)
         {
-            _audio.SetSoulSense(_player.SoulSenseActive);
+            _audio.SetSoulSense(warden.SoulSenseActive);
         }
     }
 

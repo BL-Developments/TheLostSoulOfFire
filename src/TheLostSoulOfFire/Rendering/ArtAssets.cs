@@ -57,11 +57,22 @@ public sealed class SpritePlayback
         !clip.Loop && Elapsed(clipKey, globalTime) >= clip.Duration;
 }
 
+/// <summary>
+/// One resolved character frame: which sheet to sample and where in it. Shared by
+/// the normal sprite draw and the silhouette light pass so a rim can never drift
+/// away from the body it belongs to.
+/// </summary>
+public readonly record struct ActorFrame(SpriteClip Clip, float Elapsed, Vector2 Position, float Scale, float Rotation = 0f)
+{
+    public bool IsValid => Clip is not null;
+}
+
 public sealed class ArtAssets : IDisposable
 {
     private static readonly string[] Directions = ["n", "ne", "e", "se", "s", "sw", "w", "nw"];
     private readonly Dictionary<string, SpriteClip> _characterClips = [];
     private readonly Dictionary<string, SpriteClip> _effects = [];
+    private readonly Dictionary<Texture2D, Texture2D> _silhouettes = [];
     private readonly ConditionalWeakTable<object, SpritePlayback> _playbacks = new();
     private float _time;
 
@@ -137,20 +148,67 @@ public sealed class ArtAssets : IDisposable
     {
         _floorSurface.Dispose();
         SoftBrush.Dispose();
+        foreach (Texture2D silhouette in _silhouettes.Values)
+        {
+            silhouette.Dispose();
+        }
+        _silhouettes.Clear();
     }
 
     public void DrawPlayer(SpriteBatch batch, Player player)
     {
-        if (player.IsDead)
+        ActorFrame frame = ResolvePlayerFrame(player);
+        if (!frame.IsValid)
         {
             return;
         }
 
+        // A guttering Warden has no bespoke animation yet, so the standing frame
+        // is laid over onto the floor and darkened. Documented as temporary art:
+        // it reads correctly at gameplay scale but wants a real collapse pose.
+        Color tint = player.IsDowned
+            ? new Color(
+                (int)(player.BodyTint.R * 0.55f),
+                (int)(player.BodyTint.G * 0.55f),
+                (int)(player.BodyTint.B * 0.6f))
+            : player.BodyTint;
+        DrawClip(batch, frame.Clip, frame.Elapsed, frame.Position, frame.Rotation, frame.Scale, tint);
+    }
+
+    /// <summary>
+    /// The frame a Warden is currently showing. Exposed so the actor-light pass can
+    /// trace the exact silhouette instead of approximating it with a circle.
+    /// </summary>
+    public ActorFrame ResolvePlayerFrame(Player player)
+    {
+        if (player.IsDead)
+        {
+            return default;
+        }
+
+        if (player.IsDowned)
+        {
+            ActorFrame fallen = ResolveDirectional(player, "player", "idle", player.FacingDirection, player.Position + new Vector2(0f, 16f), player.Identity.DisplaySize * 0.93f);
+            return fallen with { Rotation = 1.42f };
+        }
+
         string action = player.Velocity.LengthSquared() > 120f ? "move" : "idle";
-        DrawDirectional(batch, player, "player", action, player.FacingDirection, player.Position, 108f, Color.White);
+        return ResolveDirectional(player, "player", action, player.FacingDirection, player.Position, player.Identity.DisplaySize);
     }
 
     public void DrawEnemy(SpriteBatch batch, Enemy enemy)
+    {
+        ActorFrame frame = ResolveEnemyFrame(enemy);
+        if (!frame.IsValid)
+        {
+            return;
+        }
+
+        Color tint = enemy.HitFlashRemaining > 0f ? new Color(255, 235, 255) : Color.White;
+        DrawClip(batch, frame.Clip, frame.Elapsed, frame.Position, 0f, frame.Scale, tint);
+    }
+
+    public ActorFrame ResolveEnemyFrame(Enemy enemy)
     {
         string family;
         string action;
@@ -197,10 +255,9 @@ public sealed class ArtAssets : IDisposable
                 break;
 
             default:
-                return;
+                return default;
         }
 
-        Color tint = enemy.HitFlashRemaining > 0f ? new Color(255, 235, 255) : Color.White;
         // Contact cells inspected in the delivered sheets. Timers remain owned
         // by combat; turning and Draw cadence cannot advance an attack early.
         float? frame = enemy switch
@@ -213,7 +270,66 @@ public sealed class ArtAssets : IDisposable
             Devourer d when d.State == DevourerState.Slam => 8f + d.StrikeProgress * 7.99f,
             _ => null
         };
-        DrawDirectional(batch, enemy, family, action, facing, enemy.Position, size, tint, frame);
+        return ResolveDirectional(enemy, family, action, facing, enemy.Position, size, frame);
+    }
+
+    /// <summary>
+    /// Paints light around an actor's real silhouette by stamping its alpha mask
+    /// in a ring of offsets. Used additively with linear filtering, so the result
+    /// is a soft body of light hugging the character rather than a drawn outline —
+    /// the readability tool the owner's "no hard lines" revision leaves available.
+    /// </summary>
+    public void DrawSilhouetteLight(SpriteBatch batch, ActorFrame frame, Color color, float radius, int steps = 10)
+    {
+        if (!frame.IsValid || radius <= 0.05f || color.A == 0)
+        {
+            return;
+        }
+
+        Texture2D silhouette = GetSilhouette(frame.Clip.Texture);
+        Rectangle source = frame.Clip.GetSourceRectangle(frame.Elapsed);
+        Vector2 origin = new(frame.Clip.FrameWidth, frame.Clip.FrameHeight);
+        origin *= 0.5f;
+
+        // Two offset rings: a tight one that defines the edge and a wider, dimmer
+        // one that lets the light fall away instead of terminating.
+        Color inner = color * (1f / steps);
+        Color outer = color * (0.55f / steps);
+        for (int i = 0; i < steps; i++)
+        {
+            float angle = MathHelper.TwoPi * i / steps;
+            Vector2 unit = new(MathF.Cos(angle), MathF.Sin(angle));
+            batch.Draw(silhouette, frame.Position + unit * radius, source, inner, frame.Rotation, origin, frame.Scale, SpriteEffects.None, 0f);
+            batch.Draw(silhouette, frame.Position + unit * (radius * 2.35f), source, outer, frame.Rotation, origin, frame.Scale, SpriteEffects.None, 0f);
+        }
+    }
+
+    /// <summary>
+    /// White-with-source-alpha copy of a sheet, built once per texture and cached.
+    /// SpriteBatch multiplies tint by texel colour, so a near-black character can
+    /// only be lit from a mask like this without introducing a custom shader.
+    /// </summary>
+    private Texture2D GetSilhouette(Texture2D source)
+    {
+        if (_silhouettes.TryGetValue(source, out Texture2D cached))
+        {
+            return cached;
+        }
+
+        Color[] pixels = new Color[source.Width * source.Height];
+        source.GetData(pixels);
+        for (int i = 0; i < pixels.Length; i++)
+        {
+            // Premultiplied white: alpha in every channel so the One/One light
+            // blend adds the mask directly.
+            byte alpha = pixels[i].A;
+            pixels[i] = new Color(alpha, alpha, alpha, alpha);
+        }
+
+        Texture2D silhouette = new(source.GraphicsDevice, source.Width, source.Height, false, SurfaceFormat.Color);
+        silhouette.SetData(pixels);
+        _silhouettes[source] = silhouette;
+        return silhouette;
     }
 
     public void DrawLostSoul(SpriteBatch batch, Soul soul)
@@ -298,15 +414,13 @@ public sealed class ArtAssets : IDisposable
             0f);
     }
 
-    private void DrawDirectional(
-        SpriteBatch batch,
+    private ActorFrame ResolveDirectional(
         object owner,
         string family,
         string action,
         Vector2 facing,
         Vector2 position,
         float displaySize,
-        Color color,
         float? frame = null)
     {
         string direction = GetDirection(facing);
@@ -316,7 +430,7 @@ public sealed class ArtAssets : IDisposable
         // Facing picks a sheet, not a new action. Turning must not reset gait.
         float elapsed = frame.HasValue ? frame.Value / clip.FramesPerSecond
             : playback.Elapsed($"{family}/{action}", _time);
-        DrawClip(batch, clip, elapsed, position, 0f, displaySize / clip.FrameWidth, color);
+        return new ActorFrame(clip, elapsed, position, displaySize / clip.FrameWidth);
     }
 
     private void LoadDirectional(

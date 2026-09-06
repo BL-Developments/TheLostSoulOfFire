@@ -34,7 +34,16 @@ public enum AudioCue
     CannonImpact,
     TitleConfirm,
     WaveClear,
-    EndingReveal
+    EndingReveal,
+
+    // Session 2. The reaction thesis and local co-op had no voice of their own:
+    // Severance borrowed the Scythe's cleave, and there was nothing at all for a
+    // guttering Warden, a rescue, or a Soul surfacing.
+    SeveranceWindow,
+    SeveranceCut,
+    SoulExposed,
+    WardenDown,
+    WardenStabilize
 }
 
 /// <summary>
@@ -88,7 +97,12 @@ public sealed class AudioDirector : IDisposable
         [AudioCue.CannonImpact] = new(0.035f, 3, 0.025f),
         [AudioCue.TitleConfirm] = new(0.5f, 1),
         [AudioCue.WaveClear] = new(0.45f, 1),
-        [AudioCue.EndingReveal] = new(1f, 1)
+        [AudioCue.EndingReveal] = new(1f, 1),
+        [AudioCue.SeveranceWindow] = new(0.14f, 2, 0.02f),
+        [AudioCue.SeveranceCut] = new(0.12f, 2, 0.015f),
+        [AudioCue.SoulExposed] = new(0.1f, 3, 0.03f),
+        [AudioCue.WardenDown] = new(0.6f, 1),
+        [AudioCue.WardenStabilize] = new(0.4f, 2, 0.01f)
     };
 
     private readonly Dictionary<AudioCue, SoundEffect> _sounds = [];
@@ -140,6 +154,11 @@ public sealed class AudioDirector : IDisposable
             Add(content, AudioCue.TitleConfirm, "Audio/Sfx/title_confirm", 440f, 0.26f, 0.3f, 0.015f);
             Add(content, AudioCue.WaveClear, "Audio/Sfx/wave_clear", 294f, 0.52f, 0.32f, 0.01f, rising: true);
             Add(content, AudioCue.EndingReveal, "Audio/Sfx/ending_reveal", 147f, 0.9f, 0.3f, 0.015f, rising: true);
+            Add(content, AudioCue.SeveranceWindow, "Audio/Sfx/severance_window", 620f, 0.42f, 0.34f, 0.12f, rising: true);
+            Add(content, AudioCue.SeveranceCut, "Audio/Sfx/severance_cut", 380f, 0.7f, 0.6f, 0.4f);
+            Add(content, AudioCue.SoulExposed, "Audio/Sfx/soul_exposed", 820f, 0.5f, 0.3f, 0.03f);
+            Add(content, AudioCue.WardenDown, "Audio/Sfx/warden_down", 70f, 1.1f, 0.56f, 0.36f);
+            Add(content, AudioCue.WardenStabilize, "Audio/Sfx/warden_stabilize", 196f, 1.2f, 0.5f, 0.05f, rising: true);
 
             _ambienceSound = LoadOrCreateFallback(content, "Audio/Ambience/arena_ambience", 43f, 2.4f, 0.2f, 0.16f, false);
             _ambience = _ambienceSound.CreateInstance();
@@ -310,6 +329,16 @@ public sealed class AudioDirector : IDisposable
                 break;
             case AudioCue.EndingReveal:
                 BeginDuck(1.3f, 0.52f);
+                break;
+            // The two quietest, most important co-op moments get room to be heard.
+            case AudioCue.WardenDown:
+                BeginDuck(0.9f, 0.5f);
+                break;
+            case AudioCue.WardenStabilize:
+                BeginDuck(0.85f, 0.44f);
+                break;
+            case AudioCue.SeveranceCut:
+                BeginDuck(0.5f, 0.34f);
                 break;
         }
     }

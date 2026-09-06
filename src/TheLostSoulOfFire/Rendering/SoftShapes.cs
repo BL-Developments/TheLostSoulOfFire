@@ -186,6 +186,41 @@ public static class SoftShapes
     }
 
     /// <summary>
+    /// Pressure gathering on the floor at a given reach.
+    ///
+    /// <see cref="Ring"/> stacked so many even dabs that it summed to a saturated,
+    /// geometrically perfect neon donut — the single worst "interface over pixel
+    /// art" offender left after Session 1. This paints the same reach as an
+    /// uneven band of light: the radius breathes per angle, the density varies,
+    /// and a few soft gaps stop the eye closing it into a drawn circle. The reach
+    /// itself is still honest, because the slam hitbox is a circle in the same
+    /// plane.
+    /// </summary>
+    public static void PressureBand(
+        SpriteBatch batch,
+        Texture2D brush,
+        Vector2 center,
+        float radius,
+        float thickness,
+        Color color,
+        float phase,
+        float irregularity = 0.11f)
+    {
+        int count = DabCount(MathHelper.TwoPi * radius, thickness * 1.55f);
+        for (int i = 0; i < count; i++)
+        {
+            float angle = MathHelper.TwoPi * i / count;
+            // Two incommensurate lobes: never repeats into a visible pattern.
+            float wobble = MathF.Sin(angle * 3f + phase) * 0.62f + MathF.Sin(angle * 5f - phase * 1.7f) * 0.38f;
+            float localRadius = radius * (1f + wobble * irregularity);
+            // Soft gaps where the pressure has not gathered yet.
+            float density = MathHelper.Clamp(0.42f + 0.58f * (0.5f + 0.5f * MathF.Sin(angle * 2f + phase * 0.8f)), 0f, 1f);
+            Vector2 point = center + new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * localRadius;
+            Blob(batch, brush, point, thickness * (0.7f + density * 0.5f), color * density);
+        }
+    }
+
+    /// <summary>
     /// A soft directional lane. Replaces the Burning's rails and chevrons: the
     /// charge path is lit rather than fenced.
     /// </summary>

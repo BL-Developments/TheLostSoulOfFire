@@ -59,7 +59,7 @@ public abstract class Enemy
 
     public abstract void Update(
         float deltaTime,
-        Player player,
+        WardenField wardens,
         IReadOnlyList<Soul> souls,
         Rectangle movementBounds,
         ParticleSystem particles,

@@ -158,7 +158,7 @@ public static class SoulfireLighting
                 batch,
                 player.Position,
                 SoulfireRenderSettings.DeathFlameGlowRadius * breathe,
-                GameBalance.DeathFlame,
+                player.Identity.Flame,
                 SoulfireRenderSettings.DeathFlameGlowIntensity);
             renderer.DrawGlow(batch, player.Position, 38f, GameBalance.SoulWhite, 0.26f);
             return;
@@ -168,8 +168,8 @@ public static class SoulfireLighting
             batch,
             playerCore,
             SoulfireRenderSettings.PlayerCoreGlowRadius * breathe,
-            GameBalance.DeathFlameBright,
-            SoulfireRenderSettings.PlayerCoreGlowIntensity);
+            player.Identity.FlameBright,
+            SoulfireRenderSettings.PlayerCoreGlowIntensity * 0.8f);
 
         if (soulSenseAmount > 0.001f)
         {
@@ -179,9 +179,12 @@ public static class SoulfireLighting
 
         if (player.SeveranceReady)
         {
+            // Halved against Session 1. The Severance read is now carried by the
+            // Warden's lit silhouette and the forward gather; piling emission on
+            // top of that erased the pose the Player is supposed to recognise.
             float life = MathHelper.Clamp(player.SeveranceRemaining / GameBalance.SeveranceWindowDuration, 0f, 1f);
-            renderer.DrawGlow(batch, playerCore, 74f * breathe, GameBalance.SoulWhite, 0.3f * life);
-            renderer.DrawGlow(batch, playerCore, 148f * breathe, GameBalance.DeathFlameBright, 0.14f * life + player.SeveranceFlare * 0.2f);
+            renderer.DrawGlow(batch, playerCore, 82f * breathe, player.Identity.FlameBright, 0.13f * life);
+            renderer.DrawGlow(batch, playerCore, 156f * breathe, player.Identity.Flame, 0.07f * life + player.SeveranceFlare * 0.09f);
         }
 
         if (player.IsResonanceReady)
@@ -190,7 +193,7 @@ public static class SoulfireLighting
                 batch,
                 playerCore,
                 SoulfireRenderSettings.ReadyCoreGlowRadius * breathe,
-                GameBalance.SoulWhite,
+                player.Identity.FlameBright,
                 SoulfireRenderSettings.ReadyCoreGlowIntensity);
         }
 
@@ -201,7 +204,7 @@ public static class SoulfireLighting
                 batch,
                 playerCore,
                 SoulfireRenderSettings.ResonanceGlowRadius * resonancePulse,
-                GameBalance.DeathFlame,
+                player.Identity.Flame,
                 SoulfireRenderSettings.ResonanceGlowIntensity);
             renderer.DrawGlow(batch, playerCore, 42f * resonancePulse, GameBalance.SoulWhite, 0.24f);
         }

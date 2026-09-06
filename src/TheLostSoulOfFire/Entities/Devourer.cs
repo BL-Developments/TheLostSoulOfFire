@@ -72,7 +72,7 @@ public sealed class Devourer : Enemy
 
     public override void Update(
         float deltaTime,
-        Player player,
+        WardenField wardens,
         IReadOnlyList<Soul> souls,
         Rectangle movementBounds,
         ParticleSystem particles,
@@ -116,7 +116,7 @@ public sealed class Devourer : Enemy
         switch (State)
         {
             case DevourerState.ApproachPlayer:
-                UpdateApproachPlayer(deltaTime, player);
+                UpdateApproachPlayer(deltaTime, wardens.Target);
                 break;
 
             case DevourerState.ApproachSoul:
@@ -124,7 +124,8 @@ public sealed class Devourer : Enemy
                 break;
 
             case DevourerState.SlamTelegraph:
-                Face(player.Position);
+                // Committed: keep facing the brother the slam was shown to.
+                Face(wardens.Target.Position);
                 if (_stateTimer <= 0f)
                 {
                     State = DevourerState.Slam;
@@ -135,7 +136,7 @@ public sealed class Devourer : Enemy
                 break;
 
             case DevourerState.Slam:
-                ResolveSlam(player, screenEffects);
+                ResolveSlam(wardens, screenEffects);
                 if (_stateTimer <= 0f)
                 {
                     State = DevourerState.Recovery;
@@ -450,7 +451,11 @@ public sealed class Devourer : Enemy
         _stateTimer = GameBalance.DevourerRecoveryDuration;
     }
 
-    private void ResolveSlam(Player player, ScreenEffects screenEffects)
+    /// <summary>
+    /// The slam is a ring of pressure, so it crushes every Warden standing in the
+    /// ring the Players were shown — not only the one it was aimed at.
+    /// </summary>
+    private void ResolveSlam(WardenField wardens, ScreenEffects screenEffects)
     {
         if (!_slamDamagePending)
         {
@@ -458,15 +463,14 @@ public sealed class Devourer : Enemy
         }
 
         _slamDamagePending = false;
-        Vector2 toPlayer = player.Position - Position;
-        if (toPlayer.LengthSquared() > MathF.Pow(GameBalance.DevourerSlamRange + player.Radius, 2f))
-        {
-            return;
-        }
-
-        Vector2 direction = toPlayer.LengthSquared() > 0.001f ? Vector2.Normalize(toPlayer) : _facing;
         int damage = GameBalance.DevourerSlamDamage + Math.Min(ConsumedSoulCount, GameBalance.DevourerMaxSoulStacks) * GameBalance.DevourerDamagePerSoul;
-        player.ApplyDamage(damage, direction * GameBalance.DevourerSlamKnockback, screenEffects);
+        wardens.StrikeCircle(
+            Position,
+            GameBalance.DevourerSlamRange,
+            damage,
+            GameBalance.DevourerSlamKnockback,
+            screenEffects,
+            _facing);
     }
 
     private void ExpelOneSoul()

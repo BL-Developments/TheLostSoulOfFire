@@ -34,7 +34,20 @@ public sealed class VisualScenarioRunner
             ["golden-encounter"] = 1400,
             ["severance-window"] = 320,
             ["severance-cut"] = 340,
-            ["final-release"] = 2100
+            ["final-release"] = 2100,
+
+            // Session 2 — local co-op. Each fixture drives both brothers through
+            // the real command layer; nothing here bypasses combat state.
+            ["coop-idle"] = 150,
+            ["coop-split-targets"] = 210,
+            ["coop-severance"] = 360,
+            ["coop-down"] = 200,
+            ["coop-stabilize"] = 320,
+            ["coop-separation"] = 300,
+            ["coop-soul-release"] = 300,
+            ["coop-resonance"] = 190,
+            ["coop-golden-encounter"] = 1400,
+            ["coop-reduced"] = 210
         };
 
     private readonly string _scenario;
@@ -52,6 +65,8 @@ public sealed class VisualScenarioRunner
     private int _severanceDashTick = -1;
     private int _severanceCutTick = -1;
     private int _beatReachedTick = -1;
+    private ScriptedInput _second;
+    private bool _coopArranged;
 
     public static string KnownScenarioList => string.Join(", ", CaptureTicks.Keys);
     public bool CaptureRequested { get; private set; }
@@ -69,8 +84,8 @@ public sealed class VisualScenarioRunner
         _forceResonance = options.ForceResonance;
         bool defaultTiming = options.CaptureTicks.Length == 0 && options.CaptureAfterTicks < 0;
         _semanticEnding = _scenario == "ending" && defaultTiming;
-        _semanticSeverance = _scenario is "severance-window" or "severance-cut" && defaultTiming;
-        _semanticGoldenBeat = _scenario == "golden-encounter" && defaultTiming;
+        _semanticSeverance = _scenario is "severance-window" or "severance-cut" or "coop-severance" && defaultTiming;
+        _semanticGoldenBeat = _scenario is "golden-encounter" or "coop-golden-encounter" && defaultTiming;
         _semanticFinalRelease = _scenario == "final-release" && defaultTiming;
         _captureTicks = options.CaptureTicks.Length > 0 ? options.CaptureTicks :
             [options.CaptureAfterTicks >= 0 ? options.CaptureAfterTicks : CaptureTicks[_scenario]];
@@ -78,6 +93,10 @@ public sealed class VisualScenarioRunner
     }
 
     public static bool IsKnownScenario(string scenario) => CaptureTicks.ContainsKey(scenario);
+
+    /// <summary>Co-op fixtures start the encounter with the brother already present.</summary>
+    public static bool RequiresTwoPlayers(string scenario) =>
+        scenario.StartsWith("coop-", StringComparison.OrdinalIgnoreCase);
 
     public void Update(InputState input, GameWorld world, Viewport viewport)
     {
@@ -179,6 +198,13 @@ public sealed class VisualScenarioRunner
             case "final-release":
                 AdvanceEnding(input, world);
                 break;
+
+            default:
+                if (_scenario.StartsWith("coop-", StringComparison.Ordinal))
+                {
+                    AdvanceCoop(input, world);
+                }
+                break;
         }
 
         if (_forceSense && _tick == 104 && _scenario != "cannon-sense")
@@ -211,7 +237,7 @@ public sealed class VisualScenarioRunner
         if (_semanticSeverance)
         {
             // Window fixture: the frame the read is confirmed on.
-            // Cut fixture: eight ticks into the committed swing.
+            // Cut and co-op fixtures: eight ticks into the committed swing.
             return _scenario == "severance-window"
                 ? _severanceDashTick >= 0 && _tick == _severanceDashTick + 3
                 : _severanceCutTick >= 0 && _tick == _severanceCutTick + 8;
@@ -295,6 +321,147 @@ public sealed class VisualScenarioRunner
 
         _combatTicks = 0;
         input.InjectKeyPress(Keys.F6);
+    }
+
+    /// <summary>
+    /// Drives the brother through the same <see cref="PlayerCommand"/> every real
+    /// device produces, so a co-op capture exercises the shipped path rather than
+    /// a debug shortcut.
+    /// </summary>
+    private void AdvanceCoop(InputState input, GameWorld world)
+    {
+        _second ??= world.JoinScriptedSecondWarden();
+        if (_second is null)
+        {
+            return;
+        }
+
+        if (!_coopArranged && _tick >= 60 && world.LoopState == ArenaLoopState.Combat)
+        {
+            _coopArranged = true;
+            ArrangeCoop(world);
+        }
+
+        switch (_scenario)
+        {
+            case "coop-idle":
+            case "coop-reduced":
+                _second.Set(new PlayerCommand(Vector2.Zero, world.SecondWardenPosition + new Vector2(-220f, 0f),
+                    false, false, false, false, false, false, false));
+                break;
+
+            case "coop-split-targets":
+                // Both brothers swing at their own enemy on the same frame.
+                _second.Set(new PlayerCommand(Vector2.Zero, world.SecondWardenPosition + new Vector2(-200f, 0f),
+                    false, _tick is 150 or 168, false, false, false, false, false));
+                if (_tick is 150 or 168)
+                {
+                    input.InjectLeftMouseDown();
+                }
+                break;
+
+            case "coop-severance":
+                AdvanceCoopSeverance(input, world);
+                break;
+
+            case "coop-down":
+                if (_tick == 120) world.ForceWardenDown(1);
+                _second.Set(PlayerCommand.Idle(world.SecondWardenPosition + new Vector2(-200f, 0f)));
+                break;
+
+            case "coop-stabilize":
+                if (_tick == 110) world.ForceWardenDown(1);
+                _second.Set(PlayerCommand.Idle(world.SecondWardenPosition + new Vector2(-200f, 0f)));
+                if (_tick is > 112 and < 150)
+                {
+                    // Player 1 walks to his brother using real movement input.
+                    input.InjectHeldKey(Keys.A);
+                }
+                if (_tick >= 150)
+                {
+                    // ...and then holds. The hold is the shipped stabilise input.
+                    input.InjectHeldKey(Keys.E);
+                }
+                break;
+
+            case "coop-separation":
+                _second.Set(PlayerCommand.Idle(world.SecondWardenPosition + new Vector2(-200f, 0f)));
+                break;
+
+            case "coop-soul-release":
+                _second.Set(PlayerCommand.Idle(world.SecondWardenPosition + new Vector2(-200f, 0f)));
+                if (_tick == 150)
+                {
+                    input.InjectKeyPress(Keys.F6);
+                }
+                break;
+
+            case "coop-resonance":
+                _second.Set(new PlayerCommand(Vector2.Zero, world.SecondWardenPosition + new Vector2(-200f, 0f),
+                    false, false, false, false, false, _tick == 150, false));
+                if (_tick == 148)
+                {
+                    input.InjectKeyPress(Keys.F5);
+                }
+                break;
+
+            case "coop-golden-encounter":
+                _second.Set(PlayerCommand.Idle(world.SecondWardenPosition + new Vector2(-200f, 0f)));
+                AdvanceToBeat(input, world, 3);
+                break;
+        }
+    }
+
+    private void ArrangeCoop(GameWorld world)
+    {
+        switch (_scenario)
+        {
+            case "coop-idle":
+            case "coop-reduced":
+            case "coop-down":
+            case "coop-stabilize":
+            case "coop-resonance":
+                world.ArrangeCoopSubject(_scenario);
+                break;
+
+            case "coop-split-targets":
+            case "coop-severance":
+            case "coop-soul-release":
+                world.ArrangeCoopSubject(_scenario);
+                break;
+
+            case "coop-separation":
+                world.ArrangeCoopSubject(_scenario);
+                break;
+        }
+    }
+
+    private void AdvanceCoopSeverance(InputState input, GameWorld world)
+    {
+        _second.Set(PlayerCommand.Idle(world.SecondWardenPosition + new Vector2(-200f, 0f)));
+        if (_tick < 130)
+        {
+            return;
+        }
+
+        if (_severanceDashTick < 0)
+        {
+            if (world.SeveranceOpportunityReady)
+            {
+                _severanceDashTick = _tick;
+                input.InjectKeyPress(Keys.Space);
+                // The brother reads the same telegraph on the same frame.
+                _second.Set(new PlayerCommand(Vector2.Zero, world.SecondWardenPosition + new Vector2(200f, 0f),
+                    true, false, false, false, false, false, false));
+            }
+            return;
+        }
+
+        if (_severanceCutTick < 0 && _tick >= _severanceDashTick + 14 && world.SeveranceWindowOpen)
+        {
+            _severanceCutTick = _tick;
+            input.InjectLeftMouseDown();
+        }
     }
 
     private void AdvanceEnding(InputState input, GameWorld world)

@@ -31,6 +31,24 @@ public sealed class Soul
         ? 1f - MathHelper.Clamp(_stateTimer / GameBalance.SoulReleaseDuration, 0f, 1f) : 0f;
     public bool CanBeDevoured => State is SoulState.Exposed or SoulState.Releasing or SoulState.BeingDevoured;
 
+    /// <summary>
+    /// The Warden the residue reached, set once on the frame it lands. The world
+    /// reads it to credit the shared Resonance pool and then clears it.
+    /// </summary>
+    public Player ResidueReceiver { get; private set; }
+
+    public bool TryConsumeResidueReceiver(out Player receiver)
+    {
+        receiver = ResidueReceiver;
+        if (receiver is null)
+        {
+            return false;
+        }
+
+        ResidueReceiver = null;
+        return true;
+    }
+
     public Soul(Vector2 position)
     {
         _origin = position;
@@ -38,7 +56,7 @@ public sealed class Soul
         _stateTimer = GameBalance.SoulExposedDuration;
     }
 
-    public void Update(float deltaTime, Player player, ParticleSystem particles)
+    public void Update(float deltaTime, WardenField wardens, ParticleSystem particles)
     {
         _visualTime += deltaTime;
 
@@ -59,7 +77,7 @@ public sealed class Soul
                 break;
 
             case SoulState.Residue:
-                UpdateResidue(deltaTime, player, particles);
+                UpdateResidue(deltaTime, wardens, particles);
                 break;
         }
     }
@@ -115,7 +133,6 @@ public sealed class Soul
     public void Draw(
         SpriteBatch batch,
         Texture2D pixel,
-        Player player,
         bool soulSenseActive,
         bool useSpriteArt)
     {
@@ -198,10 +215,26 @@ public sealed class Soul
         }
     }
 
-    private void UpdateResidue(float deltaTime, Player player, ParticleSystem particles)
+    /// <summary>
+    /// What the Soul leaves behind returns to the nearest Warden who can still
+    /// carry it. Ownership is deliberately not contested: the residue feeds the
+    /// brothers' shared Resonance, so there is no pickup to race for.
+    /// </summary>
+    private void UpdateResidue(float deltaTime, WardenField wardens, ParticleSystem particles)
     {
         _stateTimer = MathF.Max(0f, _stateTimer - deltaTime);
-        Vector2 target = player.Position + player.FacingDirection * 2f;
+        Player receiver = wardens.ClosestStanding(Position);
+        if (receiver is null)
+        {
+            // Nobody left standing to receive it. The residue simply disperses.
+            if (_stateTimer <= 0f)
+            {
+                State = SoulState.Released;
+            }
+            return;
+        }
+
+        Vector2 target = receiver.Position + receiver.FacingDirection * 2f;
         float follow = 1f - MathF.Exp(-deltaTime * 8.5f);
         Position = Vector2.Lerp(Position, target, follow);
 
@@ -209,7 +242,7 @@ public sealed class Soul
         {
             Position = target;
             particles.EmitDeathFlame(target, 10, 0.82f);
-            player.AddResonance(GameBalance.ResonancePerSoulRelease);
+            ResidueReceiver = receiver;
             State = SoulState.Released;
         }
     }

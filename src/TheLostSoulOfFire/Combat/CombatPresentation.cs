@@ -1,7 +1,10 @@
 using System;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using TheLostSoulOfFire.Effects;
+using TheLostSoulOfFire.Entities;
 using TheLostSoulOfFire.Game;
+using TheLostSoulOfFire.Rendering;
 
 namespace TheLostSoulOfFire.Combat;
 
@@ -25,6 +28,12 @@ public sealed class CombatPresentation
     private readonly SpriteVfxSystem _spriteVfx;
     private float _resonanceEruptionTimer;
     private Vector2 _resonancePosition;
+    private Vector2 _stabilizeFrom;
+    private Vector2 _stabilizeTo;
+    private Color _stabilizeFlame = Color.White;
+    private float _stabilizeProgress;
+    private float _stabilizeEmberTimer;
+    private bool _stabilizeActive;
 
     public CombatPresentation(
         ParticleSystem particles,
@@ -38,6 +47,11 @@ public sealed class CombatPresentation
 
     public void Update(float deltaTime)
     {
+        _stabilizeEmberTimer = MathF.Max(0f, _stabilizeEmberTimer - deltaTime);
+        // The link is re-asserted every frame it is held, so it disappears the
+        // instant the rescuer lets go or is driven off.
+        _stabilizeActive = false;
+
         if (_resonanceEruptionTimer <= 0f)
         {
             return;
@@ -237,8 +251,10 @@ public sealed class CombatPresentation
     public void PresentSeveranceWindow(Vector2 playerPosition, Vector2 anchorPosition)
     {
         _screenEffects.BeginHitstop(CombatFeedbackTuning.SeveranceWindowHitstop);
-        _screenEffects.Flash(0.05f, 0.08f, GameBalance.SoulWhite);
-        _particles.EmitConvergence(playerPosition, 12, 74f, GameBalance.SoulWhite, 0.24f, 4f, VisualEffectPriority.Critical);
+        _screenEffects.Flash(0.05f, 0.06f, GameBalance.SoulWhite);
+        // Converge from further out and land fewer sparks, so the read brightens
+        // the space around the Warden instead of filling his silhouette in.
+        _particles.EmitConvergence(playerPosition, 9, 118f, GameBalance.SoulWhite, 0.26f, 3.4f, VisualEffectPriority.Critical);
         _particles.EmitBurst(
             Vector2.Lerp(playerPosition, anchorPosition, 0.5f),
             Vector2.Normalize(SafeDelta(anchorPosition, playerPosition)),
@@ -267,6 +283,98 @@ public sealed class CombatPresentation
         _screenEffects.AddShake(0.2f, 8.5f);
         _screenEffects.AddCameraKick(direction, 6.5f);
         _screenEffects.Flash(0.095f, 0.31f, GameBalance.SoulWhite);
+    }
+
+    /// <summary>
+    /// A Warden's flame guttering. Collapse inward and downward: it must not read
+    /// like an enemy death, because nothing has been destroyed yet.
+    /// </summary>
+    public void PresentWardenDown(Vector2 position, Color flame)
+    {
+        _spriteVfx.Spawn("death_flame_loop", position, 0f, 0.5f, flame * 0.5f);
+        _particles.EmitConvergence(position, 16, 96f, flame, 0.5f, 4f, VisualEffectPriority.Critical);
+        _particles.EmitDeathFlame(position, 10, 0.7f, VisualEffectPriority.Critical);
+        _screenEffects.AddShake(0.22f, 6.5f);
+        _screenEffects.Flash(0.1f, 0.18f, flame);
+    }
+
+    /// <summary>
+    /// The hold. A thread of the standing brother's flame reaching across to the
+    /// one on the floor, brightening as the hold completes. Painted, not drawn.
+    /// </summary>
+    public void PresentStabilizeHold(Vector2 from, Vector2 to, Color flame, float progress)
+    {
+        _stabilizeFrom = from;
+        _stabilizeTo = to;
+        _stabilizeFlame = flame;
+        _stabilizeProgress = MathHelper.Clamp(progress, 0f, 1f);
+        _stabilizeActive = true;
+
+        if (_stabilizeEmberTimer > 0f)
+        {
+            return;
+        }
+
+        _stabilizeEmberTimer = 0.075f;
+        _particles.EmitBurst(
+            Vector2.Lerp(from, to, 0.35f),
+            Vector2.Normalize(SafeDelta(to, from)),
+            2,
+            flame,
+            150f,
+            2.4f);
+    }
+
+    public void PresentStabilizeComplete(Vector2 position, Color flame)
+    {
+        _stabilizeActive = false;
+        _spriteVfx.Spawn("resonance_activate", position, 0f, 0.72f, flame * 0.72f);
+        _particles.EmitBurst(position, -Vector2.UnitY, 22, flame, 210f, 6f, VisualEffectPriority.Critical);
+        _particles.EmitDeathFlame(position, 14, 1.1f, VisualEffectPriority.Critical);
+        _screenEffects.Flash(0.12f, 0.2f, flame);
+        _screenEffects.AddShake(0.12f, 3f);
+    }
+
+    /// <summary>The brother stepping into the encounter through his own Death Flame.</summary>
+    public void PresentArrivalFlame(Vector2 position)
+    {
+        _particles.EmitConvergence(position, 18, 130f, WardenIdentity.Elder.FlameBright, 0.35f, 5f, VisualEffectPriority.Critical);
+        _particles.EmitDeathFlame(position, 12, 1.15f, VisualEffectPriority.Critical);
+        _screenEffects.AddShake(0.1f, 3f);
+    }
+
+    /// <summary>
+    /// Drawn in the additive combat-light pass with everything else, so the
+    /// rescue line is flame in the room rather than an interface connector.
+    /// </summary>
+    public void DrawStabilizeLink(SpriteBatch batch, Texture2D brush, float time)
+    {
+        if (!_stabilizeActive)
+        {
+            return;
+        }
+
+        Vector2 delta = _stabilizeTo - _stabilizeFrom;
+        float distance = delta.Length();
+        if (distance < 1f)
+        {
+            return;
+        }
+
+        Vector2 direction = delta / distance;
+        int steps = Math.Max(4, (int)(distance / 16f));
+        for (int i = 0; i < steps; i++)
+        {
+            float amount = (i + 0.5f) / steps;
+            float flow = (amount + time * 1.6f) % 1f;
+            float taper = MathF.Sin(flow * MathHelper.Pi);
+            Vector2 point = _stabilizeFrom + direction * (distance * flow);
+            SoftShapes.Blob(batch, brush, point, (5f + _stabilizeProgress * 4f) * taper,
+                _stabilizeFlame * ((0.16f + _stabilizeProgress * 0.24f) * taper));
+        }
+
+        SoftShapes.Blob(batch, brush, _stabilizeTo, 26f + _stabilizeProgress * 20f,
+            _stabilizeFlame * (0.1f + _stabilizeProgress * 0.24f));
     }
 
     private static Vector2 SafeDelta(Vector2 to, Vector2 from)

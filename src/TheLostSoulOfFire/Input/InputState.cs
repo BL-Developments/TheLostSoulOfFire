@@ -6,10 +6,14 @@ namespace TheLostSoulOfFire.Input;
 
 public sealed class InputState
 {
+    private const int GamePadSlots = 4;
+
     private KeyboardState _previousKeyboard;
     private KeyboardState _keyboard;
     private MouseState _previousMouse;
     private MouseState _mouse;
+    private readonly GamePadState[] _gamePads = new GamePadState[GamePadSlots];
+    private readonly GamePadState[] _previousGamePads = new GamePadState[GamePadSlots];
     private readonly HashSet<Keys> _injectedPresses = [];
     private readonly HashSet<Keys> _injectedHeldKeys = [];
     private readonly HashSet<Keys> _previousInjectedHeldKeys = [];
@@ -55,7 +59,24 @@ public sealed class InputState
         _previousMouse = _mouse;
         _keyboard = ignoreHardware ? new KeyboardState() : Keyboard.GetState();
         _mouse = ignoreHardware ? new MouseState() : Mouse.GetState();
+        for (int index = 0; index < GamePadSlots; index++)
+        {
+            _previousGamePads[index] = _gamePads[index];
+            _gamePads[index] = ignoreHardware
+                ? default
+                : GamePad.GetState((PlayerIndex)index);
+        }
     }
+
+    /// <summary>Polled once per frame so several readers share one device sample.</summary>
+    public GamePadState GetGamePad(PlayerIndex index) => _gamePads[(int)index];
+
+    public GamePadState GetPreviousGamePad(PlayerIndex index) => _previousGamePads[(int)index];
+
+    public bool WasGamePadPressed(PlayerIndex index, Buttons button) =>
+        _gamePads[(int)index].IsButtonDown(button) && _previousGamePads[(int)index].IsButtonUp(button);
+
+    public bool IsGamePadConnected(PlayerIndex index) => _gamePads[(int)index].IsConnected;
 
     public bool IsKeyDown(Keys key) => _injectedHeldKeys.Contains(key) || _keyboard.IsKeyDown(key);
 

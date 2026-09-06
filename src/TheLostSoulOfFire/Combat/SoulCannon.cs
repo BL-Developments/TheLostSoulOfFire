@@ -67,7 +67,7 @@ public sealed class SoulCannon
 
     public void Update(
         float deltaTime,
-        InputState input,
+        PlayerCommand command,
         Vector2 playerPosition,
         Vector2 facingDirection,
         bool canStart,
@@ -82,7 +82,7 @@ public sealed class SoulCannon
         switch (State)
         {
             case SoulCannonState.Stored:
-                if (canStart && input.WasRightMousePressed)
+                if (canStart && command.CannonPressed)
                 {
                     State = SoulCannonState.Drawing;
                     _stateTimer = GameBalance.CannonDrawDuration;
@@ -93,7 +93,7 @@ public sealed class SoulCannon
 
             case SoulCannonState.Drawing:
                 _stateTimer = MathF.Max(0f, _stateTimer - deltaTime);
-                if (input.WasRightMouseReleased)
+                if (!command.CannonHeld)
                 {
                     Fire(soulSenseActive);
                 }
@@ -115,7 +115,7 @@ public sealed class SoulCannon
                     particles.EmitBurst(muzzle, -_aimDirection, 7, GameBalance.SoulWhite, 105f, 5f);
                 }
 
-                if (input.WasRightMouseReleased || !input.IsRightMouseDown)
+                if (!command.CannonHeld)
                 {
                     Fire(soulSenseActive);
                 }

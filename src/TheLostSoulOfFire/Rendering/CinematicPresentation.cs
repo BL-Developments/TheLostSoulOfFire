@@ -75,11 +75,14 @@ public sealed class CinematicPresentation
         Rectangle worldBounds,
         Rectangle combatBounds,
         Viewport viewport,
-        float deltaTime)
+        float deltaTime,
+        float combatZoom = GameBalance.CombatCameraZoom)
     {
         Vector2 arenaCenter = combatBounds.Center.ToVector2();
         Vector2 target = playerPosition;
-        float targetZoom = GameBalance.CombatCameraZoom;
+        // combatZoom is the group camera's request. With one Warden it is the
+        // Session 1 constant, so solo framing is unchanged.
+        float targetZoom = combatZoom;
         float followSpeed = 9f;
 
         if (loopState == ArenaLoopState.Title)
@@ -91,7 +94,7 @@ public sealed class CinematicPresentation
         else if (playerDead)
         {
             target = playerPosition;
-            targetZoom = GameBalance.CombatCameraZoom * 1.055f;
+            targetZoom = combatZoom * 1.055f;
             followSpeed = 3.2f;
         }
         else if (loopState == ArenaLoopState.Intro)
@@ -99,21 +102,21 @@ public sealed class CinematicPresentation
             float settle = Ease(_stateTime / MathF.Max(0.01f, _introDuration));
             target = Vector2.Lerp(arenaCenter + new Vector2(-180f, -46f), playerPosition, settle);
             targetZoom = MathHelper.Lerp(
-                _quickIntro ? GameBalance.CombatCameraZoom * 0.97f : GameBalance.IntroCameraZoom,
-                GameBalance.CombatCameraZoom,
+                _quickIntro ? combatZoom * 0.97f : GameBalance.IntroCameraZoom,
+                combatZoom,
                 settle);
             followSpeed = _quickIntro ? 10f : 4.5f;
         }
         else if (loopState == ArenaLoopState.Transition)
         {
             target = Vector2.Lerp(playerPosition, arenaCenter, 0.12f);
-            targetZoom = GameBalance.CombatCameraZoom * 0.975f;
+            targetZoom = combatZoom * 0.975f;
             followSpeed = 5f;
         }
         else if (loopState == ArenaLoopState.Complete)
         {
             target = Vector2.Lerp(playerPosition, GetLifeFlamePosition(combatBounds), 0.2f) + new Vector2(70f, -72f);
-            targetZoom = GameBalance.CombatCameraZoom * 0.94f;
+            targetZoom = combatZoom * 0.94f;
             followSpeed = 2.8f;
         }
 

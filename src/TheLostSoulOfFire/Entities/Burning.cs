@@ -60,7 +60,7 @@ public sealed class Burning : Enemy
 
     public override void Update(
         float deltaTime,
-        Player player,
+        WardenField wardens,
         IReadOnlyList<Soul> souls,
         Rectangle movementBounds,
         ParticleSystem particles,
@@ -80,11 +80,11 @@ public sealed class Burning : Enemy
             return;
         }
 
-        Vector2 toPlayer = player.Position - Position;
-        float distance = toPlayer.Length();
+        Vector2 toTarget = wardens.Target.Position - Position;
+        float distance = toTarget.Length();
         if (distance > 0.001f && State != BurningState.Charge)
         {
-            _facing = toPlayer / distance;
+            _facing = toTarget / distance;
         }
 
         _stateTimer = MathF.Max(0f, _stateTimer - deltaTime);
@@ -95,7 +95,7 @@ public sealed class Burning : Enemy
                 break;
 
             case BurningState.Telegraph:
-                _chargeDirection = distance > 0.001f ? toPlayer / distance : _facing;
+                _chargeDirection = distance > 0.001f ? toTarget / distance : _facing;
                 if (_stateTimer <= 0f)
                 {
                     State = BurningState.Charge;
@@ -110,7 +110,7 @@ public sealed class Burning : Enemy
             case BurningState.Charge:
                 Position += _chargeDirection * GameBalance.BurningChargeSpeed * deltaTime;
                 particles.EmitDeathFlame(Position - _chargeDirection * 16f, 2, 0.72f);
-                ResolveChargeHit(player, screenEffects);
+                ResolveChargeHit(wardens, screenEffects);
                 if (_stateTimer <= 0f)
                 {
                     EnterRecovery();
@@ -341,15 +341,27 @@ public sealed class Burning : Enemy
         _stateTimer = GameBalance.BurningDeathDuration;
     }
 
-    private void ResolveChargeHit(Player player, ScreenEffects screenEffects)
+    private void ResolveChargeHit(WardenField wardens, ScreenEffects screenEffects)
     {
-        if (!_chargeDamagePending || Vector2.DistanceSquared(Position, player.Position) > MathF.Pow(Radius + player.Radius, 2f))
+        if (!_chargeDamagePending)
+        {
+            return;
+        }
+
+        // Body contact: whoever the charge actually runs into is hit, and the
+        // charge is spent on the first Warden it reaches.
+        if (!wardens.StrikeContact(
+                Position,
+                Radius,
+                _chargeDirection,
+                GameBalance.BurningChargeDamage,
+                GameBalance.BurningChargeKnockback,
+                screenEffects))
         {
             return;
         }
 
         _chargeDamagePending = false;
-        player.ApplyDamage(GameBalance.BurningChargeDamage, _chargeDirection * GameBalance.BurningChargeKnockback, screenEffects);
         EnterRecovery();
     }
 

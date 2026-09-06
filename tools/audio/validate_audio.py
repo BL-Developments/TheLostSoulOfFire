@@ -26,7 +26,7 @@ SFX_DURATIONS = {
     "burning_detonation.wav": 0.7,
     "core_hit.wav": 0.18,
     "soul_release.wav": 0.9,
-    "resonance_ready.wav": 0.35,
+    "resonance_ready.wav": 0.44,
     "resonance_activate.wav": 0.8,
     "player_hit.wav": 0.2,
     "player_death.wav": 1.2,
@@ -41,6 +41,15 @@ SFX_DURATIONS = {
     "title_confirm.wav": 0.32,
     "wave_clear.wav": 0.75,
     "ending_reveal.wav": 1.6,
+
+    # Session 2. Produced by tools/audio/build_session2_sfx.py: an approved bank
+    # sample carries the body of each cue and a filtered, gated slice of an
+    # ElevenLabs generation adds texture underneath.
+    "severance_window.wav": 0.42,
+    "severance_cut.wav": 0.62,
+    "soul_exposed.wav": 0.4,
+    "warden_down.wav": 0.85,
+    "warden_stabilize.wav": 1.0,
 }
 
 GAMEPLAY_CUES = {
@@ -51,6 +60,8 @@ GAMEPLAY_CUES = {
     "SoulSenseOff", "WaveStart", "HollowSwipe", "DevourerSlam",
     "DevourerDevour", "EnemyDeath", "CannonImpact", "TitleConfirm",
     "WaveClear", "EndingReveal",
+    "SeveranceWindow", "SeveranceCut", "SoulExposed", "WardenDown",
+    "WardenStabilize",
 }
 
 

@@ -1512,3 +1512,28 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/Weapons/soul_cannon_256.png
+
+#begin Audio/Sfx/severance_window.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/severance_window.wav
+
+#begin Audio/Sfx/severance_cut.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/severance_cut.wav
+
+#begin Audio/Sfx/soul_exposed.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/soul_exposed.wav
+
+#begin Audio/Sfx/warden_down.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/warden_down.wav
+
+#begin Audio/Sfx/warden_stabilize.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/warden_stabilize.wav

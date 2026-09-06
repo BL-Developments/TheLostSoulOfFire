@@ -15,42 +15,112 @@ public sealed class HudRenderer
     private static readonly Color BoundSoul = new(207, 207, 201);
     private static readonly Color BoundSoulDim = new(126, 127, 126);
 
-    public void Draw(SpriteBatch batch, Texture2D pixel, Viewport viewport, Player player)
+    /// <summary>
+    /// One block per Warden and one shared Resonance track.
+    ///
+    /// Player 1 keeps the exact position and shape he had in the Golden Slice.
+    /// The brother's block mirrors it into the opposite corner, tinted with his
+    /// own flame, so neither player has to hunt for their own bar. The Resonance
+    /// track stays centred because it belongs to both of them.
+    /// </summary>
+    public void Draw(SpriteBatch batch, Texture2D pixel, Viewport viewport, WardenRoster roster, TeamResonance team)
     {
-        DrawHealth(batch, pixel, player);
-        DrawDash(batch, pixel, player);
-        DrawResonance(batch, pixel, viewport, player);
-
-        if (player.Cannon.State == SoulCannonState.Charging)
+        foreach (PlayerSlot slot in roster.Slots)
         {
-            DrawCannonCharge(batch, pixel, viewport, player);
+            bool mirrored = slot.Index > 0;
+            DrawWardenBlock(batch, pixel, viewport, slot, mirrored, roster.IsCooperative, team);
+        }
+
+        DrawResonance(batch, pixel, viewport, roster, team);
+
+        foreach (PlayerSlot slot in roster.Slots)
+        {
+            if (slot.Warden.Cannon.State == SoulCannonState.Charging)
+            {
+                DrawCannonCharge(batch, pixel, viewport, slot.Warden, slot.Index > 0);
+            }
         }
     }
 
-    private static void DrawHealth(SpriteBatch batch, Texture2D pixel, Player player)
+    private static void DrawWardenBlock(
+        SpriteBatch batch,
+        Texture2D pixel,
+        Viewport viewport,
+        PlayerSlot slot,
+        bool mirrored,
+        bool cooperative,
+        TeamResonance team)
     {
-        const int x = 24;
+        int originX = mirrored ? viewport.Width - 24 - 205 : 24;
+        DrawHealth(batch, pixel, slot, originX, cooperative);
+
+        if (slot.Warden.IsDowned)
+        {
+            DrawDownState(batch, pixel, slot, originX);
+            return;
+        }
+
+        DrawDash(batch, pixel, slot.Warden, originX + 37, 54);
+    }
+
+    /// <summary>
+    /// A guttering brother needs two numbers at a glance: how long he has, and how
+    /// far the rescue has got. Both are drawn on his own block in his own flame.
+    /// </summary>
+    private static void DrawDownState(SpriteBatch batch, Texture2D pixel, PlayerSlot slot, int originX)
+    {
+        const int trackWidth = 140;
+        int trackX = originX + 37;
+        int trackY = 24 + 12;
+
+        float remaining = MathHelper.Clamp(slot.Warden.DownRemaining / GameBalance.WardenDownDuration, 0f, 1f);
+        Color flame = slot.Identity.FlameBright;
+        batch.FillRectangle(pixel, new Rectangle(trackX, trackY, trackWidth, 7), Empty);
+        batch.FillRectangle(pixel, new Rectangle(trackX, trackY, (int)MathF.Round(trackWidth * remaining), 7), flame * 0.72f);
+
+        float rescue = MathHelper.Clamp(slot.Warden.StabilizeProgress, 0f, 1f);
+        if (rescue > 0f)
+        {
+            batch.FillRectangle(pixel, new Rectangle(trackX, trackY + 8, (int)MathF.Round(trackWidth * rescue), 3), GameBalance.SoulWhite);
+        }
+
+        PixelText.Draw(batch, pixel, "GUTTERING", new Vector2(originX + 37, 54), 1, flame);
+        PixelText.Draw(
+            batch,
+            pixel,
+            $"{slot.Warden.DownRemaining:0}S",
+            new Vector2(originX + 37 + trackWidth + 8, 54),
+            1,
+            flame);
+    }
+
+    private static void DrawHealth(SpriteBatch batch, Texture2D pixel, PlayerSlot slot, int x, bool cooperative)
+    {
+        Player player = slot.Warden;
         const int y = 24;
-        const int trackX = x + 37;
+        int trackX = x + 37;
         const int trackY = y + 12;
         const int trackWidth = 140;
         const int trackHeight = 7;
 
         Rectangle panelBounds = new(x + 13, y + 4, 192, 23);
         batch.FillRectangle(pixel, panelBounds, Panel);
-        DrawCornerFrame(batch, pixel, panelBounds, Frame);
+        DrawCornerFrame(batch, pixel, panelBounds, cooperative ? slot.Identity.Accent * 0.72f : Frame);
 
+        // The bound Soul mark takes the Warden's own flame in co-op, so the block
+        // is identifiable before any text is read.
+        Color soulColor = cooperative ? slot.Identity.FlameBright : BoundSoul;
         Vector2 soulCenter = new(x + 14, y + 15);
-        DrawDiamond(batch, pixel, soulCenter, 10, BoundSoulDim);
-        DrawDiamond(batch, pixel, soulCenter, 5, BoundSoul);
+        DrawDiamond(batch, pixel, soulCenter, 10, cooperative ? slot.Identity.Flame : BoundSoulDim);
+        DrawDiamond(batch, pixel, soulCenter, 5, soulColor);
         batch.DrawLine(pixel, soulCenter - new Vector2(13f, 0f), soulCenter + new Vector2(13f, 0f), new Color(25, 23, 31), 2f);
         batch.FillRectangle(pixel, new Rectangle(trackX, trackY, trackWidth, trackHeight), Empty);
 
         float healthFill = MathHelper.Clamp(player.Health / (float)GameBalance.PlayerMaxHealth, 0f, 1f);
         int fillWidth = (int)MathF.Round(trackWidth * healthFill);
-        if (fillWidth > 0)
+        if (fillWidth > 0 && !player.IsDowned)
         {
-            batch.FillRectangle(pixel, new Rectangle(trackX, trackY, fillWidth, trackHeight), BoundSoul);
+            batch.FillRectangle(pixel, new Rectangle(trackX, trackY, fillWidth, trackHeight), cooperative ? soulColor : BoundSoul);
             batch.FillRectangle(pixel, new Rectangle(trackX, trackY + trackHeight - 2, fillWidth, 2), BoundSoulDim);
         }
 
@@ -61,12 +131,14 @@ public sealed class HudRenderer
         }
 
         PixelText.Draw(batch, pixel, player.Health.ToString(), new Vector2(trackX + trackWidth + 8, y + 12), 1, BoundSoul);
+        if (cooperative)
+        {
+            PixelText.Draw(batch, pixel, slot.Identity.ShortName, new Vector2(x + 6, y + 26), 1, slot.Identity.Accent);
+        }
     }
 
-    private static void DrawDash(SpriteBatch batch, Texture2D pixel, Player player)
+    private static void DrawDash(SpriteBatch batch, Texture2D pixel, Player player, int x, int y)
     {
-        const int x = 61;
-        const int y = 54;
         const int width = 48;
         float ready = 1f - MathHelper.Clamp(player.DashCooldownRemaining / GameBalance.DashCooldown, 0f, 1f);
         bool severance = player.SeveranceReady;
@@ -105,21 +177,26 @@ public sealed class HudRenderer
         }
     }
 
-    private static void DrawResonance(SpriteBatch batch, Texture2D pixel, Viewport viewport, Player player)
+    private static void DrawResonance(SpriteBatch batch, Texture2D pixel, Viewport viewport, WardenRoster roster, TeamResonance team)
     {
         const int trackWidth = 224;
         const int trackHeight = 5;
+        Player player = roster.Lead;
         int centerX = viewport.Width / 2;
         int trackX = centerX - trackWidth / 2;
         int trackY = viewport.Height - 34;
-        bool ready = player.IsResonanceReady;
         bool active = player.ResonanceActive;
+        bool ready = !active && team.IsReady;
         float fill = active
             ? player.ResonanceRemaining / GameBalance.ResonanceDuration
-            : player.Resonance / GameBalance.ResonanceRequired;
+            : team.Charge / GameBalance.ResonanceRequired;
         fill = MathHelper.Clamp(fill, 0f, 1f);
 
-        string label = ready ? "R RESONATE" : "RESONANCE";
+        // One track for both brothers: it is a shared pool, so showing two would
+        // imply a competition that does not exist.
+        string label = ready
+            ? roster.IsCooperative ? "RESONATE TOGETHER" : "R RESONATE"
+            : roster.IsCooperative ? "SHARED RESONANCE" : "RESONANCE";
         Color labelColor = ready || active ? GameBalance.SoulWhite : new Color(142, 119, 171);
         PixelText.DrawCentered(batch, pixel, label, centerX, trackY - 13, 1, labelColor);
 
@@ -151,10 +228,10 @@ public sealed class HudRenderer
         }
     }
 
-    private static void DrawCannonCharge(SpriteBatch batch, Texture2D pixel, Viewport viewport, Player player)
+    private static void DrawCannonCharge(SpriteBatch batch, Texture2D pixel, Viewport viewport, Player player, bool mirrored)
     {
-        int x = viewport.Width - 43;
-        const int y = 28;
+        int x = mirrored ? 43 : viewport.Width - 43;
+        int y = mirrored ? 96 : 28;
         PixelText.DrawCentered(batch, pixel, "CANNON", x, y, 1, Frame);
 
         for (int stage = 0; stage < 3; stage++)

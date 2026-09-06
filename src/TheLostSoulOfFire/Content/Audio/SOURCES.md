@@ -76,6 +76,45 @@ Every entry uses the Ludo commercial-use license and verified metered API entitl
 | `Audio/Ambience/arena_ambience.wav` | AMB-01 | 2026-08-29 | Core Audio resample 44.1 to 48 kHz; stereo; full 20 s generated loop; click-free endpoints; peak -11.0 dBFS |
 | `Audio/Music/arena_loop.ogg` | MUS-01 | 2026-08-29 | MP3 decoded to 48 kHz stereo PCM; returned 80 s performance uniformly resampled to 100 s; 20 ms loop-edge fades; peak -6.0 dBFS pre-encode; Vorbis q5 |
 
+## Session 2 additions — 2026-09-06
+
+### Service and license status
+
+- **Generation service:** ElevenLabs Text to Sound Effects (`eleven_text_to_sound_v2`), used only during authoring via `tools/audio/generate_soulfire_sfx.py`. The released game loads the committed WAV/XNB files below and has no network or API-key dependency. The API key is read from `ELEVENLABS_API_KEY` at execution time and is never written to disk, logged, committed, or recorded in this ledger.
+- **Usage:** generated material is **source only**. No raw generation ships. Every cue below is produced by `tools/audio/build_session2_sfx.py`, where an already-approved sample from this bank carries the body of the cue and a filtered, gated slice of a generation is mixed 11–15 dB underneath as texture.
+- **Why:** the first pass shipped raw ElevenLabs output and was rejected on listening. Raw text-to-audio carries a constant hiss bed, has no defined onset, and ends rather than decays. It also measures far brighter than this bank (zero-crossing rate 0.004–0.035 for every existing cue except `core_hit`), so it read as foreign in the mix regardless of the individual sound.
+- **Production chain:** resample 44.1 → 48 kHz, DC block, 55 Hz high-pass, downward expander at −40 dBFS, onset detection and trim, hard low-pass to the bank's brightness band, transient shaping, explicit exponential decay, layer, 6 ms fades, peak normalise by category.
+- **Candidate selection:** three candidates per component were generated and chosen by measurement (residual noise floor after gating, crest factor against the intended envelope class, brightness penalty). **These were not auditioned by ear during authoring** — the owner must approve them on listening. `artifacts/session2/audio-audition/` contains the shipped `hybrid` build and a `bank-only` build with no generated content for A/B.
+
+### Generation catalog
+
+| ID | Service / model | Exact generation prompt | Seconds / prompt influence |
+|---|---|---|---|
+| EL-01 `severance_window/tension` | ElevenLabs `eleven_text_to_sound_v2` | Bowstring drawn slowly to full tension, creaking fibres, dry close recording | 3.0 / 0.70 |
+| EL-02 `severance_window/air` | ElevenLabs `eleven_text_to_sound_v2` | Deep suction of air through a narrow furnace vent | 3.0 / 0.65 |
+| EL-03 `severance_cut/cut` | ElevenLabs `eleven_text_to_sound_v2` | Single sharp blade slicing a taut rope, close foley | 3.0 / 0.80 |
+| EL-04 `severance_cut/release` | ElevenLabs `eleven_text_to_sound_v2` | Fine ash sifting down as a faint bell tone decays away | 4.0 / 0.55 |
+| EL-05 `soul_exposed/surface` | ElevenLabs `eleven_text_to_sound_v2` | Small glass bowl touched gently, fragile high resonance | 4.0 / 0.70 |
+| EL-06 `warden_down/gutter` | ElevenLabs `eleven_text_to_sound_v2` | Torch flame failing in wind, deep irregular flutter | 4.0 / 0.65 |
+| EL-07 `warden_stabilize/ignite` | ElevenLabs `eleven_text_to_sound_v2` | Ember catching and growing into a steady strong flame, warm low ignition | 4.0 / 0.70 |
+| EL-08 `warden_stabilize/lock` | ElevenLabs `eleven_text_to_sound_v2` | Two low metal resonances phasing and then locking together | 4.0 / 0.65 |
+| EL-09 `resonance_ready/sync` | ElevenLabs `eleven_text_to_sound_v2` | Low heartbeat doubling into a single aligned thud, felt not heard | 4.0 / 0.65 |
+
+### Final asset ledger
+
+| Final filename | Body (approved bank source) | Generated texture | Edits performed |
+|---|---|---|---|
+| `Audio/Sfx/severance_window.wav` | `cannon_charge` reversed, 900 Hz low-pass | EL-01 at 0.22, EL-02 at 0.16 | 0.42 s; decay from 62%; peak −6.0 dBFS |
+| `Audio/Sfx/severance_cut.wav` | `core_hit` transient + `soul_release` body | EL-03 at 0.28, EL-04 at 0.18 | 0.62 s; transient-shaped; decay from 50%; peak −2.6 dBFS |
+| `Audio/Sfx/soul_exposed.wav` | `soul_release` head, 3.2 kHz low-pass | EL-05 at 0.20 | 0.40 s; decay from 45%; peak −7.0 dBFS |
+| `Audio/Sfx/warden_down.wav` | `player_death`, 700 Hz low-pass | EL-06 at 0.30 | 0.85 s; decay from 40%; peak −4.0 dBFS |
+| `Audio/Sfx/warden_stabilize.wav` | `ending_reveal`, 2.4 kHz low-pass | EL-07 at 0.34, EL-08 at 0.22 | 1.00 s; decay from 55%; peak −3.4 dBFS |
+| `Audio/Sfx/resonance_ready.wav` | `resonance_ready` doubled at +85 ms | EL-09 at 0.18 | Rebuilt: 0.44 s (was 0.35 s); peak −4.0 dBFS |
+
+### Retained unchanged
+
+`hollow_swipe`, `enemy_death`, `soul_cleave`, `scythe_hit`, `devourer_slam`, `devourer_devour`, `burning_charge`, `burning_detonation`, ambience and music were **not** replaced. They were reviewed against the Session 2 needs and judged good enough; replacing them would have cost cohesion for no gain.
+
 ## Runtime verification modes
 
 - `--audio-runtime-test` plays every cue and exercises ducking, cooldowns, and polyphony limits.

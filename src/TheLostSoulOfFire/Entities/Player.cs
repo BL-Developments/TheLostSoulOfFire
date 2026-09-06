@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using TheLostSoulOfFire.Combat;
 using TheLostSoulOfFire.Effects;
 using TheLostSoulOfFire.Game;
@@ -38,6 +37,21 @@ public sealed class Player
     private Vector2 _attackImpulse;
     private Vector2 _damageKnockback;
 
+    /// <summary>
+    /// Which brother this Warden is. Drives body tint, flame colour and HUD
+    /// accent; it is the only thing that differs between the two local players.
+    /// </summary>
+    public WardenIdentity Identity { get; }
+
+    /// <summary>Tint applied to the shared Warden sheet.</summary>
+    public Color BodyTint => Identity.BodyTint;
+
+    /// <summary>
+    /// Per-Warden offset so two brothers standing together never breathe their
+    /// flame on the same frame, which would read as one doubled character.
+    /// </summary>
+    public float LightPhase { get; }
+
     public Vector2 Position { get; private set; }
     public Vector2 Velocity { get; private set; }
     public Vector2 FacingDirection { get; private set; } = Vector2.UnitX;
@@ -49,7 +63,8 @@ public sealed class Player
     public float DashCooldownRemaining => _dashCooldownTimer;
     public bool IsDashing => _dashTimer > 0f;
     public bool IsInvulnerable => InvulnerabilityRemaining > 0f;
-    public bool IsDead => Health <= 0;
+    /// <summary>A downed Warden is not dead: his flame has guttered, not gone out.</summary>
+    public bool IsDead => Health <= 0 && !IsDowned;
     public float Resonance { get; private set; }
     public bool IsResonanceReady => !ResonanceActive && Resonance >= GameBalance.ResonanceRequired;
     public bool ResonanceActive { get; private set; }
@@ -66,6 +81,31 @@ public sealed class Player
     public float SeveranceRemaining => _severanceTimer;
     public float SeveranceFlare => MathHelper.Clamp(_severanceFlareTimer / 0.28f, 0f, 1f);
     public bool DashStartedThisFrame { get; private set; }
+
+    /// <summary>Set on the frame this Warden asked to spend the team's Resonance.</summary>
+    public bool ResonanceRequestedThisFrame { get; private set; }
+
+    /// <summary>
+    /// Set in co-op when this Warden's flame has guttered but not gone out.
+    /// Never true in solo, where death stays death.
+    /// </summary>
+    public bool IsDowned { get; private set; }
+
+    /// <summary>Seconds left before a downed Warden's flame goes out for good.</summary>
+    public float DownRemaining { get; private set; }
+
+    /// <summary>0..1 hold progress made by the other brother.</summary>
+    public float StabilizeProgress { get; private set; }
+
+    /// <summary>True while this Warden is holding a brother's flame steady.</summary>
+    public bool IsStabilizing { get; private set; }
+
+    /// <summary>Enemies commit to Wardens that can still fight back.</summary>
+    public bool CanBeTargeted => !IsDead && !IsDowned;
+
+    /// <summary>A guttering Warden cannot be hit again; only the clock can finish him.</summary>
+    public bool CanBeDamaged => !IsDead && !IsDowned;
+
     public ScytheCombat Scythe { get; } = new();
     public SoulCannon Cannon { get; } = new();
 
@@ -81,9 +121,11 @@ public sealed class Player
         _severanceFlareTimer = 0f;
     }
 
-    public Player(Vector2 position)
+    public Player(Vector2 position, WardenIdentity identity = null!)
     {
         Position = position;
+        Identity = identity ?? WardenIdentity.Younger;
+        LightPhase = ReferenceEquals(Identity, WardenIdentity.Elder) ? 1.37f : 0f;
     }
 
     public void Reset(Vector2 position)
@@ -109,6 +151,10 @@ public sealed class Player
         _severanceFlareTimer = 0f;
         DashStartedThisFrame = false;
         SoulSenseActive = false;
+        IsDowned = false;
+        DownRemaining = 0f;
+        StabilizeProgress = 0f;
+        IsStabilizing = false;
         _afterimages.Clear();
         Scythe.Reset();
         Cannon.Reset();
@@ -128,6 +174,10 @@ public sealed class Player
         _severanceTimer = 0f;
         _severanceFlareTimer = 0f;
         SoulSenseActive = false;
+        IsDowned = false;
+        DownRemaining = 0f;
+        StabilizeProgress = 0f;
+        IsStabilizing = false;
         _afterimages.Clear();
         Scythe.Reset();
         Cannon.Reset();
@@ -135,12 +185,12 @@ public sealed class Player
 
     public void Update(
         float deltaTime,
-        InputState input,
-        Vector2 mouseWorld,
+        PlayerCommand command,
         Rectangle movementBounds,
         ParticleSystem particles,
         ScreenEffects screenEffects,
-        bool forceSoulSense = false)
+        bool forceSoulSense = false,
+        bool stabilizing = false)
     {
         _visualTime += deltaTime;
         DashStartedThisFrame = false;
@@ -158,51 +208,79 @@ public sealed class Player
             }
         }
 
-        if (!IsDead && IsResonanceReady && input.WasKeyPressed(Keys.R))
-        {
-            StartResonance();
-        }
-
-        SoulSenseActive = !IsDead && (ResonanceActive || forceSoulSense || input.IsKeyDown(Keys.Q));
         _dashCooldownTimer = MathF.Max(0f, _dashCooldownTimer - deltaTime);
         InvulnerabilityRemaining = MathF.Max(0f, InvulnerabilityRemaining - deltaTime);
         UpdateAfterimages(deltaTime);
+
+        if (IsDowned)
+        {
+            // A guttering Warden cannot act, cannot be hit and cannot be reached
+            // by any of his own systems. The clock is the only thing still running.
+            DownRemaining = MathF.Max(0f, DownRemaining - deltaTime);
+            ResonanceActive = false;
+            _resonanceTimer = 0f;
+            SoulSenseActive = false;
+            Velocity = Vector2.Zero;
+            Scythe.Reset();
+            Cannon.Reset();
+            return;
+        }
 
         if (IsDead)
         {
             ResonanceActive = false;
             _resonanceTimer = 0f;
+            SoulSenseActive = false;
             Velocity = Vector2.Zero;
             return;
         }
 
-        Vector2 toMouse = mouseWorld - Position;
-        if (toMouse.LengthSquared() > 4f)
+        // Resonance is a team decision now: the request is recorded here and the
+        // world spends the shared pool, so one brother can never light it alone
+        // while the other watches.
+        ResonanceRequestedThisFrame = command.ResonancePressed && !stabilizing;
+
+        SoulSenseActive = ResonanceActive || forceSoulSense || command.SenseHeld;
+
+        Vector2 toAim = command.AimPoint - Position;
+        if (toAim.LengthSquared() > 4f)
         {
-            FacingDirection = Vector2.Normalize(toMouse);
+            FacingDirection = Vector2.Normalize(toAim);
         }
 
-        Vector2 movement = ReadMovement(input);
+        Vector2 movement = command.Move;
 
-        Cannon.Update(
-            deltaTime,
-            input,
-            Position,
-            FacingDirection,
-            !IsDashing && Scythe.ActiveStep == 0,
-            SoulSenseActive,
-            particles,
-            ResonanceActive);
-
-        Scythe.Update(deltaTime, input, FacingDirection, Position, particles, !IsDashing && Cannon.CanUseScythe, ResonanceActive, SeveranceReady);
-        if (Scythe.StartedThisFrame)
+        // Holding a brother's flame steady takes both hands. Weapons are locked
+        // and movement is halved, which is the danger window that keeps
+        // stabilisation a real decision instead of a free reset.
+        IsStabilizing = stabilizing;
+        if (stabilizing)
         {
-            _attackImpulse = Scythe.AttackDirection * Scythe.GetForwardImpulse();
+            Scythe.Reset();
+            Cannon.Reset();
         }
-
-        if (input.WasKeyPressed(Keys.Space) && _dashCooldownTimer <= 0f && Scythe.ActiveStep == 0)
+        else
         {
-            StartDash(movement, particles, screenEffects);
+            Cannon.Update(
+                deltaTime,
+                command,
+                Position,
+                FacingDirection,
+                !IsDashing && Scythe.ActiveStep == 0,
+                SoulSenseActive,
+                particles,
+                ResonanceActive);
+
+            Scythe.Update(deltaTime, command, FacingDirection, Position, particles, !IsDashing && Cannon.CanUseScythe, ResonanceActive, SeveranceReady);
+            if (Scythe.StartedThisFrame)
+            {
+                _attackImpulse = Scythe.AttackDirection * Scythe.GetForwardImpulse();
+            }
+
+            if (command.DashPressed && _dashCooldownTimer <= 0f && Scythe.ActiveStep == 0)
+            {
+                StartDash(movement, particles, screenEffects);
+            }
         }
 
         if (_dashTimer > 0f)
@@ -213,7 +291,7 @@ public sealed class Player
         {
             float movementMultiplier = SoulSenseActive && !ResonanceActive ? GameBalance.SoulSenseMovementMultiplier : 1f;
             movementMultiplier *= ResonanceActive ? GameBalance.ResonanceMovementMultiplier : 1f;
-            movementMultiplier *= Cannon.GetMovementMultiplier();
+            movementMultiplier *= stabilizing ? GameBalance.StabilizeMoveMultiplier : Cannon.GetMovementMultiplier();
             Velocity = movement * GameBalance.PlayerMoveSpeed * movementMultiplier + _attackImpulse + _damageKnockback;
             _attackImpulse *= MathF.Pow(0.002f, deltaTime);
             _damageKnockback *= MathF.Pow(0.012f, deltaTime);
@@ -241,6 +319,80 @@ public sealed class Player
     }
 
     /// <summary>
+    /// Called instead of death when a brother is still standing. The flame is not
+    /// out; it has guttered, and it will go out on its own if nobody reaches it.
+    /// </summary>
+    public void Down()
+    {
+        if (IsDowned)
+        {
+            return;
+        }
+
+        IsDowned = true;
+        DownRemaining = GameBalance.WardenDownDuration;
+        StabilizeProgress = 0f;
+        Velocity = Vector2.Zero;
+        _attackImpulse = Vector2.Zero;
+        _damageKnockback = Vector2.Zero;
+        ResonanceActive = false;
+        _resonanceTimer = 0f;
+        _severanceTimer = 0f;
+        _severanceFlareTimer = 0f;
+        SoulSenseActive = false;
+        _afterimages.Clear();
+        Scythe.Reset();
+        Cannon.Reset();
+    }
+
+    /// <summary>
+    /// Progress made by a brother holding this Warden's flame steady. Returns true
+    /// on the frame the hold completes.
+    /// </summary>
+    public bool AdvanceStabilization(float deltaTime, bool held, float requiredSeconds)
+    {
+        if (!IsDowned)
+        {
+            StabilizeProgress = 0f;
+            return false;
+        }
+
+        if (!held)
+        {
+            // Interrupted progress bleeds away rather than vanishing, so being
+            // driven off for a moment is a setback and not a restart.
+            StabilizeProgress = MathF.Max(0f, StabilizeProgress - deltaTime * 0.55f);
+            return false;
+        }
+
+        StabilizeProgress += deltaTime / MathF.Max(0.05f, requiredSeconds);
+        if (StabilizeProgress < 1f)
+        {
+            return false;
+        }
+
+        StabilizeProgress = 0f;
+        IsDowned = false;
+        DownRemaining = 0f;
+        Health = GameBalance.StabilizeRestoredHealth;
+        // Bounded, not endless: one short grace so the Warden is not instantly
+        // re-downed by the attack that is already in the air.
+        InvulnerabilityRemaining = GameBalance.StabilizeGrace;
+        HitFlashRemaining = 0.2f;
+        return true;
+    }
+
+    /// <summary>The down timer ran out. The flame goes out for good.</summary>
+    public void ExtinguishFlame()
+    {
+        IsDowned = false;
+        DownRemaining = 0f;
+        StabilizeProgress = 0f;
+        Health = 0;
+        InvulnerabilityRemaining = 0f;
+    }
+
+    /// <summary>
     /// Dash afterimages as soft residue rather than stamped silhouettes. Drawn in
     /// the additive combat-light pass with the rest of the Warden's flame.
     /// </summary>
@@ -256,8 +408,8 @@ public sealed class Player
                 afterimage.Facing,
                 30f,
                 17f,
-                new Color(96, 42, 156) * (alpha * 0.3f));
-            SoftShapes.Blob(batch, brush, afterimage.Position, 11f, GameBalance.DeathFlameBright * (alpha * 0.2f));
+                Identity.Flame * (alpha * 0.24f));
+            SoftShapes.Blob(batch, brush, afterimage.Position, 11f, Identity.FlameBright * (alpha * 0.2f));
         }
     }
 
@@ -291,21 +443,25 @@ public sealed class Player
         if (IsDead)
         {
             float deathPulse = 0.5f + 0.5f * MathF.Sin(_visualTime * 5f);
-            SoftShapes.Blob(batch, brush, Position, 46f + deathPulse * 10f, GameBalance.DeepViolet * 0.34f);
-            SoftShapes.Blob(batch, brush, Position, 17f + deathPulse * 4f, GameBalance.SoulWhite * 0.4f);
+            SoftShapes.Blob(batch, brush, Position, 46f + deathPulse * 10f, Identity.Flame * 0.26f);
+            SoftShapes.Blob(batch, brush, Position, 17f + deathPulse * 4f, GameBalance.SoulWhite * 0.36f);
             return;
         }
 
-        float pulse = 0.5f + 0.5f * MathF.Sin(_visualTime * 4f);
+        float pulse = 0.5f + 0.5f * MathF.Sin((_visualTime + LightPhase) * 4f);
         Vector2 core = Position + FacingDirection * 2f;
         bool coreReady = IsResonanceReady;
+        Color flame = Identity.Flame;
+        Color flameBright = Identity.FlameBright;
 
-        // Bound Soul core.
-        SoftShapes.Blob(batch, brush, core, (coreReady ? 26f : 19f) + pulse * 4f, GameBalance.DeepViolet * 0.4f);
-        SoftShapes.Blob(batch, brush, core, (coreReady ? 11f : 7.5f) + pulse * 2f, GameBalance.SoulWhite * 0.5f);
+        // Bound Soul core. Deliberately small: the Warden's presence is carried by
+        // the silhouette light in ActorLighting, so this only has to say "there is
+        // a Soul in there", not "there is a lamp here".
+        SoftShapes.Blob(batch, brush, core, (coreReady ? 22f : 16f) + pulse * 3f, flame * 0.26f);
+        SoftShapes.Blob(batch, brush, core, (coreReady ? 8f : 5.5f) + pulse * 1.5f, flameBright * 0.34f);
         if (coreReady)
         {
-            SoftShapes.Blob(batch, brush, core, 40f + pulse * 12f, GameBalance.DeathFlameBright * 0.2f);
+            SoftShapes.Blob(batch, brush, core, 36f + pulse * 10f, flameBright * 0.14f);
         }
 
         // Soul Sense opens the Warden's sight forward.
@@ -313,31 +469,32 @@ public sealed class Player
         if (sense > 0.001f)
         {
             Vector2 eye = Position + FacingDirection * 24f;
-            SoftShapes.Blob(batch, brush, eye, 20f, GameBalance.DeepViolet * (0.4f * sense));
-            SoftShapes.Blob(batch, brush, eye, 8f, GameBalance.SoulWhite * (0.4f * sense));
+            SoftShapes.Blob(batch, brush, eye, 20f, flame * (0.3f * sense));
+            SoftShapes.Blob(batch, brush, eye, 8f, flameBright * (0.32f * sense));
         }
 
         if (ResonanceActive)
         {
-            float flare = 0.5f + 0.5f * MathF.Sin(_visualTime * 3.8f);
-            SoftShapes.Blob(batch, brush, core, 62f + flare * 10f, GameBalance.DeathFlame * 0.2f);
-            SoftShapes.Ring(batch, brush, Position, 34f + flare * 3f, 13f, GameBalance.DeathFlame * 0.16f, 16, _visualTime * 1.6f);
+            float flare = 0.5f + 0.5f * MathF.Sin((_visualTime + LightPhase) * 3.8f);
+            SoftShapes.Blob(batch, brush, core, 62f + flare * 10f, flame * 0.16f);
+            SoftShapes.Ring(batch, brush, Position, 34f + flare * 3f, 13f, flame * 0.1f, 16, _visualTime * 1.6f);
         }
 
-        // Severance: the guttering flame draws into one taut, white-hot body of
-        // light. A pose change in the light, not an interface ring.
+        // Severance: the guttering flame draws taut and forward. Session 1 painted
+        // a white blob over the chest here, which blew the Warden out to a
+        // featureless flare exactly when the Player most needed to read his pose.
+        // The gather is now off-body and directional; the edge does the talking.
         if (SeveranceReady)
         {
             float life = MathHelper.Clamp(_severanceTimer / GameBalance.SeveranceWindowDuration, 0f, 1f);
             float flare = SeveranceFlare;
             float taut = 0.5f + 0.5f * MathF.Sin(_visualTime * 15f);
 
-            SoftShapes.Blob(batch, brush, core, 78f + flare * 46f, GameBalance.DeathFlameBright * (0.2f * life + flare * 0.22f));
-            SoftShapes.Blob(batch, brush, core, 30f + taut * 5f, GameBalance.SoulWhite * (0.44f * life));
-            SoftShapes.Ring(batch, brush, Position, 30f + taut * 4f, 11f,
-                GameBalance.SoulWhite * (0.2f * life), 14, _visualTime * 3.2f);
-            SoftShapes.Streak(batch, brush, Position + FacingDirection * 26f, FacingDirection,
-                40f + taut * 8f, 12f, GameBalance.SoulWhite * (0.24f * life));
+            SoftShapes.Blob(batch, brush, core, 70f + flare * 30f, flameBright * (0.1f * life + flare * 0.1f));
+            SoftShapes.Streak(batch, brush, Position + FacingDirection * 34f, FacingDirection,
+                46f + taut * 10f, 10f, GameBalance.SoulWhite * (0.2f * life));
+            SoftShapes.Streak(batch, brush, Position + FacingDirection * 58f, FacingDirection,
+                26f + taut * 6f, 4.5f, Color.White * (0.16f * life));
         }
 
         Scythe.DrawTrail(batch, brush, Position);
@@ -345,14 +502,14 @@ public sealed class Player
         if (HitFlashRemaining > 0f)
         {
             float flash = MathHelper.Clamp(HitFlashRemaining / 0.14f, 0f, 1f);
-            SoftShapes.Blob(batch, brush, Position, 44f * flash, GameBalance.SoulWhite * (0.34f * flash));
+            SoftShapes.Blob(batch, brush, Position, 44f * flash, GameBalance.SoulWhite * (0.28f * flash));
         }
 
         if (IsDashing)
         {
             Vector2 origin = Position - _dashDirection * 22f;
-            SoftShapes.Streak(batch, brush, origin, _dashDirection, 42f, 17f, GameBalance.DeathFlame * 0.44f);
-            SoftShapes.Streak(batch, brush, origin - _dashDirection * 8f, _dashDirection, 27f, 8f, GameBalance.DeathFlameBright * 0.34f);
+            SoftShapes.Streak(batch, brush, origin, _dashDirection, 42f, 17f, flame * 0.4f);
+            SoftShapes.Streak(batch, brush, origin - _dashDirection * 8f, _dashDirection, 27f, 8f, flameBright * 0.3f);
         }
     }
 
@@ -390,17 +547,14 @@ public sealed class Player
         screenEffects.Flash(0.09f, Health == 0 ? 0.34f : 0.2f);
     }
 
-    public void AddResonance(float amount)
+    /// <summary>
+    /// Mirrors the shared team pool onto this Warden so lighting, HUD and the
+    /// Severance core read one number. Wardens no longer bank Resonance
+    /// individually; see <see cref="Game.TeamResonance"/>.
+    /// </summary>
+    public void SyncResonance(float charge)
     {
-        Resonance = MathHelper.Clamp(Resonance + amount, 0f, GameBalance.ResonanceRequired);
-    }
-
-    public void FillResonance()
-    {
-        if (!ResonanceActive)
-        {
-            Resonance = GameBalance.ResonanceRequired;
-        }
+        Resonance = MathHelper.Clamp(charge, 0f, GameBalance.ResonanceRequired);
     }
 
     public void ApplyCannonRecoil(Vector2 shotDirection, float charge)
@@ -444,9 +598,8 @@ public sealed class Player
         });
     }
 
-    private void StartResonance()
+    public void StartResonance()
     {
-        Resonance = 0f;
         ResonanceActive = true;
         _resonanceTimer = GameBalance.ResonanceDuration;
         _resonanceActivationTimer = 0.5f;
@@ -466,15 +619,15 @@ public sealed class Player
         }
     }
 
-    public static Vector2 ReadMovement(InputState input)
+    /// <summary>
+    /// Positional correction applied from outside combat: brother separation and
+    /// the shared tether. Deliberately not a velocity change, so it can never
+    /// fight the Warden's own movement or dash.
+    /// </summary>
+    public void Nudge(Vector2 offset, Rectangle bounds)
     {
-        Vector2 movement = Vector2.Zero;
-        if (input.IsKeyDown(Keys.W)) movement.Y -= 1f;
-        if (input.IsKeyDown(Keys.S)) movement.Y += 1f;
-        if (input.IsKeyDown(Keys.A)) movement.X -= 1f;
-        if (input.IsKeyDown(Keys.D)) movement.X += 1f;
-
-        return movement.LengthSquared() > 1f ? Vector2.Normalize(movement) : movement;
+        Position += offset;
+        ClampTo(bounds);
     }
 
     private void ClampTo(Rectangle bounds)

@@ -14,3 +14,6 @@ artifacts/
 .octotrator/data/managed-workspaces/429315451c934dd5aa3622b77f172ba4.json
 /.octotrator
 .octotrator/data/managed-workspaces/207e98d95e45430991eb9bd6b70368f7.json
+
+# Generated audio authoring candidates (source only, never shipped)
+art/audio_candidates/

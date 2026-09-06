@@ -70,7 +70,7 @@ public sealed class ScytheCombat
 
     public void Update(
         float deltaTime,
-        InputState input,
+        PlayerCommand command,
         Vector2 facingDirection,
         Vector2 playerPosition,
         ParticleSystem particles,
@@ -91,7 +91,7 @@ public sealed class ScytheCombat
                 _nextStep = 1;
             }
 
-            if (canStartAttack && (input.WasLeftMousePressed || _queuedAttack))
+            if (canStartAttack && (command.ScythePressed || _queuedAttack))
             {
                 _queuedAttack = false;
                 StartAttack(facingDirection, playerPosition, particles);
@@ -100,7 +100,7 @@ public sealed class ScytheCombat
             return;
         }
 
-        if (input.WasLeftMousePressed && _attackElapsed > 0.055f)
+        if (command.ScythePressed && _attackElapsed > 0.055f)
         {
             _queuedAttack = true;
         }

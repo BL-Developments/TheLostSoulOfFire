@@ -257,6 +257,10 @@ public static class ArenaComposition
         DrawOrientedEllipse(batch, pixel, mouth + axis * 4f, axis, side, mouthHalf + 12f, 40f, rim * 0.38f, false);
         DrawOrientedEllipse(batch, pixel, mouth + axis * 7f, axis, side, mouthHalf + 6f, 36f, dark, false);
         DrawOrientedEllipse(batch, pixel, mouth + axis * 4f, axis, side, mouthHalf, 34f, new Color(9, 8, 14) * physical, true);
+        // The residue is cooling, not molten. Session 1 lit it brightly enough
+        // that the landmark out-competed the fight happening east of it; the
+        // vessel now holds the eye by mass and silhouette, and the Wardens are
+        // the brightest violet in the room.
         DrawOrientedEllipse(
             batch,
             pixel,
@@ -265,7 +269,7 @@ public static class ArenaComposition
             side,
             mouthHalf * 0.72f,
             23f,
-            GameBalance.DeepViolet * ((0.66f + glow * 0.22f) * physical),
+            GameBalance.DeepViolet * ((0.44f + glow * 0.14f) * physical),
             true);
         DrawOrientedEllipse(
             batch,
@@ -275,7 +279,7 @@ public static class ArenaComposition
             side,
             mouthHalf * 0.34f,
             11f,
-            GameBalance.DeathFlame * ((0.46f + glow * 0.26f) * physical),
+            GameBalance.DeathFlame * ((0.3f + glow * 0.16f) * physical),
             true);
 
         // Cooled crust floating on the residue. Death Flame here is spent, not molten.
