@@ -51,6 +51,13 @@ public sealed class GameWorld : IDisposable
     private bool _forceSoulSense;
     private int _waveNumber;
     private ArenaLoopState _loopState = ArenaLoopState.Title;
+
+    /// <summary>
+    /// Set only by the Session 3 character-study visual fixtures. Holds the beat
+    /// loop open so the protagonist can be judged without arrivals, banners or
+    /// transitions entering the frame. Never set in a shipped run.
+    /// </summary>
+    private bool _visualSandbox;
     private float _burningHandoffTimer;
     private int _burningCommittedLastFrame;
     private float _presentationTime;
@@ -87,6 +94,22 @@ public sealed class GameWorld : IDisposable
     // Update methods still own AI, damage, timings and knockback.
     internal void ArrangeVisualSubject(string scenario)
     {
+        // The Session 3 character fixtures want the protagonist alone on a quiet
+        // floor: the only thing being judged is the Warden, his gait and his
+        // facing. The beat loop is held open so no banner, arrival or transition
+        // can wander into the frame.
+        if (scenario is "facing-sweep" or "run-cycle" or "strafe-read")
+        {
+            _visualSandbox = true;
+            _waveNumber = 1;
+            _loopState = ArenaLoopState.Combat;
+            _enemies.Clear();
+            _souls.Clear();
+            _cannonShots.Clear();
+            _audio.SetCalm(true);
+            return;
+        }
+
         Enemy subject = scenario switch
         {
             "hollow-swipe" => new Hollow(_player.Position + new Vector2(165f, 0f), 1),
@@ -1058,12 +1081,6 @@ public sealed class GameWorld : IDisposable
             _enemies,
             _souls,
             _presentationTime);
-        // Threat cues are light, so they use the same additive path and linear
-        // filtering as the emission layer rather than crisp PointClamp geometry.
-        batch.Begin(SpriteSortMode.Deferred, SoftShapes.AdditiveLight, SamplerState.LinearClamp,
-            transformMatrix: _camera.GetTransform(viewport, _screenEffects.CameraOffset));
-        ThreatPresentation.Draw(batch, _art.SoftBrush, _enemies, _presentationTime);
-        batch.End();
         DrawHud(batch, pixel, viewport);
     }
 
@@ -1101,6 +1118,16 @@ public sealed class GameWorld : IDisposable
         // Actor light sits between the room and the fighting plane, so every
         // silhouette is lit from behind rather than pasted onto the floor.
         DrawActorLight(batch, worldTransform);
+
+        // Threat cues are light on the floor, so they belong *under* the actors.
+        // They were drawn last, over everything, which meant a Hollow's swipe
+        // band was painted straight across the Warden standing in it: the frame
+        // where the Player most needs to read his own position was the frame
+        // where he was hardest to see. Same cues, same alpha, correct layer.
+        batch.Begin(SpriteSortMode.Deferred, SoftShapes.AdditiveLight, SamplerState.LinearClamp,
+            transformMatrix: worldTransform);
+        ThreatPresentation.Draw(batch, _art.SoftBrush, _enemies, _presentationTime);
+        batch.End();
 
         batch.Begin(
             SpriteSortMode.Deferred,
@@ -1670,6 +1697,13 @@ public sealed class GameWorld : IDisposable
 
     private void UpdateArenaLoop(float deltaTime)
     {
+        // Character-study fixtures hold the beat open. Nothing else reads this
+        // flag, and it is only ever set from the visual-capture seam.
+        if (_visualSandbox)
+        {
+            return;
+        }
+
         switch (_loopState)
         {
             case ArenaLoopState.Intro:

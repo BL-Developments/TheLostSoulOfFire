@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using TheLostSoulOfFire.Game;
 
 namespace TheLostSoulOfFire.Entities;
 
@@ -18,8 +19,9 @@ public sealed record WardenIdentity(
     Color Flame,
     Color FlameBright,
     Color Accent,
+    string SheetFamily,
     float LightScale = 1f,
-    float DisplaySize = 108f)
+    float DisplaySize = GameBalance.WardenDisplaySize)
 {
     /// <summary>The protagonist. Newly dead, unstable, warm violet.</summary>
     public static readonly WardenIdentity Younger = new(
@@ -29,13 +31,19 @@ public sealed record WardenIdentity(
         Flame: new Color(145, 71, 255),
         FlameBright: new Color(221, 190, 255),
         Accent: new Color(198, 158, 255),
-        LightScale: 1f,
-        DisplaySize: 108f);
+        SheetFamily: "warden",
+        LightScale: 1f);
 
     /// <summary>
     /// The brother. Already a Warden, so the same flame reads colder, paler and
-    /// steadier. The body tint pushes his cloth and iron toward blue-steel so the
-    /// two silhouettes separate even with every effect switched off.
+    /// steadier.
+    ///
+    /// Session 2 separated the two brothers by tint and by display size, and the
+    /// capture review recorded that as the weakest result in the whole co-op
+    /// pass: in grayscale they differed only in mass. He now has his own sheet
+    /// from the same rig — hood up, long mantle, no scarf — so the difference is
+    /// structural and survives grayscale, reduced effects and distance. Both
+    /// brothers are drawn at the same exact 1:1 pixel scale.
     /// </summary>
     public static readonly WardenIdentity Elder = new(
         "THE WARDEN BROTHER",
@@ -44,12 +52,9 @@ public sealed record WardenIdentity(
         Flame: new Color(122, 156, 232),
         FlameBright: new Color(206, 226, 255),
         Accent: new Color(158, 200, 255),
+        SheetFamily: "warden_elder",
         // A cold flame separates from this violet-grey room at a much lower
         // intensity than a violet one. Matched by inspection of the two-player
         // captures so neither brother out-reads the other.
-        LightScale: 0.74f,
-        // Colour cannot be the only difference: the brothers have to stay
-        // readable in grayscale and with effects reduced. The elder carries more
-        // silhouette mass, which survives both.
-        DisplaySize: 120f);
+        LightScale: 0.74f);
 }

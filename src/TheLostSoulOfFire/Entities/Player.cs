@@ -37,6 +37,16 @@ public sealed class Player
     private Vector2 _attackImpulse;
     private Vector2 _damageKnockback;
 
+    // --- presentation-only facing and gait state -------------------------
+    // None of this feeds combat. FacingDirection stays the raw aim vector, so
+    // every hitbox, telegraph and light is exactly what it was; these values
+    // only decide which frame is drawn.
+    private float _bodyAngle;
+    private int _facingSector = 2;
+    private float _gaitPhase;
+    private bool _running;
+    private bool _backpedalling;
+
     /// <summary>
     /// Which brother this Warden is. Drives body tint, flame colour and HUD
     /// accent; it is the only thing that differs between the two local players.
@@ -55,6 +65,31 @@ public sealed class Player
     public Vector2 Position { get; private set; }
     public Vector2 Velocity { get; private set; }
     public Vector2 FacingDirection { get; private set; } = Vector2.UnitX;
+
+    /// <summary>
+    /// Where the body is actually pointed, which is not the same thing as where
+    /// the mouse is. The Warden turns at a bounded rate toward the aim instead
+    /// of teleporting his shoulders onto it every frame.
+    /// </summary>
+    public Vector2 BodyFacing => new(MathF.Cos(_bodyAngle), MathF.Sin(_bodyAngle));
+
+    /// <summary>
+    /// The eight-way sheet the body is currently showing, with hysteresis. A
+    /// sector is only given up once the body is clearly past the boundary, so a
+    /// mouse resting on a diagonal cannot make the character stutter between
+    /// two sheets.
+    /// </summary>
+    public string FacingSector => SectorNames[_facingSector];
+
+    /// <summary>0..1 position in the run cycle, advanced by distance travelled.</summary>
+    public float GaitPhase => _gaitPhase;
+
+    /// <summary>Movement is fast enough to be shown as a run. Hysteretic.</summary>
+    public bool IsRunning => _running;
+
+    /// <summary>Moving against the way the body is pointed.</summary>
+    public bool IsBackpedalling => _backpedalling;
+
     public Vector2 DashDirection => _dashDirection;
     public int Health { get; private set; } = GameBalance.PlayerMaxHealth;
     public float Radius => GameBalance.PlayerRadius;
@@ -310,12 +345,70 @@ public sealed class Player
             }
         }
 
+        UpdatePresentation(deltaTime, movement);
+
         _idleParticleTimer -= deltaTime;
         if (_idleParticleTimer <= 0f && !IsDashing)
         {
             _idleParticleTimer = 0.16f;
             particles.EmitDeathFlame(Position - FacingDirection * 2f, 1, 0.55f);
         }
+    }
+
+    private static readonly string[] SectorNames = ["e", "se", "s", "sw", "w", "nw", "n", "ne"];
+
+    /// <summary>
+    /// Body facing, sheet sector and gait. Presentation only.
+    ///
+    /// This exists because the old behaviour was to re-bucket the raw aim vector
+    /// into one of eight sheets every single frame. Two things went wrong with
+    /// that: the shoulders snapped instantly to the mouse, and a mouse sitting
+    /// on a sector boundary flipped the sheet back and forth every frame. Both
+    /// read as the character being broken rather than as him aiming.
+    /// </summary>
+    private void UpdatePresentation(float deltaTime, Vector2 movement)
+    {
+        // 1. Turn toward the aim at a bounded rate. Fast enough to feel
+        //    responsive, slow enough that the turn is visible as a turn.
+        float target = MathF.Atan2(FacingDirection.Y, FacingDirection.X);
+        float delta = MathHelper.WrapAngle(target - _bodyAngle);
+        float maxStep = (GameBalance.WardenTurnRate + MathF.Abs(delta) * GameBalance.WardenTurnAcceleration) * deltaTime;
+        _bodyAngle = MathHelper.WrapAngle(_bodyAngle + MathHelper.Clamp(delta, -maxStep, maxStep));
+
+        // 2. Pick the sheet with hysteresis around the sector we are already in.
+        float sectorCenter = _facingSector * MathHelper.PiOver4;
+        if (MathF.Abs(MathHelper.WrapAngle(_bodyAngle - sectorCenter)) > GameBalance.WardenSectorHold)
+        {
+            float degrees = MathHelper.ToDegrees(_bodyAngle);
+            if (degrees < 0f)
+            {
+                degrees += 360f;
+            }
+
+            _facingSector = (int)MathF.Floor((degrees + 22.5f) / 45f) % 8;
+        }
+
+        // 3. Advance the run cycle by distance covered, so the gait is correct
+        //    at every movement multiplier instead of only at full speed.
+        float speed = Velocity.Length();
+        _running = _running
+            ? speed > GameBalance.WardenRunExitSpeed
+            : speed > GameBalance.WardenRunEnterSpeed;
+
+        if (_running)
+        {
+            _gaitPhase += speed * deltaTime / GameBalance.WardenGaitCycleDistance;
+            _gaitPhase -= MathF.Floor(_gaitPhase);
+        }
+        else
+        {
+            // Settle to the contact pose rather than freezing mid-stride.
+            _gaitPhase = 0f;
+        }
+
+        _backpedalling = _running
+            && movement.LengthSquared() > 0.001f
+            && Vector2.Dot(Vector2.Normalize(movement), BodyFacing) < -0.35f;
     }
 
     /// <summary>
@@ -454,14 +547,15 @@ public sealed class Player
         Color flame = Identity.Flame;
         Color flameBright = Identity.FlameBright;
 
-        // Bound Soul core. Deliberately small: the Warden's presence is carried by
-        // the silhouette light in ActorLighting, so this only has to say "there is
-        // a Soul in there", not "there is a lamp here".
-        SoftShapes.Blob(batch, brush, core, (coreReady ? 22f : 16f) + pulse * 3f, flame * 0.26f);
-        SoftShapes.Blob(batch, brush, core, (coreReady ? 8f : 5.5f) + pulse * 1.5f, flameBright * 0.34f);
+        // Bound Soul core. The authored sheet now carries a two-pixel ember at
+        // the sternum, so this only has to make that ember breathe. At the old
+        // radius it was a glowing egg laid over the Warden's chest and it cost
+        // more readability than it bought.
+        SoftShapes.Blob(batch, brush, core, (coreReady ? 13f : 9f) + pulse * 2f, flame * 0.2f);
+        SoftShapes.Blob(batch, brush, core, (coreReady ? 4.5f : 3f) + pulse, flameBright * 0.3f);
         if (coreReady)
         {
-            SoftShapes.Blob(batch, brush, core, 36f + pulse * 10f, flameBright * 0.14f);
+            SoftShapes.Blob(batch, brush, core, 26f + pulse * 7f, flameBright * 0.1f);
         }
 
         // Soul Sense opens the Warden's sight forward.
@@ -490,7 +584,12 @@ public sealed class Player
             float flare = SeveranceFlare;
             float taut = 0.5f + 0.5f * MathF.Sin(_visualTime * 15f);
 
-            SoftShapes.Blob(batch, brush, core, 70f + flare * 30f, flameBright * (0.1f * life + flare * 0.1f));
+            // Kept off the body. Session 2 moved the gather forward and halved
+            // it; with the authored sheet in place it still swallowed the pose,
+            // so the remaining wash is smaller again and sits ahead of him. The
+            // Warden reading his own Severance must never cost him his outline.
+            SoftShapes.Blob(batch, brush, Position + FacingDirection * 40f, 38f + flare * 16f,
+                flameBright * (0.07f * life + flare * 0.07f));
             SoftShapes.Streak(batch, brush, Position + FacingDirection * 34f, FacingDirection,
                 46f + taut * 10f, 10f, GameBalance.SoulWhite * (0.2f * life));
             SoftShapes.Streak(batch, brush, Position + FacingDirection * 58f, FacingDirection,
@@ -498,6 +597,7 @@ public sealed class Player
         }
 
         Scythe.DrawTrail(batch, brush, Position);
+        Cannon.DrawChargeLight(batch, brush, Position, FacingDirection);
 
         if (HitFlashRemaining > 0f)
         {

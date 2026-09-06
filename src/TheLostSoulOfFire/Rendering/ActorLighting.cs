@@ -57,8 +57,15 @@ public static class ActorLighting
 
         // Base presence. Enough to own a silhouette in a dark room, not enough to
         // turn the character into a lamp.
-        float radius = 2.5f * breathe;
-        float strength = 0.5f;
+        //
+        // Session 3 halved this. The number above was set when the Warden sheet
+        // had a median luminance of 22/255 against a floor of 21 — he had no
+        // value of his own, so the rim was carrying the entire read. The
+        // authored sheet measures 56/255 with a face at 140, so the light can go
+        // back to being light. Left at the old strength it washed the new pixel
+        // art into a violet blob, which is the "too shiny" note again.
+        float radius = 1.7f * breathe;
+        float strength = 0.24f;
 
         if (player.IsDowned)
         {
@@ -69,26 +76,26 @@ public static class ActorLighting
             float beacon = 0.35f + 0.65f * Pulse(time, 1.5f);
             SoftShapes.Pool(batch, brush, player.Position + new Vector2(0f, 26f), 108f, 44f,
                 identity.Flame * (0.09f * beacon));
-            DrawContactPool(batch, brush, player.Position, 54f, identity.Flame * 0.14f);
-            art.DrawSilhouetteLight(batch, frame, identity.Flame * (0.3f + 0.28f * flicker), 2.6f);
-            art.DrawSilhouetteLight(batch, frame, identity.FlameBright * (0.16f * flicker), 1.5f);
+            DrawContactPool(batch, brush, player.Position, 54f, identity.Flame * 0.12f);
+            art.DrawSilhouetteLight(batch, frame, identity.Flame * (0.18f + 0.18f * flicker), 2.0f);
+            art.DrawSilhouetteLight(batch, frame, identity.FlameBright * (0.10f * flicker), 1.2f);
             return;
         }
 
         if (player.SoulSenseActive)
         {
-            strength += 0.12f;
+            strength += 0.07f;
         }
 
         if (player.IsResonanceReady)
         {
-            strength += 0.14f;
+            strength += 0.08f;
         }
 
         if (player.ResonanceActive)
         {
-            radius += 1.1f;
-            strength += 0.3f;
+            radius += 0.8f;
+            strength += 0.18f;
         }
 
         // Severance: the flame is drawn taut. It brightens the *edge* of the
@@ -98,12 +105,12 @@ public static class ActorLighting
         {
             float life = MathHelper.Clamp(player.SeveranceRemaining / GameBalance.SeveranceWindowDuration, 0f, 1f);
             float taut = 0.62f + 0.38f * Pulse(time, 14f);
-            radius += 1.5f * life * taut;
-            strength += 0.5f * life;
+            radius += 1.1f * life * taut;
+            strength += 0.28f * life;
         }
 
         strength *= identity.LightScale;
-        DrawContactPool(batch, brush, player.Position, 62f * breathe, identity.Flame * (0.11f * identity.LightScale));
+        DrawContactPool(batch, brush, player.Position, 58f * breathe, identity.Flame * (0.085f * identity.LightScale));
         art.DrawSilhouetteLight(batch, frame, identity.Flame * (strength * 0.62f), radius * 1.55f);
         art.DrawSilhouetteLight(batch, frame, identity.FlameBright * (strength * 0.5f), radius);
     }

@@ -6,215 +6,189 @@
 
 ## Current objective
 
-Session 2, two ordered phases, both complete and awaiting owner review:
-
-1. one disciplined improvement pass over the Session 1 Golden Combat Slice;
-2. the local two-player brother co-op proof
-   ([`../agent-prompts/02-COOP-BROTHER-PROOF.md`](../agent-prompts/02-COOP-BROTHER-PROOF.md)).
-
-Plus an audio quality pass across both.
+Session 3, a single ordered job: **correct the character, animation and
+pixel-art language before any more content is built on top of it.** No new
+content areas, no prologue, no items, no engine architecture.
 
 ## State: implemented, awaiting owner review
 
-Neither phase has been approved. The prologue has **not** been started.
+The Session 2 Golden Slice and co-op proof are unchanged in behaviour. What
+changed is what the Player looks like and how he moves.
 
 ---
 
-## Phase 1 — Golden Slice review and targeted uplift
+## What the baseline actually was
 
-### What the Session 1 result actually looked like
+Captured first, before touching anything: `artifacts/session3/before/`, three
+new deterministic fixtures (`facing-sweep`, `run-cycle`, `strafe-read`) plus the
+Session 2 set in `artifacts/session2/p1-after/`.
 
-Captured 12 scenarios at native resolution before touching anything
-(`artifacts/session2/p1-before/`) and measured them. The three largest remaining
-weaknesses, ranked by owner impact:
+Five findings, ranked by owner impact:
 
-1. **The protagonist was the least readable actor in his own game.** The Warden
-   sheet has a median luminance of 22/255; the casting floor sits at 21/255. He
-   had no value separation from the ground at all. In `arena-idle` the two
-   Hollows read more clearly than the Player; in `severance-cut` he was
-   invisible; in `final-release` the emotional final beat had no legible
-   character in it.
-2. **The Devourer slam telegraph read as a neon UI ring.** An even soft ring at
-   0.27 alpha; every dab overlapped and additive blending clipped it to a
-   saturated violet donut that dominated the frame — the worst remaining
-   violation of the 2026-09-06 "no hard lines in combat" revision.
-3. **Severance blew the Warden out to a featureless white flare** exactly when
-   the Player most needed to read his pose. `severance-window` p99 luminance was
-   195/255 with 0.55% of the play area clipped to pure white.
+1. **The eight directions were eight different creatures.** The delivered Warden
+   sheets were generated one direction at a time, so `move/e` was a side-view
+   bat-winged demon holding a trumpet, `move/w` was a bird's-eye blob seen from
+   almost straight above, and `move/s` and `move/n` were unreadable dark masses
+   from a third camera again. Sweeping the mouse did not turn the character; it
+   **morphed** him. This is the whole of the "facing/aim looks wrong or broken"
+   report, and no runtime code could have fixed it — the frames disagreed with
+   each other.
+2. **There was no walk.** Consecutive frames of the run sheets are nearly
+   identical. What motion existed did not correspond to the movement speed.
+3. **The protagonist was not human.** Bat wings, a horned skull, no readable
+   face, no legible legs, no visible hands.
+4. **The weapon was a separate illustration.** A 256px hyper-detailed
+   rifle/scythe hybrid, drawn at a different scale and a different level of
+   detail from the body, floating beside and above the character and rotating
+   around him. The two weapon textures were also bound crosswise in code to work
+   around swapped delivery filenames.
+5. **Sub-pixel display scale.** 128px frames were drawn at 108/128 and then
+   through a 1.3 camera zoom — 1.097 screen pixels per art pixel. Hand-placed
+   pixels were being resampled onto a fractional grid, which is most of the
+   "not pixel-authentic, over-rendered image pretending to be pixel art" note.
 
-### What was kept
+---
 
-Everything else. The Severance Window contract, the four-beat `EncounterDirector`,
-the generated casting floor, the Fallen Ladle, the `SoftShapes` painted-light
-grammar, every enemy identity, the Soul lifecycle and all existing art.
+## What changed
 
-### What changed
+### The protagonist is authored, not generated
 
-- `Rendering/ActorLighting.cs` — new. Establishes the Soulfire actor light
-  grammar: **living Death Flame light belongs to Wardens and Souls; manifestations
-  are separated by cold ash light only.** Silhouettes are traced from the real
-  sprite alpha (`ArtAssets.DrawSilhouetteLight` + a cached white-alpha copy of
-  each sheet) and stamped in a ring of offsets under an additive linear pass, so
-  a near-black character can be lit without a custom shader and without a drawn
-  outline.
-- `SoftShapes.PressureBand` — new. Replaces `Ring` for the Devourer. Per-angle
-  radius wobble, varying density and soft gaps, at roughly a third of the
-  previous alpha. The reach is still honest, because the slam hitbox is a circle
-  in the same plane.
-- `Player.DrawCombatLight` — the Severance gather moved off the body and forward.
-  `SoulfireLighting` Severance glows roughly halved.
-- `ArenaComposition` — Fallen Ladle residue dimmed ~33%; it was out-competing the
-  fight happening east of it.
+`tools/visual-max/warden_forge.py` — new. A deterministic pixel-art forge that
+builds the Warden from **one rig**:
 
-### Before / after evidence
+- one body plan, one palette, one camera;
+- a real ground-plane projection (`Rig.project`) through which *every* part
+  passes, so the eight directions are one character rotating rather than eight
+  drawings that happen to share a name;
+- torso and collar built from projected cross-section rings, so the body has
+  chest-to-back depth and does not collapse to a stick in profile;
+- painter's ordering solved from ground-plane depth, so limbs occlude correctly
+  in all eight directions without a per-direction table;
+- flat fills, hard three-value shading from one upper-left key light, no
+  dithering, no anti-aliasing.
 
-`artifacts/session2/p1-before/` vs `artifacts/session2/p1-after/`, plus grayscale
-sheets in `artifacts/session2/compare/`.
+The character design was reset toward human:
 
-| Scenario | Change |
+| Removed | Kept / added |
 |---|---|
-| `severance-window` | p99 luminance 195 → 108; clipped pixels 0.553% → 0.110% |
-| `devourer-slam` | p99 luminance 104 → 66 (the UI ring is gone) |
-| everything else | mean luminance within ±0.4 — the frame was **not** globally brightened |
+| bat wings | a coat that trails when he moves |
+| horned skull silhouette | a bare head, hair, a visible face |
+| glowing plate and shoulder ornament | one leather belt, one chest strap |
+| the trumpet/rifle hybrid | a plain wood-and-iron reaping scythe |
+| a stowed second weapon on the back | nothing — the Soul Cannon is manifested, not carried |
+| dozens of near-identical colours | 24 colours in six material families |
 
-That last row is the point: the fix was local figure/ground contrast, not bloom.
+The supernatural budget is now spent in exactly three places: **two ember eyes,
+a two-pixel bound Soul at the sternum, and a thin line of Death Flame on the
+trailing hem.** Nothing else on the body emits.
+
+The one saturated note on the whole figure is a rust-red scarf. It is the only
+warm colour, it breaks the silhouette, and it is what makes him read as a person
+rather than a shape.
+
+### The brother has his own sheet
+
+Session 2 recorded the weakest co-op result honestly: in grayscale the two
+brothers differed only in mass and rim intensity. He is now generated from the
+same rig with different parameters — **hood up, long mantle, no scarf, heavier
+shoulders** — so the difference is structural and survives grayscale, reduced
+effects and distance. Both brothers now draw at the same exact pixel scale.
+
+### Animation
+
+- **Idle**, 12 frames: breathing only. Feet planted, no drift.
+- **Run**, 12 frames: a genuine gait — contact, stance, toe-off, swing, with a
+  knee bend, counter-swinging arms, a two-footfall body bob and trailing cloth.
+- **Attack**, 6 frames — new: wind up, plant, cut, recover. Both hands travel
+  along the same ground-plane arc the swing overlay does, so the weapon always
+  leaves his grip.
+
+**The run is driven by distance travelled, not by a clock.**
+`GameBalance.WardenGaitCycleDistance` defines one two-step cycle in world units;
+`Player.GaitPhase` advances by `speed * dt / cycle`. The gait is therefore
+correct at every movement multiplier — Soul Sense, Resonance, stabilising, full
+sprint — instead of being right at one speed and sliding at all the others.
+
+### Aim and facing
+
+`FacingDirection` is untouched: it is still the raw aim vector, and every
+hitbox, telegraph, projectile and light still reads it. **No combat value
+changed.** Three presentation-only additions sit beside it:
+
+- `Player.BodyFacing` — the body turns toward the aim at a bounded rate
+  (`WardenTurnRate` + `WardenTurnAcceleration`) instead of teleporting his
+  shoulders onto the mouse every frame;
+- `Player.FacingSector` — the eight-way sheet choice, with **hysteresis**. A
+  sector is only surrendered once the body is 28° past its centre, so a mouse
+  resting on a boundary can no longer flip the sheet every frame;
+- `Player.IsBackpedalling` — running against the way he is looking plays the run
+  cycle **backwards**, so aiming at an enemy while retreating no longer
+  moon-walks.
+
+Idle↔run also became hysteretic (`WardenRunEnterSpeed` / `WardenRunExitSpeed`).
+
+### Pixel language
+
+- `GameBalance.WardenDisplaySize = 128 / CombatCameraZoom`. **One authored
+  pixel is exactly one screen pixel** at combat zoom.
+- The figure was scaled up ~15% inside the frame after the first in-game pass:
+  at the original size his head reached a Hollow's waist and he read as a child.
+- The authored sheet measures median luminance **56/255** against a 21/255
+  floor, where the delivered sheet measured 22/255. The character now carries
+  his own figure/ground separation, so the light could come down:
+  - `ActorLighting` Warden silhouette light: base strength 0.50 → **0.24**,
+    radius 2.5 → **1.7**, all state boosts scaled with it;
+  - `Player.DrawCombatLight` bound-Soul core: radius 16–22 → **9–13**. It was a
+    glowing egg laid over his chest;
+  - Severance gather moved fully off the body and reduced again.
+
+### Weapon cohesion
+
+- The scythe is **in the sheet** at rest and while running, drawn in the same
+  palette and the same value steps as the body.
+- `ScytheCombat.DrawRestingScythe` deleted. The only time a separate weapon
+  sprite is drawn is during a swing.
+- The swing sprite is authored by the **same `_blade` routine** as the carried
+  weapon, so they are literally the same object, and its origin is the butt of
+  the haft so it pivots out of his grip.
+- Swing scale is now **solved from the arc radius** rather than hand-picked per
+  combo step, so the blade arrives where the light does.
+- `SoulCannon.DrawBack` removed — the Cannon is Death Flame given a shape, so
+  there is nothing on his back and the carried silhouette stays one object.
+- The crossed texture binding in `ArtAssets` is gone; both weapons are authored
+  and named for what they are.
+
+### Two remaining "no hard lines in combat" violations, fixed
+
+The 2026-09-06 owner revision was applied to telegraphs and trails but missed
+the Soul Cannon, which was still drawing `FillCircle`/`DrawCircle` rings at the
+muzzle and a `DrawLine` into the chest, in the sprite pass. Those are now
+painted with the feathered brush in the additive pass
+(`SoulCannon.DrawChargeLight`).
+
+### Threat cues moved under the actors
+
+`ThreatPresentation.Draw` was the last thing drawn, over everything. A Hollow's
+swipe band was therefore painted straight across the Warden standing inside it —
+the frame where the Player most needs to read his own position was the frame
+where he was hardest to see. Same cues, same alpha, drawn between the actor
+light and the actor sprites. Verified in `hollow-swipe` and `devourer-slam`.
 
 ---
 
-## Phase 2 — Brother local co-op proof
+## Ludo MCP and ElevenLabs
 
-### Structure added
+**Ludo MCP: NOT USED.** No Ludo MCP server is registered in this environment
+(`~/.config/opencode/opencode.jsonc` declares no MCP servers), so no Ludo tool
+was callable. `~/.secrets/ludo-auth` was therefore never read.
 
-Small and concrete, per the prompt. No DI, no entity framework, no network seam.
+That is also the right answer on the merits. The failure being corrected is
+specifically what per-direction generative delivery produces: eight independently
+imagined characters under eight cameras. Coherent eight-way rotation with a real
+gait is a rig problem, not a prompt problem.
 
-- `Input/PlayerCommand.cs` — one Warden's intent for one frame, device-agnostic.
-- `Input/PlayerInputSources.cs` — `KeyboardMouseInput`, `GamePadInput`,
-  `SecondaryKeyboardInput`, `ScriptedInput`.
-- `Game/WardenRoster.cs` — `PlayerSlot` (identity + `Player` + input source) and
-  the one-or-two roster, including group framing helpers.
-- `Entities/WardenField.cs` — the combat-side seam. Enemies were handed one
-  `Player` and used it for two different questions; `Target` now answers "who am
-  I coming for" and `StrikeCircle`/`StrikeContact` answer "who did that hit".
-- `Game/TargetDirector.cs` — stable per-enemy targeting.
-- `Game/TeamResonance.cs` — the shared pool.
-- `Entities/WardenIdentity.cs` — the whole visual identity seam.
-
-`Player.Update` now takes a `PlayerCommand` instead of `InputState`;
-`ScytheCombat` and `SoulCannon` followed. Solo is the one-slot case of the same
-loop, so there is no separate single-player path to drift.
-
-### Controls
-
-| | Player 1 — the protagonist | Player 2 — the brother |
-|---|---|---|
-| Join | always present | gamepad `Start`/`A`, or `F12` for the keyboard layout |
-| Move | `WASD` | left stick / arrow keys |
-| Aim | mouse | right stick / movement direction |
-| Scythe | `LMB` | `X` / `NumPad1` |
-| Soul Cannon | hold `RMB` | hold `RT` / `NumPad2` |
-| Dash | `Space` | `A` / `NumPad0` |
-| Soul Sense | hold `Q` | hold `LT` / `NumPad3` |
-| Resonance | `R` | `Y` / `NumPad5` |
-| Stabilise | hold `E` | hold `B` / `NumPad.` |
-
-`--players 2` starts two-player directly. Player 1's controls are **unchanged**
-from the approved slice.
-
-### Brother identity
-
-Same Warden sheet, same animations, same kit. He differs by:
-
-- **flame temperature** — both violet-white per canon, but the elder's is colder
-  and paler (`WardenIdentity.Elder`), at `LightScale` 0.74 because a cold flame
-  separates from this violet-grey room at much lower intensity;
-- **body tint** — cloth and iron pushed toward blue-steel;
-- **silhouette mass** — 120 px display size against the protagonist's 108, so the
-  two stay apart in grayscale and with effects reduced;
-- **audio** — his weapon and dash are pitched ~0.08 down so two simultaneous
-  swings do not phase into one.
-
-### Camera / targeting
-
-- Group camera targets the centroid; zoom is fitted to the pair's bounding span
-  plus padding and **clamped to 0.92–1.30**. One Warden gets exactly the Session 1
-  constant, so solo framing is untouched.
-- Aim is unprojected through the live camera transform, so mouse aim stays correct
-  while the group zoom changes.
-- Separation is handled by a **shared Death Flame tether**: invisible while the
-  brothers fight together, visible as it strains past 760 units, and past 980 it
-  draws them back gradually. Never a teleport, never split-screen.
-- Targeting: a committed enemy never re-targets, targets are held for at least
-  1.15 s, a switch needs a clear distance advantage, and downed Wardens are never
-  chosen.
-- Wardens push each other apart at close range so melee never body-blocks.
-- Area attacks hit **everyone in the area**, not only the enemy's chosen target.
-
-### Soul / Resonance ownership
-
-One **team pool**. Anything that earns Resonance credits it, either brother may
-spend it, and spending it lights **both**. Residue drifts to the nearest standing
-Warden and feeds the same pool, so there is no pickup to race for. Arithmetically
-identical to Session 1 in solo.
-
-### Down / stabilisation / failure
-
-- A Warden who runs out of health while a brother stands **goes down**, not dead:
-  15 s on the clock, cannot act, cannot be hit again, and cannot be finished off.
-- The other brother holds `E`/`B` within 118 units for 2.1 s. While holding he
-  **cannot attack and moves at 42%** — that is the danger window.
-- Interrupted progress bleeds away rather than resetting.
-- Success restores 45 HP with a bounded 1.2 s grace. Never endless.
-- Each stabilisation costs 55 from the shared pool and makes the next hold 60%
-  longer, so it never becomes routine.
-- **Both down ends the encounter.** Solo never enters the downed state at all.
-
----
-
-## Audio pass
-
-### Owner feedback taken mid-session
-
-The first attempt shipped raw ElevenLabs output and was rejected on listening as
-"raw and not professional". That was correct and the diagnosis was structural,
-not a matter of picking different sounds:
-
-- clips were requested at 0.6–1.4 s, which returns squashed artifacts with no
-  transient and no decay — the project's own `master_ludo_audio.py` workflow
-  generates long and trims locally, and I had departed from it;
-- prompts were long negation lists, which generative audio handles badly;
-- output was 128 kbps MP3, which smears exactly the transients these cues need.
-
-### What replaced it
-
-`tools/audio/generate_soulfire_sfx.py` now asks for **3–4 s of headroom**, writes
-**lossless PCM**, and uses short foley briefs. `tools/audio/build_session2_sfx.py`
-treats every generation as **source material only** and produces each cue as:
-
-> an already-approved sample from this bank carries the **body**, a filtered and
-> gated slice of a generation adds **texture** 11–15 dB underneath, and the tail
-> is an explicit decay.
-
-Chain: resample 44.1 → 48 kHz, DC block, 55 Hz high-pass, downward expander at
-−40 dBFS, onset detect and trim, hard low-pass into the bank's measured
-brightness band, transient shaping, exponential decay, layer, 6 ms fades, peak
-normalise by category.
-
-### Cues added or rebuilt
-
-`severance_window`, `severance_cut`, `soul_exposed`, `warden_down`,
-`warden_stabilize` (new) and `resonance_ready` (rebuilt as a doubled pulse).
-
-**Retained unchanged:** `hollow_swipe`, `enemy_death`, `soul_cleave`,
-`scythe_hit`, `devourer_slam`, `devourer_devour`, `burning_charge`,
-`burning_detonation`, ambience and music. Nothing about them was failing.
-
-### Honest limitation
-
-**No audio was auditioned by ear during authoring.** Candidate selection was made
-on measurement — residual noise floor after gating, crest factor against the
-intended envelope class, and a brightness penalty. `artifacts/session2/audio-audition/`
-contains the shipped `hybrid` build and a `bank-only` build with no generated
-content for direct A/B. The owner must approve on listening.
+**ElevenLabs: NOT USED.** No audio work was in scope this session and no audio
+asset was touched.
 
 ---
 
@@ -226,76 +200,87 @@ dotnet build -c Release TheLostSoulOfFire.sln
 dotnet run -c Release --project src/TheLostSoulOfFire                  # solo
 dotnet run -c Release --project src/TheLostSoulOfFire -- --players 2   # co-op
 
-dotnet run -c Release --no-build --project src/TheLostSoulOfFire -- --audio-gameplay-test
-dotnet run -c Release --no-build --project src/TheLostSoulOfFire -- --audio-gameplay-test --players 2
-dotnet run -c Release --no-build --project src/TheLostSoulOfFire -- --audio-death-restart-test
-dotnet run -c Release --no-build --project src/TheLostSoulOfFire -- --audio-death-restart-test --players 2
-dotnet run -c Release --no-build --project src/TheLostSoulOfFire -- --audio-runtime-test
-dotnet run -c Release --no-build --project src/TheLostSoulOfFire -- --audio-loop-runtime-test
-python3 tools/audio/validate_audio.py
+# regenerate the character and weapon art from the rig
+python3 tools/visual-max/warden_forge.py \
+  --out /tmp/warden --builds warden,warden_elder --weapons
 
+# the three new character fixtures
 dotnet run -c Release --no-build --project src/TheLostSoulOfFire -- \
-  --visual-scenario coop-stabilize --players 2 --capture-output artifacts/session2/coop
+  --visual-scenario facing-sweep --capture-output artifacts/session3/after
+dotnet run -c Release --no-build --project src/TheLostSoulOfFire -- \
+  --visual-scenario run-cycle    --capture-output artifacts/session3/after
+dotnet run -c Release --no-build --project src/TheLostSoulOfFire -- \
+  --visual-scenario strafe-read  --capture-output artifacts/session3/after
 ```
 
-Debug: `F1` overlay, `F2`–`F4` spawn, `F5` fill shared Resonance, `F6` clear
-floor, `F7` force Soul Sense, `F8` reset, `F9` screenshot, `F10` reduced effects,
-`F11` quality, `F12` join the brother on the keyboard layout.
+Debug keys are unchanged.
+
+## What the owner should look at first
+
+1. `artifacts/session3/compare/facing-sweep-before-after.png` — eight frames of
+   one continuous mouse sweep. Top row: eight different creatures. Bottom row:
+   one person turning. This is the single most important image of the session.
+2. `artifacts/session3/compare/run-cycle-before-after.png` — six frames of one
+   run.
+3. `artifacts/session3/compare/golden-encounter-before-after.png` — the same
+   authored encounter beat.
+4. `artifacts/session3/compare/coop-golden-encounter-before-after.png` — the
+   brothers, now structurally distinct.
+5. The game itself, moving the mouse, which is where the complaint came from.
 
 ## Capture locations
 
-- `artifacts/session2/p1-before/` — Session 1 result, 12 scenarios.
-- `artifacts/session2/p1-after/` — after the Phase 1 uplift, same 12.
-- `artifacts/session2/coop/` — 11 two-player fixtures.
-- `artifacts/session2/compare/` — grayscale before/after and co-op readability.
-- `artifacts/session2/audio-audition/` — `hybrid` and `bank-only` builds.
-
-New scenarios: `coop-idle`, `coop-split-targets`, `coop-severance`, `coop-down`,
-`coop-stabilize`, `coop-separation`, `coop-soul-release`, `coop-resonance`,
-`coop-golden-encounter`, `coop-reduced`.
+- `artifacts/session3/before/` — three character fixtures, before any change.
+- `artifacts/session3/after/` — 18 solo scenarios.
+- `artifacts/session3/after-coop/` — 10 two-player scenarios.
+- `artifacts/session3/compare/` — 21 stacked before/after boards.
 
 ## Verification
 
 | Check | Result |
 |---|---|
-| Release build, zero warnings | PASS |
+| Release build, zero warnings, zero errors | PASS |
+| 18 solo visual scenarios at HIGH FULL | PASS |
+| 10 co-op visual scenarios, incl. reduced effects | PASS |
 | Solo encounter lifecycle (4 beats → completion → restart) | PASS |
 | Two-player encounter lifecycle | PASS |
-| Solo death / restart | PASS |
 | Two-player both-down failure / restart | PASS |
 | Audio runtime, all 32 cues, `fallbacks=0` | PASS |
-| Audio loop runtime (music + ambience boundaries) | PASS |
-| `validate_audio.py`, 34 assets | PASS |
-| 12 solo scenarios at HIGH FULL | PASS |
-| 11 co-op scenarios, incl. reduced effects and baseline quality | PASS |
-| Grayscale readability inspection | PASS with reservation (see below) |
+| `visual_assets.py self-test` and `inventory` | PASS (145 textures, 128 directional sheets) |
+| Every capture inspected at native resolution by the agent | PASS |
 | Physical controller play | **NOT_RUN — no controller hardware available** |
-| Audio auditioned by ear | **NOT_RUN — cannot listen; owner must approve** |
+| Judged by the owner in motion | **NOT_RUN — this is the ask** |
 
-## Known issues
+## Known limitations
 
-- **Grayscale separation between the two brothers is the weakest result.** They
-  are clearly separable from the environment, but from each other only by
-  silhouette mass and rim intensity. Recommended next art step: one bespoke
-  silhouette accent for the elder (mantle or hood), which would make the
-  distinction structural rather than tonal.
-- The downed pose is the standing idle frame rotated and darkened. It reads
-  correctly at gameplay scale but wants a real collapse animation. Documented as
-  temporary art.
-- The delivered west-facing Warden sheet has a much weaker silhouette than the
-  east-facing one — the wings spread horizontally and the body reads as a mass.
-  Pre-existing, not a co-op regression, but the new rim light makes it more
-  visible.
-- No controller was available, so gamepad mapping is verified by code path and
-  the deterministic scripted-input fixtures only.
-- `art/audio_candidates/` is generated authoring material and is gitignored,
-  matching how the Ludo inputs were handled.
+- **The attack is one clip for all three combo steps**, sampled by the Scythe's
+  own progress. Step 1, step 2, step 3 and a Severance cut therefore share a
+  pose vocabulary and differ only in timing and in the light arc. Distinct poses
+  per step are the obvious next animation step, and they are cheap now that the
+  rig exists.
+- **No dash, hurt or death clips.** Dash uses the run frames plus the existing
+  streak; the downed pose is still the idle frame rotated and darkened.
+- **The exact 1:1 pixel scale only holds at combat zoom.** The title and intro
+  cameras (1.10 and 1.16) and the co-op group zoom (0.92–1.30) resample. Combat
+  at full zoom, which is the overwhelming majority of play, is exact.
+- **The enemies were not re-authored.** They are delivered sheets in a different
+  drawing language from the new protagonist. They read acceptably next to him —
+  the Hollows are gaunt and pale where he is compact and warm — but the
+  environment, the enemies and the Warden are not yet one hand. This is the
+  largest remaining visual inconsistency and the natural next session.
+- **The face is two ember eyes and a brow.** At 1:1 that is the correct amount
+  of detail, but it means expression cannot yet carry a story beat.
+- The generated PNGs in `Content/` are derived output; `warden_forge.py` is the
+  master. Regenerating is deterministic.
 
 ## Next action
 
-Owner review of both phases and of the audio audition. Do not start the prologue
+Owner judgement on the corrected baseline, in motion, with the mouse. If the
+direction is approved, the ranked follow-ups are: per-step attack poses, a dash
+and a collapse clip, then bringing the enemies into the same drawing language.
+Do not start the prologue
 ([`../agent-prompts/03-DEATH-LAYER-PROLOGUE.md`](../agent-prompts/03-DEATH-LAYER-PROLOGUE.md))
-until the co-op direction and the audio are judged.
+until the character direction is judged.
 
 ## Important constraint
 

@@ -2,6 +2,66 @@
 
 Record owner-approved, rejected or revised product decisions here. Newer dated entries override older conflicting entries.
 
+## 2026-09-06 — Owner revision: the character and the pixel language were wrong
+
+### Revised
+
+- **The protagonist is human first and supernatural second.** The winged,
+  horned, over-accessorised reading is rejected. He is a person carrying a
+  scythe who happens to be dead.
+- **Detail is not quality.** Sheets that carry hundreds of near-identical
+  colours and one-pixel ornament read as an over-rendered image pretending to be
+  pixel art. Larger forms, stronger clusters, cleaner materials and fewer shiny
+  surfaces are the standard.
+- **Animation quality is a first-class requirement**, not something to be
+  revisited after content. Walk smoothness, idle stability and readable attacks
+  are acceptance criteria.
+- **Facing must never look broken when the mouse moves.**
+- This correction happens **before** any further content.
+
+### Implemented in response
+
+- `tools/visual-max/warden_forge.py` — the protagonist and his brother are now
+  **authored from one rig** rather than generated per direction. One body plan,
+  one palette, one camera, a real ground-plane projection and depth-sorted
+  parts, so the eight directions are one character rotating.
+- Character reset: wings, horns and the rifle/scythe hybrid removed; a visible
+  face, hands and legs, a plain wood-and-iron scythe, one leather belt, one
+  strap and a rust-red scarf. The entire supernatural budget is two ember eyes,
+  a two-pixel bound Soul at the sternum, and a thin Death Flame line on the
+  trailing hem.
+- 24 colours in six material families; flat fills, hard three-value shading from
+  one key light, no dithering, no anti-aliasing.
+- Real 12-frame idle and run and a new 6-frame attack. **The run is driven by
+  distance travelled, not by a clock**, so the gait is correct at every movement
+  multiplier.
+- Facing: bounded body turn rate, eight-sector selection with hysteresis, and
+  reversed playback when backpedalling. `FacingDirection` remains the raw aim
+  vector, so **no combat value changed**.
+- `WardenDisplaySize = 128 / CombatCameraZoom`: one authored pixel is one screen
+  pixel at combat zoom.
+- The elder brother gets his own sheet from the same rig — hood, mantle, no
+  scarf — resolving the Session 2 finding that the brothers separated only by
+  mass and tint.
+
+### Follow-on corrections found while implementing
+
+- **The Soul Cannon still drew hard vector circles and a line in the fighting
+  plane.** The 2026-09-06 "no hard lines in combat" revision had been applied to
+  telegraphs and trails but missed the Cannon. Now painted with the feathered
+  brush in the additive pass.
+- **Threat telegraphs were drawn over the actors.** A Hollow's swipe band was
+  painted across the Warden standing in it. Telegraphs are floor light and are
+  now drawn beneath the actors. Same cues, same alpha, correct layer.
+- **Actor light was over-driven.** It had been raised in Session 2 because the
+  delivered sheet had no value of its own (median 22/255 against a 21/255
+  floor). The authored sheet measures 56/255, so the Warden's silhouette light
+  and bound-Soul core were roughly halved. Anything else washed the new art out.
+
+### Still open
+
+Owner has not judged the corrected character, animation or facing.
+
 ## 2026-09-06 — Owner revision: generated audio must not ship raw
 
 ### Revised

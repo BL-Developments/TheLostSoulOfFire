@@ -85,6 +85,44 @@ Für die großen Death-Layer-Karten:
 
 „Wie Diablo“ meint größere navigierbare Flächen und Reisegefühl, nicht Loot-Überladung oder optische Nachahmung.
 
+## 5a. Pixel-Sprache — verbindlich seit Session 3
+
+Owner-Korrektur: Detailmenge ist keine Qualität. Zu viele winzige Details, zu
+viele glänzende Oberflächen und zu weiche, gemalte Übergänge lassen das Spiel wie
+ein überrendertes Bild wirken, das Pixel-Art imitiert.
+
+Verbindliche Regeln für Figuren und figurnahe Assets:
+
+- **Ein gezeichnetes Pixel ist ein Bildschirmpixel** im Kampf-Zoom. Keine
+  gebrochene Skalierung von handgesetzten Pixeln.
+- **Flächige Füllungen, harte Wertstufen, kein Dithering, kein Anti-Aliasing.**
+- **Ein Schlüssellicht** von oben links für alle Formen derselben Figur.
+- **Wenige Materialfamilien mit je zwei bis drei Werten** statt einer offenen
+  Farbliste. Der Warden nutzt sechs Familien.
+- **Mindestens zweipixelige Formen.** Einzelpixel-Ornament verschwindet in
+  Bewegung und erzeugt nur Rauschen.
+- **Übernatürliche Emission ist ein Budget, kein Effekt.** Beim Warden: zwei
+  Glutaugen, ein zweipixeliger gebundener Soul am Brustbein, eine dünne
+  Death-Flame-Linie am nachziehenden Saum. Sonst nichts.
+- **Ein gesättigter Akzent pro Figur.** Beim Warden ein rostroter Schal.
+
+## 5b. Figurenrichtung — verbindlich seit Session 3
+
+- **Mensch zuerst, übernatürlich danach.** Der Protagonist ist ein Mensch mit
+  einer Sense, der zufällig tot ist — kein geflügeltes Wesen.
+- **Lesbares Gesicht, lesbare Hände, lesbare Beine.** Emotion lebt im Gesicht.
+- **Silhouette vor Ornament.** Zubehör nur, wenn es die Silhouette verbessert.
+- **Waffe stützt die Figur.** Gleiche Palette, gleiche Wertstufen, gleiche
+  Detailtiefe wie der Körper; in Ruhe Teil des Sheets.
+- **Acht Richtungen entstehen aus einem Rig**, nie aus acht getrennten
+  Zeichnungen. Eine Bodenebenen-Projektion, eine Tiefensortierung, ein Körperbau.
+  Anders gedreht wird die Figur beim Zielen zu einem anderen Wesen.
+- **Gangart folgt der zurückgelegten Strecke**, nicht einer Uhr.
+- **Blickrichtung dreht sich mit begrenzter Rate und mit Hysterese.** Die
+  Schultern springen nie auf die Maus.
+- Brüder unterscheiden sich **strukturell** (Kapuze, Mantel), nicht nur durch
+  Farbe oder Größe.
+
 ## 6. Figuren und Koop-Lesbarkeit
 
 - Beide Brüder brauchen unterschiedliche Silhouetten, Bewegungsrhythmen und Death-Flame-Führung.

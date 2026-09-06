@@ -96,16 +96,25 @@ public sealed class ArtAssets : IDisposable
         Arena = content.Load<Texture2D>("Textures/Environment/arena_base_1800x1000");
         _floorSurface = ArenaFloorSurface.Create(Arena);
         SoftBrush = SoftShapes.CreateBrush(Arena.GraphicsDevice);
-        // Delivery filenames are inverted: visual inspection shows the curved
-        // scythe in soul_cannon_256 and the straight barrel in scythe_physical_256.
-        // Keep original assets/provenance intact and bind by actual silhouette.
-        PhysicalScythe = content.Load<Texture2D>("Textures/Weapons/soul_cannon_256");
-        SoulCannon = content.Load<Texture2D>("Textures/Weapons/scythe_physical_256");
+        // The delivered pair had their filenames swapped, and the workaround for
+        // that was a crossed binding here. Both weapons are now authored by
+        // tools/visual-max/warden_forge.py in the character's own palette and
+        // value steps, named for what they are, so the binding is honest again.
+        PhysicalScythe = content.Load<Texture2D>("Textures/Weapons/scythe_physical_256");
+        SoulCannon = content.Load<Texture2D>("Textures/Weapons/soul_cannon_256");
         LostSoul = content.Load<Texture2D>("Textures/Pickups/lost_soul_64");
         LifeFlame = content.Load<Texture2D>("Textures/Ending/life_flame_128");
 
-        LoadDirectional(content, "player", "Textures/Player/Animations", "idle", 128, 9, 9f, true);
-        LoadDirectional(content, "player", "Textures/Player/Animations", "move", 128, 9, 12f, true);
+        // Authored by tools/visual-max/warden_forge.py. Twelve frames per loop,
+        // one rig, one camera, one palette. The move clip is *not* driven by
+        // wall-clock time; see ResolvePlayerFrame.
+        LoadDirectional(content, "warden", "Textures/Player/Animations", "idle", 128, 12, 8f, true);
+        LoadDirectional(content, "warden", "Textures/Player/Animations", "move", 128, 12, 26f, true);
+        LoadDirectional(content, "warden", "Textures/Player/Animations", "attack", 128, 6, 18f, false);
+
+        LoadDirectional(content, "warden_elder", "Textures/PlayerElder/Animations", "idle", 128, 12, 8f, true);
+        LoadDirectional(content, "warden_elder", "Textures/PlayerElder/Animations", "move", 128, 12, 26f, true);
+        LoadDirectional(content, "warden_elder", "Textures/PlayerElder/Animations", "attack", 128, 6, 18f, false);
 
         LoadDirectional(content, "hollow", "Textures/Enemies/Hollow/Animations", "idle", 128, 9, 8f, true);
         LoadDirectional(content, "hollow", "Textures/Enemies/Hollow/Animations", "move", 128, 9, 12f, true);
@@ -179,6 +188,21 @@ public sealed class ArtAssets : IDisposable
     /// The frame a Warden is currently showing. Exposed so the actor-light pass can
     /// trace the exact silhouette instead of approximating it with a circle.
     /// </summary>
+    /// <summary>
+    /// Which frame a Warden is showing.
+    ///
+    /// Three rules matter here, and all three are fixes for things the owner
+    /// could see:
+    ///
+    ///   * the sheet is picked by <see cref="Player.FacingSector"/>, which has
+    ///     hysteresis, instead of by re-bucketing the raw aim vector every
+    ///     frame — that is what made a small mouse movement flip the character;
+    ///   * the run is sampled from distance travelled, not from wall-clock
+    ///     time, so the gait matches the speed at every movement multiplier and
+    ///     never slides at one speed and sprints at another;
+    ///   * the swing is sampled from the Scythe's own progress, so the pose and
+    ///     the hitbox can never disagree.
+    /// </summary>
     public ActorFrame ResolvePlayerFrame(Player player)
     {
         if (player.IsDead)
@@ -186,14 +210,38 @@ public sealed class ArtAssets : IDisposable
             return default;
         }
 
+        string family = player.Identity.SheetFamily;
+        string direction = player.FacingSector;
+        float size = player.Identity.DisplaySize;
+
         if (player.IsDowned)
         {
-            ActorFrame fallen = ResolveDirectional(player, "player", "idle", player.FacingDirection, player.Position + new Vector2(0f, 16f), player.Identity.DisplaySize * 0.93f);
+            ActorFrame fallen = Resolve(player, family, "idle", direction, player.Position + new Vector2(0f, 16f), size * 0.93f);
             return fallen with { Rotation = 1.42f };
         }
 
-        string action = player.Velocity.LengthSquared() > 120f ? "move" : "idle";
-        return ResolveDirectional(player, "player", action, player.FacingDirection, player.Position, player.Identity.DisplaySize);
+        if (player.Scythe.ActiveStep != 0)
+        {
+            SpriteClip swing = _characterClips[$"{family}/attack/{direction}"];
+            float progress = MathHelper.Clamp(player.Scythe.NormalizedProgress, 0f, 0.999f);
+            return new ActorFrame(swing, progress * swing.Duration, player.Position, size / swing.FrameWidth);
+        }
+
+        if (!player.IsRunning)
+        {
+            return Resolve(player, family, "idle", direction, player.Position, size);
+        }
+
+        SpriteClip run = _characterClips[$"{family}/move/{direction}"];
+        float phase = player.GaitPhase;
+        if (player.IsBackpedalling)
+        {
+            // Running away from where he is looking. Reversing the cycle keeps
+            // the feet pushing the right way instead of moon-walking.
+            phase = 1f - phase;
+        }
+
+        return new ActorFrame(run, MathHelper.Clamp(phase, 0f, 0.999f) * run.Duration, player.Position, size / run.FrameWidth);
     }
 
     public void DrawEnemy(SpriteBatch batch, Enemy enemy)
@@ -412,6 +460,20 @@ public sealed class ArtAssets : IDisposable
             scale,
             SpriteEffects.None,
             0f);
+    }
+
+    /// <summary>Directional lookup where the sector has already been decided.</summary>
+    private ActorFrame Resolve(
+        object owner,
+        string family,
+        string action,
+        string direction,
+        Vector2 position,
+        float displaySize)
+    {
+        SpriteClip clip = _characterClips[$"{family}/{action}/{direction}"];
+        SpritePlayback playback = _playbacks.GetValue(owner, _ => new SpritePlayback());
+        return new ActorFrame(clip, playback.Elapsed($"{family}/{action}", _time), position, displaySize / clip.FrameWidth);
     }
 
     private ActorFrame ResolveDirectional(

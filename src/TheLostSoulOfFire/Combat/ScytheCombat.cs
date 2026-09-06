@@ -152,8 +152,12 @@ public sealed class ScytheCombat
     }
 
     /// <summary>
-    /// Draws the physical weapon only. The swing's light lives in the additive
-    /// combat-light pass so it can be feathered instead of stroked.
+    /// Draws the physical weapon only, and only while it is being swung.
+    ///
+    /// At rest the scythe is part of the Warden's own sheet, carried in his
+    /// hand. It used to be a second, far more detailed 256px sprite pasted next
+    /// to him at a different scale, which is why the weapon read as an object
+    /// flying alongside the character rather than one he owns.
     /// </summary>
     public void Draw(
         SpriteBatch batch,
@@ -165,7 +169,6 @@ public sealed class ScytheCombat
     {
         if (ActiveStep == 0)
         {
-            DrawRestingScythe(batch, physicalScythe, playerPosition, facingDirection);
             return;
         }
 
@@ -238,26 +241,6 @@ public sealed class ScytheCombat
             Knockback = strike.Knockback * GameBalance.SeveranceKnockbackMultiplier,
             IsSeverance = true
         };
-    }
-
-    private static void DrawRestingScythe(
-        SpriteBatch batch,
-        Texture2D physicalScythe,
-        Vector2 playerPosition,
-        Vector2 facingDirection)
-    {
-        Vector2 right = new(-facingDirection.Y, facingDirection.X);
-        float rotation = MathF.Atan2(facingDirection.Y, facingDirection.X) + 0.35f;
-        batch.Draw(
-            physicalScythe,
-            playerPosition + facingDirection * 12f + right * 8f,
-            null,
-            Color.White,
-            rotation,
-            new Vector2(148f, 158f),
-            0.46f,
-            SpriteEffects.None,
-            0f);
     }
 
     /// <summary>
@@ -366,14 +349,23 @@ public sealed class ScytheCombat
     {
         SwingArc arc = BuildSwingArc();
         Vector2 bladeDirection = new(MathF.Cos(arc.Current), MathF.Sin(arc.Current));
+
+        // The sprite is authored haft-down with the butt on the bottom edge, so
+        // it pivots out of the Warden's grip. The scale is solved from the arc
+        // radius rather than hand-picked per step, which is what finally makes
+        // the blade arrive where the light does: the weapon and the cue describe
+        // the same reach instead of two different ones.
+        const float haftToTip = 130f;
+        const float gripOffset = 14f;
+        float scale = MathF.Max(0.34f, (arc.Radius - gripOffset) / haftToTip);
         batch.Draw(
             physicalScythe,
-            playerPosition + bladeDirection * 29f,
+            playerPosition + bladeDirection * gripOffset,
             null,
             Color.White,
             arc.Current + MathHelper.PiOver2,
-            new Vector2(148f, 158f),
-            _severanceArmed ? 0.74f : ActiveStep switch { 1 => 0.55f, 2 => 0.6f, _ => 0.7f },
+            new Vector2(64f, 150f),
+            scale,
             SpriteEffects.None,
             0f);
 

@@ -47,7 +47,26 @@ public sealed class VisualScenarioRunner
             ["coop-soul-release"] = 300,
             ["coop-resonance"] = 190,
             ["coop-golden-encounter"] = 1400,
-            ["coop-reduced"] = 210
+            ["coop-reduced"] = 210,
+
+            // Session 3 — character, animation and facing evidence. Both fixtures
+            // capture several frames of one continuous run so the sheets can be
+            // judged as motion rather than as a single lucky pose.
+            ["facing-sweep"] = 290,
+            ["run-cycle"] = 258,
+            ["strafe-read"] = 272
+        };
+
+    /// <summary>
+    /// Fixtures whose whole point is a sequence. One capture would hide exactly
+    /// the problem they exist to show.
+    /// </summary>
+    private static readonly IReadOnlyDictionary<string, int[]> SequenceTicks =
+        new Dictionary<string, int[]>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["facing-sweep"] = [220, 230, 240, 250, 260, 270, 280, 290],
+            ["run-cycle"] = [228, 234, 240, 246, 252, 258],
+            ["strafe-read"] = [248, 256, 264, 272]
         };
 
     private readonly string _scenario;
@@ -87,8 +106,10 @@ public sealed class VisualScenarioRunner
         _semanticSeverance = _scenario is "severance-window" or "severance-cut" or "coop-severance" && defaultTiming;
         _semanticGoldenBeat = _scenario is "golden-encounter" or "coop-golden-encounter" && defaultTiming;
         _semanticFinalRelease = _scenario == "final-release" && defaultTiming;
-        _captureTicks = options.CaptureTicks.Length > 0 ? options.CaptureTicks :
-            [options.CaptureAfterTicks >= 0 ? options.CaptureAfterTicks : CaptureTicks[_scenario]];
+        _captureTicks = options.CaptureTicks.Length > 0 ? options.CaptureTicks
+            : options.CaptureAfterTicks >= 0 ? [options.CaptureAfterTicks]
+            : SequenceTicks.TryGetValue(_scenario, out int[] sequence) ? sequence
+            : [CaptureTicks[_scenario]];
         _captureTick = _captureTicks.Last();
     }
 
@@ -199,6 +220,32 @@ public sealed class VisualScenarioRunner
                 AdvanceEnding(input, world);
                 break;
 
+            // Session 3. The protagonist alone on a cleared floor: these fixtures
+            // exist to judge the character, the gait and the facing rules, so
+            // nothing else is allowed into the frame.
+            case "facing-sweep":
+                if (_tick == 100) world.ArrangeVisualSubject(_scenario);
+                if (_tick >= 208)
+                {
+                    // One continuous 360 degree mouse sweep at 270 deg/s. Captures
+                    // land on the eight octants, and the frames between them are
+                    // what the turn rate and the sector hysteresis have to survive.
+                    AimAtAngle(input, viewport, MathHelper.TwoPi * ((_tick - 220) / 80f));
+                }
+                break;
+
+            case "run-cycle":
+                if (_tick == 100) world.ArrangeVisualSubject(_scenario);
+                if (_tick >= 204) input.InjectHeldKey(Keys.D);
+                break;
+
+            case "strafe-read":
+                if (_tick == 100) world.ArrangeVisualSubject(_scenario);
+                // Aiming east while running west: the case where a snapped
+                // eight-direction sheet reads as the character sliding backwards.
+                if (_tick >= 204) input.InjectHeldKey(Keys.A);
+                break;
+
             default:
                 if (_scenario.StartsWith("coop-", StringComparison.Ordinal))
                 {
@@ -252,6 +299,13 @@ public sealed class VisualScenarioRunner
     }
 
     public void MarkCaptureHandled() => CaptureRequested = false;
+
+    private static void AimAtAngle(InputState input, Viewport viewport, float radians)
+    {
+        input.InjectMousePosition(new Point(
+            viewport.Width / 2 + (int)MathF.Round(MathF.Cos(radians) * 300f),
+            viewport.Height / 2 + (int)MathF.Round(MathF.Sin(radians) * 300f)));
+    }
 
     private void SpawnAt(InputState input, Keys key, int tick)
     {

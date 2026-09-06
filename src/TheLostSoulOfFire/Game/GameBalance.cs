@@ -16,6 +16,43 @@ public static class GameBalance
 
     public const float PlayerMoveSpeed = 310f;
     public const float PlayerRadius = 22f;
+
+    // --- Warden presentation ------------------------------------------------
+    // None of these touch damage, reach or timing. They exist because facing and
+    // gait were being derived directly from raw input every frame, which is what
+    // made the character look wrong when the mouse moved.
+
+    /// <summary>
+    /// One authored sprite pixel is one screen pixel at combat zoom. The sheets
+    /// are 128px frames, so the display size is the frame divided by the zoom;
+    /// anything else resamples hand-placed pixels onto a fractional grid and
+    /// throws away the reason for drawing them by hand.
+    /// </summary>
+    public const float WardenDisplaySize = 128f / CombatCameraZoom;
+
+    /// <summary>Radians per second the body turns toward the aim at rest.</summary>
+    public const float WardenTurnRate = 11f;
+
+    /// <summary>Extra turn rate per radian of error, so large flicks stay snappy.</summary>
+    public const float WardenTurnAcceleration = 16f;
+
+    /// <summary>
+    /// How far past a sector's centre the body must turn before the sheet is
+    /// allowed to change. A plain 45 degree bucket flickers whenever the aim
+    /// rests on a boundary; 28 degrees gives 5.5 degrees of hold on each side.
+    /// </summary>
+    public const float WardenSectorHold = 0.4886f;
+
+    public const float WardenRunEnterSpeed = 62f;
+    public const float WardenRunExitSpeed = 34f;
+
+    /// <summary>
+    /// World units covered by one full two-step run cycle. Driving the cycle
+    /// from distance rather than from a clock keeps the feet honest at every
+    /// movement multiplier — Soul Sense, Resonance, stabilising and full sprint
+    /// all read as the same character.
+    /// </summary>
+    public const float WardenGaitCycleDistance = 122f;
     public const int PlayerMaxHealth = 100;
     public const float SoulSenseMovementMultiplier = 0.85f;
     public const float SoulSenseCoreDamageMultiplier = 1.45f;

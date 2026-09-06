@@ -152,23 +152,11 @@ public sealed class SoulCannon
         _ => 1f
     };
 
-    public void DrawBack(
-        SpriteBatch batch,
-        Texture2D pixel,
-        Texture2D weaponTexture,
-        Vector2 playerPosition,
-        Vector2 facingDirection)
-    {
-        if (State != SoulCannonState.Stored)
-        {
-            return;
-        }
-
-        Vector2 right = new(-facingDirection.Y, facingDirection.X);
-        Vector2 stock = playerPosition - facingDirection * 24f - right * 22f;
-        Vector2 barrel = playerPosition + facingDirection * 34f + right * 20f;
-        DrawWeapon(batch, pixel, weaponTexture, stock, barrel, 0f, false, 0f);
-    }
+    // The stowed cannon used to be drawn here and is now deliberately absent.
+    // The Soul Cannon is Death Flame given a shape: it is manifested when the
+    // Warden draws it and let go when he stops, so there is nothing on his back
+    // to draw. That also keeps the carried silhouette to one readable object —
+    // the scythe — instead of two competing ones.
 
     public void DrawActive(
         SpriteBatch batch,
@@ -202,12 +190,46 @@ public sealed class SoulCannon
         Vector2 vibration = right * MathF.Sin(_visualTime * 53f) * vibrationStrength;
         stock += vibration * 0.35f;
         barrel += vibration;
-        DrawWeapon(batch, pixel, weaponTexture, stock, barrel, ChargeProgress, IsFullCharge, pulse);
+        DrawWeapon(batch, weaponTexture, stock, barrel);
+    }
 
-        if (State == SoulCannonState.Charging)
+    /// <summary>
+    /// The charge, painted with the feathered brush in the additive combat-light
+    /// pass.
+    ///
+    /// This used to be drawn as filled and stroked circles in the sprite pass: a
+    /// hard bright ring at the muzzle and a hard line into the chest. That is
+    /// exactly the "shiny vector lines in the fighting plane" the owner rejected
+    /// on 2026-09-06, and it survived that pass because it lived in the cannon
+    /// rather than in the shared telegraph code.
+    /// </summary>
+    public void DrawChargeLight(SpriteBatch batch, Texture2D brush, Vector2 playerPosition, Vector2 facingDirection)
+    {
+        if (State == SoulCannonState.Stored || ChargeProgress <= 0f)
         {
-            Vector2 core = playerPosition + facingDirection * 2f;
-            batch.DrawLine(pixel, core, playerPosition + facingDirection * 22f + right * 6f, GameBalance.DeathFlame * (0.35f + ChargeProgress * 0.45f), 4f + ChargeProgress * 3f);
+            return;
+        }
+
+        Vector2 right = new(-facingDirection.Y, facingDirection.X);
+        float charge = ChargeProgress;
+        float pulse = 0.5f + 0.5f * MathF.Sin(_visualTime * (IsFullCharge ? 28f : 17f));
+        Color energy = IsFullCharge
+            ? GameBalance.SoulWhite
+            : Color.Lerp(GameBalance.DeepViolet, GameBalance.DeathFlameBright, charge);
+
+        Vector2 core = playerPosition + facingDirection * 2f;
+        Vector2 chamber = playerPosition + facingDirection * 24f + right * 6f;
+        Vector2 muzzle = playerPosition + facingDirection * 72f + right * 6f;
+
+        // The Soul being drawn out of the Warden and into the brace.
+        SoftShapes.Streak(batch, brush, Vector2.Lerp(core, chamber, 0.5f), facingDirection,
+            13f, 4.5f + charge * 2.5f, GameBalance.DeathFlame * (0.16f + charge * 0.2f));
+        SoftShapes.Blob(batch, brush, chamber, 7f + charge * 5f + pulse * 1.5f, energy * (0.2f + charge * 0.2f));
+        SoftShapes.Blob(batch, brush, muzzle, 12f + charge * 16f + pulse * 2f, energy * (0.13f + charge * 0.17f));
+        SoftShapes.Blob(batch, brush, muzzle, 4f + charge * 6f + pulse, energy * (0.18f + charge * 0.22f));
+        if (IsFullCharge)
+        {
+            SoftShapes.Blob(batch, brush, muzzle, 26f + pulse * 6f, GameBalance.SoulWhite * 0.12f);
         }
     }
 
@@ -271,13 +293,9 @@ public sealed class SoulCannon
 
     private static void DrawWeapon(
         SpriteBatch batch,
-        Texture2D pixel,
         Texture2D weaponTexture,
         Vector2 stock,
-        Vector2 barrel,
-        float charge,
-        bool full,
-        float pulse)
+        Vector2 barrel)
     {
         Vector2 direction = Vector2.Normalize(barrel - stock);
         float rotation = MathF.Atan2(direction.Y, direction.X);
@@ -292,27 +310,5 @@ public sealed class SoulCannon
             displayLength / weaponTexture.Width,
             SpriteEffects.None,
             0f);
-
-        if (charge <= 0f)
-        {
-            return;
-        }
-
-        int stage = charge < 0.25f ? 1 : charge < 0.67f ? 2 : 3;
-        Color energy = full
-            ? GameBalance.SoulWhite
-            : Color.Lerp(GameBalance.DeepViolet, GameBalance.DeathFlameBright, charge);
-        float chamberRadius = stage switch { 1 => 5f, 2 => 8f, _ => 10f };
-        float barrelRadius = stage switch { 1 => 10f, 2 => 16f, _ => 21f };
-        batch.FillCircle(pixel, stock + direction * 28f, chamberRadius + pulse * 1.5f, energy * (0.58f + charge * 0.38f));
-        batch.DrawCircle(pixel, barrel, barrelRadius + pulse * 2f, energy * (0.48f + charge * 0.42f), 2.5f + stage, 24);
-        if (stage >= 3)
-        {
-            batch.FillCircle(pixel, barrel, full ? 10f + pulse * 1.5f : 6f + pulse, full ? GameBalance.SoulWhite : GameBalance.DeathFlameBright * 0.9f);
-        }
-        if (full)
-        {
-            batch.DrawCircle(pixel, barrel, 29f + pulse * 5f, GameBalance.SoulWhite * (0.68f + pulse * 0.18f), 3f, 28);
-        }
     }
 }

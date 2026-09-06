@@ -1,6 +1,8 @@
 # Current Slice
 
-Status: Golden Combat Slice refined and local two-player co-op proof implemented on `prototype/design-polish`, awaiting owner review.
+Status: Golden Combat Slice, local two-player co-op proof and the Session 3
+character/animation/pixel-language reset implemented on `prototype/design-polish`,
+awaiting owner review.
 
 ## What exists
 
@@ -15,6 +17,34 @@ Status: Golden Combat Slice refined and local two-player co-op proof implemented
 - Scene rendering, emission, halos and reduced-effects presentation.
 - Deterministic visual scenario capture system.
 - Directional character animation, VFX and audio asset base.
+
+### Added by Session 3 — character, animation and pixel-language reset
+
+- **The Warden is authored from a rig** (`tools/visual-max/warden_forge.py`), not
+  generated per direction. One body plan, one palette, one camera and a real
+  ground-plane projection, so the eight directions are one character rotating
+  instead of eight different creatures.
+- **Human-first protagonist.** Wings, horns and the rifle/scythe hybrid removed;
+  visible face, hands and legs; a plain wood-and-iron scythe; a rust-red scarf.
+  The supernatural budget is two ember eyes, a two-pixel bound Soul and a thin
+  Death Flame line on the trailing hem.
+- **Real animation.** 12-frame idle, 12-frame run and a new 6-frame attack. The
+  run is driven by distance travelled rather than by a clock, so the gait is
+  correct at every movement multiplier.
+- **Stable facing.** Bounded body turn rate, eight-sector selection with
+  hysteresis, and reversed playback when backpedalling. `FacingDirection` is
+  still the raw aim vector, so no combat value changed.
+- **Exact pixel scale.** One authored pixel is one screen pixel at combat zoom.
+- **Weapon cohesion.** The scythe lives in the sheet at rest; the swing sprite is
+  built by the same routine as the carried one, pivots from the butt of the haft,
+  and its scale is solved from the arc radius so the blade reaches where the
+  light does.
+- **The elder brother has his own sheet** from the same rig — hood, mantle, no
+  scarf — so the brothers differ structurally rather than only by mass and tint.
+- **Two leftover hard-line violations removed** (Soul Cannon charge rings and
+  feed line), and **threat telegraphs moved beneath the actors** so the Warden is
+  no longer painted over by the attack he is standing in.
+- Three new deterministic fixtures: `facing-sweep`, `run-cycle`, `strafe-read`.
 
 ### Added by Session 2 — Golden Slice uplift
 
@@ -66,10 +96,15 @@ Status: Golden Combat Slice refined and local two-player co-op proof implemented
 
 - `GameWorld` owns one arena.
 - The environment is one fixed 1800×1000 arena.
-- Grayscale separation between the two brothers relies on silhouette mass and rim
-  intensity; a bespoke silhouette accent for the elder is the recommended next
-  art step.
-- The downed pose is the idle frame rotated and darkened — temporary art.
+- The attack is one clip for all three combo steps plus Severance, sampled by the
+  Scythe's own progress; per-step poses are the next animation step.
+- No dash, hurt or death clips. The downed pose is still the idle frame rotated
+  and darkened — temporary art.
+- The enemies and environment are still in the delivered drawing language and
+  have not been brought into the authored one. This is the largest remaining
+  visual inconsistency.
+- The exact 1:1 pixel scale holds at combat zoom only; the title, intro and
+  co-op group zooms resample.
 - No controller hardware was available for verification.
 - The new audio cues have not been auditioned by ear.
 - No story flow, zones, dialogue, homebase, co-op, items, save or progression exists yet.
@@ -77,8 +112,9 @@ Status: Golden Combat Slice refined and local two-player co-op proof implemented
 
 ## Active objective
 
-Owner review of the refined Golden Slice, the co-op proof and the audio audition.
-On approval, continue with
+Owner judgement of the corrected character, animation and facing **in motion**,
+plus the still-outstanding review of the refined Golden Slice, the co-op proof
+and the audio audition. On approval, continue with
 [`../agent-prompts/03-DEATH-LAYER-PROLOGUE.md`](../agent-prompts/03-DEATH-LAYER-PROLOGUE.md).
 
 Do not multiply content until the owner approves the resulting combat and visual direction.
