@@ -135,6 +135,17 @@ public sealed class GameWorld : IDisposable
     }
 
     /// <summary>
+    /// Read-only capture seam: a Burning is coming apart right now. The
+    /// detonation fixture reacts to the real state instead of guessing a tick.
+    /// </summary>
+    internal bool BurningDetonating =>
+        _enemies.Any(enemy => enemy is Burning { State: BurningState.Detonating });
+
+    /// <summary>Read-only capture seam: a Burning is mid-charge and can be burst.</summary>
+    internal bool BurningCharging =>
+        _enemies.Any(enemy => enemy is Burning { State: BurningState.Charge });
+
+    /// <summary>
     /// Read-only capture seam: true on the frames where a dash would open a
     /// Severance Window. Fixtures react to the real combat state instead of
     /// hard-coded tick numbers, so the evidence stays honest if timings change.
@@ -234,7 +245,7 @@ public sealed class GameWorld : IDisposable
         _autoJoinSecond = localPlayers >= GameBalance.MaxLocalPlayers;
         _lastMouseWorld = _player.Position + Vector2.UnitX * 200f;
         Array.Fill(_healthLastFrame, GameBalance.PlayerMaxHealth);
-        _camera.Follow(_arena.CombatBounds.Center.ToVector2(), _arena.Bounds, viewport);
+        _camera.SnapTo(_arena.CombatBounds.Center.ToVector2(), _arena.Bounds, viewport);
     }
 
     /// <summary>
@@ -1051,11 +1062,80 @@ public sealed class GameWorld : IDisposable
             _loopState,
             anyoneDead,
             _roster.FrameCentre(),
+            FrameVelocity(),
+            FrameFacing(),
+            ThreatCentre(),
             _arena.Bounds,
             _arena.CombatBounds,
             viewport,
             deltaTime,
-            groupZoom);
+            groupZoom,
+            _screenEffects.ZoomPunch);
+    }
+
+    /// <summary>Average movement of the standing Wardens. Drives camera look-ahead.</summary>
+    private Vector2 FrameVelocity()
+    {
+        Vector2 total = Vector2.Zero;
+        int count = 0;
+        foreach (PlayerSlot slot in _roster.Slots)
+        {
+            if (slot.Warden.CanBeTargeted)
+            {
+                total += slot.Warden.Velocity;
+                count++;
+            }
+        }
+
+        return count == 0 ? Vector2.Zero : total / count;
+    }
+
+    /// <summary>
+    /// Where the Wardens are looking. The smoothed body facing is used rather
+    /// than the raw aim, so a mouse flick cannot snap the frame.
+    /// </summary>
+    private Vector2 FrameFacing()
+    {
+        Vector2 total = Vector2.Zero;
+        foreach (PlayerSlot slot in _roster.Slots)
+        {
+            if (slot.Warden.CanBeTargeted)
+            {
+                total += slot.Warden.BodyFacing;
+            }
+        }
+
+        return total;
+    }
+
+    /// <summary>
+    /// The centroid of the fight the camera should acknowledge: living
+    /// manifestations near enough to matter, with a committed attacker counted
+    /// twice because that is the one about to arrive.
+    /// </summary>
+    private Vector2? ThreatCentre()
+    {
+        if (_loopState != ArenaLoopState.Combat)
+        {
+            return null;
+        }
+
+        Vector2 centre = _roster.FrameCentre();
+        Vector2 total = Vector2.Zero;
+        float weight = 0f;
+        foreach (Enemy enemy in _enemies)
+        {
+            if (!enemy.IsAlive || Vector2.DistanceSquared(enemy.Position, centre) > 560f * 560f)
+            {
+                continue;
+            }
+
+            float w = enemy.CommitmentRemaining >= 0f ? 2f : 1f;
+            total += enemy.Position * w;
+            weight += w;
+        }
+
+        return weight <= 0f ? null : total / weight;
     }
 
     public void Dispose()
@@ -1614,6 +1694,7 @@ public sealed class GameWorld : IDisposable
         _particles.EmitConvergence(position, heavy ? 20 : 12, heavy ? 128f : 84f, GameBalance.DeathFlameBright, 0.3f, heavy ? 6f : 4f);
         _arenaAtmosphere.ReactToForce(position, heavy ? 320f : 190f, heavy ? 96f : 54f);
         _screenEffects.AddShake(heavy ? 0.2f : 0.07f, heavy ? 6.5f : 1.6f);
+        _screenEffects.AddZoomPunch(heavy ? 0.6f : 0.14f);
     }
 
     private void ResetEncounter()

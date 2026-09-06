@@ -6,7 +6,70 @@
 
 ## Current objective
 
-Session 3, a single ordered job: **correct the character, animation and
+Session 4 responds to owner review of Session 3. The character was accepted; the
+camera, the animation's whole-body motion, the weapons' shape language and every
+VFX were rejected as still below a professional bar. Enemy behaviour was
+explicitly out of scope — only how it looks.
+
+### Session 4 — what changed
+
+**Camera** (`Rendering/Camera2D.cs`, rebuilt). The old camera was one lerp
+straight onto the Warden at a fixed rate, which is why it felt mechanical: it sat
+exactly on him, answered every one-pixel adjustment, never looked where he was
+going and turned as instantly as he did. It now has the three ingredients of a
+good action follow and nothing more — look-ahead from velocity and facing with
+its own slow smoothing, a soft zone so small adjustments leave the frame still,
+and critical damping so it eases instead of tracking. Vertical response is held
+to 0.62 of horizontal. A small bounded bias pulls the frame toward the fight.
+Impacts add a spring-released zoom punch.
+
+Evidence: in `run-cycle` the Warden sits clearly left of frame centre while
+running east. The frame leads him.
+
+**Whole-body motion.** The owner's note was that the feet moved under a static
+torso. The rig now carries pelvis sway onto the stance leg, shoulder
+counter-rotation against the hips that overshoots at head height so the head
+arrives late, arms crossing inboard as they come forward, and a lean that
+breathes with the footfalls. Planted feet use a projection that skips all of it,
+so nothing slides. The attack turns from the hips, which is most of the
+difference between a swing and an arm being waved.
+
+**Weapons.** Both were re-shaped, not re-detailed — the detail level is
+unchanged, the weight comes from silhouette. The scythe gained a deep recurved
+blade with a back-spur and a hooked point, an iron collar holding one bound Soul,
+a counterweight spike at the butt and a shallow S in the haft. The blade plane is
+yawed 45° off the forward axis so it never foreshortens to nothing in the north
+and south sheets. The Soul Cannon became a braced reliquary: shoulder hook,
+under-brace, a caged chamber where the Soul burns, and a flared fluted mouth.
+
+**VFX** (`tools/visual-max/vfx_forge.py`, new; all twelve sheets replaced). The
+delivered sheets were images rather than effects, and the measurements say so:
+`fx_burning_detonation` covered 79–81% of its frame for three frames and then
+spent nine frames as full-frame speckle. Drawn additively, that is the literal
+square the owner reported. The authored sheets are built from quantised energy
+fields — banded pixel light, since these are drawn PointClamp — with particles
+simulated once and sampled per frame so embers actually travel and go out,
+shockwaves that thin as they expand, and rings that are deliberately broken and
+uneven rather than perfect circles. Every effect has an attack, a body and a
+decay that reaches zero, and the tool asserts a coverage ceiling so nothing can
+become a square again.
+
+| Sheet | Peak frame coverage before | after |
+|---|---|---|
+| `fx_burning_detonation` | 0.81 | 0.11 |
+| `fx_resonance_activate` | 0.72 | 0.07 |
+| `fx_soul_release` | 0.07 (a grey blob) | 0.06 (a Soul unwinding upward) |
+
+Two supporting fixes were needed before the authored effects could be seen at
+all. Each sprite VFX lays a soft glow disc over itself, sized for sheets with no
+internal light; at the old intensities that disc simply covered the new ones, so
+a detonation with a shockwave, torn fragments and travelling embers arrived as a
+white ball. Every glow is now wider and much weaker. Separately, each particle
+contributed a disc 3.4× its own size, and two dozen emitted at one point stacked
+into the same white ball; that is now 2.3× at 0.10, and the detonation throws its
+residue clear instead of leaving it in a pile.
+
+### Session 3 — the previous job: **correct the character, animation and
 pixel-art language before any more content is built on top of it.** No new
 content areas, no prologue, no items, no engine architecture.
 
@@ -178,17 +241,27 @@ light and the actor sprites. Verified in `hollow-swipe` and `devourer-slam`.
 
 ## Ludo MCP and ElevenLabs
 
-**Ludo MCP: NOT USED.** No Ludo MCP server is registered in this environment
-(`~/.config/opencode/opencode.jsonc` declares no MCP servers), so no Ludo tool
-was callable. `~/.secrets/ludo-auth` was therefore never read.
+**Ludo MCP: NOT AVAILABLE, therefore NOT USED.** No MCP server is registered in
+this environment — `~/.config/opencode/opencode.jsonc` contains only a schema
+reference and there is no project-level `.opencode` config — so no Ludo tool is
+callable from here. `~/.secrets/ludo-auth` was never read.
 
-That is also the right answer on the merits. The failure being corrected is
-specifically what per-direction generative delivery produces: eight independently
-imagined characters under eight cameras. Coherent eight-way rotation with a real
-gait is a rig problem, not a prompt problem.
+Reporting it as requested, with an honest assessment of whether it was needed:
+**it was not, for any of this session's work.** Every item the owner raised is a
+motion, timing or shape-language problem — camera damping, gait mechanics,
+silhouette, effect lifecycles — and none of them are solved by generating more
+images. The one place external concept generation would genuinely help is the
+*next* problem, which is bringing the enemies and the environment into the
+authored drawing language; that is a design-exploration job where bounded
+candidate generation is worth having. If the owner wants Ludo used there, an MCP
+server has to be registered first.
 
-**ElevenLabs: NOT USED.** No audio work was in scope this session and no audio
-asset was touched.
+**ElevenLabs: AVAILABLE but NOT USED.** The key is present at
+`/tmp/soulfire-elevenlabs.key` and was not read. This session's brief was camera,
+animation, weapons and VFX; the owner's message ended "the rest is good", and the
+audio bank is already under an owner revision that requires local production from
+approved samples. Generating audio here would have been scope the owner did not
+ask for.
 
 ---
 
@@ -215,7 +288,18 @@ dotnet run -c Release --no-build --project src/TheLostSoulOfFire -- \
 
 Debug keys are unchanged.
 
-## What the owner should look at first
+## What the owner should look at first (Session 4)
+
+1. `artifacts/session4/compare/burning-detonation-before-after.png` — the square,
+   and its absence.
+2. The game itself, **moving**, which is the only way to judge a camera.
+3. `artifacts/session4/compare/run-cycle-session3-session4.png` — the Warden now
+   sits left of frame centre while running east, and the body moves as one.
+4. `artifacts/session4/compare/severance-cut-session3-session4.png` and
+   `scythe-combo-…` — the weapon.
+5. `artifacts/session4/compare/golden-encounter-session3-session4.png`.
+
+## What the owner should look at first (Session 3)
 
 1. `artifacts/session3/compare/facing-sweep-before-after.png` — eight frames of
    one continuous mouse sweep. Top row: eight different creatures. Bottom row:
@@ -230,6 +314,10 @@ Debug keys are unchanged.
 
 ## Capture locations
 
+- `artifacts/session4/before/` — the detonation, with the old effect sheets.
+- `artifacts/session4/after/` — 19 solo scenarios.
+- `artifacts/session4/after-coop/` — 10 two-player scenarios.
+- `artifacts/session4/compare/` — 29 stacked boards.
 - `artifacts/session3/before/` — three character fixtures, before any change.
 - `artifacts/session3/after/` — 18 solo scenarios.
 - `artifacts/session3/after-coop/` — 10 two-player scenarios.
@@ -240,7 +328,11 @@ Debug keys are unchanged.
 | Check | Result |
 |---|---|
 | Release build, zero warnings, zero errors | PASS |
-| 18 solo visual scenarios at HIGH FULL | PASS |
+| 19 solo visual scenarios at HIGH FULL | PASS |
+| No authored character frame clips its 128px cell (240 frames checked) | PASS |
+| Every effect sheet under the 0.34 coverage ceiling | PASS |
+| Audio loop runtime (music + ambience boundaries) | PASS |
+| 18 solo visual scenarios at HIGH FULL (Session 3) | PASS |
 | 10 co-op visual scenarios, incl. reduced effects | PASS |
 | Solo encounter lifecycle (4 beats → completion → restart) | PASS |
 | Two-player encounter lifecycle | PASS |
@@ -253,6 +345,14 @@ Debug keys are unchanged.
 
 ## Known limitations
 
+- **The particle system was tuned, not re-authored.** Particles are still filled
+  circles drawn by `ShapeRenderer` with a glow disc each. They now read as sparks
+  rather than fog, but they are the last part of the effects pipeline that is not
+  authored pixel art.
+- **The camera has no manual look control and no arena-specific framing.** It is
+  one model for the whole game; large regions will want more.
+- **Ludo could not be reached**, so no external concept exploration supported the
+  weapon shapes. They are authored judgement calls.
 - **The attack is one clip for all three combo steps**, sampled by the Scythe's
   own progress. Step 1, step 2, step 3 and a Severance cut therefore share a
   pose vocabulary and differ only in timing and in the light arc. Distinct poses
@@ -275,9 +375,14 @@ Debug keys are unchanged.
 
 ## Next action
 
-Owner judgement on the corrected baseline, in motion, with the mouse. If the
-direction is approved, the ranked follow-ups are: per-step attack poses, a dash
-and a collapse clip, then bringing the enemies into the same drawing language.
+Owner judgement, in motion. The camera and the whole-body animation cannot be
+judged from stills at all.
+
+If approved, the ranked follow-ups are: bring the enemies and the environment
+into the authored drawing language (the largest remaining inconsistency, and the
+one place bounded external concept generation would genuinely help — register a
+Ludo MCP server first); per-step attack poses; dash and collapse clips; then
+author the particle system.
 Do not start the prologue
 ([`../agent-prompts/03-DEATH-LAYER-PROLOGUE.md`](../agent-prompts/03-DEATH-LAYER-PROLOGUE.md))
 until the character direction is judged.

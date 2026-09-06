@@ -18,6 +18,25 @@ awaiting owner review.
 - Deterministic visual scenario capture system.
 - Directional character animation, VFX and audio asset base.
 
+### Added by Session 4 — camera, whole-body motion, weapons and VFX
+
+- **Camera follow rebuilt.** Look-ahead from velocity and facing, a soft zone, a
+  critically damped approach, vertical restraint, a small bias toward the fight
+  and a zoom punch on impact.
+- **Whole-body animation.** Pelvis sway onto the stance leg, shoulder
+  counter-rotation with a late head, arms crossing inboard; planted feet are
+  excluded from all of it so they never slide.
+- **Weapons re-shaped.** A deep recurved blade with a back-spur, an iron collar
+  carrying one bound Soul, a counterweight spike; the Cannon is a braced
+  reliquary with a caged chamber and a flared fluted mouth.
+- **All twelve sprite-VFX sheets re-authored** (`tools/visual-max/vfx_forge.py`).
+  The Burning detonation's full-frame noise square is gone; peak frame coverage
+  fell from 81% to 11%, and there is an asserted ceiling in the tool.
+- **Effect glows widened and weakened**, and the particle glow tightened, so the
+  authored effects are no longer covered by the light laid over them.
+- New deterministic fixture: `burning-detonation`, keyed off the real state
+  change rather than a guessed tick.
+
 ### Added by Session 3 — character, animation and pixel-language reset
 
 - **The Warden is authored from a rig** (`tools/visual-max/warden_forge.py`), not
@@ -98,6 +117,8 @@ awaiting owner review.
 - The environment is one fixed 1800×1000 arena.
 - The attack is one clip for all three combo steps plus Severance, sampled by the
   Scythe's own progress; per-step poses are the next animation step.
+- The particle system still draws filled circles rather than authored sprites;
+  it was tuned down rather than re-authored this session.
 - No dash, hurt or death clips. The downed pose is still the idle frame rotated
   and darkened — temporary art.
 - The enemies and environment are still in the delivered drawing language and

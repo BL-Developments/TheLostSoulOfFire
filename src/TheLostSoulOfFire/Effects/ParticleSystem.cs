@@ -55,17 +55,23 @@ public sealed class ParticleSystem
         _settings = settings;
     }
 
+    /// <param name="spread">
+    /// Extra outward speed. Ambient Death Flame lingers, but a detonation has to
+    /// throw its residue clear or two dozen particles sit on top of each other
+    /// and read as one blob instead of as embers.
+    /// </param>
     public void EmitDeathFlame(
         Vector2 position,
         int count,
         float intensity = 1f,
-        VisualEffectPriority priority = VisualEffectPriority.Decorative)
+        VisualEffectPriority priority = VisualEffectPriority.Decorative,
+        float spread = 0f)
     {
         int adjustedCount = GetAdjustedCount(count, priority);
         for (int i = 0; i < adjustedCount; i++)
         {
             float angle = RandomRange(-MathHelper.Pi, MathHelper.Pi);
-            float speed = RandomRange(15f, 48f) * intensity;
+            float speed = (RandomRange(15f, 48f) + RandomRange(0.35f, 1f) * spread) * intensity;
             Vector2 velocity = new(MathF.Cos(angle) * speed, MathF.Sin(angle) * speed);
 
             // Death Flame deliberately drifts sideways or downward instead of behaving like normal fire.

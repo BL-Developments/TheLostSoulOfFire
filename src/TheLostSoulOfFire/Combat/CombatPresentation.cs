@@ -143,6 +143,7 @@ public sealed class CombatPresentation
             default:
                 _screenEffects.BeginImpactFrame(0.038f);
                 _screenEffects.AddShake(0.19f, 7.5f);
+                _screenEffects.AddZoomPunch(0.7f);
                 _screenEffects.AddCameraKick(direction, 5.5f);
                 _screenEffects.Flash(0.085f, 0.27f, GameBalance.SoulWhite);
                 break;
@@ -172,6 +173,7 @@ public sealed class CombatPresentation
             request.IsFullCharge ? 1.42f : 0.8f,
             request.IsFullCharge ? VisualEffectPriority.Critical : VisualEffectPriority.Combat);
         _screenEffects.AddShake(request.IsFullCharge ? 0.24f : 0.08f, request.IsFullCharge ? 8f : 1.5f);
+        _screenEffects.AddZoomPunch(request.IsFullCharge ? 0.85f : 0.2f);
         _screenEffects.AddCameraKick(-request.Direction, request.IsFullCharge ? 12f : 3f);
         _screenEffects.Flash(
             request.IsFullCharge ? 0.085f : 0.045f,
@@ -228,7 +230,9 @@ public sealed class CombatPresentation
 
     public void PresentBurningDetonation(Vector2 position)
     {
-        _spriteVfx.Spawn("burning_detonation", position, 0f, 0.88f);
+        // Scaled so the authored shockwave arrives at the real blast radius. The
+        // effect used to stop well inside the circle that actually hurt you.
+        _spriteVfx.Spawn("burning_detonation", position, 0f, 1.62f);
         _particles.EmitBurst(
             position,
             Vector2.UnitX,
@@ -237,11 +241,12 @@ public sealed class CombatPresentation
             430f,
             12f,
             VisualEffectPriority.Critical);
-        _particles.EmitDeathFlame(position, 24, 1.55f, VisualEffectPriority.Critical);
+        _particles.EmitDeathFlame(position, 24, 1.55f, VisualEffectPriority.Critical, spread: 260f);
         _screenEffects.BeginHitstop(CombatFeedbackTuning.BurningDetonationHitstop);
         _screenEffects.BeginImpactFrame(0.058f);
         _screenEffects.AddShake(0.3f, 12.5f);
-        _screenEffects.Flash(0.11f, 0.4f, GameBalance.SoulWhite);
+        _screenEffects.AddZoomPunch(1f);
+        _screenEffects.Flash(0.11f, 0.3f, GameBalance.SoulWhite);
     }
 
     /// <summary>
@@ -281,6 +286,7 @@ public sealed class CombatPresentation
         _screenEffects.BeginHitstop(GameBalance.SeveranceHitstop);
         _screenEffects.BeginImpactFrame(0.062f);
         _screenEffects.AddShake(0.2f, 8.5f);
+        _screenEffects.AddZoomPunch(0.75f);
         _screenEffects.AddCameraKick(direction, 6.5f);
         _screenEffects.Flash(0.095f, 0.31f, GameBalance.SoulWhite);
     }
@@ -295,6 +301,7 @@ public sealed class CombatPresentation
         _particles.EmitConvergence(position, 16, 96f, flame, 0.5f, 4f, VisualEffectPriority.Critical);
         _particles.EmitDeathFlame(position, 10, 0.7f, VisualEffectPriority.Critical);
         _screenEffects.AddShake(0.22f, 6.5f);
+        _screenEffects.AddZoomPunch(0.65f);
         _screenEffects.Flash(0.1f, 0.18f, flame);
     }
 
@@ -410,6 +417,7 @@ public sealed class CombatPresentation
             VisualEffectPriority.Critical);
         _particles.EmitDeathFlame(_resonancePosition, 12, 1f, VisualEffectPriority.Critical);
         _screenEffects.AddShake(0.22f, 8f);
+        _screenEffects.AddZoomPunch(0.8f);
         _screenEffects.AddCameraKick(Vector2.UnitY, 6f);
         _screenEffects.Flash(0.07f, 0.16f, GameBalance.SoulWhite);
     }

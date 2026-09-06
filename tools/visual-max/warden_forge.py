@@ -310,6 +310,13 @@ class Rig:
         self.profile = abs(self.fx)
         self.bob = 0.0
         self.lean = 0.0
+        # Whole-body motion. Owner note: the first pass read as legs moving
+        # under a static torso. A person does not run with their feet; the
+        # pelvis shifts onto the stance leg, the shoulders counter-rotate
+        # against the hips, and the head arrives late. All three live here so
+        # every part inherits them and nothing can drift out of phase.
+        self.sway = 0.0
+        self.twist = 0.0
 
     # -- camera -----------------------------------------------------------
 
@@ -317,7 +324,26 @@ class Rig:
         """Scale a screen-space length (limb thickness, head radius) with the figure."""
         return value * FIGURE
 
+    def ground(self, a: float, b: float, h: float) -> tuple[float, float]:
+        """Projection with no body motion. Planted feet use this: a foot on the
+        floor must not sway with the hips or it slides."""
+        a *= FIGURE
+        b *= FIGURE
+        h *= FIGURE
+        gx = a * self.fx + b * self.fy
+        gy = a * self.fy - b * self.fx
+        return (CENTER_X + gx, GROUND_Y + gy * SQUASH - h + self.bob)
+
     def project(self, a: float, b: float, h: float) -> tuple[float, float]:
+        # Twist ramps in from the hips to the shoulders and slightly overshoots
+        # at head height, which is what makes the head read as arriving late.
+        if self.twist != 0.0 or self.sway != 0.0:
+            reach = max(self.shoulder_h - self.hip_h, 0.001)
+            t = min(max((h - self.hip_h * 0.45) / reach, 0.0), 1.35)
+            angle = self.twist * t
+            ca, sa = math.cos(angle), math.sin(angle)
+            a, b = a * ca - b * sa, a * sa + b * ca
+            b += self.sway * min(1.0, 0.35 + t * 0.75)
         a *= FIGURE
         b *= FIGURE
         h *= FIGURE
@@ -388,6 +414,8 @@ class Pose:
     arm: list[tuple[float, float, float]] = field(default_factory=list)  # (along, lift, out)
     bob: float = 0.0
     lean: float = 0.0
+    sway: float = 0.0
+    twist: float = 0.0
     coat_trail: float = 0.0
     scarf_trail: float = 0.0
     head_tilt: float = 0.0
@@ -411,6 +439,10 @@ def idle_pose(t: float) -> Pose:
             (0.2 + breathe * 0.25, -17.0 + breathe * 0.5, 0.5),
         ],
         bob=breathe * 0.6 + settle * 0.15,
+        # A slow shift of weight from one foot to the other. Without it an idle
+        # reads as a paused frame rather than as someone waiting.
+        sway=math.sin(t * math.tau) * 0.9,
+        twist=math.sin(t * math.tau - 0.6) * 0.045,
         lean=0.5,
         coat_trail=1.2 + breathe * 0.7,
         scarf_trail=2.4 + breathe * 1.2,
@@ -437,9 +469,11 @@ def run_pose(t: float) -> Pose:
 
     def arm(phase: float) -> tuple[float, float, float]:
         ph = (t + phase) % 1.0
-        along = -math.cos(ph * math.tau) * 7.0
+        along = -math.cos(ph * math.tau) * 8.5
         swing = math.sin(ph * math.tau)
-        return along, -16.0 + swing * 2.4, 0.4 + max(0.0, -along) * 0.06
+        # Arms cross slightly inboard as they come forward, the way they do on a
+        # real runner, instead of pistoning straight fore and aft.
+        return along, -16.0 + swing * 2.6, 0.4 - max(0.0, along) * 0.045
 
     # Two footfalls per cycle: the body drops on contact and rises through flight.
     contact = math.cos(t * math.tau * 2.0)
@@ -447,7 +481,10 @@ def run_pose(t: float) -> Pose:
         leg=[leg(0.0), leg(0.5)],
         arm=[arm(0.5), arm(0.0)],
         bob=-1.9 - contact * 1.5,
-        lean=3.4,
+        # Weight rolls onto the stance leg, and the shoulders answer the hips.
+        sway=-math.sin(t * math.tau) * 2.6,
+        twist=math.sin(t * math.tau) * 0.19,
+        lean=3.4 + contact * 0.6,
         coat_trail=5.0 + math.sin(t * math.tau * 2.0) * 1.4,
         scarf_trail=6.0 + math.sin(t * math.tau * 2.0 + 0.8) * 1.8,
         head_tilt=-0.5,
@@ -482,7 +519,11 @@ def attack_pose(t: float) -> Pose:
         ],
         arm=[(0.0, -6.0, 1.0), (0.0, -6.0, 1.0)],
         hand_body=[trail_hand, lead],
-        bob=-1.4 * coil - 3.0 * drive + recover * 1.2,
+        bob=-1.2 * coil - 2.4 * drive + recover * 1.1,
+        # The whole body turns through the cut. This is most of the difference
+        # between a swing and an arm being waved.
+        sway=-2.2 * coil + 3.0 * drive,
+        twist=-0.34 * coil + 0.30 * min(1.0, max(0.0, (t - 0.18) / 0.42)) * 2.0,
         lean=-2.0 * coil + 7.5 * drive + 2.0 * recover,
         coat_trail=2.5 + coil * 3.0 + drive * 5.0,
         scarf_trail=3.0 + coil * 3.5 + drive * 6.0,
@@ -501,6 +542,8 @@ def draw_frame(build: Build, facing: tuple[float, float], pose: Pose, *, carry_w
     canvas = Canvas()
     rig = Rig(build, facing)
     rig.bob = pose.bob
+    rig.sway = pose.sway
+    rig.twist = pose.twist
 
     coat_dk, coat_md, coat_lt, coat_hi = build.coat
     parts: list[tuple[float, object]] = []
@@ -548,15 +591,17 @@ def draw_frame(build: Build, facing: tuple[float, float], pose: Pose, *, carry_w
 def _leg_drawer(canvas: Canvas, rig: Rig, along: float, lift: float, b: float):
     def draw() -> None:
         hip = rig.project(0.0, b, rig.hip_h)
-        foot = rig.project(along, b, lift)
+        foot = rig.ground(along, b, lift)
         # A real knee. Straight sticks are the fastest way to make a run cycle
         # look like a slide.
-        knee = rig.project(along * 0.40 + 2.4 + lift * 0.55, b, rig.hip_h * 0.50 + lift * 0.52)
+        knee_swayed = rig.project(along * 0.40 + 2.4 + lift * 0.55, b, rig.hip_h * 0.50 + lift * 0.52)
+        knee_planted = rig.ground(along * 0.40 + 2.4 + lift * 0.55, b, rig.hip_h * 0.50 + lift * 0.52)
+        knee = ((knee_swayed[0] + knee_planted[0]) * 0.5, (knee_swayed[1] + knee_planted[1]) * 0.5)
         thigh = canvas.capsule(hip, knee, rig.s(4.0))
         shin = canvas.capsule(knee, (foot[0], foot[1] - rig.s(3.0)), rig.s(3.2))
         canvas.paint_shaded(thigh | shin, "under_dk", "under_md", "coat_md")
-        heel = rig.project(along - 2.0, b, lift)
-        toe = rig.project(along + 3.4, b, lift + 0.4)
+        heel = rig.ground(along - 2.0, b, lift)
+        toe = rig.ground(along + 3.4, b, lift + 0.4)
         boot = canvas.capsule((heel[0], heel[1] - rig.s(2.4)), (toe[0], toe[1] - rig.s(2.4)), rig.s(3.4))
         canvas.paint_shaded(boot, "leather_dk", "leather_md", "leather_lt")
 
@@ -707,7 +752,7 @@ def _head_drawer(canvas: Canvas, rig: Rig, pose: Pose):
         # bald ball and the away-facing directions still own a silhouette.
         back = rig.project(a - 2.6, 0.0, head_h + 1.6)
         if build.hooded:
-            hood = canvas.ellipse(back[0], back[1] - 0.6, rx + 2.2, ry + 2.4)
+            hood = canvas.ellipse(back[0], back[1] + 0.6, rx + 2.0, ry + 2.0)
             hood |= canvas.polygon([
                 (back[0] - rx - 2.2, back[1] + 1.0),
                 (back[0] + rx + 2.2, back[1] + 1.0),
@@ -741,22 +786,37 @@ def _head_drawer(canvas: Canvas, rig: Rig, pose: Pose):
 
 def _weapon_drawer(canvas: Canvas, rig: Rig, pose: Pose, hand_a: float, hand_lift: float, b: float):
     """The scythe, placed in body space so it rotates with the character instead
-    of being pasted on per direction. Same palette and same value steps as the
-    body: it is part of him, not an illustration flying alongside him."""
+    of being pasted on per direction.
+
+    Owner note: the first pass read as a farm tool. The shape language is now
+    deliberately imposing — a deep recurved blade with a back-spur, an iron
+    collar carrying a bound Soul, and a counterweight spike at the butt — while
+    the *detail* level stays exactly where the body is. Imposing comes from
+    silhouette, not from ornament.
+    """
 
     def draw() -> None:
         raise_h = pose.weapon_raise
         if pose.weapon == "carry":
-            butt_a, butt_h, tip_a, tip_h = 8.0, 12.0 + raise_h, -8.0, 70.0 + raise_h
+            butt_a, butt_h, tip_a, tip_h = 8.0, 6.0 + raise_h, -8.0, 62.0 + raise_h
         else:
-            butt_a, butt_h, tip_a, tip_h = 2.5, -1.0, -3.0, 64.0 + raise_h
+            butt_a, butt_h, tip_a, tip_h = 2.5, -2.0, -3.0, 56.0 + raise_h
 
         butt = rig.project(butt_a, b, butt_h)
         tip = rig.project(tip_a, b, tip_h)
-        haft = canvas.capsule(butt, tip, rig.s(2.0))
+        # A shallow S in the haft. A straight stick reads as a broom handle.
+        bow_a = (butt_a + tip_a) * 0.5 + 2.2
+        mid = rig.project(bow_a, b, (butt_h + tip_h) * 0.5)
+        haft = canvas.capsule(butt, mid, rig.s(2.1)) | canvas.capsule(mid, tip, rig.s(2.0))
         canvas.paint_shaded(haft, "wood_dk", "wood_md", "leather_lt")
 
-        # Two chunky grip bands where the hands sit. No spiral of single pixels.
+        # Counterweight spike at the butt: the asymmetry that makes it a weapon.
+        spur = rig.project(butt_a + 1.0, b, butt_h - 7.0)
+        canvas.paint_shaded(canvas.capsule(butt, spur, rig.s(1.6)), "iron_dk", "iron_md", "iron_hi")
+        ferrule = rig.project(butt_a, b, butt_h + 4.0)
+        canvas.paint_shaded(canvas.capsule(butt, ferrule, rig.s(2.6)), "iron_dk", "iron_md", "iron_hi")
+
+        # Two chunky grip bands where the hands sit.
         for t in (0.42, 0.58):
             a = butt_a + (tip_a - butt_a) * t
             h = butt_h + (tip_h - butt_h) * t
@@ -769,20 +829,58 @@ def _weapon_drawer(canvas: Canvas, rig: Rig, pose: Pose, hand_a: float, hand_lif
     return draw
 
 
+# Blade control points in body space, relative to the socket: (forward, up, radius).
+# A long reach, a deep belly and a hooked point — read as a threat at a glance,
+# and still only three values of iron.
+_BLADE_ARC = [
+    (0.0, 0.0, 3.8),
+    (5.5, 6.2, 3.6),
+    (14.5, 8.6, 2.9),
+    (24.0, 5.6, 2.1),
+    (31.5, -1.6, 1.4),
+    (35.0, -9.5, 0.9),
+]
+
+# The back-spur: a short second point behind the socket.
+_BLADE_SPUR = [(0.0, 0.0, 2.4), (-6.5, 4.8, 1.6), (-10.0, 10.0, 0.9)]
+
+
+# The blade plane is turned out from the character's forward axis. Aligned with
+# it, the blade pointed straight at or away from the camera in the north and
+# south sheets and foreshortened to nothing; turned out, some of its length
+# always crosses the screen, so the weapon reads in all eight directions.
+BLADE_YAW = 0.78
+
+
 def _blade(canvas: Canvas, rig: Rig, tip_a: float, b: float, tip_h: float) -> None:
-    """One curved reaping blade, built in body space from four control points.
-    No filigree, no runes: the weapon supports the character read."""
-    arc = [(0.0, 0.0, 3.0), (4.0, 4.2, 2.8), (11.0, 5.6, 2.2), (18.5, 2.8, 1.5), (24.0, -3.4, 0.9)]
-    mask = np.zeros((canvas.h, canvas.w), dtype=bool)
-    previous = None
-    for da, dh, radius in arc:
-        point = rig.project(tip_a + da, b, tip_h + dh)
-        if previous is not None:
-            mask |= canvas.capsule(previous[0], point, max(rig.s((previous[1] + radius) * 0.5), 0.8))
-        previous = (point, radius)
-    canvas.paint_shaded(mask, "iron_dk", "iron_md", "iron_hi")
+    """One deep recurved reaping blade, a back-spur and an iron collar."""
+    yaw_a = math.cos(BLADE_YAW)
+    yaw_b = math.sin(BLADE_YAW)
+
+    def sweep(arc, widen: float = 1.0) -> np.ndarray:
+        mask = np.zeros((canvas.h, canvas.w), dtype=bool)
+        previous = None
+        for da, dh, radius in arc:
+            point = rig.project(tip_a + da * yaw_a, b + da * yaw_b, tip_h + dh)
+            if previous is not None:
+                mask |= canvas.capsule(previous[0], point,
+                                       max(rig.s((previous[1] + radius) * 0.5 * widen), 0.8))
+            previous = (point, radius)
+        return mask
+
+    body = sweep(_BLADE_ARC)
+    canvas.paint_shaded(body, "iron_dk", "iron_md", "iron_hi")
+    # The cutting edge: a thinner pass along the same arc, one value up. This is
+    # what makes a blade look sharp instead of look like a bar.
+    canvas.paint(sweep(_BLADE_ARC, 0.42) & body, PALETTE["iron_hi"])
+    canvas.paint_shaded(sweep(_BLADE_SPUR), "iron_dk", "iron_md", "iron_hi")
+
     socket = rig.project(tip_a, b, tip_h)
-    canvas.paint_shaded(canvas.ellipse(socket[0], socket[1], rig.s(2.6), rig.s(2.6)), "iron_dk", "iron_md", "iron_hi")
+    collar = canvas.ellipse(socket[0], socket[1], rig.s(3.2), rig.s(3.2))
+    canvas.paint_shaded(collar, "iron_dk", "iron_md", "iron_hi")
+    # One bound Soul in the collar. The weapon's entire supernatural budget.
+    canvas.paint(canvas.ellipse(socket[0], socket[1], rig.s(1.3), rig.s(1.3)), "flame")
+    canvas.paint(canvas.ellipse(socket[0], socket[1], rig.s(0.7), rig.s(0.7)), "flame_hi")
 
 
 def _soul_ember(canvas: Canvas, rig: Rig, pose: Pose) -> None:
@@ -844,40 +942,70 @@ def build_swing_weapon() -> Image.Image:
 
     class _Straight(Rig):
         def project(self, a: float, b: float, h: float) -> tuple[float, float]:
-            return (64.0 + a, 150.0 - h)
+            return (96.0 + a * FIGURE, 176.0 - h * FIGURE)
 
-    canvas = Canvas(128, 168)
+    canvas = Canvas(192, 200)
     rig = _Straight(PROTAGONIST, (1.0, 0.0))
     butt = rig.project(0.0, 0.0, 0.0)
-    tip = rig.project(0.0, 0.0, 112.0)
-    canvas.paint_shaded(canvas.capsule(butt, tip, 2.4), "wood_dk", "wood_md", "leather_lt")
+    tip = rig.project(0.0, 0.0, 108.0)
+    mid = rig.project(2.6, 0.0, 54.0)
+    canvas.paint_shaded(canvas.capsule(butt, mid, rig.s(2.6)) | canvas.capsule(mid, tip, rig.s(2.4)),
+                        "wood_dk", "wood_md", "leather_lt")
+    canvas.paint_shaded(canvas.capsule(butt, rig.project(1.2, 0.0, -8.0), rig.s(1.8)),
+                        "iron_dk", "iron_md", "iron_hi")
+    canvas.paint_shaded(canvas.capsule(butt, rig.project(0.0, 0.0, 5.0), rig.s(3.0)),
+                        "iron_dk", "iron_md", "iron_hi")
     for h in (34.0, 56.0):
         canvas.paint_shaded(
-            canvas.capsule(rig.project(0.0, 0.0, h - 4.0), rig.project(0.0, 0.0, h + 4.0), 3.0),
+            canvas.capsule(rig.project(0.0, 0.0, h - 4.0), rig.project(0.0, 0.0, h + 4.0), rig.s(3.0)),
             "leather_dk", "leather_md", "leather_lt")
-    _blade(canvas, rig, 0.0, 0.0, 112.0)
+    _blade(canvas, rig, 0.0, 0.0, 108.0)
     return canvas.to_image()
 
 
 def build_cannon() -> Image.Image:
-    """The Soul Cannon: a manifested brace of iron, not a rifle.
+    """The Soul Cannon: a braced reliquary, not a rifle.
 
     Drawn along +x with the stock at the left, because SoulCannon.DrawWeapon
-    rotates it from stock to muzzle.
+    rotates it from stock to muzzle. Weight comes from the flared mouth, the
+    caged chamber and the under-brace — three big forms, not a hundred rivets.
     """
-    canvas = Canvas(160, 64)
-    y = 32.0
-    body = canvas.capsule((26.0, y), (118.0, y), 5.0)
+    canvas = Canvas(192, 80)
+    y = 40.0
+
+    # Under-brace: the mass that says this thing kicks.
+    brace = canvas.polygon([(38.0, y + 4.0), (104.0, y + 3.0), (96.0, y + 15.0), (44.0, y + 14.0)])
+    canvas.paint_shaded(brace, "wood_dk", "wood_md", "leather_lt")
+
+    # Barrel.
+    body = canvas.capsule((30.0, y), (132.0, y), 6.4)
     canvas.paint_shaded(body, "iron_dk", "iron_md", "iron_hi")
-    stock = canvas.polygon([(14.0, y - 4.0), (34.0, y - 6.0), (34.0, y + 6.0), (16.0, y + 8.0)])
-    canvas.paint_shaded(stock, "wood_dk", "wood_md", "leather_lt")
-    mouth = canvas.capsule((118.0, y), (140.0, y), 7.5) & ~canvas.capsule((122.0, y), (146.0, y), 4.6)
+
+    # Shoulder stock with a hook.
+    stock = canvas.polygon([(10.0, y - 5.0), (36.0, y - 8.0), (36.0, y + 8.0), (14.0, y + 12.0)])
+    stock |= canvas.capsule((10.0, y - 4.0), (6.0, y + 6.0), 3.0)
+    canvas.paint_shaded(stock, "leather_dk", "leather_md", "leather_lt")
+
+    # Caged chamber: four ribs over a hollow where the Soul burns.
+    cage = canvas.capsule((58.0, y), (88.0, y), 9.2)
+    canvas.paint_shaded(cage, "iron_dk", "iron_md", "iron_hi")
+    hollow = canvas.capsule((61.0, y), (85.0, y), 6.2)
+    canvas.paint(hollow, "under_dk")
+    for x in (62.0, 70.0, 78.0, 86.0):
+        canvas.paint_shaded(canvas.capsule((x, y - 9.0), (x, y + 9.0), 1.8),
+                            "iron_dk", "iron_md", "iron_hi")
+
+    # Flared, fluted mouth.
+    mouth = canvas.polygon([(126.0, y - 7.0), (168.0, y - 15.0), (168.0, y + 15.0), (126.0, y + 7.0)])
+    mouth &= ~canvas.polygon([(132.0, y - 4.0), (172.0, y - 10.0), (172.0, y + 10.0), (132.0, y + 4.0)])
     canvas.paint_shaded(mouth, "iron_dk", "iron_md", "iron_hi")
-    band = canvas.capsule((70.0, y - 7.0), (70.0, y + 7.0), 2.2) & (body | mouth)
-    canvas.paint_shaded(band, "leather_dk", "leather_md", "leather_lt")
-    chamber = canvas.ellipse(52.0, y, 4.0, 4.0)
-    canvas.paint(chamber & canvas.a, "flame")
-    canvas.paint(canvas.ellipse(52.0, y, 2.0, 2.0) & canvas.a, "flame_hi")
+    for dy in (-9.0, 0.0, 9.0):
+        canvas.paint_shaded(canvas.capsule((140.0, y + dy * 0.72), (166.0, y + dy), 1.7),
+                            "iron_dk", "iron_md", "iron_hi")
+
+    # One bound Soul in the chamber. Nothing else emits.
+    canvas.paint(canvas.ellipse(73.0, y, 3.4, 3.2) & canvas.a, "flame")
+    canvas.paint(canvas.ellipse(73.0, y, 1.7, 1.6) & canvas.a, "flame_hi")
     return canvas.to_image()
 
 

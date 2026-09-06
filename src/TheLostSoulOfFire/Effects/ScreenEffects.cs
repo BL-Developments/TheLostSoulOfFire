@@ -20,6 +20,15 @@ public sealed class ScreenEffects
     private Color _flashColor = GameBalance.DeathFlameBright;
     private float _impactFrameTimer;
     private float _impactFrameDuration;
+    private float _zoomPunch;
+    private float _zoomPunchVelocity;
+
+    /// <summary>
+    /// A short inward push of the frame on impact, released as a spring.
+    /// Shake says "something happened"; a punch says "that landed". Bounded and
+    /// scaled by the same accessibility setting as every other camera motion.
+    /// </summary>
+    public float ZoomPunch => _zoomPunch;
 
     public Vector2 ShakeOffset { get; private set; }
     public Vector2 CameraOffset => ShakeOffset + _cameraKick;
@@ -48,6 +57,18 @@ public sealed class ScreenEffects
         _shakeTimer = MathF.Max(_shakeTimer, duration);
         _shakeDuration = MathF.Max(_shakeDuration, duration);
         _shakeMagnitude = MathF.Max(_shakeMagnitude, magnitude);
+    }
+
+    /// <summary>Weight behind a hit, 0..1. Only the strongest punch in flight survives.</summary>
+    public void AddZoomPunch(float strength)
+    {
+        strength *= _settings.CameraMotionScale;
+        if (strength <= 0f)
+        {
+            return;
+        }
+
+        _zoomPunch = MathF.Min(0.075f, MathF.Max(_zoomPunch, strength * 0.075f));
     }
 
     public void AddCameraKick(Vector2 direction, float magnitude)
@@ -112,6 +133,20 @@ public sealed class ScreenEffects
             _flashDuration = 0f;
             _flashStrength = 0f;
             _flashColor = GameBalance.DeathFlameBright;
+        }
+
+        // Spring the punch back out. Slightly under-damped, so the frame
+        // breathes out rather than sliding back.
+        if (_zoomPunch > 0.0001f || MathF.Abs(_zoomPunchVelocity) > 0.0001f)
+        {
+            _zoomPunchVelocity += -_zoomPunch * 320f * deltaTime;
+            _zoomPunchVelocity *= MathF.Pow(0.0009f, deltaTime);
+            _zoomPunch = MathF.Max(0f, _zoomPunch + _zoomPunchVelocity * deltaTime);
+        }
+        else
+        {
+            _zoomPunch = 0f;
+            _zoomPunchVelocity = 0f;
         }
 
         _shakeTimer = MathF.Max(0f, _shakeTimer - deltaTime);

@@ -39,8 +39,12 @@ public static class SoulfireRenderSettings
     public const float CannonGlowIntensity = 0.38f;
     public const float DeathFlameGlowRadius = 92f;
     public const float DeathFlameGlowIntensity = 0.48f;
-    public const float ParticleGlowRadiusMultiplier = 3.4f;
-    public const float ParticleGlowIntensity = 0.17f;
+    // Every particle used to contribute a soft disc 3.4x its own size at 0.17.
+    // Two dozen of them emitted at one point — which is exactly what a
+    // detonation does — stacked into a single white ball that swallowed the
+    // effect underneath. Tighter and weaker, so a burst reads as a burst.
+    public const float ParticleGlowRadiusMultiplier = 2.3f;
+    public const float ParticleGlowIntensity = 0.10f;
 }
 
 /// <summary>

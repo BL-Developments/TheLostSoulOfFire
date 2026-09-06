@@ -54,7 +54,10 @@ public sealed class VisualScenarioRunner
             // judged as motion rather than as a single lucky pose.
             ["facing-sweep"] = 290,
             ["run-cycle"] = 258,
-            ["strafe-read"] = 272
+            ["strafe-read"] = 272,
+
+            // Session 4 — the effect the owner reported as "a square at the end".
+            ["burning-detonation"] = 214
         };
 
     /// <summary>
@@ -66,7 +69,8 @@ public sealed class VisualScenarioRunner
         {
             ["facing-sweep"] = [220, 230, 240, 250, 260, 270, 280, 290],
             ["run-cycle"] = [228, 234, 240, 246, 252, 258],
-            ["strafe-read"] = [248, 256, 264, 272]
+            ["strafe-read"] = [248, 256, 264, 272],
+            ["burning-detonation"] = [0, 4, 9, 15, 22, 32]
         };
 
     private readonly string _scenario;
@@ -84,17 +88,24 @@ public sealed class VisualScenarioRunner
     private int _severanceDashTick = -1;
     private int _severanceCutTick = -1;
     private int _beatReachedTick = -1;
+    private int _detonationTick = -1;
     private ScriptedInput _second;
     private bool _coopArranged;
 
     public static string KnownScenarioList => string.Join(", ", CaptureTicks.Keys);
     public bool CaptureRequested { get; private set; }
-    public bool TimedOut => _tick > _captureTick + 180;
+    public bool TimedOut => _tick > _captureTick + (_scenario == "burning-detonation" ? 400 : 180);
     public bool IsSemantic => _semanticEnding || _semanticSeverance || _semanticGoldenBeat || _semanticFinalRelease;
     public int Tick => _tick;
     public string Scenario => _scenario;
-    public bool IsLastCapture => IsSemantic || _tick >= _captureTick;
+    public bool IsLastCapture => _scenario == "burning-detonation"
+        ? DetonationComplete
+        : IsSemantic || _tick >= _captureTick;
     public string OutputName => _captureTicks.Length > 1 ? $"{_scenario}-{_tick:D4}" : _scenario;
+
+    /// <summary>The detonation fixture is done once its last offset has landed.</summary>
+    private bool DetonationComplete =>
+        _detonationTick >= 0 && _tick >= _detonationTick + _captureTicks[^1];
 
     public VisualScenarioRunner(VisualRunOptions options)
     {
@@ -159,6 +170,23 @@ public sealed class VisualScenarioRunner
 
             case "burning-charge":
                 if (_tick == 100) world.ArrangeVisualSubject(_scenario);
+                break;
+
+            // The detonation the Player actually sees. Six frames, keyed off the
+            // real state change, because the whole complaint was about how the
+            // effect *ends*.
+            case "burning-detonation":
+                if (_tick == 100) world.ArrangeVisualSubject("burning-charge");
+                // Hold the Cannon at full charge and release it into the charge
+                // itself, which is the only way a Burning comes apart.
+                if (_tick >= 104 && !world.BurningCharging && _detonationTick < 0)
+                {
+                    input.InjectRightMouseDown();
+                }
+                if (_detonationTick < 0 && world.BurningDetonating)
+                {
+                    _detonationTick = _tick;
+                }
                 break;
 
             case "devourer-slam":
@@ -293,6 +321,12 @@ public sealed class VisualScenarioRunner
         if (_semanticGoldenBeat)
         {
             return _beatReachedTick >= 0 && _tick == _beatReachedTick + 260;
+        }
+
+        if (_scenario == "burning-detonation")
+        {
+            // Offsets from the frame the Burning actually came apart.
+            return _detonationTick >= 0 && _captureTicks.Contains(_tick - _detonationTick);
         }
 
         return _captureTicks.Contains(_tick);

@@ -72,30 +72,41 @@ public sealed class CinematicPresentation
         ArenaLoopState loopState,
         bool playerDead,
         Vector2 playerPosition,
+        Vector2 playerVelocity,
+        Vector2 playerFacing,
+        Vector2? threatCentre,
         Rectangle worldBounds,
         Rectangle combatBounds,
         Viewport viewport,
         float deltaTime,
-        float combatZoom = GameBalance.CombatCameraZoom)
+        float combatZoom = GameBalance.CombatCameraZoom,
+        float zoomPunch = 0f)
     {
         Vector2 arenaCenter = combatBounds.Center.ToVector2();
         Vector2 target = playerPosition;
         // combatZoom is the group camera's request. With one Warden it is the
         // Session 1 constant, so solo framing is unchanged.
         float targetZoom = combatZoom;
-        float followSpeed = 9f;
+        // Seconds to close most of the distance. Combat is responsive; scripted
+        // states are slow and deliberate.
+        float smoothTime = 0.20f;
+        // Scripted framing has no look-ahead: the shot is authored, so the
+        // camera must not add opinions of its own.
+        float lead = 1f;
 
         if (loopState == ArenaLoopState.Title)
         {
             target = arenaCenter + new Vector2(-330f, -6f);
             targetZoom = GameBalance.TitleCameraZoom;
-            followSpeed = 2.4f;
+            smoothTime = 0.85f;
+            lead = 0f;
         }
         else if (playerDead)
         {
             target = playerPosition;
             targetZoom = combatZoom * 1.055f;
-            followSpeed = 3.2f;
+            smoothTime = 0.62f;
+            lead = 0f;
         }
         else if (loopState == ArenaLoopState.Intro)
         {
@@ -105,24 +116,41 @@ public sealed class CinematicPresentation
                 _quickIntro ? combatZoom * 0.97f : GameBalance.IntroCameraZoom,
                 combatZoom,
                 settle);
-            followSpeed = _quickIntro ? 10f : 4.5f;
+            smoothTime = _quickIntro ? 0.18f : 0.42f;
+            lead = settle * settle;
         }
         else if (loopState == ArenaLoopState.Transition)
         {
+            // Between beats the frame drifts toward the room, which is the
+            // moment the Player is allowed to look at where he is fighting.
             target = Vector2.Lerp(playerPosition, arenaCenter, 0.12f);
             targetZoom = combatZoom * 0.975f;
-            followSpeed = 5f;
+            smoothTime = 0.34f;
+            lead = 0.45f;
         }
         else if (loopState == ArenaLoopState.Complete)
         {
             target = Vector2.Lerp(playerPosition, GetLifeFlamePosition(combatBounds), 0.2f) + new Vector2(70f, -72f);
             targetZoom = combatZoom * 0.94f;
-            followSpeed = 2.8f;
+            smoothTime = 0.70f;
+            lead = 0f;
         }
 
-        float zoomSmoothing = 1f - MathF.Exp(-deltaTime * followSpeed);
-        camera.Zoom = MathHelper.Lerp(camera.Zoom, targetZoom, zoomSmoothing);
-        camera.Follow(target, worldBounds, viewport, zoomSmoothing);
+        // The punch is a short inward push on impact, resolved before the bounds
+        // clamp so a zoomed frame never reveals outside the room.
+        float zoomSmoothing = 1f - MathF.Exp(-deltaTime * 9f);
+        camera.Zoom = MathHelper.Lerp(camera.Zoom, targetZoom * (1f + zoomPunch), zoomSmoothing);
+        camera.Follow(
+            new CameraFocus(
+                target,
+                lead > 0f ? playerVelocity : Vector2.Zero,
+                lead > 0f ? playerFacing : Vector2.Zero,
+                lead > 0f ? threatCentre : null,
+                smoothTime,
+                lead),
+            worldBounds,
+            viewport,
+            deltaTime);
     }
 
     public void DrawWorldAccents(

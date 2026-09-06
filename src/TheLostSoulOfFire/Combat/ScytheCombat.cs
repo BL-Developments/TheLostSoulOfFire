@@ -355,7 +355,9 @@ public sealed class ScytheCombat
         // radius rather than hand-picked per step, which is what finally makes
         // the blade arrive where the light does: the weapon and the cue describe
         // the same reach instead of two different ones.
-        const float haftToTip = 130f;
+        // Sprite geometry, measured from the authored file: the butt of the haft
+        // sits at (96, 176) and the blade's furthest point is 124px along it.
+        const float haftToTip = 124f;
         const float gripOffset = 14f;
         float scale = MathF.Max(0.34f, (arc.Radius - gripOffset) / haftToTip);
         batch.Draw(
@@ -364,7 +366,7 @@ public sealed class ScytheCombat
             null,
             Color.White,
             arc.Current + MathHelper.PiOver2,
-            new Vector2(64f, 150f),
+            new Vector2(96f, 176f),
             scale,
             SpriteEffects.None,
             0f);

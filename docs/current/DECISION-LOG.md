@@ -2,6 +2,56 @@
 
 Record owner-approved, rejected or revised product decisions here. Newer dated entries override older conflicting entries.
 
+## 2026-09-06 — Owner revision: camera, whole-body motion, weapons and VFX
+
+### Reviewed
+
+The corrected character was accepted ("the character looks decent now"). Four
+things were rejected as still below a professional bar.
+
+### Revised
+
+- **The camera must follow like a good action game does.** Children of Morta was
+  named as the reference for *how the frame behaves*, not for its content. A
+  camera that sits exactly on the player and tracks at a constant rate is not
+  acceptable.
+- **Animation must move the whole body.** Feet moving under a static torso reads
+  as a puppet. Weight shift, counter-rotation and secondary motion are required.
+- **The scythe and the Soul Cannon are not imposing enough.** They read as a farm
+  tool and a pipe.
+- **Every VFX is below standard.** Named example: the Burning's detonation "is
+  like a square at the end". The complaint was explicitly general — all effects.
+- **Enemy behaviour is not to change.** Only how it looks.
+
+### Implemented in response
+
+- **Camera rebuilt** (`Rendering/Camera2D.cs`): velocity and facing look-ahead
+  with its own smoothing, a soft zone so small adjustments do not move the frame,
+  critical damping instead of a fixed-rate lerp, vertical restraint, and a small
+  bias toward the fight. Plus a zoom punch on impact.
+- **Whole-body motion** in the rig: pelvis sway onto the stance leg, shoulder
+  counter-rotation against the hips with the head overshooting late, arms
+  crossing inboard, and planted feet excluded from all of it so nothing slides.
+- **Weapons re-shaped**: a deep recurved blade with a back-spur, an iron collar
+  holding one bound Soul, a counterweight spike and an S-curved haft; the Cannon
+  became a braced reliquary with a caged chamber and a flared fluted mouth.
+  Detail level unchanged — the weight comes from silhouette.
+- **All twelve effect sheets re-authored** (`tools/visual-max/vfx_forge.py`) as
+  effects rather than pictures: quantised energy fields, particles simulated once
+  and sampled per frame so embers actually travel, shockwaves that thin as they
+  expand, broken rather than perfectly circular rings, and an asserted coverage
+  ceiling so nothing can become a square again.
+
+### Measured
+
+The old `fx_burning_detonation` covered 79–81% of its frame for three frames and
+then spent nine frames as full-frame speckle — that is the square. The authored
+one peaks at 11%. `fx_resonance_activate` went from 72% to 7%.
+
+### Still open
+
+Owner has not judged the camera, the reworked animation, the weapons or the VFX.
+
 ## 2026-09-06 — Owner revision: the character and the pixel language were wrong
 
 ### Revised
