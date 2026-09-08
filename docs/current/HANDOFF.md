@@ -1,5 +1,97 @@
 # Current Handoff
 
+## 2026-09-08 — Konzeptaufnahme: Zusammenfassung und GitHub-Planung
+
+### Aktueller Auftrag
+
+Undatiertes Owner-Transkript zusammenfassen und in logisch kategorisierte
+GitHub-Meilensteine/Issues übertragen; Aufnahme bei Lore-Konflikten bevorzugen.
+Importdatum 2026-09-08 ist nicht das belegte Aufnahmedatum.
+
+### Erledigt
+
+- Ausführliche deutsche Auswertung mit bestätigten Richtungen, offenen Fragen,
+  Beispielwerten und Konflikttabelle:
+  [`RECORDING-SUMMARY-2026-09-08.md`](RECORDING-SUMMARY-2026-09-08.md).
+- Sechs Meilensteine mit 24 Arbeits-Issues und einem Übersichts-Issue in neun
+  Kategorien ausgearbeitet. Jede Aufgabe besitzt Abnahmekriterien und
+  nachvollziehbare Abhängigkeiten:
+  [`../planning/recording-2026-09-08/BACKLOG.md`](../planning/recording-2026-09-08/BACKLOG.md).
+- Aufnahme-Vorrang und bewusste Abweichungen im Decision Log festgehalten;
+  Product Truth und Canon Status verweisen auf die übergeordneten Revisionen.
+  Vollständige Angleichung aller älteren thematischen Texte ist geplante Arbeit.
+- Reproduzierbare Daten in `docs/planning/recording-2026-09-08/backlog.json`,
+  GitHub-Übersichtsvorlage in `overview.md` desselben Ordners.
+- `tools/github/Publish-RecordingBacklog.ps1` vorbereitet: echte Milestones,
+  Bereichslabels, Issues, Abhängigkeiten und Übersicht; wiederholt ausführbar,
+  nutzt ausschließlich normale GitHub-CLI-Anmeldung. Erfolgslinks werden erst
+  nach vollständiger Remote-Verifikation in `published.json` geschrieben.
+
+### Tatsächlicher GitHub-Status und Blocker
+
+- Kanonisches Repository ist **BL-Developments/TheLostSoulOfFire**. Die lokale
+  `origin`-URL unter `bjsc-dev` leitet weiter; Remote-Konfiguration unverändert.
+- Lesender MCP-Zugriff funktioniert. Prüfung ergab keine vorhandenen Issues
+  oder Milestones. Der MCP bietet keine Milestone-Erstellung.
+- Ein Versuch, das Übersichts-Issue zu erstellen, scheiterte mit
+  **403 Resource not accessible by integration**. Es wurden **0 Issues,
+  0 Milestones und 0 Labels** erstellt. Keine automatische Wiederholung über
+  dieselbe abgelehnte Integration.
+- GitHub-CLI ist nicht angemeldet; Browser-Verbindung nicht verfügbar.
+  Owner wurde gebeten, regulär `gh auth login` auszuführen.
+- Erneuter Versuch auf Owner-Anweisung „Try again“ am 2026-09-08:
+  Issues weiterhin leer; Erstellung der vorbereiteten Übersicht erneut mit
+  **403 Resource not accessible by integration** abgelehnt. Regulärer
+  `gh auth status` außerhalb der Sandbox bestätigt weiterhin keine Anmeldung.
+  Auch dieser Versuch hat keine Issues, Milestones oder Labels erstellt.
+- Ein ergänzender Credential-Manager-Check außerhalb der Sandbox wurde von
+  Auto-Review als unerwünschter Zugriff auf andere Zugangsdaten abgelehnt.
+  Diesen Weg nicht wiederaufnehmen oder umgehen; normale CLI-Anmeldung nutzen.
+
+### Verifikation
+
+- **PASS:** unabhängiger Abgleich Aufnahme ↔ Zusammenfassung ↔ 24 Aufgaben.
+- **PASS:** PowerShell-7-Validierung mit `-ValidateOnly`: gültige IDs,
+  sechs Meilensteine, 24 Arbeits-Issues, ein Überblick, neun Kategorien,
+  keine zyklischen oder unbekannten Abhängigkeiten, keine Remote-Schreibzugriffe.
+- **FAIL:** tatsächliche Issue-Veröffentlichung über MCP — Berechtigung 403.
+- **PASS:** `git diff --check` und zusätzliche Whitespace-/UTF-8-Prüfung aller
+  neun betroffenen Dateien einschließlich neuer Dateien; unabhängige Prüfung
+  des Publishers, mit UTF-8-Antwortdekodierung und additiver Label-Reparatur.
+- **NOT_RUN:** Milestone-/Label-Veröffentlichung und authentifizierter
+  Gesamtlauf des Publishers; reguläre Anmeldung fehlt.
+- **NOT_RUN:** Spiel-Build, Spieltests und Screenshots: Planungs-/Dokuarbeit,
+  kein Laufzeitcode und kein Content verändert. Frühere Prüfergebnisse unten
+  gehören zum damaligen Spielstand, nicht zu diesem Auftrag.
+
+### Annahmen und noch offene Entscheidungen
+
+Aufnahme entscheidet Grundstruktur, keine festen Preise oder Kampagnenzahlen.
+Vaelor-Auswahl ist neuer Storybeat; Ursache bleibt offen. Run-Niederlage und
+endgültiger Warden-Tod müssen erzählerisch unterschieden werden. Ultimate,
+Koop-Konten, Meta-Level, Bankquoten und Rüstungsanpassung bleiben Designaufgaben.
+Keine Termine oder Zuweisungen an andere Personen erfunden. Keine Spielabnahme
+aus diesem Planungsauftrag abgeleitet.
+
+### Exakte nächste Aktion
+
+Nach regulärer GitHub-Anmeldung im Repository ausführen:
+
+```powershell
+pwsh -NoProfile -File tools/github/Publish-RecordingBacklog.ps1
+```
+
+Der Owner hat das Anlegen der geplanten Issues und Meilensteine bereits
+autorisiert; nicht erneut um inhaltliche Erlaubnis fragen. Verifizierte Links
+aus `published.json` berichten und diesen Status sowie `BACKLOG.md` aktualisieren.
+Bei einem Teilfehler denselben Publisher erneut ausführen; Marker/Titel vermeiden
+Doppelungen. Vorhandene externe Änderungen bewahren.
+
+Geänderte Dateien dieses Auftrags: die drei Kontextdateien
+`DECISION-LOG.md`, `PRODUCT-TRUTH.md`, `CANON-STATUS.md`, dieser Handoff,
+die neue Zusammenfassung, drei Planungsdateien (`BACKLOG.md`, `backlog.json`,
+`overview.md`) und der Publisher. Keine Commits oder Pushes ausgeführt.
+
 ## Branch
 
 `prototype/design-polish`

@@ -1,5 +1,28 @@
 # Canon Status and Decision Register
 
+## Vorrangige Revision aus der Aufnahme — 2026-09-08
+
+Die vom Owner priorisierte Aufnahme ergänzt bzw. ersetzt widersprechende
+Einträge unten. Siehe [`DECISION-LOG.md`](DECISION-LOG.md) und
+[`RECORDING-SUMMARY-2026-09-08.md`](RECORDING-SUMMARY-2026-09-08.md).
+
+- Vaelors Auswahl des Protagonisten und die anfängliche Sense sind nun
+  gewünschte Storybeats. Die unten stehende pauschale Ablehnung persönlicher
+  Auswahl ist hierfür historisch überholt; deren metaphysischer Mechanismus
+  bleibt offen. Vaelor bleibt kein Gott, ein Warden-Siegel bleibt verworfen.
+- Erlöste Seelen gehen weiter; gesammelt wird eine daraus entstehende mystische
+  Ressource. Keine intakten Souls als gewöhnliche Währung oder Munition.
+- Run-Niederlagen führen zur Homebase. Die Trennung von wiederholbarer
+  Niederlage/Bergung und endgültiger Warden-Zerstörung ist eine offene
+  Ausgestaltung; der Gameplay-Rückkehrpunkt ist beschlossen.
+- Reguläre Runs: eine gewählte Hauptwaffe, zwei aus drei angebotenen
+  Fähigkeiten, mehrere Levels je Biom, Boss-Freischaltung des nächsten Bioms,
+  Teilsicherung/Extraktion und kein gewöhnliches Loot-Inventar.
+
+Die älteren Detailabschnitte dokumentieren weiterhin die Herkunft der Lore.
+Ihre vollständige thematische Angleichung ist als eigenes Arbeits-Issue
+vorbereitet; die obige Revision darf dabei nicht zurückgenommen werden.
+
 ## Statusdefinitionen
 
 - **CANON:** ausdrücklich bestätigt oder durch die jüngste Entscheidung eindeutig festgelegt.

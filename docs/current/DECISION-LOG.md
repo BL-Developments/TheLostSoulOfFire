@@ -2,6 +2,71 @@
 
 Record owner-approved, rejected or revised product decisions here. Newer dated entries override older conflicting entries.
 
+## 2026-09-08 — Owner direction: Konzeptaufnahme hat Vorrang
+
+Quelle: vom Owner bereitgestelltes undatiertes Gesprächstranskript, ausgewertet
+am 2026-09-08. Das Datum bezeichnet den Import, nicht das Aufnahmedatum.
+Auftrag: Zusammenfassung sowie logisch kategorisierte GitHub-Meilensteine und
+Issues. Bei Konflikten ausdrücklich die Aufnahme bevorzugen.
+
+Die ausführliche Einordnung steht in
+[`RECORDING-SUMMARY-2026-09-08.md`](RECORDING-SUMMARY-2026-09-08.md), die
+24 Arbeitsaufgaben in sechs geplanten Meilensteinen in
+[`../planning/recording-2026-09-08/backlog.json`](../planning/recording-2026-09-08/backlog.json).
+
+### Festgelegte Richtung
+
+- Dauerhafte Warden-Homebase als Vorbereitung und Rückkehrpunkt; Runs durch
+  mehrere Levels eines gewählten Bioms. Neustart nach Niederlage/Extraktion
+  bei Level 1 dieses Bioms. Freigeschaltete Biome bleiben direkt anwählbar.
+- Der vorausgehende Biom-Boss schaltet das nächste Biom frei. Ein Meta-Level
+  ersetzt diese Bedingung nicht. Boss-Handschrift prägt Umgebung und Gegner.
+- Mindestens normales Geld und mystische Ressource aus erfolgter Erlösung.
+  Die Seele geht weiter; ihre Person wird nicht gesammelt oder verbraucht.
+- Mystische Ressource für Fähigkeiten im Run oder dauerhaften Fortschritt.
+  Ungesicherter mystischer Bestand ist bei Niederlage verloren. Reisepunkte
+  ermöglichen Teilsicherung mit Weiterreise oder vollständige Extraktion.
+- Eine Hauptwaffe vor dem Run wählen: Nah- oder Fernkampf. Drei zufällige
+  Fähigkeitsangebote, daraus zwei auswählen, als konkretes Startmodell.
+  Geteilte Kräfte anderer jagender Wardens begründen die wechselnde Auswahl.
+- Aktive Fähigkeiten, Ultimate, Waffenperks/Kombos und Timing-Counter sind
+  gewünscht. Getrennte Waffen- und Fähigkeitsbäume; später dauerhafte Fähigkeiten.
+- NPC-Begegnungen schalten Händler, Schmied und weitere Homebase-Dienste
+  schrittweise frei. Feste Figur ohne anfängliche Klassenwahl.
+- Tutorial mit Vaelors Auswahl, Sense, ersten Kämpfen und Bergung zur Homebase.
+- Kein gewöhnliches Loot-Inventar. Collectibles/Easter Eggs belohnen Erkundung.
+
+### Bewusste Abweichungen gegenüber bisherigen Texten
+
+- Vaelors Auswahl des Protagonisten ist nun ein gewünschter Storybeat. Ältere
+  absolute Verbote persönlicher Auswahl sind hierfür überholt. Die Aufnahme
+  erklärt den metaphysischen Mechanismus nicht; Gottstatus, Siegel oder
+  Allwissenheit werden dadurch nicht eingeführt.
+- Die gleichzeitige Scythe/Cannon-Verfügbarkeit ist Implementierungsbestand;
+  Ziel regulärer Runs ist eine gewählte Hauptwaffe. Systeme wiederverwenden.
+- Den früher geplanten Sechs-Item-Soul-Echo-Proof nicht unverändert bauen;
+  passende Effekte in Fähigkeiten-/Waffenfortschritt neu einordnen.
+- Prolog-/Debug-Sektor-Retry ist keine Regel für reguläre Biom-Runs.
+- Wiederholte Run-Niederlage führt zur Homebase. Ihre Lore-Erklärung gegenüber
+  endgültiger Warden-Zerstörung bleibt auszuarbeiten.
+- Bestehende TeamResonance ist nicht automatisch Geldbörse, Meta-Fortschritt
+  und neue Ultimate-Ladung zugleich; Besitz-/Ausgaberegeln im Koop definieren.
+
+### Offen, kein stillschweigender Beschluss
+
+Ultimate-Aufladung/Kosten, Währungsnamen und genaue Ausgabenzuordnung,
+Sicherungsquote/-limits, Geldverlust, Koop-Konten, Metalevel-Formel,
+dauerhafte Fähigkeitsslots, Rüstungsanpassung, Biomthema/-anzahl,
+Level-/Miniboss-/Waffenanzahl und genaue NPC-Freischaltfolge.
+Heilung/Run-Händler und Sammlungsabschluss-Belohnungen sind Optionen.
+1.000 Einheiten, 50 % Sicherung, drei Startwaffen und drei/fünf Levels sind
+Beispiele. Das Meta-Level aus heimgebrachten Ressourcen ist eine Arbeitsrichtung.
+
+Die nicht widersprechende Lore einschließlich Bruder-Koop, tragischer Souls,
+Release, Flammenbedeutung, unbekanntem Keeper und Soulfire Gothic bleibt gültig.
+Dieser Auftrag erstellt Planung; er genehmigt nicht rückwirkend offene
+Spiel-/Grafikabnahmen und implementiert keine neuen Laufzeitsysteme.
+
 ## 2026-09-06 — Owner revision: the scythe is a held weapon, and the dash is a real out
 
 ### Reviewed

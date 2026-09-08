@@ -1,0 +1,531 @@
+{
+  "schema_version": 1,
+  "recording_import_date": "2026-09-08",
+  "source": "Vom Owner bereitgestelltes Transkript; Aufnahmedatum unbekannt. Bei Konflikten Vorrang vor dem bisherigen Repo. Keine Rohtranskript-Veröffentlichung.",
+  "repository": "BL-Developments/TheLostSoulOfFire",
+  "milestones": [
+    {
+      "id": "M1",
+      "title": "M1 — Produktregeln und Lore-Abgleich",
+      "description": "Abnahme: Aufnahme und bestehende Lore sind nachvollziehbar abgeglichen; Ressourcen-, Rückkehr- und Koop-Regeln sind beschrieben; der bestehende Prolog ist für Vaelor-Auswahl und Startwaffe angepasst. Offene Details bleiben als solche markiert."
+    },
+    {
+      "id": "M2",
+      "title": "M2 — Homebase und vollständiger Run-Kreislauf",
+      "description": "Abnahme: Homebase → freigeschaltetes Biom ab Level 1 → Levelwechsel → Sichern/Extraktion oder Niederlage → Homebase funktioniert mit dauerhaftem Spielstand in Solo und lokalem Koop."
+    },
+    {
+      "id": "M3",
+      "title": "M3 — Waffenwahl, Fähigkeiten und Reaktionskampf",
+      "description": "Abnahme: Eine gewählte Hauptwaffe, drei Fähigkeitsangebote mit zwei Auswahlen, ressourcenbasierte Fähigkeiten, eine bewusst definierte Ultimate und faire Waffen-/Team-Counter sind spielbar."
+    },
+    {
+      "id": "M4",
+      "title": "M4 — NPC-Dienste und dauerhafter Fortschritt",
+      "description": "Abnahme: Entdeckte NPCs schalten Homebase-Dienste frei; Händler, Schmied und getrennte Waffen-/Fähigkeitsbäume erzeugen nachvollziehbaren Fortschritt. Die diskutierte Meta-Level-Richtung wird geprüft und konkret entschieden."
+    },
+    {
+      "id": "M5",
+      "title": "M5 — Erstes Biom, Boss und Erkundung",
+      "description": "Abnahme: Ein menschlich verankertes Biom mit mehreren Levels, erkennbarer Boss-Handschrift, Freischaltung des nächsten Bioms und Collectible-Erkundung ist spielbar. Keine verbindliche Kampagnen- oder Levelanzahl aus Gesprächsbeispielen ableiten."
+    },
+    {
+      "id": "M6",
+      "title": "M6 — Balance und integrierte Solo-/Koop-Abnahme",
+      "description": "Abnahme: Der komplette Kreislauf ist deterministisch geprüft und real gespielt; Ausgabe versus Sicherung bleibt eine faire Entscheidung, Fortschritt bleibt konsistent und bekannte Grenzen sind dokumentiert."
+    }
+  ],
+  "items": [
+    {
+      "id": "lore",
+      "milestone": "M1",
+      "category": "Lore & Story",
+      "type": "design",
+      "title": "Aufnahme als neue Produktgrundlage und Lore-Revision einarbeiten",
+      "context": "Die Aufnahme hat laut Owner bei Konflikten Vorrang. Vaelor wählt den Protagonisten aus und die Sense wird Startwaffe. Das widerspricht der bisherigen Ablehnung persönlicher Auswahl. Wiederholte Run-Niederlagen führen zur Homebase, während endgültige Warden-Zerstörung bisher den Übergang vollendet.",
+      "acceptance": [
+        "Entscheidungslog, Canon, Story Opening und betroffene Produkt-/Roadmaptexte konsistent auf die Aufnahme beziehen; lokale Zusammenfassung als Ausgangspunkt verwenden.",
+        "Auswahl durch Vaelor und Sense erhalten; Ursprung/Mechanik der Auswahl offen markieren. Gottstatus, Warden-Siegel und genaue Ortungsfähigkeit nicht daraus ableiten.",
+        "Run-Niederlage/Rückkehr gegenüber endgültigem Warden-Tod erzählerisch klären; die Rückkehr als festes Gameplayziel erhalten.",
+        "Eine Hauptwaffe statt dauerhaftem Doppelsystem und Verzicht auf Inventar/Loot festhalten; den bisherigen Sechs-Item-Soul-Echo-Plan ersetzen oder als Fähigkeiten neu fassen.",
+        "Lost Souls bleiben tragische Menschen; Release und Besiegen bleiben getrennt. Bruder als Spieler 2, unbekannter Keeper und Soulfire Gothic bleiben erhalten."
+      ],
+      "depends": [],
+      "open": ""
+    },
+    {
+      "id": "economy_design",
+      "milestone": "M1",
+      "category": "Ökonomie",
+      "type": "design",
+      "title": "Zwei Währungen sowie Ausgabe-, Verlust- und Sicherungsregeln definieren",
+      "context": "Bestätigt sind mindestens normales Geld und eine mystische Ressource aus der Erlösung. Nicht die intakte Seele wird gesammelt. Die mystische Ressource steht im Konflikt zwischen aktiven Fähigkeiten im Run und langfristigem Fortschritt.",
+      "acceptance": [
+        "Für jede Ressource Herkunft, Verwendungen, ungesicherten Run-Bestand und gesicherten Bestand definieren.",
+        "Festlegen, welche Ausgaben mit Geld bzw. mystischer Ressource erfolgen und wann eine erfolgreiche Erlösung genau einmal gutgeschrieben wird.",
+        "Teilsicherung mit Weiterreise und vollständige Extraktion unterscheidbar beschreiben; ungesicherte mystische Ressource geht bei Niederlage verloren.",
+        "Konkrete Rechenbeispiele für Verdienen, Ausgeben, Teilsichern, Extraktion und Niederlage dokumentieren.",
+        "Namen und Zahlen als Arbeitswerte markieren; das normale Geld erhält keine unbelegte Todesverlustregel."
+      ],
+      "depends": [
+        "lore"
+      ],
+      "open": "Endgültige Namen, Sicherungsquote und Limits; Schicksal von Geld bei Niederlage; Heilung und Run-Händler sind diskutierte Optionen. 50 % und 1.000 Einheiten sind Beispiele."
+    },
+    {
+      "id": "coop_contract",
+      "milestone": "M1",
+      "category": "Koop",
+      "type": "design",
+      "title": "Besitz, Ausgaben und gemeinsame Run-Entscheidungen im Koop klären",
+      "context": "Der bestehende Prototyp verwendet TeamResonance als gemeinsamen Pool. Daraus folgt nicht automatisch, dass Geld, Meta-Fortschritt und Ultimate-Ladung ebenfalls gemeinsam sein sollen. Alle neuen Systeme müssen solo und mit beiden Brüdern funktionieren.",
+      "acceptance": [
+        "Besitz/Gutschrift von Geld, mystischer Ressource, Freischaltungen und späterem Meta-Level pro Profil oder Team ausdrücklich festlegen.",
+        "Regeln für Ausgaben, Teilsicherung, Extraktion und Startbereitschaft beider Spieler definieren; nachvollziehbare Vorschau der Konsequenzen.",
+        "Fähigkeitsangebote und Waffenwahl für beide Spieler sowie Umgang mit unterschiedlichen Freischaltungen festlegen.",
+        "Down/Stabilisieren, vollständige Team-Niederlage und Solo-Rückkehr verbinden; Doppelauszahlungen verhindern.",
+        "Abnahmefälle für gleichzeitige Interaktion und widersprüchliche Entscheidungen dokumentieren; vorhandene Kamera, Targeting und Tether wiederverwenden."
+      ],
+      "depends": [
+        "economy_design"
+      ],
+      "open": ""
+    },
+    {
+      "id": "tutorial",
+      "milestone": "M1",
+      "category": "Lore & Story",
+      "type": "feature",
+      "title": "Bestehenden Prolog um Vaelor-Auswahl und Sense als Startwaffe überarbeiten",
+      "context": "Ein spielbarer Prolog bis zur Homebase-Schwelle existiert bereits. Gewünscht ist New Game → Vaelors Auswahl → Sense → erste Kämpfe → Bergung durch einen Warden → Homebase. Der etablierte Bruder passt in die Bergung.",
+      "acceptance": [
+        "Bestehenden PrologueDirector und echte Kämpfe anpassen, statt einen zweiten Tutorialpfad zu bauen.",
+        "Vaelors Auswahl und Erhalt der Sense verständlich inszenieren; Auswahlmechanik nicht unbelegt erklären.",
+        "Bewegung, Ausweichen, erste Angriffe und Release verständlich einführen; später freigeschaltete Dienste nicht voraussetzen.",
+        "Bergung/Bruder-Handoff und Weg zur Homebase solo sowie mit Spieler 2 erhalten; Umgang mit Tutorial-Sonderwaffen explizit festlegen.",
+        "Deterministische Prologroute prüfen und passende Vorher-/Nachher-Captures am nativen Bild ansehen."
+      ],
+      "depends": [
+        "lore"
+      ],
+      "open": ""
+    },
+    {
+      "id": "hub",
+      "milestone": "M2",
+      "category": "Homebase",
+      "type": "feature",
+      "title": "Homebase als spielbaren Ort für Vorbereitung und Run-Start ausbauen",
+      "context": "Der aktuelle Prolog endet am äußeren Homebase-Schwellwert; ein benutzbarer Hub fehlt. Die Aufnahme macht die Warden-Heimat zum wiederkehrenden Vorbereitungs- und Rückkehrort.",
+      "acceptance": [
+        "Homebase betreten und dort zu Waffen-/Fähigkeitsvorbereitung sowie Biom-Auswahl gelangen können.",
+        "Freigeschaltete und noch fehlende NPC-Dienste verständlich zeigen; Ausrüstung und Kosten lesbar darstellen.",
+        "Nur freigeschaltete Biome anbieten; Auswahl startet das Biom bei Level 1.",
+        "Interaktion und Startbereitschaft für Solo und zwei lokale Spieler umsetzen.",
+        "Ein konkreter Raum/Zustandsablauf genügt; keine allgemeine Quest-/Dialog-Engine voraussetzen. Native Darstellung prüfen."
+      ],
+      "depends": [
+        "coop_contract",
+        "tutorial"
+      ],
+      "open": ""
+    },
+    {
+      "id": "save",
+      "milestone": "M2",
+      "category": "Run-Struktur & Speichern",
+      "type": "feature",
+      "title": "Dauerhafte Profile, gesicherte Ressourcen und Freischaltungen speichern",
+      "context": "Hub-Fortschritt muss mehrere Runs und Neustarts überstehen. Der aktuelle Stand besitzt noch keinen persistenten Spielstand.",
+      "acceptance": [
+        "Gesicherte Währungen, freigeschaltete Biome/Waffen/Fähigkeiten, NPC-Dienste, Skillknoten und Collectible-Flags als versionierte Daten speichern.",
+        "Ungesicherten Run-Bestand von dauerhaftem Bestand trennen; Laden darf weder Kopien erzeugen noch gesicherte Werte verlieren.",
+        "Die beschlossene Solo-/Koop-Profilzuordnung unterstützen.",
+        "Atomaren Schreib-/Ladevorgang und definierten Umgang mit fehlendem/ungültigem Spielstand prüfen.",
+        "Mehrfaches Laden sowie Wiederholung derselben Sicherungs-/Freischaltaktion ohne doppelte Belohnung testen; mitten im Run fortsetzbare Saves sind kein automatisch zugesagtes Feature."
+      ],
+      "depends": [
+        "economy_design",
+        "coop_contract"
+      ],
+      "open": ""
+    },
+    {
+      "id": "run_flow",
+      "milestone": "M2",
+      "category": "Run-Struktur & Speichern",
+      "type": "feature",
+      "title": "Biom- und Level-Runs mit Rückkehr und Neustart auf Level 1 umsetzen",
+      "context": "Ein Run besteht aus mehreren Levels eines gewählten Bioms. Nach Niederlage oder beendeter Extraktion beginnt ein neuer Versuch bei Level 1 dieses Bioms. Dauerhaft freigeschaltete spätere Biome bleiben direkt anwählbar.",
+      "acceptance": [
+        "Konkrete Zustände für Homebase, Run-Start, laufendes Level, Levelabschluss, Extraktion, Niederlage und Bossabschluss einführen.",
+        "Biom 2 / Level 3 → Niederlage → Homebase → Biom 2 / Level 1 deterministisch nachweisen.",
+        "Freigeschaltetes Biom 3 direkt starten können, ohne Biom 1/2 erneut zu spielen.",
+        "Vorhandene Prolog-Sektor-Retries und Debugsprünge ausdrücklich vom regulären Run-Verhalten abgrenzen.",
+        "Solo-Niederlage und vollständige Team-Niederlage sauber abschließen; keine ungerechtfertigten Level- oder Ressourcenreste behalten."
+      ],
+      "depends": [
+        "hub",
+        "save"
+      ],
+      "open": ""
+    },
+    {
+      "id": "checkpoints",
+      "milestone": "M2",
+      "category": "Ökonomie",
+      "type": "feature",
+      "title": "Warden-Reisepunkte mit Teilsicherung, Extraktion und Ressourcenanzeige bauen",
+      "context": "An Levelgrenzen sollen Warden-Reisepunkte eine Entscheidung ermöglichen: einen Teil sichern und weitergehen oder den Run beenden und alles dafür vorgesehene sichern. Die genaue Quote ist noch nicht entschieden.",
+      "acceptance": [
+        "Beschlossene Geld-/Ressourcenkonten beim Sammeln, Ausgeben und Sichern korrekt führen; Erlösung bleibt visuell von der Ressourcengutschrift getrennt.",
+        "Am Reisepunkt Weiterreise mit Teilsicherung und vollständige Extraktion samt Folgen anbieten.",
+        "Gesicherte Werte persistieren; Fortsetzung behält nur den verbleibenden Run-Bestand; Rückkehr beendet den Run.",
+        "HUD zeigt beide Währungen, verfügbar/gesichert und Vorschau der Entscheidung, mit verständlichem Feedback bei fehlenden Mitteln.",
+        "Grenzfälle null Bestand, Rundung, doppelte Aktivierung, gleichzeitige Koop-Eingaben und Niederlage nach Teilsicherung prüfen."
+      ],
+      "depends": [
+        "run_flow",
+        "economy_design",
+        "coop_contract"
+      ],
+      "open": "50 % ist nur ein Beispiel. Quote, Wiederholbarkeit und Transfers müssen vor Implementierung aus den Ressourcenregeln hervorgehen."
+    },
+    {
+      "id": "weapons",
+      "milestone": "M3",
+      "category": "Kampf & Builds",
+      "type": "feature",
+      "title": "Eine Nah- oder Fernkampfwaffe vor dem Run auswählen",
+      "context": "Die Aufnahme legt eine vorab gewählte Waffe fest. Der aktuelle Player besitzt gleichzeitig Scythe und Soul Cannon; beide vorhandenen Systeme dienen als Ausgangspunkt für unterschiedliche Loadouts.",
+      "acceptance": [
+        "Sense als erste Tutorialwaffe erhalten; vor regulären Runs eine freigeschaltete Nah- oder Fernkampfwaffe ausrüsten.",
+        "Im normalen Run nur das gewählte Hauptwaffen-Kit verfügbar machen und Waffenwahl im HUD sichtbar halten.",
+        "Vorhandene Sense, Cannon, Kombos und Dash-Cancel wiederverwenden; Freischaltungen/Upgrades datenbasiert anbinden.",
+        "Jedes Loadout kann notwendige Kämpfe und Releases alleine bewältigen; keine versteckte Pflicht zur gleichzeitig ausgerüsteten zweiten Waffe.",
+        "Beide Brüder können ihre Wahl gemäß Koop-Vertrag treffen; Klassenwahl und Loot-Inventar nicht einführen.",
+        "Umfang von äußerer Anpassung/Rüstung und möglicher Spielwirkung als kleine Designentscheidung dokumentieren; die erwähnte Anpassung nicht unbelegt als Rüstungsloot oder fertiges Statsystem umsetzen."
+      ],
+      "depends": [
+        "hub",
+        "save"
+      ],
+      "open": ""
+    },
+    {
+      "id": "draft",
+      "milestone": "M3",
+      "category": "Kampf & Builds",
+      "type": "feature",
+      "title": "Drei zufällige Fähigkeiten anbieten und zwei für den Run wählen",
+      "context": "Das besprochene Startmodell lautet: aus einem freigeschalteten Gesamtpool drei Angebote, daraus zwei Fähigkeiten wählen. Verfügbarkeit wird durch andere jagende Wardens und geteilte Kräfte in der Homebase erklärt.",
+      "acceptance": [
+        "Vor dem Run drei unterschiedliche zulässige Angebote bilden und zwei auswählbar machen; Auswahl bleibt für den Run eindeutig.",
+        "Zufall über einen Seed reproduzierbar machen; gesperrte Fähigkeiten nicht anbieten.",
+        "Für einen kleinen Freischaltpool einen definierten Fallback bieten; Verhalten bei Abbruch und erneutem Run-Start als Designregel festlegen.",
+        "Warden-Verfügbarkeit knapp erzählerisch erklären; spätere dauerhafte Fähigkeiten mit Slot-/Angebotsregeln vorbereiten.",
+        "Waffenwahl und beide Koop-Spieler berücksichtigen; Fähigkeiten, Kosten und Wirkung vor Bestätigung zeigen."
+      ],
+      "depends": [
+        "hub",
+        "save",
+        "coop_contract"
+      ],
+      "open": "Drei Angebote / zwei Auswahlen ist der konkrete Prototypansatz. Dauerhafte Fähigkeiten und ihr Einfluss auf freie Slots benötigen Regeln. Ob Neuwürfeln bei Abbruch begrenzt wird, ist eine Designempfehlung und keine Entscheidung der Aufnahme."
+    },
+    {
+      "id": "abilities",
+      "milestone": "M3",
+      "category": "Kampf & Builds",
+      "type": "feature",
+      "title": "Run-Fähigkeiten mit mystischer Ressource als Einsatzkosten implementieren",
+      "context": "Die gewählten Fähigkeiten sollen den Run verändern und die zentrale Ausgabe-versus-Fortschritt-Entscheidung erzeugen. Kampf- und Bewegungsfähigkeiten wurden besprochen; konkrete Inhalte sind offen.",
+      "acceptance": [
+        "Einen kleinen, konkret beschriebenen Fähigkeitenpool umsetzen, der die Angebotsauswahl demonstriert; Fähigkeiten verbinden sich mit Flame, Anchor, Release oder Warden-Rollen.",
+        "Kosten aus dem verfügbaren Run-Konto abbuchen; gesicherte Meta-Ressourcen nicht versehentlich verbrauchen.",
+        "Bei unzureichenden Mitteln klare Rückmeldung; keine negativen Werte oder doppelten Abbuchungen bei Inputwiederholung.",
+        "Angriffs-, Bewegungs- und Koop-Nutzen unterscheiden sich spürbar; Grundwaffe/Ausweichen bleiben als handlungsfähiges Basiskit erhalten.",
+        "Timing, Treffer und Effekte im laufenden Kampf prüfen; Kosten durch angemessene Kontrollregeln gegen Spam ergänzen, ohne das Ressourcenmodell stillschweigend durch reine Cooldowns zu ersetzen."
+      ],
+      "depends": [
+        "draft",
+        "checkpoints",
+        "weapons"
+      ],
+      "open": ""
+    },
+    {
+      "id": "ult_design",
+      "milestone": "M3",
+      "category": "Kampf & Builds",
+      "type": "design",
+      "title": "Ultimate-Aufladung und Verhältnis zur Fortschrittswährung entscheiden",
+      "context": "Eine Ultimate ist ausdrücklich gewünscht, ihr Kostenmodell blieb offen. Diskutiert wurden gemeinsame Ressource, getrennte Ladung/Mana, Zeit, besiegte Gegner und Aufladeorte. Die aktuelle TeamResonance leert den ganzen Pool; diese Regel ist nicht automatisch die neue Wirtschaft.",
+      "acceptance": [
+        "Aktuelle TeamResonance sowie zwei begrenzte Alternativen anhand gleicher Kampfsituationen vergleichen.",
+        "Festlegen, wodurch Ladung entsteht, was Aktivierung kostet, wie lange die Wirkung dauert und was bei Levelwechsel/Niederlage erhalten bleibt.",
+        "Verhältnis zu aktiven Fähigkeiten, langfristigem Fortschritt und Stabilisierung des Bruders ausdrücklich entscheiden.",
+        "Solo-/Teamwirkung, Besitz und Aktivierungsrecht nach Koop-Vertrag definieren.",
+        "Empfehlung mit Auswirkungen auf Spielentscheidungen dokumentieren; Ergebnis vor Integration konkret beurteilen lassen."
+      ],
+      "depends": [
+        "economy_design",
+        "coop_contract"
+      ],
+      "open": "Keine der genannten Varianten ist bereits beschlossen. Kein automatisches Leeren des gesamten Geld-/Meta-Kontos ableiten."
+    },
+    {
+      "id": "ult",
+      "milestone": "M3",
+      "category": "Kampf & Builds",
+      "type": "feature",
+      "title": "Ultimate nach gewähltem Ressourcenmodell in das Run-Kit integrieren",
+      "context": "Die Ultimate ergänzt Waffen und zwei Run-Fähigkeiten. Vorhandene Resonance-Präsentation und Zustände können weiterverwendet werden, wenn sie zum ausgewählten Modell passen.",
+      "acceptance": [
+        "Das Ergebnis der Ultimate-Entscheidung implementieren; bestehende TeamResonance nicht unbeabsichtigt als Geldbörse verwenden.",
+        "Ladung, Bereitschaft, Aktivierung und Ende im HUD sowie im Kampf klar unterscheiden.",
+        "Effekt, Dauer und Wiederaufladung bei Solo, Koop, Down/Stabilisieren und Levelwechsel korrekt führen.",
+        "Aktive Fähigkeiten und gesicherte Fortschrittswährung werden nur nach expliziten Regeln beeinflusst.",
+        "Deterministische Aktivierungs-/Resetfälle plus echte Kampfprüfung und native Screenshots liefern."
+      ],
+      "depends": [
+        "ult_design",
+        "abilities"
+      ],
+      "open": ""
+    },
+    {
+      "id": "reactions",
+      "milestone": "M3",
+      "category": "Kampf & Builds",
+      "type": "feature",
+      "title": "Timing-Counter für jedes Waffen-Loadout und Teamaktionen ausbauen",
+      "context": "Die Aufnahme bestätigt aktive Reaktionen: beispielsweise einen anstürmenden Gegner im richtigen Moment treffen und eine Detonation auslösen. Bereits vorhanden sind Severance Window und Burning-Detonation.",
+      "acceptance": [
+        "Bestehende Counter zuerst prüfen und für getrennte Nah-/Fernkampf-Loadouts zugänglich machen.",
+        "Mindestens eine lesbare zeitkritische Gegnerinteraktion mit konkreter Folgeaktion ausarbeiten; Treffer vor, im und nach dem Fenster vergleichen.",
+        "Eine Detonation trifft die feindliche Manifestation bzw. geeignete Restenergie; intakte erlöste Seelen werden nicht als Sprengstoff verwendet.",
+        "Telegraphe, deterministische Kollision und faire Fehlerrückmeldung erhalten; Teampartner kann die Gelegenheit sinnvoll nutzen.",
+        "Solo und zwei Spieler mit unterschiedlichen Waffen real prüfen; VFX und Kamera erhalten lesbare Bedrohungen."
+      ],
+      "depends": [
+        "weapons",
+        "lore"
+      ],
+      "open": ""
+    },
+    {
+      "id": "npcs",
+      "milestone": "M4",
+      "category": "Homebase",
+      "type": "feature",
+      "title": "NPC-Begegnungen schalten Homebase-Dienste schrittweise frei",
+      "context": "Im Run gefundene oder gerettete NPCs sollen Händler, Schmied und Fähigkeitstraining in der Homebase verfügbar machen. Das erste Biom führt diese Funktionen schrittweise ein.",
+      "acceptance": [
+        "Entdecken/Ansprechen bzw. Rettung als konkrete Freischaltereignisse modellieren und persistent speichern.",
+        "Vor und nach Freischaltung sichtbar machen, welcher Dienst verfügbar ist.",
+        "Die Reihenfolge im ersten Biom als begründeten Ablauf festlegen; im Gespräch genannte Levelnummern nicht als Canon behandeln.",
+        "Klarmachen, wann eine Freischaltung gesichert ist und wie Extraktion/Niederlage davor oder danach wirken.",
+        "Gemeinsame Begegnungen im Koop ohne doppelte NPCs oder doppelte Freischaltbelohnung abschließen; NPCs tragen glaubwürdige Warden-Rollen."
+      ],
+      "depends": [
+        "save",
+        "run_flow",
+        "coop_contract"
+      ],
+      "open": "Händler in Level 1, Schmied in Level 2 und Skilltrees nach Boss sind ein Beispiel für gestaffelte Einführung."
+    },
+    {
+      "id": "shops",
+      "milestone": "M4",
+      "category": "Ökonomie",
+      "type": "feature",
+      "title": "Händler und Schmied für Waffenfreischaltung und Verbesserung umsetzen",
+      "context": "Die Aufnahme sieht Kauf/Freischaltung weiterer Waffen und Verbesserungen bestehender Waffen vor. NPCs können Wardens auch unterwegs versorgen; ein Run-Händler bleibt eine Option.",
+      "acceptance": [
+        "Händler verkauft/freischaltet Waffen aus dem vereinbarten Angebot; Schmied verbessert besessene Waffen.",
+        "Kosten und Voraussetzungen aus dem Ressourcen-/Fortschrittsmodell anzeigen und atomar abbuchen.",
+        "Neue Waffe erscheint anschließend in der Vorbereitungswahl; Upgrades über Neustarts erhalten.",
+        "Schmied-Upgrades gegenüber Waffen-Skilltree-Knoten abgrenzen: Zuständigkeit, Kosten und Kombination der Effekte gemeinsam definieren; Zahlenänderungen und Handhabungs-/Perk-Wirkungen transparent darstellen.",
+        "Koop-Besitzregeln beachten; keine zufälligen Lootgegenstände oder Inventarsortierung voraussetzen."
+      ],
+      "depends": [
+        "npcs",
+        "weapons",
+        "economy_design"
+      ],
+      "open": "Ein Händler unterwegs sowie Heilung oder temporäre Upgrades sind optionale Erweiterungen, keine Abnahmevoraussetzung dieses ersten Dienstes."
+    },
+    {
+      "id": "trees",
+      "milestone": "M4",
+      "category": "Metaprogression",
+      "type": "feature",
+      "title": "Getrennte Waffen- und Fähigkeits-Skilltrees aufbauen",
+      "context": "Gewünscht sind getrennte Fortschrittspfade für die vorab gewählte Waffe und die variablen Run-Fähigkeiten. Höherer Fortschritt soll auch dauerhaften Zugang zu ausgewählten Fähigkeiten ermöglichen.",
+      "acceptance": [
+        "Zwei klar getrennte kleine Bäume mit nachvollziehbaren Voraussetzungen, Kosten und Wirkung darstellen.",
+        "Waffenbaum erweitert Handhabung, Kombos/Perks und passende Werte; Grenzen und Zusammenspiel mit Schmied-Upgrades gemäß gemeinsamem Fortschrittsmodell umsetzen. Fähigkeitenbaum verbessert Fähigkeiten und Verfügbarkeit.",
+        "Mindestens einen späten Knoten für dauerhaften Fähigkeitszugang als Progressionsziel konkretisieren; Wirkung auf drei Angebote/zwei Slots eindeutig regeln.",
+        "Kauf, fehlende Mittel, Mehrfachkauf und Speichern/Laden testen; gesicherte mystische Ressource nach Wirtschaftsregel verwenden.",
+        "Die festgelegte Figur wird durch Ausrüstung/Fähigkeiten entwickelt, ohne Krieger-/Magier-Klasse. Rüstungsanpassung bleibt ein gesondert offenes Detail."
+      ],
+      "depends": [
+        "shops",
+        "draft",
+        "npcs"
+      ],
+      "open": ""
+    },
+    {
+      "id": "meta_level",
+      "milestone": "M4",
+      "category": "Metaprogression",
+      "type": "design",
+      "title": "Meta-Level aus heimgebrachten Ressourcen konkretisieren und prüfen",
+      "context": "Ein über erfolgreich heimgebrachte Ressourcen wachsendes Grundlevel wurde als ergänzende Richtung diskutiert. Es kann spätere Waffen/Skillknoten öffnen, darf aber nicht die Boss-Freischaltung von Biomen ersetzen.",
+      "acceptance": [
+        "Arbeitsmodell für kumulativ gesicherten Fortschritt gegenüber aktuellem ausgebbarem Kontostand vergleichen und einen Vorschlag ausarbeiten.",
+        "Festlegen, welche Ressource zählt und ob Teilsicherung, Extraktion sowie Collectible-Belohnungen beitragen.",
+        "Doppelte Zählung derselben Ressource ausschließen; Ausgaben dürfen den erreichten Rang im empfohlenen Modell nicht rückwirkend entziehen.",
+        "Freigabeschwellen und Solo-/Koop-Zuordnung definieren; ein kleiner Daten-/UI-Prototyp zeigt Händler- und Skilltree-Gates.",
+        "Biomfreischaltung bleibt ausschließlich an den vorherigen Biom-Boss gebunden; endgültiges Modell vor vollständiger Integration beurteilen."
+      ],
+      "depends": [
+        "save",
+        "economy_design",
+        "trees"
+      ],
+      "open": "Meta-Level ist eine besprochene Arbeitsrichtung; konkrete Formel und Kurve sind nicht beschlossen."
+    },
+    {
+      "id": "biome_design",
+      "milestone": "M5",
+      "category": "Biome & Erkundung",
+      "type": "design",
+      "title": "Erstes Biom aus menschlicher Geschichte und Boss-Handschrift entwerfen",
+      "context": "Die Aufnahme entscheidet Struktur und Boss-Handschrift, benennt aber kein Startbiom. Vorhandene Region Seeds sind nutzbare Kandidaten, keine automatisch festgelegte Kampagne.",
+      "acceptance": [
+        "Einen begrenzten Vorschlag für menschlichen Ort, Ereignis, emotionales Residuum und Soul-Verformung erstellen.",
+        "Eine tragische Bossfigur und ihre erkennbare Wirkung auf Architektur, Gegner und Hindernisse beschreiben.",
+        "Mehrere Level, Reisepunkte, Freischaltbegegnungen und kurze Erkundungsabzweigungen als spielbaren Ablauf skizzieren.",
+        "Vorhandene Lore, Warden-Reisestruktur und Soulfire-Gothic-Materialien verbinden; Lesbarkeit für beide Spieler berücksichtigen.",
+        "Anzahl der Levels, Minibosse und Thema ausdrücklich als neuen Vorschlag kennzeichnen; Empfehlung vor großer Content-Produktion beurteilen."
+      ],
+      "depends": [
+        "lore",
+        "economy_design"
+      ],
+      "open": "Drei/fünf Level, konkrete Biomanzahl und Minibosse wurden als Beispiele genannt. Die gestalterische Auswahl kann früh parallel zu M2–M4 vorbereitet werden."
+    },
+    {
+      "id": "biome_levels",
+      "milestone": "M5",
+      "category": "Biome & Erkundung",
+      "type": "feature",
+      "title": "Erstes Biom mit mehreren Levels und Wiederholbarkeit bauen",
+      "context": "Auf Basis des Biom-Briefs soll ein vollständiger Abschnitt zwischen Homebase-Aufbruch und Endboss entstehen. Bestehende Gegner, Levelkomposition und Capturesystem bilden die technische Basis.",
+      "acceptance": [
+        "Die beschlossene kleine Zahl authored Levels samt Levelausgang, Reisepunkt und nächstem Level umsetzen.",
+        "Boss-Handschrift, menschliche Spuren und unterschiedliche Encounter-Räume in jedem Level erkennen lassen.",
+        "NPC-Freischaltungen gemäß Onboarding-Ablauf sowie Erkundungsabzweigungen integrieren.",
+        "Alle notwendigen Wege, Releases und Ausgänge sind mit jeder Hauptwaffe in Solo/Koop erreichbar.",
+        "Denselben Biom-Run wiederholen können; Variation deterministisch halten und keine vorgezogene Prozedural-Engine voraussetzen. Native Vorher-/Nachher-Captures prüfen."
+      ],
+      "depends": [
+        "biome_design",
+        "run_flow",
+        "checkpoints",
+        "npcs",
+        "reactions"
+      ],
+      "open": ""
+    },
+    {
+      "id": "boss",
+      "milestone": "M5",
+      "category": "Biome & Erkundung",
+      "type": "feature",
+      "title": "Biom-Endboss und dauerhafte Freischaltung des nächsten Bioms umsetzen",
+      "context": "Jedes Biom endet mit einem Boss. Der Sieg über den vorherigen Endboss ist die Bedingung für das nächste Biom; Meta-Level oder Ausgaben dürfen diese Regel nicht ersetzen.",
+      "acceptance": [
+        "Einen lesbaren Boss mit erkennbarer menschlicher Geschichte und Bezug zu den vorherigen Gegnern entwickeln.",
+        "Boss besiegen als Fortschrittsereignis behandeln und die getrennte Soul-Release-Phase narrativ/mechanisch erhalten.",
+        "Das nächste Biom genau einmal dauerhaft freischalten; kein zusätzliches stillschweigendes Rang- oder Release-Gate für die besprochene Freischaltregel einführen.",
+        "Auswahl des freigeschalteten Bioms ab dessen Level 1 nach Rückkehr und Neustart nachweisen; für den Test genügt ein klar gekennzeichneter kleiner Folgebereich.",
+        "Solo und beide Brüder einschließlich Down/Revive, Boss-Niederlage und erneutem Sieg prüfen; Telegraphen und Kamera im realen Kampf ansehen."
+      ],
+      "depends": [
+        "biome_levels",
+        "save",
+        "ult"
+      ],
+      "open": ""
+    },
+    {
+      "id": "collectibles",
+      "milestone": "M5",
+      "category": "Biome & Erkundung",
+      "type": "feature",
+      "title": "Collectibles und Easter Eggs ohne Loot-Inventar integrieren",
+      "context": "Erkundung soll durch sammelbare Entdeckungen und Easter Eggs belohnt werden. Ein normales Inventar und zufälliger Gegenstandsloot wurden ausdrücklich ausgeschlossen.",
+      "acceptance": [
+        "Eine kleine Sammlung thematisch passender Entdeckungen in Abzweigungen und Umweltspuren anlegen.",
+        "Fundstatus pro vereinbarter Profil-/Teamregel dauerhaft verfolgen und in einer kompakten Sammlung anzeigen.",
+        "Bereits gefundene Einträge verständlich markieren; Wiederholung darf keine unbeabsichtigte Belohnungsschleife erzeugen.",
+        "Eine abgeschlossene Kategorie kann nach bewusster Entscheidung Geld oder mystische Ressource vergeben; Belohnung und Zeitpunkt sind vor Integration festzulegen.",
+        "Kein Taschenmanagement, Drop-Raritätssystem oder zusätzliche Ausrüstungsslots für diese Funde; Solo-/Koop-Fund und Speichern/Laden prüfen."
+      ],
+      "depends": [
+        "biome_design",
+        "save",
+        "coop_contract"
+      ],
+      "open": "Sammlungsabschluss-Belohnung ist eine diskutierte Option; Menge, Währung und Verlust-/Sicherungsregel bleiben offen."
+    },
+    {
+      "id": "balance",
+      "milestone": "M6",
+      "category": "Balance & Qualität",
+      "type": "validation",
+      "title": "Ausgeben versus Sichern sowie Build-Fortschritt im Spiel balancieren",
+      "context": "Der Kernkonflikt soll spürbare Entscheidungen erzeugen: Fähigkeiten erhöhen die Überlebenschance, reduzieren aber möglichen Meta-Fortschritt. Konkrete Schwellen aus der Aufnahme sind keine Balancevorgaben.",
+      "acceptance": [
+        "Auf demselben Abschnitt sparsame, aktive und früh extrahierende Spielweise vergleichen; Einkommen, Kosten, Niederlagen und Bankfortschritt erfassen.",
+        "Verhindern, dass ausschließlich Horten, ausschließlich Spam oder erzwungenes Farmen ohne sinnvolle Wahl dominiert.",
+        "Nah-/Fernkampf, Fähigkeitskombinationen und Ultimate getrennt sowie im Team vergleichen; Kämpfe bleiben ohne verbrauchbare Fähigkeiten grundsätzlich handhabbar.",
+        "NPC-Einführung, Skillkosten und etwaige Meta-Level-Gates am realen Verlauf prüfen; optionale Heil-/Run-Händler nur bei begründetem Nutzen prototypisieren.",
+        "Nachvollziehbare Tuningentscheidung und verbleibende Balancefragen dokumentieren; Owner spielt den vollständigen Abschnitt."
+      ],
+      "depends": [
+        "checkpoints",
+        "ult",
+        "trees",
+        "meta_level",
+        "boss",
+        "collectibles"
+      ],
+      "open": ""
+    },
+    {
+      "id": "integration",
+      "milestone": "M6",
+      "category": "Balance & Qualität",
+      "type": "validation",
+      "title": "Gesamten Run-Kreislauf mit Spielstand und Koop abnehmen",
+      "context": "Die Planung ist erst spielbar erfüllt, wenn Hub, Run, Ressourcen, Kampf und Fortschritt zusammen funktionieren. Build-Erfolg alleine genügt nicht.",
+      "acceptance": [
+        "Deterministische Route Homebase → Auswahl → mehrere Levels → Teilsicherung → Boss → Rückkehr → neuer Run nachweisen.",
+        "Zusätzliche Fälle Niederlage nach Teilsicherung, freiwillige Extraktion, direkter Start eines späteren Bioms, Laden/Neustart und doppelte Ereignisse prüfen.",
+        "Solo und lokaler Koop mit unterschiedlichen Waffen, gleichzeitigen Interaktionen und vollständiger Team-Niederlage abdecken.",
+        "Prolog/Golden-Slice-Regressionen gezielt prüfen; Release-Build, relevante automatisierte Checks und native Screenshot-Inspektion als PASS/FAIL/NOT_RUN dokumentieren.",
+        "Reale Spielprüfung und, falls verfügbar, Controllerprüfung samt bekannten Grenzen und reproduzierbaren Start-/Testanweisungen liefern; Owner-Abnahme erbitten."
+      ],
+      "depends": [
+        "balance",
+        "tutorial"
+      ],
+      "open": ""
+    }
+  ]
+}

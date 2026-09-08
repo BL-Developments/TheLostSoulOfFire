@@ -2,6 +2,15 @@
 
 Status: authoritative working direction for `prototype/design-polish`.
 
+Planning revision 2026-09-08: the owner's concept recording takes priority in
+conflicts. See [`DECISION-LOG.md`](DECISION-LOG.md) and
+[`RECORDING-SUMMARY-2026-09-08.md`](RECORDING-SUMMARY-2026-09-08.md).
+The current runtime remains the baseline; regular runs now target one selected
+main weapon, a three-offer/two-choice ability draft, a persistent hub and
+bankable release resources. The six-item proof below is superseded as an
+inventory/loot direction; useful effects must be reframed as abilities or
+weapon progression. This is a planned direction, not implemented gameplay.
+
 ## Game identity
 
 **The Lost Soul of Fire** is a story-driven cooperative 2D action roguelike set between a dystopian future Earth, the Death Layer and the unreachable true afterlife.
