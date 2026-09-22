@@ -60,7 +60,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         _pixel = new Texture2D(GraphicsDevice, 1, 1);
         _pixel.SetData([Color.White]);
         _art = new ArtAssets(Content);
-        _world = new GameWorld(GraphicsDevice.Viewport, _art, Content);
+        _world = new GameWorld(GraphicsDevice.Viewport, _art, Content, _audioGameplayTest || _audioDeathRestartTest);
         _soulfireRenderer = new SoulfireRenderer(GraphicsDevice);
     }
 
@@ -85,6 +85,11 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         }
 
         _world.Update(gameTime, _input, GraphicsDevice.Viewport);
+        if (_world.QuitRequested)
+        {
+            Exit();
+            return;
+        }
         if (_audioGameplayTest || _audioDeathRestartTest)
         {
             FinishAutomatedTestFrame();

@@ -13,6 +13,7 @@ public sealed class InputState
     private readonly HashSet<Keys> _injectedPresses = [];
 
     public Point MousePosition => _mouse.Position;
+    public bool MouseMoved => _mouse.Position != _previousMouse.Position;
     public bool AnyInputPressed
     {
         get
