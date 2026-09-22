@@ -111,7 +111,8 @@ public sealed class Player
         Rectangle movementBounds,
         ParticleSystem particles,
         ScreenEffects screenEffects,
-        bool forceSoulSense = false)
+        bool forceSoulSense = false,
+        bool combatEnabled = true)
     {
         _visualTime += deltaTime;
         _resonanceActivationTimer = MathF.Max(0f, _resonanceActivationTimer - deltaTime);
@@ -126,7 +127,7 @@ public sealed class Player
             }
         }
 
-        if (!IsDead && IsResonanceReady && input.WasKeyPressed(Keys.R))
+        if (combatEnabled && !IsDead && IsResonanceReady && input.WasKeyPressed(Keys.R))
         {
             StartResonance();
         }
@@ -152,20 +153,29 @@ public sealed class Player
 
         Vector2 movement = ReadMovement(input);
 
-        Cannon.Update(
-            deltaTime,
-            input,
-            Position,
-            FacingDirection,
-            !IsDashing && Scythe.ActiveStep == 0,
-            SoulSenseActive,
-            particles,
-            ResonanceActive);
-
-        Scythe.Update(deltaTime, input, FacingDirection, Position, particles, !IsDashing && Cannon.CanUseScythe, ResonanceActive);
-        if (Scythe.StartedThisFrame)
+        if (combatEnabled)
         {
-            _attackImpulse = Scythe.AttackDirection * Scythe.GetForwardImpulse();
+            Cannon.Update(
+                deltaTime,
+                input,
+                Position,
+                FacingDirection,
+                !IsDashing && Scythe.ActiveStep == 0,
+                SoulSenseActive,
+                particles,
+                ResonanceActive);
+
+            Scythe.Update(deltaTime, input, FacingDirection, Position, particles, !IsDashing && Cannon.CanUseScythe, ResonanceActive);
+            if (Scythe.StartedThisFrame)
+            {
+                _attackImpulse = Scythe.AttackDirection * Scythe.GetForwardImpulse();
+            }
+        }
+        else
+        {
+            Scythe.Reset();
+            Cannon.Reset();
+            _attackImpulse = Vector2.Zero;
         }
 
         if (input.WasKeyPressed(Keys.Space) && _dashCooldownTimer <= 0f && Scythe.ActiveStep == 0)
