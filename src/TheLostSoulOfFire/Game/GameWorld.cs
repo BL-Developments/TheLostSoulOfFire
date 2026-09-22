@@ -238,7 +238,7 @@ public sealed class GameWorld : IDisposable
             return;
         }
 
-        _lastMouseWorld = _camera.ScreenToWorld(input.MousePosition, viewport);
+        _lastMouseWorld = _camera.ScreenToWorld(input.MouseVirtualPosition.ToPoint(), viewport);
 
         if (_screenEffects.IsHitStopped)
         {
@@ -391,7 +391,7 @@ public sealed class GameWorld : IDisposable
         {
             for (int i = 0; i < bounds.Count; i++)
             {
-                if (bounds[i].Contains(input.MousePosition))
+                if (bounds[i].Contains(input.MouseVirtualPosition))
                 {
                     _menu.SetHoverIndex(i);
                     break;
@@ -414,7 +414,7 @@ public sealed class GameWorld : IDisposable
         {
             for (int i = 0; i < bounds.Count; i++)
             {
-                if (bounds[i].Contains(input.MousePosition))
+                if (bounds[i].Contains(input.MouseVirtualPosition))
                 {
                     _menu.SetHoverIndex(i);
                     confirmedByMouse = true;
@@ -449,11 +449,11 @@ public sealed class GameWorld : IDisposable
 
     internal void RequestAudioTestFatalDamage() => _audioTestFatalDamageRequested = true;
 
-    public void Draw(SpriteBatch batch, Texture2D pixel, Viewport viewport, SoulfireRenderer renderer)
+    public void Draw(SpriteBatch batch, Texture2D pixel, Viewport viewport, SoulfireRenderer renderer, RenderTarget2D? rootTarget = null)
     {
         renderer.BeginScene(viewport);
         DrawScene(batch, pixel, viewport);
-        renderer.PresentScene(batch, viewport, _soulSensePresentation.WorldSuppression);
+        renderer.PresentScene(batch, rootTarget, viewport, _soulSensePresentation.WorldSuppression);
         DrawSoulfireLighting(batch, renderer, viewport);
         _soulSensePresentation.DrawSoulLayer(
             batch,

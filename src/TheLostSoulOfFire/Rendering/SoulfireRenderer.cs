@@ -81,9 +81,9 @@ public sealed class SoulfireRenderer : IDisposable
         _graphicsDevice.Clear(GameBalance.VoidColor);
     }
 
-    public void PresentScene(SpriteBatch batch, Viewport viewport, float soulSenseWorldSuppression = 0f)
+    public void PresentScene(SpriteBatch batch, RenderTarget2D? rootTarget, Viewport viewport, float soulSenseWorldSuppression = 0f)
     {
-        _graphicsDevice.SetRenderTarget(null);
+        _graphicsDevice.SetRenderTarget(rootTarget);
         _graphicsDevice.Clear(GameBalance.VoidColor);
 
         Rectangle destination = new(0, 0, viewport.Width, viewport.Height);

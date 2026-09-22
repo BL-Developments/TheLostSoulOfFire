@@ -8,7 +8,12 @@ namespace TheLostSoulOfFire.Debugging;
 
 public static class ScreenshotCapture
 {
-    public static bool TrySaveBackBuffer(GraphicsDevice graphicsDevice, string context, out string result)
+    /// <summary>
+    /// Captures the game's virtual render target rather than the window's back buffer,
+    /// so the resulting image is always the virtual resolution and never includes the
+    /// letterbox bars added when the window doesn't match its aspect ratio.
+    /// </summary>
+    public static bool TrySaveVirtualTarget(RenderTarget2D virtualTarget, string context, out string result)
     {
         try
         {
@@ -23,12 +28,12 @@ public static class ScreenshotCapture
             string timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss_fff");
             string path = Path.Combine(directory, $"{timestamp}_{safeContext}.png");
 
-            int width = graphicsDevice.PresentationParameters.BackBufferWidth;
-            int height = graphicsDevice.PresentationParameters.BackBufferHeight;
+            int width = virtualTarget.Width;
+            int height = virtualTarget.Height;
             Color[] pixels = new Color[width * height];
-            graphicsDevice.GetBackBufferData(pixels);
+            virtualTarget.GetData(pixels);
 
-            using Texture2D screenshot = new(graphicsDevice, width, height);
+            using Texture2D screenshot = new(virtualTarget.GraphicsDevice, width, height);
             screenshot.SetData(pixels);
             using FileStream stream = File.Create(path);
             screenshot.SaveAsPng(stream, width, height);

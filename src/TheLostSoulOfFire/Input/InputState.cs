@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using TheLostSoulOfFire.Core;
 
 namespace TheLostSoulOfFire.Input;
 
@@ -13,6 +14,15 @@ public sealed class InputState
     private readonly HashSet<Keys> _injectedPresses = [];
 
     public Point MousePosition => _mouse.Position;
+
+    /// <summary>
+    /// The pointer position mapped from window coordinates into the game's virtual
+    /// resolution. All gameplay- and menu-facing hit tests should use this instead of
+    /// <see cref="MousePosition"/> so that aiming and clicking stay accurate at any
+    /// window size.
+    /// </summary>
+    public Vector2 MouseVirtualPosition { get; private set; }
+
     public bool MouseMoved => _mouse.Position != _previousMouse.Position;
     public bool AnyInputPressed
     {
@@ -34,13 +44,14 @@ public sealed class InputState
         }
     }
 
-    public void Update()
+    public void Update(ResolutionManager resolution)
     {
         _injectedPresses.Clear();
         _previousKeyboard = _keyboard;
         _previousMouse = _mouse;
         _keyboard = Keyboard.GetState();
         _mouse = Mouse.GetState();
+        MouseVirtualPosition = resolution.WindowToVirtual(_mouse.Position);
     }
 
     public bool IsKeyDown(Keys key) => _keyboard.IsKeyDown(key);
