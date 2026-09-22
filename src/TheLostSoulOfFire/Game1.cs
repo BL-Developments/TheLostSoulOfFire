@@ -33,6 +33,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     private RenderTarget2D _virtualTarget = null!;
     private readonly bool _audioGameplayTest;
     private readonly bool _audioDeathRestartTest;
+    private readonly bool _antechamberVisualTest;
     private bool _screenshotRequested;
     private string _screenshotStatus = string.Empty;
     private float _audioTestTotalTime;
@@ -46,11 +47,13 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     private bool _isFullscreen;
     private int _windowedWidth = GameBalance.BackBufferWidth;
     private int _windowedHeight = GameBalance.BackBufferHeight;
+    private int _antechamberVisualStage;
 
-    public Game1(bool audioGameplayTest = false, bool audioDeathRestartTest = false)
+    public Game1(bool audioGameplayTest = false, bool audioDeathRestartTest = false, bool antechamberVisualTest = false)
     {
         _audioGameplayTest = audioGameplayTest;
         _audioDeathRestartTest = audioDeathRestartTest;
+        _antechamberVisualTest = antechamberVisualTest;
         _graphics = new GraphicsDeviceManager(this)
         {
             PreferredBackBufferWidth = GameBalance.BackBufferWidth,
@@ -87,7 +90,11 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
             false,
             SurfaceFormat.Color,
             DepthFormat.None);
-        _world = new GameWorld(VirtualViewport, _art, Content, _audioGameplayTest || _audioDeathRestartTest);
+        _world = new GameWorld(
+            VirtualViewport,
+            _art,
+            Content,
+            _audioGameplayTest || _audioDeathRestartTest || _antechamberVisualTest);
         _soulfireRenderer = new SoulfireRenderer(GraphicsDevice);
         _resolution.Update(GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight);
     }
@@ -95,7 +102,11 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     protected override void Update(GameTime gameTime)
     {
         _input.Update(_resolution);
-        if (_audioGameplayTest || _audioDeathRestartTest)
+        if (_antechamberVisualTest)
+        {
+            ConfigureAntechamberVisualTest((float)gameTime.ElapsedGameTime.TotalSeconds);
+        }
+        else if (_audioGameplayTest || _audioDeathRestartTest)
         {
             ConfigureAutomatedTest((float)gameTime.ElapsedGameTime.TotalSeconds);
         }
@@ -126,6 +137,12 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         if (_audioGameplayTest || _audioDeathRestartTest)
         {
             FinishAutomatedTestFrame();
+        }
+        else if (_antechamberVisualTest && _antechamberVisualStage >= 3 && _audioTestTotalTime >= 2.9f)
+        {
+            Console.WriteLine("ANTECHAMBER_VISUAL_TEST_PASS normal=true soulSense=true");
+            Environment.ExitCode = 0;
+            Exit();
         }
         Window.Title = string.IsNullOrEmpty(_screenshotStatus) ? _world.WindowTitle : _screenshotStatus;
         _screenshotStatus = string.Empty;
@@ -234,9 +251,20 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         _audioTestTotalTime += deltaTime;
         _audioTestStateTime += deltaTime;
 
-        if (_world.LoopState == ArenaLoopState.Title)
+        if (_world.Phase == GamePhase.Title)
         {
             _input.InjectKeyPress(Keys.Space);
+            return;
+        }
+
+        if (_world.Phase == GamePhase.Antechamber)
+        {
+            _world.RequestAutomatedGateEntry();
+            return;
+        }
+
+        if (_world.Phase == GamePhase.EnteringArena)
+        {
             return;
         }
 
@@ -297,11 +325,42 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
 
     }
 
+    private void ConfigureAntechamberVisualTest(float deltaTime)
+    {
+        _audioTestTotalTime += deltaTime;
+        if (_world.Phase == GamePhase.Title)
+        {
+            _input.InjectKeyPress(Keys.Space);
+            return;
+        }
+
+        if (_world.Phase != GamePhase.Antechamber)
+        {
+            return;
+        }
+
+        if (_antechamberVisualStage == 0 && _audioTestTotalTime >= 1f)
+        {
+            _screenshotRequested = true;
+            _antechamberVisualStage = 1;
+        }
+        else if (_antechamberVisualStage == 1 && _audioTestTotalTime >= 1.7f)
+        {
+            _world.SetAutomatedSoulSense(true);
+            _antechamberVisualStage = 2;
+        }
+        else if (_antechamberVisualStage == 2 && _audioTestTotalTime >= 2.7f)
+        {
+            _screenshotRequested = true;
+            _antechamberVisualStage = 3;
+        }
+    }
+
     private void FinishAutomatedTestFrame()
     {
         if (_audioDeathRestartTest)
         {
-            if (_audioTestRestartInjected && !_world.PlayerDead && _world.LoopState == ArenaLoopState.Intro)
+            if (_audioTestRestartInjected && !_world.PlayerDead && _world.Phase == GamePhase.Arena && _world.LoopState == ArenaLoopState.Intro)
             {
                 Console.WriteLine("AUDIO_DEATH_RESTART_TEST_PASS death=true restart=true");
                 Environment.ExitCode = 0;
@@ -324,7 +383,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
             return;
         }
 
-        if (_audioTestRestartInjected && _world.LoopState == ArenaLoopState.Intro && _world.WaveNumber == 0)
+        if (_audioTestRestartInjected && _world.Phase == GamePhase.Arena && _world.LoopState == ArenaLoopState.Intro && _world.WaveNumber == 0)
         {
             Console.WriteLine("AUDIO_GAMEPLAY_TEST_PASS waves=4 completion=true restart=true");
             Environment.ExitCode = 0;
