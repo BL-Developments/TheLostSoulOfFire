@@ -2,6 +2,7 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using TheLostSoulOfFire.Core;
 using TheLostSoulOfFire.Debugging;
 using TheLostSoulOfFire.Game;
 using TheLostSoulOfFire.Input;
@@ -11,6 +12,16 @@ namespace TheLostSoulOfFire;
 
 public sealed class Game1 : Microsoft.Xna.Framework.Game
 {
+    /// <summary>
+    /// The game is always simulated and drawn at this fixed resolution; the result is then
+    /// scaled into whatever window size the player has chosen. Keeping this constant means
+    /// the visible world, HUD and menu layout never change with window size.
+    /// </summary>
+    private static readonly Viewport VirtualViewport = new(0, 0, GameBalance.BackBufferWidth, GameBalance.BackBufferHeight);
+
+    private const int MinWindowWidth = 480;
+    private const int MinWindowHeight = 270;
+
     private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch = null!;
     private Texture2D _pixel = null!;
@@ -18,6 +29,8 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     private GameWorld _world = null!;
     private ArtAssets _art = null!;
     private SoulfireRenderer _soulfireRenderer = null!;
+    private ResolutionManager _resolution = null!;
+    private RenderTarget2D _virtualTarget = null!;
     private readonly bool _audioGameplayTest;
     private readonly bool _audioDeathRestartTest;
     private bool _screenshotRequested;
@@ -29,6 +42,10 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     private bool _audioTestCompleteSeen;
     private bool _audioTestRestartInjected;
     private bool _audioTestDeathRequested;
+    private bool _isHandlingResize;
+    private bool _isFullscreen;
+    private int _windowedWidth = GameBalance.BackBufferWidth;
+    private int _windowedHeight = GameBalance.BackBufferHeight;
 
     public Game1(bool audioGameplayTest = false, bool audioDeathRestartTest = false)
     {
@@ -46,11 +63,14 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         IsFixedTimeStep = true;
         TargetElapsedTime = TimeSpan.FromSeconds(1d / 60d);
         Window.Title = "The Lost Soul of Fire";
+        Window.AllowUserResizing = true;
     }
 
     protected override void Initialize()
     {
         _input = new InputState();
+        _resolution = new ResolutionManager(GameBalance.BackBufferWidth, GameBalance.BackBufferHeight);
+        Window.ClientSizeChanged += OnClientSizeChanged;
         base.Initialize();
     }
 
@@ -60,13 +80,21 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         _pixel = new Texture2D(GraphicsDevice, 1, 1);
         _pixel.SetData([Color.White]);
         _art = new ArtAssets(Content);
-        _world = new GameWorld(GraphicsDevice.Viewport, _art, Content);
+        _virtualTarget = new RenderTarget2D(
+            GraphicsDevice,
+            GameBalance.BackBufferWidth,
+            GameBalance.BackBufferHeight,
+            false,
+            SurfaceFormat.Color,
+            DepthFormat.None);
+        _world = new GameWorld(VirtualViewport, _art, Content, _audioGameplayTest || _audioDeathRestartTest);
         _soulfireRenderer = new SoulfireRenderer(GraphicsDevice);
+        _resolution.Update(GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight);
     }
 
     protected override void Update(GameTime gameTime)
     {
-        _input.Update();
+        _input.Update(_resolution);
         if (_audioGameplayTest || _audioDeathRestartTest)
         {
             ConfigureAutomatedTest((float)gameTime.ElapsedGameTime.TotalSeconds);
@@ -79,12 +107,22 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
             return;
         }
 
+        if (_input.WasKeyPressed(Keys.F11))
+        {
+            ToggleFullscreen();
+        }
+
         if (_input.WasKeyPressed(Keys.F9))
         {
             _screenshotRequested = true;
         }
 
-        _world.Update(gameTime, _input, GraphicsDevice.Viewport);
+        _world.Update(gameTime, _input, VirtualViewport);
+        if (_world.QuitRequested)
+        {
+            Exit();
+            return;
+        }
         if (_audioGameplayTest || _audioDeathRestartTest)
         {
             FinishAutomatedTestFrame();
@@ -96,15 +134,28 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
 
     protected override void Draw(GameTime gameTime)
     {
+        // Phase 1: world and HUD are drawn at the fixed virtual resolution, exactly as
+        // before this game supported resizing. SoulfireRenderer.PresentScene is handed
+        // _virtualTarget explicitly so its internal composite lands here rather than on
+        // the window's back buffer (MonoGame has no render-target stack — SetRenderTarget
+        // always means "this target or the back buffer", never "whatever was bound before").
+        GraphicsDevice.SetRenderTarget(_virtualTarget);
         GraphicsDevice.Clear(GameBalance.VoidColor);
         Viewport viewport = GraphicsDevice.Viewport;
-        _world.Draw(_spriteBatch, _pixel, viewport, _soulfireRenderer);
+        _world.Draw(_spriteBatch, _pixel, viewport, _soulfireRenderer, _virtualTarget);
+
+        // Phase 2: letterbox the finished frame into the actual window.
+        GraphicsDevice.SetRenderTarget(null);
+        GraphicsDevice.Clear(Color.Black);
+        _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp);
+        _spriteBatch.Draw(_virtualTarget, _resolution.Destination, Color.White);
+        _spriteBatch.End();
 
         if (_screenshotRequested)
         {
             _screenshotRequested = false;
-            _screenshotStatus = ScreenshotCapture.TrySaveBackBuffer(
-                GraphicsDevice,
+            _screenshotStatus = ScreenshotCapture.TrySaveVirtualTarget(
+                _virtualTarget,
                 _world.ScreenshotContext,
                 out string path)
                 ? $"Screenshot saved — {path}"
@@ -116,11 +167,66 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
 
     protected override void UnloadContent()
     {
+        Window.ClientSizeChanged -= OnClientSizeChanged;
         _world.Dispose();
         _soulfireRenderer.Dispose();
+        _virtualTarget.Dispose();
         _pixel.Dispose();
         _spriteBatch.Dispose();
         base.UnloadContent();
+    }
+
+    private void OnClientSizeChanged(object? sender, EventArgs e)
+    {
+        if (_isHandlingResize)
+        {
+            return;
+        }
+
+        _isHandlingResize = true;
+        try
+        {
+            int width = Window.ClientBounds.Width;
+            int height = Window.ClientBounds.Height;
+            if (!_isFullscreen && (width < MinWindowWidth || height < MinWindowHeight))
+            {
+                width = Math.Max(width, MinWindowWidth);
+                height = Math.Max(height, MinWindowHeight);
+                _graphics.PreferredBackBufferWidth = width;
+                _graphics.PreferredBackBufferHeight = height;
+                _graphics.ApplyChanges();
+            }
+
+            _resolution.Update(GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight);
+        }
+        finally
+        {
+            _isHandlingResize = false;
+        }
+    }
+
+    private void ToggleFullscreen()
+    {
+        if (_isFullscreen)
+        {
+            _isFullscreen = false;
+            _graphics.IsFullScreen = false;
+            _graphics.PreferredBackBufferWidth = _windowedWidth;
+            _graphics.PreferredBackBufferHeight = _windowedHeight;
+            _graphics.ApplyChanges();
+        }
+        else
+        {
+            _windowedWidth = Window.ClientBounds.Width;
+            _windowedHeight = Window.ClientBounds.Height;
+            DisplayMode displayMode = GraphicsDevice.Adapter.CurrentDisplayMode;
+            _isFullscreen = true;
+            _graphics.HardwareModeSwitch = false;
+            _graphics.PreferredBackBufferWidth = displayMode.Width;
+            _graphics.PreferredBackBufferHeight = displayMode.Height;
+            _graphics.IsFullScreen = true;
+            _graphics.ApplyChanges();
+        }
     }
 
     private void ConfigureAutomatedTest(float deltaTime)

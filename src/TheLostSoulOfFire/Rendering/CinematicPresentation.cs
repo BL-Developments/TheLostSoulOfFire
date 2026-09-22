@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TheLostSoulOfFire.Entities;
 using TheLostSoulOfFire.Game;
+using TheLostSoulOfFire.Menu;
 
 namespace TheLostSoulOfFire.Rendering;
 
@@ -182,11 +184,12 @@ public sealed class CinematicPresentation
         Viewport viewport,
         ArenaLoopState loopState,
         bool playerDead,
-        int waveNumber)
+        int waveNumber,
+        MenuController menu)
     {
         if (loopState == ArenaLoopState.Title)
         {
-            DrawTitle(batch, pixel, viewport);
+            DrawTitle(batch, pixel, viewport, menu);
         }
         else if (playerDead)
         {
@@ -215,7 +218,7 @@ public sealed class CinematicPresentation
 
     public float GetLifeFlameAlpha() => Ease((_stateTime - 1.05f) / 1.15f);
 
-    private void DrawTitle(SpriteBatch batch, Texture2D pixel, Viewport viewport)
+    private void DrawTitle(SpriteBatch batch, Texture2D pixel, Viewport viewport, MenuController menu)
     {
         float reveal = Ease((_titleTime - 0.1f) / 1.05f);
         float darkness = MathHelper.Lerp(0.96f, 0.68f, Ease(_titleTime / 1.25f));
@@ -229,6 +232,13 @@ public sealed class CinematicPresentation
         PixelText.DrawCentered(batch, pixel, "SOUL OF FIRE", centerX, titleY + 9f, 6, GameBalance.SoulWhite * reveal);
         PixelText.DrawCentered(batch, pixel, "DEATH IS NOT THE END", centerX, titleY + 82f, 2, GameBalance.DeathFlameBright * (0.56f * reveal));
 
+        if (menu.IsOpen)
+        {
+            float menuReveal = Ease(menu.OpenTimer / MenuController.RevealDuration);
+            DrawMenuList(batch, pixel, viewport, menu, menuReveal);
+            return;
+        }
+
         float promptReveal = Ease((_titleTime - 1.15f) / 0.75f);
         float promptBreathe = 0.58f + MathF.Sin(_titleTime * 2.4f) * 0.12f;
         PixelText.DrawCentered(
@@ -240,6 +250,63 @@ public sealed class CinematicPresentation
             2,
             GameBalance.SoulWhite * (promptReveal * promptBreathe));
         DrawPromptMark(batch, pixel, new Vector2(centerX, viewport.Height * 0.72f - 20f), promptReveal * promptBreathe);
+    }
+
+    private const int MenuEntryScale = 3;
+    private const float MenuEntrySpacing = 36f;
+    private const float MenuStartYFraction = 0.60f;
+    private const float MenuHitPaddingX = 24f;
+    private const float MenuHitPaddingY = 6f;
+
+    /// <summary>
+    /// Hit-testable bounds for each entry of <paramref name="page"/>, laid out
+    /// with the exact same constants <see cref="DrawMenuList"/> draws with so
+    /// hover/click detection matches what is on screen.
+    /// </summary>
+    public IReadOnlyList<Rectangle> GetMenuEntryBounds(Viewport viewport, MenuPage page)
+    {
+        List<Rectangle> bounds = new(page.Entries.Count);
+        float centerX = viewport.Width * 0.5f;
+        for (int i = 0; i < page.Entries.Count; i++)
+        {
+            int width = PixelText.Measure(page.Entries[i].Label, MenuEntryScale);
+            int height = 7 * MenuEntryScale;
+            float y = viewport.Height * MenuStartYFraction + i * MenuEntrySpacing;
+            float x = centerX - width * 0.5f;
+            bounds.Add(new Rectangle(
+                (int)(x - MenuHitPaddingX),
+                (int)(y - MenuHitPaddingY),
+                width + (int)(MenuHitPaddingX * 2f),
+                height + (int)(MenuHitPaddingY * 2f)));
+        }
+        return bounds;
+    }
+
+    private void DrawMenuList(SpriteBatch batch, Texture2D pixel, Viewport viewport, MenuController menu, float reveal)
+    {
+        float centerX = viewport.Width * 0.5f;
+        IReadOnlyList<MenuEntry> entries = menu.CurrentPage.Entries;
+        for (int i = 0; i < entries.Count; i++)
+        {
+            float y = viewport.Height * MenuStartYFraction + i * MenuEntrySpacing;
+            bool selected = i == menu.SelectedIndex;
+            Color baseColor = entries[i].IsPlaceholder ? GameBalance.SoulWhite * 0.42f : GameBalance.SoulWhite * 0.72f;
+            Color color = selected ? GameBalance.DeathFlameBright : baseColor;
+            float breathe = selected ? 0.85f + MathF.Sin(_titleTime * 3f) * 0.15f : 1f;
+            PixelText.DrawCentered(batch, pixel, entries[i].Label, centerX, y, MenuEntryScale, color * (reveal * breathe));
+
+            if (selected)
+            {
+                int width = PixelText.Measure(entries[i].Label, MenuEntryScale);
+                DrawSelectionMarker(batch, pixel, new Vector2(centerX - width * 0.5f - 16f, y + 10f), GameBalance.DeathFlameBright * reveal);
+            }
+        }
+    }
+
+    private static void DrawSelectionMarker(SpriteBatch batch, Texture2D pixel, Vector2 center, Color color)
+    {
+        batch.DrawLine(pixel, center + new Vector2(-5f, -5f), center + new Vector2(3f, 0f), color, 2f);
+        batch.DrawLine(pixel, center + new Vector2(3f, 0f), center + new Vector2(-5f, 5f), color, 2f);
     }
 
     private void DrawIntro(SpriteBatch batch, Texture2D pixel, Viewport viewport)

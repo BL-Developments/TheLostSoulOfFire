@@ -10,6 +10,7 @@ using TheLostSoulOfFire.Combat;
 using TheLostSoulOfFire.Effects;
 using TheLostSoulOfFire.Entities;
 using TheLostSoulOfFire.Input;
+using TheLostSoulOfFire.Menu;
 using TheLostSoulOfFire.Rendering;
 
 namespace TheLostSoulOfFire.Game;
@@ -37,6 +38,8 @@ public sealed class GameWorld : IDisposable
     private readonly ArtAssets _art;
     private readonly SpriteVfxSystem _spriteVfx;
     private readonly CombatPresentation _combatPresentation;
+    private readonly MenuController _menu = new();
+    private readonly bool _skipMainMenu;
     private readonly Player _player;
     private readonly List<Enemy> _enemies = [];
     private readonly List<Soul> _souls = [];
@@ -59,13 +62,15 @@ public sealed class GameWorld : IDisposable
     public ArenaLoopState LoopState => _loopState;
     public int WaveNumber => _waveNumber;
     public bool PlayerDead => _player.IsDead;
+    public bool QuitRequested { get; private set; }
 
     public string WindowTitle => _debugVisible
         ? $"The Lost Soul of Fire — DEBUG | Wave {_waveNumber}/4 {_loopState.ToString().ToUpperInvariant()} | HP {_player.Health} | RES {(_player.ResonanceActive ? $"ACTIVE {_player.ResonanceRemaining:0.0}s" : $"{_player.Resonance:0}/{GameBalance.ResonanceRequired:0}")} | Player {GetPlayerState()} | Enemies {_enemies.Count(enemy => enemy.IsAlive)} | Souls {_souls.Count}"
         : "The Lost Soul of Fire";
 
-    public GameWorld(Viewport viewport, ArtAssets art, ContentManager content)
+    public GameWorld(Viewport viewport, ArtAssets art, ContentManager content, bool skipMainMenu = false)
     {
+        _skipMainMenu = skipMainMenu;
         _art = art;
         _audio = new AudioDirector(content);
         _spriteVfx = new SpriteVfxSystem(art);
@@ -98,11 +103,18 @@ public sealed class GameWorld : IDisposable
 
         if (_loopState == ArenaLoopState.Title)
         {
-            if (input.AnyInputPressed && !input.WasKeyPressed(Keys.F9))
+            if (_skipMainMenu)
             {
-                _audio.Play(AudioCue.TitleConfirm, 0.58f);
-                _loopState = ArenaLoopState.Intro;
-                _presentation.BeginIntro(false);
+                if (input.AnyInputPressed && !input.WasKeyPressed(Keys.F9))
+                {
+                    _audio.Play(AudioCue.TitleConfirm, 0.58f);
+                    _loopState = ArenaLoopState.Intro;
+                    _presentation.BeginIntro(false);
+                }
+            }
+            else
+            {
+                UpdateMenu(deltaTime, input, viewport);
             }
             _soulSensePresentation.Update(deltaTime, false);
             _particles.Update(deltaTime);
@@ -226,7 +238,7 @@ public sealed class GameWorld : IDisposable
             return;
         }
 
-        _lastMouseWorld = _camera.ScreenToWorld(input.MousePosition, viewport);
+        _lastMouseWorld = _camera.ScreenToWorld(input.MouseVirtualPosition.ToPoint(), viewport);
 
         if (_screenEffects.IsHitStopped)
         {
@@ -355,6 +367,80 @@ public sealed class GameWorld : IDisposable
             deltaTime);
     }
 
+    private void UpdateMenu(float deltaTime, InputState input, Viewport viewport)
+    {
+        if (!_menu.IsOpen)
+        {
+            if (input.AnyInputPressed && !input.WasKeyPressed(Keys.F9))
+            {
+                _audio.Play(AudioCue.TitleConfirm, 0.58f);
+                _menu.Open();
+            }
+            return;
+        }
+
+        _menu.Tick(deltaTime);
+        if (!_menu.AcceptsInput)
+        {
+            return;
+        }
+
+        IReadOnlyList<Rectangle> bounds = _presentation.GetMenuEntryBounds(viewport, _menu.CurrentPage);
+
+        if (input.MouseMoved)
+        {
+            for (int i = 0; i < bounds.Count; i++)
+            {
+                if (bounds[i].Contains(input.MouseVirtualPosition))
+                {
+                    _menu.SetHoverIndex(i);
+                    break;
+                }
+            }
+        }
+
+        if (input.WasKeyPressed(Keys.Up) || input.WasKeyPressed(Keys.W))
+        {
+            _menu.MoveSelection(-1);
+        }
+        else if (input.WasKeyPressed(Keys.Down) || input.WasKeyPressed(Keys.S))
+        {
+            _menu.MoveSelection(1);
+        }
+
+        bool confirmedByKeyboard = input.WasKeyPressed(Keys.Enter);
+        bool confirmedByMouse = false;
+        if (input.WasLeftMousePressed)
+        {
+            for (int i = 0; i < bounds.Count; i++)
+            {
+                if (bounds[i].Contains(input.MouseVirtualPosition))
+                {
+                    _menu.SetHoverIndex(i);
+                    confirmedByMouse = true;
+                    break;
+                }
+            }
+        }
+
+        if (!confirmedByKeyboard && !confirmedByMouse)
+        {
+            return;
+        }
+
+        switch (_menu.Confirm())
+        {
+            case MenuActionResult.NewGame:
+                _menu.Close();
+                _loopState = ArenaLoopState.Intro;
+                _presentation.BeginIntro(false);
+                break;
+            case MenuActionResult.Quit:
+                QuitRequested = true;
+                break;
+        }
+    }
+
     public void Dispose()
     {
         _audio.Dispose();
@@ -363,11 +449,11 @@ public sealed class GameWorld : IDisposable
 
     internal void RequestAudioTestFatalDamage() => _audioTestFatalDamageRequested = true;
 
-    public void Draw(SpriteBatch batch, Texture2D pixel, Viewport viewport, SoulfireRenderer renderer)
+    public void Draw(SpriteBatch batch, Texture2D pixel, Viewport viewport, SoulfireRenderer renderer, RenderTarget2D? rootTarget = null)
     {
         renderer.BeginScene(viewport);
         DrawScene(batch, pixel, viewport);
-        renderer.PresentScene(batch, viewport, _soulSensePresentation.WorldSuppression);
+        renderer.PresentScene(batch, rootTarget, viewport, _soulSensePresentation.WorldSuppression);
         DrawSoulfireLighting(batch, renderer, viewport);
         _soulSensePresentation.DrawSoulLayer(
             batch,
@@ -511,7 +597,7 @@ public sealed class GameWorld : IDisposable
             _hud.Draw(batch, pixel, viewport, _player);
         }
 
-        _presentation.DrawOverlay(batch, pixel, viewport, _loopState, _player.IsDead, _waveNumber);
+        _presentation.DrawOverlay(batch, pixel, viewport, _loopState, _player.IsDead, _waveNumber, _menu);
 
         if (_debugVisible && _loopState != ArenaLoopState.Title)
         {
@@ -847,7 +933,7 @@ public sealed class GameWorld : IDisposable
     private string GetScreenshotContext()
     {
         if (_player.IsDead) return "phase05_player_down";
-        if (_loopState == ArenaLoopState.Title) return "phase15_title";
+        if (_loopState == ArenaLoopState.Title) return _menu.IsOpen ? $"phase15_menu_{_menu.CurrentPage.Id}" : "phase15_title";
         if (_loopState == ArenaLoopState.Complete) return "phase15_soul_free";
         if (_loopState == ArenaLoopState.Transition) return $"phase12_wave_{_waveNumber}_clear";
         if (_loopState == ArenaLoopState.Intro) return "phase12_arena_intro";
