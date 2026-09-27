@@ -101,6 +101,8 @@ public sealed class AudioDirector : IDisposable
     private bool _musicPlaying;
     private bool _calm;
     private bool _soulSense;
+    private float _arenaMix = 1f;
+    private float _targetArenaMix = 1f;
     private float _duckTimer;
     private float _duckAmount;
     private uint _random = 0xA17D3C5Bu;
@@ -178,6 +180,10 @@ public sealed class AudioDirector : IDisposable
         {
             _duckAmount = MathF.Max(0f, _duckAmount - deltaTime * 2.4f);
         }
+        float mixStep = deltaTime / 0.9f;
+        _arenaMix = _arenaMix < _targetArenaMix
+            ? MathF.Min(_targetArenaMix, _arenaMix + mixStep)
+            : MathF.Max(_targetArenaMix, _arenaMix - mixStep);
         EnsureMusicPlaying();
         ApplyMix();
     }
@@ -231,6 +237,16 @@ public sealed class AudioDirector : IDisposable
     public void SetSoulSense(bool active)
     {
         _soulSense = active;
+        ApplyMix();
+    }
+
+    public void SetArenaActive(bool active, bool immediate = false)
+    {
+        _targetArenaMix = active ? 1f : 0f;
+        if (immediate)
+        {
+            _arenaMix = _targetArenaMix;
+        }
         ApplyMix();
     }
 
@@ -323,8 +339,8 @@ public sealed class AudioDirector : IDisposable
 
     private void ApplyMix()
     {
-        float ambienceBase = _calm ? 0.035f : 0.12f;
-        float musicBase = _calm ? MusicCalmVolume : MusicGameplayVolume;
+        float ambienceBase = Lerp(0.048f, _calm ? 0.035f : 0.12f, _arenaMix);
+        float musicBase = (_calm ? MusicCalmVolume : MusicGameplayVolume) * _arenaMix;
         if (_soulSense)
         {
             ambienceBase *= 0.52f;
@@ -340,6 +356,9 @@ public sealed class AudioDirector : IDisposable
             MediaPlayer.Volume = Math.Clamp(musicBase * (1f - _duckAmount * 0.62f), 0f, 1f);
         }
     }
+
+    private static float Lerp(float from, float to, float amount) =>
+        from + (to - from) * Math.Clamp(amount, 0f, 1f);
 
     private int CountActiveEnemyVoices()
     {
