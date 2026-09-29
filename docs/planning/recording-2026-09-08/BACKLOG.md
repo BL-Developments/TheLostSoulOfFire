@@ -52,14 +52,14 @@ Abnahme: Aufnahme und bestehende Lore sind nachvollziehbar abgeglichen; Ressourc
 
 ID: `lore` · Kategorie: Lore & Story · Typ: design
 
-Die Aufnahme hat laut Owner bei Konflikten Vorrang. Vaelor wählt den Protagonisten aus und die Sense wird Startwaffe. Das widerspricht der bisherigen Ablehnung persönlicher Auswahl. Wiederholte Run-Niederlagen führen zur Homebase, während endgültige Warden-Zerstörung bisher den Übergang vollendet.
+Die Aufnahme hat laut Owner bei Konflikten Vorrang. Vaelor wählt den Protagonisten aus und die Sense wird Startwaffe. Das widerspricht der bisherigen Ablehnung persönlicher Auswahl. Beschluss vom 29.09.2026: Run-Niederlage bedeutet Kampfunfähigkeit mit Bergung vor endgültiger Zerstörung und Rückkehr zur Homebase; endgültiger Warden-Tod führt weiterhin ins Jenseits.
 
 Abnahme:
 
 - [ ] Entscheidungslog, Canon, Story Opening und betroffene Produkt-/Roadmaptexte konsistent auf die Aufnahme beziehen; lokale Zusammenfassung als Ausgangspunkt verwenden.
 - [ ] Auswahl durch Vaelor und Sense erhalten; Ursprung/Mechanik der Auswahl offen markieren. Gottstatus, Warden-Siegel und genaue Ortungsfähigkeit nicht daraus ableiten.
-- [ ] Run-Niederlage/Rückkehr gegenüber endgültigem Warden-Tod erzählerisch klären; die Rückkehr als festes Gameplayziel erhalten.
-- [ ] Eine Hauptwaffe statt dauerhaftem Doppelsystem und Verzicht auf Inventar/Loot festhalten; den bisherigen Sechs-Item-Soul-Echo-Plan ersetzen oder als Fähigkeiten neu fassen.
+- [ ] Bergung vor endgültiger Zerstörung und Rückkehr nach Run-Niederlage in Canon und Story konsistent festhalten; konkrete Inszenierung offenlassen.
+- [ ] Eine Hauptwaffe statt dauerhaftem Doppelsystem und Verzicht auf Inventar/Loot festhalten; den Sechs-Item-Soul-Echo-Plan streichen. Einzelne Effekte können später als Fähigkeiten oder Waffenfortschritt neu entstehen.
 - [ ] Lost Souls bleiben tragische Menschen; Release und Besiegen bleiben getrennt. Bruder als Spieler 2, unbekannter Keeper und Soulfire Gothic bleiben erhalten.
 
 Abhängigkeiten: keine vorgelagerte Arbeitsaufgabe.

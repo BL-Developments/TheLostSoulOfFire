@@ -67,8 +67,10 @@ Importdatum 2026-09-08 ist nicht das belegte Aufnahmedatum.
 ### Annahmen und noch offene Entscheidungen
 
 Aufnahme entscheidet Grundstruktur, keine festen Preise oder Kampagnenzahlen.
-Vaelor-Auswahl ist neuer Storybeat; Ursache bleibt offen. Run-Niederlage und
-endgültiger Warden-Tod müssen erzählerisch unterschieden werden. Ultimate,
+Vaelor-Auswahl ist neuer Storybeat; Ursache bleibt offen. Run-Niederlage ist
+Kampfunfähigkeit mit Bergung vor endgültigem Warden-Tod. Der Sechs-Item-Soul-Echo-Proof
+entfällt; einzelne Effekte können später als Fähigkeiten oder Waffenfortschritt
+neu entstehen. Ultimate,
 Koop-Konten, Meta-Level, Bankquoten und Rüstungsanpassung bleiben Designaufgaben.
 Keine Termine oder Zuweisungen an andere Personen erfunden. Keine Spielabnahme
 aus diesem Planungsauftrag abgeleitet.

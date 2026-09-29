@@ -12,12 +12,14 @@ Einträge unten. Siehe [`DECISION-LOG.md`](DECISION-LOG.md) und
   bleibt offen. Vaelor bleibt kein Gott, ein Warden-Siegel bleibt verworfen.
 - Erlöste Seelen gehen weiter; gesammelt wird eine daraus entstehende mystische
   Ressource. Keine intakten Souls als gewöhnliche Währung oder Munition.
-- Run-Niederlagen führen zur Homebase. Die Trennung von wiederholbarer
-  Niederlage/Bergung und endgültiger Warden-Zerstörung ist eine offene
-  Ausgestaltung; der Gameplay-Rückkehrpunkt ist beschlossen.
+- Run-Niederlage bedeutet Kampfunfähigkeit und Bergung durch andere Wardens
+  vor endgültiger Zerstörung; danach Rückkehr zur Homebase. Nur endgültige
+  Warden-Zerstörung führt ins wahre Jenseits. Die Bergungsinszenierung ist offen.
 - Reguläre Runs: eine gewählte Hauptwaffe, zwei aus drei angebotenen
   Fähigkeiten, mehrere Levels je Biom, Boss-Freischaltung des nächsten Bioms,
   Teilsicherung/Extraktion und kein gewöhnliches Loot-Inventar.
+- Der Sechs-Item-Soul-Echo-Proof entfällt. Einzelne Effekte können später als
+  Fähigkeiten oder Waffenfortschritt neu entworfen werden.
 
 Die älteren Detailabschnitte dokumentieren weiterhin die Herkunft der Lore.
 Ihre vollständige thematische Angleichung ist als eigenes Arbeits-Issue
