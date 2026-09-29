@@ -6,8 +6,13 @@ namespace TheLostSoulOfFire.Game;
 /// </summary>
 public static class GameFlowRules
 {
-    public static GamePhase ConfirmTitle(GamePhase phase) =>
-        phase == GamePhase.Title ? GamePhase.Antechamber : phase;
+    public static GamePhase ConfirmTitle(GamePhase phase, bool skipPrologue = false) =>
+        phase == GamePhase.Title
+            ? skipPrologue ? GamePhase.Antechamber : GamePhase.Prologue
+            : phase;
+
+    public static GamePhase FinishPrologue(GamePhase phase) =>
+        phase == GamePhase.Prologue ? GamePhase.Antechamber : phase;
 
     public static GamePhase EnterGate(GamePhase phase) =>
         phase == GamePhase.Antechamber ? GamePhase.EnteringArena : phase;
@@ -19,5 +24,5 @@ public static class GameFlowRules
 
     public static GamePhase RestartAfterCompletion() => GamePhase.Title;
 
-    public static bool AllowsCombat(GamePhase phase) => phase == GamePhase.Arena;
+    public static bool AllowsCombat(GamePhase phase) => phase is GamePhase.Prologue or GamePhase.Arena;
 }

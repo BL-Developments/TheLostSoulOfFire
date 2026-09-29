@@ -94,7 +94,8 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
             VirtualViewport,
             _art,
             Content,
-            _audioGameplayTest || _audioDeathRestartTest || _antechamberVisualTest);
+            _audioGameplayTest || _audioDeathRestartTest || _antechamberVisualTest,
+            skipPrologue: _audioGameplayTest || _audioDeathRestartTest || _antechamberVisualTest);
         _soulfireRenderer = new SoulfireRenderer(GraphicsDevice);
         _resolution.Update(GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight);
     }

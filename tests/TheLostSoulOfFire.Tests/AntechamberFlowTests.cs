@@ -16,7 +16,7 @@ public sealed class AntechamberFlowTests
     {
         GamePhase phase = GamePhase.Title;
 
-        phase = GameFlowRules.ConfirmTitle(phase);
+        phase = GameFlowRules.ConfirmTitle(phase, skipPrologue: true);
         Assert.AreEqual(GamePhase.Antechamber, phase);
 
         phase = GameFlowRules.EnterGate(phase);
@@ -37,6 +37,7 @@ public sealed class AntechamberFlowTests
     public void CombatIsOnlyAvailableInsideArena()
     {
         Assert.IsFalse(GameFlowRules.AllowsCombat(GamePhase.Title));
+        Assert.IsTrue(GameFlowRules.AllowsCombat(GamePhase.Prologue));
         Assert.IsFalse(GameFlowRules.AllowsCombat(GamePhase.Antechamber));
         Assert.IsFalse(GameFlowRules.AllowsCombat(GamePhase.EnteringArena));
         Assert.IsTrue(GameFlowRules.AllowsCombat(GamePhase.Arena));
