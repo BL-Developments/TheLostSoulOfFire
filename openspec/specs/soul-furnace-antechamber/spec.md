@@ -1,10 +1,15 @@
-## ADDED Requirements
+# soul-furnace-antechamber Specification
+
+## Purpose
+Die Aschenvorhalle ist ein kampffreies, begehbares Pre-Level zwischen Prolog und Arena. Sie führt räumlich und atmosphärisch in den Abandoned Soul Furnace ein und endet mit einem inszenierten Toreintritt in das Arena-Intro.
+
+## Requirements
 
 ### Requirement: Ein begehbares Pre-Level liegt vor der Arena
-Das System SHALL nach Bestätigung des Titelbildschirms die Aschenvorhalle laden und SHALL den Arenaablauf erst nach Verlassen dieses Pre-Levels beginnen.
+Das System SHALL nach dem Prolog die Aschenvorhalle laden und SHALL den Arenaablauf erst nach Verlassen dieses Pre-Levels beginnen. Automatisierte Prüfläufe, die den Prolog überspringen, SHALL direkt nach dem Titel in die Aschenvorhalle wechseln.
 
 #### Scenario: Neuer Durchlauf wird gestartet
-- **WHEN** der Spieler den Titelbildschirm bestätigt
+- **WHEN** der Spieler den Prolog abgeschlossen hat oder ein automatisierter Prüflauf den Prolog überspringt
 - **THEN** erscheint der Spieler steuerbar am Spawnpunkt der Aschenvorhalle und die Arena-Wellen bleiben inaktiv
 
 #### Scenario: Spieler erkundet die Vorhalle
@@ -82,7 +87,7 @@ Das System SHALL die vorhandene räumliche Ambience in der Aschenvorhalle zurüc
 - **THEN** überführt das System die ruhige Vorhallenmischung in die bestehende Arena-Ambience und Musik
 
 ### Requirement: Resetpfade respektieren den Einstiegskontext
-Das System SHALL einen Retry nach Spielertod direkt in der Arena beginnen und SHALL einen vollständigen Neustart nach erfolgreichem Abschluss wieder über Titel und Aschenvorhalle führen.
+Das System SHALL einen Retry nach Spielertod direkt in der Arena beginnen und SHALL einen vollständigen Neustart nach erfolgreichem Abschluss wieder über Titel, Prolog und Aschenvorhalle führen.
 
 #### Scenario: Spieler startet nach Tod neu
 - **WHEN** der Spieler im Todeszustand `R` drückt
@@ -90,4 +95,4 @@ Das System SHALL einen Retry nach Spielertod direkt in der Arena beginnen und SH
 
 #### Scenario: Spieler startet nach Abschluss neu
 - **WHEN** der Spieler im erfolgreichen Abschlusszustand `R` drückt
-- **THEN** leert das System den vollständigen Durchlaufzustand und kehrt zum Titel zurück, dessen Bestätigung erneut in die Aschenvorhalle führt
+- **THEN** leert das System den vollständigen Durchlaufzustand und kehrt zum Titel zurück, dessen Bestätigung erneut über den Prolog in die Aschenvorhalle führt

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-TBD - synced from `add-main-menu` change specs. Update this Purpose statement to describe the capability in one or two sentences.
+Das Hauptmenü ist der Einstieg nach der Titelkarte: ein navigierbares Menü mit Einzelspieler-Untermenü, Auswahl per Maus und Tastatur, dem Start eines neuen Spiels und dem Beenden der Anwendung.
 
 ## Requirements
 
