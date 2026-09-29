@@ -37,6 +37,18 @@ public sealed class Devourer : Enemy
     public DevourerState State { get; private set; } = DevourerState.ApproachPlayer;
     public override string StateLabel => State.ToString().ToUpperInvariant();
     public int ConsumedSoulCount => _consumedSouls.Count;
+
+    /// <summary>
+    /// Authored setup for scripted encounters: the Devourer arrives already
+    /// holding a Soul. The caller keeps ownership of the Soul so the world still
+    /// updates and draws it.
+    /// </summary>
+    public void SeedHeldSoul(Soul soul)
+    {
+        soul.BeginDevour();
+        soul.Consume();
+        _consumedSouls.Add(soul);
+    }
     public Vector2 FacingDirection => _facing;
     public Vector2 TorsoPosition => Position + new Vector2(0f, -8f);
 

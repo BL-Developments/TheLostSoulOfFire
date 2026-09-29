@@ -44,12 +44,16 @@ public static class SoulfireLighting
         float soulSenseAmount,
         bool endingComplete,
         Vector2 lifeFlamePosition,
-        float lifeFlameAlpha)
+        float lifeFlameAlpha,
+        bool drawArenaFurnaces = true)
     {
         renderer.BeginLighting(batch, worldTransform);
         float breathe = 0.88f + MathF.Sin(presentationTime * 4.6f) * 0.12f;
 
-        arenaAtmosphere.DrawLighting(batch, renderer, soulSenseAmount);
+        if (drawArenaFurnaces)
+        {
+            arenaAtmosphere.DrawLighting(batch, renderer, soulSenseAmount);
+        }
         particles.DrawLighting(batch, renderer);
         DrawSouls(batch, renderer, souls, soulSenseAmount, breathe);
         DrawEnemyEnergy(batch, renderer, enemies, soulSenseAmount, breathe);

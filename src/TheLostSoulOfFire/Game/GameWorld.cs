@@ -18,6 +18,7 @@ namespace TheLostSoulOfFire.Game;
 public enum GamePhase
 {
     Title,
+    Prologue,
     Antechamber,
     EnteringArena,
     Arena
@@ -31,7 +32,7 @@ public enum ArenaLoopState
     Complete
 }
 
-public sealed class GameWorld : IDisposable
+public sealed partial class GameWorld : IDisposable
 {
     private const float GateTransitionDuration = 1.35f;
     private readonly Arena _arena = new();
@@ -49,6 +50,8 @@ public sealed class GameWorld : IDisposable
     private readonly CombatPresentation _combatPresentation;
     private readonly MenuController _menu = new();
     private readonly bool _skipMainMenu;
+    private readonly bool _skipPrologue;
+    private readonly PrologueDirector _prologue = new();
     private readonly Player _player;
     private readonly List<Enemy> _enemies = [];
     private readonly List<Soul> _souls = [];
@@ -68,9 +71,21 @@ public sealed class GameWorld : IDisposable
     private int _fps = 60;
     private bool _audioTestFatalDamageRequested;
     private bool _endingRevealPlayed;
+    private bool _prologueEncounterArmed;
+    private bool _prologueReleaseObserved;
+    private int _transitWave;
+    private float _transitSpawnTimer;
+    private bool _transitArrivalCuePlayed;
 
     public string ScreenshotContext => GetScreenshotContext();
     public GamePhase Phase => _phase;
+    internal PrologueStage PrologueStage => _prologue.Stage;
+    private bool IsCombatPhase => _phase is GamePhase.Arena or GamePhase.Prologue;
+    private Rectangle ActiveCombatBounds => _phase == GamePhase.Prologue ? _prologue.MovementBounds : _arena.CombatBounds;
+    private Rectangle ActiveWorldBounds => _phase == GamePhase.Prologue ? PrologueDirector.WorldBounds : _arena.Bounds;
+    private ArenaLoopState CameraLoopState => _phase == GamePhase.Prologue && _loopState == ArenaLoopState.Complete
+        ? ArenaLoopState.Combat
+        : _loopState;
     public ArenaLoopState LoopState => _loopState;
     public int WaveNumber => _waveNumber;
     public bool PlayerDead => _player.IsDead;
@@ -86,9 +101,10 @@ public sealed class GameWorld : IDisposable
         ? $"The Lost Soul of Fire — DEBUG | {_phase.ToString().ToUpperInvariant()} {_loopState.ToString().ToUpperInvariant()} | Wave {_waveNumber}/4 | HP {_player.Health} | RES {(_player.ResonanceActive ? $"ACTIVE {_player.ResonanceRemaining:0.0}s" : $"{_player.Resonance:0}/{GameBalance.ResonanceRequired:0}")} | Player {GetPlayerState()} | Enemies {_enemies.Count(enemy => enemy.IsAlive)} | Souls {_souls.Count}"
         : "The Lost Soul of Fire";
 
-    public GameWorld(Viewport viewport, ArtAssets art, ContentManager content, bool skipMainMenu = false)
+    public GameWorld(Viewport viewport, ArtAssets art, ContentManager content, bool skipMainMenu = false, bool skipPrologue = false)
     {
         _skipMainMenu = skipMainMenu;
+        _skipPrologue = skipPrologue;
         _art = art;
         _audio = new AudioDirector(content);
         _spriteVfx = new SpriteVfxSystem(art);
@@ -131,7 +147,7 @@ public sealed class GameWorld : IDisposable
                 if (input.AnyInputPressed && !input.WasKeyPressed(Keys.F9))
                 {
                     _audio.Play(AudioCue.TitleConfirm, 0.58f);
-                    BeginAntechamber(viewport);
+                    StartNewGame(viewport);
                     return;
                 }
             }
@@ -139,7 +155,7 @@ public sealed class GameWorld : IDisposable
             {
                 UpdateMenu(deltaTime, input, viewport);
                 // The menu can leave the title phase from inside UpdateMenu; skip the
-                // title camera for that frame so the antechamber owns it immediately.
+                // title camera for that frame so the next phase owns it immediately.
                 if (_phase != GamePhase.Title)
                 {
                     return;
@@ -209,15 +225,23 @@ public sealed class GameWorld : IDisposable
 
         if (input.WasKeyPressed(Keys.F8))
         {
-            ResetEncounter();
+            RetryCurrentEncounter(viewport);
+        }
+
+        if (_phase == GamePhase.Prologue)
+        {
+            if (input.WasKeyPressed(Keys.D1)) DebugEnterPrologueStage(PrologueStage.FindTrace);
+            if (input.WasKeyPressed(Keys.D2)) DebugEnterPrologueStage(PrologueStage.SearchApproach);
+            if (input.WasKeyPressed(Keys.D3)) DebugEnterPrologueStage(PrologueStage.DevourerPressure);
+            if (input.WasKeyPressed(Keys.D4)) DebugEnterPrologueStage(PrologueStage.Transit);
         }
 
         if (_player.IsDead && input.WasKeyPressed(Keys.R))
         {
-            ResetEncounter();
+            RetryCurrentEncounter(viewport);
         }
 
-        if (_loopState == ArenaLoopState.Complete && input.WasKeyPressed(Keys.R))
+        if (_phase == GamePhase.Arena && _loopState == ArenaLoopState.Complete && input.WasKeyPressed(Keys.R))
         {
             ResetFullRun(viewport);
             return;
@@ -229,11 +253,11 @@ public sealed class GameWorld : IDisposable
             _particles.Update(deltaTime);
             _presentation.UpdateCamera(
                 _camera,
-                _loopState,
+                CameraLoopState,
                 true,
                 _player.Position,
-                _arena.Bounds,
-                _arena.CombatBounds,
+                ActiveWorldBounds,
+                ActiveCombatBounds,
                 viewport,
                 deltaTime);
             return;
@@ -241,21 +265,29 @@ public sealed class GameWorld : IDisposable
 
         if (_loopState == ArenaLoopState.Complete)
         {
-            if (!_endingRevealPlayed && _presentation.StateTime >= CinematicPresentation.LifeFlameRevealTime)
+            if (_phase == GamePhase.Prologue)
+            {
+                if (_prologue.StateTime >= 1.5f && input.AnyInputPressed && !input.WasKeyPressed(Keys.F9))
+                {
+                    BeginAntechamber(viewport);
+                    return;
+                }
+            }
+            else if (!_endingRevealPlayed && _presentation.StateTime >= CinematicPresentation.LifeFlameRevealTime)
             {
                 _endingRevealPlayed = true;
                 _audio.Play(AudioCue.EndingReveal, 0.72f);
             }
-            UpdateArenaLoop(deltaTime);
+            UpdateLoop(deltaTime);
             _soulSensePresentation.Update(deltaTime, false);
             _particles.Update(deltaTime);
             _presentation.UpdateCamera(
                 _camera,
-                _loopState,
+                CameraLoopState,
                 false,
                 _player.Position,
-                _arena.Bounds,
-                _arena.CombatBounds,
+                ActiveWorldBounds,
+                ActiveCombatBounds,
                 viewport,
                 deltaTime);
             return;
@@ -263,16 +295,16 @@ public sealed class GameWorld : IDisposable
 
         if (_loopState == ArenaLoopState.Intro)
         {
-            UpdateArenaLoop(deltaTime);
+            UpdateLoop(deltaTime);
             _soulSensePresentation.Update(deltaTime, false);
             _particles.Update(deltaTime);
             _presentation.UpdateCamera(
                 _camera,
-                _loopState,
+                CameraLoopState,
                 false,
                 _player.Position,
-                _arena.Bounds,
-                _arena.CombatBounds,
+                ActiveWorldBounds,
+                ActiveCombatBounds,
                 viewport,
                 deltaTime);
             return;
@@ -286,7 +318,7 @@ public sealed class GameWorld : IDisposable
             return;
         }
 
-        _player.Update(deltaTime, input, _lastMouseWorld, _arena.CombatBounds, _particles, _screenEffects, _forceSoulSense);
+        _player.Update(deltaTime, input, _lastMouseWorld, ActiveCombatBounds, _particles, _screenEffects, _forceSoulSense);
         _soulSensePresentation.Update(deltaTime, _player.SoulSenseActive);
         if (_audioTestFatalDamageRequested)
         {
@@ -324,7 +356,7 @@ public sealed class GameWorld : IDisposable
             HollowState? previousHollowState = enemy is Hollow hollowBefore ? hollowBefore.State : null;
             BurningState? previousBurningState = enemy is Burning burningBefore ? burningBefore.State : null;
             DevourerState? previousDevourerState = enemy is Devourer devourerBefore ? devourerBefore.State : null;
-            enemy.Update(deltaTime, _player, _souls, _arena.CombatBounds, _particles, _screenEffects);
+            enemy.Update(deltaTime, _player, _souls, ActiveCombatBounds, _particles, _screenEffects);
             if (enemy is Hollow hollowAfter && previousHollowState != HollowState.Swipe && hollowAfter.State == HollowState.Swipe)
             {
                 _audio.Play(AudioCue.HollowSwipe, 0.48f);
@@ -379,7 +411,7 @@ public sealed class GameWorld : IDisposable
         }
 
         _souls.RemoveAll(soul => soul.IsFinished);
-        UpdateArenaLoop(deltaTime);
+        UpdateLoop(deltaTime);
         if (previousHealth > _player.Health)
         {
             if (_player.IsDead)
@@ -398,11 +430,11 @@ public sealed class GameWorld : IDisposable
 
         _presentation.UpdateCamera(
             _camera,
-            _loopState,
+            CameraLoopState,
             false,
             _player.Position,
-            _arena.Bounds,
-            _arena.CombatBounds,
+            ActiveWorldBounds,
+            ActiveCombatBounds,
             viewport,
             deltaTime);
     }
@@ -472,7 +504,7 @@ public sealed class GameWorld : IDisposable
         {
             case MenuActionResult.NewGame:
                 _menu.Close();
-                BeginAntechamber(viewport);
+                StartNewGame(viewport);
                 break;
             case MenuActionResult.Quit:
                 QuitRequested = true;
@@ -548,11 +580,22 @@ public sealed class GameWorld : IDisposable
         }
         else
         {
-            _art.DrawArena(batch);
-            _arenaAtmosphere.DrawBackground(batch, pixel, _soulSensePresentation.WorldSuppression);
-            if (_phase == GamePhase.Arena)
+            if (_phase == GamePhase.Prologue)
             {
-                DrawArenaLoop(batch, pixel);
+                PrologueEnvironment.DrawGround(batch, pixel, _prologue, _presentationTime, _soulSensePresentation.WorldSuppression);
+                PrologueEnvironment.DrawProps(batch, pixel, _prologue, _presentationTime, _soulSensePresentation.WorldSuppression);
+            }
+            else
+            {
+                _art.DrawArena(batch);
+                _arenaAtmosphere.DrawBackground(batch, pixel, _soulSensePresentation.WorldSuppression);
+            }
+            if (IsCombatPhase)
+            {
+                if (_phase == GamePhase.Arena)
+                {
+                    DrawArenaLoop(batch, pixel);
+                }
                 _player.DrawAfterimages(batch, pixel);
                 foreach (Enemy enemy in _enemies)
                 {
@@ -573,13 +616,13 @@ public sealed class GameWorld : IDisposable
         }
         _particles.Draw(batch, pixel);
         bool shouldDrawPlayer = _phase is GamePhase.Antechamber or GamePhase.EnteringArena ||
-            _phase == GamePhase.Arena && _presentation.ShouldDrawPlayer(_loopState, _player.IsDead);
+            IsCombatPhase && _presentation.ShouldDrawPlayer(_loopState, _player.IsDead);
         if (shouldDrawPlayer)
         {
             batch.FillCircle(pixel, _player.Position + new Vector2(3f, 8f), 24f, new Color(3, 3, 7) * 0.55f);
             _art.DrawPlayer(batch, _player);
             _player.Draw(batch, pixel, _art, _debugVisible, _soulSensePresentation.SoulEmergence);
-            if (_phase == GamePhase.Arena && _player.Cannon.State == SoulCannonState.Charging)
+            if (IsCombatPhase && _player.Cannon.State == SoulCannonState.Charging)
             {
                 Vector2 muzzle = _player.Position + _player.FacingDirection * 74f;
                 float charge = _player.Cannon.ChargeProgress;
@@ -600,20 +643,25 @@ public sealed class GameWorld : IDisposable
                     chargeColor);
             }
         }
-        _presentation.DrawWorldAccents(batch, pixel, _art, _phase, _loopState, _player.IsDead, _player, _arena.CombatBounds);
+        _presentation.DrawWorldAccents(batch, pixel, _art, _phase, _loopState, _player.IsDead, _player, ActiveCombatBounds);
         _spriteVfx.Draw(batch);
 
-        if (_phase == GamePhase.Arena && _presentation.ShouldDrawAim(_loopState, _player.IsDead))
+        if (_phase == GamePhase.Prologue)
+        {
+            PrologueEnvironment.DrawForeground(batch, pixel, _prologue);
+        }
+
+        if (IsCombatPhase && _presentation.ShouldDrawAim(_loopState, _player.IsDead))
         {
             batch.DrawCircle(pixel, _lastMouseWorld, 9f, GameBalance.DeathFlameBright * 0.75f, 2f, 16);
             batch.DrawLine(pixel, _lastMouseWorld - Vector2.UnitX * 13f, _lastMouseWorld + Vector2.UnitX * 13f, GameBalance.DeathFlame * 0.6f, 1f);
             batch.DrawLine(pixel, _lastMouseWorld - Vector2.UnitY * 13f, _lastMouseWorld + Vector2.UnitY * 13f, GameBalance.DeathFlame * 0.6f, 1f);
         }
 
-        if (_debugVisible && _phase == GamePhase.Arena)
+        if (_debugVisible && IsCombatPhase)
         {
-            batch.DrawRectangle(pixel, _arena.CombatBounds, new Color(80, 220, 210) * 0.8f, 3f);
-            Vector2 center = _arena.CombatBounds.Center.ToVector2();
+            batch.DrawRectangle(pixel, ActiveCombatBounds, new Color(80, 220, 210) * 0.8f, 3f);
+            Vector2 center = ActiveCombatBounds.Center.ToVector2();
             batch.DrawLine(pixel, center - Vector2.UnitX * 28f, center + Vector2.UnitX * 28f, new Color(80, 220, 210), 2f);
             batch.DrawLine(pixel, center - Vector2.UnitY * 28f, center + Vector2.UnitY * 28f, new Color(80, 220, 210), 2f);
         }
@@ -650,9 +698,10 @@ public sealed class GameWorld : IDisposable
             _arenaAtmosphere,
             _presentationTime,
             _soulSensePresentation.SoulEmergence,
-            _loopState == ArenaLoopState.Complete,
+            _phase == GamePhase.Arena && _loopState == ArenaLoopState.Complete,
             _presentation.GetLifeFlamePosition(_arena.CombatBounds),
-            _presentation.GetLifeFlameAlpha());
+            _presentation.GetLifeFlameAlpha(),
+            drawArenaFurnaces: _phase != GamePhase.Prologue);
     }
 
     private void DrawScreenFeedback(SpriteBatch batch, Texture2D pixel, Viewport viewport)
@@ -682,12 +731,26 @@ public sealed class GameWorld : IDisposable
     {
         batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
 
-        if (_phase == GamePhase.Arena && _presentation.ShouldDrawCombatHud(_loopState, _player.IsDead))
+        if (_phase == GamePhase.Prologue)
         {
-            _hud.Draw(batch, pixel, viewport, _player);
-        }
+            bool showPrologueHud = !_player.IsDead && _loopState == ArenaLoopState.Combat &&
+                _prologue.Stage is not (PrologueStage.Arrival or PrologueStage.Complete);
+            if (showPrologueHud)
+            {
+                _hud.Draw(batch, pixel, viewport, _player);
+            }
 
-        _presentation.DrawOverlay(batch, pixel, viewport, _phase, _loopState, _player.IsDead, _waveNumber, _menu);
+            ProloguePresentation.DrawOverlay(batch, pixel, viewport, _prologue, _player.IsDead);
+        }
+        else
+        {
+            if (_phase == GamePhase.Arena && _presentation.ShouldDrawCombatHud(_loopState, _player.IsDead))
+            {
+                _hud.Draw(batch, pixel, viewport, _player);
+            }
+
+            _presentation.DrawOverlay(batch, pixel, viewport, _phase, _loopState, _player.IsDead, _waveNumber, _menu);
+        }
 
         if (_phase is GamePhase.Antechamber or GamePhase.EnteringArena)
         {
@@ -855,10 +918,46 @@ public sealed class GameWorld : IDisposable
         _audio.Play(AudioCue.WaveStart, 0.62f, MathF.Min(0.18f, waveNumber * 0.03f));
     }
 
+    private void StartNewGame(Viewport viewport)
+    {
+        if (_skipPrologue)
+        {
+            BeginAntechamber(viewport);
+        }
+        else
+        {
+            BeginPrologue(viewport);
+        }
+    }
+
+    private void RetryCurrentEncounter(Viewport viewport)
+    {
+        if (_phase == GamePhase.Prologue)
+        {
+            RestartPrologueSector(viewport);
+        }
+        else
+        {
+            ResetEncounter();
+        }
+    }
+
+    private void UpdateLoop(float deltaTime)
+    {
+        if (_phase == GamePhase.Prologue)
+        {
+            UpdatePrologueFlow(deltaTime);
+        }
+        else
+        {
+            UpdateArenaLoop(deltaTime);
+        }
+    }
+
     private void BeginAntechamber(Viewport viewport)
     {
         ClearRunState();
-        _phase = GameFlowRules.ConfirmTitle(_phase);
+        _phase = GameFlowRules.FinishPrologue(GameFlowRules.ConfirmTitle(_phase, skipPrologue: true));
         _phaseTime = 0f;
         _player.Reset(_antechamber.PlayerSpawn);
         _lastMouseWorld = _player.Position + Vector2.UnitX * 200f;
@@ -1208,6 +1307,7 @@ public sealed class GameWorld : IDisposable
     private string GetScreenshotContext()
     {
         if (_phase == GamePhase.Title) return _menu.IsOpen ? $"phase15_menu_{_menu.CurrentPage.Id}" : "phase15_title";
+        if (_phase == GamePhase.Prologue) return $"prologue_{_prologue.Stage.ToString().ToLowerInvariant()}";
         if (_phase == GamePhase.Antechamber) return _player.SoulSenseActive ? "phase16_antechamber_soul_sense" : "phase16_antechamber";
         if (_phase == GamePhase.EnteringArena) return "phase16_entering_arena";
         if (_player.IsDead) return "phase05_player_down";
@@ -1266,7 +1366,7 @@ public sealed class GameWorld : IDisposable
     {
         foreach (CannonShot shot in _cannonShots)
         {
-            shot.Update(deltaTime, _arena.Bounds);
+            shot.Update(deltaTime, ActiveWorldBounds);
             if (shot.IsFinished)
             {
                 continue;
