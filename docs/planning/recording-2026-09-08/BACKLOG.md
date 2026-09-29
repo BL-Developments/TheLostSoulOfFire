@@ -176,7 +176,7 @@ Abnahme:
 - [ ] Biom 2 / Level 3 → Niederlage → Homebase → Biom 2 / Level 1 deterministisch nachweisen.
 - [ ] Freigeschaltetes Biom 3 direkt starten können, ohne Biom 1/2 erneut zu spielen.
 - [ ] Vorhandene Prolog-Sektor-Retries und Debugsprünge ausdrücklich vom regulären Run-Verhalten abgrenzen.
-- [ ] Solo-Niederlage und vollständige Team-Niederlage sauber abschließen; keine ungerechtfertigten Level- oder Ressourcenreste behalten.
+- [ ] Solo-Niederlage und vollständige Team-Niederlage als Kampfunfähigkeit mit Bergung durch andere Wardens vor endgültigem Warden-Tod abschließen; keine ungerechtfertigten Level- oder Ressourcenreste behalten. Die konkrete Bergungsinszenierung bleibt offen.
 
 Abhängigkeiten: [Homebase als spielbaren Ort für Vorbereitung und Run-Start ausbauen](#hub); [Dauerhafte Profile, gesicherte Ressourcen und Freischaltungen speichern](#save).
 
