@@ -10,6 +10,7 @@ public sealed class ScreenEffects
     private float _shakeDuration;
     private float _shakeMagnitude;
     private Vector2 _cameraKick;
+    private Vector2 _shakeOffset;
     private float _hitstopTimer;
     private float _flashTimer;
     private float _flashDuration;
@@ -17,8 +18,10 @@ public sealed class ScreenEffects
     private float _impactFrameTimer;
     private float _impactFrameDuration;
 
-    public Vector2 ShakeOffset { get; private set; }
-    public Vector2 CameraOffset => ShakeOffset + _cameraKick;
+    public float MotionScale { get; set; } = 1f;
+
+    public Vector2 ShakeOffset => _shakeOffset * MotionScale;
+    public Vector2 CameraOffset => ShakeOffset + _cameraKick * MotionScale;
     public bool IsHitStopped => _hitstopTimer > 0f;
     public float FlashAlpha => _flashDuration <= 0f
         ? 0f
@@ -84,7 +87,7 @@ public sealed class ScreenEffects
         _shakeTimer = MathF.Max(0f, _shakeTimer - deltaTime);
         if (_shakeTimer <= 0f)
         {
-            ShakeOffset = Vector2.Zero;
+            _shakeOffset = Vector2.Zero;
             _shakeDuration = 0f;
             _shakeMagnitude = 0f;
         }
@@ -93,7 +96,7 @@ public sealed class ScreenEffects
             float decay = _shakeDuration <= 0f
                 ? 0f
                 : MathF.Pow(MathHelper.Clamp(_shakeTimer / _shakeDuration, 0f, 1f), 1.6f);
-            ShakeOffset = new Vector2(
+            _shakeOffset = new Vector2(
                 (float)(_random.NextDouble() * 2d - 1d),
                 (float)(_random.NextDouble() * 2d - 1d)) * (_shakeMagnitude * decay);
         }
@@ -117,6 +120,6 @@ public sealed class ScreenEffects
         _flashStrength = 0f;
         _impactFrameTimer = 0f;
         _impactFrameDuration = 0f;
-        ShakeOffset = Vector2.Zero;
+        _shakeOffset = Vector2.Zero;
     }
 }

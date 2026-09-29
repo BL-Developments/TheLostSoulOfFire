@@ -34,6 +34,8 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     private readonly bool _audioGameplayTest;
     private readonly bool _audioDeathRestartTest;
     private readonly bool _antechamberVisualTest;
+    private readonly GameSettingsStore _settingsStore = new();
+    private readonly GameSettings _settings;
     private bool _screenshotRequested;
     private string _screenshotStatus = string.Empty;
     private float _audioTestTotalTime;
@@ -54,6 +56,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         _audioGameplayTest = audioGameplayTest;
         _audioDeathRestartTest = audioDeathRestartTest;
         _antechamberVisualTest = antechamberVisualTest;
+        _settings = _settingsStore.Load();
         _graphics = new GraphicsDeviceManager(this)
         {
             PreferredBackBufferWidth = GameBalance.BackBufferWidth,
@@ -73,6 +76,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     {
         _input = new InputState();
         _resolution = new ResolutionManager(GameBalance.BackBufferWidth, GameBalance.BackBufferHeight);
+        if (_settings.Fullscreen) SetFullscreen(true, rememberWindow: false);
         Window.ClientSizeChanged += OnClientSizeChanged;
         base.Initialize();
     }
@@ -95,7 +99,9 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
             _art,
             Content,
             _audioGameplayTest || _audioDeathRestartTest || _antechamberVisualTest,
-            skipPrologue: _audioGameplayTest || _audioDeathRestartTest || _antechamberVisualTest);
+            skipPrologue: _audioGameplayTest || _audioDeathRestartTest || _antechamberVisualTest,
+            settings: _settings,
+            settingsChanged: _settingsStore.Save);
         _soulfireRenderer = new SoulfireRenderer(GraphicsDevice);
         _resolution.Update(GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight);
     }
@@ -112,8 +118,8 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
             ConfigureAutomatedTest((float)gameTime.ElapsedGameTime.TotalSeconds);
         }
 
-        if (_input.IsKeyDown(Keys.Escape) ||
-            GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+        if (!_world.IsSettingsPageOpen && (_input.IsKeyDown(Keys.Escape) ||
+            GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed))
         {
             Exit();
             return;
@@ -121,7 +127,9 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
 
         if (_input.WasKeyPressed(Keys.F11))
         {
-            ToggleFullscreen();
+            _settings.Fullscreen = !_settings.Fullscreen;
+            SetFullscreen(_settings.Fullscreen);
+            _settingsStore.Save(_settings);
         }
 
         if (_input.WasKeyPressed(Keys.F9))
@@ -130,6 +138,11 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         }
 
         _world.Update(gameTime, _input, VirtualViewport);
+        if (_settings.Fullscreen != _isFullscreen)
+        {
+            SetFullscreen(_settings.Fullscreen);
+            _settingsStore.Save(_settings);
+        }
         if (_world.QuitRequested)
         {
             Exit();
@@ -223,9 +236,10 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         }
     }
 
-    private void ToggleFullscreen()
+    private void SetFullscreen(bool enabled, bool rememberWindow = true)
     {
-        if (_isFullscreen)
+        if (_isFullscreen == enabled) return;
+        if (!enabled)
         {
             _isFullscreen = false;
             _graphics.IsFullScreen = false;
@@ -235,8 +249,11 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         }
         else
         {
-            _windowedWidth = Window.ClientBounds.Width;
-            _windowedHeight = Window.ClientBounds.Height;
+            if (rememberWindow)
+            {
+                _windowedWidth = Window.ClientBounds.Width;
+                _windowedHeight = Window.ClientBounds.Height;
+            }
             DisplayMode displayMode = GraphicsDevice.Adapter.CurrentDisplayMode;
             _isFullscreen = true;
             _graphics.HardwareModeSwitch = false;

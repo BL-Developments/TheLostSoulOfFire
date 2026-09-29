@@ -48,7 +48,9 @@ public sealed partial class GameWorld : IDisposable
     private readonly ArtAssets _art;
     private readonly SpriteVfxSystem _spriteVfx;
     private readonly CombatPresentation _combatPresentation;
-    private readonly MenuController _menu = new();
+    private readonly MenuController _menu;
+    private readonly GameSettings _settings;
+    private readonly Action<GameSettings>? _settingsChanged;
     private readonly bool _skipMainMenu;
     private readonly bool _skipPrologue;
     private readonly PrologueDirector _prologue = new();
@@ -90,6 +92,7 @@ public sealed partial class GameWorld : IDisposable
     public int WaveNumber => _waveNumber;
     public bool PlayerDead => _player.IsDead;
     public bool QuitRequested { get; private set; }
+    public bool IsSettingsPageOpen => _menu.IsSettingsPage;
     public bool CombatActionsEnabled => GameFlowRules.AllowsCombat(_phase) &&
         !_player.IsDead && _loopState is ArenaLoopState.Combat or ArenaLoopState.Transition;
 
@@ -101,12 +104,16 @@ public sealed partial class GameWorld : IDisposable
         ? $"The Lost Soul of Fire — DEBUG | {_phase.ToString().ToUpperInvariant()} {_loopState.ToString().ToUpperInvariant()} | Wave {_waveNumber}/4 | HP {_player.Health} | RES {(_player.ResonanceActive ? $"ACTIVE {_player.ResonanceRemaining:0.0}s" : $"{_player.Resonance:0}/{GameBalance.ResonanceRequired:0}")} | Player {GetPlayerState()} | Enemies {_enemies.Count(enemy => enemy.IsAlive)} | Souls {_souls.Count}"
         : "The Lost Soul of Fire";
 
-    public GameWorld(Viewport viewport, ArtAssets art, ContentManager content, bool skipMainMenu = false, bool skipPrologue = false)
+    public GameWorld(Viewport viewport, ArtAssets art, ContentManager content, bool skipMainMenu = false, bool skipPrologue = false, GameSettings? settings = null, Action<GameSettings>? settingsChanged = null)
     {
         _skipMainMenu = skipMainMenu;
         _skipPrologue = skipPrologue;
+        _settings = settings ?? new GameSettings();
+        _menu = new MenuController(_settings);
+        _settingsChanged = settingsChanged;
         _art = art;
         _audio = new AudioDirector(content);
+        ApplyAudioSettings();
         _spriteVfx = new SpriteVfxSystem(art);
         _combatPresentation = new CombatPresentation(_particles, _screenEffects, _spriteVfx);
         _camera = new Camera2D(_arena.CombatBounds.Center.ToVector2());
@@ -120,6 +127,12 @@ public sealed partial class GameWorld : IDisposable
     {
         float deltaTime = MathF.Min((float)gameTime.ElapsedGameTime.TotalSeconds, 1f / 20f);
         _presentationTime += deltaTime;
+        _screenEffects.MotionScale = _settings.CameraMotion switch
+        {
+            CameraMotionLevel.Reduced => 0.35f,
+            CameraMotionLevel.Off => 0f,
+            _ => 1f
+        };
         _phaseTime += deltaTime;
         _presentation.Update(deltaTime, _phase);
         _audio.Update(deltaTime);
@@ -452,12 +465,18 @@ public sealed partial class GameWorld : IDisposable
         }
 
         _menu.Tick(deltaTime);
+        if (input.WasKeyPressed(Keys.Escape) && _menu.IsSettingsPage)
+        {
+            _menu.GoBack();
+            _settingsChanged?.Invoke(_settings);
+            return;
+        }
         if (!_menu.AcceptsInput)
         {
             return;
         }
 
-        IReadOnlyList<Rectangle> bounds = _presentation.GetMenuEntryBounds(viewport, _menu.CurrentPage);
+        IReadOnlyList<Rectangle> bounds = _presentation.GetMenuEntryBounds(viewport, _menu.CurrentPage, _menu);
 
         if (input.MouseMoved)
         {
@@ -480,6 +499,11 @@ public sealed partial class GameWorld : IDisposable
             _menu.MoveSelection(1);
         }
 
+        bool valueChanged = false;
+        if (input.WasKeyPressed(Keys.Left) || input.WasKeyPressed(Keys.A)) valueChanged = _menu.AdjustSelectedValue(-1);
+        else if (input.WasKeyPressed(Keys.Right) || input.WasKeyPressed(Keys.D)) valueChanged = _menu.AdjustSelectedValue(1);
+        if (valueChanged) ApplySettingsChanges();
+
         bool confirmedByKeyboard = input.WasKeyPressed(Keys.Enter);
         bool confirmedByMouse = false;
         if (input.WasLeftMousePressed)
@@ -489,6 +513,12 @@ public sealed partial class GameWorld : IDisposable
                 if (bounds[i].Contains(input.MouseVirtualPosition))
                 {
                     _menu.SetHoverIndex(i);
+                    if (_menu.CurrentPage.Entries[i].Id is MenuEntryId.OptionalHints or MenuEntryId.Fullscreen or MenuEntryId.CameraMotion or MenuEntryId.MasterVolume or MenuEntryId.MusicVolume or MenuEntryId.EffectsVolume)
+                    {
+                        _menu.AdjustSelectedValue(input.MouseVirtualPosition.X < viewport.Width * 0.5f ? -1 : 1);
+                        ApplySettingsChanges();
+                        return;
+                    }
                     confirmedByMouse = true;
                     break;
                 }
@@ -509,8 +539,22 @@ public sealed partial class GameWorld : IDisposable
             case MenuActionResult.Quit:
                 QuitRequested = true;
                 break;
+            case MenuActionResult.SettingsChanged:
+                ApplySettingsChanges();
+                break;
         }
     }
+
+    private void ApplySettingsChanges()
+    {
+        ApplyAudioSettings();
+        _settingsChanged?.Invoke(_settings);
+    }
+
+    private void ApplyAudioSettings() => _audio.SetVolumes(
+        _settings.MasterVolume / 100f,
+        _settings.MusicVolume / 100f,
+        _settings.EffectsVolume / 100f);
 
     public void Dispose()
     {
@@ -740,7 +784,7 @@ public sealed partial class GameWorld : IDisposable
                 _hud.Draw(batch, pixel, viewport, _player);
             }
 
-            ProloguePresentation.DrawOverlay(batch, pixel, viewport, _prologue, _player.IsDead);
+            ProloguePresentation.DrawOverlay(batch, pixel, viewport, _prologue, _player.IsDead, _settings.OptionalHints);
         }
         else
         {

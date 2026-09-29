@@ -275,13 +275,13 @@ public sealed class CinematicPresentation
     /// with the exact same constants <see cref="DrawMenuList"/> draws with so
     /// hover/click detection matches what is on screen.
     /// </summary>
-    public IReadOnlyList<Rectangle> GetMenuEntryBounds(Viewport viewport, MenuPage page)
+    public IReadOnlyList<Rectangle> GetMenuEntryBounds(Viewport viewport, MenuPage page, MenuController? menu = null)
     {
         List<Rectangle> bounds = new(page.Entries.Count);
         float centerX = viewport.Width * 0.5f;
         for (int i = 0; i < page.Entries.Count; i++)
         {
-            int width = PixelText.Measure(page.Entries[i].Label, MenuEntryScale);
+            int width = PixelText.Measure(menu?.GetLabel(page.Entries[i]) ?? page.Entries[i].Label, MenuEntryScale);
             int height = 7 * MenuEntryScale;
             float y = viewport.Height * MenuStartYFraction + i * MenuEntrySpacing;
             float x = centerX - width * 0.5f;
@@ -305,11 +305,11 @@ public sealed class CinematicPresentation
             Color baseColor = entries[i].IsPlaceholder ? GameBalance.SoulWhite * 0.42f : GameBalance.SoulWhite * 0.72f;
             Color color = selected ? GameBalance.DeathFlameBright : baseColor;
             float breathe = selected ? 0.85f + MathF.Sin(_titleTime * 3f) * 0.15f : 1f;
-            PixelText.DrawCentered(batch, pixel, entries[i].Label, centerX, y, MenuEntryScale, color * (reveal * breathe));
+            PixelText.DrawCentered(batch, pixel, menu.GetLabel(entries[i]), centerX, y, MenuEntryScale, color * (reveal * breathe));
 
             if (selected)
             {
-                int width = PixelText.Measure(entries[i].Label, MenuEntryScale);
+                int width = PixelText.Measure(menu.GetLabel(entries[i]), MenuEntryScale);
                 DrawSelectionMarker(batch, pixel, new Vector2(centerX - width * 0.5f - 16f, y + 10f), GameBalance.DeathFlameBright * reveal);
             }
         }

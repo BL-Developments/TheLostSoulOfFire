@@ -1,4 +1,5 @@
 using TheLostSoulOfFire.Menu;
+using TheLostSoulOfFire.Game;
 
 namespace TheLostSoulOfFire.Tests;
 
@@ -18,6 +19,43 @@ public sealed class MenuControllerTests
     }
 
     [TestMethod]
+    public void SettingsPages_OpenAndReturn_AndPlaceholdersStayInert()
+    {
+        MenuController menu = new();
+        menu.Open();
+        menu.MoveSelection(2);
+        menu.Confirm();
+        Assert.AreEqual(MenuPages.Settings.Id, menu.CurrentPage.Id);
+        Assert.AreEqual(6, menu.CurrentPage.Entries.Count);
+        menu.SetHoverIndex(3);
+        menu.Confirm();
+        Assert.AreEqual(MenuPages.Settings.Id, menu.CurrentPage.Id);
+        menu.SetHoverIndex(1);
+        menu.Confirm();
+        Assert.AreEqual(MenuPages.Graphics.Id, menu.CurrentPage.Id);
+        Assert.IsTrue(menu.GoBack());
+        Assert.AreEqual(MenuPages.Settings.Id, menu.CurrentPage.Id);
+    }
+
+    [TestMethod]
+    public void SettingAdjustments_RespectTheirRangesAndDisplayCurrentValues()
+    {
+        GameSettings settings = new();
+        MenuController menu = new(settings);
+        menu.Open();
+        menu.SetHoverIndex(2);
+        menu.Confirm();
+        menu.SetHoverIndex(2);
+        menu.Confirm();
+        menu.SetHoverIndex(2);
+        for (int i = 0; i < 12; i++) menu.AdjustSelectedValue(1);
+        Assert.AreEqual(100, settings.EffectsVolume);
+        Assert.AreEqual("EFFEKTE: 100%", menu.GetLabel(menu.CurrentPage.Entries[2]));
+        for (int i = 0; i < 15; i++) menu.AdjustSelectedValue(-1);
+        Assert.AreEqual(0, settings.EffectsVolume);
+    }
+
+    [TestMethod]
     public void Close_ClearsStack()
     {
         MenuController menu = new();
@@ -26,6 +64,7 @@ public sealed class MenuControllerTests
         menu.Close();
 
         Assert.IsFalse(menu.IsOpen);
+        Assert.IsFalse(menu.IsSettingsPage);
     }
 
     [TestMethod]

@@ -14,7 +14,19 @@ public enum MenuEntryId
     Quit,
     NewGame,
     LoadGame,
-    Back
+    Back,
+    Achievements,
+    Gameplay,
+    Graphics,
+    Audio,
+    Controls,
+    Accessibility,
+    OptionalHints,
+    Fullscreen,
+    CameraMotion,
+    MasterVolume,
+    MusicVolume,
+    EffectsVolume
 }
 
 /// <summary>
@@ -62,7 +74,8 @@ public static class MenuPages
     {
         new MenuEntry(MenuEntryId.Singleplayer, "EINZELSPIELER"),
         new MenuEntry(MenuEntryId.Multiplayer, "MEHRSPIELER", isPlaceholder: true),
-        new MenuEntry(MenuEntryId.Settings, "EINSTELLUNGEN", isPlaceholder: true),
+        new MenuEntry(MenuEntryId.Settings, "EINSTELLUNGEN"),
+        new MenuEntry(MenuEntryId.Achievements, "ERRUNGENSCHAFTEN UND STATISTIKEN", isPlaceholder: true),
         new MenuEntry(MenuEntryId.Quit, "BEENDEN")
     });
 
@@ -70,6 +83,37 @@ public static class MenuPages
     {
         new MenuEntry(MenuEntryId.NewGame, "NEUES SPIEL"),
         new MenuEntry(MenuEntryId.LoadGame, "SPIEL LADEN", isPlaceholder: true),
+        new MenuEntry(MenuEntryId.Back, "ZURÜCK")
+    });
+
+    public static readonly MenuPage Settings = new("settings", new[]
+    {
+        new MenuEntry(MenuEntryId.Gameplay, "GAMEPLAY"),
+        new MenuEntry(MenuEntryId.Graphics, "GRAFIK"),
+        new MenuEntry(MenuEntryId.Audio, "AUDIO"),
+        new MenuEntry(MenuEntryId.Controls, "STEUERUNG", isPlaceholder: true),
+        new MenuEntry(MenuEntryId.Accessibility, "BARRIEREFREIHEIT", isPlaceholder: true),
+        new MenuEntry(MenuEntryId.Back, "ZURÜCK")
+    });
+
+    public static readonly MenuPage Gameplay = new("settings_gameplay", new[]
+    {
+        new MenuEntry(MenuEntryId.OptionalHints, "OPTIONALE HINWEISE"),
+        new MenuEntry(MenuEntryId.Back, "ZURÜCK")
+    });
+
+    public static readonly MenuPage Graphics = new("settings_graphics", new[]
+    {
+        new MenuEntry(MenuEntryId.Fullscreen, "VOLLBILD"),
+        new MenuEntry(MenuEntryId.CameraMotion, "BILDBEWEGUNG"),
+        new MenuEntry(MenuEntryId.Back, "ZURÜCK")
+    });
+
+    public static readonly MenuPage Audio = new("settings_audio", new[]
+    {
+        new MenuEntry(MenuEntryId.MasterVolume, "GESAMTLAUTSTÄRKE"),
+        new MenuEntry(MenuEntryId.MusicVolume, "MUSIK"),
+        new MenuEntry(MenuEntryId.EffectsVolume, "EFFEKTE"),
         new MenuEntry(MenuEntryId.Back, "ZURÜCK")
     });
 }

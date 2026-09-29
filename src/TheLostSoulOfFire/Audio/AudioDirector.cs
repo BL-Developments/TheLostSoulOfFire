@@ -107,6 +107,9 @@ public sealed class AudioDirector : IDisposable
     private float _duckAmount;
     private uint _random = 0xA17D3C5Bu;
     private bool _available = true;
+    private float _masterVolume = 1f;
+    private float _musicVolume = 1f;
+    private float _effectsVolume = 1f;
 
     public int FallbackSoundCount => _ownedFallbackSounds.Count;
     public bool MusicPlaying => _musicPlaying && MediaPlayer.State == MediaState.Playing;
@@ -188,6 +191,15 @@ public sealed class AudioDirector : IDisposable
         ApplyMix();
     }
 
+    public void SetVolumes(float master, float music, float effects)
+    {
+        _masterVolume = Math.Clamp(master, 0f, 1f);
+        _musicVolume = Math.Clamp(music, 0f, 1f);
+        _effectsVolume = Math.Clamp(effects, 0f, 1f);
+        try { SoundEffect.MasterVolume = _masterVolume * _effectsVolume; } catch { }
+        ApplyMix();
+    }
+
     public void Play(AudioCue cue, float volume = 1f, float pitch = 0f)
     {
         if (!_available || !_sounds.TryGetValue(cue, out SoundEffect sound))
@@ -253,6 +265,7 @@ public sealed class AudioDirector : IDisposable
     public void Dispose()
     {
         DisposeSounds();
+        try { SoundEffect.MasterVolume = 1f; } catch { }
         GC.SuppressFinalize(this);
     }
 
@@ -349,11 +362,11 @@ public sealed class AudioDirector : IDisposable
 
         if (_ambience is not null)
         {
-            _ambience.Volume = Math.Clamp(ambienceBase * (1f - _duckAmount * 0.72f), 0f, 1f);
+            _ambience.Volume = Math.Clamp(ambienceBase * _masterVolume * _effectsVolume * (1f - _duckAmount * 0.72f), 0f, 1f);
         }
         if (_musicPlaying)
         {
-            MediaPlayer.Volume = Math.Clamp(musicBase * (1f - _duckAmount * 0.62f), 0f, 1f);
+            MediaPlayer.Volume = Math.Clamp(musicBase * _masterVolume * _musicVolume * (1f - _duckAmount * 0.62f), 0f, 1f);
         }
     }
 
