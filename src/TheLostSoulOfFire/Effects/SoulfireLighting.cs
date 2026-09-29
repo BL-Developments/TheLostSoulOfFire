@@ -11,6 +11,25 @@ namespace TheLostSoulOfFire.Effects;
 
 public static class SoulfireLighting
 {
+    public static void DrawAntechamber(
+        SpriteBatch batch,
+        SoulfireRenderer renderer,
+        Matrix worldTransform,
+        Player player,
+        ParticleSystem particles,
+        SoulFurnaceAntechamber antechamber,
+        float presentationTime,
+        float soulSenseAmount,
+        float gateProgress)
+    {
+        renderer.BeginLighting(batch, worldTransform);
+        float breathe = 0.88f + MathF.Sin(presentationTime * 4.6f) * 0.12f;
+        antechamber.DrawLighting(batch, renderer, presentationTime, soulSenseAmount, gateProgress);
+        particles.DrawLighting(batch, renderer);
+        DrawPlayerEnergy(batch, renderer, player, presentationTime, soulSenseAmount, breathe);
+        batch.End();
+    }
+
     public static void Draw(
         SpriteBatch batch,
         SoulfireRenderer renderer,

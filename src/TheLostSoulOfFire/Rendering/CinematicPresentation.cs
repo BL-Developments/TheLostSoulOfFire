@@ -29,9 +29,9 @@ public sealed class CinematicPresentation
     public bool TransitionComplete => _stateTime >= _introDuration;
     public bool WaveTransitionComplete => _stateTime >= WaveTransitionDuration;
 
-    public void Update(float deltaTime, ArenaLoopState loopState)
+    public void Update(float deltaTime, GamePhase gamePhase)
     {
-        if (loopState == ArenaLoopState.Title)
+        if (gamePhase == GamePhase.Title)
         {
             _titleTime += deltaTime;
         }
@@ -39,6 +39,13 @@ public sealed class CinematicPresentation
         {
             _stateTime += deltaTime;
         }
+    }
+
+    public void ResetTitle()
+    {
+        _titleTime = 0f;
+        _stateTime = 0f;
+        _quickIntro = false;
     }
 
     public void BeginIntro(bool quick)
@@ -84,13 +91,7 @@ public sealed class CinematicPresentation
         float targetZoom = 1f;
         float followSpeed = 9f;
 
-        if (loopState == ArenaLoopState.Title)
-        {
-            target = arenaCenter + new Vector2(0f, -36f);
-            targetZoom = 0.9f;
-            followSpeed = 2.4f;
-        }
-        else if (playerDead)
+        if (playerDead)
         {
             target = playerPosition;
             targetZoom = 1.055f;
@@ -125,6 +126,7 @@ public sealed class CinematicPresentation
         SpriteBatch batch,
         Texture2D pixel,
         ArtAssets art,
+        GamePhase gamePhase,
         ArenaLoopState loopState,
         bool playerDead,
         Player player,
@@ -132,7 +134,7 @@ public sealed class CinematicPresentation
     {
         Vector2 center = combatBounds.Center.ToVector2();
 
-        if (loopState == ArenaLoopState.Title)
+        if (gamePhase == GamePhase.Title)
         {
             float reveal = Ease((_titleTime - 0.15f) / 1.1f);
             float breathe = 0.94f + MathF.Sin(_titleTime * 2.1f) * 0.04f;
@@ -145,6 +147,11 @@ public sealed class CinematicPresentation
                 0.54f * breathe,
                 Color.White * (0.72f * reveal));
             batch.DrawCircle(pixel, center + new Vector2(0f, -92f), 47f + breathe * 4f, GameBalance.DeathFlame * (0.12f * reveal), 2f, 28);
+            return;
+        }
+
+        if (gamePhase != GamePhase.Arena)
+        {
             return;
         }
 
@@ -182,14 +189,19 @@ public sealed class CinematicPresentation
         SpriteBatch batch,
         Texture2D pixel,
         Viewport viewport,
+        GamePhase gamePhase,
         ArenaLoopState loopState,
         bool playerDead,
         int waveNumber,
         MenuController menu)
     {
-        if (loopState == ArenaLoopState.Title)
+        if (gamePhase == GamePhase.Title)
         {
             DrawTitle(batch, pixel, viewport, menu);
+        }
+        else if (gamePhase != GamePhase.Arena)
+        {
+            return;
         }
         else if (playerDead)
         {
