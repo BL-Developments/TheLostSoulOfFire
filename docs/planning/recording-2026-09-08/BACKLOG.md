@@ -52,14 +52,14 @@ Abnahme: Aufnahme und bestehende Lore sind nachvollziehbar abgeglichen; Ressourc
 
 ID: `lore` · Kategorie: Lore & Story · Typ: design
 
-Die Aufnahme hat laut Owner bei Konflikten Vorrang. Vaelor wählt den Protagonisten aus und die Sense wird Startwaffe. Das widerspricht der bisherigen Ablehnung persönlicher Auswahl. Wiederholte Run-Niederlagen führen zur Homebase, während endgültige Warden-Zerstörung bisher den Übergang vollendet.
+Die Aufnahme hat laut Owner bei Konflikten Vorrang. Vaelor wählt den Protagonisten aus und die Sense wird Startwaffe. Das widerspricht der bisherigen Ablehnung persönlicher Auswahl. Beschluss vom 29.09.2026: Run-Niederlage bedeutet Kampfunfähigkeit mit Bergung vor endgültiger Zerstörung und Rückkehr zur Homebase; endgültiger Warden-Tod führt weiterhin ins Jenseits.
 
 Abnahme:
 
 - [ ] Entscheidungslog, Canon, Story Opening und betroffene Produkt-/Roadmaptexte konsistent auf die Aufnahme beziehen; lokale Zusammenfassung als Ausgangspunkt verwenden.
 - [ ] Auswahl durch Vaelor und Sense erhalten; Ursprung/Mechanik der Auswahl offen markieren. Gottstatus, Warden-Siegel und genaue Ortungsfähigkeit nicht daraus ableiten.
-- [ ] Run-Niederlage/Rückkehr gegenüber endgültigem Warden-Tod erzählerisch klären; die Rückkehr als festes Gameplayziel erhalten.
-- [ ] Eine Hauptwaffe statt dauerhaftem Doppelsystem und Verzicht auf Inventar/Loot festhalten; den bisherigen Sechs-Item-Soul-Echo-Plan ersetzen oder als Fähigkeiten neu fassen.
+- [ ] Bergung vor endgültiger Zerstörung und Rückkehr nach Run-Niederlage in Canon und Story konsistent festhalten; konkrete Inszenierung offenlassen.
+- [ ] Eine Hauptwaffe statt dauerhaftem Doppelsystem und Verzicht auf Inventar/Loot festhalten; den Sechs-Item-Soul-Echo-Plan streichen. Einzelne Effekte können später als Fähigkeiten oder Waffenfortschritt neu entstehen.
 - [ ] Lost Souls bleiben tragische Menschen; Release und Besiegen bleiben getrennt. Bruder als Spieler 2, unbekannter Keeper und Soulfire Gothic bleiben erhalten.
 
 Abhängigkeiten: keine vorgelagerte Arbeitsaufgabe.
@@ -176,7 +176,7 @@ Abnahme:
 - [ ] Biom 2 / Level 3 → Niederlage → Homebase → Biom 2 / Level 1 deterministisch nachweisen.
 - [ ] Freigeschaltetes Biom 3 direkt starten können, ohne Biom 1/2 erneut zu spielen.
 - [ ] Vorhandene Prolog-Sektor-Retries und Debugsprünge ausdrücklich vom regulären Run-Verhalten abgrenzen.
-- [ ] Solo-Niederlage und vollständige Team-Niederlage sauber abschließen; keine ungerechtfertigten Level- oder Ressourcenreste behalten.
+- [ ] Solo-Niederlage und vollständige Team-Niederlage als Kampfunfähigkeit mit Bergung durch andere Wardens vor endgültigem Warden-Tod abschließen; keine ungerechtfertigten Level- oder Ressourcenreste behalten. Die konkrete Bergungsinszenierung bleibt offen.
 
 Abhängigkeiten: [Homebase als spielbaren Ort für Vorbereitung und Run-Start ausbauen](#hub); [Dauerhafte Profile, gesicherte Ressourcen und Freischaltungen speichern](#save).
 

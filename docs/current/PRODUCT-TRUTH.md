@@ -7,9 +7,10 @@ conflicts. See [`DECISION-LOG.md`](DECISION-LOG.md) and
 [`RECORDING-SUMMARY-2026-09-08.md`](RECORDING-SUMMARY-2026-09-08.md).
 The current runtime remains the baseline; regular runs now target one selected
 main weapon, a three-offer/two-choice ability draft, a persistent hub and
-bankable release resources. The six-item proof below is superseded as an
-inventory/loot direction; useful effects must be reframed as abilities or
-weapon progression. This is a planned direction, not implemented gameplay.
+bankable release resources. The six-item Soul Echo proof is cancelled; useful
+effects may later be redesigned as abilities or weapon progression, without an
+item count or loot inventory. A lost run ends with rescue before final Warden
+death and return to the hub. This is a planned direction, not implemented gameplay.
 
 ## Game identity
 
@@ -41,8 +42,7 @@ Build in this order:
 1. one 60–90 second gold-standard encounter in the current arena;
 2. a local two-player brother proof in the same room;
 3. an 8–12 minute Death Layer prologue across three authored sectors;
-4. a minimal six-item Soul Echo proof;
-5. an AI-assisted content factory based on the approved quality bar.
+4. an AI-assisted content factory based on the approved quality bar.
 
 ## Quality bar
 

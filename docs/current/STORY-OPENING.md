@@ -54,6 +54,11 @@ Dies ist eine belastbare Story-Spine, keine gesperrte Szenenliste.
 
 Neue Wardens erscheinen nach ihrer seltenen Resonanz nicht an einem zentralen Tor. Ihre Manifestationsorte in der Death Layer sind unvorhersehbar.
 
+Diese erste Bergung ist vom späteren Run-Verhalten zu unterscheiden: Bei einer
+regulären Run-Niederlage bergen andere Wardens den kampfunfähigen Warden vor
+seiner endgültigen Zerstörung und bringen ihn zur Homebase. Wie das in Solo
+und Koop gezeigt wird, ist noch offen.
+
 Vaelor weiß nicht genau, wo sie auftauchen. Möglich ist, dass er oder andere Wardens eine Resonanzwelle, Störung oder ein Echo bemerken und daraus ein Suchgebiet ableiten. Suchtrupps müssen den neuen Warden anschließend bergen.
 
 Wichtig für die bestehende Kosmologie:

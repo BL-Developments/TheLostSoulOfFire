@@ -2,6 +2,19 @@
 
 Record owner-approved, rejected or revised product decisions here. Newer dated entries override older conflicting entries.
 
+## 2026-09-29 — Run-Niederlage und Soul-Echo-Plan
+
+- Eine reguläre Run-Niederlage bedeutet Kampfunfähigkeit. Andere Wardens bergen
+  die Unterlegenen vor der endgültigen Zerstörung und bringen sie zur Homebase.
+  Im Koop kann der Bruder an der Bergung beteiligt sein; auch eine vollständige
+  Team-Niederlage bleibt ein verlorener Run mit Rückkehr. Die genaue Inszenierung
+  der Bergung ist offen. Verlorene Runs sind kein endgültiger Warden-Tod.
+- Erst die endgültige Zerstörung eines Wardens vollendet den Übergang ins wahre
+  Jenseits. Die bestehende Kosmologie bleibt dafür gültig.
+- Der Sechs-Item-Soul-Echo-Proof entfällt als Produktziel. Einzelne brauchbare
+  Effekte dürfen später als Fähigkeiten oder Waffenfortschritt neu entworfen
+  werden; daraus folgt weder ein Inventar noch eine Pflicht zu sechs Effekten.
+
 ## 2026-09-08 — Owner direction: Konzeptaufnahme hat Vorrang
 
 Quelle: vom Owner bereitgestelltes undatiertes Gesprächstranskript, ausgewertet

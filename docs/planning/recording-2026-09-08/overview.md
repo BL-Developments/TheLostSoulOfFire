@@ -19,8 +19,8 @@ Auswertung des vom Owner bereitgestellten Gesprächstranskripts, importiert am *
 |---|---|
 | Vaelor wählt Wardens nicht persönlich aus | Auswahl und Sense-Szene aus der Aufnahme übernehmen; metaphysischer Mechanismus bleibt offen. Kein Gottstatus oder Siegel daraus ableiten. |
 | Scythe und Cannon gleichzeitig verfügbar | Eine Hauptwaffe pro regulärem Run wählen; vorhandene Systeme als Loadouts weiterverwenden. |
-| Geplanter Sechs-Item-Soul-Echo-Proof | Durch Fähigkeiten-/Waffenfortschritt ersetzen oder passend neu fassen; kein Loot-Inventar. |
-| Endgültige Warden-Zerstörung führt ins Jenseits | Wiederholte Run-Niederlage führt zur Homebase; Niederlage/Bergung versus endgültigen Tod klären. |
+| Geplanter Sechs-Item-Soul-Echo-Proof | Nach Beschluss vom 29.09.2026 gestrichen; einzelne Effekte können später als Fähigkeiten oder Waffenfortschritt neu entstehen, ohne Inventar oder feste Anzahl. |
+| Endgültige Warden-Zerstörung führt ins Jenseits | Nach Beschluss vom 29.09.2026 ist Run-Niederlage Kampfunfähigkeit mit Bergung vor endgültiger Zerstörung und Rückkehr zur Homebase. Endgültiger Warden-Tod bleibt der Übergang ins Jenseits. |
 | Prolog wiederholt einzelne Sektoren | Reguläre Biom-Runs starten nach Ende/Niederlage bei Level 1 des gewählten Bioms. |
 | Bestehender gemeinsamer TeamResonance-Pool | Besitz und Ausgaben der neuen Währungen, Ultimate und Meta-Fortschritt ausdrücklich neu definieren. |
 

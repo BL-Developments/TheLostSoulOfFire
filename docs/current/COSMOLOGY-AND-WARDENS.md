@@ -80,6 +80,10 @@ Ein Warden:
 
 Wenn ein Warden stirbt, gibt es keine zweite Zwischenexistenz. Die Death Flame vollendet ihren ursprünglichen Zweck, und die Seele geht ins wahre Jenseits.
 
+Eine reguläre Run-Niederlage ist keine solche Zerstörung: Der Warden wird
+kampfunfähig und vor dem endgültigen Tod durch andere Wardens geborgen. Wie
+diese Bergung im Einzelfall gezeigt wird, bleibt offen.
+
 **WORKING CANON:** Ein Warden kann außerdem bewusst aufhören, die eigene Form zu stabilisieren, wenn seine Zeit in der Übergangsebene erfüllt ist. Das ist ein friedlicher Abschluss des Übergangs und soll erzählerisch nicht wie gewöhnlicher Suizid behandelt werden.
 
 ## 5. Zweck der Wardens — CANON
