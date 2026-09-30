@@ -11,7 +11,8 @@ public static class ProloguePresentation
         Texture2D pixel,
         Viewport viewport,
         PrologueDirector prologue,
-        bool playerDead)
+        bool playerDead,
+        bool optionalHints = true)
     {
         if (playerDead)
         {
@@ -30,6 +31,9 @@ public static class ProloguePresentation
             float alpha = prologue.SectorTime < 2.2f ? 1f : MathHelper.Clamp((3.1f - prologue.SectorTime) / 0.9f, 0f, 1f);
             PixelText.DrawCentered(batch, pixel, prologue.SectorTitle, viewport.Width * 0.5f, 64f, 2, GameBalance.SoulWhite * alpha);
         }
+
+        if (optionalHints && prologue.Stage is not (PrologueStage.Arrival or PrologueStage.Complete))
+            PixelText.DrawCentered(batch, pixel, "WASD MOVE  MOUSE ATTACK", viewport.Width * 0.5f, 38f, 1, new Color(173, 161, 194) * 0.72f);
 
         string story = prologue.StoryLine;
         if (!string.IsNullOrEmpty(story))

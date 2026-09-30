@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TheLostSoulOfFire.Game;
 
 namespace TheLostSoulOfFire.Menu;
 
@@ -10,6 +11,7 @@ namespace TheLostSoulOfFire.Menu;
 public enum MenuActionResult
 {
     None,
+    SettingsChanged,
     NewGame,
     Quit
 }
@@ -31,6 +33,10 @@ public sealed class MenuController
     private readonly Stack<MenuPage> _pages = new();
     private int _selectedIndex;
     private float _openTimer;
+
+    public GameSettings Settings { get; }
+
+    public MenuController(GameSettings? settings = null) => Settings = settings ?? new GameSettings();
 
     public bool IsOpen => _pages.Count > 0;
     public MenuPage CurrentPage => _pages.Peek();
@@ -82,9 +88,29 @@ public sealed class MenuController
             case MenuEntryId.Singleplayer:
                 Push(MenuPages.Singleplayer);
                 return MenuActionResult.None;
-            case MenuEntryId.Back:
-                Pop();
+            case MenuEntryId.Settings:
+                Push(MenuPages.Settings);
                 return MenuActionResult.None;
+            case MenuEntryId.Gameplay:
+                Push(MenuPages.Gameplay);
+                return MenuActionResult.None;
+            case MenuEntryId.Graphics:
+                Push(MenuPages.Graphics);
+                return MenuActionResult.None;
+            case MenuEntryId.Audio:
+                Push(MenuPages.Audio);
+                return MenuActionResult.None;
+            case MenuEntryId.Back:
+                GoBack();
+                return MenuActionResult.None;
+            case MenuEntryId.OptionalHints:
+            case MenuEntryId.Fullscreen:
+            case MenuEntryId.CameraMotion:
+            case MenuEntryId.MasterVolume:
+            case MenuEntryId.MusicVolume:
+            case MenuEntryId.EffectsVolume:
+                AdjustSelectedValue(1);
+                return MenuActionResult.SettingsChanged;
             case MenuEntryId.NewGame:
                 return MenuActionResult.NewGame;
             case MenuEntryId.Quit:
@@ -93,6 +119,45 @@ public sealed class MenuController
                 return MenuActionResult.None;
         }
     }
+
+    public bool IsSettingsPage => IsOpen && CurrentPage.Id.StartsWith("settings", System.StringComparison.Ordinal);
+
+    public bool GoBack()
+    {
+        if (_pages.Count <= 1) return false;
+        _pages.Pop();
+        _selectedIndex = 0;
+        return true;
+    }
+
+    public bool AdjustSelectedValue(int direction)
+    {
+        MenuEntryId id = CurrentPage.Entries[_selectedIndex].Id;
+        switch (id)
+        {
+            case MenuEntryId.OptionalHints: Settings.OptionalHints = !Settings.OptionalHints; break;
+            case MenuEntryId.Fullscreen: Settings.Fullscreen = !Settings.Fullscreen; break;
+            case MenuEntryId.CameraMotion:
+                Settings.CameraMotion = (CameraMotionLevel)(((int)Settings.CameraMotion + (direction > 0 ? 1 : 2)) % 3);
+                break;
+            case MenuEntryId.MasterVolume: Settings.MasterVolume = System.Math.Clamp(Settings.MasterVolume + direction * 10, 0, 100); break;
+            case MenuEntryId.MusicVolume: Settings.MusicVolume = System.Math.Clamp(Settings.MusicVolume + direction * 10, 0, 100); break;
+            case MenuEntryId.EffectsVolume: Settings.EffectsVolume = System.Math.Clamp(Settings.EffectsVolume + direction * 10, 0, 100); break;
+            default: return false;
+        }
+        return true;
+    }
+
+    public string GetLabel(MenuEntry entry) => entry.Id switch
+    {
+        MenuEntryId.OptionalHints => $"OPTIONALE HINWEISE: {(Settings.OptionalHints ? "AN" : "AUS")}",
+        MenuEntryId.Fullscreen => $"VOLLBILD: {(Settings.Fullscreen ? "AN" : "AUS")}",
+        MenuEntryId.CameraMotion => $"BILDBEWEGUNG: {Settings.CameraMotion.ToString().ToUpperInvariant()}",
+        MenuEntryId.MasterVolume => $"GESAMTLAUTSTÄRKE: {Settings.MasterVolume}%",
+        MenuEntryId.MusicVolume => $"MUSIK: {Settings.MusicVolume}%",
+        MenuEntryId.EffectsVolume => $"EFFEKTE: {Settings.EffectsVolume}%",
+        _ => entry.Label
+    };
 
     private void Push(MenuPage page)
     {
