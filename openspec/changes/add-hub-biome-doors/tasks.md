@@ -24,4 +24,4 @@
 
 - [x] 4.1 `AntechamberFlowTests` und `PrologueFlowTests` auf Türen umstellen und Tests für Sperrzustand, Zonen und wirkungsloses `E` an versiegelten Türen ergänzen
 - [ ] 4.2 Antechamber-Visual-Test in `Game1` auf Tür I umstellen und Screenshots für Hub, versiegelten Hinweis und Eintritt prüfen
-- [ ] 4.3 Build und alle Tests grün
+- [x] 4.3 Build und alle Tests grün
