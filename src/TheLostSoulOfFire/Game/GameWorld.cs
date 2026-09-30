@@ -34,7 +34,7 @@ public enum ArenaLoopState
 
 public sealed partial class GameWorld : IDisposable
 {
-    private const float GateTransitionDuration = 1.35f;
+    private const float DoorTransitionDuration = 1.35f;
     private readonly Arena _arena = new();
     private readonly SoulFurnaceAntechamber _antechamber = new();
     private readonly AudioDirector _audio;
@@ -96,8 +96,8 @@ public sealed partial class GameWorld : IDisposable
     public bool CombatActionsEnabled => GameFlowRules.AllowsCombat(_phase) &&
         !_player.IsDead && _loopState is ArenaLoopState.Combat or ArenaLoopState.Transition;
 
-    private float GateTransitionProgress => _phase == GamePhase.EnteringArena
-        ? MathHelper.Clamp(_phaseTime / GateTransitionDuration, 0f, 1f)
+    private float DoorTransitionProgress => _phase == GamePhase.EnteringArena
+        ? MathHelper.Clamp(_phaseTime / DoorTransitionDuration, 0f, 1f)
         : 0f;
 
     public string WindowTitle => _debugVisible
@@ -194,7 +194,7 @@ public sealed partial class GameWorld : IDisposable
 
         if (_phase == GamePhase.EnteringArena)
         {
-            UpdateGateTransition(deltaTime, viewport);
+            UpdateDoorTransition(deltaTime, viewport);
             return;
         }
 
@@ -566,11 +566,11 @@ public sealed partial class GameWorld : IDisposable
 
     internal void SetAutomatedSoulSense(bool active) => _forceSoulSense = active;
 
-    internal void RequestAutomatedGateEntry()
+    internal void RequestAutomatedDoorEntry()
     {
         if (_phase == GamePhase.Antechamber)
         {
-            BeginGateTransition();
+            BeginDoorTransition();
         }
     }
 
@@ -618,7 +618,7 @@ public sealed partial class GameWorld : IDisposable
                 pixel,
                 _presentationTime,
                 _soulSensePresentation.SoulEmergence,
-                GateTransitionProgress,
+                DoorTransitionProgress,
                 _debugVisible);
             _player.DrawAfterimages(batch, pixel);
         }
@@ -726,7 +726,7 @@ public sealed partial class GameWorld : IDisposable
                 _antechamber,
                 _presentationTime,
                 _soulSensePresentation.SoulEmergence,
-                GateTransitionProgress);
+                DoorTransitionProgress);
             return;
         }
 
@@ -824,21 +824,25 @@ public sealed partial class GameWorld : IDisposable
             2,
             GameBalance.SoulWhite * (0.7f * placeAlpha));
 
-        if (_phase == GamePhase.Antechamber && _antechamber.IsPlayerAtGate(_player.Position))
+        HubDoor? nearbyDoor = _phase == GamePhase.Antechamber ? _antechamber.DoorAt(_player.Position) : null;
+        if (nearbyDoor is not null)
         {
             float pulse = 0.68f + MathF.Sin(_presentationTime * 4f) * 0.14f;
-            int promptWidth = 386;
+            string prompt = nearbyDoor.Prompt;
+            int textScale = PixelText.Measure(prompt, 2) + 48 <= viewport.Width ? 2 : 1;
+            int promptWidth = PixelText.Measure(prompt, textScale) + 48;
             Rectangle panel = new((viewport.Width - promptWidth) / 2, viewport.Height - 104, promptWidth, 48);
+            Color accent = nearbyDoor.IsSealed ? GameBalance.DeepViolet : GameBalance.DeathFlame;
             batch.FillRectangle(pixel, panel, Color.Black * 0.72f);
-            batch.DrawRectangle(pixel, panel, GameBalance.DeathFlame * (0.52f * pulse), 2f);
+            batch.DrawRectangle(pixel, panel, accent * (0.52f * pulse), 2f);
             PixelText.DrawCentered(
                 batch,
                 pixel,
-                "E  ENTER THE SOUL FURNACE",
+                prompt,
                 centerX,
-                panel.Y + 16f,
-                2,
-                GameBalance.SoulWhite * pulse);
+                panel.Y + 24f - textScale * 3.5f,
+                textScale,
+                GameBalance.SoulWhite * (nearbyDoor.IsSealed ? 0.72f : pulse));
         }
 
         if (_phase != GamePhase.EnteringArena)
@@ -846,12 +850,12 @@ public sealed partial class GameWorld : IDisposable
             return;
         }
 
-        float progress = GateTransitionProgress;
+        float progress = DoorTransitionProgress;
         int barHeight = (int)MathHelper.Lerp(18f, 58f, Ease(progress));
         batch.FillRectangle(pixel, new Rectangle(0, 0, viewport.Width, barHeight), Color.Black * 0.9f);
         batch.FillRectangle(pixel, new Rectangle(0, viewport.Height - barHeight, viewport.Width, barHeight), Color.Black * 0.9f);
         float labelAlpha = Ease(progress / 0.35f) * (1f - Ease((progress - 0.68f) / 0.25f));
-        PixelText.DrawCentered(batch, pixel, "THE GATE AWAKENS", centerX, viewport.Height * 0.78f, 2, GameBalance.DeathFlameBright * labelAlpha);
+        PixelText.DrawCentered(batch, pixel, "THE DOOR AWAKENS", centerX, viewport.Height * 0.78f, 2, GameBalance.DeathFlameBright * labelAlpha);
         float fade = Ease((progress - 0.72f) / 0.28f);
         batch.FillRectangle(pixel, viewport.Bounds, Color.Black * fade);
     }
@@ -1051,18 +1055,19 @@ public sealed partial class GameWorld : IDisposable
 
         float smoothing = 1f - MathF.Exp(-deltaTime * 6.5f);
         _camera.Zoom = MathHelper.Lerp(_camera.Zoom, 1f, smoothing);
-        Vector2 target = Vector2.Lerp(_player.Position, _antechamber.GateCenter, 0.11f) + new Vector2(70f, -22f);
+        Vector2 target = Vector2.Lerp(_player.Position, _antechamber.EntryDoorCenter, 0.11f) + new Vector2(0f, -40f);
         _camera.Follow(target, _antechamber.Bounds, viewport, smoothing);
 
-        if (_antechamber.IsPlayerAtGate(_player.Position) && input.WasKeyPressed(Keys.E))
+        HubDoor? door = _antechamber.DoorAt(_player.Position);
+        if (door is { IsSealed: false } && input.WasKeyPressed(Keys.E))
         {
-            BeginGateTransition();
+            BeginDoorTransition();
         }
     }
 
-    private void BeginGateTransition()
+    private void BeginDoorTransition()
     {
-        _phase = GameFlowRules.EnterGate(_phase);
+        _phase = GameFlowRules.EnterDoor(_phase);
         _phaseTime = 0f;
         _player.SettleForCompletion();
         _soulSensePresentation.Reset();
@@ -1072,21 +1077,21 @@ public sealed partial class GameWorld : IDisposable
         _audio.Play(AudioCue.TitleConfirm, 0.48f, -0.14f);
     }
 
-    private void UpdateGateTransition(float deltaTime, Viewport viewport)
+    private void UpdateDoorTransition(float deltaTime, Viewport viewport)
     {
         _soulSensePresentation.Update(deltaTime, false);
         _particles.Update(deltaTime);
 
-        float eased = Ease(GateTransitionProgress);
+        float eased = Ease(DoorTransitionProgress);
         float smoothing = 1f - MathF.Exp(-deltaTime * 7f);
         _camera.Zoom = MathHelper.Lerp(_camera.Zoom, MathHelper.Lerp(1f, 0.88f, eased), smoothing);
         _camera.Follow(
-            Vector2.Lerp(_player.Position, _antechamber.GateCenter + new Vector2(75f, -30f), eased),
+            Vector2.Lerp(_player.Position, _antechamber.EntryDoorCenter + new Vector2(0f, 90f), eased),
             _antechamber.Bounds,
             viewport,
             smoothing);
 
-        if (_phaseTime >= GateTransitionDuration)
+        if (_phaseTime >= DoorTransitionDuration)
         {
             EnterArena(viewport);
         }
@@ -1095,7 +1100,7 @@ public sealed partial class GameWorld : IDisposable
     private void EnterArena(Viewport viewport)
     {
         ClearRunState();
-        _phase = GameFlowRules.FinishGateTransition(_phase);
+        _phase = GameFlowRules.FinishDoorTransition(_phase);
         _phaseTime = 0f;
         _loopState = ArenaLoopState.Intro;
         _player.Reset(_arena.CombatBounds.Center.ToVector2());

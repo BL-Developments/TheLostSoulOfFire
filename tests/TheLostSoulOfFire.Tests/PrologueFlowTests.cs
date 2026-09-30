@@ -9,7 +9,7 @@ namespace TheLostSoulOfFire.Tests;
 public sealed class PrologueFlowTests
 {
     [TestMethod]
-    public void NewGameRunsPrologueThenAntechamberThenGateToArena()
+    public void NewGameRunsPrologueThenAntechamberThenDoorToArena()
     {
         GamePhase phase = GameFlowRules.ConfirmTitle(GamePhase.Title);
         Assert.AreEqual(GamePhase.Prologue, phase);
@@ -17,8 +17,8 @@ public sealed class PrologueFlowTests
         phase = GameFlowRules.FinishPrologue(phase);
         Assert.AreEqual(GamePhase.Antechamber, phase);
 
-        phase = GameFlowRules.EnterGate(phase);
-        phase = GameFlowRules.FinishGateTransition(phase);
+        phase = GameFlowRules.EnterDoor(phase);
+        phase = GameFlowRules.FinishDoorTransition(phase);
         Assert.AreEqual(GamePhase.Arena, phase);
     }
 

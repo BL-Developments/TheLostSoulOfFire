@@ -277,7 +277,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
 
         if (_world.Phase == GamePhase.Antechamber)
         {
-            _world.RequestAutomatedGateEntry();
+            _world.RequestAutomatedDoorEntry();
             return;
         }
 

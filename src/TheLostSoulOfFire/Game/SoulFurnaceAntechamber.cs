@@ -1,63 +1,158 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TheLostSoulOfFire.Rendering;
 
 namespace TheLostSoulOfFire.Game;
 
+public enum HubDoorKind
+{
+    Biome,
+    Final
+}
+
 /// <summary>
-/// Authored exploration room before the combat arena. The room deliberately has
-/// no interior collision so the player can read the gate and the left-to-right
-/// route immediately.
+/// One door of the hub. The sealed flag is the hook for the later unlock logic;
+/// for now it is fixed when the room is created.
+/// </summary>
+public sealed class HubDoor
+{
+    public HubDoor(HubDoorKind kind, int biomeNumber, Rectangle bounds, Rectangle interactionZone, bool isSealed)
+    {
+        Kind = kind;
+        BiomeNumber = biomeNumber;
+        Bounds = bounds;
+        InteractionZone = interactionZone;
+        IsSealed = isSealed;
+    }
+
+    public HubDoorKind Kind { get; }
+    public int BiomeNumber { get; }
+    public Rectangle Bounds { get; }
+    public Rectangle InteractionZone { get; }
+    public bool IsSealed { get; set; }
+    public Vector2 Center => Bounds.Center.ToVector2();
+
+    public string Numeral => Kind == HubDoorKind.Final ? string.Empty : RomanNumerals[BiomeNumber - 1];
+
+    public string Prompt => !IsSealed
+        ? $"E  ENTER BIOME {Numeral}"
+        : Kind == HubDoorKind.Final
+            ? "SEALED · DEFEAT ALL GUARDIANS"
+            : "SEALED · DEFEAT THE PREVIOUS GUARDIAN";
+
+    private static readonly string[] RomanNumerals = ["I", "II", "III", "IV", "V", "VI"];
+}
+
+/// <summary>
+/// Authored hub room: the Ashen Antechamber with seven doors along the north
+/// wall (I, II, III, final, IV, V, VI). The room deliberately has no interior
+/// collision so the player can read the doors and the route immediately.
 /// </summary>
 public sealed class SoulFurnaceAntechamber
 {
+    private const int WallBottom = 340;
+
     private static readonly Vector2[] SoulTraces =
     [
-        new(360f, 560f),
-        new(530f, 510f),
-        new(720f, 470f),
-        new(910f, 430f),
-        new(1080f, 410f)
+        new(300f, 640f),
+        new(265f, 580f),
+        new(235f, 515f),
+        new(210f, 450f),
+        new(195f, 395f)
     ];
 
-    public Rectangle Bounds { get; } = new(0, 0, 1500, 820);
-    public Rectangle MovementBounds { get; } = new(72, 105, 1356, 640);
-    public Vector2 PlayerSpawn { get; } = new(245f, 535f);
-    public Rectangle Gate { get; } = new(1214, 184, 172, 512);
-    public Rectangle InteractionZone { get; } = new(1035, 260, 330, 420);
-    public Vector2 GateCenter => Gate.Center.ToVector2();
+    private static readonly Vector2[] BrazierPositions =
+    [
+        new(560f, 610f),
+        new(940f, 610f)
+    ];
 
-    public bool IsPlayerAtGate(Vector2 playerPosition) =>
-        InteractionZone.Contains(playerPosition.ToPoint());
+    public SoulFurnaceAntechamber()
+    {
+        // Left to right: I, II, III, final, IV, V, VI. Only door I is open.
+        (HubDoorKind Kind, int Biome, int CenterX)[] layout =
+        [
+            (HubDoorKind.Biome, 1, 190),
+            (HubDoorKind.Biome, 2, 370),
+            (HubDoorKind.Biome, 3, 550),
+            (HubDoorKind.Final, 0, 750),
+            (HubDoorKind.Biome, 4, 950),
+            (HubDoorKind.Biome, 5, 1130),
+            (HubDoorKind.Biome, 6, 1310)
+        ];
+
+        List<HubDoor> doors = [];
+        foreach ((HubDoorKind kind, int biome, int centerX) in layout)
+        {
+            bool isFinal = kind == HubDoorKind.Final;
+            int width = isFinal ? 220 : 120;
+            int height = isFinal ? 290 : 200;
+            int zoneWidth = isFinal ? 230 : 160;
+            Rectangle bounds = new(centerX - width / 2, WallBottom - height, width, height);
+            Rectangle zone = new(centerX - zoneWidth / 2, WallBottom, zoneWidth, 250);
+            doors.Add(new HubDoor(kind, biome, bounds, zone, isSealed: !(kind == HubDoorKind.Biome && biome == 1)));
+        }
+        Doors = doors;
+    }
+
+    public Rectangle Bounds { get; } = new(0, 0, 1500, 900);
+    public Rectangle MovementBounds { get; } = new(72, 385, 1356, 420);
+    public Vector2 PlayerSpawn { get; } = new(300f, 660f);
+    public IReadOnlyList<HubDoor> Doors { get; }
+    public HubDoor EntryDoor => Doors[0];
+    public Vector2 EntryDoorCenter => EntryDoor.Center;
+
+    /// <summary>Returns the door whose interaction zone contains the player, if any.</summary>
+    public HubDoor? DoorAt(Vector2 playerPosition)
+    {
+        Point point = playerPosition.ToPoint();
+        foreach (HubDoor door in Doors)
+        {
+            if (door.InteractionZone.Contains(point))
+            {
+                return door;
+            }
+        }
+
+        return null;
+    }
 
     public void Draw(
         SpriteBatch batch,
         Texture2D pixel,
         float time,
         float soulSenseAmount,
-        float gateProgress,
+        float doorProgress,
         bool debugVisible)
     {
         batch.FillRectangle(pixel, Bounds, new Color(7, 7, 12));
+        batch.FillRectangle(pixel, new Rectangle(0, WallBottom, Bounds.Width, Bounds.Height - WallBottom), new Color(14, 14, 21));
         batch.FillRectangle(pixel, MovementBounds, new Color(18, 18, 26));
 
         // Large floor slabs keep the room readable without turning it into a grid.
         for (int x = MovementBounds.Left; x < MovementBounds.Right; x += 170)
         {
             Color seam = new Color(43, 40, 52) * 0.54f;
-            batch.DrawLine(pixel, new Vector2(x, 410f), new Vector2(x + 70f, MovementBounds.Bottom), seam, 3f);
+            batch.DrawLine(pixel, new Vector2(x, MovementBounds.Top), new Vector2(x + 70f, MovementBounds.Bottom), seam, 3f);
         }
-        batch.DrawLine(pixel, new Vector2(MovementBounds.Left, 410f), new Vector2(MovementBounds.Right, 410f), new Color(49, 45, 58) * 0.62f, 4f);
+        batch.DrawLine(pixel, new Vector2(MovementBounds.Left, 590f), new Vector2(MovementBounds.Right, 590f), new Color(49, 45, 58) * 0.62f, 4f);
 
         DrawArchitecture(batch, pixel);
         DrawBraziers(batch, pixel, time, soulSenseAmount);
-        DrawGate(batch, pixel, time, gateProgress);
+        foreach (HubDoor door in Doors)
+        {
+            DrawDoor(batch, pixel, door, time, door == EntryDoor ? doorProgress : 0f);
+        }
 
         if (debugVisible)
         {
             batch.DrawRectangle(pixel, MovementBounds, new Color(80, 220, 210) * 0.8f, 3f);
-            batch.DrawRectangle(pixel, InteractionZone, new Color(245, 205, 90) * 0.75f, 3f);
+            foreach (HubDoor door in Doors)
+            {
+                batch.DrawRectangle(pixel, door.InteractionZone, new Color(245, 205, 90) * 0.75f, 3f);
+            }
         }
     }
 
@@ -85,7 +180,7 @@ public sealed class SoulFurnaceAntechamber
         batch.DrawLine(
             pixel,
             SoulTraces[^1],
-            GateCenter,
+            new Vector2(EntryDoor.Center.X, EntryDoor.Bounds.Bottom - 40f),
             GameBalance.DeathFlameBright * (0.24f * amount),
             3f);
     }
@@ -95,12 +190,22 @@ public sealed class SoulFurnaceAntechamber
         SoulfireRenderer renderer,
         float time,
         float soulSenseAmount,
-        float gateProgress)
+        float doorProgress)
     {
         float breathe = 0.9f + MathF.Sin(time * 3.1f) * 0.1f;
-        renderer.DrawGlow(batch, new Vector2(430f, 320f), 110f * breathe, GameBalance.DeathFlame, 0.16f);
-        renderer.DrawGlow(batch, new Vector2(865f, 320f), 110f * breathe, GameBalance.DeathFlame, 0.14f);
-        renderer.DrawGlow(batch, GateCenter, 96f + gateProgress * 110f, GameBalance.DeathFlameBright, 0.2f + gateProgress * 0.25f);
+        foreach (Vector2 brazier in BrazierPositions)
+        {
+            renderer.DrawGlow(batch, brazier - Vector2.UnitY * 10f, 110f * breathe, GameBalance.DeathFlame, 0.15f);
+        }
+
+        renderer.DrawGlow(batch, EntryDoorCenter, 96f + doorProgress * 110f, GameBalance.DeathFlameBright, 0.2f + doorProgress * 0.25f);
+        foreach (HubDoor door in Doors)
+        {
+            if (door.IsSealed)
+            {
+                renderer.DrawGlow(batch, door.Center, door.Kind == HubDoorKind.Final ? 120f : 56f, GameBalance.DeepViolet, door.Kind == HubDoorKind.Final ? 0.22f : 0.1f);
+            }
+        }
 
         if (soulSenseAmount <= 0.001f)
         {
@@ -115,32 +220,33 @@ public sealed class SoulFurnaceAntechamber
 
     private void DrawArchitecture(SpriteBatch batch, Texture2D pixel)
     {
-        batch.FillRectangle(pixel, new Rectangle(0, 0, Bounds.Width, 112), new Color(10, 9, 16));
-        batch.FillRectangle(pixel, new Rectangle(0, 710, Bounds.Width, 110), new Color(10, 9, 16));
+        // North wall that carries the doors.
+        batch.FillRectangle(pixel, new Rectangle(0, 0, Bounds.Width, WallBottom), new Color(10, 9, 16));
+        batch.FillRectangle(pixel, new Rectangle(0, WallBottom - 14, Bounds.Width, 14), new Color(28, 26, 36));
+        batch.DrawLine(pixel, new Vector2(0f, WallBottom), new Vector2(Bounds.Width, WallBottom), new Color(53, 48, 62), 6f);
+        batch.FillRectangle(pixel, new Rectangle(0, MovementBounds.Bottom, Bounds.Width, Bounds.Height - MovementBounds.Bottom), new Color(10, 9, 16));
 
-        for (int x = 110; x <= 1120; x += 250)
+        // Pillars between the doors.
+        foreach (int x in new[] { 280, 460, 625, 875, 1030, 1220 })
         {
-            batch.FillRectangle(pixel, new Rectangle(x, 118, 52, 570), new Color(28, 26, 36));
-            batch.DrawRectangle(pixel, new Rectangle(x, 118, 52, 570), GameBalance.MetalColor * 0.72f, 4f);
-            batch.FillRectangle(pixel, new Rectangle(x - 18, 118, 88, 24), new Color(51, 47, 61));
-            batch.FillRectangle(pixel, new Rectangle(x - 18, 664, 88, 24), new Color(51, 47, 61));
+            batch.FillRectangle(pixel, new Rectangle(x - 10, 60, 20, WallBottom - 60), new Color(24, 22, 32));
+            batch.DrawRectangle(pixel, new Rectangle(x - 10, 60, 20, WallBottom - 60), GameBalance.MetalColor * 0.55f, 3f);
         }
 
         // Furnace pipes and hanging chains make this recognisably the same place
         // as the arena while preserving a calm, traversable silhouette.
-        for (int x = 210; x < 1180; x += 310)
+        for (int x = 100; x < 1450; x += 310)
         {
-            batch.DrawLine(pixel, new Vector2(x, 0f), new Vector2(x, 118f), new Color(58, 54, 67), 12f);
-            batch.FillCircle(pixel, new Vector2(x, 105f), 13f, new Color(31, 29, 39));
+            batch.DrawLine(pixel, new Vector2(x, 0f), new Vector2(x, 50f), new Color(58, 54, 67), 12f);
+            batch.FillCircle(pixel, new Vector2(x, 46f), 13f, new Color(31, 29, 39));
         }
-        batch.DrawLine(pixel, new Vector2(70f, 160f), new Vector2(1150f, 160f), new Color(53, 48, 62), 11f);
-        batch.DrawLine(pixel, new Vector2(70f, 176f), new Vector2(1150f, 176f), new Color(19, 18, 26), 4f);
+        batch.DrawLine(pixel, new Vector2(40f, 28f), new Vector2(1460f, 28f), new Color(53, 48, 62), 9f);
     }
 
     private static void DrawBraziers(SpriteBatch batch, Texture2D pixel, float time, float soulSenseAmount)
     {
-        DrawBrazier(batch, pixel, new Vector2(430f, 330f), time, soulSenseAmount);
-        DrawBrazier(batch, pixel, new Vector2(865f, 330f), time + 0.7f, soulSenseAmount);
+        DrawBrazier(batch, pixel, BrazierPositions[0], time, soulSenseAmount);
+        DrawBrazier(batch, pixel, BrazierPositions[1], time + 0.7f, soulSenseAmount);
     }
 
     private static void DrawBrazier(SpriteBatch batch, Texture2D pixel, Vector2 position, float time, float soulSenseAmount)
@@ -153,29 +259,67 @@ public sealed class SoulFurnaceAntechamber
         batch.FillCircle(pixel, position - Vector2.UnitY * flame * 0.52f, flame * 0.5f, GameBalance.DeathFlameBright * (0.72f + soulSenseAmount * 0.2f));
     }
 
-    private void DrawGate(SpriteBatch batch, Texture2D pixel, float time, float gateProgress)
+    private static void DrawDoor(SpriteBatch batch, Texture2D pixel, HubDoor door, float time, float openProgress)
     {
-        int opening = (int)(Gate.Width * 0.42f * Ease(gateProgress));
-        Rectangle frame = new(Gate.Left - 28, Gate.Top - 35, Gate.Width + 56, Gate.Height + 60);
+        bool isFinal = door.Kind == HubDoorKind.Final;
+        Rectangle gate = door.Bounds;
+        int opening = (int)(gate.Width * 0.42f * Ease(openProgress));
+        int framePad = isFinal ? 14 : 10;
+        Rectangle frame = new(gate.Left - framePad, gate.Top - framePad, gate.Width + framePad * 2, gate.Height + framePad);
+        Color frameColor = isFinal ? new Color(118, 104, 138) : door.IsSealed ? new Color(66, 60, 76) : new Color(83, 75, 93);
+        Color leafColor = door.IsSealed ? new Color(24, 22, 31) : new Color(35, 31, 43);
+
         batch.FillRectangle(pixel, frame, new Color(17, 15, 24));
-        batch.DrawRectangle(pixel, frame, new Color(83, 75, 93), 9f);
-
-        Rectangle leftDoor = new(Gate.Left, Gate.Top, Math.Max(3, Gate.Width / 2 - opening), Gate.Height);
-        Rectangle rightDoor = new(Gate.Center.X + opening, Gate.Top, Math.Max(3, Gate.Width / 2 - opening), Gate.Height);
-        batch.FillRectangle(pixel, leftDoor, new Color(35, 31, 43));
-        batch.FillRectangle(pixel, rightDoor, new Color(35, 31, 43));
-        batch.DrawRectangle(pixel, leftDoor, GameBalance.MetalColor, 5f);
-        batch.DrawRectangle(pixel, rightDoor, GameBalance.MetalColor, 5f);
-
-        for (int y = Gate.Top + 38; y < Gate.Bottom; y += 52)
+        batch.DrawRectangle(pixel, frame, frameColor, isFinal ? 10f : 6f);
+        if (isFinal)
         {
-            batch.DrawLine(pixel, new Vector2(leftDoor.Left + 8f, y), new Vector2(leftDoor.Right - 5f, y), new Color(68, 61, 78), 4f);
-            batch.DrawLine(pixel, new Vector2(rightDoor.Left + 5f, y), new Vector2(rightDoor.Right - 8f, y), new Color(68, 61, 78), 4f);
+            Rectangle inner = new(frame.Left + 14, frame.Top + 14, frame.Width - 28, frame.Height - 14);
+            batch.DrawRectangle(pixel, inner, GameBalance.DeepViolet * 0.8f, 4f);
         }
 
-        float pulse = 0.62f + MathF.Sin(time * 3.4f) * 0.15f;
-        batch.DrawLine(pixel, new Vector2(Gate.Center.X, Gate.Top + 12f), new Vector2(Gate.Center.X, Gate.Bottom - 12f), GameBalance.DeathFlameBright * pulse, 5f);
-        batch.FillCircle(pixel, GateCenter, 12f + pulse * 3f, GameBalance.SoulWhite * 0.8f);
+        Rectangle leftDoor = new(gate.Left, gate.Top, Math.Max(3, gate.Width / 2 - opening), gate.Height);
+        Rectangle rightDoor = new(gate.Center.X + opening, gate.Top, Math.Max(3, gate.Width / 2 - opening), gate.Height);
+        batch.FillRectangle(pixel, leftDoor, leafColor);
+        batch.FillRectangle(pixel, rightDoor, leafColor);
+        batch.DrawRectangle(pixel, leftDoor, GameBalance.MetalColor * (door.IsSealed ? 0.6f : 1f), 4f);
+        batch.DrawRectangle(pixel, rightDoor, GameBalance.MetalColor * (door.IsSealed ? 0.6f : 1f), 4f);
+
+        Color bandColor = door.IsSealed ? new Color(44, 40, 52) : new Color(68, 61, 78);
+        for (int y = gate.Top + 34; y < gate.Bottom; y += 46)
+        {
+            batch.DrawLine(pixel, new Vector2(leftDoor.Left + 6f, y), new Vector2(leftDoor.Right - 4f, y), bandColor, 3f);
+            batch.DrawLine(pixel, new Vector2(rightDoor.Left + 4f, y), new Vector2(rightDoor.Right - 6f, y), bandColor, 3f);
+        }
+
+        if (door.IsSealed)
+        {
+            // A dim seal over the seam marks the door as closed for now.
+            float sealPulse = 0.5f + MathF.Sin(time * 2.2f + door.Center.X * 0.01f) * 0.1f;
+            float radius = isFinal ? 34f : 20f;
+            Vector2 sealCenter = door.Center + new Vector2(0f, gate.Height * 0.08f);
+            batch.FillCircle(pixel, sealCenter, radius, new Color(12, 11, 18));
+            batch.DrawCircle(pixel, sealCenter, radius, GameBalance.DeepViolet * sealPulse, 3f, 24);
+            batch.DrawLine(pixel, sealCenter + new Vector2(-radius * 0.55f, -radius * 0.55f), sealCenter + new Vector2(radius * 0.55f, radius * 0.55f), GameBalance.DeepViolet * sealPulse, 3f);
+            batch.DrawLine(pixel, sealCenter + new Vector2(radius * 0.55f, -radius * 0.55f), sealCenter + new Vector2(-radius * 0.55f, radius * 0.55f), GameBalance.DeepViolet * sealPulse, 3f);
+        }
+        else
+        {
+            float pulse = 0.62f + MathF.Sin(time * 3.4f) * 0.15f;
+            batch.DrawLine(pixel, new Vector2(gate.Center.X, gate.Top + 12f), new Vector2(gate.Center.X, gate.Bottom - 12f), GameBalance.DeathFlameBright * pulse, 4f);
+            batch.FillCircle(pixel, door.Center, 10f + pulse * 3f, GameBalance.SoulWhite * 0.8f);
+        }
+
+        if (!isFinal)
+        {
+            PixelText.DrawCentered(
+                batch,
+                pixel,
+                door.Numeral,
+                door.Center.X,
+                frame.Top - 30f,
+                3,
+                door.IsSealed ? GameBalance.SoulWhite * 0.45f : GameBalance.SoulWhite * 0.9f);
+        }
     }
 
     private static float Ease(float amount)
