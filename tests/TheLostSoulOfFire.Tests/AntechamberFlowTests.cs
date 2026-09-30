@@ -12,17 +12,17 @@ namespace TheLostSoulOfFire.Tests;
 public sealed class AntechamberFlowTests
 {
     [TestMethod]
-    public void MainFlowRequiresAntechamberAndGateBeforeArena()
+    public void MainFlowRequiresAntechamberAndDoorBeforeArena()
     {
         GamePhase phase = GamePhase.Title;
 
         phase = GameFlowRules.ConfirmTitle(phase, skipPrologue: true);
         Assert.AreEqual(GamePhase.Antechamber, phase);
 
-        phase = GameFlowRules.EnterGate(phase);
+        phase = GameFlowRules.EnterDoor(phase);
         Assert.AreEqual(GamePhase.EnteringArena, phase);
 
-        phase = GameFlowRules.FinishGateTransition(phase);
+        phase = GameFlowRules.FinishDoorTransition(phase);
         Assert.AreEqual(GamePhase.Arena, phase);
     }
 
@@ -44,16 +44,64 @@ public sealed class AntechamberFlowTests
     }
 
     [TestMethod]
-    public void RoomHasReadableSpawnToGateRouteAndBoundedInteraction()
+    public void HubHasSixBiomeDoorsAndAMiddleFinalDoor()
+    {
+        SoulFurnaceAntechamber room = new();
+
+        Assert.AreEqual(7, room.Doors.Count);
+        CollectionAssert.AreEqual(
+            new[] { "I", "II", "III", "", "IV", "V", "VI" },
+            room.Doors.Select(door => door.Numeral).ToArray());
+
+        HubDoor final = room.Doors[3];
+        Assert.AreEqual(HubDoorKind.Final, final.Kind);
+        Assert.IsTrue(room.Doors.Where(door => door != final).All(door => door.Bounds.Width < final.Bounds.Width));
+        Assert.IsTrue(room.Doors.Where(door => door != final).All(door => door.Bounds.Height < final.Bounds.Height));
+        Assert.IsTrue(room.Doors.All(door => room.Bounds.Contains(door.Bounds)));
+    }
+
+    [TestMethod]
+    public void OnlyDoorOneIsOpen()
+    {
+        SoulFurnaceAntechamber room = new();
+
+        Assert.IsFalse(room.EntryDoor.IsSealed);
+        Assert.AreEqual(1, room.EntryDoor.BiomeNumber);
+        Assert.AreEqual(6, room.Doors.Count(door => door.IsSealed));
+        Assert.IsTrue(room.Doors[3].IsSealed);
+    }
+
+    [TestMethod]
+    public void DoorZonesAreReachableAndDoNotOverlap()
     {
         SoulFurnaceAntechamber room = new();
 
         Assert.IsTrue(room.MovementBounds.Contains(room.PlayerSpawn.ToPoint()));
-        Assert.IsTrue(room.Bounds.Contains(room.Gate));
-        Assert.IsTrue(room.InteractionZone.Intersects(room.Gate));
-        Assert.IsTrue(room.GateCenter.X > room.PlayerSpawn.X);
-        Assert.IsFalse(room.IsPlayerAtGate(room.PlayerSpawn));
-        Assert.IsTrue(room.IsPlayerAtGate(room.InteractionZone.Center.ToVector2()));
+        Assert.IsNull(room.DoorAt(room.PlayerSpawn));
+        foreach (HubDoor door in room.Doors)
+        {
+            Vector2 inside = door.InteractionZone.Center.ToVector2();
+            Assert.IsTrue(room.MovementBounds.Contains(inside.ToPoint()), "zone center must be walkable");
+            Assert.AreSame(door, room.DoorAt(inside));
+        }
+
+        for (int i = 0; i < room.Doors.Count; i++)
+        {
+            for (int j = i + 1; j < room.Doors.Count; j++)
+            {
+                Assert.IsFalse(room.Doors[i].InteractionZone.Intersects(room.Doors[j].InteractionZone));
+            }
+        }
+    }
+
+    [TestMethod]
+    public void DoorPromptsNameTheDoorOrTheSeal()
+    {
+        SoulFurnaceAntechamber room = new();
+
+        Assert.AreEqual("E  ENTER BIOME I", room.Doors[0].Prompt);
+        Assert.AreEqual("SEALED · DEFEAT THE PREVIOUS GUARDIAN", room.Doors[1].Prompt);
+        Assert.AreEqual("SEALED · DEFEAT ALL GUARDIANS", room.Doors[3].Prompt);
     }
 
     [TestMethod]

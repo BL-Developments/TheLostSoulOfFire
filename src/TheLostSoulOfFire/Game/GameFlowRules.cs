@@ -14,10 +14,10 @@ public static class GameFlowRules
     public static GamePhase FinishPrologue(GamePhase phase) =>
         phase == GamePhase.Prologue ? GamePhase.Antechamber : phase;
 
-    public static GamePhase EnterGate(GamePhase phase) =>
+    public static GamePhase EnterDoor(GamePhase phase) =>
         phase == GamePhase.Antechamber ? GamePhase.EnteringArena : phase;
 
-    public static GamePhase FinishGateTransition(GamePhase phase) =>
+    public static GamePhase FinishDoorTransition(GamePhase phase) =>
         phase == GamePhase.EnteringArena ? GamePhase.Arena : phase;
 
     public static GamePhase RetryAfterDeath() => GamePhase.Arena;
