@@ -1,7 +1,7 @@
 ## REMOVED Requirements
 
 ### Requirement: Ein massives Tor kontrolliert den Arena-Eintritt
-**Reason**: Das Tor entfällt. Die Aschenvorhalle wird zum Hub mit sieben Biom-Türen; der Arena-Eintritt liegt hinter Tür I.
+**Reason**: Das Tor entfällt. Die Aschenvorhalle wird zum Hub mit sechs Biom-Türen und einer Final-Tür; der Arena-Eintritt liegt hinter Tür I.
 **Migration**: Siehe `hub-biome-doors`, Requirement „Die offene Tür I führt in die Arena“.
 
 ## RENAMED Requirements

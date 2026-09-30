@@ -4,10 +4,11 @@ Der eigentliche Spielablauf soll von einem Hub ausgehen, aus dem die Biome errei
 
 ## What Changes
 
-- Die Aschenvorhalle wird zum Hub und erhält sieben schlicht dargestellte Türen, je eine pro Biom, beschriftet mit `BIOME I` bis `BIOME VII`.
+- Die Aschenvorhalle wird zum Hub und erhält sieben schlicht dargestellte Türen in einer Reihe: sechs Biom-Türen `BIOME I` bis `BIOME VI` und in der Mitte eine optisch größere Final-Tür.
+- Die Final-Tür führt später zu Endboss und End-Level. Beides existiert noch nicht; die Tür bleibt vorerst versiegelt und zeigt `SEALED · DEFEAT ALL GUARDIANS`.
 - **BREAKING**: Das bisherige Ofen-/Kathedralentor zur Arena wird entfernt.
 - Tür I ist offen. Ihre Aktivierung mit `E` startet den bisherigen Arena-Ablauf einschließlich inszeniertem Eintritt und Arena-Intro.
-- Die Türen II bis VII sind versiegelt. In ihrer Nähe erscheint der Hinweis `SEALED · DEFEAT THE PREVIOUS GUARDIAN`; `E` startet dort keinen Übergang.
+- Die Biom-Türen II bis VI sind versiegelt. In ihrer Nähe erscheint der Hinweis `SEALED · DEFEAT THE PREVIOUS GUARDIAN`; `E` startet dort keinen Übergang.
 - Jede Tür besitzt einen Sperrzustand, an den die spätere Freischaltung durch Endbosssiege (#26, #27) andocken kann. Die Freischaltlogik selbst ist nicht Teil dieses Changes.
 - Soul-Sense-Spuren führen künftig zu Tür I statt zum Tor.
 
@@ -15,7 +16,7 @@ Der eigentliche Spielablauf soll von einem Hub ausgehen, aus dem die Biome errei
 
 ### New Capabilities
 
-- `hub-biome-doors`: Sieben Biom-Türen im Hub mit Offen-/Versiegelt-Zustand, Näherungshinweis und Aktivierung der offenen Tür.
+- `hub-biome-doors`: Sechs Biom-Türen und eine mittlere Final-Tür im Hub mit Offen-/Versiegelt-Zustand, Näherungshinweis und Aktivierung der offenen Tür.
 
 ### Modified Capabilities
 
