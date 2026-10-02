@@ -7,6 +7,15 @@ The entries from 2026-09-06 and earlier describe implementation work on the
 `tools/visual-max/`, `SoftShapes.cs`, Team Resonance, Severance) are not
 necessarily present on `main`.
 
+## 2026-10-02 — Code-Basis für Charakter-Systeme
+
+- `main` ist die Code-Basis für alle weiteren Systeme. Der Branch
+  `prototype/design-polish` wird nicht gemergt.
+- Systeme, die nur dort existieren (lokaler Koop, Team Resonance, Severance
+  Window, Down/Stabilisieren, WardenRoster), werden einzeln als eigener
+  OpenSpec-Change nach `main` portiert, sobald ein Issue sie braucht.
+  Der Branch dient bis dahin als Referenz.
+
 ## 2026-10-02 — Maßgebliche Dokumente auf `main`
 
 - Entscheidungslog, Aufnahme-Zusammenfassung, Produktidentität, Canon und Lore

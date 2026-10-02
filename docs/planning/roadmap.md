@@ -6,7 +6,7 @@ Stand: 27.09.2026, ergänzt am 02.10.2026 · Repository: [BL-Developments/TheLos
 
 Es sind 25 Issues offen: [#5](https://github.com/BL-Developments/TheLostSoulOfFire/issues/5) ist die Planungsübersicht, die übrigen 24 sind Arbeitsaufgaben. Die Reihenfolge unten richtet sich nach Abhängigkeiten und danach, wie schnell ein vollständiger, überprüfbarer Run entsteht. Sie ist keine Aussage über bereits erledigte Implementierung. In den Issues liegen derzeit keine klärenden Kommentare vor.
 
-**Branchgrundlage klären:** Der Solo-Prolog mit `PrologueDirector` ist seit PR #37 auf `main`. Lokaler Koop, TeamResonance, Severance Window und Down/Stabilisieren existieren dagegen nur auf `prototype/design-polish`. Offen ist, ob diese Systeme nach `main` portiert, gemergt oder neu gebaut werden. Entscheidungslog, Aufnahme-Zusammenfassung, Canon und Lore liegen seit dem 02.10.2026 unter `docs/current/`.
+**Branchgrundlage (Beschluss vom 02.10.2026):** `main` ist die Basis. Der Solo-Prolog mit `PrologueDirector` ist seit PR #37 auf `main`. Lokaler Koop, TeamResonance, Severance Window und Down/Stabilisieren existieren nur auf `prototype/design-polish` und werden einzeln als OpenSpec-Change portiert, sobald ein Issue sie braucht. Entscheidungslog, Aufnahme-Zusammenfassung, Canon und Lore liegen seit dem 02.10.2026 unter `docs/current/`.
 
 Die Aufnahme hat laut #5 bei Konflikten Vorrang vor älteren Repo-Dokumenten. Die dort genannten 50 % Teilsicherung, 1.000 Ressourceneinheiten und drei beziehungsweise fünf Levels sind Beispiele, keine beschlossenen Werte. Drei Fähigkeitsangebote mit zwei Auswahlen sind dagegen das konkret besprochene Startmodell.
 
@@ -68,7 +68,7 @@ Die Aufnahme hat laut #5 bei Konflikten Vorrang vor älteren Repo-Dokumenten. Di
 
 ### Sofort klären – sie blockieren Architektur oder Umsetzung
 
-1. **Welcher Branch ist die Produktgrundlage?** Soll `prototype/design-polish` in den aktuellen Entwicklungsstand übernommen werden, oder sollen die Issues für den tatsächlichen `main`-Stand neu zugeschnitten werden? Betrifft bereits #8, #11 und die Annahmen in #5.
+1. ~~**Welcher Branch ist die Produktgrundlage?**~~ *Entschieden am 02.10.2026: `main`, mit gezielter Portierung (siehe oben).* Soll `prototype/design-polish` in den aktuellen Entwicklungsstand übernommen werden, oder sollen die Issues für den tatsächlichen `main`-Stand neu zugeschnitten werden? Betrifft bereits #8, #11 und die Annahmen in #5.
 2. ~~**Welche Dokumente gelten bei Widersprüchen?**~~ *Entschieden am 02.10.2026: `docs/current/` mit dem Entscheidungslog gilt vor `docs/mvp/` und `docs/vision/`.* #5 gibt der Aufnahme Vorrang; ältere MVP-Dokumente nennen Entscheidungen teils noch „locked“. #6 sollte konkret festhalten, was ersetzt wird.
 3. **Was genau sind die beiden Währungen?** Wie heißen sie, wodurch entstehen sie, wofür werden sie ausgegeben und welche Bestände sind im Run beziehungsweise dauerhaft verfügbar? Wann wird eine Soul Release genau einmal gutgeschrieben? (#7)
 4. **Wie funktioniert Teilsicherung exakt?** Welche Quote gilt, wie wird gerundet, darf mehrfach pro Run gesichert werden und was geschieht bei erneutem Besuch desselben Reisepunkts? Was wird bei vollständiger Extraktion übertragen? (#7, #18)
@@ -90,4 +90,4 @@ Die Aufnahme hat laut #5 bei Konflikten Vorrang vor älteren Repo-Dokumenten. Di
 
 ## Nächster Schritt
 
-Zielbranch festlegen. Danach #6, #7 und #9 als kurze, widerspruchsfreie Entscheidungsgrundlage abschließen. Damit werden die meisten nachfolgenden Issues ausführbar, ohne ihre Grundregeln mehrfach neu zu entscheiden.
+Zielbranch ist festgelegt. Als Nächstes #6, #7 und #9 als kurze, widerspruchsfreie Entscheidungsgrundlage abschließen. Damit werden die meisten nachfolgenden Issues ausführbar, ohne ihre Grundregeln mehrfach neu zu entscheiden.
