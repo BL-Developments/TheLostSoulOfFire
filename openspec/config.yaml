@@ -18,3 +18,7 @@ schema: spec-driven
 #       - Always include a "Non-goals" section
 #     tasks:
 #       - Break tasks into chunks of max 2 hours
+
+rules:
+  tasks:
+    - Die letzte Aufgabe nennt den Developer-Mode-Startbefehl, mit dem sich der Change direkt anspielen lässt (z. B. `dotnet run --project src/TheLostSoulOfFire -- --dev --start hub`). Fehlt ein passender Bereich, ergänzt der Change ihn in `DeveloperStartOptions`.
