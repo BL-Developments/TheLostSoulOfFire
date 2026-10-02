@@ -1,5 +1,10 @@
 # Visual Art Direction
 
+> **Revision 2026-10-02:** Der Grafikstil ist gemalt wie Bastion, nicht
+> Pixel-Art (siehe [`DECISION-LOG.md`](DECISION-LOG.md)). Aussagen zu
+> Pixel-Art in diesem Dokument gelten nur noch, soweit sie unten nicht
+> ausdrücklich ersetzt sind.
+
 ## 1. Zielbild
 
 **The Lost Soul of Fire** soll wie ein hochwertiges, eigenständiges 2D-Action-Roguelike mit starkem räumlichem Eindruck wirken. Die Welt bleibt klar 2D, soll aber durch Layering, Maßstab, Kontakt, Licht und Überlagerung fast dreidimensional gelesen werden.
@@ -8,7 +13,7 @@ Der Stil heißt **Soulfire Gothic**:
 
 - menschliche Industrie- und Alltagsorte;
 - sakrale Monumentalität;
-- melancholische Pixel-Art;
+- melancholische, gemalte 2D-Grafik in hoher Auflösung (Stilreferenz: Bastion);
 - tote oder zwanghaft weiterlaufende Infrastruktur;
 - violett-weiße Death Flame;
 - seltene warme orange Life Flame;
@@ -20,13 +25,13 @@ Children of Morta dient als **Qualitäts- und Prinzipienreferenz**, nicht als Vo
 
 Zu übersetzende Prinzipien:
 
-- detailreiche Pixel-Art mit klaren Silhouetten;
+- detailreiche Grafik mit klaren Silhouetten;
 - starke räumliche Tiefe trotz 2D-Grundlage;
 - große Umweltmassen statt flacher Kampfbretter;
 - sichtbarer Bodenkontakt für Figuren und Props;
 - lesbare Charaktere in dunklen, detailreichen Räumen;
 - Vordergrund-/Hintergrundüberlagerung;
-- Atmosphäre und weiches Licht, ohne Pixel-Art zu verwischen;
+- Atmosphäre und weiches Licht, ohne Formen zu verwischen;
 - Umgebungen, die bewohnt, benutzt und historisch gewachsen wirken;
 - emotionale Nähe zwischen Figuren trotz düsterer Welt;
 - deutliche Animation-Pose und Impact-Lesbarkeit.
@@ -85,7 +90,13 @@ Für die großen Death-Layer-Karten:
 
 „Wie Diablo“ meint größere navigierbare Flächen und Reisegefühl, nicht Loot-Überladung oder optische Nachahmung.
 
-## 5a. Pixel-Sprache — verbindlich seit Session 3
+## 5a. Bildsprache — verbindlich seit Session 3, revidiert 2026-10-02
+
+Die Pixel-Regeln dieses Abschnitts („ein gezeichnetes Pixel ist ein
+Bildschirmpixel“, kein Anti-Aliasing, kein Dithering, mindestens zweipixelige
+Formen) sind seit dem 2026-10-02 aufgehoben; Assets sind gemalt und werden
+weich skaliert. Die Regeln zu Detailmenge, Schlüssellicht, Materialfamilien,
+Emission und Akzentfarbe gelten weiter.
 
 Owner-Korrektur: Detailmenge ist keine Qualität. Zu viele winzige Details, zu
 viele glänzende Oberflächen und zu weiche, gemalte Übergänge lassen das Spiel wie
@@ -93,14 +104,15 @@ ein überrendertes Bild wirken, das Pixel-Art imitiert.
 
 Verbindliche Regeln für Figuren und figurnahe Assets:
 
-- **Ein gezeichnetes Pixel ist ein Bildschirmpixel** im Kampf-Zoom. Keine
-  gebrochene Skalierung von handgesetzten Pixeln.
-- **Flächige Füllungen, harte Wertstufen, kein Dithering, kein Anti-Aliasing.**
+- ~~**Ein gezeichnetes Pixel ist ein Bildschirmpixel** im Kampf-Zoom. Keine
+  gebrochene Skalierung von handgesetzten Pixeln.~~ *(aufgehoben 2026-10-02)*
+- ~~**Flächige Füllungen, harte Wertstufen, kein Dithering, kein Anti-Aliasing.**~~ *(aufgehoben 2026-10-02)*
 - **Ein Schlüssellicht** von oben links für alle Formen derselben Figur.
 - **Wenige Materialfamilien mit je zwei bis drei Werten** statt einer offenen
   Farbliste. Der Warden nutzt sechs Familien.
-- **Mindestens zweipixelige Formen.** Einzelpixel-Ornament verschwindet in
-  Bewegung und erzeugt nur Rauschen.
+- ~~**Mindestens zweipixelige Formen.** Einzelpixel-Ornament verschwindet in
+  Bewegung und erzeugt nur Rauschen.~~ *(aufgehoben 2026-10-02; der Gedanke
+  „kein winziges Ornament“ gilt weiter)*
 - **Übernatürliche Emission ist ein Budget, kein Effekt.** Beim Warden: zwei
   Glutaugen, ein zweipixeliger gebundener Soul am Brustbein, eine dünne
   Death-Flame-Linie am nachziehenden Saum. Sonst nichts.
