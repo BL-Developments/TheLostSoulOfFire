@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using TheLostSoulOfFire.Core;
 
 namespace TheLostSoulOfFire.Rendering;
 
@@ -56,21 +57,28 @@ public static class PixelText
         ['ß'] = "01100/10010/10010/01100/10001/10001/10011"
     };
 
+    /// <summary>
+    /// Draws in logical coordinates, but every glyph cell is a whole number of output pixels
+    /// (see <see cref="RenderResolution"/>) so all cells stay equally sized at a fractional scale.
+    /// </summary>
     public static void Draw(SpriteBatch batch, Texture2D pixel, string text, Vector2 position, int scale, Color color)
     {
-        float x = position.X;
+        float cell = CellSize(scale);
+        Vector2 cellSize = new(cell);
+        float x = RenderResolution.SnapToOutputPixel(position.X);
+        float y = RenderResolution.SnapToOutputPixel(position.Y);
         foreach (char rawCharacter in text)
         {
             char character = char.ToUpperInvariant(rawCharacter);
             if (character == ' ')
             {
-                x += scale * 4;
+                x += cell * 4;
                 continue;
             }
 
             if (!Glyphs.TryGetValue(character, out string pattern))
             {
-                x += scale * 6;
+                x += cell * 6;
                 continue;
             }
 
@@ -81,13 +89,16 @@ public static class PixelText
                 {
                     if (rows[row][column] == '1')
                     {
-                        batch.FillRectangle(pixel, new Rectangle((int)x + column * scale, (int)position.Y + row * scale, scale, scale), color);
+                        batch.Draw(pixel, new Vector2(x + column * cell, y + row * cell), null, color, 0f, Vector2.Zero, cellSize, SpriteEffects.None, 0f);
                     }
                 }
             }
-            x += scale * 6;
+            x += cell * 6;
         }
     }
+
+    /// <summary>Logical size of one glyph cell: <paramref name="scale"/> rounded to whole output pixels.</summary>
+    public static float CellSize(int scale) => RenderResolution.ToOutputPixels(scale) / RenderResolution.Scale;
 
     public static void DrawCentered(SpriteBatch batch, Texture2D pixel, string text, float centerX, float y, int scale, Color color) =>
         Draw(batch, pixel, text, new Vector2(centerX - Measure(text, scale) * 0.5f, y), scale, color);
@@ -99,6 +110,6 @@ public static class PixelText
         {
             units += character == ' ' ? 4 : 6;
         }
-        return units * scale;
+        return (int)MathF.Ceiling(units * CellSize(scale));
     }
 }

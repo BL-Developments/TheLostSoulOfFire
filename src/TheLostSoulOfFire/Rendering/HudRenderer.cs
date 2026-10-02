@@ -36,7 +36,10 @@ public sealed class HudRenderer
         const int trackWidth = 140;
         const int trackHeight = 7;
 
-        Rectangle panelBounds = new(x + 13, y + 4, 192, 23);
+        const int healthTextX = trackX + trackWidth + 8;
+        // The panel grows with the measured width of the largest health value.
+        int panelRight = healthTextX + PixelText.Measure(GameBalance.PlayerMaxHealth.ToString(), 1) + 3;
+        Rectangle panelBounds = new(x + 13, y + 4, panelRight - (x + 13), 23);
         batch.FillRectangle(pixel, panelBounds, Panel);
         DrawCornerFrame(batch, pixel, panelBounds, Frame);
 
@@ -60,7 +63,7 @@ public sealed class HudRenderer
             batch.FillRectangle(pixel, new Rectangle(linkX - 1, trackY - 1, 2, trackHeight + 2), new Color(15, 13, 20));
         }
 
-        PixelText.Draw(batch, pixel, player.Health.ToString(), new Vector2(trackX + trackWidth + 8, y + 12), 1, BoundSoul);
+        PixelText.Draw(batch, pixel, player.Health.ToString(), new Vector2(healthTextX, y + 12), 1, BoundSoul);
     }
 
     private static void DrawDash(SpriteBatch batch, Texture2D pixel, Player player)
@@ -71,11 +74,13 @@ public sealed class HudRenderer
         float ready = 1f - MathHelper.Clamp(player.DashCooldownRemaining / GameBalance.DashCooldown, 0f, 1f);
         Color dashColor = ready >= 0.999f ? GameBalance.DeathFlameBright : GameBalance.DeathFlame * 0.62f;
 
+        // The bar follows the label's measured width, which depends on the output pixel grid.
+        int barX = x + PixelText.Measure("DASH", 1) + 5;
         PixelText.Draw(batch, pixel, "DASH", new Vector2(x, y), 1, ready >= 0.999f ? BoundSoulDim : Frame);
-        batch.FillRectangle(pixel, new Rectangle(x + 29, y + 3, width, 2), Empty);
-        batch.FillRectangle(pixel, new Rectangle(x + 29, y + 3, (int)MathF.Round(width * ready), 2), dashColor);
+        batch.FillRectangle(pixel, new Rectangle(barX, y + 3, width, 2), Empty);
+        batch.FillRectangle(pixel, new Rectangle(barX, y + 3, (int)MathF.Round(width * ready), 2), dashColor);
 
-        Vector2 marker = new(x + 84, y + 4);
+        Vector2 marker = new(barX + width + 7, y + 4);
         if (ready >= 0.999f)
         {
             DrawDiamond(batch, pixel, marker, 3, GameBalance.DeathFlameBright);
