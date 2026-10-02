@@ -1101,6 +1101,11 @@ public sealed partial class GameWorld : IDisposable
     {
         ClearRunState();
         _phase = GameFlowRules.FinishDoorTransition(_phase);
+        BeginArenaIntro(viewport);
+    }
+
+    private void BeginArenaIntro(Viewport viewport)
+    {
         _phaseTime = 0f;
         _loopState = ArenaLoopState.Intro;
         _player.Reset(_arena.CombatBounds.Center.ToVector2());

@@ -34,6 +34,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     private readonly bool _audioGameplayTest;
     private readonly bool _audioDeathRestartTest;
     private readonly bool _antechamberVisualTest;
+    private readonly DeveloperStartOptions? _developerStart;
     private readonly GameSettingsStore _settingsStore = new();
     private readonly GameSettings _settings;
     private bool _screenshotRequested;
@@ -51,11 +52,16 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     private int _windowedHeight = GameBalance.BackBufferHeight;
     private int _antechamberVisualStage;
 
-    public Game1(bool audioGameplayTest = false, bool audioDeathRestartTest = false, bool antechamberVisualTest = false)
+    public Game1(
+        bool audioGameplayTest = false,
+        bool audioDeathRestartTest = false,
+        bool antechamberVisualTest = false,
+        DeveloperStartOptions? developerStart = null)
     {
         _audioGameplayTest = audioGameplayTest;
         _audioDeathRestartTest = audioDeathRestartTest;
         _antechamberVisualTest = antechamberVisualTest;
+        _developerStart = developerStart;
         _settings = _settingsStore.Load();
         _graphics = new GraphicsDeviceManager(this)
         {
@@ -102,6 +108,11 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
             skipPrologue: _audioGameplayTest || _audioDeathRestartTest || _antechamberVisualTest,
             settings: _settings,
             settingsChanged: _settingsStore.Save);
+        if (_developerStart is not null)
+        {
+            Console.WriteLine(_developerStart.Describe());
+            _world.ApplyDeveloperStart(_developerStart, VirtualViewport);
+        }
         _soulfireRenderer = new SoulfireRenderer(GraphicsDevice);
         _resolution.Update(GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight);
     }
