@@ -40,7 +40,7 @@ Die Etappen sind eine sinnvolle Integrationsreihenfolge, keine starren Kalendert
 
 ## Bestehende Grundlage und Umfang
 
-Zum Zeitpunkt der Planung (Branch `prototype/design-polish`) besaß das Repo Prolog, Scythe/Cannon, Severance, Soul-Lifecycle, lokale zwei Spieler und deterministische Captures; Hub-Innenraum, Speichern und breiterer Fortschritt fehlten. Auf `main` fehlen davon derzeit Severance, lokaler Koop und TeamResonance. Daher sind die Aufgaben überwiegend Ausbau/Anpassung. C#/.NET 9/MonoGame und die bestehende Content-Pipeline bleiben Grundlage.
+Zum Zeitpunkt der Planung (Branch `prototype/design-polish`) besaß das Repo Prolog, Scythe/Cannon, Severance, Soul-Lifecycle, lokale zwei Spieler und deterministische Captures; Hub-Innenraum, Speichern und breiterer Fortschritt fehlten. Auf `main` fehlen davon derzeit Severance, lokaler Koop und TeamResonance; sie werden bei Bedarf gezielt portiert (Beschluss vom 02.10.2026). Daher sind die Aufgaben überwiegend Ausbau/Anpassung. C#/.NET 9/MonoGame und die bestehende Content-Pipeline bleiben Grundlage.
 
 Diese Übertragung erstellt Planung und Issues; sie behauptet keine Umsetzung neuer Gameplay-Systeme. Die ausführliche lokale Auswertung steht in `docs/current/RECORDING-SUMMARY-2026-09-08.md`, die reproduzierbare Planung in `docs/planning/recording-2026-09-08/backlog.json`.
 
