@@ -7,6 +7,19 @@ The entries from 2026-09-06 and earlier describe implementation work on the
 `tools/visual-max/`, `SoftShapes.cs`, Team Resonance, Severance) are not
 necessarily present on `main`.
 
+## 2026-10-02 — Grafikstil: gemalt wie Bastion
+
+- Das Spiel soll aussehen wie gemalte, hochaufgelöste 2D-Grafik im Sinne von
+  Bastion, nicht wie Pixel-Art. Bastion ist dafür die Stilreferenz.
+- Die Pixel-Regeln aus `VISUAL-ART-DIRECTION.md` §5a („ein gezeichnetes Pixel
+  ist ein Bildschirmpixel“, kein Anti-Aliasing, kein Dithering, mindestens
+  zweipixelige Formen) gelten nicht mehr. Die übrigen Regeln dort (ein
+  Schlüssellicht, wenige Materialfamilien, Emission als Budget, ein
+  gesättigter Akzent pro Figur) bleiben.
+- Assets werden in hoher Auflösung gebaut und weich skaliert (lineare
+  Filterung, Mipmaps). Damit ist jede Ausgabeauflösung möglich; der erste
+  Schritt ist eine Full-HD-Ausgabe (OpenSpec-Change `add-full-hd-rendering`).
+
 ## 2026-10-02 — Code-Basis für Charakter-Systeme
 
 - `main` ist die Code-Basis für alle weiteren Systeme. Der Branch

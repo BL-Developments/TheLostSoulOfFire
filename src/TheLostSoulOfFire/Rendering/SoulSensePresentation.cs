@@ -67,7 +67,7 @@ public sealed class SoulSensePresentation
         batch.Begin(
             SpriteSortMode.Deferred,
             BlendState.AlphaBlend,
-            SamplerState.PointClamp,
+            SamplerState.LinearClamp,
             transformMatrix: worldTransform);
 
         DrawTraces(batch, pixel, presentationTime, amount);

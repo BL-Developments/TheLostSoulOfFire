@@ -13,9 +13,10 @@ namespace TheLostSoulOfFire;
 public sealed class Game1 : Microsoft.Xna.Framework.Game
 {
     /// <summary>
-    /// The game is always simulated and drawn at this fixed resolution; the result is then
-    /// scaled into whatever window size the player has chosen. Keeping this constant means
-    /// the visible world, HUD and menu layout never change with window size.
+    /// The game is always simulated and laid out at this fixed logical resolution and drawn at
+    /// <see cref="RenderResolution.OutputWidth"/>×<see cref="RenderResolution.OutputHeight"/>;
+    /// the result is then scaled into whatever window size the player has chosen. Keeping this
+    /// constant means the visible world, HUD and menu layout never change with window size.
     /// </summary>
     private static readonly Viewport VirtualViewport = new(0, 0, GameBalance.BackBufferWidth, GameBalance.BackBufferHeight);
 
@@ -95,8 +96,8 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         _art = new ArtAssets(Content);
         _virtualTarget = new RenderTarget2D(
             GraphicsDevice,
-            GameBalance.BackBufferWidth,
-            GameBalance.BackBufferHeight,
+            RenderResolution.OutputWidth,
+            RenderResolution.OutputHeight,
             false,
             SurfaceFormat.Color,
             DepthFormat.None);
@@ -176,20 +177,20 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
 
     protected override void Draw(GameTime gameTime)
     {
-        // Phase 1: world and HUD are drawn at the fixed virtual resolution, exactly as
-        // before this game supported resizing. SoulfireRenderer.PresentScene is handed
+        // Phase 1: world and HUD are laid out in the fixed logical resolution and drawn at the
+        // output resolution through RenderResolution.ScaleMatrix. SoulfireRenderer.PresentScene is handed
         // _virtualTarget explicitly so its internal composite lands here rather than on
         // the window's back buffer (MonoGame has no render-target stack — SetRenderTarget
         // always means "this target or the back buffer", never "whatever was bound before").
         GraphicsDevice.SetRenderTarget(_virtualTarget);
         GraphicsDevice.Clear(GameBalance.VoidColor);
-        Viewport viewport = GraphicsDevice.Viewport;
-        _world.Draw(_spriteBatch, _pixel, viewport, _soulfireRenderer, _virtualTarget);
+        _world.Draw(_spriteBatch, _pixel, VirtualViewport, _soulfireRenderer, _virtualTarget);
 
-        // Phase 2: letterbox the finished frame into the actual window.
+        // Phase 2: letterbox the finished frame into the actual window. Linear filtering keeps
+        // the painted art smooth at any window size and is lossless at 1:1 (Full-HD fullscreen).
         GraphicsDevice.SetRenderTarget(null);
         GraphicsDevice.Clear(Color.Black);
-        _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp);
+        _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.LinearClamp);
         _spriteBatch.Draw(_virtualTarget, _resolution.Destination, Color.White);
         _spriteBatch.End();
 

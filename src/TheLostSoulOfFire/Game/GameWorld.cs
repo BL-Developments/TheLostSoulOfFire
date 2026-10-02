@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using TheLostSoulOfFire.Audio;
 using TheLostSoulOfFire.Combat;
+using TheLostSoulOfFire.Core;
 using TheLostSoulOfFire.Effects;
 using TheLostSoulOfFire.Entities;
 using TheLostSoulOfFire.Input;
@@ -583,7 +584,7 @@ public sealed partial class GameWorld : IDisposable
         _soulSensePresentation.DrawSoulLayer(
             batch,
             pixel,
-            _camera.GetTransform(viewport, _screenEffects.ShakeOffset),
+            RenderResolution.ToOutput(_camera.GetTransform(viewport, _screenEffects.ShakeOffset)),
             _player,
             _enemies,
             _souls,
@@ -593,8 +594,8 @@ public sealed partial class GameWorld : IDisposable
             batch.Begin(
                 SpriteSortMode.Deferred,
                 BlendState.Additive,
-                SamplerState.PointClamp,
-                transformMatrix: _camera.GetTransform(viewport, _screenEffects.ShakeOffset));
+                SamplerState.LinearClamp,
+                transformMatrix: RenderResolution.ToOutput(_camera.GetTransform(viewport, _screenEffects.ShakeOffset)));
             _antechamber.DrawSoulSense(batch, pixel, _presentationTime, _soulSensePresentation.SoulEmergence);
             batch.End();
         }
@@ -608,8 +609,8 @@ public sealed partial class GameWorld : IDisposable
         batch.Begin(
             SpriteSortMode.Deferred,
             BlendState.AlphaBlend,
-            SamplerState.PointClamp,
-            transformMatrix: _camera.GetTransform(viewport, _screenEffects.CameraOffset));
+            SamplerState.LinearClamp,
+            transformMatrix: RenderResolution.ToOutput(_camera.GetTransform(viewport, _screenEffects.CameraOffset)));
 
         if (_phase is GamePhase.Antechamber or GamePhase.EnteringArena)
         {
@@ -720,7 +721,7 @@ public sealed partial class GameWorld : IDisposable
             SoulfireLighting.DrawAntechamber(
                 batch,
                 renderer,
-                _camera.GetTransform(viewport, _screenEffects.CameraOffset),
+                RenderResolution.ToOutput(_camera.GetTransform(viewport, _screenEffects.CameraOffset)),
                 _player,
                 _particles,
                 _antechamber,
@@ -733,7 +734,7 @@ public sealed partial class GameWorld : IDisposable
         SoulfireLighting.Draw(
             batch,
             renderer,
-            _camera.GetTransform(viewport, _screenEffects.CameraOffset),
+            RenderResolution.ToOutput(_camera.GetTransform(viewport, _screenEffects.CameraOffset)),
             _player,
             _enemies,
             _souls,
@@ -750,7 +751,7 @@ public sealed partial class GameWorld : IDisposable
 
     private void DrawScreenFeedback(SpriteBatch batch, Texture2D pixel, Viewport viewport)
     {
-        batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
+        batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, transformMatrix: RenderResolution.ScaleMatrix);
 
         if (_screenEffects.ImpactFrameAlpha > 0f)
         {
@@ -773,7 +774,7 @@ public sealed partial class GameWorld : IDisposable
 
     private void DrawHud(SpriteBatch batch, Texture2D pixel, Viewport viewport)
     {
-        batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
+        batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, transformMatrix: RenderResolution.ScaleMatrix);
 
         if (_phase == GamePhase.Prologue)
         {

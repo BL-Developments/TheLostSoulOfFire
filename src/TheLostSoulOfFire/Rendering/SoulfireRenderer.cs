@@ -1,13 +1,14 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using TheLostSoulOfFire.Core;
 using TheLostSoulOfFire.Game;
 
 namespace TheLostSoulOfFire.Rendering;
 
 /// <summary>
 /// Central tuning surface for the restrained scene grade and supernatural light layer.
-/// World art remains PointClamp; only the generated, low-frequency light texture is filtered.
+/// Art is painted and drawn with linear filtering at the output resolution (see RenderResolution).
 /// </summary>
 public static class SoulfireRenderSettings
 {
@@ -42,7 +43,7 @@ public static class SoulfireRenderSettings
 }
 
 /// <summary>
-/// A deliberately small render foundation: one crisp scene target, one procedural glow
+/// A deliberately small render foundation: one output-sized scene target, one procedural glow
 /// texture, and one procedural vignette. UI is drawn after this renderer has finished.
 /// </summary>
 public sealed class SoulfireRenderer : IDisposable
@@ -74,9 +75,13 @@ public sealed class SoulfireRenderer : IDisposable
         _vignetteTexture = CreateVignetteTexture(graphicsDevice);
     }
 
+    /// <summary>
+    /// The scene target is always output-sized; callers keep passing the logical viewport and
+    /// draw through <see cref="RenderResolution.ScaleMatrix"/>.
+    /// </summary>
     public void BeginScene(Viewport viewport)
     {
-        EnsureSceneTarget(viewport.Width, viewport.Height);
+        EnsureSceneTarget(RenderResolution.OutputWidth, RenderResolution.OutputHeight);
         _graphicsDevice.SetRenderTarget(_sceneTarget);
         _graphicsDevice.Clear(GameBalance.VoidColor);
     }
@@ -86,7 +91,7 @@ public sealed class SoulfireRenderer : IDisposable
         _graphicsDevice.SetRenderTarget(rootTarget);
         _graphicsDevice.Clear(GameBalance.VoidColor);
 
-        Rectangle destination = new(0, 0, viewport.Width, viewport.Height);
+        Rectangle destination = RenderResolution.OutputBounds;
         float suppression = MathHelper.Clamp(soulSenseWorldSuppression, 0f, 1f);
         Color sceneGrade = Color.Lerp(
             SoulfireRenderSettings.SceneGrade,
@@ -145,7 +150,7 @@ public sealed class SoulfireRenderer : IDisposable
         batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp);
         batch.Draw(
             _vignetteTexture,
-            new Rectangle(0, 0, viewport.Width, viewport.Height),
+            RenderResolution.OutputBounds,
             Color.White * MathHelper.Clamp(opacity, 0f, 1f));
         batch.End();
     }

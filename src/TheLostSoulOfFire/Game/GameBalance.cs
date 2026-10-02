@@ -4,8 +4,8 @@ namespace TheLostSoulOfFire.Game;
 
 public static class GameBalance
 {
-    public const int BackBufferWidth = 1280;
-    public const int BackBufferHeight = 720;
+    public const int BackBufferWidth = Core.RenderResolution.LogicalWidth;
+    public const int BackBufferHeight = Core.RenderResolution.LogicalHeight;
 
     public const float PlayerMoveSpeed = 310f;
     public const float PlayerRadius = 22f;
