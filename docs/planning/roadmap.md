@@ -1,12 +1,12 @@
 # Priorisierung der offenen Issues und offene Fragen
 
-Stand: 27.09.2026 · Repository: [BL-Developments/TheLostSoulOfFire](https://github.com/BL-Developments/TheLostSoulOfFire/issues)
+Stand: 27.09.2026, ergänzt am 02.10.2026 · Repository: [BL-Developments/TheLostSoulOfFire](https://github.com/BL-Developments/TheLostSoulOfFire/issues)
 
 ## Ausgangslage und Maßstab
 
 Es sind 25 Issues offen: [#5](https://github.com/BL-Developments/TheLostSoulOfFire/issues/5) ist die Planungsübersicht, die übrigen 24 sind Arbeitsaufgaben. Die Reihenfolge unten richtet sich nach Abhängigkeiten und danach, wie schnell ein vollständiger, überprüfbarer Run entsteht. Sie ist keine Aussage über bereits erledigte Implementierung. In den Issues liegen derzeit keine klärenden Kommentare vor.
 
-**Vor jeder Umsetzung die Branchgrundlage klären:** Der aktuell ausgecheckte `main` enthält weder den in #8 vorausgesetzten `PrologueDirector` noch `docs/current/CURRENT-SLICE.md`, auf das #5 verweist. Beides liegt auf `prototype/design-polish`. Auch der hier vorhandene Stand von `develop` enthält den `PrologueDirector` nicht. Ohne Entscheidung über den Zielbranch würde „bestehenden Prolog anpassen“ auf `main` faktisch zum Neubau.
+**Branchgrundlage klären:** Der Solo-Prolog mit `PrologueDirector` ist seit PR #37 auf `main`. Lokaler Koop, TeamResonance, Severance Window und Down/Stabilisieren existieren dagegen nur auf `prototype/design-polish`. Offen ist, ob diese Systeme nach `main` portiert, gemergt oder neu gebaut werden. Entscheidungslog, Aufnahme-Zusammenfassung, Canon und Lore liegen seit dem 02.10.2026 unter `docs/current/`.
 
 Die Aufnahme hat laut #5 bei Konflikten Vorrang vor älteren Repo-Dokumenten. Die dort genannten 50 % Teilsicherung, 1.000 Ressourceneinheiten und drei beziehungsweise fünf Levels sind Beispiele, keine beschlossenen Werte. Drei Fähigkeitsangebote mit zwei Auswahlen sind dagegen das konkret besprochene Startmodell.
 
@@ -69,12 +69,12 @@ Die Aufnahme hat laut #5 bei Konflikten Vorrang vor älteren Repo-Dokumenten. Di
 ### Sofort klären – sie blockieren Architektur oder Umsetzung
 
 1. **Welcher Branch ist die Produktgrundlage?** Soll `prototype/design-polish` in den aktuellen Entwicklungsstand übernommen werden, oder sollen die Issues für den tatsächlichen `main`-Stand neu zugeschnitten werden? Betrifft bereits #8, #11 und die Annahmen in #5.
-2. **Welche Dokumente gelten bei Widersprüchen?** #5 gibt der Aufnahme Vorrang; ältere MVP-Dokumente nennen Entscheidungen teils noch „locked“. #6 sollte konkret festhalten, was ersetzt wird.
+2. ~~**Welche Dokumente gelten bei Widersprüchen?**~~ *Entschieden am 02.10.2026: `docs/current/` mit dem Entscheidungslog gilt vor `docs/mvp/` und `docs/vision/`.* #5 gibt der Aufnahme Vorrang; ältere MVP-Dokumente nennen Entscheidungen teils noch „locked“. #6 sollte konkret festhalten, was ersetzt wird.
 3. **Was genau sind die beiden Währungen?** Wie heißen sie, wodurch entstehen sie, wofür werden sie ausgegeben und welche Bestände sind im Run beziehungsweise dauerhaft verfügbar? Wann wird eine Soul Release genau einmal gutgeschrieben? (#7)
 4. **Wie funktioniert Teilsicherung exakt?** Welche Quote gilt, wie wird gerundet, darf mehrfach pro Run gesichert werden und was geschieht bei erneutem Besuch desselben Reisepunkts? Was wird bei vollständiger Extraktion übertragen? (#7, #18)
 5. **Was geschieht mit normalem Geld bei Niederlage?** Der Verlust ungesicherter mystischer Ressource ist vorgesehen; für Geld ist die Regel offen. (#7)
 6. **Wem gehören Ressourcen und Fortschritt im lokalen Koop?** Gemeinsame oder persönliche Konten, Waffen, Freischaltungen und Meta-Fortschritt? Wie werden widersprüchliche Entscheidungen am Reisepunkt aufgelöst? (#9)
-7. **Was bedeutet Run-Niederlage in der Welt?** Wie kehrt ein Warden zurück, während endgültige Zerstörung laut älterer Lore eine andere Folge hat? (#6)
+7. ~~**Was bedeutet Run-Niederlage in der Welt?**~~ *Entschieden am 29.09.2026: Kampfunfähigkeit und Bergung vor endgültiger Zerstörung, Rückkehr zur Homebase (Entscheidungslog).* Wie kehrt ein Warden zurück, während endgültige Zerstörung laut älterer Lore eine andere Folge hat? (#6)
 8. **Wie lädt sich die Ultimate auf und wem gehört die Ladung?** Teamweit oder pro Spieler; durch Kampf, Zeit oder Orte? Was bleibt bei Levelwechsel und Niederlage erhalten? Die bisherige Resonance-Aktivierung darf nicht ungeprüft das Wirtschaftskonto leeren. (#13)
 
 ### Vor Content- und Fortschrittsproduktion klären
