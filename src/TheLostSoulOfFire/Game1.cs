@@ -40,6 +40,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     private float _abilityTestTime;
     private int _abilityTestStep;
     private bool _abilityMenuCaptured;
+    private int _abilityMenuTestStep;
     private void ConfigureAbilityVisualTest(float dt)
     {
         _abilityTestTime += dt;
@@ -49,12 +50,19 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         {
             _input.InjectKeyPress(Keys.C);
             _abilityMenuCaptured = true;
-            _screenshotRequested = true;
+            _abilityTestTime = 0;
         }
-        else if (_abilityMenuCaptured && _abilityTestStep == 0 && _abilityTestTime > 0.7f)
+        else if (_abilityMenuCaptured && _abilityTestStep == 0 && _abilityTestTime > 0.35f)
         {
-            _input.InjectKeyPress(Keys.Enter);
-            _abilityTestStep = 1;
+            switch (_abilityMenuTestStep++)
+            {
+                case 0: _screenshotRequested = true; break;
+                case 1: _input.InjectKeyPress(Keys.X); _input.InjectKeyPress(Keys.D4); break;
+                case 2: _screenshotRequested = true; break;
+                case 3: _input.InjectKeyPress(Keys.Z); _input.InjectKeyPress(Keys.D5); break;
+                case 4: _world.VerifyAutomatedSkillLoadout(); _screenshotRequested = true; break;
+                default: _input.InjectKeyPress(Keys.Enter); _abilityTestStep = 1; break;
+            }
             _abilityTestTime = 0;
         }
         if (_world.LoopState != ArenaLoopState.Combat) return;
@@ -67,9 +75,23 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
                 _abilityTestStep++;
                 _abilityTestTime = 0;
             }
-            else if (_abilityTestStep > 6)
+            else if (_abilityTestStep == 7)
             {
-                Console.WriteLine("ABILITY_VISUAL_TEST_PASS sixCasts=true menu=true profile=isolated");
+                _world.ShowAutomatedSkillsMenu(true);
+                _input.InjectKeyPress(Keys.D3);
+                _abilityTestStep++;
+                _abilityTestTime = 0;
+            }
+            else if (_abilityTestStep == 8)
+            {
+                _world.VerifyAutomatedSkillLoadout();
+                _screenshotRequested = true;
+                _abilityTestStep++;
+                _abilityTestTime = 0;
+            }
+            else if (_abilityTestStep > 8)
+            {
+                Console.WriteLine("ABILITY_VISUAL_TEST_PASS sixCasts=true menu=true skills=true selection=true combatLocked=true profile=isolated");
                 Exit();
             }
         }

@@ -87,12 +87,12 @@ public sealed partial class GameWorld : IDisposable
     private float _transitSpawnTimer;
     private bool _transitArrivalCuePlayed;
 
-    public string ScreenshotContext => _abilitySelectionOpen ? "ability_selection" :
+    public string ScreenshotContext => _characterMenu.IsOpen ? GetScreenshotContext() :
         _abilities.FeedbackRemaining > 0 ? "ability_" + _abilities.Feedback : GetScreenshotContext();
     public GamePhase Phase => _phase;
     internal PrologueStage PrologueStage => _prologue.Stage;
-    /// <summary>Pause, character, dev menu or ability selection is open; the world is frozen under each of them.</summary>
-    private bool IsGamePaused => _pauseMenu.IsOpen || _characterMenu.IsOpen || _devMenu.IsOpen || _abilitySelectionOpen;
+    /// <summary>Pause, character or dev menu is open; the world is frozen under each of them.</summary>
+    private bool IsGamePaused => _pauseMenu.IsOpen || _characterMenu.IsOpen || _devMenu.IsOpen;
     private bool IsCombatPhase => _phase is GamePhase.Arena or GamePhase.Prologue;
     private Rectangle ActiveCombatBounds => _phase == GamePhase.Prologue ? _prologue.MovementBounds : _arena.CombatBounds;
     private Rectangle ActiveWorldBounds => _phase == GamePhase.Prologue ? PrologueDirector.WorldBounds : _arena.Bounds;
@@ -578,7 +578,8 @@ public sealed partial class GameWorld : IDisposable
     private void UpdateCharacterMenu(float deltaTime, InputState input, Viewport viewport)
     {
         _characterMenu.Tick(deltaTime);
-        if (input.WasKeyPressed(Keys.Tab) || input.WasKeyPressed(Keys.Escape))
+        if (input.WasKeyPressed(Keys.Tab) || input.WasKeyPressed(Keys.Escape) ||
+            _characterMenu.SelectedTab == CharacterMenuTab.Abilities && (input.WasKeyPressed(Keys.C) || input.WasKeyPressed(Keys.Enter)))
         {
             _characterMenu.Close();
             _audio.SetPaused(false);
@@ -600,6 +601,8 @@ public sealed partial class GameWorld : IDisposable
                 }
             }
         }
+        if (_characterMenu.SelectedTab == CharacterMenuTab.Abilities)
+            UpdateSkillSelection(input, viewport);
     }
 
     private CharacterSheet CurrentCharacterSheet => new(
@@ -1000,7 +1003,7 @@ public sealed partial class GameWorld : IDisposable
 
         if (_characterMenu.IsOpen)
         {
-            _presentation.DrawCharacterMenu(batch, pixel, viewport, _characterMenu, CurrentCharacterSheet);
+            _presentation.DrawCharacterMenu(batch, pixel, viewport, _characterMenu, CurrentCharacterSheet, CurrentAbilityCards(), AbilityChoicePhase);
         }
 
         if (_devMenu.IsOpen)
@@ -1396,7 +1399,6 @@ public sealed partial class GameWorld : IDisposable
     private void ClearRunState(bool stayInSandbox = false)
     {
         _abilities.Clear(_player);
-        _abilitySelectionOpen = false;
         _enemies.Clear();
         _souls.Clear();
         _cannonShots.Clear();

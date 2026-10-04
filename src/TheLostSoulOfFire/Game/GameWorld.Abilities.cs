@@ -11,8 +11,6 @@ namespace TheLostSoulOfFire.Game;
 public sealed partial class GameWorld
 {
     private readonly RunAbilities _abilities = new();
-    private bool _abilitySelectionOpen;
-    private int _abilitySelectionSlot;
     internal void ShowAutomatedAbility(RunAbility ability)
     {
         _player.Reset(ActiveCombatBounds.Center.ToVector2());
@@ -32,31 +30,65 @@ public sealed partial class GameWorld
         }
     }
 
-    /// <summary>The sandbox has no intermission, so there the selection is open during combat as well.</summary>
-    private bool CanChooseAbilities => !_pauseMenu.IsOpen && !_characterMenu.IsOpen && !_devMenu.IsOpen && !_player.IsDead && (_phase == GamePhase.Antechamber ||
+    private bool AbilityChoicePhase => !_player.IsDead && (_phase == GamePhase.Antechamber ||
         _phase == GamePhase.Arena && (_sandboxActive || _loopState is ArenaLoopState.Intermission or ArenaLoopState.Intro));
+    private bool CanChooseAbilities => !_pauseMenu.IsOpen && !_characterMenu.IsOpen && !_devMenu.IsOpen && AbilityChoicePhase;
+
+    private AbilityCard[] CurrentAbilityCards()
+    {
+        var cards = new AbilityCard[RunAbilities.Definitions.Length];
+        for (int i = 0; i < cards.Length; i++)
+            cards[i] = AbilityCard.Create((RunAbility)i, _abilities, _player, _wallet.Run(Currency.Glut),
+                _phase == GamePhase.Arena && _loopState == ArenaLoopState.Combat, freeCast: _sandboxActive);
+        return cards;
+    }
+
+    private void OpenSkillsMenu()
+    {
+        _characterMenu.Open();
+        _characterMenu.Select(TheLostSoulOfFire.Menu.CharacterMenuTab.Abilities);
+        _audio.SetPaused(true);
+    }
+
+    internal void ShowAutomatedSkillsMenu(bool open)
+    {
+        if (open) OpenSkillsMenu();
+        else { _characterMenu.Close(); _audio.SetPaused(false); }
+    }
+
+    internal void VerifyAutomatedSkillLoadout()
+    {
+        if (_abilities.Slots[0] != RunAbility.Revenge || _abilities.Slots[1] != RunAbility.Vortex)
+            throw new InvalidOperationException("Skill menu did not equip the expected slots.");
+    }
 
     private bool HandleAbilitySelection(InputState input)
     {
-        if (!_abilitySelectionOpen && CanChooseAbilities && input.WasKeyPressed(Keys.C))
-        {
-            _abilitySelectionOpen = true;
-            _audio.SetPaused(true);
-            return true;
-        }
-        if (!_abilitySelectionOpen) return false;
-        if (input.WasKeyPressed(Keys.C) || input.WasKeyPressed(Keys.Escape) || input.WasKeyPressed(Keys.Enter))
-        {
-            _abilitySelectionOpen = false;
-            _audio.SetPaused(false);
-            return true;
-        }
-        if (input.WasKeyPressed(Keys.Left) || input.WasKeyPressed(Keys.Right))
-            _abilitySelectionSlot = 1 - _abilitySelectionSlot;
+        if (!CanChooseAbilities || _devMenu.IsOpen || !input.WasKeyPressed(Keys.C)) return false;
+        OpenSkillsMenu();
+        return true;
+    }
+
+    private void UpdateSkillSelection(InputState input, Viewport viewport)
+    {
+        if (input.WasKeyPressed(Keys.Z)) _characterMenu.SelectSkillSlot(0);
+        if (input.WasKeyPressed(Keys.X)) _characterMenu.SelectSkillSlot(1);
         Keys[] keys = [Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.D5, Keys.D6];
         for (int i = 0; i < keys.Length; i++)
-            if (input.WasKeyPressed(keys[i])) _abilities.Equip(_abilitySelectionSlot, (RunAbility)i);
-        return true;
+            if (input.WasKeyPressed(keys[i])) _characterMenu.EquipSkill(_abilities, (RunAbility)i, AbilityChoicePhase);
+        if (!input.WasLeftMousePressed) return;
+        for (int slot = 0; slot < 2; slot++)
+            if (AbilityPresentation.SlotBounds(viewport, slot).Contains(input.MouseVirtualPosition))
+            {
+                _characterMenu.SelectSkillSlot(slot);
+                return;
+            }
+        for (int i = 0; i < RunAbilities.Definitions.Length; i++)
+            if (AbilityPresentation.CatalogueBounds(viewport, i).Contains(input.MouseVirtualPosition))
+            {
+                _characterMenu.EquipSkill(_abilities, (RunAbility)i, AbilityChoicePhase);
+                return;
+            }
     }
 
     private void UpdateAbilities(float dt, InputState input)
@@ -101,46 +133,18 @@ public sealed partial class GameWorld
 
     private void DrawAbilityHud(SpriteBatch batch, Texture2D pixel, Viewport viewport)
     {
+        if (_characterMenu.IsOpen || _player.IsDead) return;
         if (_phase != GamePhase.Arena && _phase != GamePhase.Antechamber) return;
         if (_phase == GamePhase.Arena && _loopState == ArenaLoopState.Complete) return;
+        var cards = CurrentAbilityCards();
         for (int slot = 0; slot < 2; slot++)
-        {
-            RunAbility ability = _abilities.Slots[slot];
-            AbilityDefinition definition = RunAbilities.Definitions[(int)ability];
-            float cooldown = _abilities.Cooldown(ability);
-            bool affordable = _sandboxActive || _wallet.Run(Currency.Glut) >= definition.Cost;
-            int x = 24 + slot * 300;
-            Rectangle panel = new(x, viewport.Height - 105, 288, 40);
-            batch.FillRectangle(pixel, panel, Color.Black * 0.8f);
-            string cost = _sandboxActive ? "FREI" : $"{definition.Cost} GLUT";
-            string label = $"{(slot == 0 ? "Z" : "X")}  {definition.Name}  {cost}";
-            PixelText.Draw(batch, pixel, label, new Vector2(x + 10, panel.Y + 7), 1,
-                affordable ? GameBalance.DeathFlameBright : Color.Gray);
-            string state = cooldown > 0 ? $"BEREIT IN {cooldown:0.0}S" :
-                !affordable ? "GLUT FEHLT" : "BEREIT";
-            PixelText.Draw(batch, pixel, state, new Vector2(x + 10, panel.Y + 23), 1, GameBalance.SoulWhite * 0.7f);
-        }
+            AbilityPresentation.DrawHud(batch, pixel, viewport, cards[(int)_abilities.Slots[slot]]);
+        PixelText.Draw(batch, pixel, "TAB  FÄHIGKEITEN UND CHARAKTER", new Vector2(24, viewport.Height - 57), 1, GameBalance.SoulWhite * 0.55f);
         if (CanChooseAbilities)
-            PixelText.Draw(batch, pixel, "C  FAEHIGKEITEN WAEHLEN", new Vector2(650, viewport.Height - 85), 1, GameBalance.DeathFlameBright);
+            PixelText.Draw(batch, pixel, "C  FAEHIGKEITEN WAEHLEN", new Vector2(380, viewport.Height - 57), 1, GameBalance.DeathFlameBright);
         if (_abilities.FeedbackRemaining > 0)
             PixelText.DrawCentered(batch, pixel, _abilities.Feedback, viewport.Width * 0.5f, 85, 1, GameBalance.GlutBright);
         if (_player.AbilityEffects.SetupRemaining > 0 || _player.AbilityEffects.RevengeRemaining > 0)
             PixelText.DrawCentered(batch, pixel, "NAECHSTER TREFFER VERSTAERKT", viewport.Width * 0.5f, 102, 1, GameBalance.DeathFlameBright);
-        if (!_abilitySelectionOpen) return;
-        batch.FillRectangle(pixel, new Rectangle(0, 0, viewport.Width, viewport.Height), Color.Black * 0.88f);
-        PixelText.DrawCentered(batch, pixel, "FAEHIGKEITEN", viewport.Width * 0.5f, 125, 3, GameBalance.DeathFlameBright);
-        PixelText.DrawCentered(batch, pixel, $"SLOT {_abilitySelectionSlot + 1}  -  LINKS / RECHTS WECHSELN", viewport.Width * 0.5f, 170, 1, GameBalance.SoulWhite);
-        for (int i = 0; i < 6; i++)
-        {
-            AbilityDefinition definition = RunAbilities.Definitions[i];
-            int y = 210 + i * 62;
-            bool selected = Array.IndexOf(_abilities.Slots, (RunAbility)i) >= 0;
-            string cost = _sandboxActive ? "FREI" : $"{definition.Cost} GLUT";
-            PixelText.Draw(batch, pixel, $"{i + 1}  {definition.Name}   {cost}{(selected ? "  AUSGERUESTET" : "")}",
-                new Vector2(260, y), 2, selected ? GameBalance.GlutBright : GameBalance.DeathFlameBright);
-            PixelText.Draw(batch, pixel, definition.Description, new Vector2(260, y + 26), 1, GameBalance.SoulWhite * 0.8f);
-        }
-        PixelText.DrawCentered(batch, pixel, "1-6 AUSWAEHLEN   ENTER / C SCHLIESSEN", viewport.Width * 0.5f, 625, 1, GameBalance.SoulWhite);
     }
 }
-
