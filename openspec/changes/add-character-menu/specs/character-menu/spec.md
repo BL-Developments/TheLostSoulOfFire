@@ -76,6 +76,17 @@ Das System SHALL auf der Seite `CHARAKTER` die aktuellen Werte des Spielers anze
 - **WHEN** der Spieler mit Rüstung 10 einen Hollow-Hieb erlitten hat und das Charaktermenü öffnet
 - **THEN** zeigt die Seite `LEBEN 87 / 100`
 
+### Requirement: Die Charakterseite zeigt die Währungen
+Das System SHALL auf der Seite `CHARAKTER` unter den Charakterwerten einen Abschnitt `WÄHRUNGEN` mit je einer Zeile für `GELD` und `GLUT` anzeigen. In der Arena SHALL jede Zeile den Run-Bestand und den gesicherten Bestand nennen (`IM LAUF <n>` und `GESICHERT <n>`); außerhalb der Arena SHALL sie nur den gesicherten Bestand nennen. Die Beträge SHALL dieselben sein, die `run-currencies` führt.
+
+#### Scenario: Währungen im Run
+- **WHEN** der Spieler in der Arena 25 Geld und 19 Glut im Run hat, 50 Geld und 30 Glut gesichert sind und er das Charaktermenü öffnet
+- **THEN** zeigt die Seite `GELD` mit `IM LAUF 25` und `GESICHERT 50` sowie `GLUT` mit `IM LAUF 19` und `GESICHERT 30`
+
+#### Scenario: Währungen im Hub
+- **WHEN** der Spieler im Hub mit 50 gesichertem Geld und 30 gesicherter Glut das Charaktermenü öffnet
+- **THEN** zeigt die Seite `GELD` mit `GESICHERT 50` und `GLUT` mit `GESICHERT 30` und keinen Run-Bestand
+
 ### Requirement: Map und Skills sind Platzhalter
 Das System SHALL die Reiter `MAP` und `SKILLS` wählbar machen, sie in der gedämpften Farbe der Platzhaltereinträge des Hauptmenüs darstellen und auf ihrer Seite nur den Hinweis `NOCH NICHT VERFÜGBAR` zeigen.
 

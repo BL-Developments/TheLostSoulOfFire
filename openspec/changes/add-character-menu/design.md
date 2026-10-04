@@ -16,7 +16,7 @@ Die Charakterwerte stehen seit `add-player-attributes` in `Player.Attributes` (`
 
 - Inhalte für Map und Skills, Werte erhöhen, Ausrüstung oder Inventar.
 - Gamepad-Bedienung und Tastenbelegung ändern (fehlt auch beim Pausenmenü).
-- Währungen im Charaktermenü; sie stehen schon im HUD und im Hub.
+- Währungen ausgeben oder umbuchen; die Seite zeigt sie nur an.
 
 ## Decisions
 
@@ -36,6 +36,8 @@ Die Charakterwerte stehen seit `add-player-attributes` in `Player.Attributes` (`
 | RÜSTUNG | `10` | `SCHADENSVERRINGERUNG 17 %` |
 
 Prozentwerte kommen aus `PlayerAttributes` (`(Multiplier − 1) × 100`, `ArmorReduction × 100`), gerundet auf ganze Zahlen, beim Schaden mit Vorzeichen. `PixelText` kennt bisher kein `+`; das Zeichen wird ergänzt. Damit stimmen Anzeige und Rechnung immer überein. Die Werte werden bei jedem Zeichnen aus dem Spieler gelesen, nicht beim Öffnen kopiert.
+
+**Währungen auf der Charakterseite.** Unter den Werten folgt ein Abschnitt `WÄHRUNGEN` mit je einer Zeile für `GELD` und `GLUT`, gelesen aus `CurrencyWallet`. In der Arena nennt jede Zeile `IM LAUF <n>` und `GESICHERT <n>`, damit sichtbar ist, was bei einer Niederlage verloren ginge. Außerhalb der Arena gibt es keinen Run, der Run-Bestand wäre immer 0; dort steht nur `GESICHERT <n>`. Die Farben der Bezeichnungen folgen den Akzenten des Währungs-HUD, damit Geld und Glut überall gleich aussehen.
 
 **Platzhalterseiten.** `MAP` und `SKILLS` sind wählbar und zeigen mittig einen gedämpften Hinweis `NOCH NICHT VERFÜGBAR`. Ihre Reiter stehen in der gedämpften Platzhalterfarbe wie Platzhaltereinträge im Hauptmenü.
 
