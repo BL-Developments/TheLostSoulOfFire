@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TheLostSoulOfFire.Combat;
 
 namespace TheLostSoulOfFire.Debugging;
 
@@ -18,10 +19,12 @@ public enum DeveloperStartArea
 
 /// <summary>
 /// Parses the developer start parameters (<c>--dev --start &lt;area&gt; [--wave n]</c>) that let a
-/// feature be reached directly instead of playing through title, prologue and hub. Kept free of
-/// MonoGame so the command-line rules are testable on their own.
+/// feature be reached directly instead of playing through title, prologue and hub. The optional
+/// <c>--strength</c>, <c>--ability-power</c> and <c>--armor</c> flags override the player's
+/// attributes so their scaling can be tried out. Kept free of MonoGame so the command-line rules
+/// are testable on their own.
 /// </summary>
-public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave)
+public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, PlayerAttributes? AttributeOverride = null)
 {
     public const int MinWave = 1;
     public const int MaxWave = 4;
@@ -54,14 +57,23 @@ public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave)
     public string AreaName => Areas.First(entry => entry.Area == Area).Name;
 
     public static string Usage =>
-        "Usage: dotnet run --project src/TheLostSoulOfFire -- --dev [--start <area>] [--wave <1-4>]" + Environment.NewLine +
+        "Usage: dotnet run --project src/TheLostSoulOfFire -- --dev [--start <area>] [--wave <1-4>] [--strength <n>] [--ability-power <n>] [--armor <n>]" + Environment.NewLine +
         $"Areas: {string.Join(", ", AreaNames)}" + Environment.NewLine +
-        "--wave is only valid with --start arena.";
+        "--wave is only valid with --start arena." + Environment.NewLine +
+        $"Attributes range from {PlayerAttributes.MinValue} to {PlayerAttributes.MaxValue}; unset ones keep {PlayerAttributes.Baseline}.";
+
+    private static readonly string[] AttributeFlags = ["--strength", "--ability-power", "--armor"];
 
     /// <summary>The console line written when a developer start takes effect.</summary>
-    public string Describe() => Area == DeveloperStartArea.Arena
-        ? $"DEV_START area={AreaName} wave={Wave}"
-        : $"DEV_START area={AreaName}";
+    public string Describe()
+    {
+        string line = Area == DeveloperStartArea.Arena
+            ? $"DEV_START area={AreaName} wave={Wave}"
+            : $"DEV_START area={AreaName}";
+        return AttributeOverride is { } attributes
+            ? $"{line} strength={attributes.Strength} ability-power={attributes.AbilityPower} armor={attributes.Armor}"
+            : line;
+    }
 
     /// <summary>
     /// Returns true when the arguments are valid. <paramref name="options"/> is null when
@@ -76,6 +88,7 @@ public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave)
         bool dev = false;
         string? startValue = null;
         string? waveValue = null;
+        string?[] attributeValues = new string?[AttributeFlags.Length];
 
         for (int i = 0; i < args.Length; i++)
         {
@@ -102,14 +115,28 @@ public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave)
                     }
                     waveValue = args[++i];
                     break;
+
+                default:
+                    int attributeIndex = Array.IndexOf(AttributeFlags, args[i]);
+                    if (attributeIndex < 0)
+                    {
+                        break;
+                    }
+                    if (i + 1 >= args.Length || args[i + 1].StartsWith("--", StringComparison.Ordinal))
+                    {
+                        error = $"{args[i]} needs a number.";
+                        return false;
+                    }
+                    attributeValues[attributeIndex] = args[++i];
+                    break;
             }
         }
 
         if (!dev)
         {
-            if (startValue is not null || waveValue is not null)
+            if (startValue is not null || waveValue is not null || attributeValues.Any(value => value is not null))
             {
-                error = "--start and --wave require --dev.";
+                error = "--start, --wave and attribute flags require --dev.";
                 return false;
             }
             return true;
@@ -150,7 +177,27 @@ public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave)
             }
         }
 
-        options = new DeveloperStartOptions(area, wave);
+        int[] attributes = [PlayerAttributes.Baseline, PlayerAttributes.Baseline, PlayerAttributes.Baseline];
+        for (int i = 0; i < AttributeFlags.Length; i++)
+        {
+            string? value = attributeValues[i];
+            if (value is null)
+            {
+                continue;
+            }
+
+            if (!int.TryParse(value, out attributes[i]) || attributes[i] < PlayerAttributes.MinValue || attributes[i] > PlayerAttributes.MaxValue)
+            {
+                error = $"{AttributeFlags[i]} must be between {PlayerAttributes.MinValue} and {PlayerAttributes.MaxValue}, got '{value}'.";
+                return false;
+            }
+        }
+
+        PlayerAttributes? attributeOverride = attributeValues.Any(value => value is not null)
+            ? new PlayerAttributes(attributes[0], attributes[1], attributes[2])
+            : null;
+
+        options = new DeveloperStartOptions(area, wave, attributeOverride);
         return true;
     }
 }

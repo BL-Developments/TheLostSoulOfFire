@@ -54,6 +54,7 @@ public sealed class Player
     public float ResonanceRemaining => _resonanceTimer;
     public float ResonanceActivationRemaining => _resonanceActivationTimer;
     public bool SoulSenseActive { get; private set; }
+    public PlayerAttributes Attributes { get; set; } = PlayerAttributes.Default;
     public ScytheCombat Scythe { get; } = new();
     public SoulCannon Cannon { get; } = new();
 
@@ -163,9 +164,10 @@ public sealed class Player
                 !IsDashing && Scythe.ActiveStep == 0,
                 SoulSenseActive,
                 particles,
-                ResonanceActive);
+                ResonanceActive,
+                Attributes);
 
-            Scythe.Update(deltaTime, input, FacingDirection, Position, particles, !IsDashing && Cannon.CanUseScythe, ResonanceActive);
+            Scythe.Update(deltaTime, input, FacingDirection, Position, particles, !IsDashing && Cannon.CanUseScythe, ResonanceActive, Attributes);
             if (Scythe.StartedThisFrame)
             {
                 _attackImpulse = Scythe.AttackDirection * Scythe.GetForwardImpulse();
@@ -324,14 +326,15 @@ public sealed class Player
         screenEffects.AddShake(0.1f, 3f);
     }
 
-    public void ApplyDamage(int damage, Vector2 knockback, ScreenEffects screenEffects)
+    public void ApplyDamage(int damage, Vector2 knockback, ScreenEffects screenEffects, bool ignoreArmor = false)
     {
         if (IsDead || IsInvulnerable)
         {
             return;
         }
 
-        Health = Math.Max(0, Health - damage);
+        int taken = ignoreArmor ? damage : Attributes.MitigateIncomingDamage(damage);
+        Health = Math.Max(0, Health - taken);
         HitFlashRemaining = Health == 0 ? 0.24f : 0.14f;
         _damageKnockback += knockback;
         InvulnerabilityRemaining = 0.5f;

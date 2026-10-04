@@ -11,6 +11,11 @@ public sealed partial class GameWorld
 {
     public void ApplyDeveloperStart(DeveloperStartOptions options, Viewport viewport)
     {
+        if (options.AttributeOverride is { } attributes)
+        {
+            _player.Attributes = attributes;
+        }
+
         switch (options.Area)
         {
             case DeveloperStartArea.Title:

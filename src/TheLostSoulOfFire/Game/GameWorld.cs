@@ -363,7 +363,7 @@ public sealed partial class GameWorld : IDisposable
         if (_audioTestFatalDamageRequested)
         {
             _audioTestFatalDamageRequested = false;
-            _player.ApplyDamage(GameBalance.PlayerMaxHealth, Vector2.Zero, _screenEffects);
+            _player.ApplyDamage(GameBalance.PlayerMaxHealth, Vector2.Zero, _screenEffects, ignoreArmor: true);
         }
         if (_player.Scythe.StartedThisFrame)
         {
