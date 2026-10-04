@@ -23,6 +23,10 @@ dotnet run --project src/TheLostSoulOfFire
 
 Mit `Escape` oder der Zurück-Taste eines Controllers wird das Spiel beendet.
 
+Im Spiel öffnet `Escape` das Pausenmenü und `Tab` das Charaktermenü mit den
+Reitern Charakter, Map und Skills. Die Charakterseite zeigt Leben,
+Charakterwerte und Währungen; `Tab` oder `Escape` schließt das Menü wieder.
+
 ## Developer-Mode
 
 Mit `--dev` und `--start <bereich>` beginnt das Spiel direkt im gewählten
