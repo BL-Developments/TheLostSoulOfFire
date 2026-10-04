@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: F öffnet und schließt das Dev-Menü der Sandbox
-Das System SHALL in der Sandbox bei `F` das Dev-Menü öffnen, sofern weder Pausenmenü noch Charaktermenü noch Dev-Menü geöffnet sind. Bei geöffnetem Dev-Menü SHALL `F` oder `Escape` es schließen und die Sandbox an derselben Stelle fortsetzen; dabei SHALL weder das Pausenmenü noch das Charaktermenü erscheinen, und `Tab` SHALL bei geöffnetem Dev-Menü wirkungslos bleiben. Außerhalb der Sandbox SHALL `F` nichts bewirken.
+Das System SHALL in der Sandbox bei `F` das Dev-Menü öffnen, sofern weder Pausenmenü noch Charaktermenü noch Dev-Menü geöffnet sind und der Spieler nicht besiegt ist. Bei geöffnetem Dev-Menü SHALL `F` oder `Escape` es schließen und die Sandbox an derselben Stelle fortsetzen; dabei SHALL weder das Pausenmenü noch das Charaktermenü erscheinen, und `Tab` SHALL bei geöffnetem Dev-Menü wirkungslos bleiben. Außerhalb der Sandbox SHALL `F` nichts bewirken.
 
 #### Scenario: Öffnen in der Sandbox
 - **WHEN** der Spieler in der Sandbox `F` drückt
@@ -14,6 +14,10 @@ Das System SHALL in der Sandbox bei `F` das Dev-Menü öffnen, sofern weder Paus
 #### Scenario: Andere Menüs offen
 - **WHEN** der Spieler bei geöffnetem Pausen- oder Charaktermenü `F` drückt
 - **THEN** öffnet sich kein Dev-Menü
+
+#### Scenario: Nach einer Niederlage
+- **WHEN** der Spieler in der Sandbox besiegt ist und `F` drückt
+- **THEN** öffnet sich kein Dev-Menü, und `R` setzt ihn wie gewohnt zurück
 
 #### Scenario: Außerhalb der Sandbox
 - **WHEN** der Spieler in der regulären Arena, im Hub oder im Prolog `F` drückt

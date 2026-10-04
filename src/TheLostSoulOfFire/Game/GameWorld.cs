@@ -176,7 +176,7 @@ public sealed partial class GameWorld : IDisposable
             return;
         }
 
-        if (_sandboxActive && input.WasKeyPressed(Keys.F))
+        if (_sandboxActive && !_player.IsDead && input.WasKeyPressed(Keys.F))
         {
             _devMenu.Open();
             _audio.SetPaused(true);
@@ -599,7 +599,7 @@ public sealed partial class GameWorld : IDisposable
 
     private CharacterSheet CurrentCharacterSheet => new(
         _player.Health,
-        GameBalance.PlayerMaxHealth,
+        _player.MaxHealth,
         _player.Attributes,
         _phase == GamePhase.Arena && !_sandboxActive,
         _wallet.Run(Currency.Geld),
@@ -1384,7 +1384,8 @@ public sealed partial class GameWorld : IDisposable
         _audio.SetArenaActive(false, true);
     }
 
-    private void ClearRunState()
+    /// <param name="stayInSandbox">Keeps the sandbox (and its character values) for a reset inside it.</param>
+    private void ClearRunState(bool stayInSandbox = false)
     {
         _enemies.Clear();
         _souls.Clear();
@@ -1405,7 +1406,11 @@ public sealed partial class GameWorld : IDisposable
         _soulSensePresentation.Reset();
         _audioTestFatalDamageRequested = false;
         _endingRevealPlayed = false;
-        _sandboxActive = false;
+        if (_sandboxActive && !stayInSandbox)
+        {
+            RestoreSandboxStartValues();
+        }
+        _sandboxActive = stayInSandbox;
     }
 
     private void ConfigureBurningAggression(float deltaTime)
@@ -1548,7 +1553,7 @@ public sealed partial class GameWorld : IDisposable
 
         Color label = new(189, 231, 226);
         PixelText.Draw(batch, pixel, $"FPS: {_fps}", new Vector2(x, y), 2, label);
-        PixelText.Draw(batch, pixel, $"HP: {_player.Health}/{GameBalance.PlayerMaxHealth}", new Vector2(x, y + 24), 2, label);
+        PixelText.Draw(batch, pixel, $"HP: {_player.Health}/{_player.MaxHealth}", new Vector2(x, y + 24), 2, label);
         string resonance = _player.ResonanceActive
             ? $"RESONANCE: {_player.ResonanceRemaining:0.0}"
             : $"RESONANCE: {_player.Resonance:0}/{GameBalance.ResonanceRequired:0}";

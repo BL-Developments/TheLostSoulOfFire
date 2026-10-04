@@ -4,7 +4,7 @@ In der Sandbox (`add-sandbox-start`) sollen sich laut #104 Charakterwerte setzen
 
 ## What Changes
 
-- `F` öffnet in der Sandbox das Dev-Menü; `F` oder `Escape` schließen es wieder. Außerhalb der Sandbox bewirkt `F` nichts.
+- `F` öffnet in der Sandbox das Dev-Menü, solange der Spieler nicht besiegt ist; `F` oder `Escape` schließen es wieder. Außerhalb der Sandbox bewirkt `F` nichts.
 - Solange das Dev-Menü offen ist, ist das Spiel angehalten wie beim Pausenmenü (Musik leiser, Effekte pausiert, keine Spiel- oder Entwicklereingaben).
 - Das Dev-Menü schließt Pausen- und Charaktermenü aus: `Escape` schließt das Dev-Menü, ohne das Pausenmenü zu öffnen, `Tab` öffnet dort nicht das Charaktermenü, und bei offenem Pausen- oder Charaktermenü öffnet `F` nichts.
 - Darstellung als Tafel links über der angehaltenen Sandbox, damit das Feld sichtbar bleibt: Überschrift `DEV-MENÜ`, Abschnitte `CHARAKTER` und `GEGNER`, unten eine Tastenhilfe. Abschnitte ohne Einträge zeigen `NOCH KEINE EINTRÄGE`.

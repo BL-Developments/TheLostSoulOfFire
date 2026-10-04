@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using TheLostSoulOfFire.Combat;
 using TheLostSoulOfFire.Input;
 using TheLostSoulOfFire.Menu;
 using TheLostSoulOfFire.Rendering;
@@ -17,6 +18,8 @@ public sealed partial class GameWorld
 {
     private readonly DevMenu _devMenu = new(SandboxDevMenuEntries.All);
     private bool _sandboxActive;
+    /// <summary>Attributes at sandbox start (default or the <c>--strength</c>/<c>--armor</c> flags); ZURÜCKSETZEN returns to them.</summary>
+    private PlayerAttributes _sandboxStartAttributes = PlayerAttributes.Default;
 
     public bool IsSandbox => _sandboxActive;
 
@@ -24,6 +27,7 @@ public sealed partial class GameWorld
     {
         ClearRunState();
         _sandboxActive = true;
+        _sandboxStartAttributes = _player.Attributes;
         _phase = GamePhase.Arena;
         _phaseTime = 0f;
         _loopState = ArenaLoopState.Combat;
@@ -39,8 +43,7 @@ public sealed partial class GameWorld
     /// <summary>Death or <c>F8</c> in the sandbox: the player starts again in the middle, the field is cleared.</summary>
     private void ResetSandbox()
     {
-        ClearRunState();
-        _sandboxActive = true;
+        ClearRunState(stayInSandbox: true);
         _phaseTime = 0f;
         _loopState = ArenaLoopState.Combat;
         _player.Reset(_arena.CombatBounds.Center.ToVector2());
@@ -96,15 +99,52 @@ public sealed partial class GameWorld
         }
     }
 
+    /// <summary>Leaving the sandbox: the regular flow starts with the regular health and the start attributes.</summary>
+    private void RestoreSandboxStartValues()
+    {
+        _player.Attributes = _sandboxStartAttributes;
+        _player.SetMaxHealth(GameBalance.PlayerMaxHealth);
+    }
+
     private void AdjustDevEntry(DevMenuEntry entry, int direction, bool largeStep)
     {
+        PlayerAttributes attributes = _player.Attributes;
+        DevValueRange attribute = DevValueRange.Attribute;
+        switch (entry.Id)
+        {
+            case SandboxDevMenuEntries.Health:
+                _player.SetMaxHealth(DevValueRange.Health.Adjust(_player.MaxHealth, direction, largeStep));
+                break;
+            case SandboxDevMenuEntries.Strength:
+                _player.Attributes = attributes with { Strength = attribute.Adjust(attributes.Strength, direction, largeStep) };
+                break;
+            case SandboxDevMenuEntries.AbilityPower:
+                _player.Attributes = attributes with { AbilityPower = attribute.Adjust(attributes.AbilityPower, direction, largeStep) };
+                break;
+            case SandboxDevMenuEntries.Armor:
+                _player.Attributes = attributes with { Armor = attribute.Adjust(attributes.Armor, direction, largeStep) };
+                break;
+        }
     }
 
     private void ActivateDevEntry(DevMenuEntry entry)
     {
+        switch (entry.Id)
+        {
+            case SandboxDevMenuEntries.ResetCharacter:
+                RestoreSandboxStartValues();
+                break;
+        }
     }
 
-    private string? DevEntryValue(DevMenuEntry entry) => null;
+    private string? DevEntryValue(DevMenuEntry entry) => entry.Id switch
+    {
+        SandboxDevMenuEntries.Health => _player.MaxHealth.ToString(),
+        SandboxDevMenuEntries.Strength => _player.Attributes.Strength.ToString(),
+        SandboxDevMenuEntries.AbilityPower => _player.Attributes.AbilityPower.ToString(),
+        SandboxDevMenuEntries.Armor => _player.Attributes.Armor.ToString(),
+        _ => null
+    };
 
     private string? DevMenuFooter => null;
 
