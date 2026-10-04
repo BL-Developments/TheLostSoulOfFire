@@ -28,6 +28,18 @@ public abstract class Enemy
     public bool IsFinished { get; protected set; }
     public float HitFlashRemaining { get; private set; }
 
+    public float AbilityMarkRemaining { get; private set; }
+    public void MarkForFollowup() => AbilityMarkRemaining = 5f;
+    public int ConsumeAbilityMark()
+    {
+        if (AbilityMarkRemaining <= 0) return 0;
+        AbilityMarkRemaining = 0;
+        return 25;
+    }
+    public void Displace(Vector2 offset, Rectangle bounds)
+    {
+        if (IsAlive) Position = RunAbilities.Clamp(Position + offset, bounds, Radius);
+    }
     public abstract string StateLabel { get; }
 
     /// <summary>Glut credited once when this enemy is defeated; amount depends on the type.</summary>
@@ -87,6 +99,7 @@ public abstract class Enemy
 
     protected void UpdateCommon(float deltaTime, Rectangle movementBounds)
     {
+        AbilityMarkRemaining = MathF.Max(0f, AbilityMarkRemaining - deltaTime);
         HitFlashRemaining = MathF.Max(0f, HitFlashRemaining - deltaTime);
         Position += _knockbackVelocity * deltaTime;
         _knockbackVelocity *= MathF.Pow(0.02f, deltaTime);
