@@ -7,6 +7,19 @@ The entries from 2026-09-06 and earlier describe implementation work on the
 `tools/visual-max/`, `SoftShapes.cs`, Team Resonance, Severance) are not
 necessarily present on `main`.
 
+## 2026-10-04 — Erster Fähigkeitenpool bestätigt
+
+Der Owner bestätigt die Auswahl und die beschriebenen grundlegenden Wirkungsregeln für #79:
+AB-006 Zweiter Atem (Heilung), AB-012 Durchschlag (direkter Angriff),
+AB-017 Rückstoßsprung (Movement), AB-021 Sog (Kontrolle),
+AB-027 Vergeltung (Verteidigung) und AB-048 Vorlage (Vorbereitung/Koop).
+
+Die gemeinsamen Regeln und Wirkungsgrenzen aus [FIRST-ABILITY-POOL.md](FIRST-ABILITY-POOL.md)
+bilden die Designgrundlage. Konkrete Arbeits-/Balancewerte und die dort ausdrücklich
+offenen Grenzfälle sind weiterhin zu spezifizieren. Auswahlbestätigung ist kein
+Gameplay-Umsetzungsnachweis und schließt #79 noch nicht ab.
+Die übrigen 44 Fähigkeiten und alle Ultimate-Ideen bleiben Vorschläge.
+
 ## 2026-10-04 — Zwei Währungen (#52)
 
 - Arbeitsnamen: **Geld** und **Glut** (mystische Ressource). Endgültige Namen
