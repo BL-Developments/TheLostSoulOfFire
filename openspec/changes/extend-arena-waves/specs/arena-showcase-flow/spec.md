@@ -62,3 +62,18 @@ Das System SHALL den nächsten Schub einer Welle auslösen, sobald seit dem vori
 #### Scenario: Spieler steht am Spawnpunkt
 - **WHEN** ein Schub fällig wird und der Spieler näher als den Mindestabstand an einem Spawnpunkt steht
 - **THEN** wählt das System für diesen Schub nur Spawnpunkte, die mindestens den Mindestabstand entfernt sind
+
+### Requirement: Das HUD zeigt die aktuelle Welle
+Das System SHALL im Kampf-HUD der Arena ab der ersten Welle die aktuelle Welle und die Gesamtzahl als `WELLE <n>/10` anzeigen. Hat die Welle mehrere Schübe, SHALL das HUD je Schub eine Markierung zeigen, die hervorgehoben ist, sobald der Schub ausgelöst wurde. Die zehnte Welle SHALL im HUD hervorgehoben sein.
+
+#### Scenario: Spieler kämpft in Welle 3
+- **WHEN** das Kampf-HUD während Welle 3 sichtbar ist
+- **THEN** zeigt es `WELLE 3/10` ohne Schubmarkierungen
+
+#### Scenario: Nachschub rückt nach
+- **WHEN** in Welle 8 der zweite von drei Schüben ausgelöst wird
+- **THEN** zeigt das HUD `WELLE 8/10` mit zwei hervorgehobenen und einer leeren Schubmarkierung
+
+#### Scenario: Pause nach einer Welle
+- **WHEN** die Arena nach Welle 5 pausiert
+- **THEN** zeigt das HUD weiter `WELLE 5/10`, bis die nächste Welle beginnt

@@ -14,6 +14,7 @@
 - [x] 2.6 `CinematicPresentation.ToRoman` bis X erweitern; Startaufforderung `E  LETZTE WELLE STARTEN` vor Welle 10.
 - [x] 2.7 Kisten nach den Wellen 3, 6 und 9 über `GameBalance.ArenaChestWaves`, eigene Positionen in `ArenaChest.PositionForWave`; Pause mit manuellem Start nach den Wellen 1 bis 9; Unit-Test für die Kistenwellen.
 - [x] 2.8 `F6` verwirft zusätzlich ausstehende Schübe und Ankündigungen der laufenden Welle.
+- [x] 2.9 `HudRenderer.DrawWave`: `WELLE <n>/10` oben rechts, Schubmarkierungen bei Wellen mit Nachschub, hervorgehobene zehnte Welle; per Screenshot geprüft.
 
 ## 3. Developer-Start, Tests und Doku
 
