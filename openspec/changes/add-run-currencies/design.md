@@ -2,7 +2,7 @@
 
 `main` hat einen Hub (Aschenvorhalle, Tür I offen) und eine Arena mit vier Wellen. Tod bietet mit `R` einen Neuversuch derselben Arena, der Abschluss führt mit `R` zurück zur Titelkarte. Es gibt keine Levels, keinen Bosssieg und keinen Rückweg zur Homebase, also keinen der Sicherungsorte aus #52. Persistiert wird bisher nur `settings.json` über `GameSettingsStore` (JSON, Schreiben über Temp-Datei).
 
-Die Regeln stammen aus #52: Geld aus Kisten und NPC-Prämien, Glut beim Besiegen genau einmal, Erlösung ohne zweite Gutschrift, Run- und gesicherte Bestände, Verlust beider Run-Bestände bei Niederlage, kostenloser Basisvorrat, keine Mitnahme gesicherter Glut. Björn hat am 04.10. bestätigt: Arena-Abschluss sichert vorläufig, eine Kiste ist die erste Geldquelle, Arbeitsnamen sind Geld und Glut.
+Die Regeln stammen aus #52: Geld aus Kisten und NPC-Prämien, Glut beim Besiegen genau einmal, Erlösung ohne zweite Gutschrift, Run- und gesicherte Bestände, Verlust beider Run-Bestände bei Niederlage, kostenloser Basisvorrat, keine Mitnahme gesicherter Glut. Björn hat am 04.10. bestätigt: Arena-Abschluss sichert vorläufig, Kisten sind die erste Geldquelle (nach jeder Welle außer der letzten, sie verschwinden nach dem Öffnen), Arbeitsnamen sind Geld und Glut.
 
 ## Goals / Non-Goals
 
@@ -29,13 +29,13 @@ Die Regeln stammen aus #52: Geld aus Kisten und NPC-Prämien, Glut beim Besiegen
 
 **Run-Grenzen.** Run-Start: `EnterArena` und `ResetEncounter` rufen `BeginRun`. Niederlage: Wechsel des Spielers in den Todeszustand ruft `LoseRun`. Abschluss: Übergang nach `ArenaLoopState.Complete` ruft `SecureAllRun` und speichert das Profil. Der Developer-Start in die Arena läuft über denselben Run-Start.
 
-**Kiste.** Nach dem Leeren von Welle 2 erscheint eine Kiste an fester Position in der Arena. Interaktion mit `E` in ihrer Zone öffnet sie einmalig und schreibt `GameBalance.ChestGeld` gut. Sie bleibt bis zum Ende des Runs stehen; eine ungeöffnete Kiste verfällt beim Abschluss oder Neuversuch. Alternative: automatisches Aufsammeln beim Drüberlaufen. Verworfen, weil `E` schon die Interaktion im Hub ist und Kisten später als Erkundungsziel taugen sollen.
+**Kisten.** Nach dem Leeren der Wellen 1 bis 3 erscheint je eine Kiste an einer für jede Welle eigenen festen Position, damit ungeöffnete Kisten nicht übereinanderliegen; nach Welle 4 folgt direkt der Abschluss. Interaktion mit `E` in ihrer Zone öffnet sie einmalig, schreibt `GameBalance.ChestGeld` gut und entfernt sie nach einer kurzen Öffnungsdarstellung. Ungeöffnete Kisten bleiben bis zum Ende des Runs stehen und verfallen beim Abschluss oder Neuversuch. Alternative: automatisches Aufsammeln beim Drüberlaufen. Verworfen, weil `E` schon die Interaktion im Hub ist und Kisten später als Erkundungsziel taugen sollen.
 
 **Profil `PlayerProfile` und `PlayerProfileStore`.** JSON mit `Version = 1`, `SecuredGeld`, `SecuredGlut` unter `%LocalAppData%/TheLostSoulOfFire/profile.json`. Schreiben über Temp-Datei und Ersetzen wie bei den Einstellungen. Fehlende Datei, unlesbares JSON, unbekannte Version oder negative Werte ergeben ein leeres Profil; eine ungültige Datei wird vor dem Überschreiben als `profile.json.invalid` beiseitegelegt, damit nichts stillschweigend verloren geht. Das Profil wird nur beim Sichern geschrieben, nicht bei jeder Gutschrift. Der Pfad ist injizierbar, damit Tests eigene Dateien nutzen.
 
 **HUD.** Im Run zeigt `HudRenderer` unter der Gesundheit zwei Zeilen `GELD <n>` und `GLUT <n>` (Run-Bestände). Im Hub zeigt eine zurückhaltende Anzeige `GESICHERT · GELD <n> · GLUT <n>`. Der Abschlusszustand der Arena nennt die eben gesicherten Beträge. Bei einer Gutschrift pulsiert die betroffene Zeile kurz.
 
-**Arbeitswerte in `GameBalance`.** Basisvorrat Glut 10; Glut je Hollow 3, Burning 5, Devourer 12; Kiste 25 Geld. Reine Balancewerte, im Code als Arbeitswerte kommentiert.
+**Arbeitswerte in `GameBalance`.** Basisvorrat Glut 10; Glut je Hollow 3, Burning 5, Devourer 12; 25 Geld je Kiste. Reine Balancewerte, im Code als Arbeitswerte kommentiert.
 
 ## Risks / Trade-offs
 

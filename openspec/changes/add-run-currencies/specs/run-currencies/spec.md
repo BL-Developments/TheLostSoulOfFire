@@ -44,15 +44,23 @@ Das System SHALL bei jeder Glut-Gutschrift einen Glutfunken vom besiegten Gegner
 - **WHEN** der Spieler stirbt, bevor ein Glutfunke ihn erreicht
 - **THEN** war die Glut bereits gutgeschrieben und wird mit dem Run-Bestand verloren
 
-### Requirement: Eine Kiste liefert Geld
-Das System SHALL nach dem Leeren der zweiten Welle eine Kiste in der Arena erscheinen lassen. In ihrer Interaktionszone SHALL das System eine Aufforderung mit `E` zeigen. Das Öffnen mit `E` SHALL den festgelegten Geldbetrag genau einmal dem Run-Bestand Geld gutschreiben. Eine ungeöffnete Kiste SHALL mit dem Ende des Runs verfallen.
+### Requirement: Kisten liefern Geld
+Das System SHALL nach dem Leeren jeder Welle außer der letzten eine Kiste in der Arena erscheinen lassen. In ihrer Interaktionszone SHALL das System eine Aufforderung mit `E` zeigen. Das Öffnen mit `E` SHALL den festgelegten Geldbetrag genau einmal dem Run-Bestand Geld gutschreiben und die Kiste danach aus der Arena entfernen. Eine ungeöffnete Kiste SHALL mit dem Ende des Runs verfallen.
 
-#### Scenario: Spieler öffnet die Kiste
-- **WHEN** der Spieler in der Zone der geschlossenen Kiste `E` drückt
-- **THEN** öffnet sich die Kiste und der Run-Bestand Geld steigt um den Kistenbetrag
+#### Scenario: Welle wird geleert
+- **WHEN** die Wellen 1, 2 oder 3 geleert werden
+- **THEN** erscheint eine geschlossene Kiste in der Arena
 
-#### Scenario: Spieler drückt erneut E
-- **WHEN** der Spieler an der bereits geöffneten Kiste `E` drückt
+#### Scenario: Letzte Welle wird geleert
+- **WHEN** die vierte Welle geleert wird
+- **THEN** erscheint keine weitere Kiste, und der Abschluss beginnt
+
+#### Scenario: Spieler öffnet eine Kiste
+- **WHEN** der Spieler in der Zone einer geschlossenen Kiste `E` drückt
+- **THEN** steigt der Run-Bestand Geld um den Kistenbetrag, und die Kiste verschwindet nach einer kurzen Öffnungsdarstellung
+
+#### Scenario: Spieler drückt nach dem Öffnen erneut E
+- **WHEN** der Spieler an der Stelle einer bereits geöffneten Kiste `E` drückt
 - **THEN** bleibt der Run-Bestand Geld unverändert
 
 ### Requirement: Niederlage leert beide Run-Bestände

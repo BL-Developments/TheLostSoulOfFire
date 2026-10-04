@@ -8,7 +8,7 @@ Die Wirtschaftsregeln sind seit #52 beschlossen, im Spiel gibt es aber noch kein
 - Jeder besiegte Gegner schreibt genau einmal Glut gut, Menge je Gegnertyp. Ein Glutfunke fliegt vom Gegner zum Spieler; die Gutschrift hängt nicht vom Ende der Animation ab.
 - Soul Release erzeugt weiter nur Resonance und keine Währung.
 - Ein Run beginnt beim Betreten der Arena (oder bei einem Neuversuch) mit einem kleinen kostenlosen Glut-Basisvorrat. Gesicherte Glut wird nicht in den Run mitgenommen.
-- Nach Welle 2 erscheint eine Kiste, die beim Öffnen mit `E` einmalig Geld in den Run-Bestand legt.
+- Nach jeder Welle außer der letzten erscheint eine Kiste. Beim Öffnen mit `E` legt sie einmalig Geld in den Run-Bestand und verschwindet.
 - Niederlage leert beide Run-Bestände.
 - Der Arena-Abschluss gilt vorläufig als Sicherungspunkt und überträgt beide Run-Bestände vollständig in den gesicherten Bestand. Diese Regel ist ein Platzhalter, bis #53 Teilsicherung und Quote festlegt.
 - Der gesicherte Bestand wird in einem versionierten Profil gespeichert und beim Start geladen.
@@ -19,7 +19,7 @@ Die Wirtschaftsregeln sind seit #52 beschlossen, im Spiel gibt es aber noch kein
 
 ### New Capabilities
 
-- `run-currencies`: Geld und Glut, Run- und gesicherter Bestand, Gutschrift beim Besiegen, Basisvorrat, Kiste, Verlust bei Niederlage, vorläufige Sicherung beim Arena-Abschluss und HUD-Anzeige.
+- `run-currencies`: Geld und Glut, Run- und gesicherter Bestand, Gutschrift beim Besiegen, Basisvorrat, Kisten, Verlust bei Niederlage, vorläufige Sicherung beim Arena-Abschluss und HUD-Anzeige.
 - `player-profile`: Versioniertes, atomar gespeichertes Profil mit den gesicherten Beständen und definiertem Verhalten bei fehlendem oder ungültigem Spielstand.
 
 ### Modified Capabilities
@@ -28,4 +28,4 @@ Die Wirtschaftsregeln sind seit #52 beschlossen, im Spiel gibt es aber noch kein
 
 ## Impact
 
-Betroffen sind `GameWorld` (Run-Start, Kill-Gutschrift in `ApplyEnemyDamage`, Kiste, Niederlage, Abschluss), `Enemy` und Unterklassen (Glutmenge je Typ), `GameBalance` (Arbeitswerte), `HudRenderer` und die Hub-Darstellung, ein neues Kontenmodell und ein neuer Profilspeicher nach dem Muster von `GameSettingsStore`. Neue Speicherdatei `profile.json` neben `settings.json`. `docs/current/GAME-RULES.md` und `DECISION-LOG.md` werden auf den Beschluss aus #52 nachgezogen. Kein Koop, keine Reisepunkte, keine Ausgabestellen; Resonance bleibt unverändert.
+Betroffen sind `GameWorld` (Run-Start, Kill-Gutschrift in `ApplyEnemyDamage`, Kisten, Niederlage, Abschluss), `Enemy` und Unterklassen (Glutmenge je Typ), `GameBalance` (Arbeitswerte), `HudRenderer` und die Hub-Darstellung, ein neues Kontenmodell und ein neuer Profilspeicher nach dem Muster von `GameSettingsStore`. Neue Speicherdatei `profile.json` neben `settings.json`. `docs/current/GAME-RULES.md` und `DECISION-LOG.md` werden auf den Beschluss aus #52 nachgezogen. Kein Koop, keine Reisepunkte, keine Ausgabestellen; Resonance bleibt unverändert.
