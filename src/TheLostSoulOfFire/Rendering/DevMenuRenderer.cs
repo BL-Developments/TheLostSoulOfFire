@@ -32,7 +32,7 @@ public static class DevMenuRenderer
     public static IReadOnlyList<Rectangle> GetEntryBounds(DevMenu menu)
     {
         List<Rectangle> bounds = new(menu.Entries.Count);
-        foreach (Row row in Layout(menu, out _, out _))
+        foreach (Row row in Layout(menu, out _))
         {
             if (row.EntryIndex >= 0)
             {
@@ -42,14 +42,13 @@ public static class DevMenuRenderer
         return bounds;
     }
 
-    public static void Draw(SpriteBatch batch, Texture2D pixel, Viewport viewport, DevMenu menu, Func<DevMenuEntry, string?> valueOf, string? footer = null)
+    public static void Draw(SpriteBatch batch, Texture2D pixel, Viewport viewport, DevMenu menu, Func<DevMenuEntry, string?> valueOf)
     {
         float reveal = Ease(menu.OpenTimer / MenuController.RevealDuration);
         batch.FillRectangle(pixel, viewport.Bounds, Color.Black * (VeilAlpha * reveal));
 
-        IReadOnlyList<Row> rows = Layout(menu, out float panelBottom, out float hintsY);
+        IReadOnlyList<Row> rows = Layout(menu, out float hintsY);
         float bottom = hintsY + 7 * 1 + Padding;
-        if (footer is not null) bottom += 22f;
         Rectangle panel = new(PanelX, PanelY, PanelWidth, (int)(bottom - PanelY));
         batch.FillRectangle(pixel, panel, new Color(6, 5, 10) * (0.88f * reveal));
         batch.DrawRectangle(pixel, panel, GameBalance.DeathFlame * (0.55f * reveal), 2f);
@@ -96,16 +95,11 @@ public static class DevMenuRenderer
             }
         }
 
-        if (footer is not null)
-        {
-            PixelText.Draw(batch, pixel, footer, new Vector2(left, hintsY), 1, GameBalance.SoulWhite * (0.6f * reveal));
-            hintsY += 22f;
-        }
         PixelText.Draw(batch, pixel, Hints, new Vector2(left, hintsY), 1, dim);
     }
 
     /// <summary>Headers (index -1), empty-section notes (-2) and entries (their index) top to bottom.</summary>
-    private static IReadOnlyList<Row> Layout(DevMenu menu, out float bottom, out float hintsY)
+    private static IReadOnlyList<Row> Layout(DevMenu menu, out float hintsY)
     {
         List<Row> rows = [];
         float y = PanelY + Padding + 7 * TitleScale + SectionGap;
@@ -129,7 +123,6 @@ public static class DevMenuRenderer
             y += SectionGap;
         }
 
-        bottom = y;
         hintsY = y;
         return rows;
     }

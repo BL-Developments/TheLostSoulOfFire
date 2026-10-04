@@ -58,7 +58,9 @@ Mitte zurück und räumt das Feld. `F` öffnet dort das Dev-Menü; `F` oder `Esc
 schließt es wieder. `W`/`S` wählen einen Eintrag, `A`/`D` ändern einen Wert
 (mit Umschalt in großen Schritten), `Enter` führt eine Aktion aus. Im
 Abschnitt Charakter lassen sich Leben (1 bis 999), Stärke, Fähigkeitsstärke und
-Rüstung setzen; `ZURÜCKSETZEN` stellt die Werte vom Sandbox-Start wieder her.
+Rüstung setzen; `ZURÜCKSETZEN` stellt die Werte vom Sandbox-Start wieder her. Im
+Abschnitt Gegner spawnt jeder Eintrag einen Gegner dieses Typs in Sichtweite;
+`ALLE GEGNER ENTFERNEN` räumt das Feld.
 
 Ungültige Angaben beenden das Programm mit einer Meldung und Exitcode 2. Die
 Debug-Tasten (`F1` Overlay, `F2`–`F4` Gegner, `F5` Resonance, `F6` Welle

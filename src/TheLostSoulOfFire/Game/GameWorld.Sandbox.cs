@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using TheLostSoulOfFire.Combat;
+using TheLostSoulOfFire.Entities;
 using TheLostSoulOfFire.Input;
 using TheLostSoulOfFire.Menu;
 using TheLostSoulOfFire.Rendering;
@@ -20,6 +22,7 @@ public sealed partial class GameWorld
     private bool _sandboxActive;
     /// <summary>Attributes at sandbox start (default or the <c>--strength</c>/<c>--armor</c> flags); ZURÜCKSETZEN returns to them.</summary>
     private PlayerAttributes _sandboxStartAttributes = PlayerAttributes.Default;
+    private int _sandboxSpawnCount;
 
     public bool IsSandbox => _sandboxActive;
 
@@ -129,12 +132,40 @@ public sealed partial class GameWorld
 
     private void ActivateDevEntry(DevMenuEntry entry)
     {
+        if (SandboxDevMenuEntries.SpawnKind(entry) is { } kind)
+        {
+            SpawnSandboxEnemy(kind);
+            return;
+        }
+
         switch (entry.Id)
         {
             case SandboxDevMenuEntries.ResetCharacter:
                 RestoreSandboxStartValues();
                 break;
+            case SandboxDevMenuEntries.RemoveEnemies:
+                RemoveSandboxEnemies();
+                break;
         }
+    }
+
+    private void SpawnSandboxEnemy(SandboxEnemyKind kind)
+    {
+        Vector2 position = SandboxSpawner.ChoosePosition(_arena.CombatBounds, _player.Position, _sandboxSpawnCount, SandboxSpawner.Radius(kind));
+        _sandboxSpawnCount++;
+        _enemies.Add(SandboxSpawner.Create(kind, position, 1000 + _sandboxSpawnCount));
+        _particles.EmitDeathFlame(position, 10, 0.7f);
+    }
+
+    /// <summary>Takes every enemy and lost soul off the field without defeat effects.</summary>
+    private void RemoveSandboxEnemies()
+    {
+        foreach (Enemy enemy in _enemies)
+        {
+            _particles.EmitDeathFlame(enemy.Position, 6, 0.5f);
+        }
+        _enemies.Clear();
+        _souls.Clear();
     }
 
     private string? DevEntryValue(DevMenuEntry entry) => entry.Id switch
@@ -143,13 +174,13 @@ public sealed partial class GameWorld
         SandboxDevMenuEntries.Strength => _player.Attributes.Strength.ToString(),
         SandboxDevMenuEntries.AbilityPower => _player.Attributes.AbilityPower.ToString(),
         SandboxDevMenuEntries.Armor => _player.Attributes.Armor.ToString(),
+        SandboxDevMenuEntries.RemoveEnemies => _enemies.Count(enemy => enemy.IsAlive).ToString(),
+        _ when SandboxDevMenuEntries.SpawnKind(entry) is { } kind => _enemies.Count(enemy => enemy.IsAlive && SandboxSpawner.IsKind(enemy, kind)).ToString(),
         _ => null
     };
 
-    private string? DevMenuFooter => null;
-
     private void DrawDevMenu(SpriteBatch batch, Texture2D pixel, Viewport viewport) =>
-        DevMenuRenderer.Draw(batch, pixel, viewport, _devMenu, DevEntryValue, DevMenuFooter);
+        DevMenuRenderer.Draw(batch, pixel, viewport, _devMenu, DevEntryValue);
 
     private void DrawSandboxHud(SpriteBatch batch, Texture2D pixel, Viewport viewport)
     {
