@@ -16,7 +16,7 @@ Björn möchte zehn Wellen; spätere Wellen sollen mehr Gegner bringen und sie �
 **Non-Goals:**
 
 - Neue Gegnertypen, stärkere Gegnerwerte je Welle oder Elite-Varianten.
-- Änderungen an Glut je Gegner, Kistenbetrag, Sicherungsregel oder HUD.
+- Änderungen an Glut je Gegner, Kistenbetrag, Kistenzahl, Sicherungsregel oder HUD.
 - Eine Wellenanzeige im HUD (die Ankündigung und die Startaufforderung nennen die Welle bereits).
 - Endlosmodus oder zufällige Wellen.
 
@@ -52,11 +52,11 @@ Die Welle ist geleert, wenn alle Schübe ausgelöst, alle angekündigten Gegner 
 
 **Burning-Aggression.** Die Obergrenze gleichzeitig angreifender Burning bleibt ab Welle 4 bei 2. Mehr Burning in späten Wellen erhöhen den Druck über die Gesamtzahl, nicht über gleichzeitige Charges.
 
-**Pause und Kisten.** Die Pause mit manuellem Start gilt weiter nach jeder Welle außer der letzten, also nach den Wellen 1 bis 9. Kisten erscheinen nur nach den Wellen 1 bis 3 (`ArenaChest.PositionForWave` bleibt unverändert). Nach Welle 10 folgt direkt der Abschluss mit Sicherung. Der Kistenwert wird damit nicht inflationiert; ob später mehr Kisten kommen, entscheidet Björn getrennt.
+**Pause und Kisten.** Die Pause mit manuellem Start gilt weiter nach jeder Welle außer der letzten, also nach den Wellen 1 bis 9. Kisten erscheinen nach den Wellen 3, 6 und 9 (Björn, 04.10.), festgelegt als `GameBalance.ArenaChestWaves`. Es bleibt bei drei Kisten mit zusammen 75 Geld, sie verteilen sich aber über den ganzen Run, und das Risiko, mit ungesichertem Geld in späte Wellen zu gehen, wird spürbar. `ArenaChest.PositionForWave` bekommt für die Wellen 3, 6 und 9 je eine eigene feste Position außerhalb der Mittelzone. Nach Welle 10 folgt direkt der Abschluss mit Sicherung.
 
 **Ankündigung und Texte.** `ToRoman` reicht bis X. Die Ankündigung zeigt `FINAL WAVE`, wenn die nächste Welle `ArenaWaveCount` ist, sonst `WAVE <römisch>`. Die Startaufforderung lautet für die letzte Welle `E  LETZTE WELLE STARTEN`. Der Debugtitel zeigt `Wave n/10`.
 
-**Debug und automatisierte Läufe.** `F6` besiegt wie bisher alle lebenden Gegner und verwirft zusätzlich ausstehende Schübe und Ankündigungen der laufenden Welle, damit automatisierte Läufe eine Welle mit einem Tastendruck leeren können; verworfene Gegner bringen keine Glut. `--audio-gameplay-test` läuft durch alle zehn Wellen, das Zeitlimit wächst entsprechend, und die Erfolgsmeldung nennt `waves=10`. `--currency-visual-test` braucht keine Änderung außer dem längeren Durchlauf, weil er nur die Kisten nach den Wellen 1 bis 3 betrachtet.
+**Debug und automatisierte Läufe.** `F6` besiegt wie bisher alle lebenden Gegner und verwirft zusätzlich ausstehende Schübe und Ankündigungen der laufenden Welle, damit automatisierte Läufe eine Welle mit einem Tastendruck leeren können; verworfene Gegner bringen keine Glut. `--audio-gameplay-test` läuft durch alle zehn Wellen, das Zeitlimit wächst entsprechend, und die Erfolgsmeldung nennt `waves=10`. `--currency-visual-test` öffnet die Kisten nach den Wellen 3 und 6, lässt die nach Welle 9 ungeöffnet und prüft weiter zweimal `ChestGeld` im gesicherten Bestand.
 
 **Developer-Start.** `DeveloperStartOptions.MaxWave` wird `GameBalance.ArenaWaveCount` (10). Hilfetext und README nennen `--wave 1` bis `--wave 10`.
 
@@ -70,4 +70,4 @@ Die Welle ist geleert, wenn alle Schübe ausgelöst, alle angekündigten Gegner 
 
 ## Open Questions
 
-- Sollen später mehr Kisten erscheinen (nach jeder Welle oder nach den Wellen 3, 6 und 9)? Default in diesem Change: nur nach den Wellen 1 bis 3.
+Keine.
