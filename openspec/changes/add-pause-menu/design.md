@@ -32,7 +32,7 @@ Hover, Pfeiltasten, Wertänderung, Klick und `Confirm` aus `UpdateMenu` werden i
 Ist `_pauseMenu.IsOpen`, tickt `Update` nur Menü und Audio und kehrt dann zurück, bevor Präsentationszeit, Effekte, Partikel, Kamera oder Phasenlogik fortschreiten. Das Öffnen geschieht ebenfalls vor allen Ticks und beendet das Frame. Das Fortsetzen beendet das Frame ebenfalls, deshalb sieht `ScytheCombat` den bestätigenden Klick nie als neuen Tastendruck. Alternative: Zeitskala 0. Verworfen, weil einige Systeme Eingaben unabhängig von der Zeit auswerten.
 
 ### Darstellung
-`CinematicPresentation.DrawPauseMenu` zeichnet am Ende von `DrawHud` (über HUD und Debug-Overlay) Schleier 0,62, Letterbox, Zierlinie, `PAUSIERT` und die Liste. `DrawMenuList` erhält die Atemzeit als Parameter (Titel: `_titleTime`, Pause: `OpenTimer`, weil `_titleTime` außerhalb der Titelphase steht) und zeichnet einen vorhandenen `Prompt` über den Einträgen. Hit-Boxen bleiben in `GetMenuEntryBounds` mit denselben Konstanten.
+`CinematicPresentation.DrawPauseMenu` zeichnet am Ende von `DrawHud` (über HUD und Debug-Overlay; Story-, Hinweis- und Inszenierungstexte werden während der Pause ausgelassen, damit sie nicht mit der Menüschrift kollidieren) Schleier 0,55, Letterbox, Zierlinie, `PAUSIERT` und die Liste. `DrawMenuList` erhält die Atemzeit als Parameter (Titel: `_titleTime`, Pause: `OpenTimer`, weil `_titleTime` außerhalb der Titelphase steht) und zeichnet einen vorhandenen `Prompt` über den Einträgen. Hit-Boxen bleiben in `GetMenuEntryBounds` mit denselben Konstanten.
 
 ### Audio
 `AudioDirector.SetPaused(bool)` pausiert bzw. setzt laufende Effektinstanzen fort und multipliziert Musik und Ambience im Mix mit 0,4. `StopEffects()` verwirft Effekte vor der Rückkehr ins Hauptmenü.

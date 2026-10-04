@@ -26,7 +26,13 @@ public enum MenuEntryId
     CameraMotion,
     MasterVolume,
     MusicVolume,
-    EffectsVolume
+    EffectsVolume,
+    Resume,
+    PauseQuit,
+    QuitToMainMenu,
+    QuitToDesktop,
+    ConfirmQuit,
+    CancelQuit
 }
 
 /// <summary>
@@ -53,19 +59,23 @@ public sealed class MenuEntry
 /// </summary>
 public sealed class MenuPage
 {
-    public MenuPage(string id, IReadOnlyList<MenuEntry> entries)
+    public MenuPage(string id, IReadOnlyList<MenuEntry> entries, string? prompt = null)
     {
         Id = id;
         Entries = entries;
+        Prompt = prompt;
     }
 
     /// <summary>Stable identifier used for screenshot/debug context, not for display.</summary>
     public string Id { get; }
     public IReadOnlyList<MenuEntry> Entries { get; }
+
+    /// <summary>Optional question drawn above the entries, e.g. on the quit confirmation.</summary>
+    public string? Prompt { get; }
 }
 
 /// <summary>
-/// The fixed page content for the main menu. Defined once and shared by
+/// The fixed page content for the main and pause menus. Defined once and shared by
 /// every <see cref="MenuController"/> instance.
 /// </summary>
 public static class MenuPages
@@ -114,6 +124,27 @@ public static class MenuPages
         new MenuEntry(MenuEntryId.MasterVolume, "GESAMTLAUTSTÄRKE"),
         new MenuEntry(MenuEntryId.MusicVolume, "MUSIK"),
         new MenuEntry(MenuEntryId.EffectsVolume, "EFFEKTE"),
+        new MenuEntry(MenuEntryId.Back, "ZURÜCK")
+    });
+
+    public static readonly MenuPage QuitConfirm = new("quit_confirm", new[]
+    {
+        new MenuEntry(MenuEntryId.ConfirmQuit, "JA"),
+        new MenuEntry(MenuEntryId.CancelQuit, "NEIN")
+    }, prompt: "SOLL DAS SPIEL WIRKLICH BEENDET WERDEN?");
+
+    public static readonly MenuPage Pause = new("pause", new[]
+    {
+        new MenuEntry(MenuEntryId.Resume, "FORTSETZEN"),
+        new MenuEntry(MenuEntryId.Settings, "EINSTELLUNGEN"),
+        new MenuEntry(MenuEntryId.Achievements, "ERRUNGENSCHAFTEN UND STATISTIKEN", isPlaceholder: true),
+        new MenuEntry(MenuEntryId.PauseQuit, "BEENDEN")
+    });
+
+    public static readonly MenuPage PauseQuit = new("pause_quit", new[]
+    {
+        new MenuEntry(MenuEntryId.QuitToMainMenu, "ZURÜCK ZUM HAUPTMENÜ"),
+        new MenuEntry(MenuEntryId.QuitToDesktop, "ZURÜCK ZUM DESKTOP"),
         new MenuEntry(MenuEntryId.Back, "ZURÜCK")
     });
 }

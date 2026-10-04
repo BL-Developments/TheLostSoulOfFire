@@ -50,6 +50,7 @@ public sealed partial class GameWorld : IDisposable
     private readonly SpriteVfxSystem _spriteVfx;
     private readonly CombatPresentation _combatPresentation;
     private readonly MenuController _menu;
+    private readonly MenuController _pauseMenu;
     private readonly GameSettings _settings;
     private readonly Action<GameSettings>? _settingsChanged;
     private readonly bool _skipMainMenu;
@@ -93,7 +94,6 @@ public sealed partial class GameWorld : IDisposable
     public int WaveNumber => _waveNumber;
     public bool PlayerDead => _player.IsDead;
     public bool QuitRequested { get; private set; }
-    public bool IsSettingsPageOpen => _menu.IsSettingsPage;
     public bool CombatActionsEnabled => GameFlowRules.AllowsCombat(_phase) &&
         !_player.IsDead && _loopState is ArenaLoopState.Combat or ArenaLoopState.Transition;
 
@@ -111,6 +111,7 @@ public sealed partial class GameWorld : IDisposable
         _skipPrologue = skipPrologue;
         _settings = settings ?? new GameSettings();
         _menu = new MenuController(_settings);
+        _pauseMenu = new MenuController(_settings);
         _settingsChanged = settingsChanged;
         _art = art;
         _audio = new AudioDirector(content);
@@ -127,6 +128,22 @@ public sealed partial class GameWorld : IDisposable
     public void Update(GameTime gameTime, InputState input, Viewport viewport)
     {
         float deltaTime = MathF.Min((float)gameTime.ElapsedGameTime.TotalSeconds, 1f / 20f);
+        if (_pauseMenu.IsOpen)
+        {
+            // Paused: only the menu and the audio mix advance; every simulation and
+            // presentation clock below stays frozen until the menu closes.
+            _audio.Update(deltaTime);
+            UpdatePauseMenu(deltaTime, input, viewport);
+            return;
+        }
+
+        if (_phase != GamePhase.Title && input.WasKeyPressed(Keys.Escape))
+        {
+            _pauseMenu.Open(MenuPages.Pause);
+            _audio.SetPaused(true);
+            return;
+        }
+
         _presentationTime += deltaTime;
         _screenEffects.MotionScale = _settings.CameraMotion switch
         {
@@ -158,6 +175,11 @@ public sealed partial class GameWorld : IDisposable
         {
             if (_skipMainMenu)
             {
+                if (input.WasKeyPressed(Keys.Escape))
+                {
+                    QuitRequested = true;
+                    return;
+                }
                 if (input.AnyInputPressed && !input.WasKeyPressed(Keys.F9))
                 {
                     _audio.Play(AudioCue.TitleConfirm, 0.58f);
@@ -457,6 +479,11 @@ public sealed partial class GameWorld : IDisposable
     {
         if (!_menu.IsOpen)
         {
+            if (input.WasKeyPressed(Keys.Escape))
+            {
+                _menu.OpenQuitConfirmation();
+                return;
+            }
             if (input.AnyInputPressed && !input.WasKeyPressed(Keys.F9))
             {
                 _audio.Play(AudioCue.TitleConfirm, 0.58f);
@@ -465,19 +492,62 @@ public sealed partial class GameWorld : IDisposable
             return;
         }
 
-        _menu.Tick(deltaTime);
-        if (input.WasKeyPressed(Keys.Escape) && _menu.IsSettingsPage)
+        switch (UpdateMenuInput(_menu, deltaTime, input, viewport))
         {
-            _menu.GoBack();
-            _settingsChanged?.Invoke(_settings);
-            return;
+            case MenuActionResult.NewGame:
+                _menu.Close();
+                StartNewGame(viewport);
+                break;
+            case MenuActionResult.Quit:
+                QuitRequested = true;
+                break;
         }
-        if (!_menu.AcceptsInput)
+    }
+
+    private void UpdatePauseMenu(float deltaTime, InputState input, Viewport viewport)
+    {
+        switch (UpdateMenuInput(_pauseMenu, deltaTime, input, viewport))
         {
-            return;
+            case MenuActionResult.Resume:
+                _pauseMenu.Close();
+                _audio.SetPaused(false);
+                break;
+            case MenuActionResult.QuitToMainMenu:
+                _pauseMenu.Close();
+                _audio.StopEffects();
+                _audio.SetPaused(false);
+                ResetFullRun(viewport);
+                _menu.Open();
+                break;
+            case MenuActionResult.Quit:
+                QuitRequested = true;
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Shared mouse/keyboard handling for the title and pause menus. Navigation and value
+    /// changes are applied here; results that leave the menu are returned to the caller.
+    /// </summary>
+    private MenuActionResult UpdateMenuInput(MenuController menu, float deltaTime, InputState input, Viewport viewport)
+    {
+        menu.Tick(deltaTime);
+        if (input.WasKeyPressed(Keys.Escape))
+        {
+            bool leavingSettings = menu.IsSettingsPage;
+            MenuActionResult escapeResult = menu.HandleEscape();
+            if (leavingSettings)
+            {
+                _settingsChanged?.Invoke(_settings);
+            }
+            return escapeResult;
+        }
+        if (!menu.AcceptsInput)
+        {
+            return MenuActionResult.None;
         }
 
-        IReadOnlyList<Rectangle> bounds = _presentation.GetMenuEntryBounds(viewport, _menu.CurrentPage, _menu);
+        IReadOnlyList<Rectangle> bounds = _presentation.GetMenuEntryBounds(viewport, menu.CurrentPage, menu);
 
         if (input.MouseMoved)
         {
@@ -485,7 +555,7 @@ public sealed partial class GameWorld : IDisposable
             {
                 if (bounds[i].Contains(input.MouseVirtualPosition))
                 {
-                    _menu.SetHoverIndex(i);
+                    menu.SetHoverIndex(i);
                     break;
                 }
             }
@@ -493,16 +563,16 @@ public sealed partial class GameWorld : IDisposable
 
         if (input.WasKeyPressed(Keys.Up) || input.WasKeyPressed(Keys.W))
         {
-            _menu.MoveSelection(-1);
+            menu.MoveSelection(-1);
         }
         else if (input.WasKeyPressed(Keys.Down) || input.WasKeyPressed(Keys.S))
         {
-            _menu.MoveSelection(1);
+            menu.MoveSelection(1);
         }
 
         bool valueChanged = false;
-        if (input.WasKeyPressed(Keys.Left) || input.WasKeyPressed(Keys.A)) valueChanged = _menu.AdjustSelectedValue(-1);
-        else if (input.WasKeyPressed(Keys.Right) || input.WasKeyPressed(Keys.D)) valueChanged = _menu.AdjustSelectedValue(1);
+        if (input.WasKeyPressed(Keys.Left) || input.WasKeyPressed(Keys.A)) valueChanged = menu.AdjustSelectedValue(-1);
+        else if (input.WasKeyPressed(Keys.Right) || input.WasKeyPressed(Keys.D)) valueChanged = menu.AdjustSelectedValue(1);
         if (valueChanged) ApplySettingsChanges();
 
         bool confirmedByKeyboard = input.WasKeyPressed(Keys.Enter);
@@ -513,12 +583,12 @@ public sealed partial class GameWorld : IDisposable
             {
                 if (bounds[i].Contains(input.MouseVirtualPosition))
                 {
-                    _menu.SetHoverIndex(i);
-                    if (_menu.CurrentPage.Entries[i].Id is MenuEntryId.OptionalHints or MenuEntryId.Fullscreen or MenuEntryId.CameraMotion or MenuEntryId.MasterVolume or MenuEntryId.MusicVolume or MenuEntryId.EffectsVolume)
+                    menu.SetHoverIndex(i);
+                    if (MenuController.IsValueEntry(menu.CurrentPage.Entries[i].Id))
                     {
-                        _menu.AdjustSelectedValue(input.MouseVirtualPosition.X < viewport.Width * 0.5f ? -1 : 1);
+                        menu.AdjustSelectedValue(input.MouseVirtualPosition.X < viewport.Width * 0.5f ? -1 : 1);
                         ApplySettingsChanges();
-                        return;
+                        return MenuActionResult.None;
                     }
                     confirmedByMouse = true;
                     break;
@@ -528,22 +598,16 @@ public sealed partial class GameWorld : IDisposable
 
         if (!confirmedByKeyboard && !confirmedByMouse)
         {
-            return;
+            return MenuActionResult.None;
         }
 
-        switch (_menu.Confirm())
+        MenuActionResult result = menu.Confirm();
+        if (result == MenuActionResult.SettingsChanged)
         {
-            case MenuActionResult.NewGame:
-                _menu.Close();
-                StartNewGame(viewport);
-                break;
-            case MenuActionResult.Quit:
-                QuitRequested = true;
-                break;
-            case MenuActionResult.SettingsChanged:
-                ApplySettingsChanges();
-                break;
+            ApplySettingsChanges();
+            return MenuActionResult.None;
         }
+        return result;
     }
 
     private void ApplySettingsChanges()
@@ -785,7 +849,10 @@ public sealed partial class GameWorld : IDisposable
                 _hud.Draw(batch, pixel, viewport, _player);
             }
 
-            ProloguePresentation.DrawOverlay(batch, pixel, viewport, _prologue, _player.IsDead, _settings.OptionalHints);
+            if (!_pauseMenu.IsOpen)
+            {
+                ProloguePresentation.DrawOverlay(batch, pixel, viewport, _prologue, _player.IsDead, _settings.OptionalHints);
+            }
         }
         else
         {
@@ -794,10 +861,15 @@ public sealed partial class GameWorld : IDisposable
                 _hud.Draw(batch, pixel, viewport, _player);
             }
 
-            _presentation.DrawOverlay(batch, pixel, viewport, _phase, _loopState, _player.IsDead, _waveNumber, _menu);
+            if (!_pauseMenu.IsOpen)
+            {
+                _presentation.DrawOverlay(batch, pixel, viewport, _phase, _loopState, _player.IsDead, _waveNumber, _menu);
+            }
         }
 
-        if (_phase is GamePhase.Antechamber or GamePhase.EnteringArena)
+        // Story, prompt and cinematic text would compete with the pause menu's type;
+        // the paused world and HUD stay visible under the veil.
+        if (_phase is GamePhase.Antechamber or GamePhase.EnteringArena && !_pauseMenu.IsOpen)
         {
             DrawAntechamberOverlay(batch, pixel, viewport);
         }
@@ -805,6 +877,11 @@ public sealed partial class GameWorld : IDisposable
         if (_debugVisible && _phase != GamePhase.Title)
         {
             DrawDebugOverlay(batch, pixel, viewport);
+        }
+
+        if (_pauseMenu.IsOpen)
+        {
+            _presentation.DrawPauseMenu(batch, pixel, viewport, _pauseMenu);
         }
 
         batch.End();
@@ -1361,6 +1438,7 @@ public sealed partial class GameWorld : IDisposable
 
     private string GetScreenshotContext()
     {
+        if (_pauseMenu.IsOpen) return $"phase15_pause_{_pauseMenu.CurrentPage.Id}";
         if (_phase == GamePhase.Title) return _menu.IsOpen ? $"phase15_menu_{_menu.CurrentPage.Id}" : "phase15_title";
         if (_phase == GamePhase.Prologue) return $"prologue_{_prologue.Stage.ToString().ToLowerInvariant()}";
         if (_phase == GamePhase.Antechamber) return _player.SoulSenseActive ? "phase16_antechamber_soul_sense" : "phase16_antechamber";

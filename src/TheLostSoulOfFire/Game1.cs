@@ -130,8 +130,8 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
             ConfigureAutomatedTest((float)gameTime.ElapsedGameTime.TotalSeconds);
         }
 
-        if (!_world.IsSettingsPageOpen && (_input.IsKeyDown(Keys.Escape) ||
-            GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed))
+        // Escape is handled by GameWorld (pause menu, menu back navigation, quit confirmation).
+        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
         {
             Exit();
             return;

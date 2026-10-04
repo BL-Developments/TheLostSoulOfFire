@@ -110,6 +110,10 @@ public sealed class AudioDirector : IDisposable
     private float _masterVolume = 1f;
     private float _musicVolume = 1f;
     private float _effectsVolume = 1f;
+    private bool _paused;
+
+    /// <summary>Music and ambience level while the pause menu is open.</summary>
+    private const float PausedBedVolume = 0.4f;
 
     public int FallbackSoundCount => _ownedFallbackSounds.Count;
     public bool MusicPlaying => _musicPlaying && MediaPlayer.State == MediaState.Playing;
@@ -240,6 +244,49 @@ public sealed class AudioDirector : IDisposable
         }
     }
 
+    /// <summary>
+    /// Pause menu mix: running effects are paused (and resumed later), music and
+    /// ambience keep playing at a lower level.
+    /// </summary>
+    public void SetPaused(bool paused)
+    {
+        if (_paused == paused)
+        {
+            return;
+        }
+
+        _paused = paused;
+        try
+        {
+            foreach (List<SoundEffectInstance> instances in _activeInstances.Values)
+            {
+                foreach (SoundEffectInstance instance in instances)
+                {
+                    if (paused && instance.State == SoundState.Playing) instance.Pause();
+                    else if (!paused && instance.State == SoundState.Paused) instance.Resume();
+                }
+            }
+        }
+        catch
+        {
+            _available = false;
+        }
+        ApplyMix();
+    }
+
+    /// <summary>Discards every running or paused effect, e.g. when a run is abandoned.</summary>
+    public void StopEffects()
+    {
+        foreach (List<SoundEffectInstance> instances in _activeInstances.Values)
+        {
+            foreach (SoundEffectInstance instance in instances)
+            {
+                try { instance.Stop(); instance.Dispose(); } catch { }
+            }
+            instances.Clear();
+        }
+    }
+
     public void SetCalm(bool calm)
     {
         _calm = calm;
@@ -358,6 +405,12 @@ public sealed class AudioDirector : IDisposable
         {
             ambienceBase *= 0.52f;
             musicBase *= 0.68f;
+        }
+
+        if (_paused)
+        {
+            ambienceBase *= PausedBedVolume;
+            musicBase *= PausedBedVolume;
         }
 
         if (_ambience is not null)

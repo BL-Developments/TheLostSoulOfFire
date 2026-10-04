@@ -51,6 +51,7 @@ public static class PixelText
         ['.'] = "00000/00000/00000/00000/00000/00110/00110",
         ['·'] = "00000/00000/00100/00100/00000/00000/00000",
         ['%'] = "11001/11010/00100/01000/10110/00110/00000",
+        ['?'] = "01110/10001/00001/00010/00100/00000/00100",
         ['Ä'] = "01010/01110/10001/10001/11111/10001/10001",
         ['Ö'] = "01010/01110/10001/10001/10001/10001/01110",
         ['Ü'] = "01010/10001/10001/10001/10001/10001/01110",
@@ -102,6 +103,8 @@ public static class PixelText
 
     public static void DrawCentered(SpriteBatch batch, Texture2D pixel, string text, float centerX, float y, int scale, Color color) =>
         Draw(batch, pixel, text, new Vector2(centerX - Measure(text, scale) * 0.5f, y), scale, color);
+
+    public static bool CanRender(char character) => Glyphs.ContainsKey(char.ToUpperInvariant(character));
 
     public static int Measure(string text, int scale)
     {

@@ -13,11 +13,15 @@ public enum MenuActionResult
     None,
     SettingsChanged,
     NewGame,
-    Quit
+    Quit,
+    Resume,
+    QuitToMainMenu
 }
 
 /// <summary>
-/// Owns the main menu's page stack, selection and open/close lifecycle.
+/// Owns a menu's page stack, selection and open/close lifecycle. The same type
+/// drives the title menu (root <see cref="MenuPages.Main"/>) and the pause menu
+/// (root <see cref="MenuPages.Pause"/>).
 /// Deliberately free of any MonoGame input or rendering dependency so it can
 /// be driven and tested with plain values.
 /// </summary>
@@ -44,13 +48,39 @@ public sealed class MenuController
     public float OpenTimer => _openTimer;
     public bool AcceptsInput => _openTimer >= RevealDuration;
 
-    public void Open()
+    public MenuPage? RootPage { get; private set; }
+
+    public void Open(MenuPage? root = null)
     {
+        RootPage = root ?? MenuPages.Main;
         _pages.Clear();
-        _pages.Push(MenuPages.Main);
+        _pages.Push(RootPage);
         _selectedIndex = 0;
         _openTimer = 0f;
     }
+
+    /// <summary>Opens the main menu with the quit confirmation already on top.</summary>
+    public void OpenQuitConfirmation()
+    {
+        Open(MenuPages.Main);
+        Push(MenuPages.QuitConfirm);
+    }
+
+    /// <summary>
+    /// Escape inside the menu: sub-pages go back one level, the pause root resumes and
+    /// the main root asks before quitting.
+    /// </summary>
+    public MenuActionResult HandleEscape()
+    {
+        if (!IsOpen) return MenuActionResult.None;
+        if (GoBack()) return MenuActionResult.None;
+        if (RootPage == MenuPages.Pause) return MenuActionResult.Resume;
+        Push(MenuPages.QuitConfirm);
+        return MenuActionResult.None;
+    }
+
+    public static bool IsValueEntry(MenuEntryId id) => id is MenuEntryId.OptionalHints or MenuEntryId.Fullscreen
+        or MenuEntryId.CameraMotion or MenuEntryId.MasterVolume or MenuEntryId.MusicVolume or MenuEntryId.EffectsVolume;
 
     public void Close()
     {
@@ -101,6 +131,7 @@ public sealed class MenuController
                 Push(MenuPages.Audio);
                 return MenuActionResult.None;
             case MenuEntryId.Back:
+            case MenuEntryId.CancelQuit:
                 GoBack();
                 return MenuActionResult.None;
             case MenuEntryId.OptionalHints:
@@ -114,7 +145,18 @@ public sealed class MenuController
             case MenuEntryId.NewGame:
                 return MenuActionResult.NewGame;
             case MenuEntryId.Quit:
+                Push(MenuPages.QuitConfirm);
+                return MenuActionResult.None;
+            case MenuEntryId.ConfirmQuit:
+            case MenuEntryId.QuitToDesktop:
                 return MenuActionResult.Quit;
+            case MenuEntryId.Resume:
+                return MenuActionResult.Resume;
+            case MenuEntryId.PauseQuit:
+                Push(MenuPages.PauseQuit);
+                return MenuActionResult.None;
+            case MenuEntryId.QuitToMainMenu:
+                return MenuActionResult.QuitToMainMenu;
             default:
                 return MenuActionResult.None;
         }
@@ -163,14 +205,5 @@ public sealed class MenuController
     {
         _pages.Push(page);
         _selectedIndex = 0;
-    }
-
-    private void Pop()
-    {
-        if (_pages.Count > 1)
-        {
-            _pages.Pop();
-            _selectedIndex = 0;
-        }
     }
 }
