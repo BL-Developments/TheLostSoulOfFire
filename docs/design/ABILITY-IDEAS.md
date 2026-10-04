@@ -130,3 +130,7 @@ Aktive Fähigkeiten verbrauchen den mystischen Run-Bestand gemäß [#52](https:/
 ## Verwandte Ideen
 
 Die zehn Ultimate-Vorschläge stehen im [Ultimate-Ideenpool](ULTIMATE-IDEAS.md). Auswahl und Ressourcenmodell werden separat in #13 entschieden; Integration folgt in #24. Sie gehören nicht automatisch zum Draft regulärer Fähigkeiten.
+
+## Spezifikationsentwurf
+
+Der [erste Fähigkeitenpool](../current/FIRST-ABILITY-POOL.md) konkretisiert die sechs Kandidaten mit Aktivierung, Wirkungsgrenzen, offenen Werten und Prüffällen. Auswahl und Detailregeln bleiben bis zur ausdrücklichen Entscheidung Vorschläge.
