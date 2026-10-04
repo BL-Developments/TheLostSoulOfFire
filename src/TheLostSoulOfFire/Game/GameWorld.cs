@@ -87,11 +87,12 @@ public sealed partial class GameWorld : IDisposable
     private float _transitSpawnTimer;
     private bool _transitArrivalCuePlayed;
 
-    public string ScreenshotContext => GetScreenshotContext();
+    public string ScreenshotContext => _abilitySelectionOpen ? "ability_selection" :
+        _abilities.FeedbackRemaining > 0 ? "ability_" + _abilities.Feedback : GetScreenshotContext();
     public GamePhase Phase => _phase;
     internal PrologueStage PrologueStage => _prologue.Stage;
-    /// <summary>Pause, character or dev menu is open; the world is frozen under each of them.</summary>
-    private bool IsGamePaused => _pauseMenu.IsOpen || _characterMenu.IsOpen || _devMenu.IsOpen;
+    /// <summary>Pause, character, dev menu or ability selection is open; the world is frozen under each of them.</summary>
+    private bool IsGamePaused => _pauseMenu.IsOpen || _characterMenu.IsOpen || _devMenu.IsOpen || _abilitySelectionOpen;
     private bool IsCombatPhase => _phase is GamePhase.Arena or GamePhase.Prologue;
     private Rectangle ActiveCombatBounds => _phase == GamePhase.Prologue ? _prologue.MovementBounds : _arena.CombatBounds;
     private Rectangle ActiveWorldBounds => _phase == GamePhase.Prologue ? PrologueDirector.WorldBounds : _arena.Bounds;
@@ -145,6 +146,7 @@ public sealed partial class GameWorld : IDisposable
             return;
         }
 
+        if (HandleAbilitySelection(input)) { _audio.Update(deltaTime); return; }
         if (_characterMenu.IsOpen)
         {
             // Same freeze as the pause menu: only the menu and the audio mix advance.
@@ -425,6 +427,7 @@ public sealed partial class GameWorld : IDisposable
             _arenaAtmosphere.ReactToResonance();
         }
         PlayPlayerActionAudio(wasDashing, wasResonanceActive, wasSoulSenseActive, wasCannonFull, previousCannonState);
+        UpdateAbilities(deltaTime, input);
         SpawnCannonShot();
         ResolveScytheStrike();
         UpdateCannonShots(deltaTime);
@@ -492,10 +495,12 @@ public sealed partial class GameWorld : IDisposable
         _souls.RemoveAll(soul => soul.IsFinished);
         UpdateCurrency(deltaTime, input);
         UpdateLoop(deltaTime);
+        if (_loopState == ArenaLoopState.Complete) _abilities.Clear(_player);
         if (previousHealth > _player.Health)
         {
             if (_player.IsDead)
             {
+                _abilities.Clear(_player);
                 LoseRunCurrencies();
                 _audio.SetCalm(true);
                 _audio.SetSoulSense(false);
@@ -814,6 +819,7 @@ public sealed partial class GameWorld : IDisposable
                 }
             }
         }
+        DrawAbilityWorld(batch, pixel);
         _particles.Draw(batch, pixel);
         bool shouldDrawPlayer = _phase is GamePhase.Antechamber or GamePhase.EnteringArena ||
             IsCombatPhase && _presentation.ShouldDrawPlayer(_loopState, _player.IsDead);
@@ -973,6 +979,8 @@ public sealed partial class GameWorld : IDisposable
             }
         }
 
+        DrawAbilityHud(batch, pixel, viewport);
+
         // Story, prompt and cinematic text would compete with the pause menu's type;
         // the paused world and HUD stay visible under the veil.
         if (_phase is GamePhase.Antechamber or GamePhase.EnteringArena && !IsGamePaused)
@@ -1087,7 +1095,7 @@ public sealed partial class GameWorld : IDisposable
             int damage = coreHit
                 ? (int)MathF.Round(strike.Damage * GameBalance.SoulSenseCoreDamageMultiplier)
                 : strike.Damage;
-            ApplyEnemyDamage(enemy, new DamageInfo(
+            ApplyWeaponDamage(enemy, new DamageInfo(
                 damage,
                 targetDirection * strike.Knockback,
                 coreHit ? weakPoint : enemy.Position,
@@ -1387,6 +1395,8 @@ public sealed partial class GameWorld : IDisposable
     /// <param name="stayInSandbox">Keeps the sandbox (and its character values) for a reset inside it.</param>
     private void ClearRunState(bool stayInSandbox = false)
     {
+        _abilities.Clear(_player);
+        _abilitySelectionOpen = false;
         _enemies.Clear();
         _souls.Clear();
         _cannonShots.Clear();
@@ -1733,7 +1743,7 @@ public sealed partial class GameWorld : IDisposable
                     ? (int)MathF.Round(shot.Damage * GameBalance.CannonCoreDamageMultiplier)
                     : shot.Damage;
                 float knockback = MathHelper.Lerp(330f, 760f, shot.Charge);
-                ApplyEnemyDamage(enemy, new DamageInfo(
+                ApplyWeaponDamage(enemy, new DamageInfo(
                     damage,
                     shot.Direction * knockback,
                     coreHit ? weakPoint : enemy.Position,
@@ -1889,6 +1899,12 @@ public sealed partial class GameWorld : IDisposable
         {
             _audio.SetSoulSense(_player.SoulSenseActive);
         }
+    }
+
+    private void ApplyWeaponDamage(Enemy enemy, DamageInfo damage)
+    {
+        if (!enemy.IsAlive) return;
+        ApplyEnemyDamage(enemy, RunAbilities.ResolveWeaponHit(_player, enemy, damage));
     }
 
     private void ApplyEnemyDamage(Enemy enemy, DamageInfo damage)
