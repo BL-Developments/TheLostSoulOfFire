@@ -50,7 +50,7 @@ public sealed partial class GameWorld
 
     private void CreditDefeatedEnemy(Enemy enemy)
     {
-        if (_phase != GamePhase.Arena || !enemy.TryClaimReward(out int glut))
+        if (_phase != GamePhase.Arena || _sandboxActive || !enemy.TryClaimReward(out int glut))
         {
             return;
         }
@@ -62,7 +62,7 @@ public sealed partial class GameWorld
 
     private void LoseRunCurrencies()
     {
-        if (_phase == GamePhase.Arena)
+        if (_phase == GamePhase.Arena && !_sandboxActive)
         {
             _wallet.LoseRun();
         }
@@ -126,7 +126,7 @@ public sealed partial class GameWorld
         _geldPulse = MathF.Max(0f, _geldPulse - deltaTime);
         _glutPulse = MathF.Max(0f, _glutPulse - deltaTime);
 
-        if (_phase == GamePhase.Arena && input.WasKeyPressed(Keys.E))
+        if (_phase == GamePhase.Arena && !_sandboxActive && input.WasKeyPressed(Keys.E))
         {
             // A chest in reach wins over the wave trigger, so E never starts a wave by accident.
             if (ChestInReach() is { } chest)

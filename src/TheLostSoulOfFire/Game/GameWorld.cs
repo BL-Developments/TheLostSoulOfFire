@@ -91,8 +91,8 @@ public sealed partial class GameWorld : IDisposable
         _abilities.FeedbackRemaining > 0 ? "ability_" + _abilities.Feedback : GetScreenshotContext();
     public GamePhase Phase => _phase;
     internal PrologueStage PrologueStage => _prologue.Stage;
-    /// <summary>Pause or character menu is open; the world is frozen under either.</summary>
-    private bool IsGamePaused => _pauseMenu.IsOpen || _characterMenu.IsOpen || _abilitySelectionOpen;
+    /// <summary>Pause, character, dev menu or ability selection is open; the world is frozen under each of them.</summary>
+    private bool IsGamePaused => _pauseMenu.IsOpen || _characterMenu.IsOpen || _devMenu.IsOpen || _abilitySelectionOpen;
     private bool IsCombatPhase => _phase is GamePhase.Arena or GamePhase.Prologue;
     private Rectangle ActiveCombatBounds => _phase == GamePhase.Prologue ? _prologue.MovementBounds : _arena.CombatBounds;
     private Rectangle ActiveWorldBounds => _phase == GamePhase.Prologue ? PrologueDirector.WorldBounds : _arena.Bounds;
@@ -139,6 +139,13 @@ public sealed partial class GameWorld : IDisposable
     public void Update(GameTime gameTime, InputState input, Viewport viewport)
     {
         float deltaTime = MathF.Min((float)gameTime.ElapsedGameTime.TotalSeconds, 1f / 20f);
+        if (_devMenu.IsOpen)
+        {
+            _audio.Update(deltaTime);
+            UpdateDevMenu(deltaTime, input);
+            return;
+        }
+
         if (HandleAbilitySelection(input)) { _audio.Update(deltaTime); return; }
         if (_characterMenu.IsOpen)
         {
@@ -167,6 +174,13 @@ public sealed partial class GameWorld : IDisposable
         if (_phase != GamePhase.Title && input.WasKeyPressed(Keys.Tab))
         {
             _characterMenu.Open();
+            _audio.SetPaused(true);
+            return;
+        }
+
+        if (_sandboxActive && !_player.IsDead && input.WasKeyPressed(Keys.F))
+        {
+            _devMenu.Open();
             _audio.SetPaused(true);
             return;
         }
@@ -590,9 +604,9 @@ public sealed partial class GameWorld : IDisposable
 
     private CharacterSheet CurrentCharacterSheet => new(
         _player.Health,
-        GameBalance.PlayerMaxHealth,
+        _player.MaxHealth,
         _player.Attributes,
-        _phase == GamePhase.Arena,
+        _phase == GamePhase.Arena && !_sandboxActive,
         _wallet.Run(Currency.Geld),
         _wallet.Secured(Currency.Geld),
         _wallet.Run(Currency.Glut),
@@ -939,7 +953,12 @@ public sealed partial class GameWorld : IDisposable
         }
         else
         {
-            if (_phase == GamePhase.Arena && _presentation.ShouldDrawCombatHud(_loopState, _player.IsDead))
+            if (_phase == GamePhase.Arena && _sandboxActive && !_player.IsDead)
+            {
+                _hud.Draw(batch, pixel, viewport, _player);
+                DrawSandboxHud(batch, pixel, viewport);
+            }
+            else if (_phase == GamePhase.Arena && _presentation.ShouldDrawCombatHud(_loopState, _player.IsDead))
             {
                 _hud.Draw(batch, pixel, viewport, _player);
                 DrawCurrencyHud(batch, pixel, viewport);
@@ -982,6 +1001,11 @@ public sealed partial class GameWorld : IDisposable
         if (_characterMenu.IsOpen)
         {
             _presentation.DrawCharacterMenu(batch, pixel, viewport, _characterMenu, CurrentCharacterSheet);
+        }
+
+        if (_devMenu.IsOpen)
+        {
+            DrawDevMenu(batch, pixel, viewport);
         }
 
         batch.End();
@@ -1200,6 +1224,10 @@ public sealed partial class GameWorld : IDisposable
         {
             RestartPrologueSector(viewport);
         }
+        else if (_sandboxActive)
+        {
+            ResetSandbox();
+        }
         else
         {
             ResetEncounter();
@@ -1364,7 +1392,8 @@ public sealed partial class GameWorld : IDisposable
         _audio.SetArenaActive(false, true);
     }
 
-    private void ClearRunState()
+    /// <param name="stayInSandbox">Keeps the sandbox (and its character values) for a reset inside it.</param>
+    private void ClearRunState(bool stayInSandbox = false)
     {
         _abilities.Clear(_player);
         _abilitySelectionOpen = false;
@@ -1387,6 +1416,11 @@ public sealed partial class GameWorld : IDisposable
         _soulSensePresentation.Reset();
         _audioTestFatalDamageRequested = false;
         _endingRevealPlayed = false;
+        if (_sandboxActive && !stayInSandbox)
+        {
+            RestoreSandboxStartValues();
+        }
+        _sandboxActive = stayInSandbox;
     }
 
     private void ConfigureBurningAggression(float deltaTime)
@@ -1433,6 +1467,11 @@ public sealed partial class GameWorld : IDisposable
 
     private void UpdateArenaLoop(float deltaTime)
     {
+        if (_sandboxActive)
+        {
+            return;
+        }
+
         switch (_loopState)
         {
             case ArenaLoopState.Intro:
@@ -1524,7 +1563,7 @@ public sealed partial class GameWorld : IDisposable
 
         Color label = new(189, 231, 226);
         PixelText.Draw(batch, pixel, $"FPS: {_fps}", new Vector2(x, y), 2, label);
-        PixelText.Draw(batch, pixel, $"HP: {_player.Health}/{GameBalance.PlayerMaxHealth}", new Vector2(x, y + 24), 2, label);
+        PixelText.Draw(batch, pixel, $"HP: {_player.Health}/{_player.MaxHealth}", new Vector2(x, y + 24), 2, label);
         string resonance = _player.ResonanceActive
             ? $"RESONANCE: {_player.ResonanceRemaining:0.0}"
             : $"RESONANCE: {_player.Resonance:0}/{GameBalance.ResonanceRequired:0}";
@@ -1606,6 +1645,7 @@ public sealed partial class GameWorld : IDisposable
     private string GetScreenshotContext()
     {
         if (_pauseMenu.IsOpen) return $"phase15_pause_{_pauseMenu.CurrentPage.Id}";
+        if (_devMenu.IsOpen) return "sandbox_dev_menu";
         if (_characterMenu.IsOpen) return $"character_{_characterMenu.SelectedTab.ToString().ToLowerInvariant()}";
         if (_phase == GamePhase.Title) return _menu.IsOpen ? $"phase15_menu_{_menu.CurrentPage.Id}" : "phase15_title";
         if (_phase == GamePhase.Prologue) return $"prologue_{_prologue.Stage.ToString().ToLowerInvariant()}";
@@ -1618,6 +1658,7 @@ public sealed partial class GameWorld : IDisposable
             return $"phase16_antechamber_door_{name}_{(door.IsSealed ? "sealed" : "open")}";
         }
         if (_phase == GamePhase.EnteringArena) return "phase16_entering_arena";
+        if (_sandboxActive) return _player.IsDead ? "sandbox_player_down" : "sandbox";
         if (_player.IsDead) return "phase05_player_down";
         if (_loopState == ArenaLoopState.Complete) return "phase15_soul_free";
         if (_loopState is ArenaLoopState.Intermission or ArenaLoopState.Transition) return $"phase12_wave_{_waveNumber}_clear";

@@ -14,14 +14,16 @@ public enum DeveloperStartArea
     PrologueDevourer,
     PrologueTransit,
     Hub,
-    Arena
+    Arena,
+    Sandbox
 }
 
 /// <summary>
 /// Parses the developer start parameters (<c>--dev --start &lt;area&gt; [--wave n]</c>) that let a
 /// feature be reached directly instead of playing through title, prologue and hub. The optional
 /// <c>--strength</c>, <c>--ability-power</c> and <c>--armor</c> flags override the player's
-/// attributes so their scaling can be tried out. Kept free of MonoGame so the command-line rules
+/// attributes so their scaling can be tried out. The sandbox area is reachable only from here.
+/// Kept free of MonoGame so the command-line rules
 /// are testable on their own.
 /// </summary>
 public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, PlayerAttributes? AttributeOverride = null)
@@ -38,7 +40,8 @@ public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, Pl
         ("prologue:devourer", DeveloperStartArea.PrologueDevourer),
         ("prologue:transit", DeveloperStartArea.PrologueTransit),
         ("hub", DeveloperStartArea.Hub),
-        ("arena", DeveloperStartArea.Arena)
+        ("arena", DeveloperStartArea.Arena),
+        ("sandbox", DeveloperStartArea.Sandbox)
     ];
 
     private static readonly string[] AutomatedTestFlags =

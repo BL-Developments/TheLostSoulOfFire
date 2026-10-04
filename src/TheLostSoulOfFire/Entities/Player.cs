@@ -41,6 +41,8 @@ public sealed class Player
     public Vector2 FacingDirection { get; private set; } = Vector2.UnitX;
     public Vector2 DashDirection => _dashDirection;
     public int Health { get; private set; } = GameBalance.PlayerMaxHealth;
+    /// <summary>Starts at <see cref="GameBalance.PlayerMaxHealth"/>; only the sandbox dev menu changes it.</summary>
+    public int MaxHealth { get; private set; } = GameBalance.PlayerMaxHealth;
     public float Radius => GameBalance.PlayerRadius;
     public float InvulnerabilityRemaining { get; private set; }
     public float HitFlashRemaining { get; private set; }
@@ -69,7 +71,7 @@ public sealed class Player
         Position = position;
         Velocity = Vector2.Zero;
         FacingDirection = Vector2.UnitX;
-        Health = GameBalance.PlayerMaxHealth;
+        Health = MaxHealth;
         _idleParticleTimer = 0f;
         _dashTimer = 0f;
         _dashCooldownTimer = 0f;
@@ -88,6 +90,13 @@ public sealed class Player
         AbilityEffects.Clear();
         Scythe.Reset();
         Cannon.Reset();
+    }
+
+    /// <summary>Sets maximum health and fills the player up to it.</summary>
+    public void SetMaxHealth(int maxHealth)
+    {
+        MaxHealth = Math.Max(1, maxHealth);
+        Health = MaxHealth;
     }
 
     public void SettleForCompletion()
