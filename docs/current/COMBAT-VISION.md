@@ -6,7 +6,7 @@ Der Spieler führt Death Flame nicht als gewöhnliches Element, sondern als Kraf
 
 Das System verbindet:
 
-- die klare 2D-Action und Pixel-Lesbarkeit, die zur Children-of-Morta-Qualitätsrichtung passt;
+- klare 2D-Action und Silhouettenlesbarkeit im gemalten Bastion-Stil;
 - zeitkritische Reaktionen und befriedigende Folgeangriffe, inspiriert von der Reaktionsqualität moderner God-of-War-Kämpfe;
 - Soulfire-spezifische Entscheidungen über Resonance, Anchor, Release und Risiko;
 - vollständige Koopfähigkeit.
@@ -55,28 +55,13 @@ Mögliche Belohnungen:
 - Kamera bleibt für beide Koop-Spieler funktional.
 - Fehler sind verständlich und nicht durch Effektchaos verdeckt.
 
-## 4. Soul Resonance als taktische Ressource — UNRESOLVED DIRECTION
+## 4. Ressourcen und taktische Detonation
 
-Ein mögliches System bietet nach bestimmten Treffern, Countern oder Releases eine Wahl:
+Bestätigt ist eine mystische Ressource aus erfolgreicher Erlösung: die Seele selbst geht weiter. Die Ressource kann Run-Fähigkeiten oder dauerhaften Fortschritt finanzieren. Herkunft, Konten und Verlust-/Sicherungsdetails werden in #7 entschieden; Koop-Besitz in #9, Ultimate-Ladung in #13.
 
-### Bewahren / Sammeln
+Die TeamResonance auf `prototype/design-polish` ist eine Referenz und weder automatisch auf `main` vorhanden noch identisch mit Währung, Ultimate-Ladung oder Meta-Fortschritt.
 
-Freigesetzte Energie wird als Soul Resonance aufgenommen und später für Waffenformen, Heilung, Teamfähigkeiten oder Release eingesetzt.
-
-### Sofort umwandeln / detonieren
-
-Die Energie wird unmittelbar als Explosion, Kettenreaktion, Crowd Control oder hoher Risikoschaden ausgelöst.
-
-Diese Richtung ist interessant, weil sie Tempo gegen langfristige Stärke stellt. Sie ist jedoch lore-sensibel.
-
-Vor Implementierung muss entschieden werden, was tatsächlich detoniert:
-
-1. **Intakte bewusste Seele:** moralisch gravierend und wahrscheinlich mit dem Warden-Auftrag unvereinbar.
-2. **Abgelöstes Soul-Fragment:** könnte Identität beschädigen und eine bewusste harte Entscheidung bilden.
-3. **Instabiles emotionales Residuum:** sicherste Lore-Variante; Explosion vernichtet nicht die Person.
-4. **Überschüssige Death-Flame-Energie nach Release:** mechanisch sauber, aber weniger moralische Spannung.
-
-Bis zur Entscheidung darf kein Agent behaupten, Wardens würden gerettete Seelen routinemäßig als Munition verbrauchen.
+Eine Counter-Detonation kann eine feindliche Manifestation oder geeignete Restenergie betreffen. Ihre genaue Quelle, Kosten und Wirkung sind offen. Erlöste intakte Seelen werden nicht gesammelt oder als Sprengstoff verwendet. Früher diskutierte Soul-Detonationsoptionen sind keine gültige Verbrauchsregel.
 
 ## 5. Waffenidentitäten
 

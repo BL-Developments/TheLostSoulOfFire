@@ -1,10 +1,10 @@
 # Priorisierung der offenen Issues und offene Fragen
 
-Stand: 27.09.2026, ergänzt am 02.10.2026 · Repository: [BL-Developments/TheLostSoulOfFire](https://github.com/BL-Developments/TheLostSoulOfFire/issues)
+Stand: 04.10.2026 · Repository: [BL-Developments/TheLostSoulOfFire](https://github.com/BL-Developments/TheLostSoulOfFire/issues)
 
 ## Ausgangslage und Maßstab
 
-Es sind 25 Issues offen: [#5](https://github.com/BL-Developments/TheLostSoulOfFire/issues/5) ist die Planungsübersicht, die übrigen 24 sind Arbeitsaufgaben. Die Reihenfolge unten richtet sich nach Abhängigkeiten und danach, wie schnell ein vollständiger, überprüfbarer Run entsteht. Sie ist keine Aussage über bereits erledigte Implementierung. In den Issues liegen derzeit keine klärenden Kommentare vor.
+Die übergeordneten Issues #6 bis #29 beschreiben Produktziele und Integrationsumfang; #5 ist der zentrale Wegweiser. Große Aufgaben sind in echte Unter-Issues zerlegt. Bereits klar umrissene vertikale Aufgaben bleiben eigenständig. Die aktuelle Zuordnung steht in [issue-map-2026-10-04.json](issue-map-2026-10-04.json); der tatsächliche Status wird in GitHub gepflegt.
 
 **Branchgrundlage (Beschluss vom 02.10.2026):** `main` ist die Basis. Der Solo-Prolog mit `PrologueDirector` ist seit PR #37 auf `main`. Lokaler Koop, TeamResonance, Severance Window und Down/Stabilisieren existieren nur auf `prototype/design-polish` und werden einzeln als OpenSpec-Change portiert, sobald ein Issue sie braucht. Entscheidungslog, Aufnahme-Zusammenfassung, Canon und Lore liegen seit dem 02.10.2026 unter `docs/current/`.
 
@@ -62,19 +62,19 @@ Die Aufnahme hat laut #5 bei Konflikten Vorrang vor älteren Repo-Dokumenten. Di
 | 24 | [#29 – Gesamten Run solo und im Koop abnehmen](https://github.com/BL-Developments/TheLostSoulOfFire/issues/29) | Abschließender Nachweis für Laden, Extraktion, Niederlage, erneuten Start und beide Spielmodi. |
 | Übersicht | [#5 – Planungsübersicht](https://github.com/BL-Developments/TheLostSoulOfFire/issues/5) | Als Wegweiser aktuell halten; keine zusätzliche Implementierungsaufgabe. |
 
-**Abhängigkeit prüfen:** #28 verlangt auch #17 und #26. Damit werden Collectibles und das bislang nur erwogene Meta-Level faktisch Voraussetzungen der Balance-Abnahme. Für eine frühe Abnahme des spielbaren Kerns diese Verknüpfung ausdrücklich beurteilen.
+**Optionale Inhalte:** #17 und #26 sind für die Kern-Balance keine Pflichtvoraussetzung. Sammlungsbelohnungen und Meta-Level nur berücksichtigen, wenn ausdrücklich beschlossen und implementiert; das Meta-Level ersetzt keine Boss-Freischaltung.
 
 ## Offene Fragen
 
 ### Sofort klären – sie blockieren Architektur oder Umsetzung
 
-1. ~~**Welcher Branch ist die Produktgrundlage?**~~ *Entschieden am 02.10.2026: `main`, mit gezielter Portierung (siehe oben).* Soll `prototype/design-polish` in den aktuellen Entwicklungsstand übernommen werden, oder sollen die Issues für den tatsächlichen `main`-Stand neu zugeschnitten werden? Betrifft bereits #8, #11 und die Annahmen in #5.
-2. ~~**Welche Dokumente gelten bei Widersprüchen?**~~ *Entschieden am 02.10.2026: `docs/current/` mit dem Entscheidungslog gilt vor `docs/mvp/` und `docs/vision/`.* #5 gibt der Aufnahme Vorrang; ältere MVP-Dokumente nennen Entscheidungen teils noch „locked“. #6 sollte konkret festhalten, was ersetzt wird.
+1. **Entschieden:** `main` ist Code-Basis, `prototype/design-polish` Referenz für gezielte Portierungen (02.10.2026).
+2. **Entschieden:** Neuere datierte Beschlüsse und `docs/current/` haben Vorrang vor älteren widersprechenden Quellen (02.10.2026).
 3. **Was genau sind die beiden Währungen?** Wie heißen sie, wodurch entstehen sie, wofür werden sie ausgegeben und welche Bestände sind im Run beziehungsweise dauerhaft verfügbar? Wann wird eine Soul Release genau einmal gutgeschrieben? (#7)
 4. **Wie funktioniert Teilsicherung exakt?** Welche Quote gilt, wie wird gerundet, darf mehrfach pro Run gesichert werden und was geschieht bei erneutem Besuch desselben Reisepunkts? Was wird bei vollständiger Extraktion übertragen? (#7, #18)
 5. **Was geschieht mit normalem Geld bei Niederlage?** Der Verlust ungesicherter mystischer Ressource ist vorgesehen; für Geld ist die Regel offen. (#7)
 6. **Wem gehören Ressourcen und Fortschritt im lokalen Koop?** Gemeinsame oder persönliche Konten, Waffen, Freischaltungen und Meta-Fortschritt? Wie werden widersprüchliche Entscheidungen am Reisepunkt aufgelöst? (#9)
-7. ~~**Was bedeutet Run-Niederlage in der Welt?**~~ *Entschieden am 29.09.2026: Kampfunfähigkeit und Bergung vor endgültiger Zerstörung, Rückkehr zur Homebase (Entscheidungslog).* Wie kehrt ein Warden zurück, während endgültige Zerstörung laut älterer Lore eine andere Folge hat? (#6)
+7. **Entschieden:** Run-Niederlage bedeutet Kampfunfähigkeit mit Bergung und Rückkehr. Endgültiger Warden-Tod führt weiterhin ins Jenseits (29.09.2026). Offen bleibt die Inszenierung.
 8. **Wie lädt sich die Ultimate auf und wem gehört die Ladung?** Teamweit oder pro Spieler; durch Kampf, Zeit oder Orte? Was bleibt bei Levelwechsel und Niederlage erhalten? Die bisherige Resonance-Aktivierung darf nicht ungeprüft das Wirtschaftskonto leeren. (#13)
 
 ### Vor Content- und Fortschrittsproduktion klären
@@ -91,3 +91,7 @@ Die Aufnahme hat laut #5 bei Konflikten Vorrang vor älteren Repo-Dokumenten. Di
 ## Nächster Schritt
 
 Zielbranch ist festgelegt. Als Nächstes #6, #7 und #9 als kurze, widerspruchsfreie Entscheidungsgrundlage abschließen. Damit werden die meisten nachfolgenden Issues ausführbar, ohne ihre Grundregeln mehrfach neu zu entscheiden.
+
+## Pflege seit der Bereinigung
+
+[Projektwissen](../current/README.md), [offene Entscheidungen](../current/OPEN-QUESTIONS.md) und [Pflegeregeln](WORKFLOW.md) sind die Einstiege. Keine Statuszahlen aus diesem Dokument als Live-Stand behandeln. Die Reihenfolge bezeichnet Ziele; ausführbare Einheiten sind die verknüpften Unter-Issues. Vor Umsetzung deren konkrete Geschwister-Abhängigkeiten prüfen.

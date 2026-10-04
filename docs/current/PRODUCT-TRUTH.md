@@ -1,18 +1,8 @@
 # Product Truth
 
-Status: authoritative product direction. Originally written for the
-`prototype/design-polish` branch; the "First playable target" section below
-describes that branch's plan, not the current `main` runtime.
+Status: verbindliche Produktidentität, konsolidiert am 04.10.2026.
 
-Planning revision 2026-09-08: the owner's concept recording takes priority in
-conflicts. See [`DECISION-LOG.md`](DECISION-LOG.md) and
-[`RECORDING-SUMMARY-2026-09-08.md`](RECORDING-SUMMARY-2026-09-08.md).
-The current runtime remains the baseline; regular runs now target one selected
-main weapon, a three-offer/two-choice ability draft, a persistent hub and
-bankable release resources. The six-item Soul Echo proof is cancelled; useful
-effects may later be redesigned as abilities or weapon progression, without an
-item count or loot inventory. A lost run ends with rescue before final Warden
-death and return to the hub. This is a planned direction, not implemented gameplay.
+Neuere datierte Beschlüsse im [Entscheidungslog](DECISION-LOG.md) haben Vorrang. [Spielregeln](GAME-RULES.md) trennen festgelegte Richtung von offenen Details; [offene Entscheidungen](OPEN-QUESTIONS.md) verlinken die zuständigen Issues. Implementiertes Verhalten wird in `openspec/specs/` und am Code auf `main` geprüft. Der Branch `prototype/design-polish` ist eine historische Referenz, kein implizit vorhandener Laufzeitbestand.
 
 ## Game identity
 
@@ -37,20 +27,17 @@ The game must remain cooperative by construction. In cooperative story play, the
 
 Local shared-screen co-op is the first technical proof. Online networking is deferred until the local design is approved.
 
-## First playable target
+## Aktuelles Ausbauziel
 
-Build in this order:
+Homebase → gewähltes Biom ab Level 1 → mehrere Levels → Teilsicherung, Boss oder Extraktion/Niederlage → Homebase → neuer Run. Eine Hauptwaffe, zwei aus drei angebotenen Fähigkeiten und Ressourcen aus erfolgreicher Erlösung tragen die Risikoentscheidung zwischen unmittelbarem Einsatz und dauerhaftem Fortschritt. Kein gewöhnliches Loot-Inventar und kein Sechs-Item-Soul-Echo-Ziel.
 
-1. one 60–90 second gold-standard encounter in the current arena;
-2. a local two-player brother proof in the same room;
-3. an 8–12 minute Death Layer prologue across three authored sectors;
-4. an AI-assisted content factory based on the approved quality bar.
+Die konkrete Reihenfolge steht in [der Roadmap](../planning/roadmap.md). Koop bleibt Produktziel; Systeme aus dem Referenzbranch werden einzeln auf `main` portiert. Die historische Reihenfolge Golden Slice → Koop-Proof → Prolog ist keine neue Behauptung über den Stand von `main`.
 
 ## Quality bar
 
 ### Visual
 
-Use Children of Morta as the primary quality reference for:
+Bastion ist seit 02.10.2026 die primäre Stilreferenz: gemalte, hochaufgelöste 2D-Grafik mit weicher Skalierung. Children of Morta bleibt eine ergänzende Prinzipienreferenz für:
 
 - authored spatial depth;
 - grounded characters and props;
@@ -64,7 +51,7 @@ Do not copy its characters, palette, layouts or assets. Translate those principl
 
 ### Combat
 
-Preserve the existing Scythe, Soul Cannon, dash, Soul Sense, Resonance and Soul lifecycle. Raise combat quality with readable anticipation, impact, recovery and reaction timing. A correct response should create an interesting action or position, not merely negate damage.
+Use Scythe, Soul Cannon, dash, Soul Sense and Soul lifecycle on `main` as the inspected baseline. Team Resonance, Severance and local co-op from `prototype/design-polish` require targeted ports when needed. Raise combat quality with readable anticipation, impact, recovery and reaction timing. A correct response should create an interesting action or position, not merely negate damage.
 
 God of War is only a reference for the satisfaction of well-timed reactions unlocking expressive follow-ups. The result must remain native to a cooperative 2D action game.
 

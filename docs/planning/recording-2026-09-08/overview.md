@@ -1,49 +1,42 @@
-## Zusammenfassung der Aufnahme
+# Planungsübersicht aus der Konzeptaufnahme
 
-Diese Übersicht wird aus der lokalen Planung erzeugt und bei erneuter Übertragung aktualisiert. Eigene Ergänzungen bitte als Issue-Kommentar oder in den zugehörigen Arbeits-Issues festhalten.
+Bereinigt am 04.10.2026. Dieses Issue ist ein Wegweiser; dauerhaftes Produktwissen steht im Repository.
 
-Auswertung des vom Owner bereitgestellten Gesprächstranskripts, importiert am **08.09.2026**; das Aufnahmedatum ist unbekannt. Die Aufnahme hat laut Owner bei Konflikten Vorrang vor bestehenden Repo-Dokumenten. Dieses Issue veröffentlicht die fachliche Zusammenfassung, keine privaten Gesprächsfloskeln oder das Rohtranskript.
+## Verbindliche Quellen
 
-- **Run-Kreislauf:** Warden-Homebase → gewähltes Biom mit mehreren Levels → Boss bzw. Extraktion/Niederlage → Homebase. Ein neuer Versuch beginnt bei Level 1 des gewählten Bioms; freigeschaltete spätere Biome bleiben direkt anwählbar.
-- **Wirtschaft:** mindestens normales Geld und eine mystische Ressource aus erfolgreicher Erlösung. Die Seele selbst geht ins Jenseits. Die Ressource wird für Fähigkeiten im Run oder dauerhaften Fortschritt verwendet.
-- **Risiko:** an Warden-Reisepunkten einen Teil sichern und weitergehen oder den Run mit vollständiger Sicherung beenden. Ungesicherte mystische Ressource ist bei Niederlage verloren; die Regel für normales Geld ist offen.
-- **Builds:** eine Nah- oder Fernkampfwaffe vor dem Run wählen; drei zufällige Fähigkeiten werden angeboten, zwei ausgewählt. Warden-Gemeinschaft und gerade verfügbare geteilte Kräfte begründen die Variation.
-- **Kampf:** aktive Fähigkeiten und eine Ultimate sind gewünscht. Timing-Counter sollen besondere Folgeaktionen oder Teamchancen eröffnen; die bestehende Scythe/Cannon/Severance-Basis wird weitergenutzt.
-- **Fortschritt:** NPCs im Run entdecken/retten, um Händler, Schmied und Fähigkeitstraining in der Homebase freizuschalten; getrennte Waffen- und Fähigkeits-Skilltrees, perspektivisch dauerhafte Fähigkeiten.
-- **Figuren und Welt:** fester anpassbarer Protagonist ohne Klassenwahl; Tutorial mit Vaelors Auswahl, Sense, Bergung und Homebase. Bestehende Bruder-/Koop-Prämisse bleibt erhalten. Biome tragen die Geschichte und Handschrift ihres Bosses.
-- **Erkundung:** Collectibles und Easter Eggs sind erwünscht; herkömmliches Loot-Inventar ist ausgeschlossen.
+- [Zentrale Wissensübersicht](https://github.com/BL-Developments/TheLostSoulOfFire/blob/main/docs/current/README.md)
+- [Spielregeln](https://github.com/BL-Developments/TheLostSoulOfFire/blob/main/docs/current/GAME-RULES.md)
+- [Offene Entscheidungen](https://github.com/BL-Developments/TheLostSoulOfFire/blob/main/docs/current/OPEN-QUESTIONS.md)
+- [Datierter Entscheidungslog](https://github.com/BL-Developments/TheLostSoulOfFire/blob/main/docs/current/DECISION-LOG.md)
+- [Konzeptaufnahme](https://github.com/BL-Developments/TheLostSoulOfFire/blob/main/docs/current/RECORDING-SUMMARY-2026-09-08.md)
+- [Roadmap](https://github.com/BL-Developments/TheLostSoulOfFire/blob/main/docs/planning/roadmap.md)
 
-## Aufnahme vor bisherigem Repo
+Neuere datierte Beschlüsse haben Vorrang vor älteren Aussagen. `main` ist die Code-Basis. `prototype/design-polish` wird nicht insgesamt gemergt; benötigte Koop-/Resonance-/Severance-Systeme werden gezielt portiert. Der Stil ist gemalt wie Bastion. Die Aschenvorhalle mit Biom-Türen ist eine Grundlage für den Homebase-Ausbau, keine vollständige Homebase mit Diensten.
 
-| Bisheriger Stand | Neue Richtung / Umgang |
+## Ziele nach Meilenstein
+
+| Meilenstein | Ziele / Arbeits-Issues |
 |---|---|
-| Vaelor wählt Wardens nicht persönlich aus | Auswahl und Sense-Szene aus der Aufnahme übernehmen; metaphysischer Mechanismus bleibt offen. Kein Gottstatus oder Siegel daraus ableiten. |
-| Scythe und Cannon gleichzeitig verfügbar | Eine Hauptwaffe pro regulärem Run wählen; vorhandene Systeme als Loadouts weiterverwenden. |
-| Geplanter Sechs-Item-Soul-Echo-Proof | Nach Beschluss vom 29.09.2026 gestrichen; einzelne Effekte können später als Fähigkeiten oder Waffenfortschritt neu entstehen, ohne Inventar oder feste Anzahl. |
-| Endgültige Warden-Zerstörung führt ins Jenseits | Nach Beschluss vom 29.09.2026 ist Run-Niederlage Kampfunfähigkeit mit Bergung vor endgültiger Zerstörung und Rückkehr zur Homebase. Endgültiger Warden-Tod bleibt der Übergang ins Jenseits. |
-| Prolog wiederholt einzelne Sektoren | Reguläre Biom-Runs starten nach Ende/Niederlage bei Level 1 des gewählten Bioms. |
-| Bestehender gemeinsamer TeamResonance-Pool | Besitz und Ausgaben der neuen Währungen, Ultimate und Meta-Fortschritt ausdrücklich neu definieren. |
+| [M1 — Produktregeln und Lore-Abgleich](https://github.com/BL-Developments/TheLostSoulOfFire/milestone/1) | #6 Lore und Quellen, #7 Wirtschaft, #9 Koop-Vertrag, #8 Prolog |
+| [M2 — Homebase und Run-Kreislauf](https://github.com/BL-Developments/TheLostSoulOfFire/milestone/2) | #11 Homebase, #12 Spielstände, #14 Run-Zustände, #18 Reisepunkte |
+| [M3 — Waffen und Fähigkeiten](https://github.com/BL-Developments/TheLostSoulOfFire/milestone/3) | #15 Waffenwahl, #16 Draft, #21 Fähigkeiten, #13 Ultimate-Entscheidung, #24 Ultimate, #19 Counter |
+| [M4 — Dienste und Fortschritt](https://github.com/BL-Developments/TheLostSoulOfFire/milestone/4) | #20 NPCs, #22 Händler/Schmied, #25 Skilltrees, #26 optionales Meta-Level |
+| [M5 — Biom und Erkundung](https://github.com/BL-Developments/TheLostSoulOfFire/milestone/5) | #10 Biomkonzept, #23 Levels, #27 Boss/Freischaltung, #17 Entdeckungen |
+| [M6 — Balance und Abnahme](https://github.com/BL-Developments/TheLostSoulOfFire/milestone/6) | #28 Balance, #29 integrierte Solo-/Koop-Abnahme |
 
-**Weiter gültig:** tragische menschliche Lost Souls, Trennung von Besiegen und Erlösen, keine intakten Seelen als Verbrauchswährung, komplementäre Life/Death Flame, Vaelor als höchster Warden, unbekannter Keeper, Übergangsebene getrennt vom wahren Jenseits, Soulfire Gothic und lokaler Bruder-Koop.
+Große Ziele haben echte Unter-Issues mit einzelnen Ergebnissen. Ihre bisherigen Nummern, Gesamtanforderungen und Meilensteine bleiben erhalten. Die Unteraufgaben tragen dieselben Themenlabels und Meilensteine. Bereits umrissene Einzelaufgaben werden nicht künstlich zerlegt.
 
-## Offen oder beispielhaft
+## Zuerst bearbeiten
 
-Ultimate-Kosten/Aufladung, Währungsnamen, Sicherungsquote und Wiederholbarkeit, Geldverlust, genaue Koop-Besitzregeln, Rüstungsanpassung, konkretes Startbiom, Level-/Waffen-/Minibosszahlen sowie NPC-Reihenfolge sind noch nicht abschließend festgelegt. Das Meta-Level aus heimgebrachten Ressourcen ist eine Arbeitsrichtung; Formel und Freischaltschwellen sind offen. Heilung/Run-Händler und Sammlungsabschluss-Belohnungen sind Optionen.
+1. Konsolidierte Dokumentation aus #6 prüfen.
+2. Herkunft/Konten und Sicherungs-/Verlustregeln in #7 entscheiden und durch Beispiele prüfen.
+3. Besitz-/Profil- und Zustimmungsregeln in #9 festlegen.
+4. Damit Prolog, Homebase, Savegame und Run-Kreislauf ausführbar machen.
 
-**1.000 Einheiten, 50 % sichern, drei Startwaffen und drei/fünf Levels sind Beispiele.** Drei Fähigkeitsangebote mit zwei Auswahlen ist dagegen das konkret besprochene Startmodell.
+Meta-Level und Sammlungsbelohnungen bleiben optionale Entscheidungen. Keine festen Währungsnamen, Quoten oder Levelzahlen aus Gesprächsbeispielen ableiten. Neue Empfehlungen sind kein Beschluss.
 
-## Meilensteine und Arbeits-Issues
+## Pflege und Nachweis
 
-<!-- MILESTONE_LINKS -->
+[Project](https://github.com/orgs/BL-Developments/projects/1) · [Pflegeregeln](https://github.com/BL-Developments/TheLostSoulOfFire/blob/main/docs/planning/WORKFLOW.md) · [Issue-Zuordnung](https://github.com/BL-Developments/TheLostSoulOfFire/blob/main/docs/planning/issue-map-2026-10-04.json)
 
-Die Etappen sind eine sinnvolle Integrationsreihenfolge, keine starren Kalendertermine. Konzeptarbeit am Biom kann früh parallel erfolgen. Koop-Kriterien gelten in jeder Etappe.
-
-## Bestehende Grundlage und Umfang
-
-Zum Zeitpunkt der Planung (Branch `prototype/design-polish`) besaß das Repo Prolog, Scythe/Cannon, Severance, Soul-Lifecycle, lokale zwei Spieler und deterministische Captures; Hub-Innenraum, Speichern und breiterer Fortschritt fehlten. Auf `main` fehlen davon derzeit Severance, lokaler Koop und TeamResonance; sie werden bei Bedarf gezielt portiert (Beschluss vom 02.10.2026). Daher sind die Aufgaben überwiegend Ausbau/Anpassung. C#/.NET 9/MonoGame und die bestehende Content-Pipeline bleiben Grundlage.
-
-Diese Übertragung erstellt Planung und Issues; sie behauptet keine Umsetzung neuer Gameplay-Systeme. Die ausführliche lokale Auswertung steht in `docs/current/RECORDING-SUMMARY-2026-09-08.md`, die reproduzierbare Planung in `docs/planning/recording-2026-09-08/backlog.json`.
-
-<!-- PUBLISH_STATUS -->
-
-<!-- recording-plan:2026-09-08 overview -->
+Implizite Behauptungen zu umgesetzten Systemen wurden entfernt. `openspec/specs/` und Code beschreiben den Stand von `main`; konkrete Checks und Spielprüfung liefern den Nachweis. Der [Snapshot vor der Bereinigung](https://github.com/BL-Developments/TheLostSoulOfFire/blob/main/docs/planning/issue-body-snapshot-2026-10-04.json) erhält die ursprünglichen Texte. Den historischen Aufnahme-Import nicht erneut über diese Planung synchronisieren.

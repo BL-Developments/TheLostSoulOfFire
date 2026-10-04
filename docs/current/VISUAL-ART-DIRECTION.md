@@ -1,9 +1,6 @@
 # Visual Art Direction
 
-> **Revision 2026-10-02:** Der Grafikstil ist gemalt wie Bastion, nicht
-> Pixel-Art (siehe [`DECISION-LOG.md`](DECISION-LOG.md)). Aussagen zu
-> Pixel-Art in diesem Dokument gelten nur noch, soweit sie unten nicht
-> ausdrücklich ersetzt sind.
+> **Gültige Richtung:** gemalte, hochaufgelöste 2D-Grafik wie Bastion (Beschluss vom 02.10.2026). Pixel-Art-Vorgaben sind aufgehoben. Frühere Fassungen stehen in der Git-Historie.
 
 ## 1. Zielbild
 
@@ -19,9 +16,9 @@ Der Stil heißt **Soulfire Gothic**:
 - seltene warme orange Life Flame;
 - moderne, kontrollierte Licht- und VFX-Unterstützung.
 
-## 2. Primäre Qualitätsreferenz: Children of Morta
+## 2. Stilreferenz Bastion und ergänzende Qualitätsprinzipien
 
-Children of Morta dient als **Qualitäts- und Prinzipienreferenz**, nicht als Vorlage zum Kopieren.
+Bastion ist die primäre Stilreferenz für gemalte, hochaufgelöste 2D-Grafik. Children of Morta bleibt eine ergänzende **Qualitäts- und Prinzipienreferenz** für Raumtiefe, Figurenlesbarkeit und Kamera. Keine Referenz ist eine Vorlage zum Kopieren.
 
 Zu übersetzende Prinzipien:
 
@@ -50,7 +47,7 @@ Jede Referenz muss durch die Lore transformiert werden:
 
 | Referenzprinzip | Soulfire-Übersetzung |
 |---|---|
-| räumliche Pixel-Art | Death-Layer-Architektur mit sichtbarer Höhe, Überlagerung und metaphysischen Brüchen |
+| räumliche 2D-Komposition | Death-Layer-Architektur mit sichtbarer Höhe, Überlagerung und metaphysischen Brüchen |
 | warme Familiennähe | Beziehung der Brüder und Warden-Gemeinschaft innerhalb einer kalten Zwischenwelt |
 | Umweltgeschichte | konkrete menschliche Orte, Ereignisse und emotionale Residuen |
 | moderne Beleuchtung | Licht erklärt Form und Flammenbedeutung, nicht bloß „mehr Glow“ |
@@ -90,33 +87,17 @@ Für die großen Death-Layer-Karten:
 
 „Wie Diablo“ meint größere navigierbare Flächen und Reisegefühl, nicht Loot-Überladung oder optische Nachahmung.
 
-## 5a. Bildsprache — verbindlich seit Session 3, revidiert 2026-10-02
+## 5a. Bildsprache — gültig seit 02.10.2026
 
-Die Pixel-Regeln dieses Abschnitts („ein gezeichnetes Pixel ist ein
-Bildschirmpixel“, kein Anti-Aliasing, kein Dithering, mindestens zweipixelige
-Formen) sind seit dem 2026-10-02 aufgehoben; Assets sind gemalt und werden
-weich skaliert. Die Regeln zu Detailmenge, Schlüssellicht, Materialfamilien,
-Emission und Akzentfarbe gelten weiter.
+Detailmenge ist keine Qualität. Hochaufgelöste, gemalte Assets werden weich skaliert; lineare Filterung und Mipmaps sind die festgelegte Richtung. Full-HD ist der erste Ausgabeschritt, kein festes Asset-Pixelraster.
 
-Owner-Korrektur: Detailmenge ist keine Qualität. Zu viele winzige Details, zu
-viele glänzende Oberflächen und zu weiche, gemalte Übergänge lassen das Spiel wie
-ein überrendertes Bild wirken, das Pixel-Art imitiert.
+- Ein Schlüssellicht von oben links macht Formen derselben Figur lesbar.
+- Wenige Materialfamilien mit klarer Werthierarchie statt einer unkontrollierten Farbliste.
+- Silhouette und große Formen vor winzigem Ornament.
+- Übernatürliche Emission bleibt ein begrenztes Budget; Lichtakzente dürfen Gesicht, Hände und Waffenführung nicht verdecken.
+- Ein gesättigter Akzent pro Figur.
 
-Verbindliche Regeln für Figuren und figurnahe Assets:
-
-- ~~**Ein gezeichnetes Pixel ist ein Bildschirmpixel** im Kampf-Zoom. Keine
-  gebrochene Skalierung von handgesetzten Pixeln.~~ *(aufgehoben 2026-10-02)*
-- ~~**Flächige Füllungen, harte Wertstufen, kein Dithering, kein Anti-Aliasing.**~~ *(aufgehoben 2026-10-02)*
-- **Ein Schlüssellicht** von oben links für alle Formen derselben Figur.
-- **Wenige Materialfamilien mit je zwei bis drei Werten** statt einer offenen
-  Farbliste. Der Warden nutzt sechs Familien.
-- ~~**Mindestens zweipixelige Formen.** Einzelpixel-Ornament verschwindet in
-  Bewegung und erzeugt nur Rauschen.~~ *(aufgehoben 2026-10-02; der Gedanke
-  „kein winziges Ornament“ gilt weiter)*
-- **Übernatürliche Emission ist ein Budget, kein Effekt.** Beim Warden: zwei
-  Glutaugen, ein zweipixeliger gebundener Soul am Brustbein, eine dünne
-  Death-Flame-Linie am nachziehenden Saum. Sonst nichts.
-- **Ein gesättigter Akzent pro Figur.** Beim Warden ein rostroter Schal.
+Die historischen Regeln „ein gezeichnetes Pixel ist ein Bildschirmpixel“, harte Wertstufen ohne Anti-Aliasing/Dithering und zweipixelige Mindestformen gelten nicht mehr. Detaillierte Rig- und Animationsregeln unten beschreiben die Qualitätsrichtung; ihre Verfügbarkeit auf `main` ist am Code zu prüfen.
 
 ## 5b. Figurenrichtung — verbindlich seit Session 3
 
@@ -171,4 +152,4 @@ Eine Szene besteht den visuellen Anspruch, wenn:
 - **Hades:** Encounter-Komposition, negative Fläche, Landmarken, Eingänge und visuelle Priorität.
 - **God of War:** Kampfinszenierung und Reaktionsbefriedigung, nicht der grundlegende Artstyle.
 
-Children of Morta bleibt die primäre Referenz für das visuelle Niveau. Soulfire Gothic bleibt die kreative Identität.
+Bastion bleibt die primäre Stilreferenz. Children of Morta ergänzt Raumtiefe und Lesbarkeit. Soulfire Gothic bleibt die kreative Identität.

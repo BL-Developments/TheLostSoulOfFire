@@ -2,7 +2,7 @@
 
 ## Status
 
-Der grobe Ablauf und seine Figurenfunktion sind **CANON / WORKING CANON**. Szenenfolge, Namen, Dialoge, Kartenanzahl und Setpiece-Mechanik sind **UNRESOLVED**.
+Vaelors Auswahl des Protagonisten, die Sense als Startwaffe, erste Kämpfe, Bergung und Homebase sind bestätigte Storybeats aus der priorisierten Konzeptaufnahme. Der übrige grobe Ablauf und seine Figurenfunktion sind **CANON / WORKING CANON**. Szenenfolge, Namen, Dialoge, Kartenanzahl und Setpiece-Mechanik sind **UNRESOLVED**.
 
 ## 1. Ausgangslage
 
@@ -38,6 +38,8 @@ Der Prolog soll die Regeln zeigen, bevor Figuren sie vollständig erklären.
 
 Mögliche Dramaturgie:
 
+Vor den ersten Kämpfen müssen **Vaelors Auswahl und der Erhalt der Sense** verständlich inszeniert werden. Position, Dialog und Ursache der Auswahl sind offen; die folgende Dramaturgie ist eine Option, keine vollständige Freigabe.
+
 1. **Erwachen:** Der Protagonist kommt in der Death Layer zu sich. Die Life Flame ist erloschen; die Death Flame reagiert unkontrolliert.
 2. **Erste Spur:** Fragmente einer menschlichen Tragödie vermitteln, dass Landschaft hier aus Erinnerung und Festhalten entsteht.
 3. **Erste Lost Soul:** Der Gegner wirkt zunächst monströs, zeigt aber während oder nach dem Kampf ein menschliches Residuum.
@@ -63,10 +65,10 @@ Vaelor weiß nicht genau, wo sie auftauchen. Möglich ist, dass er oder andere W
 
 Wichtig für die bestehende Kosmologie:
 
-- Vaelor erschafft oder ernennt den neuen Warden nicht.
+- Vaelor wählt den Protagonisten aus. Diesen Storybeat nicht auf bloßes Erkennen von Potenzial reduzieren. Die Auswahl erklärt noch nicht, wie seine Warden-Existenz entsteht.
 - Die Bergung folgt auf die beginnende Resonanz; sie verursacht sie nicht.
-- „Auswahlprozess“ ist ein vorläufiger Begriff für den ungeklärten Vorgang, durch den einzelne Seelen resonanzfähig werden.
-- Ob überhaupt jemand oder etwas auswählt, bleibt offen.
+- Der metaphysische Zusammenhang zwischen Vaelors Auswahl und Death-Flame-Resonanz bleibt offen.
+- Daraus folgen weder Gottstatus noch ein Warden-Siegel noch Allwissenheit oder automatische Ortung.
 
 ## 5. Der Bruder
 
@@ -153,7 +155,7 @@ Hier können Vaelor, Ausbildung, Warden-Rollen und die wachsende Zahl der Lost S
 - wer den Bergungstrupp führt;
 - wann der Bruder enthüllt wird;
 - ob die Brüder einander sofort erkennen;
-- Tutorialfähigkeiten und erste Waffe;
+- genaue Tutorialfähigkeiten und Zeitpunkt weiterer Waffenfreischaltungen; die Sense als Startwaffe ist festgelegt;
 - Ursache und Ziel der ersten Lost Souls;
 - genaue Homebase und Reiseentfernung;
 - Setpiece-Position und Wiederverwendbarkeit des Gefährts;

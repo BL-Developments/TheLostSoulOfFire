@@ -527,5 +527,9 @@
       ],
       "open": ""
     }
-  ]
+  ],
+  "snapshot_status": "historical-import",
+  "superseded_for_issue_sync_on": "2026-10-04",
+  "current_issue_map": "../issue-map-2026-10-04.json",
+  "sync_warning": "Historical input only. Do not regenerate current issue bodies or hierarchy from this snapshot; use the current GitHub issues."
 }

@@ -1,0 +1,746 @@
+{
+  "date": "2026-10-04",
+  "repository": "BL-Developments/TheLostSoulOfFire",
+  "project": "https://github.com/orgs/BL-Developments/projects/1",
+  "description": "Datierte Zuordnung nach Bereinigung; Live-Status und Texte werden in GitHub gepflegt. Historischer Aufnahme-Import ist kein Sync-Auftrag.",
+  "parents": [
+    {
+      "number": 29,
+      "title": "[Balance & Qualität] Gesamten Run-Kreislauf mit Spielstand und Koop abnehmen",
+      "subissues": [
+        96,
+        97,
+        98
+      ]
+    },
+    {
+      "number": 28,
+      "title": "[Balance & Qualität] Ausgeben versus Sichern sowie Build-Fortschritt im Spiel balancieren",
+      "subissues": [
+        94,
+        95
+      ]
+    },
+    {
+      "number": 27,
+      "title": "[Biome & Erkundung] Biom-Endboss und dauerhafte Freischaltung des nächsten Bioms umsetzen",
+      "subissues": [
+        91,
+        92,
+        93
+      ]
+    },
+    {
+      "number": 26,
+      "title": "[Metaprogression] Meta-Level aus heimgebrachten Ressourcen konkretisieren und prüfen",
+      "subissues": [
+        89,
+        90
+      ]
+    },
+    {
+      "number": 25,
+      "title": "[Metaprogression] Getrennte Waffen- und Fähigkeits-Skilltrees aufbauen",
+      "subissues": [
+        86,
+        87,
+        88
+      ]
+    },
+    {
+      "number": 24,
+      "title": "[Kampf & Builds] Ultimate nach gewähltem Ressourcenmodell in das Run-Kit integrieren",
+      "subissues": []
+    },
+    {
+      "number": 23,
+      "title": "[Biome & Erkundung] Erstes Biom mit mehreren Levels und Wiederholbarkeit bauen",
+      "subissues": [
+        84,
+        85
+      ]
+    },
+    {
+      "number": 22,
+      "title": "[Ökonomie] Händler und Schmied für Waffenfreischaltung und Verbesserung umsetzen",
+      "subissues": [
+        81,
+        82,
+        83
+      ]
+    },
+    {
+      "number": 21,
+      "title": "[Kampf & Builds] Run-Fähigkeiten mit mystischer Ressource als Einsatzkosten implementieren",
+      "subissues": [
+        79,
+        80
+      ]
+    },
+    {
+      "number": 20,
+      "title": "[Homebase] NPC-Begegnungen schalten Homebase-Dienste schrittweise frei",
+      "subissues": [
+        77,
+        78
+      ]
+    },
+    {
+      "number": 19,
+      "title": "[Kampf & Builds] Timing-Counter für jedes Waffen-Loadout und Teamaktionen ausbauen",
+      "subissues": [
+        75,
+        76
+      ]
+    },
+    {
+      "number": 18,
+      "title": "[Ökonomie] Warden-Reisepunkte mit Teilsicherung, Extraktion und Ressourcenanzeige bauen",
+      "subissues": [
+        73,
+        74
+      ]
+    },
+    {
+      "number": 17,
+      "title": "[Biome & Erkundung] Collectibles und Easter Eggs ohne Loot-Inventar integrieren",
+      "subissues": [
+        71,
+        72
+      ]
+    },
+    {
+      "number": 16,
+      "title": "[Kampf & Builds] Drei zufällige Fähigkeiten anbieten und zwei für den Run wählen",
+      "subissues": [
+        70
+      ]
+    },
+    {
+      "number": 15,
+      "title": "[Kampf & Builds] Eine Nah- oder Fernkampfwaffe vor dem Run auswählen",
+      "subissues": [
+        69
+      ]
+    },
+    {
+      "number": 14,
+      "title": "[Run-Struktur & Speichern] Biom- und Level-Runs mit Rückkehr und Neustart auf Level 1 umsetzen",
+      "subissues": [
+        66,
+        67,
+        68
+      ]
+    },
+    {
+      "number": 13,
+      "title": "[Kampf & Builds] Ultimate-Aufladung und Verhältnis zur Fortschrittswährung entscheiden",
+      "subissues": []
+    },
+    {
+      "number": 12,
+      "title": "[Run-Struktur & Speichern] Dauerhafte Profile, gesicherte Ressourcen und Freischaltungen speichern",
+      "subissues": [
+        63,
+        64,
+        65
+      ]
+    },
+    {
+      "number": 11,
+      "title": "[Homebase] Homebase als spielbaren Ort für Vorbereitung und Run-Start ausbauen",
+      "subissues": [
+        61,
+        62
+      ]
+    },
+    {
+      "number": 10,
+      "title": "[Biome & Erkundung] Erstes Biom aus menschlicher Geschichte und Boss-Handschrift entwerfen",
+      "subissues": []
+    },
+    {
+      "number": 9,
+      "title": "[Koop] Besitz, Ausgaben und gemeinsame Run-Entscheidungen im Koop klären",
+      "subissues": [
+        58,
+        59,
+        60
+      ]
+    },
+    {
+      "number": 8,
+      "title": "[Lore & Story] Bestehenden Prolog um Vaelor-Auswahl und Sense als Startwaffe überarbeiten",
+      "subissues": [
+        55,
+        56,
+        57
+      ]
+    },
+    {
+      "number": 7,
+      "title": "[Ökonomie] Zwei Währungen sowie Ausgabe-, Verlust- und Sicherungsregeln definieren",
+      "subissues": [
+        52,
+        53,
+        54
+      ]
+    },
+    {
+      "number": 6,
+      "title": "[Lore & Story] Aufnahme als neue Produktgrundlage und Lore-Revision einarbeiten",
+      "subissues": [
+        51
+      ]
+    }
+  ],
+  "subissues": [
+    {
+      "number": 51,
+      "parent": 6,
+      "title": "[Lore & Story] Produktregeln und Lore-Dateien auf die beschlossenen Revisionen abgleichen",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/51",
+      "depends_on": [],
+      "type": "documentation"
+    },
+    {
+      "number": 52,
+      "parent": 7,
+      "title": "[Ökonomie] Herkunft, Konten und Verwendungen beider Währungen entscheiden",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/52",
+      "depends_on": [
+        6
+      ],
+      "type": "documentation"
+    },
+    {
+      "number": 53,
+      "parent": 7,
+      "title": "[Ökonomie] Teilsicherung, Extraktion und Niederlagenverlust entscheiden",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/53",
+      "depends_on": [
+        52
+      ],
+      "type": "documentation"
+    },
+    {
+      "number": 54,
+      "parent": 7,
+      "title": "[Ökonomie] Beschlossene Wirtschaftsregeln durch Rechenbeispiele prüfen",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/54",
+      "depends_on": [
+        52,
+        53
+      ],
+      "type": "documentation"
+    },
+    {
+      "number": 55,
+      "parent": 8,
+      "title": "[Lore & Story] Vaelors Auswahl und Erhalt der Sense im bestehenden Prolog inszenieren",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/55",
+      "depends_on": [
+        51
+      ],
+      "type": "enhancement"
+    },
+    {
+      "number": 56,
+      "parent": 8,
+      "title": "[Lore & Story] Bewegung, Ausweichen, Angriff und Release im Prolog einführen",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/56",
+      "depends_on": [
+        55
+      ],
+      "type": "enhancement"
+    },
+    {
+      "number": 57,
+      "parent": 8,
+      "title": "[Lore & Story] Bergung und Homebase-Handoff im Prolog integrieren",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/57",
+      "depends_on": [
+        55,
+        56,
+        9
+      ],
+      "type": "enhancement"
+    },
+    {
+      "number": 58,
+      "parent": 9,
+      "title": "[Koop] Ressourcen- und Fortschrittsbesitz im lokalen Koop entscheiden",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/58",
+      "depends_on": [
+        7
+      ],
+      "type": "documentation"
+    },
+    {
+      "number": 59,
+      "parent": 9,
+      "title": "[Koop] Gemeinsame Entscheidungen über Run-Start, Sicherung und Extraktion festlegen",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/59",
+      "depends_on": [
+        58,
+        53
+      ],
+      "type": "documentation"
+    },
+    {
+      "number": 60,
+      "parent": 9,
+      "title": "[Koop] Loadouts und Niederlagenregeln im Koop-Vertrag festhalten",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/60",
+      "depends_on": [
+        58,
+        59
+      ],
+      "type": "documentation"
+    },
+    {
+      "number": 61,
+      "parent": 11,
+      "title": "[Homebase] Aschenvorhalle zur Homebase mit sichtbaren Dienstzugängen ausbauen",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/61",
+      "depends_on": [
+        8,
+        9
+      ],
+      "type": "enhancement"
+    },
+    {
+      "number": 62,
+      "parent": 11,
+      "title": "[Homebase] Biomwahl und Startbereitschaft an Homebase-Interaktionen anbinden",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/62",
+      "depends_on": [
+        61,
+        9,
+        12
+      ],
+      "type": "enhancement"
+    },
+    {
+      "number": 63,
+      "parent": 12,
+      "title": "[Run-Struktur & Speichern] Versioniertes Profilmodell für dauerhaften Fortschritt definieren",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/63",
+      "depends_on": [
+        52,
+        53,
+        58
+      ],
+      "type": "documentation"
+    },
+    {
+      "number": 64,
+      "parent": 12,
+      "title": "[Run-Struktur & Speichern] Profile atomar speichern und fehlende oder ungültige Saves behandeln",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/64",
+      "depends_on": [
+        63
+      ],
+      "type": "enhancement"
+    },
+    {
+      "number": 65,
+      "parent": 12,
+      "title": "[Run-Struktur & Speichern] Laden und Fortschrittsereignisse gegen doppelte Gutschrift absichern",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/65",
+      "depends_on": [
+        64
+      ],
+      "type": "enhancement"
+    },
+    {
+      "number": 66,
+      "parent": 14,
+      "title": "[Run-Struktur & Speichern] Run-Zustände und Levelwechsel vom Prolog-Verhalten trennen",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/66",
+      "depends_on": [
+        11,
+        12
+      ],
+      "type": "enhancement"
+    },
+    {
+      "number": 67,
+      "parent": 14,
+      "title": "[Run-Struktur & Speichern] Biom-Neustart bei Level 1 und direkte Biomwahl umsetzen",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/67",
+      "depends_on": [
+        66
+      ],
+      "type": "enhancement"
+    },
+    {
+      "number": 68,
+      "parent": 14,
+      "title": "[Run-Struktur & Speichern] Run-Niederlage mit Bergung und Rückkehr zur Homebase abschließen",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/68",
+      "depends_on": [
+        66,
+        7,
+        9
+      ],
+      "type": "enhancement"
+    },
+    {
+      "number": 69,
+      "parent": 15,
+      "title": "[Kampf & Builds] Äußere Anpassung und mögliche Rüstungswirkung abgrenzen",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/69",
+      "depends_on": [
+        6
+      ],
+      "type": "documentation"
+    },
+    {
+      "number": 70,
+      "parent": 16,
+      "title": "[Kampf & Builds] Fallback, Abbruch und dauerhafte Slots für den Fähigkeitsdraft entscheiden",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/70",
+      "depends_on": [
+        11,
+        12,
+        9
+      ],
+      "type": "documentation"
+    },
+    {
+      "number": 71,
+      "parent": 17,
+      "title": "[Biome & Erkundung] Optionale Sammlungsbelohnung und deren Sicherungsregeln entscheiden",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/71",
+      "depends_on": [
+        7,
+        9
+      ],
+      "type": "documentation"
+    },
+    {
+      "number": 72,
+      "parent": 17,
+      "title": "[Biome & Erkundung] Entdeckungen mit persistentem Fundstatus und Sammlungsanzeige integrieren",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/72",
+      "depends_on": [
+        10,
+        12,
+        9
+      ],
+      "type": "enhancement"
+    },
+    {
+      "number": 73,
+      "parent": 18,
+      "title": "[Ökonomie] Ressourcenkonten und Anzeigen für Run-Bestand und gesicherten Bestand integrieren",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/73",
+      "depends_on": [
+        14,
+        52,
+        53,
+        58
+      ],
+      "type": "enhancement"
+    },
+    {
+      "number": 74,
+      "parent": 18,
+      "title": "[Ökonomie] Teilsicherung und Extraktion am Reisepunkt atomar ausführen",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/74",
+      "depends_on": [
+        73,
+        59
+      ],
+      "type": "enhancement"
+    },
+    {
+      "number": 75,
+      "parent": 19,
+      "title": "[Kampf & Builds] Timing-Counter für getrennte Nah- und Fernkampf-Loadouts umsetzen",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/75",
+      "depends_on": [
+        15,
+        6
+      ],
+      "type": "enhancement"
+    },
+    {
+      "number": 76,
+      "parent": 19,
+      "title": "[Kampf & Builds] Counter-Gelegenheiten für den Koop-Partner lesbar nutzbar machen",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/76",
+      "depends_on": [
+        75,
+        9
+      ],
+      "type": "enhancement"
+    },
+    {
+      "number": 77,
+      "parent": 20,
+      "title": "[Homebase] Zeitpunkt und Reihenfolge dauerhafter NPC-Freischaltungen entscheiden",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/77",
+      "depends_on": [
+        10,
+        7,
+        9
+      ],
+      "type": "documentation"
+    },
+    {
+      "number": 78,
+      "parent": 20,
+      "title": "[Homebase] NPC-Begegnung als persistenten Homebase-Dienst integrieren",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/78",
+      "depends_on": [
+        77,
+        12,
+        14
+      ],
+      "type": "enhancement"
+    },
+    {
+      "number": 79,
+      "parent": 21,
+      "title": "[Kampf & Builds] Kleinen Fähigkeitenpool mit konkreten Wirkungen spezifizieren",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/79",
+      "depends_on": [
+        6,
+        16
+      ],
+      "type": "documentation"
+    },
+    {
+      "number": 80,
+      "parent": 21,
+      "title": "[Kampf & Builds] Fähigkeiten mit Run-Ressourcenkosten im Kampf ausführen",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/80",
+      "depends_on": [
+        79,
+        18,
+        15,
+        16
+      ],
+      "type": "enhancement"
+    },
+    {
+      "number": 81,
+      "parent": 22,
+      "title": "[Ökonomie] Schmied-Upgrades gegenüber Waffen-Skilltree-Knoten abgrenzen",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/81",
+      "depends_on": [
+        7,
+        15
+      ],
+      "type": "documentation"
+    },
+    {
+      "number": 82,
+      "parent": 22,
+      "title": "[Ökonomie] Waffen beim Händler kaufen und dauerhaft für die Vorbereitung freischalten",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/82",
+      "depends_on": [
+        20,
+        15,
+        7,
+        9,
+        12
+      ],
+      "type": "enhancement"
+    },
+    {
+      "number": 83,
+      "parent": 22,
+      "title": "[Ökonomie] Besessene Waffen beim Schmied persistent verbessern",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/83",
+      "depends_on": [
+        81,
+        20,
+        15,
+        7,
+        12
+      ],
+      "type": "enhancement"
+    },
+    {
+      "number": 84,
+      "parent": 23,
+      "title": "[Biome & Erkundung] Erstes Biom mit verbundenen authored Levels und Boss-Handschrift bauen",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/84",
+      "depends_on": [
+        10,
+        14,
+        18,
+        19
+      ],
+      "type": "enhancement"
+    },
+    {
+      "number": 85,
+      "parent": 23,
+      "title": "[Biome & Erkundung] NPC-Begegnungen und Erkundungswege im wiederholbaren Biom integrieren",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/85",
+      "depends_on": [
+        84,
+        20
+      ],
+      "type": "enhancement"
+    },
+    {
+      "number": 86,
+      "parent": 25,
+      "title": "[Metaprogression] Slot- und Angebotsregeln für dauerhaften Fähigkeitszugang entscheiden",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/86",
+      "depends_on": [
+        70,
+        7
+      ],
+      "type": "documentation"
+    },
+    {
+      "number": 87,
+      "parent": 25,
+      "title": "[Metaprogression] Waffen-Skilltree mit Voraussetzungen, Kosten und persistenten Käufen integrieren",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/87",
+      "depends_on": [
+        81,
+        22,
+        12
+      ],
+      "type": "enhancement"
+    },
+    {
+      "number": 88,
+      "parent": 25,
+      "title": "[Metaprogression] Fähigkeits-Skilltree mit Voraussetzungen, Kosten und persistenten Käufen integrieren",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/88",
+      "depends_on": [
+        86,
+        16,
+        20,
+        12
+      ],
+      "type": "enhancement"
+    },
+    {
+      "number": 89,
+      "parent": 26,
+      "title": "[Metaprogression] Nutzen und Zählmodell eines optionalen Meta-Levels entscheiden",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/89",
+      "depends_on": [
+        7,
+        12,
+        25
+      ],
+      "type": "documentation"
+    },
+    {
+      "number": 90,
+      "parent": 26,
+      "title": "[Metaprogression] Beschlossenes Meta-Level-Modell als kleinen Daten- und UI-Prototyp prüfen",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/90",
+      "depends_on": [
+        89
+      ],
+      "type": "enhancement"
+    },
+    {
+      "number": 91,
+      "parent": 27,
+      "title": "[Biome & Erkundung] Tragische Bossfigur und lesbare Angriffsmuster spezifizieren",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/91",
+      "depends_on": [
+        10
+      ],
+      "type": "documentation"
+    },
+    {
+      "number": 92,
+      "parent": 27,
+      "title": "[Biome & Erkundung] Bosskampf mit getrennter Soul-Release-Phase integrieren",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/92",
+      "depends_on": [
+        91,
+        23,
+        24
+      ],
+      "type": "enhancement"
+    },
+    {
+      "number": 93,
+      "parent": 27,
+      "title": "[Biome & Erkundung] Nächstes Biom nach Bosssieg genau einmal dauerhaft freischalten",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/93",
+      "depends_on": [
+        92,
+        12
+      ],
+      "type": "enhancement"
+    },
+    {
+      "number": 94,
+      "parent": 28,
+      "title": "[Balance & Qualität] Ausgeben, Horten und Extraktion im selben Abschnitt vergleichen",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/94",
+      "depends_on": [
+        18,
+        24,
+        25,
+        27
+      ],
+      "type": "enhancement"
+    },
+    {
+      "number": 95,
+      "parent": 28,
+      "title": "[Balance & Qualität] Waffen, Fähigkeiten und Ultimate anhand dokumentierter Spielversuche balancieren",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/95",
+      "depends_on": [
+        94,
+        18,
+        24,
+        25,
+        27
+      ],
+      "type": "enhancement"
+    },
+    {
+      "number": 96,
+      "parent": 29,
+      "title": "[Balance & Qualität] Solo-Run-Kreislauf einschließlich Niederlage und Extraktion abnehmen",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/96",
+      "depends_on": [
+        28,
+        8
+      ],
+      "type": "enhancement"
+    },
+    {
+      "number": 97,
+      "parent": 29,
+      "title": "[Balance & Qualität] Lokalen Koop mit gemeinsamen Interaktionen und Team-Niederlage abnehmen",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/97",
+      "depends_on": [
+        28,
+        8,
+        9
+      ],
+      "type": "enhancement"
+    },
+    {
+      "number": 98,
+      "parent": 29,
+      "title": "[Balance & Qualität] Speichern, Neustart und wiederholte Fortschrittsereignisse im Run abnehmen",
+      "url": "https://github.com/BL-Developments/TheLostSoulOfFire/issues/98",
+      "depends_on": [
+        12,
+        18,
+        27,
+        28
+      ],
+      "type": "enhancement"
+    }
+  ]
+}

@@ -139,7 +139,7 @@ Vaelor kann ihre Entstehung möglicherweise wahrnehmen oder Anzeichen deuten, ke
 - feststellen, ob tatsächlich stabile Resonanz oder beginnendes Hollowing vorliegt;
 - den Weg in die Warden-Gesellschaft anbieten, ohne die Person durch ein Siegel oder Amt erst zum Warden zu machen.
 
-„Auswahlprozess“ bleibt ein vorläufiger In-World- oder Entwicklungsbegriff. Canonisch wählt Vaelor die Person nicht aus. Offen ist, ob die Death Flame, der Kreislauf, The Keeper oder reine seltene Eignung bestimmt, wer resonieren kann.
+Vaelor wählt den Protagonisten aus; die Sense ist dessen Startwaffe (priorisierte Konzeptaufnahme, 08.09.2026). Das pauschale Verbot persönlicher Auswahl ist überholt. Wie diese Auswahl mit der seltenen Death-Flame-Resonanz zusammenhängt, bleibt offen. Kein Gottstatus, Siegel oder sicherer Entstehungsmechanismus folgt daraus.
 
 ## 10. Der Bruder und Koop — WORKING CANON
 

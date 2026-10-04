@@ -143,7 +143,7 @@ The Keeper soll als Mysterium erhalten bleiben. Vaelor kann ehrlich sein und den
 
 - Kein **Warden’s Seal**.
 - Vaelor hält den Übergang neuer Wardens nicht magisch an.
-- Vaelor wählt nicht kraft göttlichen Amtes aus, wer Warden wird.
+- Vaelor besitzt kein göttliches Amt, das fremde Todeszeitpunkte bestimmt. Seine Auswahl des Protagonisten ist ein bestätigter Storybeat; deren metaphysische Mechanik bleibt offen (siehe Entscheidungslog).
 - Das wahre Jenseits ist keine normal begehbare Stadt der Toten.
 - Warden-Waffen sind nicht bloß von Vaelor ausgegebene Level-Rewards.
 

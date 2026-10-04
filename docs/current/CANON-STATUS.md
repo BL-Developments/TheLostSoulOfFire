@@ -7,7 +7,7 @@ Einträge unten. Siehe [`DECISION-LOG.md`](DECISION-LOG.md) und
 [`RECORDING-SUMMARY-2026-09-08.md`](RECORDING-SUMMARY-2026-09-08.md).
 
 - Vaelors Auswahl des Protagonisten und die anfängliche Sense sind nun
-  gewünschte Storybeats. Die unten stehende pauschale Ablehnung persönlicher
+  gewünschte Storybeats. Die frühere pauschale Ablehnung persönlicher
   Auswahl ist hierfür historisch überholt; deren metaphysischer Mechanismus
   bleibt offen. Vaelor bleibt kein Gott, ein Warden-Siegel bleibt verworfen.
 - Erlöste Seelen gehen weiter; gesammelt wird eine daraus entstehende mystische
@@ -21,9 +21,7 @@ Einträge unten. Siehe [`DECISION-LOG.md`](DECISION-LOG.md) und
 - Der Sechs-Item-Soul-Echo-Proof entfällt. Einzelne Effekte können später als
   Fähigkeiten oder Waffenfortschritt neu entworfen werden.
 
-Die älteren Detailabschnitte dokumentieren weiterhin die Herkunft der Lore.
-Ihre vollständige thematische Angleichung ist als eigenes Arbeits-Issue
-vorbereitet; die obige Revision darf dabei nicht zurückgenommen werden.
+Die Detailabschnitte sind mit den Beschlüssen vom 29.09. und 02.10.2026 abgeglichen. Historische Fassungen bleiben über die Git-Historie nachvollziehbar. Produktmechaniken stehen in [GAME-RULES.md](GAME-RULES.md).
 
 ## Statusdefinitionen
 
@@ -79,9 +77,10 @@ vorbereitet; die obige Revision darf dabei nicht zurückgenommen werden.
 - Der Startbereich nutzt größere erkundbare Karten und bleibt später erneut zugänglich.
 - Neue Wardens können an unvorhersehbaren Orten der Death Layer erscheinen und müssen von Wardens geborgen werden.
 - Vaelor kennt ihre genaue Position nicht automatisch.
+- Vaelor wählt den Protagonisten aus; die Sense ist seine Startwaffe. Ursache und metaphysische Mechanik der Auswahl bleiben offen.
 - Die Story und alle Kernsysteme müssen koopfähig konzipiert werden.
 - In der Koop-Geschichte trifft der Protagonist auf seinen Bruder, der bereits Warden ist.
-- Children of Morta ist primäre visuelle Qualitätsreferenz, nicht zu kopierende Asset- oder Stilvorlage.
+- Bastion ist seit 02.10.2026 die primäre Stilreferenz für gemalte, hochaufgelöste 2D-Grafik. Children of Morta bleibt eine ergänzende Qualitäts-/Prinzipienreferenz; keine Assets kopieren.
 - Reaktionsbasiertes Timing und daraus entstehende besondere Attacken sind Teil der Combat-Direction.
 
 ## WORKING CANON
@@ -157,7 +156,7 @@ vorbereitet; die obige Revision darf dabei nicht zurückgenommen werden.
 - Endgültiger Sammelname für Warden-Waffen.
 - Exakte Lore-Funktion von Scythe und Soul Cannon.
 - Definition und Mechanik eines emotionalen Anchor.
-- Ob freigesetzte Seelen, Soul-Fragmente oder Residuen gesammelt, detoniert oder anderweitig taktisch verwendet werden.
+- Welche nichtpersonale Energie oder geeigneten Residuen taktische Detonationen tragen können. Erlöste intakte Seelen gehen weiter und werden nicht gesammelt oder verbraucht.
 - Moralische und metaphysische Folgen einer möglichen Soul-Detonation.
 - Exakte Trigger, Kosten und Koop-Regeln reaktionsbasierter Spezialangriffe.
 
@@ -166,7 +165,7 @@ vorbereitet; die obige Revision darf dabei nicht zurückgenommen werden.
 - **Warden’s Seal:** verworfen. Vaelor setzt kein Siegel, das Seelen künstlich zurückhält.
 - **Vaelor als Gott des Todes:** verworfen.
 - **Vaelor als Instanz, die bestimmt, wer stirbt:** verworfen.
-- **Vaelor wählt Wardens übernatürlich aus und macht sie zu Wardens:** durch Selbststabilisierung via Resonanz ersetzt. Er kann sie finden, prüfen oder ausbilden.
+- **Vaelor erschafft Wardens kraft göttlichen Amtes oder durch ein Siegel:** verworfen. Seine Auswahl des Protagonisten ist hingegen ein bestätigter Storybeat; deren metaphysische Mechanik bleibt offen.
 - **Vaelor öffnet oder schließt persönlich den letzten Übergang jeder Seele:** verworfen.
 - **Wardens als unsterbliche ernannte Superhelden:** verworfen.
 - **Übergangsebene als das wahre Jenseits:** verworfen.
@@ -174,7 +173,7 @@ vorbereitet; die obige Revision darf dabei nicht zurückgenommen werden.
 - **Lost Souls als böse Seelen, die für Sünden bestraft werden:** verworfen.
 - **Life Reactors als eindeutig böse Technologie, die einfach abgeschaltet werden muss:** verworfen.
 - **Direkte platte Parteipropaganda:** nicht Ziel der politischen Ebene.
-- **„Auswahlprozess“ als persönliche Wahl oder Ernennung durch Vaelor:** nicht annehmen; der Begriff bezeichnet vorerst nur die ungeklärte seltene Warden-Entstehung.
+- **Pauschales Verbot einer persönlichen Auswahl durch Vaelor:** durch die Konzeptaufnahme überholt. Aus der bestätigten Auswahl folgen weder Gottstatus noch Siegel noch eine Erklärung des Entstehungsmechanismus.
 - **Unveränderte Übernahme von Children of Morta, Diablo oder God of War:** ausgeschlossen. Sie sind Qualitäts- bzw. Strukturreferenzen.
 
 ## Do-not-assume für zukünftige Agents
@@ -195,4 +194,4 @@ Ein Agent darf ohne neue Nutzerentscheidung nicht:
 
 ## Pflegehinweis
 
-Neue Lore-Entscheidungen zuerst hier eintragen und danach in den thematischen Dateien spiegeln. Bei einer bewussten Änderung den alten Punkt unter **NON-CANON / REJECTED** dokumentieren, damit spätere Agents ihn nicht versehentlich wiederbeleben.
+Bestätigte neue Entscheidungen zuerst datiert im Entscheidungslog festhalten, danach hier und in den thematischen Dateien spiegeln. Offene Vorschläge bleiben als solche markiert. Bei einer bewussten Änderung den alten Punkt unter **NON-CANON / REJECTED** dokumentieren, damit spätere Agents ihn nicht versehentlich wiederbeleben.

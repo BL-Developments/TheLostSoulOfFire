@@ -2,6 +2,13 @@
 
 Ein 2D-Top-down-Roguelike auf Basis von C# und MonoGame.
 
+## Projektwissen und Planung
+
+- [Zentrale Wissensübersicht](docs/current/README.md)
+- [Spielregeln](docs/current/GAME-RULES.md) und [offene Entscheidungen](docs/current/OPEN-QUESTIONS.md)
+- [Roadmap](docs/planning/roadmap.md) und [Pflegeregeln](docs/planning/WORKFLOW.md)
+- [GitHub Project](https://github.com/orgs/BL-Developments/projects/1)
+
 ## Voraussetzungen
 
 - [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)

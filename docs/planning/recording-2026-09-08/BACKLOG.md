@@ -1,3 +1,5 @@
+> **Historischer Importstand.** Diese Datei dokumentiert die Planung aus der Aufnahme. Seit der Bereinigung am 04.10.2026 gelten die aktuellen GitHub-Issues und [die neue Zuordnung](../issue-map-2026-10-04.json). Nicht erneut über die bereinigten Issues synchronisieren. Die Angabe „Auf GitHub erstellt: 0“ unten beschreibt nur den damaligen Vorbereitungsstand.
+
 # Entwicklungsplanung aus der Konzeptaufnahme
 
 Stand: 2026-09-08 (Importdatum; Aufnahmedatum unbekannt).

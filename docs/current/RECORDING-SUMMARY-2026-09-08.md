@@ -80,7 +80,7 @@ Vor einem Run wird **eine ausgerüstete Waffe** gewählt: eine Nahkampf- oder ei
 
 Das unterscheidet sich vom derzeit gleichzeitig verfügbaren Sense-und-Soul-Cannon-Kit. Die vorhandenen Kampfimplementierungen bleiben wertvolle Grundlagen für auswählbare Waffen; der neue Plan muss ihre Verfügbarkeit und alle davon abhängigen Begegnungen an die Auswahl anpassen.
 
-Timing soll mehr bieten als Schadensvermeidung. Als Beispiel wird ein heranstürmender Gegner genannt, der bei einem präzise gesetzten Treffer explodiert und weitere Gegner trifft. Das ist eine Referenz für eine Interaktion mit einer feindlichen Manifestation, keine Festlegung, intakte Seelen als Sprengstoff zu verbrauchen. Bestehende Severance-Fenster und Gegnerreaktionen bieten dafür eine Grundlage.
+Timing soll mehr bieten als Schadensvermeidung. Als Beispiel wird ein heranstürmender Gegner genannt, der bei einem präzise gesetzten Treffer explodiert und weitere Gegner trifft. Das ist eine Referenz für eine Interaktion mit einer feindlichen Manifestation, keine Festlegung, intakte Seelen als Sprengstoff zu verbrauchen. Severance-Fenster auf `prototype/design-polish` sind eine Referenz für gezielte Portierung; Gegnerreaktionen auf `main` sind am Code zu prüfen.
 
 ### Fähigkeiten vor jedem Run
 
@@ -144,7 +144,7 @@ Ein Sammelregister ist damit möglich, ohne eine Tasche mit ausrüstbaren Lootge
 
 | Thema | Bisherige Grundlage | Vorrang der Aufnahme und Konsequenz |
 |---|---|---|
-| Vaelors Auswahl | [Canon Status](CANON-STATUS.md) und [Story Opening](STORY-OPENING.md) lehnen eine persönliche Auswahl oder Ernennung durch Vaelor ab. | Die Aufnahme sieht seine Auswahl des Protagonisten und die anfängliche Sense vor. Diesen Storybeat als neue Richtung erhalten. Die genaue metaphysische Ursache ist offen; nicht stillschweigend wieder auf bloßes Erkennen von Potenzial reduzieren. Gottheit, Siegel, Allwissenheit und Bestimmung fremder Todeszeitpunkte werden damit nicht eingeführt. |
+| Vaelors Auswahl | Historische Fassungen von Canon Status und Story Opening lehnten eine persönliche Auswahl oder Ernennung durch Vaelor ab. Die aktuellen Dateien sind entsprechend revidiert. | Die Aufnahme sieht seine Auswahl des Protagonisten und die anfängliche Sense vor. Diesen Storybeat als neue Richtung erhalten. Die genaue metaphysische Ursache ist offen; nicht stillschweigend wieder auf bloßes Erkennen von Potenzial reduzieren. Gottheit, Siegel, Allwissenheit und Bestimmung fremder Todeszeitpunkte werden damit nicht eingeführt. |
 | Waffenverfügbarkeit | Der Prototyp stellt Scythe und Soul Cannon gemeinsam bereit. | Vor einem Run wird eine Nahkampf- oder Fernkampfwaffe gewählt. Bestehende Waffen, Gegnerinteraktionen und Tutorialschritte auf dieses Loadout umstellen, wenn die zugehörigen Issues implementiert werden. |
 | Items und Inventar | [Product Truth](PRODUCT-TRUTH.md) nannte einen sechs Items umfassenden Soul-Echo-Proof. | Nachträglicher Beschluss vom 29.09.2026: Der Proof entfällt. Einzelne Effekte dürfen später als Fähigkeiten oder Waffenfortschritt neu entworfen werden; kein Loot-Inventar und keine feste Zahl. |
 | Niederlage und endgültiger Tod | Die endgültige Zerstörung eines Wardens vollendet seinen Übergang ins wahre Jenseits. | Nachträglicher Beschluss vom 29.09.2026: Run-Niederlage bedeutet Kampfunfähigkeit und Bergung durch andere Wardens vor endgültiger Zerstörung; danach Rückkehr zur Homebase. Die konkrete Inszenierung bleibt offen. |
@@ -189,6 +189,6 @@ Die Planung lässt sich in **Lore und Produktregeln**, **Homebase und Einführun
 
 Für jedes spielrelevante Issue sollen Solo und lokaler Koop gemeinsam betrachtet werden: Wer wählt Loadout und Fähigkeiten, wer darf Ressourcen ausgeben oder sichern, was geschieht bei einem einzelnen gefallenen Bruder und wann scheitert der gesamte Run? Neue Regeln dürfen die bestehende Bruder- und Release-Logik nicht stillschweigend umgehen.
 
-Vorhandene Systeme wie PrologueDirector, Scythe, Soul Cannon, Severance, Soul Release, Team Resonance und deterministische Szenarien sollen bei späterer Implementierung wiederverwendet und passend erweitert werden. Noch nicht vorhandene Hub-Innenräume, Wirtschaft, Savegame und Meta-Progression sind dabei als neue Arbeit auszuweisen.
+PrologueDirector, Scythe, Soul Cannon, Soul Release und vorhandene Tests auf `main` sind vor Wiederverwendung zu prüfen. Lokaler Koop, Team Resonance, Severance und Down/Stabilisieren liegen auf `prototype/design-polish` und erfordern gezielte Portierung. Die Aschenvorhalle mit Biom-Türen existiert auf `main`; vollständige Homebase-Dienste, Wirtschaft, Savegame und Meta-Progression bleiben Ausbauziele.
 
 Die Veröffentlichung dieser Zusammenfassung und der GitHub-Planung verändert keine Laufzeitmechanik. Eine spätere Abnahme muss die neuen Entscheidungen im tatsächlichen Spiel und in relevanten deterministischen Szenarien prüfen; ein erfolgreicher Build allein bestätigt weder Ökonomie noch Spielgefühl.
