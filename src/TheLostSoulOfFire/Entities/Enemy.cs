@@ -10,6 +10,7 @@ namespace TheLostSoulOfFire.Entities;
 public abstract class Enemy
 {
     private Vector2 _knockbackVelocity;
+    private bool _rewardClaimed;
 
     protected Enemy(Vector2 position, int maxHealth, float radius)
     {
@@ -28,6 +29,23 @@ public abstract class Enemy
     public float HitFlashRemaining { get; private set; }
 
     public abstract string StateLabel { get; }
+
+    /// <summary>Glut credited once when this enemy is defeated; amount depends on the type.</summary>
+    public abstract int GlutReward { get; }
+
+    /// <summary>Returns the Glut reward exactly once, and only after the enemy was defeated.</summary>
+    public bool TryClaimReward(out int glut)
+    {
+        glut = 0;
+        if (IsAlive || _rewardClaimed)
+        {
+            return false;
+        }
+
+        _rewardClaimed = true;
+        glut = GlutReward;
+        return true;
+    }
 
     public abstract void Update(
         float deltaTime,

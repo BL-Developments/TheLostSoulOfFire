@@ -35,6 +35,11 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     private readonly bool _audioGameplayTest;
     private readonly bool _audioDeathRestartTest;
     private readonly bool _antechamberVisualTest;
+    private readonly bool _currencyVisualTest;
+    private string? _testProfilePath;
+    private float _currencyTestStateTime;
+    private string _currencyTestState = string.Empty;
+    private readonly HashSet<string> _currencyTestDone = [];
     private readonly DeveloperStartOptions? _developerStart;
     private readonly GameSettingsStore _settingsStore = new();
     private readonly GameSettings _settings;
@@ -59,8 +64,10 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         bool audioGameplayTest = false,
         bool audioDeathRestartTest = false,
         bool antechamberVisualTest = false,
-        DeveloperStartOptions? developerStart = null)
+        DeveloperStartOptions? developerStart = null,
+        bool currencyVisualTest = false)
     {
+        _currencyVisualTest = currencyVisualTest;
         _audioGameplayTest = audioGameplayTest;
         _audioDeathRestartTest = audioDeathRestartTest;
         _antechamberVisualTest = antechamberVisualTest;
@@ -79,6 +86,18 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         TargetElapsedTime = TimeSpan.FromSeconds(1d / 60d);
         Window.Title = "The Lost Soul of Fire";
         Window.AllowUserResizing = true;
+    }
+
+    /// <summary>Automated runs must never touch the player's real profile.</summary>
+    private PlayerProfileStore CreateProfileStore()
+    {
+        if (!(_audioGameplayTest || _audioDeathRestartTest || _antechamberVisualTest || _currencyVisualTest))
+        {
+            return new PlayerProfileStore();
+        }
+
+        _testProfilePath = Path.Combine(Path.GetTempPath(), $"TheLostSoulOfFire-test-profile-{Environment.ProcessId}.json");
+        return new PlayerProfileStore(_testProfilePath);
     }
 
     protected override void Initialize()
@@ -107,10 +126,11 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
             VirtualViewport,
             _art,
             Content,
-            _audioGameplayTest || _audioDeathRestartTest || _antechamberVisualTest,
-            skipPrologue: _audioGameplayTest || _audioDeathRestartTest || _antechamberVisualTest,
+            _audioGameplayTest || _audioDeathRestartTest || _antechamberVisualTest || _currencyVisualTest,
+            skipPrologue: _audioGameplayTest || _audioDeathRestartTest || _antechamberVisualTest || _currencyVisualTest,
             settings: _settings,
-            settingsChanged: _settingsStore.Save);
+            settingsChanged: _settingsStore.Save,
+            profileStore: CreateProfileStore());
         if (_developerStart is not null)
         {
             Console.WriteLine(_developerStart.Describe());
@@ -130,6 +150,10 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         else if (_audioGameplayTest || _audioDeathRestartTest)
         {
             ConfigureAutomatedTest((float)gameTime.ElapsedGameTime.TotalSeconds);
+        }
+        else if (_currencyVisualTest)
+        {
+            ConfigureCurrencyVisualTest((float)gameTime.ElapsedGameTime.TotalSeconds);
         }
 
         // Escape is handled by GameWorld (pause menu, menu back navigation, quit confirmation).
@@ -218,6 +242,10 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         _virtualTarget.Dispose();
         _pixel.Dispose();
         _spriteBatch.Dispose();
+        if (_testProfilePath is not null)
+        {
+            try { File.Delete(_testProfilePath); } catch { }
+        }
         base.UnloadContent();
     }
 
@@ -403,6 +431,97 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
             steps[_antechamberVisualStage].Act();
             _antechamberVisualStage++;
         }
+    }
+
+    /// <summary>
+    /// <c>--currency-visual-test</c>: plays one arena run, opens the chests after waves 1 and 2,
+    /// leaves the one after wave 3 unopened, captures HUD, chest and completion, then checks
+    /// the secured balances in the hub. Uses a temporary profile.
+    /// </summary>
+    private void ConfigureCurrencyVisualTest(float deltaTime)
+    {
+        _audioTestTotalTime += deltaTime;
+        string state = _world.Phase == GamePhase.Arena ? $"arena-{_world.LoopState}-{_world.WaveNumber}" : _world.Phase.ToString();
+        if (state != _currencyTestState)
+        {
+            _currencyTestState = state;
+            _currencyTestStateTime = 0f;
+        }
+        _currencyTestStateTime += deltaTime;
+
+        bool Once(string key, float at)
+        {
+            if (_currencyTestStateTime < at || !_currencyTestDone.Add($"{key}:{(_currencyTestDone.Contains("complete") ? "hub" : "run")}"))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        if (_audioTestTotalTime >= 60f)
+        {
+            Console.WriteLine($"CURRENCY_VISUAL_TEST_FAIL timeout state={state}");
+            Environment.ExitCode = 1;
+            Exit();
+            return;
+        }
+
+        switch (_world.Phase)
+        {
+            case GamePhase.Title:
+                if (_currencyTestStateTime >= 0.3f) _input.InjectKeyPress(Keys.Space);
+                return;
+            case GamePhase.Antechamber:
+                if (_currencyTestDone.Contains("complete"))
+                {
+                    if (Once("hub-shot", 1.2f)) _screenshotRequested = true;
+                    if (_currencyTestStateTime >= 1.6f) FinishCurrencyVisualTest();
+                }
+                else if (_currencyTestStateTime >= 0.4f)
+                {
+                    _world.RequestAutomatedDoorEntry();
+                }
+                return;
+            case GamePhase.Arena:
+                break;
+            default:
+                return;
+        }
+
+        int wave = _world.WaveNumber;
+        switch (_world.LoopState)
+        {
+            case ArenaLoopState.Combat:
+                if (Once($"kill-{wave}", 0.65f)) _input.InjectKeyPress(Keys.F6);
+                if (wave == 1 && Once("spark-shot", 0.95f)) _screenshotRequested = true;
+                break;
+            case ArenaLoopState.Transition when wave is 1 or 2:
+                if (Once($"place-{wave}", 0.15f)) _world.PlaceAutomatedPlayerAtNewestChest();
+                if (wave == 1 && Once("chest-shot", 0.3f)) _screenshotRequested = true;
+                if (Once($"open-{wave}", 0.4f)) _input.InjectKeyPress(Keys.E);
+                if (wave == 1 && Once("open-shot", 0.55f)) _screenshotRequested = true;
+                break;
+            case ArenaLoopState.Complete:
+                if (Once("complete-shot", 2.2f)) _screenshotRequested = true;
+                if (_currencyTestStateTime >= 2.5f && _currencyTestDone.Add("complete"))
+                {
+                    Console.WriteLine($"CURRENCY_COMPLETE secured geld={_world.Wallet.Secured(Currency.Geld)} glut={_world.Wallet.Secured(Currency.Glut)}");
+                    _input.InjectKeyPress(Keys.R);
+                }
+                break;
+        }
+    }
+
+    private void FinishCurrencyVisualTest()
+    {
+        CurrencyWallet wallet = _world.Wallet;
+        int geld = wallet.Secured(Currency.Geld);
+        int glut = wallet.Secured(Currency.Glut);
+        bool pass = geld == 2 * GameBalance.ChestGeld && glut > GameBalance.GlutStarterStock &&
+            wallet.Run(Currency.Geld) == 0 && wallet.Run(Currency.Glut) == 0;
+        Console.WriteLine($"CURRENCY_VISUAL_TEST_{(pass ? "PASS" : "FAIL")} securedGeld={geld} securedGlut={glut}");
+        Environment.ExitCode = pass ? 0 : 1;
+        Exit();
     }
 
     private void FinishAutomatedTestFrame()

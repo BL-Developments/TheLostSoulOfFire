@@ -41,7 +41,7 @@ Die Regeln stammen aus #52: Geld aus Kisten und NPC-Prämien, Glut beim Besiegen
 
 - [Vollständige Sicherung beim Abschluss macht Risiko kaum spürbar] → Ausdrücklich Platzhalter; #53 ersetzt die Regel, das Modell trennt `SecureAllRun` schon von einer späteren `SecurePartial`.
 - [Neuversuch nach Tod setzt Glut auf den Basisvorrat zurück und verwirft Geld] → Entspricht #52; mit dem echten Niederlage-Rückweg (#68) wird der Neuversuch ohnehin ersetzt.
-- [Entwicklertests schreiben in das echte Profil] → Pfad ist injizierbar; die automatisierten Läufe (`--audio-*-test`, `--antechamber-visual-test`) verwenden ein Profil im Temp-Verzeichnis.
+- [Entwicklertests schreiben in das echte Profil] → Pfad ist injizierbar; die automatisierten Läufe (`--audio-*-test`, `--antechamber-visual-test`, `--currency-visual-test`) verwenden ein Profil im Temp-Verzeichnis, das beim Beenden gelöscht wird. `--currency-visual-test` spielt einen Arena-Run mit zwei geöffneten und einer ungeöffneten Kiste durch, nimmt HUD, Kiste, Abschluss und Hub auf und prüft die gesicherten Bestände.
 - [Spätere Koop-Entscheidung (#58) braucht Konten pro Spieler] → Das Profil ist einer Person zugeordnet; ein Team-Konto ließe sich als zweites `CurrencyWallet` ergänzen, ohne die Regeln zu ändern.
 
 ## Open Questions

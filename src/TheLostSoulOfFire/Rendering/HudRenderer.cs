@@ -66,6 +66,24 @@ public sealed class HudRenderer
         PixelText.Draw(batch, pixel, player.Health.ToString(), new Vector2(healthTextX, y + 12), 1, BoundSoul);
     }
 
+    /// <summary>Run balances under the dash bar; a credited line glows briefly.</summary>
+    public static void DrawCurrencies(SpriteBatch batch, Texture2D pixel, int geld, int glut, float geldPulse, float glutPulse)
+    {
+        const int x = 61;
+        const int y = 72;
+        DrawCurrencyLine(batch, pixel, "GELD", geld, new Vector2(x, y), GameBalance.Geld, geldPulse);
+        DrawCurrencyLine(batch, pixel, "GLUT", glut, new Vector2(x, y + 16), GameBalance.Glut, glutPulse);
+    }
+
+    private static void DrawCurrencyLine(SpriteBatch batch, Texture2D pixel, string label, int amount, Vector2 position, Color accent, float pulse)
+    {
+        pulse = MathHelper.Clamp(pulse, 0f, 1f);
+        DrawDiamond(batch, pixel, position + new Vector2(-9f, 4f), 3 + (int)MathF.Round(pulse * 2f), accent);
+        PixelText.Draw(batch, pixel, label, position, 1, Color.Lerp(BoundSoulDim, accent, 0.45f + pulse * 0.55f));
+        int valueX = (int)position.X + PixelText.Measure("GELD", 1) + 8;
+        PixelText.Draw(batch, pixel, amount.ToString(), new Vector2(valueX, position.Y), 1, Color.Lerp(BoundSoul, Color.White, pulse));
+    }
+
     private static void DrawDash(SpriteBatch batch, Texture2D pixel, Player player)
     {
         const int x = 61;

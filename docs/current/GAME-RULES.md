@@ -7,9 +7,9 @@ Konsolidiert am 04.10.2026 aus der Konzeptaufnahme und dem Entscheidungslog. Die
 | Bereich | Regel | Quelle / Arbeit |
 |---|---|---|
 | Run | Homebase → gewähltes Biom ab Level 1 → mehrere Levels → Boss, Extraktion oder Niederlage → Homebase. Freigeschaltete spätere Biome sind direkt anwählbar. | Aufnahme; #11, #14 |
-| Niederlage | Kampfunfähigkeit; andere Wardens bergen vor endgültiger Zerstörung. Ungesicherte mystische Ressource geht verloren. Endgültiger Warden-Tod führt weiterhin ins wahre Jenseits. | Beschluss 29.09.; #7, #14 |
+| Niederlage | Kampfunfähigkeit; andere Wardens bergen vor endgültiger Zerstörung. Die Run-Bestände von Geld und Glut gehen verloren, gesicherte bleiben. Endgültiger Warden-Tod führt weiterhin ins wahre Jenseits. | Beschluss 29.09., 04.10.; #7, #14, #52 |
 | Biome | Der vorherige Biom-Boss schaltet das nächste Biom frei; Meta-Level ersetzt dies nicht. | Aufnahme; #27 |
-| Ressourcen | Mindestens Geld und mystische Ressource aus erfolgreicher Erlösung. Die Seele geht weiter und ist keine Verbrauchswährung. | Aufnahme; #7 |
+| Ressourcen | Geld (Arbeitsname) aus Kisten und NPC-Prämien für Waffen und Schmied; Glut (mystische Ressource, Arbeitsname) genau einmal je besiegtem Monster, für Fähigkeiten im Run und Skilltrees aus dem gesicherten Bestand. Erlösung schreibt nichts gut; die Seele geht weiter und ist keine Verbrauchswährung. | Beschluss 04.10.; #7, #52 |
 | Risiko | Reisepunkte ermöglichen Teilsicherung mit Weiterreise oder vollständige Extraktion. Mystische Ressource steht zwischen Einsatzkosten im Run und dauerhaftem Fortschritt. | Aufnahme; #18, #21 |
 | Waffen | Eine Hauptwaffe vor regulärem Run; Nah- oder Fernkampf. Sense als Startwaffe. | Aufnahme; #8, #15 |
 | Fähigkeiten | Drei Angebote, daraus zwei auswählen. Aktive Fähigkeiten und Ultimate sind gewünscht; Ultimate-Modell ist offen. | Aufnahme; #16, #13, #24 |

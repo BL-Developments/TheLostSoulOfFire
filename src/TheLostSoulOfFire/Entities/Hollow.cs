@@ -32,6 +32,8 @@ public sealed class Hollow : Enemy
     private Vector2 _facing = -Vector2.UnitY;
 
     public HollowState State { get; private set; } = HollowState.Approach;
+    public override int GlutReward => GameBalance.HollowGlut;
+
     public override string StateLabel => State.ToString().ToUpperInvariant();
     public Vector2 FacingDirection => _facing;
     public Vector2 CorePosition => Position + new Vector2(0f, -5f);

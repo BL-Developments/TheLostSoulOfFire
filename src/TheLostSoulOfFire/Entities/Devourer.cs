@@ -35,6 +35,8 @@ public sealed class Devourer : Enemy
     private Vector2 _facing = -Vector2.UnitY;
 
     public DevourerState State { get; private set; } = DevourerState.ApproachPlayer;
+    public override int GlutReward => GameBalance.DevourerGlut;
+
     public override string StateLabel => State.ToString().ToUpperInvariant();
     public int ConsumedSoulCount => _consumedSouls.Count;
 

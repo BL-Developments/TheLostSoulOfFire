@@ -34,6 +34,8 @@ public sealed class Burning : Enemy
     private Vector2 _chargeDirection = Vector2.UnitX;
 
     public BurningState State { get; private set; } = BurningState.Approach;
+    public override int GlutReward => GameBalance.BurningGlut;
+
     public override string StateLabel => State.ToString().ToUpperInvariant();
     public bool IsCharging => State == BurningState.Charge;
     public bool IsAggressionCommitted => State is BurningState.Telegraph or BurningState.Charge;

@@ -57,7 +57,7 @@ Mögliche Belohnungen:
 
 ## 4. Ressourcen und taktische Detonation
 
-Bestätigt ist eine mystische Ressource aus erfolgreicher Erlösung: die Seele selbst geht weiter. Die Ressource kann Run-Fähigkeiten oder dauerhaften Fortschritt finanzieren. Herkunft, Konten und Verlust-/Sicherungsdetails werden in #7 entschieden; Koop-Besitz in #9, Ultimate-Ladung in #13.
+Bestätigt ist eine mystische Ressource (Arbeitsname Glut), die beim Besiegen eines Monsters genau einmal gutgeschrieben wird; die Erlösung schreibt nichts zusätzlich gut, und die Seele selbst geht weiter. Glut finanziert Run-Fähigkeiten aus dem Run-Bestand und Skilltrees aus dem gesicherten Bestand (Beschluss #52). Sicherungsquote und Teilsicherung werden in #53 entschieden; Koop-Besitz in #9, Ultimate-Ladung in #13.
 
 Die TeamResonance auf `prototype/design-polish` ist eine Referenz und weder automatisch auf `main` vorhanden noch identisch mit Währung, Ultimate-Ladung oder Meta-Fortschritt.
 

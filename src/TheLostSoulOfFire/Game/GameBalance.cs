@@ -97,6 +97,16 @@ public static class GameBalance
     public const float ResonanceCannonDamageMultiplier = 1.28f;
     public const float ResonanceCannonSizeMultiplier = 1.25f;
 
+    // Working values for the currencies (#52); balancing is still open.
+    public const int GlutStarterStock = 10;
+    public const int HollowGlut = 3;
+    public const int BurningGlut = 5;
+    public const int DevourerGlut = 12;
+    public const int ChestGeld = 25;
+    public const float ChestInteractRadius = 70f;
+    public const float ChestOpenDuration = 0.45f;
+    public const float GlutSparkTravelTime = 0.6f;
+
     public const float CannonDrawDuration = 0.16f;
     public const float CannonFullChargeTime = 1.2f;
     public const float CannonReturnDuration = 0.28f;
@@ -122,5 +132,8 @@ public static class GameBalance
     public static readonly Color SoulWhite = new(246, 239, 255);
     public static readonly Color SoulSenseWorldGrade = new(199, 204, 208);
     public static readonly Color SoulSenseWorldVeil = new(8, 11, 15);
+    public static readonly Color Glut = new(255, 146, 58);
+    public static readonly Color GlutBright = new(255, 214, 150);
+    public static readonly Color Geld = new(224, 196, 120);
     public static readonly Color SoulSenseTrace = new(170, 112, 232);
 }
