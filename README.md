@@ -63,6 +63,8 @@ Abschnitt Gegner spawnt jeder Eintrag einen Gegner dieses Typs in Sichtweite,
 darunter die `TRAININGSPUPPE`: Sie steht still, greift nicht an, zeigt jeden
 Treffer und die Schadenssumme und füllt sich nach 2,5 Sekunden ohne Treffer auf;
 `ALLE GEGNER ENTFERNEN` räumt das Feld.
+`C` öffnet in der Sandbox jederzeit die Fähigkeitsauswahl; `Z`/`X` wirken dort
+ohne Glutkosten, die Abklingzeiten gelten wie in der Arena.
 
 Ungültige Angaben beenden das Programm mit einer Meldung und Exitcode 2. Die
 Debug-Tasten (`F1` Overlay, `F2`–`F4` Gegner, `F5` Resonance, `F6` Welle

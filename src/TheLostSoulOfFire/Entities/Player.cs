@@ -368,7 +368,7 @@ public sealed class Player
 
     public void Heal(int amount)
     {
-        if (!IsDead && amount > 0) Health = Math.Min(GameBalance.PlayerMaxHealth, Health + amount);
+        if (!IsDead && amount > 0) Health = Math.Min(MaxHealth, Health + amount);
     }
 
     public void MoveByAbility(Vector2 offset, Rectangle bounds)
