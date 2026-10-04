@@ -35,6 +35,7 @@ public sealed class SoulCannon
     private CannonShotRequest _pendingShot;
     private Vector2 _aimDirection = Vector2.UnitX;
     private bool _resonanceActive;
+    private PlayerAttributes _attributes = PlayerAttributes.Default;
 
     public SoulCannonState State { get; private set; } = SoulCannonState.Stored;
     public float ChargeProgress => MathHelper.Clamp(_chargeTime / GetFullChargeTime(), 0f, 1f);
@@ -73,10 +74,12 @@ public sealed class SoulCannon
         bool canStart,
         bool soulSenseActive,
         ParticleSystem particles,
-        bool resonanceActive)
+        bool resonanceActive,
+        PlayerAttributes attributes)
     {
         _visualTime += deltaTime;
         _resonanceActive = resonanceActive;
+        _attributes = attributes;
         _aimDirection = facingDirection.LengthSquared() > 0.001f ? Vector2.Normalize(facingDirection) : Vector2.UnitX;
 
         switch (State)
@@ -215,7 +218,7 @@ public sealed class SoulCannon
     {
         float charge = ChargeProgress;
         bool full = IsFullCharge;
-        int damage = (int)MathF.Round(MathHelper.Lerp(GameBalance.CannonWeakDamage, GameBalance.CannonFullDamage, charge));
+        int damage = _attributes.ScaleAbilityDamage(MathHelper.Lerp(GameBalance.CannonWeakDamage, GameBalance.CannonFullDamage, charge));
         float radius = MathHelper.Lerp(11f, 25f, charge);
         if (_resonanceActive)
         {

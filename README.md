@@ -43,6 +43,11 @@ dotnet run --project src/TheLostSoulOfFire -- --dev --start arena --wave 3
 | `hub` | Aschenvorhalle mit den Biom-Türen |
 | `arena` | Arena hinter Tür I; `--wave 1` bis `--wave 4` wählt die erste Welle |
 
+Mit `--strength`, `--ability-power` und `--armor` (je 0 bis 99, Standard 10)
+lassen sich die Charakterwerte des Spielers setzen, etwa
+`-- --dev --start arena --strength 20 --armor 0`. Stärke skaliert die Sense,
+Fähigkeitsstärke die Seelenkanone, Rüstung verringert erlittenen Schaden.
+
 Ungültige Angaben beenden das Programm mit einer Meldung und Exitcode 2. Die
 Debug-Tasten (`F1` Overlay, `F2`–`F4` Gegner, `F5` Resonance, `F6` Welle
 räumen, `F7` Soul Sense, `F8` Encounter neu, `D1`–`D4` Prolog-Abschnitte)

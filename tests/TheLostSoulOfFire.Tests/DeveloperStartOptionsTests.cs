@@ -1,3 +1,4 @@
+using TheLostSoulOfFire.Combat;
 using TheLostSoulOfFire.Debugging;
 
 namespace TheLostSoulOfFire.Tests;
@@ -89,5 +90,40 @@ public sealed class DeveloperStartOptionsTests
         {
             StringAssert.Contains(DeveloperStartOptions.Usage, name);
         }
+    }
+
+    [TestMethod]
+    public void AttributeFlags_OverrideOnlyTheGivenAttributes()
+    {
+        Assert.IsTrue(DeveloperStartOptions.TryParse(["--dev", "--start", "arena", "--strength", "20", "--armor", "0"], out DeveloperStartOptions? options, out string? error), error);
+
+        Assert.AreEqual(new PlayerAttributes(20, PlayerAttributes.Baseline, 0), options!.AttributeOverride);
+        Assert.AreEqual("DEV_START area=arena wave=1 strength=20 ability-power=10 armor=0", options.Describe());
+    }
+
+    [TestMethod]
+    public void WithoutAttributeFlags_KeepsCharacterAttributes()
+    {
+        Assert.IsTrue(DeveloperStartOptions.TryParse(["--dev", "--start", "hub"], out DeveloperStartOptions? options, out _));
+
+        Assert.IsNull(options!.AttributeOverride);
+    }
+
+    [TestMethod]
+    [DataRow("--strength", "-1")]
+    [DataRow("--ability-power", "100")]
+    [DataRow("--armor", "viel")]
+    public void AttributeFlags_RejectValuesOutsideTheRange(string flag, string value)
+    {
+        Assert.IsFalse(DeveloperStartOptions.TryParse(["--dev", flag, value], out DeveloperStartOptions? options, out string? error));
+        Assert.IsNull(options);
+        StringAssert.Contains(error, flag);
+    }
+
+    [TestMethod]
+    public void AttributeFlags_RequireDev()
+    {
+        Assert.IsFalse(DeveloperStartOptions.TryParse(["--strength", "20"], out _, out string? error));
+        StringAssert.Contains(error, "--dev");
     }
 }
