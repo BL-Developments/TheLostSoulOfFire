@@ -45,7 +45,7 @@ dotnet run --project src/TheLostSoulOfFire -- --dev --start arena --wave 3
 | `prologue:devourer` | Prolog, Devourer-Abschnitt |
 | `prologue:transit` | Prolog, Fahrt auf dem Skiff |
 | `hub` | Aschenvorhalle mit den Biom-Türen |
-| `arena` | Arena hinter Tür I; `--wave 1` bis `--wave 4` wählt die erste Welle |
+| `arena` | Arena hinter Tür I; `--wave 1` bis `--wave 10` wählt die erste Welle |
 
 Mit `--strength`, `--ability-power` und `--armor` (je 0 bis 99, Standard 10)
 lassen sich die Charakterwerte des Spielers setzen, etwa

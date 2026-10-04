@@ -440,8 +440,8 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     }
 
     /// <summary>
-    /// <c>--currency-visual-test</c>: plays one arena run, opens the chests after waves 1 and 2,
-    /// leaves the one after wave 3 unopened, captures HUD, chest and completion, then checks
+    /// <c>--currency-visual-test</c>: plays one arena run, opens the chests after waves 3 and 6,
+    /// leaves the one after wave 9 unopened, captures HUD, chest and completion, then checks
     /// the secured balances in the hub. Uses a temporary profile.
     /// </summary>
     private void ConfigureCurrencyVisualTest(float deltaTime)
@@ -464,7 +464,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
             return true;
         }
 
-        if (_audioTestTotalTime >= 60f)
+        if (_audioTestTotalTime >= 150f)
         {
             Console.WriteLine($"CURRENCY_VISUAL_TEST_FAIL timeout state={state}");
             Environment.ExitCode = 1;
@@ -502,12 +502,12 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
                 if (wave == 1 && Once("spark-shot", 0.95f)) _screenshotRequested = true;
                 break;
             case ArenaLoopState.Intermission:
-                if (wave is 1 or 2)
+                if (wave is 3 or 6)
                 {
                     if (Once($"place-{wave}", 0.15f)) _world.PlaceAutomatedPlayerAtNewestChest();
-                    if (wave == 1 && Once("chest-shot", 0.3f)) _screenshotRequested = true;
+                    if (wave == 3 && Once("chest-shot", 0.3f)) _screenshotRequested = true;
                     if (Once($"open-{wave}", 0.4f)) _input.InjectKeyPress(Keys.E);
-                    if (wave == 1 && Once("open-shot", 0.55f)) _screenshotRequested = true;
+                    if (wave == 3 && Once("open-shot", 0.55f)) _screenshotRequested = true;
                 }
                 if (Once($"to-centre-{wave}", 0.9f)) _world.PlaceAutomatedPlayerAtWaveTrigger();
                 if (wave == 1 && Once("trigger-shot", 1.05f)) _screenshotRequested = true;
@@ -555,7 +555,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
             return;
         }
 
-        if (_world.PlayerDead || _audioTestTotalTime >= 35f)
+        if (_world.PlayerDead || _audioTestTotalTime >= 90f)
         {
             Console.WriteLine($"AUDIO_GAMEPLAY_TEST_FAIL dead={_world.PlayerDead} state={_world.LoopState} wave={_world.WaveNumber}");
             Environment.ExitCode = 1;
@@ -565,7 +565,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
 
         if (_audioTestRestartInjected && _world.Phase == GamePhase.Arena && _world.LoopState == ArenaLoopState.Intro && _world.WaveNumber == 0)
         {
-            Console.WriteLine("AUDIO_GAMEPLAY_TEST_PASS waves=4 completion=true restart=true");
+            Console.WriteLine($"AUDIO_GAMEPLAY_TEST_PASS waves={GameBalance.ArenaWaveCount} completion=true restart=true");
             Environment.ExitCode = 0;
             Exit();
         }

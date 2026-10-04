@@ -27,7 +27,7 @@ public enum DeveloperStartArea
 public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, PlayerAttributes? AttributeOverride = null)
 {
     public const int MinWave = 1;
-    public const int MaxWave = 4;
+    public static int MaxWave => Game.GameBalance.ArenaWaveCount;
 
     private static readonly (string Name, DeveloperStartArea Area)[] Areas =
     [
@@ -57,7 +57,7 @@ public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, Pl
     public string AreaName => Areas.First(entry => entry.Area == Area).Name;
 
     public static string Usage =>
-        "Usage: dotnet run --project src/TheLostSoulOfFire -- --dev [--start <area>] [--wave <1-4>] [--strength <n>] [--ability-power <n>] [--armor <n>]" + Environment.NewLine +
+        "Usage: dotnet run --project src/TheLostSoulOfFire -- --dev [--start <area>] [--wave <1-10>] [--strength <n>] [--ability-power <n>] [--armor <n>]" + Environment.NewLine +
         $"Areas: {string.Join(", ", AreaNames)}" + Environment.NewLine +
         "--wave is only valid with --start arena." + Environment.NewLine +
         $"Attributes range from {PlayerAttributes.MinValue} to {PlayerAttributes.MaxValue}; unset ones keep {PlayerAttributes.Baseline}.";

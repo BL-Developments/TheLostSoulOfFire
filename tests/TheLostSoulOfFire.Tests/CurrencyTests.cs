@@ -140,7 +140,7 @@ public sealed class ArenaChestTests
     public void PositionForWave_GivesDistinctSpotsInsideTheCombatArea()
     {
         Rectangle bounds = GameBalance.CombatBounds;
-        Vector2[] spots = [ArenaChest.PositionForWave(1, bounds), ArenaChest.PositionForWave(2, bounds), ArenaChest.PositionForWave(3, bounds)];
+        Vector2[] spots = GameBalance.ArenaChestWaves.Select(wave => ArenaChest.PositionForWave(wave, bounds)).ToArray();
         foreach (Vector2 spot in spots)
         {
             Assert.IsTrue(bounds.Contains(spot), $"{spot} lies outside the combat area");

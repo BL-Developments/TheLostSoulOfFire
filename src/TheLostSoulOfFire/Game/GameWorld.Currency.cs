@@ -11,13 +11,12 @@ namespace TheLostSoulOfFire.Game;
 
 /// <summary>
 /// Run currencies (#52, change <c>add-run-currencies</c>): Glut on every defeat in the arena,
-/// money chests after waves 1 to 3, loss of both run balances on defeat and, as a placeholder
+/// money chests after waves 3, 6 and 9 (change <c>extend-arena-waves</c>), loss of both run balances on defeat and, as a placeholder
 /// until #53, securing everything when the arena is completed.
 /// </summary>
 public sealed partial class GameWorld
 {
     private const float CurrencyPulseDuration = 0.45f;
-    private const int LastWave = 4;
 
     private readonly CurrencyWallet _wallet = new();
     private readonly PlayerProfileStore _profileStore;
@@ -79,7 +78,7 @@ public sealed partial class GameWorld
 
     private void SpawnChestAfterWave(int clearedWave)
     {
-        if (clearedWave < LastWave)
+        if (Array.IndexOf(GameBalance.ArenaChestWaves, clearedWave) >= 0)
         {
             _chests.Add(new ArenaChest(ArenaChest.PositionForWave(clearedWave, _arena.CombatBounds)));
         }
@@ -196,7 +195,7 @@ public sealed partial class GameWorld
         }
         else if (PlayerAtWaveTrigger && CombatActionsEnabled)
         {
-            DrawCenteredPrompt(batch, pixel, viewport, _waveNumber + 1 >= LastWave ? "E  LETZTE WELLE STARTEN" : $"E  WELLE {CinematicPresentation.ToRoman(_waveNumber + 1)} STARTEN", GameBalance.DeathFlame);
+            DrawCenteredPrompt(batch, pixel, viewport, _waveNumber + 1 >= GameBalance.ArenaWaveCount ? "E  LETZTE WELLE STARTEN" : $"E  WELLE {CinematicPresentation.ToRoman(_waveNumber + 1)} STARTEN", GameBalance.DeathFlame);
         }
         else if (_loopState == ArenaLoopState.Intermission && CombatActionsEnabled)
         {

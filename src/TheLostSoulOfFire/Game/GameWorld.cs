@@ -67,6 +67,9 @@ public sealed partial class GameWorld : IDisposable
     private bool _debugVisible;
     private bool _forceSoulSense;
     private int _waveNumber;
+    private ArenaWaveRun _waveRun = ArenaWaveRun.Empty;
+    private readonly List<PendingArenaSpawn> _pendingSpawns = [];
+    private int _reinforcementSeed;
     private GamePhase _phase = GamePhase.Title;
     private ArenaLoopState _loopState = ArenaLoopState.Intro;
     private float _phaseTime;
@@ -107,7 +110,7 @@ public sealed partial class GameWorld : IDisposable
         : 0f;
 
     public string WindowTitle => _debugVisible
-        ? $"The Lost Soul of Fire — DEBUG | {_phase.ToString().ToUpperInvariant()} {_loopState.ToString().ToUpperInvariant()} | Wave {_waveNumber}/4 | HP {_player.Health} | RES {(_player.ResonanceActive ? $"ACTIVE {_player.ResonanceRemaining:0.0}s" : $"{_player.Resonance:0}/{GameBalance.ResonanceRequired:0}")} | Player {GetPlayerState()} | Enemies {_enemies.Count(enemy => enemy.IsAlive)} | Souls {_souls.Count}"
+        ? $"The Lost Soul of Fire — DEBUG | {_phase.ToString().ToUpperInvariant()} {_loopState.ToString().ToUpperInvariant()} | Wave {_waveNumber}/{GameBalance.ArenaWaveCount} | HP {_player.Health} | RES {(_player.ResonanceActive ? $"ACTIVE {_player.ResonanceRemaining:0.0}s" : $"{_player.Resonance:0}/{GameBalance.ResonanceRequired:0}")} | Player {GetPlayerState()} | Enemies {_enemies.Count(enemy => enemy.IsAlive)} | Souls {_souls.Count}"
         : "The Lost Soul of Fire";
 
     public GameWorld(Viewport viewport, ArtAssets art, ContentManager content, bool skipMainMenu = false, bool skipPrologue = false, GameSettings? settings = null, Action<GameSettings>? settingsChanged = null, PlayerProfileStore? profileStore = null)
@@ -274,6 +277,10 @@ public sealed partial class GameWorld : IDisposable
             {
                 ApplyEnemyDamage(enemy, new DamageInfo(enemy.Health + enemy.MaxHealth, Vector2.Zero, enemy.Position));
             }
+
+            // Also drop the pushes still to come so one press clears the whole wave.
+            _waveRun.DiscardRemaining();
+            _pendingSpawns.Clear();
         }
 
         if (input.WasKeyPressed(Keys.F7))
@@ -930,6 +937,10 @@ public sealed partial class GameWorld : IDisposable
             {
                 _hud.Draw(batch, pixel, viewport, _player);
                 DrawCurrencyHud(batch, pixel, viewport);
+                if (_waveNumber > 0)
+                {
+                    HudRenderer.DrawWave(batch, pixel, viewport, _waveNumber, GameBalance.ArenaWaveCount, _waveRun.PushesReleased, ArenaWaves.Pushes(_waveNumber).Count);
+                }
             }
 
             if (!IsGamePaused)
@@ -1085,38 +1096,26 @@ public sealed partial class GameWorld : IDisposable
     private void SpawnWave(int waveNumber)
     {
         Vector2 center = _arena.CombatBounds.Center.ToVector2();
+        _waveRun = new ArenaWaveRun(ArenaWaves.Pushes(waveNumber));
+        _pendingSpawns.Clear();
+        _reinforcementSeed = 0;
+        ArenaPush firstPush = _waveRun.TakeFirst();
         int seed = waveNumber * 10;
-        switch (waveNumber)
+        if (ArenaWaves.HasAuthoredLayout(waveNumber))
         {
-            case 1:
-                _enemies.Add(new Hollow(center + new Vector2(360f, -195f), seed + 1));
-                _enemies.Add(new Hollow(center + new Vector2(-390f, -125f), seed + 2));
-                _enemies.Add(new Hollow(center + new Vector2(235f, 265f), seed + 3));
-                break;
-
-            case 2:
-                _enemies.Add(new Hollow(center + new Vector2(-470f, -210f), seed + 1));
-                _enemies.Add(new Hollow(center + new Vector2(430f, 235f), seed + 2));
-                _enemies.Add(new Burning(center + new Vector2(445f, -170f), seed + 3));
-                _enemies.Add(new Burning(center + new Vector2(-420f, 225f), seed + 4));
-                break;
-
-            case 3:
-                _enemies.Add(new Hollow(center + new Vector2(-500f, -230f), seed + 1));
-                _enemies.Add(new Hollow(center + new Vector2(480f, 235f), seed + 2));
-                _enemies.Add(new Burning(center + new Vector2(420f, -250f), seed + 3));
-                _enemies.Add(new Burning(center + new Vector2(-420f, 260f), seed + 4));
-                _enemies.Add(new Devourer(center + new Vector2(560f, 10f)));
-                break;
-
-            case 4:
-                _enemies.Add(new Devourer(center + new Vector2(575f, -35f)));
-                _enemies.Add(new Burning(center + new Vector2(-500f, -265f), seed + 1));
-                _enemies.Add(new Burning(center + new Vector2(-525f, 40f), seed + 2));
-                _enemies.Add(new Burning(center + new Vector2(390f, 275f), seed + 3));
-                _enemies.Add(new Hollow(center + new Vector2(455f, -245f), seed + 4));
-                _enemies.Add(new Hollow(center + new Vector2(-320f, 285f), seed + 5));
-                break;
+            foreach ((ArenaEnemyKind kind, Vector2 offset) in ArenaWaves.AuthoredLayout(waveNumber))
+            {
+                _enemies.Add(CreateArenaEnemy(kind, center + offset, ref seed));
+            }
+        }
+        else
+        {
+            List<Vector2> positions = ArenaWaves.ChooseSpawnPositions(_arena.CombatBounds, _player.Position, firstPush.Total);
+            int index = 0;
+            foreach (ArenaEnemyKind kind in firstPush.Kinds())
+            {
+                _enemies.Add(CreateArenaEnemy(kind, positions[index++], ref seed));
+            }
         }
 
         _waveNumber = waveNumber;
@@ -1128,6 +1127,51 @@ public sealed partial class GameWorld : IDisposable
         _screenEffects.Flash(0.08f, 0.12f + waveNumber * 0.035f);
         _audio.SetCalm(false);
         _audio.Play(AudioCue.WaveStart, 0.62f, MathF.Min(0.18f, waveNumber * 0.03f));
+    }
+
+    private static Enemy CreateArenaEnemy(ArenaEnemyKind kind, Vector2 position, ref int seed) => kind switch
+    {
+        ArenaEnemyKind.Hollow => new Hollow(position, ++seed),
+        ArenaEnemyKind.Burning => new Burning(position, ++seed),
+        _ => new Devourer(position)
+    };
+
+    private void UpdateReinforcements(float deltaTime)
+    {
+        int alive = _enemies.Count(enemy => enemy.IsAlive) + _pendingSpawns.Count;
+        if (_waveRun.TryTakeNext(deltaTime, alive, out ArenaPush push))
+        {
+            List<Vector2> positions = ArenaWaves.ChooseSpawnPositions(_arena.CombatBounds, _player.Position, push.Total);
+            int index = 0;
+            foreach (ArenaEnemyKind kind in push.Kinds())
+            {
+                _pendingSpawns.Add(new PendingArenaSpawn(kind, positions[index++], GameBalance.ArenaSpawnTelegraphDuration));
+            }
+
+            _audio.Play(AudioCue.WaveStart, 0.34f, 0.12f);
+        }
+
+        for (int i = _pendingSpawns.Count - 1; i >= 0; i--)
+        {
+            PendingArenaSpawn spawn = _pendingSpawns[i];
+            spawn.Remaining -= deltaTime;
+            if (spawn.Remaining > 0f)
+            {
+                continue;
+            }
+
+            _pendingSpawns.RemoveAt(i);
+            int seed = _waveNumber * 100 + _reinforcementSeed++;
+            _enemies.Add(CreateArenaEnemy(spawn.Kind, spawn.Position, ref seed));
+            _particles.EmitDeathFlame(spawn.Position, 10, 0.7f);
+        }
+    }
+
+    private sealed class PendingArenaSpawn(ArenaEnemyKind kind, Vector2 position, float remaining)
+    {
+        public ArenaEnemyKind Kind { get; } = kind;
+        public Vector2 Position { get; } = position;
+        public float Remaining { get; set; } = remaining;
     }
 
     private void StartNewGame(Viewport viewport)
@@ -1325,6 +1369,8 @@ public sealed partial class GameWorld : IDisposable
         _screenEffects.Clear();
         _arenaAtmosphere.Reset();
         _waveNumber = 0;
+        _waveRun = ArenaWaveRun.Empty;
+        _pendingSpawns.Clear();
         _burningHandoffTimer = 0f;
         _burningCommittedLastFrame = 0;
         _forceSoulSense = false;
@@ -1394,10 +1440,12 @@ public sealed partial class GameWorld : IDisposable
                 break;
 
             case ArenaLoopState.Combat:
-                if (_enemies.Count == 0 && _souls.Count == 0)
+                UpdateReinforcements(deltaTime);
+                if (_enemies.Count == 0 && _souls.Count == 0 && _waveRun.AllPushesReleased && _pendingSpawns.Count == 0)
                 {
-                    _audio.Play(AudioCue.WaveClear, _waveNumber >= 4 ? 0.74f : 0.62f);
-                    if (_waveNumber >= 4)
+                    bool lastWave = _waveNumber >= GameBalance.ArenaWaveCount;
+                    _audio.Play(AudioCue.WaveClear, lastWave ? 0.74f : 0.62f);
+                    if (lastWave)
                     {
                         _loopState = ArenaLoopState.Complete;
                         SecureRunCurrencies();
@@ -1438,6 +1486,16 @@ public sealed partial class GameWorld : IDisposable
             Vector2 center = _arena.CombatBounds.Center.ToVector2();
             batch.DrawCircle(pixel, center, GameBalance.WaveTriggerRadius, GameBalance.DeathFlameBright * (0.22f + pulse * 0.22f), 4f, 48);
             batch.DrawCircle(pixel, center, GameBalance.WaveTriggerRadius * 0.55f, GameBalance.DeathFlame * (0.14f + pulse * 0.14f), 3f, 36);
+        }
+
+        foreach (PendingArenaSpawn spawn in _pendingSpawns)
+        {
+            // Gathering death flame: the ring closes in while the enemy is about to appear.
+            float progress = 1f - spawn.Remaining / GameBalance.ArenaSpawnTelegraphDuration;
+            float pulse = 0.5f + 0.5f * MathF.Sin(_presentationTime * 14f);
+            float radius = MathHelper.Lerp(62f, 26f, progress);
+            batch.DrawCircle(pixel, spawn.Position, radius, GameBalance.DeathFlameBright * (0.25f + progress * 0.45f), 4f, 32);
+            batch.DrawCircle(pixel, spawn.Position, radius * 0.55f + pulse * 4f, GameBalance.DeathFlame * (0.2f + progress * 0.4f), 3f, 24);
         }
 
         if (_loopState is ArenaLoopState.Intro or ArenaLoopState.Transition)
