@@ -314,6 +314,130 @@ public sealed class CinematicPresentation
 
     private const float PauseVeilAlpha = 0.55f;
 
+    private const int CharacterTabScale = 3;
+    private const float CharacterTabY = 92f;
+    private const float CharacterTabSpacing = 220f;
+    private const float CharacterRuleY = 146f;
+    private const float CharacterRowsY = 190f;
+    private const float CharacterRowSpacing = 46f;
+    private const float CharacterLabelOffsetX = -380f;
+    private const float CharacterValueRightOffsetX = 20f;
+    private const float CharacterEffectOffsetX = 64f;
+    private const float CharacterSecuredColumnOffsetX = 210f;
+
+    /// <summary>
+    /// Hit-testable bounds of the character menu's tabs, laid out with the same constants
+    /// <see cref="DrawCharacterMenu"/> draws with, in <see cref="CharacterMenu.Tabs"/> order.
+    /// </summary>
+    public IReadOnlyList<Rectangle> GetCharacterTabBounds(Viewport viewport)
+    {
+        List<Rectangle> bounds = new(CharacterMenu.Tabs.Count);
+        for (int i = 0; i < CharacterMenu.Tabs.Count; i++)
+        {
+            float centerX = CharacterTabCenterX(viewport, i);
+            int width = PixelText.Measure(CharacterMenu.GetLabel(CharacterMenu.Tabs[i]), CharacterTabScale);
+            int height = 7 * CharacterTabScale;
+            bounds.Add(new Rectangle(
+                (int)(centerX - width * 0.5f - MenuHitPaddingX),
+                (int)(CharacterTabY - MenuHitPaddingY),
+                width + (int)(MenuHitPaddingX * 2f),
+                height + (int)(MenuHitPaddingY * 2f)));
+        }
+        return bounds;
+    }
+
+    /// <summary>
+    /// Character menu over the frozen world: the pause menu's veil, letterbox and rule,
+    /// with the tab bar in place of the heading and the selected tab's page below it.
+    /// </summary>
+    public void DrawCharacterMenu(SpriteBatch batch, Texture2D pixel, Viewport viewport, CharacterMenu menu, CharacterSheet sheet)
+    {
+        float reveal = Ease(menu.OpenTimer / MenuController.RevealDuration);
+        batch.FillRectangle(pixel, viewport.Bounds, Color.Black * (PauseVeilAlpha * reveal));
+        DrawLetterbox(batch, pixel, viewport, 44, 0.94f * reveal);
+        DrawCharacterTabs(batch, pixel, viewport, menu, reveal);
+        DrawTitleRules(batch, pixel, viewport, CharacterRuleY, reveal);
+
+        if (menu.SelectedTab == CharacterMenuTab.Character)
+        {
+            DrawCharacterPage(batch, pixel, viewport, sheet, reveal);
+        }
+        else
+        {
+            PixelText.DrawCentered(batch, pixel, "NOCH NICHT VERFÜGBAR", viewport.Width * 0.5f, viewport.Height * 0.5f - 10f, MenuEntryScale, GameBalance.SoulWhite * (0.42f * reveal));
+        }
+    }
+
+    private static float CharacterTabCenterX(Viewport viewport, int index) =>
+        viewport.Width * 0.5f + (index - (CharacterMenu.Tabs.Count - 1) * 0.5f) * CharacterTabSpacing;
+
+    private static void DrawCharacterTabs(SpriteBatch batch, Texture2D pixel, Viewport viewport, CharacterMenu menu, float reveal)
+    {
+        for (int i = 0; i < CharacterMenu.Tabs.Count; i++)
+        {
+            CharacterMenuTab tab = CharacterMenu.Tabs[i];
+            string label = CharacterMenu.GetLabel(tab);
+            float centerX = CharacterTabCenterX(viewport, i);
+            bool selected = tab == menu.SelectedTab;
+            Color baseColor = CharacterMenu.IsPlaceholder(tab) ? GameBalance.SoulWhite * 0.42f : GameBalance.SoulWhite * 0.72f;
+            Color color = selected ? GameBalance.DeathFlameBright : baseColor;
+            float breathe = selected ? 0.85f + MathF.Sin(menu.OpenTimer * 3f) * 0.15f : 1f;
+            PixelText.DrawCentered(batch, pixel, label, centerX, CharacterTabY, CharacterTabScale, color * (reveal * breathe));
+
+            if (selected)
+            {
+                int width = PixelText.Measure(label, CharacterTabScale);
+                DrawSelectionMarker(batch, pixel, new Vector2(centerX - width * 0.5f - 16f, CharacterTabY + 10f), GameBalance.DeathFlameBright * reveal);
+                float underlineY = CharacterTabY + 7 * CharacterTabScale + 8f;
+                batch.DrawLine(pixel, new Vector2(centerX - width * 0.5f, underlineY), new Vector2(centerX + width * 0.5f, underlineY), GameBalance.DeathFlameBright * (0.7f * reveal), 2f);
+            }
+        }
+    }
+
+    private static void DrawCharacterPage(SpriteBatch batch, Texture2D pixel, Viewport viewport, CharacterSheet sheet, float reveal)
+    {
+        float centerX = viewport.Width * 0.5f;
+        Color label = GameBalance.SoulWhite * (0.72f * reveal);
+        Color value = GameBalance.SoulWhite * reveal;
+        Color effect = GameBalance.SoulWhite * (0.42f * reveal);
+
+        DrawCharacterRow(batch, pixel, centerX, CharacterRowsY, "LEBEN", sheet.HealthText, null, label, value, effect);
+        DrawCharacterRow(batch, pixel, centerX, CharacterRowsY + CharacterRowSpacing, "STÄRKE", sheet.Attributes.Strength.ToString(), sheet.WeaponDamageText, label, value, effect);
+        DrawCharacterRow(batch, pixel, centerX, CharacterRowsY + CharacterRowSpacing * 2f, "FÄHIGKEITSSTÄRKE", sheet.Attributes.AbilityPower.ToString(), sheet.AbilityDamageText, label, value, effect);
+        DrawCharacterRow(batch, pixel, centerX, CharacterRowsY + CharacterRowSpacing * 3f, "RÜSTUNG", sheet.Attributes.Armor.ToString(), sheet.ArmorReductionText, label, value, effect);
+
+        float currencyY = CharacterRowsY + CharacterRowSpacing * 4f + 26f;
+        PixelText.Draw(batch, pixel, "WÄHRUNGEN", new Vector2(centerX + CharacterLabelOffsetX, currencyY), 2, effect);
+        float ruleY = currencyY + 7 * 2 + 8f;
+        batch.DrawLine(pixel, new Vector2(centerX + CharacterLabelOffsetX, ruleY), new Vector2(centerX - CharacterLabelOffsetX, ruleY), GameBalance.DeathFlame * (0.32f * reveal), 1f);
+        DrawCurrencyRow(batch, pixel, centerX, ruleY + 20f, "GELD", sheet.GeldRunText, sheet.GeldSecuredText, GameBalance.Geld * reveal, value);
+        DrawCurrencyRow(batch, pixel, centerX, ruleY + 20f + CharacterRowSpacing, "GLUT", sheet.GlutRunText, sheet.GlutSecuredText, GameBalance.Glut * reveal, value);
+    }
+
+    private static void DrawCharacterRow(SpriteBatch batch, Texture2D pixel, float centerX, float y, string label, string value, string? effect, Color labelColor, Color valueColor, Color effectColor)
+    {
+        PixelText.Draw(batch, pixel, label, new Vector2(centerX + CharacterLabelOffsetX, y), MenuEntryScale, labelColor);
+        int valueWidth = PixelText.Measure(value, MenuEntryScale);
+        PixelText.Draw(batch, pixel, value, new Vector2(centerX + CharacterValueRightOffsetX - valueWidth, y), MenuEntryScale, valueColor);
+        if (effect is not null)
+        {
+            // Scale 2 text sits on the scale 3 baseline.
+            PixelText.Draw(batch, pixel, effect, new Vector2(centerX + CharacterEffectOffsetX, y + 7f), 2, effectColor);
+        }
+    }
+
+    private static void DrawCurrencyRow(SpriteBatch batch, Texture2D pixel, float centerX, float y, string label, string? runText, string securedText, Color labelColor, Color valueColor)
+    {
+        PixelText.Draw(batch, pixel, label, new Vector2(centerX + CharacterLabelOffsetX, y), MenuEntryScale, labelColor);
+        float x = centerX + CharacterEffectOffsetX;
+        if (runText is not null)
+        {
+            PixelText.Draw(batch, pixel, runText, new Vector2(x, y + 7f), 2, valueColor);
+            x += CharacterSecuredColumnOffsetX;
+        }
+        PixelText.Draw(batch, pixel, securedText, new Vector2(x, y + 7f), 2, valueColor);
+    }
+
     private static void DrawMenuList(SpriteBatch batch, Texture2D pixel, Viewport viewport, MenuController menu, float reveal, float time)
     {
         float centerX = viewport.Width * 0.5f;

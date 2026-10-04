@@ -53,6 +53,7 @@ public sealed partial class GameWorld : IDisposable
     private readonly CombatPresentation _combatPresentation;
     private readonly MenuController _menu;
     private readonly MenuController _pauseMenu;
+    private readonly CharacterMenu _characterMenu = new();
     private readonly GameSettings _settings;
     private readonly Action<GameSettings>? _settingsChanged;
     private readonly bool _skipMainMenu;
@@ -86,6 +87,8 @@ public sealed partial class GameWorld : IDisposable
     public string ScreenshotContext => GetScreenshotContext();
     public GamePhase Phase => _phase;
     internal PrologueStage PrologueStage => _prologue.Stage;
+    /// <summary>Pause or character menu is open; the world is frozen under either.</summary>
+    private bool IsGamePaused => _pauseMenu.IsOpen || _characterMenu.IsOpen;
     private bool IsCombatPhase => _phase is GamePhase.Arena or GamePhase.Prologue;
     private Rectangle ActiveCombatBounds => _phase == GamePhase.Prologue ? _prologue.MovementBounds : _arena.CombatBounds;
     private Rectangle ActiveWorldBounds => _phase == GamePhase.Prologue ? PrologueDirector.WorldBounds : _arena.Bounds;
@@ -132,6 +135,14 @@ public sealed partial class GameWorld : IDisposable
     public void Update(GameTime gameTime, InputState input, Viewport viewport)
     {
         float deltaTime = MathF.Min((float)gameTime.ElapsedGameTime.TotalSeconds, 1f / 20f);
+        if (_characterMenu.IsOpen)
+        {
+            // Same freeze as the pause menu: only the menu and the audio mix advance.
+            _audio.Update(deltaTime);
+            UpdateCharacterMenu(deltaTime, input, viewport);
+            return;
+        }
+
         if (_pauseMenu.IsOpen)
         {
             // Paused: only the menu and the audio mix advance; every simulation and
@@ -144,6 +155,13 @@ public sealed partial class GameWorld : IDisposable
         if (_phase != GamePhase.Title && input.WasKeyPressed(Keys.Escape))
         {
             _pauseMenu.Open(MenuPages.Pause);
+            _audio.SetPaused(true);
+            return;
+        }
+
+        if (_phase != GamePhase.Title && input.WasKeyPressed(Keys.Tab))
+        {
+            _characterMenu.Open();
             _audio.SetPaused(true);
             return;
         }
@@ -531,6 +549,43 @@ public sealed partial class GameWorld : IDisposable
         }
     }
 
+    private void UpdateCharacterMenu(float deltaTime, InputState input, Viewport viewport)
+    {
+        _characterMenu.Tick(deltaTime);
+        if (input.WasKeyPressed(Keys.Tab) || input.WasKeyPressed(Keys.Escape))
+        {
+            _characterMenu.Close();
+            _audio.SetPaused(false);
+            return;
+        }
+
+        if (input.WasKeyPressed(Keys.Left) || input.WasKeyPressed(Keys.A)) _characterMenu.SelectPrevious();
+        else if (input.WasKeyPressed(Keys.Right) || input.WasKeyPressed(Keys.D)) _characterMenu.SelectNext();
+
+        if (input.WasLeftMousePressed)
+        {
+            IReadOnlyList<Rectangle> bounds = _presentation.GetCharacterTabBounds(viewport);
+            for (int i = 0; i < bounds.Count; i++)
+            {
+                if (bounds[i].Contains(input.MouseVirtualPosition))
+                {
+                    _characterMenu.Select(CharacterMenu.Tabs[i]);
+                    break;
+                }
+            }
+        }
+    }
+
+    private CharacterSheet CurrentCharacterSheet => new(
+        _player.Health,
+        GameBalance.PlayerMaxHealth,
+        _player.Attributes,
+        _phase == GamePhase.Arena,
+        _wallet.Run(Currency.Geld),
+        _wallet.Secured(Currency.Geld),
+        _wallet.Run(Currency.Glut),
+        _wallet.Secured(Currency.Glut));
+
     /// <summary>
     /// Shared mouse/keyboard handling for the title and pause menus. Navigation and value
     /// changes are applied here; results that leave the menu are returned to the caller.
@@ -864,7 +919,7 @@ public sealed partial class GameWorld : IDisposable
                 _hud.Draw(batch, pixel, viewport, _player);
             }
 
-            if (!_pauseMenu.IsOpen)
+            if (!IsGamePaused)
             {
                 ProloguePresentation.DrawOverlay(batch, pixel, viewport, _prologue, _player.IsDead, _settings.OptionalHints);
             }
@@ -877,7 +932,7 @@ public sealed partial class GameWorld : IDisposable
                 DrawCurrencyHud(batch, pixel, viewport);
             }
 
-            if (!_pauseMenu.IsOpen)
+            if (!IsGamePaused)
             {
                 _presentation.DrawOverlay(batch, pixel, viewport, _phase, _loopState, _player.IsDead, _waveNumber, _menu);
                 if (_phase == GamePhase.Arena && _loopState == ArenaLoopState.Complete && !_player.IsDead)
@@ -890,7 +945,7 @@ public sealed partial class GameWorld : IDisposable
 
         // Story, prompt and cinematic text would compete with the pause menu's type;
         // the paused world and HUD stay visible under the veil.
-        if (_phase is GamePhase.Antechamber or GamePhase.EnteringArena && !_pauseMenu.IsOpen)
+        if (_phase is GamePhase.Antechamber or GamePhase.EnteringArena && !IsGamePaused)
         {
             DrawAntechamberOverlay(batch, pixel, viewport);
         }
@@ -903,6 +958,11 @@ public sealed partial class GameWorld : IDisposable
         if (_pauseMenu.IsOpen)
         {
             _presentation.DrawPauseMenu(batch, pixel, viewport, _pauseMenu);
+        }
+
+        if (_characterMenu.IsOpen)
+        {
+            _presentation.DrawCharacterMenu(batch, pixel, viewport, _characterMenu, CurrentCharacterSheet);
         }
 
         batch.End();
@@ -1478,6 +1538,7 @@ public sealed partial class GameWorld : IDisposable
     private string GetScreenshotContext()
     {
         if (_pauseMenu.IsOpen) return $"phase15_pause_{_pauseMenu.CurrentPage.Id}";
+        if (_characterMenu.IsOpen) return $"character_{_characterMenu.SelectedTab.ToString().ToLowerInvariant()}";
         if (_phase == GamePhase.Title) return _menu.IsOpen ? $"phase15_menu_{_menu.CurrentPage.Id}" : "phase15_title";
         if (_phase == GamePhase.Prologue) return $"prologue_{_prologue.Stage.ToString().ToLowerInvariant()}";
         if (_phase == GamePhase.Antechamber)
