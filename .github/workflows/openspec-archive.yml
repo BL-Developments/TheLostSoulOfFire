@@ -1,0 +1,78 @@
+name: OpenSpec archive
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      change:
+        description: Name des Changes unter openspec/changes (mehrere durch Leerzeichen getrennt)
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: openspec-archive
+  cancel-in-progress: false
+
+env:
+  OPENSPEC: npx --yes @fission-ai/openspec@1.5.0
+  OPENSPEC_TELEMETRY: 0
+
+jobs:
+  archive:
+    name: Archive merged OpenSpec changes
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.pull_request.merged == true &&
+       github.event.pull_request.head.repo.full_name == github.repository &&
+       !startsWith(github.event.pull_request.head.ref, 'chore/archive-'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.OPENSPEC_ARCHIVE_TOKEN || github.token }}
+
+      - name: Find OpenSpec changes touched by the pull request
+        id: changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          INPUT_CHANGE: ${{ inputs.change }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            changes="$INPUT_CHANGE"
+          else
+            changes="$(gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/files" \
+                --jq '.[] | .filename, (.previous_filename // empty)' \
+              | sed -nE 's#^openspec/changes/([^/]+)/.*#\1#p' \
+              | grep -vx 'archive' | sort -u | tr '\n' ' ' || true)"
+          fi
+          echo "Betroffene Changes: ${changes:-keine}"
+          {
+            echo "changes<<EOF_CHANGES"
+            echo "$changes"
+            echo "EOF_CHANGES"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Archive changes and open follow-up pull requests
+        env:
+          GH_TOKEN: ${{ secrets.OPENSPEC_ARCHIVE_TOKEN || github.token }}
+          CHANGES: ${{ steps.changes.outputs.changes }}
+          BASE_BRANCH: main
+          SOURCE_PR: ${{ github.event.pull_request.number }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Kopie ausführen, weil das Skript zwischen Branches wechselt.
+          cp .github/scripts/archive-openspec-changes.sh "$RUNNER_TEMP/archive.sh"
+          bash "$RUNNER_TEMP/archive.sh"
