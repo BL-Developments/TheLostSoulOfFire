@@ -943,6 +943,10 @@ public sealed partial class GameWorld : IDisposable
             {
                 _hud.Draw(batch, pixel, viewport, _player);
                 DrawCurrencyHud(batch, pixel, viewport);
+                if (_waveNumber > 0)
+                {
+                    HudRenderer.DrawWave(batch, pixel, viewport, _waveNumber, GameBalance.ArenaWaveCount, _waveRun.PushesReleased, ArenaWaves.Pushes(_waveNumber).Count);
+                }
             }
 
             if (!IsGamePaused)

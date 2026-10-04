@@ -75,6 +75,51 @@ public sealed class HudRenderer
         DrawCurrencyLine(batch, pixel, "GLUT", glut, new Vector2(x, y + 16), GameBalance.Glut, glutPulse);
     }
 
+    /// <summary>
+    /// Wave counter in the top right corner. Waves with reinforcements show one diamond per
+    /// push below the counter: filled once the push has entered the arena.
+    /// </summary>
+    public static void DrawWave(SpriteBatch batch, Texture2D pixel, Viewport viewport, int wave, int waveCount, int pushesReleased, int pushCount)
+    {
+        if (wave <= 0)
+        {
+            return;
+        }
+
+        string label = "WELLE";
+        string value = $"{wave}/{waveCount}";
+        bool lastWave = wave >= waveCount;
+        int labelWidth = PixelText.Measure(label, 1);
+        int valueWidth = PixelText.Measure(value, 1);
+        int right = viewport.Width - 24;
+        int width = labelWidth + valueWidth + 30;
+        int height = pushCount > 1 ? 34 : 23;
+        Rectangle panelBounds = new(right - width, 28, width, height);
+        batch.FillRectangle(pixel, panelBounds, Panel);
+        DrawCornerFrame(batch, pixel, panelBounds, lastWave ? GameBalance.DeathFlame : Frame);
+
+        int textX = panelBounds.X + 11;
+        int textY = panelBounds.Y + 8;
+        PixelText.Draw(batch, pixel, label, new Vector2(textX, textY), 1, lastWave ? GameBalance.DeathFlameBright : BoundSoulDim);
+        PixelText.Draw(batch, pixel, value, new Vector2(textX + labelWidth + 8, textY), 1, BoundSoul);
+
+        if (pushCount > 1)
+        {
+            const int spacing = 12;
+            int startX = panelBounds.Center.X - (pushCount - 1) * spacing / 2;
+            for (int push = 0; push < pushCount; push++)
+            {
+                Vector2 center = new(startX + push * spacing, panelBounds.Bottom - 8);
+                bool released = push < pushesReleased;
+                DrawDiamond(batch, pixel, center, 4, released ? GameBalance.DeathFlame : Frame);
+                if (released)
+                {
+                    DrawDiamond(batch, pixel, center, 2, GameBalance.DeathFlameBright);
+                }
+            }
+        }
+    }
+
     private static void DrawCurrencyLine(SpriteBatch batch, Texture2D pixel, string label, int amount, Vector2 position, Color accent, float pulse)
     {
         pulse = MathHelper.Clamp(pulse, 0f, 1f);
