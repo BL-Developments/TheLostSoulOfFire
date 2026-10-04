@@ -1,6 +1,6 @@
 # Fähigkeiten — Ideenpool
 
-Stand: 04.10.2026. 50 Brainstorming-Vorschläge in zehn Kategorien. Keine Fähigkeit ist beschlossen oder implementiert. Namen und erwähnte Zahlen sind Arbeitswerte. Lore-Zuordnung wird erst später geprüft.
+Stand: 04.10.2026. 50 Brainstorming-Vorschläge in zehn Kategorien. Sechs Fähigkeiten sind als erster Pool samt grundlegenden Wirkungsregeln bestätigt; keine ist damit als implementiert nachgewiesen. Namen und erwähnte Zahlen sind Arbeitswerte. Lore-Zuordnung wird erst später geprüft.
 
 Auswahl und Spezifikation: [#79](https://github.com/BL-Developments/TheLostSoulOfFire/issues/79). Umsetzung nach Auswahl: [#80](https://github.com/BL-Developments/TheLostSoulOfFire/issues/80). Umfangsrahmen: [#21](https://github.com/BL-Developments/TheLostSoulOfFire/issues/21).
 
@@ -8,6 +8,7 @@ Auswahl und Spezifikation: [#79](https://github.com/BL-Developments/TheLostSoulO
 
 - **Idee:** Teil des Pools, noch nicht ausgewählt.
 - **Kandidat:** Für den ersten kleinen Pool empfohlen; keine Produktfreigabe.
+- **Ausgewählt:** Vom Owner für den ersten Pool bestätigt; konkrete Werte und offene Detailfälle bleiben zu spezifizieren.
 - **Prototyp:** Nach ausdrücklicher Auswahl umgesetzt und prüfbar; Nachweis verlinken.
 - **Verworfen:** Nicht weiterverfolgt; Grund erhalten.
 
@@ -15,7 +16,7 @@ IDs AB-001 bis AB-050 bleiben stabil, auch bei Umbenennung oder Verwerfung. Prot
 
 ## Auswahl in #79
 
-Die sechs Kandidaten sind eine Empfehlung des Brainstormings: Zweiter Atem, Durchschlag, Rückstoßsprung, Sog, Vergeltung und Vorlage. Sie decken Heilung, Schaden, Bewegung, Kontrolle, Verteidigung und Zusammenspiel ab.
+Am 04.10.2026 hat der Owner diese sechs Fähigkeiten als ersten Pool bestätigt: Zweiter Atem, Durchschlag, Rückstoßsprung, Sog, Vergeltung und Vorlage. Sie decken Heilung, Schaden, Bewegung, Kontrolle, Verteidigung und Zusammenspiel ab.
 
 Vor Auswahl je Kandidat prüfen:
 
@@ -41,7 +42,7 @@ Aktive Fähigkeiten verbrauchen den mystischen Run-Bestand gemäß [#52](https:/
 
 | ID | Name | Wirkungsvorschlag | Status |
 |---|---|---|---|
-| AB-006 | Zweiter Atem | Stellt sofort einen kleinen Teil der Lebenspunkte wieder her. | Kandidat |
+| AB-006 | Zweiter Atem | Stellt sofort einen kleinen Teil der Lebenspunkte wieder her. | Ausgewählt |
 | AB-007 | Erholung | Heilt über einige Sekunden; erlittener Schaden beendet die Wirkung. | Idee |
 | AB-008 | Lebensraub | Erfolgreiche Waffenangriffe heilen kurzzeitig. | Idee |
 | AB-009 | Heilkreis | Stationäre Zone heilt Spieler und Partner langsam. | Idee |
@@ -52,7 +53,7 @@ Aktive Fähigkeiten verbrauchen den mystischen Run-Bestand gemäß [#52](https:/
 | ID | Name | Wirkungsvorschlag | Status |
 |---|---|---|---|
 | AB-011 | Druckwelle | Verursacht Schaden in einem breiten Kegel. | Idee |
-| AB-012 | Durchschlag | Projektil durchdringt mehrere Gegner. | Kandidat |
+| AB-012 | Durchschlag | Projektil durchdringt mehrere Gegner. | Ausgewählt |
 | AB-013 | Kettenblitz | Treffer springt auf nahe Gegner über. | Idee |
 | AB-014 | Nachbeben | Markierte Fläche explodiert nach kurzer Verzögerung. | Idee |
 | AB-015 | Klingenorbit | Kreisende Geschosse verletzen Gegner um den Spieler. | Idee |
@@ -62,7 +63,7 @@ Aktive Fähigkeiten verbrauchen den mystischen Run-Bestand gemäß [#52](https:/
 | ID | Name | Wirkungsvorschlag | Status |
 |---|---|---|---|
 | AB-016 | Durchbruch | Stürmt durch Gegner und verursacht beim Durchqueren Schaden. | Idee |
-| AB-017 | Rückstoßsprung | Springt rückwärts und stößt Gegner vor dem Spieler zurück. | Kandidat |
+| AB-017 | Rückstoßsprung | Springt rückwärts und stößt Gegner vor dem Spieler zurück. | Ausgewählt |
 | AB-018 | Zielsprung | Sprung zum Zielpunkt mit kleiner Druckwelle bei der Landung. | Idee |
 | AB-019 | Rückkehrpunkt | Setzt einen Marker; zweite Aktivierung bringt den Spieler dorthin zurück. | Idee |
 | AB-020 | Phasenschritt | Erlaubt kurzzeitig Bewegung durch Gegner und ihre Geschosse. | Idee |
@@ -71,7 +72,7 @@ Aktive Fähigkeiten verbrauchen den mystischen Run-Bestand gemäß [#52](https:/
 
 | ID | Name | Wirkungsvorschlag | Status |
 |---|---|---|---|
-| AB-021 | Sog | Zieht nahe Gegner zu einem gewählten Punkt. | Kandidat |
+| AB-021 | Sog | Zieht nahe Gegner zu einem gewählten Punkt. | Ausgewählt |
 | AB-022 | Fessel | Hält einen Gegner kurzzeitig fest; er kann weiterhin angreifen. | Idee |
 | AB-023 | Schockruf | Unterbricht vorbereitete Angriffe naher Gegner. | Idee |
 | AB-024 | Trägheitsfeld | Verlangsamt Bewegung und Angriffsvorbereitung in einer Zone. | Idee |
@@ -82,7 +83,7 @@ Aktive Fähigkeiten verbrauchen den mystischen Run-Bestand gemäß [#52](https:/
 | ID | Name | Wirkungsvorschlag | Status |
 |---|---|---|---|
 | AB-026 | Schutzmantel | Temporärer Schild absorbiert begrenzten Schaden. | Idee |
-| AB-027 | Vergeltung | Fängt einen Treffer ab und verstärkt den nächsten Waffenangriff. | Kandidat |
+| AB-027 | Vergeltung | Fängt einen Treffer ab und verstärkt den nächsten Waffenangriff. | Ausgewählt |
 | AB-028 | Spiegelwache | Kurzes Timingfenster reflektiert Geschosse. | Idee |
 | AB-029 | Standfest | Reduziert Schaden und verhindert Rückstoß bei langsamer Bewegung. | Idee |
 | AB-030 | Notreserve | Kurzzeitiger Schutz verhindert einmalig den nächsten tödlichen Treffer. | Idee |
@@ -123,10 +124,14 @@ Aktive Fähigkeiten verbrauchen den mystischen Run-Bestand gemäß [#52](https:/
 |---|---|---|---|
 | AB-046 | Geteilte Deckung | Eigener Schild; naher Partner erhält einen kleineren Schild. | Idee |
 | AB-047 | Rallye | Feld erhöht das Angriffstempo beider Spieler. | Idee |
-| AB-048 | Vorlage | Nächster Treffer öffnet eine Schwachstelle: Partner nutzt sie sofort, solo der nächste eigene Treffer. | Kandidat |
+| AB-048 | Vorlage | Nächster Treffer öffnet eine Schwachstelle: Partner nutzt sie sofort, solo der nächste eigene Treffer. | Ausgewählt |
 | AB-049 | Rettungsimpuls | Stößt Gegner zurück und heilt Spieler und nahen Partner geringfügig. | Idee |
 | AB-050 | Doppelstoß | Nächster Waffenangriff hat einen verzögerten zweiten Treffer; trifft der Partner vorher, erfolgt dieser sofort und stärker. | Idee |
 
 ## Verwandte Ideen
 
 Die zehn Ultimate-Vorschläge stehen im [Ultimate-Ideenpool](ULTIMATE-IDEAS.md). Auswahl und Ressourcenmodell werden separat in #13 entschieden; Integration folgt in #24. Sie gehören nicht automatisch zum Draft regulärer Fähigkeiten.
+
+## Spezifikationsentwurf
+
+Der [erste Fähigkeitenpool](../current/FIRST-ABILITY-POOL.md) konkretisiert die sechs Kandidaten mit Aktivierung, Wirkungsgrenzen, offenen Werten und Prüffällen. Auswahl und grundlegende Wirkungsregeln wurden am 04.10.2026 bestätigt; Balancewerte und ausdrücklich offene Grenzfälle bleiben zu klären.
