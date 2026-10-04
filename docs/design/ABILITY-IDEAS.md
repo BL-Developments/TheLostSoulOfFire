@@ -126,3 +126,7 @@ Aktive Fähigkeiten verbrauchen den mystischen Run-Bestand gemäß [#52](https:/
 | AB-048 | Vorlage | Nächster Treffer öffnet eine Schwachstelle: Partner nutzt sie sofort, solo der nächste eigene Treffer. | Kandidat |
 | AB-049 | Rettungsimpuls | Stößt Gegner zurück und heilt Spieler und nahen Partner geringfügig. | Idee |
 | AB-050 | Doppelstoß | Nächster Waffenangriff hat einen verzögerten zweiten Treffer; trifft der Partner vorher, erfolgt dieser sofort und stärker. | Idee |
+
+## Verwandte Ideen
+
+Die zehn Ultimate-Vorschläge stehen im [Ultimate-Ideenpool](ULTIMATE-IDEAS.md). Auswahl und Ressourcenmodell werden separat in #13 entschieden; Integration folgt in #24. Sie gehören nicht automatisch zum Draft regulärer Fähigkeiten.
