@@ -46,11 +46,15 @@ dotnet run --project src/TheLostSoulOfFire -- --dev --start arena --wave 3
 | `prologue:transit` | Prolog, Fahrt auf dem Skiff |
 | `hub` | Aschenvorhalle mit den Biom-Türen |
 | `arena` | Arena hinter Tür I; `--wave 1` bis `--wave 10` wählt die erste Welle |
+| `sandbox` | Sandbox: Arena ohne Wellen, Truhen und Währungen, nur über `--dev` erreichbar |
 
 Mit `--strength`, `--ability-power` und `--armor` (je 0 bis 99, Standard 10)
 lassen sich die Charakterwerte des Spielers setzen, etwa
 `-- --dev --start arena --strength 20 --armor 0`. Stärke skaliert die Sense,
 Fähigkeitsstärke die Seelenkanone, Rüstung verringert erlittenen Schaden.
+
+In der Sandbox setzt `R` nach einer Niederlage (oder `F8`) den Spieler in der
+Mitte zurück und räumt das Feld.
 
 Ungültige Angaben beenden das Programm mit einer Meldung und Exitcode 2. Die
 Debug-Tasten (`F1` Overlay, `F2`–`F4` Gegner, `F5` Resonance, `F6` Welle

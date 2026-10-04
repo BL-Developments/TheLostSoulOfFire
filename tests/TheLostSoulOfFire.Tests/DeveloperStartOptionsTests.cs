@@ -35,6 +35,8 @@ public sealed class DeveloperStartOptionsTests
     [DataRow("hub", DeveloperStartArea.Hub)]
     [DataRow("HUB", DeveloperStartArea.Hub)]
     [DataRow("arena", DeveloperStartArea.Arena)]
+    [DataRow("sandbox", DeveloperStartArea.Sandbox)]
+    [DataRow("Sandbox", DeveloperStartArea.Sandbox)]
     public void Start_MapsEveryArea(string name, DeveloperStartArea expected)
     {
         Assert.IsTrue(DeveloperStartOptions.TryParse(["--dev", "--start", name], out DeveloperStartOptions? options, out string? error), error);
@@ -70,6 +72,8 @@ public sealed class DeveloperStartOptionsTests
     [DataRow("--dev", "--start")]
     [DataRow("--dev", "--start", "--wave", "2")]
     [DataRow("--dev", "--start", "hub", "--wave", "2")]
+    [DataRow("--dev", "--start", "sandbox", "--wave", "2")]
+    [DataRow("--start", "sandbox")]
     [DataRow("--dev", "--wave", "2")]
     [DataRow("--dev", "--start", "arena", "--wave", "0")]
     [DataRow("--dev", "--start", "arena", "--wave", "11")]
@@ -128,5 +132,21 @@ public sealed class DeveloperStartOptionsTests
     {
         Assert.IsFalse(DeveloperStartOptions.TryParse(["--strength", "20"], out _, out string? error));
         StringAssert.Contains(error, "--dev");
+    }
+
+    [TestMethod]
+    public void Sandbox_DescribesWithoutWave_AndTakesAttributes()
+    {
+        Assert.IsTrue(DeveloperStartOptions.TryParse(["--dev", "--start", "sandbox"], out DeveloperStartOptions? options, out _));
+        Assert.AreEqual("DEV_START area=sandbox", options!.Describe());
+
+        Assert.IsTrue(DeveloperStartOptions.TryParse(["--dev", "--start", "sandbox", "--armor", "0"], out options, out _));
+        Assert.AreEqual("DEV_START area=sandbox strength=10 ability-power=10 armor=0", options!.Describe());
+    }
+
+    [TestMethod]
+    public void Usage_ListsSandbox()
+    {
+        StringAssert.Contains(DeveloperStartOptions.Usage, "sandbox");
     }
 }

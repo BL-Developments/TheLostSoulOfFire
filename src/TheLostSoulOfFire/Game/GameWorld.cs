@@ -587,7 +587,7 @@ public sealed partial class GameWorld : IDisposable
         _player.Health,
         GameBalance.PlayerMaxHealth,
         _player.Attributes,
-        _phase == GamePhase.Arena,
+        _phase == GamePhase.Arena && !_sandboxActive,
         _wallet.Run(Currency.Geld),
         _wallet.Secured(Currency.Geld),
         _wallet.Run(Currency.Glut),
@@ -933,7 +933,12 @@ public sealed partial class GameWorld : IDisposable
         }
         else
         {
-            if (_phase == GamePhase.Arena && _presentation.ShouldDrawCombatHud(_loopState, _player.IsDead))
+            if (_phase == GamePhase.Arena && _sandboxActive && !_player.IsDead)
+            {
+                _hud.Draw(batch, pixel, viewport, _player);
+                DrawSandboxHud(batch, pixel, viewport);
+            }
+            else if (_phase == GamePhase.Arena && _presentation.ShouldDrawCombatHud(_loopState, _player.IsDead))
             {
                 _hud.Draw(batch, pixel, viewport, _player);
                 DrawCurrencyHud(batch, pixel, viewport);
@@ -1192,6 +1197,10 @@ public sealed partial class GameWorld : IDisposable
         {
             RestartPrologueSector(viewport);
         }
+        else if (_sandboxActive)
+        {
+            ResetSandbox();
+        }
         else
         {
             ResetEncounter();
@@ -1377,6 +1386,7 @@ public sealed partial class GameWorld : IDisposable
         _soulSensePresentation.Reset();
         _audioTestFatalDamageRequested = false;
         _endingRevealPlayed = false;
+        _sandboxActive = false;
     }
 
     private void ConfigureBurningAggression(float deltaTime)
@@ -1423,6 +1433,11 @@ public sealed partial class GameWorld : IDisposable
 
     private void UpdateArenaLoop(float deltaTime)
     {
+        if (_sandboxActive)
+        {
+            return;
+        }
+
         switch (_loopState)
         {
             case ArenaLoopState.Intro:
@@ -1608,6 +1623,7 @@ public sealed partial class GameWorld : IDisposable
             return $"phase16_antechamber_door_{name}_{(door.IsSealed ? "sealed" : "open")}";
         }
         if (_phase == GamePhase.EnteringArena) return "phase16_entering_arena";
+        if (_sandboxActive) return _player.IsDead ? "sandbox_player_down" : "sandbox";
         if (_player.IsDead) return "phase05_player_down";
         if (_loopState == ArenaLoopState.Complete) return "phase15_soul_free";
         if (_loopState is ArenaLoopState.Intermission or ArenaLoopState.Transition) return $"phase12_wave_{_waveNumber}_clear";
