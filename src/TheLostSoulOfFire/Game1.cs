@@ -367,6 +367,12 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
             return;
         }
 
+        if (_world.LoopState == ArenaLoopState.Intermission)
+        {
+            _world.RequestAutomatedNextWave();
+            return;
+        }
+
         if (_world.LoopState == ArenaLoopState.Complete)
         {
             if (!_audioTestCompleteSeen)
@@ -495,11 +501,17 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
                 if (Once($"kill-{wave}", 0.65f)) _input.InjectKeyPress(Keys.F6);
                 if (wave == 1 && Once("spark-shot", 0.95f)) _screenshotRequested = true;
                 break;
-            case ArenaLoopState.Transition when wave is 1 or 2:
-                if (Once($"place-{wave}", 0.15f)) _world.PlaceAutomatedPlayerAtNewestChest();
-                if (wave == 1 && Once("chest-shot", 0.3f)) _screenshotRequested = true;
-                if (Once($"open-{wave}", 0.4f)) _input.InjectKeyPress(Keys.E);
-                if (wave == 1 && Once("open-shot", 0.55f)) _screenshotRequested = true;
+            case ArenaLoopState.Intermission:
+                if (wave is 1 or 2)
+                {
+                    if (Once($"place-{wave}", 0.15f)) _world.PlaceAutomatedPlayerAtNewestChest();
+                    if (wave == 1 && Once("chest-shot", 0.3f)) _screenshotRequested = true;
+                    if (Once($"open-{wave}", 0.4f)) _input.InjectKeyPress(Keys.E);
+                    if (wave == 1 && Once("open-shot", 0.55f)) _screenshotRequested = true;
+                }
+                if (Once($"to-centre-{wave}", 0.9f)) _world.PlaceAutomatedPlayerAtWaveTrigger();
+                if (wave == 1 && Once("trigger-shot", 1.05f)) _screenshotRequested = true;
+                if (Once($"next-{wave}", 1.8f)) _input.InjectKeyPress(Keys.E);
                 break;
             case ArenaLoopState.Complete:
                 if (Once("complete-shot", 2.2f)) _screenshotRequested = true;

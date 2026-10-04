@@ -106,6 +106,7 @@ public static class GameBalance
     public const float ChestInteractRadius = 70f;
     public const float ChestOpenDuration = 0.45f;
     public const float GlutSparkTravelTime = 0.6f;
+    public const float WaveTriggerRadius = 110f;
 
     public const float CannonDrawDuration = 0.16f;
     public const float CannonFullChargeTime = 1.2f;

@@ -95,16 +95,54 @@ public sealed partial class GameWorld
         return null;
     }
 
+    private bool PlayerAtWaveTrigger =>
+        _loopState == ArenaLoopState.Intermission &&
+        Vector2.DistanceSquared(_player.Position, _arena.CombatBounds.Center.ToVector2()) <= GameBalance.WaveTriggerRadius * GameBalance.WaveTriggerRadius;
+
+    internal void PlaceAutomatedPlayerAtWaveTrigger()
+    {
+        if (_phase == GamePhase.Arena && _loopState == ArenaLoopState.Intermission)
+        {
+            _player.Reset(_arena.CombatBounds.Center.ToVector2());
+        }
+    }
+
+    internal void RequestAutomatedNextWave()
+    {
+        if (_phase == GamePhase.Arena && _loopState == ArenaLoopState.Intermission)
+        {
+            StartNextWaveFromIntermission();
+        }
+    }
+
+    private void StartNextWaveFromIntermission()
+    {
+        _loopState = ArenaLoopState.Transition;
+        _presentation.BeginWaveTransition();
+        _particles.EmitDeathFlame(_arena.CombatBounds.Center.ToVector2(), 18, 1f);
+    }
+
     private void UpdateCurrency(float deltaTime, InputState input)
     {
         _geldPulse = MathF.Max(0f, _geldPulse - deltaTime);
         _glutPulse = MathF.Max(0f, _glutPulse - deltaTime);
 
-        if (_phase == GamePhase.Arena && input.WasKeyPressed(Keys.E) && ChestInReach() is { } chest && chest.TryOpen())
+        if (_phase == GamePhase.Arena && input.WasKeyPressed(Keys.E))
         {
-            _wallet.Credit(Currency.Geld, GameBalance.ChestGeld);
-            _geldPulse = CurrencyPulseDuration;
-            _particles.EmitBurst(chest.Position, -Vector2.UnitY, 18, GameBalance.Geld, 180f, 5f);
+            // A chest in reach wins over the wave trigger, so E never starts a wave by accident.
+            if (ChestInReach() is { } chest)
+            {
+                if (chest.TryOpen())
+                {
+                    _wallet.Credit(Currency.Geld, GameBalance.ChestGeld);
+                    _geldPulse = CurrencyPulseDuration;
+                    _particles.EmitBurst(chest.Position, -Vector2.UnitY, 18, GameBalance.Geld, 180f, 5f);
+                }
+            }
+            else if (PlayerAtWaveTrigger)
+            {
+                StartNextWaveFromIntermission();
+            }
         }
 
         foreach (ArenaChest arenaChest in _chests) arenaChest.Update(deltaTime);
@@ -155,6 +193,14 @@ public sealed partial class GameWorld
         if (ChestInReach() is not null && CombatActionsEnabled)
         {
             DrawCenteredPrompt(batch, pixel, viewport, "E  KISTE ÖFFNEN", GameBalance.Geld);
+        }
+        else if (PlayerAtWaveTrigger && CombatActionsEnabled)
+        {
+            DrawCenteredPrompt(batch, pixel, viewport, _waveNumber + 1 >= LastWave ? "E  LETZTE WELLE STARTEN" : $"E  WELLE {CinematicPresentation.ToRoman(_waveNumber + 1)} STARTEN", GameBalance.DeathFlame);
+        }
+        else if (_loopState == ArenaLoopState.Intermission && CombatActionsEnabled)
+        {
+            PixelText.DrawCentered(batch, pixel, "WELLE GELEERT · IN DER MITTE GEHT ES WEITER", viewport.Width * 0.5f, viewport.Height - 130f, 1, GameBalance.DeathFlameBright * 0.7f);
         }
     }
 

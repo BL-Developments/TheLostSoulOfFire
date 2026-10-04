@@ -29,6 +29,8 @@ public enum ArenaLoopState
 {
     Intro,
     Combat,
+    /// <summary>Pause after a cleared wave; the player starts the next one at the arena centre.</summary>
+    Intermission,
     Transition,
     Complete
 }
@@ -95,7 +97,7 @@ public sealed partial class GameWorld : IDisposable
     public bool PlayerDead => _player.IsDead;
     public bool QuitRequested { get; private set; }
     public bool CombatActionsEnabled => GameFlowRules.AllowsCombat(_phase) &&
-        !_player.IsDead && _loopState is ArenaLoopState.Combat or ArenaLoopState.Transition;
+        !_player.IsDead && _loopState is ArenaLoopState.Combat or ArenaLoopState.Intermission or ArenaLoopState.Transition;
 
     private float DoorTransitionProgress => _phase == GamePhase.EnteringArena
         ? MathHelper.Clamp(_phaseTime / DoorTransitionDuration, 0f, 1f)
@@ -1348,9 +1350,8 @@ public sealed partial class GameWorld : IDisposable
                     }
                     else
                     {
-                        _loopState = ArenaLoopState.Transition;
+                        _loopState = ArenaLoopState.Intermission;
                         SpawnChestAfterWave(_waveNumber);
-                        _presentation.BeginWaveTransition();
                         _particles.EmitDeathFlame(_arena.CombatBounds.Center.ToVector2(), 12, 0.8f);
                     }
                 }
@@ -1369,6 +1370,14 @@ public sealed partial class GameWorld : IDisposable
             {
                 batch.DrawLine(pixel, new Vector2(x, gate.Top - 17), new Vector2(x, gate.Bottom + 17), GameBalance.StoneColor, 7f);
             }
+        }
+
+        if (_loopState == ArenaLoopState.Intermission)
+        {
+            float pulse = 0.5f + 0.5f * MathF.Sin(_presentationTime * 3f);
+            Vector2 center = _arena.CombatBounds.Center.ToVector2();
+            batch.DrawCircle(pixel, center, GameBalance.WaveTriggerRadius, GameBalance.DeathFlameBright * (0.22f + pulse * 0.22f), 4f, 48);
+            batch.DrawCircle(pixel, center, GameBalance.WaveTriggerRadius * 0.55f, GameBalance.DeathFlame * (0.14f + pulse * 0.14f), 3f, 36);
         }
 
         if (_loopState is ArenaLoopState.Intro or ArenaLoopState.Transition)
@@ -1482,7 +1491,7 @@ public sealed partial class GameWorld : IDisposable
         if (_phase == GamePhase.EnteringArena) return "phase16_entering_arena";
         if (_player.IsDead) return "phase05_player_down";
         if (_loopState == ArenaLoopState.Complete) return "phase15_soul_free";
-        if (_loopState == ArenaLoopState.Transition) return $"phase12_wave_{_waveNumber}_clear";
+        if (_loopState is ArenaLoopState.Intermission or ArenaLoopState.Transition) return $"phase12_wave_{_waveNumber}_clear";
         if (_loopState == ArenaLoopState.Intro) return "phase12_arena_intro";
         if (_player.ResonanceActive) return "phase11_resonance_active";
         if (_player.IsResonanceReady) return "phase11_resonance_ready";

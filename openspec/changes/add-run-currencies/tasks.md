@@ -14,6 +14,7 @@
 - [x] 3.2 Run-Grenzen anbinden: `BeginRun` in `EnterArena`, `ResetEncounter` und Developer-Arena-Start, `LoseRun` beim Spielertod, `SecureAllRun` plus Profilspeichern beim Wechsel nach `Complete`; Profil in `Game1`/`GameWorld` beim Start laden.
 - [x] 3.3 Kisten nach den Wellen 1 bis 3 mit Interaktionszone, `E`-Aufforderung, einmaliger Geldgutschrift und Entfernen nach dem Öffnen; ungeöffnete verfallen beim Run-Ende.
 - [x] 3.4 Automatisierte Testläufe (`--audio-*-test`, `--antechamber-visual-test`, neu `--currency-visual-test`) auf ein Profil im Temp-Verzeichnis umstellen, das beim Beenden gelöscht wird.
+- [x] 3.5 Pause `Intermission` nach den Wellen 1 bis 3 mit Auslösezone in der Arenamitte; `E` startet die nächste Welle, Kisten haben Vorrang; automatisierte Läufe lösen die Welle selbst aus.
 
 ## 4. Darstellung
 
@@ -24,4 +25,4 @@
 ## 5. Gesamtabnahme
 
 - [x] 5.1 `openspec validate add-run-currencies --strict` und `dotnet test` erfolgreich ausführen.
-- [x] 5.2 Manuell anspielen mit `dotnet run --project src/TheLostSoulOfFire -- --dev --start arena` (Glut beim Besiegen, Kisten nach den Wellen 1 bis 3 und ihr Verschwinden, Tod leert den Run-Bestand, Abschluss sichert) und danach `dotnet run --project src/TheLostSoulOfFire -- --dev --start hub` (gesicherte Bestände nach Neustart sichtbar).
+- [x] 5.2 Manuell anspielen mit `dotnet run --project src/TheLostSoulOfFire -- --dev --start arena` (Glut beim Besiegen, Kisten nach den Wellen 1 bis 3 und ihr Verschwinden, Pause und Wellenstart mit `E` in der Mitte, Tod leert den Run-Bestand, Abschluss sichert) und danach `dotnet run --project src/TheLostSoulOfFire -- --dev --start hub` (gesicherte Bestände nach Neustart sichtbar).
