@@ -19,6 +19,7 @@ public sealed class TrainingDummy : Enemy
     private readonly Vector2 _anchor;
     private readonly List<DamageNumber> _numbers = [];
     private float _sinceLastHit;
+    private int _hitCount;
 
     public TrainingDummy(Vector2 position)
         : base(position, GameBalance.TrainingDummyMaxHealth, GameBalance.TrainingDummyRadius)
@@ -46,7 +47,7 @@ public sealed class TrainingDummy : Enemy
         LastHit = damage.Damage;
         DamageSinceRefill += damage.Damage;
         _sinceLastHit = 0f;
-        _numbers.Add(new DamageNumber(damage.Damage, damage.IsSoulCoreHit, _numbers.Count % 3));
+        _numbers.Add(new DamageNumber(damage.Damage, damage.IsSoulCoreHit, _hitCount++ % 3));
         // The bar drops but stops at 1, so the dummy stays on the field; knockback does not move it.
         base.ApplyDamage(damage with { Damage = Math.Min(damage.Damage, Health - 1), Knockback = Vector2.Zero });
     }
