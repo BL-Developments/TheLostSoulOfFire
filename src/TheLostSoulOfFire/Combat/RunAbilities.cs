@@ -42,19 +42,20 @@ public sealed class RunAbilities
         return true;
     }
 
+    /// <param name="chargeCost">False in the sandbox: every check still applies, only the Glut is not charged.</param>
     public bool TryCast(RunAbility ability, Player player, CurrencyWallet wallet, Vector2 target,
-        Rectangle bounds, IReadOnlyList<Enemy> enemies, ParticleSystem particles)
+        Rectangle bounds, IReadOnlyList<Enemy> enemies, ParticleSystem particles, bool chargeCost = true)
     {
         AbilityDefinition definition = Definitions[(int)ability];
         if (player.IsDead) return Reject("NICHT HANDLUNGSFAEHIG");
         if (Cooldown(ability) > 0) return Reject("NOCH NICHT BEREIT");
-        if (ability == RunAbility.SecondWind && player.Health >= GameBalance.PlayerMaxHealth)
+        if (ability == RunAbility.SecondWind && player.Health >= player.MaxHealth)
             return Reject("LEBEN BEREITS VOLL");
         if (ability == RunAbility.Retreat && player.IsDashing) return Reject("AUSWEICHEN AKTIV");
         Vector2 destination = Clamp(player.Position - player.FacingDirection * 180f, bounds, player.Radius);
         if (ability == RunAbility.Retreat && Vector2.DistanceSquared(destination, player.Position) < 16f)
             return Reject("WEG BLOCKIERT");
-        if (!wallet.TrySpendRun(Currency.Glut, definition.Cost)) return Reject("NICHT GENUG GLUT");
+        if (chargeCost && !wallet.TrySpendRun(Currency.Glut, definition.Cost)) return Reject("NICHT GENUG GLUT");
 
         _cooldowns[(int)ability] = definition.Cooldown;
         Feedback = definition.Name;

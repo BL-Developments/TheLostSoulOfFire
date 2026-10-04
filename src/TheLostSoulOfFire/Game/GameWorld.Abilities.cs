@@ -32,8 +32,9 @@ public sealed partial class GameWorld
         }
     }
 
-    private bool CanChooseAbilities => !_pauseMenu.IsOpen && !_characterMenu.IsOpen && !_player.IsDead && (_phase == GamePhase.Antechamber ||
-        _phase == GamePhase.Arena && _loopState is ArenaLoopState.Intermission or ArenaLoopState.Intro);
+    /// <summary>The sandbox has no intermission, so there the selection is open during combat as well.</summary>
+    private bool CanChooseAbilities => !_pauseMenu.IsOpen && !_characterMenu.IsOpen && !_devMenu.IsOpen && !_player.IsDead && (_phase == GamePhase.Antechamber ||
+        _phase == GamePhase.Arena && (_sandboxActive || _loopState is ArenaLoopState.Intermission or ArenaLoopState.Intro));
 
     private bool HandleAbilitySelection(InputState input)
     {
@@ -65,10 +66,11 @@ public sealed partial class GameWorld
         if (_loopState != ArenaLoopState.Combat) { _abilities.Clear(_player); return; }
         _abilities.Update(dt, _player, ActiveCombatBounds, _enemies, _particles, ApplyEnemyDamage);
         if (!CombatActionsEnabled || _player.IsDead) return;
+        // The sandbox has no Glut; casting there is free, cooldowns still apply.
         if (input.WasKeyPressed(Keys.Z)) _abilities.TryCast(_abilities.Slots[0], _player, _wallet,
-            _lastMouseWorld, ActiveCombatBounds, _enemies, _particles);
+            _lastMouseWorld, ActiveCombatBounds, _enemies, _particles, chargeCost: !_sandboxActive);
         if (input.WasKeyPressed(Keys.X)) _abilities.TryCast(_abilities.Slots[1], _player, _wallet,
-            _lastMouseWorld, ActiveCombatBounds, _enemies, _particles);
+            _lastMouseWorld, ActiveCombatBounds, _enemies, _particles, chargeCost: !_sandboxActive);
     }
 
     private void DrawAbilityWorld(SpriteBatch batch, Texture2D pixel)
@@ -106,11 +108,12 @@ public sealed partial class GameWorld
             RunAbility ability = _abilities.Slots[slot];
             AbilityDefinition definition = RunAbilities.Definitions[(int)ability];
             float cooldown = _abilities.Cooldown(ability);
-            bool affordable = _wallet.Run(Currency.Glut) >= definition.Cost;
+            bool affordable = _sandboxActive || _wallet.Run(Currency.Glut) >= definition.Cost;
             int x = 24 + slot * 300;
             Rectangle panel = new(x, viewport.Height - 105, 288, 40);
             batch.FillRectangle(pixel, panel, Color.Black * 0.8f);
-            string label = $"{(slot == 0 ? "Z" : "X")}  {definition.Name}  {definition.Cost} GLUT";
+            string cost = _sandboxActive ? "FREI" : $"{definition.Cost} GLUT";
+            string label = $"{(slot == 0 ? "Z" : "X")}  {definition.Name}  {cost}";
             PixelText.Draw(batch, pixel, label, new Vector2(x + 10, panel.Y + 7), 1,
                 affordable ? GameBalance.DeathFlameBright : Color.Gray);
             string state = cooldown > 0 ? $"BEREIT IN {cooldown:0.0}S" :
@@ -132,7 +135,8 @@ public sealed partial class GameWorld
             AbilityDefinition definition = RunAbilities.Definitions[i];
             int y = 210 + i * 62;
             bool selected = Array.IndexOf(_abilities.Slots, (RunAbility)i) >= 0;
-            PixelText.Draw(batch, pixel, $"{i + 1}  {definition.Name}   {definition.Cost} GLUT{(selected ? "  AUSGERUESTET" : "")}",
+            string cost = _sandboxActive ? "FREI" : $"{definition.Cost} GLUT";
+            PixelText.Draw(batch, pixel, $"{i + 1}  {definition.Name}   {cost}{(selected ? "  AUSGERUESTET" : "")}",
                 new Vector2(260, y), 2, selected ? GameBalance.GlutBright : GameBalance.DeathFlameBright);
             PixelText.Draw(batch, pixel, definition.Description, new Vector2(260, y + 26), 1, GameBalance.SoulWhite * 0.8f);
         }
