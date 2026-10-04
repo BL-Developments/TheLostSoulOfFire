@@ -350,7 +350,7 @@ public sealed class CinematicPresentation
     /// Character menu over the frozen world: the pause menu's veil, letterbox and rule,
     /// with the tab bar in place of the heading and the selected tab's page below it.
     /// </summary>
-    public void DrawCharacterMenu(SpriteBatch batch, Texture2D pixel, Viewport viewport, CharacterMenu menu, CharacterSheet sheet)
+    public void DrawCharacterMenu(SpriteBatch batch, Texture2D pixel, Viewport viewport, CharacterMenu menu, CharacterSheet sheet, IReadOnlyList<AbilityCard> abilities, bool canChooseAbilities)
     {
         float reveal = Ease(menu.OpenTimer / MenuController.RevealDuration);
         batch.FillRectangle(pixel, viewport.Bounds, Color.Black * (PauseVeilAlpha * reveal));
@@ -361,6 +361,10 @@ public sealed class CinematicPresentation
         if (menu.SelectedTab == CharacterMenuTab.Character)
         {
             DrawCharacterPage(batch, pixel, viewport, sheet, reveal);
+        }
+        else if (menu.SelectedTab == CharacterMenuTab.Abilities)
+        {
+            AbilityPresentation.DrawCatalogue(batch, pixel, viewport, abilities, canChooseAbilities, menu.SelectedSkillSlot, menu.SkillFeedback, reveal);
         }
         else
         {
