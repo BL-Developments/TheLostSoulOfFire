@@ -42,22 +42,22 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.OPENSPEC_ARCHIVE_TOKEN || github.token }}
 
-      - name: Find OpenSpec changes touched by the pull request
+      - name: Read OpenSpec changes marked in the pull request description
         id: changes
         env:
-          GH_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_BODY: ${{ github.event.pull_request.body }}
           INPUT_CHANGE: ${{ inputs.change }}
         run: |
+          # Im PR-Text markiert eine Zeile "OpenSpec-Archive: <name> [<name> ...]"
+          # die Changes, die nach dem Merge archiviert werden sollen.
           if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
             changes="$INPUT_CHANGE"
           else
-            changes="$(gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/files" \
-                --jq '.[] | .filename, (.previous_filename // empty)' \
-              | sed -nE 's#^openspec/changes/([^/]+)/.*#\1#p' \
-              | grep -vx 'archive' | sort -u | tr '\n' ' ' || true)"
+            changes="$(printf '%s\n' "$PR_BODY" | tr -d '\r' \
+              | sed -nE 's/^[[:space:]]*OpenSpec-Archive:[[:space:]]*(.*)$/\1/Ip' \
+              | tr -d '`' | tr -s ', \t' '\n' | sed '/^$/d' | sort -u | tr '\n' ' ' || true)"
           fi
-          echo "Betroffene Changes: ${changes:-keine}"
+          echo "Markierte Changes: ${changes:-keine}"
           {
             echo "changes<<EOF_CHANGES"
             echo "$changes"

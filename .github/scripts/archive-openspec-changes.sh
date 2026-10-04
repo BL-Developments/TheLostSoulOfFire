@@ -21,7 +21,7 @@ summary() {
 echo "## OpenSpec-Archivierung" >> "$SUMMARY_FILE"
 
 if [ -z "${CHANGES//[[:space:]]/}" ]; then
-  summary "Keine OpenSpec-Changes betroffen, nichts zu tun."
+  summary "Keine Zeile \`OpenSpec-Archive:\` im PR-Text, nichts zu archivieren."
   exit 0
 fi
 
