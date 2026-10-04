@@ -52,6 +52,8 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     private int _windowedWidth = GameBalance.BackBufferWidth;
     private int _windowedHeight = GameBalance.BackBufferHeight;
     private int _antechamberVisualStage;
+    private float _antechamberEntryTime;
+    private bool _antechamberEntryCaptured;
 
     public Game1(
         bool audioGameplayTest = false,
@@ -164,9 +166,9 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         {
             FinishAutomatedTestFrame();
         }
-        else if (_antechamberVisualTest && _antechamberVisualStage >= 3 && _audioTestTotalTime >= 2.9f)
+        else if (_antechamberVisualTest && _antechamberEntryCaptured && _antechamberEntryTime >= 0.8f)
         {
-            Console.WriteLine("ANTECHAMBER_VISUAL_TEST_PASS normal=true soulSense=true");
+            Console.WriteLine("ANTECHAMBER_VISUAL_TEST_PASS normal=true soulSense=true sealedDoor=true finalDoor=true doorI=true entry=true");
             Environment.ExitCode = 0;
             Exit();
         }
@@ -364,25 +366,42 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
             return;
         }
 
+        if (_world.Phase == GamePhase.EnteringArena)
+        {
+            _antechamberEntryTime += deltaTime;
+            if (!_antechamberEntryCaptured && _antechamberEntryTime >= 0.6f)
+            {
+                _screenshotRequested = true;
+                _antechamberEntryCaptured = true;
+            }
+            return;
+        }
+
         if (_world.Phase != GamePhase.Antechamber)
         {
             return;
         }
 
-        if (_antechamberVisualStage == 0 && _audioTestTotalTime >= 1f)
+        // Each step waits for its time mark, then either acts on the hub or requests a capture:
+        // hub, Soul Sense, sealed biome door II, sealed final door, open door I, entry into door I.
+        (float At, Action Act)[] steps =
+        [
+            (1f, () => _screenshotRequested = true),
+            (1.7f, () => _world.SetAutomatedSoulSense(true)),
+            (2.7f, () => _screenshotRequested = true),
+            (2.9f, () => { _world.SetAutomatedSoulSense(false); _world.PlaceAutomatedPlayerAtDoor(1); }),
+            (3.9f, () => _screenshotRequested = true),
+            (4.0f, () => _world.PlaceAutomatedPlayerAtDoor(3)),
+            (4.6f, () => _screenshotRequested = true),
+            (4.7f, () => _world.PlaceAutomatedPlayerAtDoor(0)),
+            (5.3f, () => _screenshotRequested = true),
+            (5.4f, () => _world.RequestAutomatedDoorEntry()),
+        ];
+
+        if (_antechamberVisualStage < steps.Length && _audioTestTotalTime >= steps[_antechamberVisualStage].At)
         {
-            _screenshotRequested = true;
-            _antechamberVisualStage = 1;
-        }
-        else if (_antechamberVisualStage == 1 && _audioTestTotalTime >= 1.7f)
-        {
-            _world.SetAutomatedSoulSense(true);
-            _antechamberVisualStage = 2;
-        }
-        else if (_antechamberVisualStage == 2 && _audioTestTotalTime >= 2.7f)
-        {
-            _screenshotRequested = true;
-            _antechamberVisualStage = 3;
+            steps[_antechamberVisualStage].Act();
+            _antechamberVisualStage++;
         }
     }
 

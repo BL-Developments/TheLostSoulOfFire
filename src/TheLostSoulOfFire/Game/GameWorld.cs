@@ -631,6 +631,14 @@ public sealed partial class GameWorld : IDisposable
 
     internal void SetAutomatedSoulSense(bool active) => _forceSoulSense = active;
 
+    internal void PlaceAutomatedPlayerAtDoor(int doorIndex)
+    {
+        if (_phase == GamePhase.Antechamber)
+        {
+            _player.Reset(_antechamber.Doors[doorIndex].InteractionZone.Center.ToVector2());
+        }
+    }
+
     internal void RequestAutomatedDoorEntry()
     {
         if (_phase == GamePhase.Antechamber)
@@ -1441,7 +1449,14 @@ public sealed partial class GameWorld : IDisposable
         if (_pauseMenu.IsOpen) return $"phase15_pause_{_pauseMenu.CurrentPage.Id}";
         if (_phase == GamePhase.Title) return _menu.IsOpen ? $"phase15_menu_{_menu.CurrentPage.Id}" : "phase15_title";
         if (_phase == GamePhase.Prologue) return $"prologue_{_prologue.Stage.ToString().ToLowerInvariant()}";
-        if (_phase == GamePhase.Antechamber) return _player.SoulSenseActive ? "phase16_antechamber_soul_sense" : "phase16_antechamber";
+        if (_phase == GamePhase.Antechamber)
+        {
+            if (_player.SoulSenseActive) return "phase16_antechamber_soul_sense";
+            HubDoor? door = _antechamber.DoorAt(_player.Position);
+            if (door is null) return "phase16_antechamber";
+            string name = door.Kind == HubDoorKind.Final ? "final" : door.Numeral.ToLowerInvariant();
+            return $"phase16_antechamber_door_{name}_{(door.IsSealed ? "sealed" : "open")}";
+        }
         if (_phase == GamePhase.EnteringArena) return "phase16_entering_arena";
         if (_player.IsDead) return "phase05_player_down";
         if (_loopState == ArenaLoopState.Complete) return "phase15_soul_free";
