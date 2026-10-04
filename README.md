@@ -59,7 +59,9 @@ schließt es wieder. `W`/`S` wählen einen Eintrag, `A`/`D` ändern einen Wert
 (mit Umschalt in großen Schritten), `Enter` führt eine Aktion aus. Im
 Abschnitt Charakter lassen sich Leben (1 bis 999), Stärke, Fähigkeitsstärke und
 Rüstung setzen; `ZURÜCKSETZEN` stellt die Werte vom Sandbox-Start wieder her. Im
-Abschnitt Gegner spawnt jeder Eintrag einen Gegner dieses Typs in Sichtweite;
+Abschnitt Gegner spawnt jeder Eintrag einen Gegner dieses Typs in Sichtweite,
+darunter die `TRAININGSPUPPE`: Sie steht still, greift nicht an, zeigt jeden
+Treffer und die Schadenssumme und füllt sich nach 2,5 Sekunden ohne Treffer auf;
 `ALLE GEGNER ENTFERNEN` räumt das Feld.
 
 Ungültige Angaben beenden das Programm mit einer Meldung und Exitcode 2. Die

@@ -24,8 +24,6 @@ public sealed partial class GameWorld
     private PlayerAttributes _sandboxStartAttributes = PlayerAttributes.Default;
     private int _sandboxSpawnCount;
 
-    public bool IsSandbox => _sandboxActive;
-
     private void BeginSandbox(Viewport viewport)
     {
         ClearRunState();

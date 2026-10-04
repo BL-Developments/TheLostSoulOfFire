@@ -12,7 +12,8 @@ public enum SandboxEnemyKind
 {
     Hollow,
     Burning,
-    Devourer
+    Devourer,
+    TrainingDummy
 }
 
 /// <summary>Creates sandbox enemies and picks where they appear; free of game state so it is testable.</summary>
@@ -37,28 +38,32 @@ public static class SandboxSpawner
     {
         SandboxEnemyKind.Hollow => "HOLLOW",
         SandboxEnemyKind.Burning => "BURNING",
-        _ => "DEVOURER"
+        SandboxEnemyKind.Devourer => "DEVOURER",
+        _ => "TRAININGSPUPPE"
     };
 
     public static float Radius(SandboxEnemyKind kind) => kind switch
     {
         SandboxEnemyKind.Hollow => GameBalance.HollowRadius,
         SandboxEnemyKind.Burning => GameBalance.BurningRadius,
-        _ => GameBalance.DevourerRadius
+        SandboxEnemyKind.Devourer => GameBalance.DevourerRadius,
+        _ => GameBalance.TrainingDummyRadius
     };
 
     public static bool IsKind(Enemy enemy, SandboxEnemyKind kind) => kind switch
     {
         SandboxEnemyKind.Hollow => enemy is Hollow,
         SandboxEnemyKind.Burning => enemy is Burning,
-        _ => enemy is Devourer
+        SandboxEnemyKind.Devourer => enemy is Devourer,
+        _ => enemy is TrainingDummy
     };
 
     public static Enemy Create(SandboxEnemyKind kind, Vector2 position, int seed) => kind switch
     {
         SandboxEnemyKind.Hollow => new Hollow(position, seed),
         SandboxEnemyKind.Burning => new Burning(position, seed),
-        _ => new Devourer(position)
+        SandboxEnemyKind.Devourer => new Devourer(position),
+        _ => new TrainingDummy(position)
     };
 
     /// <summary>
