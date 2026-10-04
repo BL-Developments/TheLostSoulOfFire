@@ -54,7 +54,9 @@ lassen sich die Charakterwerte des Spielers setzen, etwa
 Fähigkeitsstärke die Seelenkanone, Rüstung verringert erlittenen Schaden.
 
 In der Sandbox setzt `R` nach einer Niederlage (oder `F8`) den Spieler in der
-Mitte zurück und räumt das Feld.
+Mitte zurück und räumt das Feld. `F` öffnet dort das Dev-Menü; `F` oder `Escape`
+schließt es wieder. `W`/`S` wählen einen Eintrag, `A`/`D` ändern einen Wert
+(mit Umschalt in großen Schritten), `Enter` führt eine Aktion aus.
 
 Ungültige Angaben beenden das Programm mit einer Meldung und Exitcode 2. Die
 Debug-Tasten (`F1` Overlay, `F2`–`F4` Gegner, `F5` Resonance, `F6` Welle

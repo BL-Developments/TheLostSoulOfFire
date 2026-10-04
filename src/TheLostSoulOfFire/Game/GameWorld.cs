@@ -90,8 +90,8 @@ public sealed partial class GameWorld : IDisposable
     public string ScreenshotContext => GetScreenshotContext();
     public GamePhase Phase => _phase;
     internal PrologueStage PrologueStage => _prologue.Stage;
-    /// <summary>Pause or character menu is open; the world is frozen under either.</summary>
-    private bool IsGamePaused => _pauseMenu.IsOpen || _characterMenu.IsOpen;
+    /// <summary>Pause, character or dev menu is open; the world is frozen under each of them.</summary>
+    private bool IsGamePaused => _pauseMenu.IsOpen || _characterMenu.IsOpen || _devMenu.IsOpen;
     private bool IsCombatPhase => _phase is GamePhase.Arena or GamePhase.Prologue;
     private Rectangle ActiveCombatBounds => _phase == GamePhase.Prologue ? _prologue.MovementBounds : _arena.CombatBounds;
     private Rectangle ActiveWorldBounds => _phase == GamePhase.Prologue ? PrologueDirector.WorldBounds : _arena.Bounds;
@@ -138,6 +138,13 @@ public sealed partial class GameWorld : IDisposable
     public void Update(GameTime gameTime, InputState input, Viewport viewport)
     {
         float deltaTime = MathF.Min((float)gameTime.ElapsedGameTime.TotalSeconds, 1f / 20f);
+        if (_devMenu.IsOpen)
+        {
+            _audio.Update(deltaTime);
+            UpdateDevMenu(deltaTime, input);
+            return;
+        }
+
         if (_characterMenu.IsOpen)
         {
             // Same freeze as the pause menu: only the menu and the audio mix advance.
@@ -165,6 +172,13 @@ public sealed partial class GameWorld : IDisposable
         if (_phase != GamePhase.Title && input.WasKeyPressed(Keys.Tab))
         {
             _characterMenu.Open();
+            _audio.SetPaused(true);
+            return;
+        }
+
+        if (_sandboxActive && input.WasKeyPressed(Keys.F))
+        {
+            _devMenu.Open();
             _audio.SetPaused(true);
             return;
         }
@@ -981,6 +995,11 @@ public sealed partial class GameWorld : IDisposable
             _presentation.DrawCharacterMenu(batch, pixel, viewport, _characterMenu, CurrentCharacterSheet);
         }
 
+        if (_devMenu.IsOpen)
+        {
+            DrawDevMenu(batch, pixel, viewport);
+        }
+
         batch.End();
     }
 
@@ -1611,6 +1630,7 @@ public sealed partial class GameWorld : IDisposable
     private string GetScreenshotContext()
     {
         if (_pauseMenu.IsOpen) return $"phase15_pause_{_pauseMenu.CurrentPage.Id}";
+        if (_devMenu.IsOpen) return "sandbox_dev_menu";
         if (_characterMenu.IsOpen) return $"character_{_characterMenu.SelectedTab.ToString().ToLowerInvariant()}";
         if (_phase == GamePhase.Title) return _menu.IsOpen ? $"phase15_menu_{_menu.CurrentPage.Id}" : "phase15_title";
         if (_phase == GamePhase.Prologue) return $"prologue_{_prologue.Stage.ToString().ToLowerInvariant()}";
