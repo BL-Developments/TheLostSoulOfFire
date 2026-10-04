@@ -55,6 +55,7 @@ public sealed class Player
     public float ResonanceActivationRemaining => _resonanceActivationTimer;
     public bool SoulSenseActive { get; private set; }
     public PlayerAttributes Attributes { get; set; } = PlayerAttributes.Default;
+    public AbilityEffects AbilityEffects { get; } = new();
     public ScytheCombat Scythe { get; } = new();
     public SoulCannon Cannon { get; } = new();
 
@@ -84,6 +85,7 @@ public sealed class Player
         _activeDashDistance = GameBalance.DashDistance;
         SoulSenseActive = false;
         _afterimages.Clear();
+        AbilityEffects.Clear();
         Scythe.Reset();
         Cannon.Reset();
     }
@@ -101,6 +103,7 @@ public sealed class Player
         _resonanceAfterimageTimer = 0f;
         SoulSenseActive = false;
         _afterimages.Clear();
+        AbilityEffects.Clear();
         Scythe.Reset();
         Cannon.Reset();
     }
@@ -115,6 +118,8 @@ public sealed class Player
         bool forceSoulSense = false,
         bool combatEnabled = true)
     {
+        AbilityEffects.Update(deltaTime);
+        if (IsDead) AbilityEffects.Clear();
         _visualTime += deltaTime;
         _resonanceActivationTimer = MathF.Max(0f, _resonanceActivationTimer - deltaTime);
         HitFlashRemaining = MathF.Max(0f, HitFlashRemaining - deltaTime);
@@ -175,6 +180,7 @@ public sealed class Player
         }
         else
         {
+            AbilityEffects.Clear();
             Scythe.Reset();
             Cannon.Reset();
             _attackImpulse = Vector2.Zero;
@@ -333,14 +339,33 @@ public sealed class Player
             return;
         }
 
+        if (damage <= 0) return;
+        if (!ignoreArmor && AbilityEffects.TryBlock())
+        {
+            InvulnerabilityRemaining = 0.12f;
+            screenEffects.Flash(0.08f, 0.15f);
+            return;
+        }
         int taken = ignoreArmor ? damage : Attributes.MitigateIncomingDamage(damage);
         Health = Math.Max(0, Health - taken);
+        if (IsDead) AbilityEffects.Clear();
         HitFlashRemaining = Health == 0 ? 0.24f : 0.14f;
         _damageKnockback += knockback;
         InvulnerabilityRemaining = 0.5f;
         screenEffects.BeginHitstop(Health == 0 ? 0.12f : 0.045f);
         screenEffects.AddShake(Health == 0 ? 0.28f : 0.12f, Health == 0 ? 9f : 5f);
         screenEffects.Flash(0.09f, Health == 0 ? 0.34f : 0.2f);
+    }
+
+    public void Heal(int amount)
+    {
+        if (!IsDead && amount > 0) Health = Math.Min(GameBalance.PlayerMaxHealth, Health + amount);
+    }
+
+    public void MoveByAbility(Vector2 offset, Rectangle bounds)
+    {
+        if (IsDead) return;
+        Position = RunAbilities.Clamp(Position + offset, bounds, Radius);
     }
 
     public void AddResonance(float amount)
