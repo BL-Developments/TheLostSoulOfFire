@@ -22,7 +22,7 @@ Björn möchte zehn Wellen; spätere Wellen sollen mehr Gegner bringen und sie �
 
 ## Decisions
 
-**Wellentabelle in `GameBalance`.** Eine Welle ist eine Liste von Schüben, ein Schub zählt Hollow, Burning und Devourer. Die Tabelle steht als `GameBalance.ArenaWaves` (z. B. `ArenaWave[]` mit `ArenaPush(int Hollow, int Burning, int Devourer)`), damit Balance an einer Stelle bleibt. `GameBalance.ArenaWaveCount` leitet sich aus der Tabelle ab und ersetzt alle verstreuten `4`.
+**Wellentabelle in `GameBalance`.** Eine Welle ist eine Liste von Schüben, ein Schub zählt Hollow, Burning und Devourer. Die Tabelle steht als `GameBalance.ArenaWaves` (z. B. `ArenaPush[][]` mit `ArenaPush(int Hollow, int Burning, int Devourer)`), damit Balance an einer Stelle bleibt. `GameBalance.ArenaWaveCount` leitet sich aus der Tabelle ab und ersetzt alle verstreuten `4`.
 
 | Welle | Schub 1 (Start) | Schub 2 | Schub 3 | Gesamt |
 |---|---|---|---|---|
@@ -44,7 +44,7 @@ H = Hollow, B = Burning, D = Devourer. Alternative: Gegnerzahl per Formel aus de
 **Nachschub-Regel.** Ein `ArenaWaveRun` (reine Klasse, kein MonoGame) führt den Zustand einer laufenden Welle: Index des nächsten Schubs und Zeit seit dem letzten Schub. Pro Frame bekommt er `deltaTime` und die Zahl lebender Gegner und meldet, ob der nächste Schub jetzt fällig ist:
 
 - fällig, wenn seit dem letzten Schub `GameBalance.ArenaPushInterval` (10 s) vergangen ist **oder** höchstens `GameBalance.ArenaPushEarlyAlive` (1) Gegner leben;
-- zurückgehalten, solange `GameBalance.ArenaMaxAliveEnemies` (9) oder mehr Gegner leben (Gegner in Ankündigung zählen mit).
+- zurückgehalten, solange lebende Gegner plus der Schub `GameBalance.ArenaMaxAliveEnemies` (9) überschreiten würden (Gegner in Ankündigung zählen mit).
 
 Die Welle ist geleert, wenn alle Schübe ausgelöst, alle angekündigten Gegner erschienen und `_enemies` sowie `_souls` leer sind. Alternative: feste Zeitpunkte ohne Frühauslösung. Verworfen, weil schnelle Spieler sonst in einer leeren Arena warten.
 

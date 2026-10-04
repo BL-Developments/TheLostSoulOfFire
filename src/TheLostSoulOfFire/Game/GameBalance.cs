@@ -108,6 +108,29 @@ public static class GameBalance
     public const float GlutSparkTravelTime = 0.6f;
     public const float WaveTriggerRadius = 110f;
 
+    // Working values for the ten arena waves (change extend-arena-waves); balancing is still open.
+    // One row per wave, one entry per push. H = Hollow, B = Burning, D = Devourer.
+    public static readonly ArenaPush[][] ArenaWaves =
+    [
+        [new(3, 0, 0)],
+        [new(2, 2, 0)],
+        [new(2, 2, 1)],
+        [new(2, 3, 1)],
+        [new(3, 2, 0), new(2, 1, 0)],
+        [new(3, 2, 0), new(2, 1, 1)],
+        [new(2, 2, 1), new(3, 2, 0)],
+        [new(3, 2, 0), new(2, 1, 1), new(2, 1, 0)],
+        [new(3, 2, 1), new(2, 2, 0), new(2, 1, 1)],
+        [new(2, 2, 1), new(3, 2, 0), new(2, 1, 2)]
+    ];
+    public static int ArenaWaveCount => ArenaWaves.Length;
+    public static readonly int[] ArenaChestWaves = [3, 6, 9];
+    public const float ArenaPushInterval = 10f;
+    public const int ArenaPushEarlyAlive = 1;
+    public const int ArenaMaxAliveEnemies = 9;
+    public const float ArenaSpawnTelegraphDuration = 0.9f;
+    public const float ArenaSpawnMinPlayerDistance = 380f;
+
     public const float CannonDrawDuration = 0.16f;
     public const float CannonFullChargeTime = 1.2f;
     public const float CannonReturnDuration = 0.28f;

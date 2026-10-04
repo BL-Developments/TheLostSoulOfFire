@@ -45,8 +45,8 @@ public sealed class ArenaChest
     /// <summary>Fixed spot per wave inside the combat area so unopened chests never overlap.</summary>
     public static Vector2 PositionForWave(int waveNumber, Rectangle combatBounds) => waveNumber switch
     {
-        1 => new Vector2(combatBounds.Left + combatBounds.Width * 0.22f, combatBounds.Top + combatBounds.Height * 0.3f),
-        2 => new Vector2(combatBounds.Left + combatBounds.Width * 0.78f, combatBounds.Top + combatBounds.Height * 0.3f),
+        3 => new Vector2(combatBounds.Left + combatBounds.Width * 0.22f, combatBounds.Top + combatBounds.Height * 0.3f),
+        6 => new Vector2(combatBounds.Left + combatBounds.Width * 0.78f, combatBounds.Top + combatBounds.Height * 0.3f),
         _ => new Vector2(combatBounds.Left + combatBounds.Width * 0.5f, combatBounds.Top + combatBounds.Height * 0.78f)
     };
 }

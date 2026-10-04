@@ -45,19 +45,19 @@ Das System SHALL die Wellen 1 bis 4 mit ihrer bisherigen Zusammensetzung als ein
 - **THEN** erscheint zunächst nur ihr erster Schub, und die übrigen Gegner der Welle rücken in weiteren Schüben nach
 
 ### Requirement: Nachschub rückt über die Zeit nach
-Das System SHALL den nächsten Schub einer Welle auslösen, sobald seit dem vorigen Schub die festgelegte Wartezeit vergangen ist oder höchstens ein Gegner der Welle noch lebt. Solange die Höchstzahl gleichzeitiger Gegner erreicht ist, SHALL der Schub warten. Nachrückende Gegner SHALL an festen Spawnpunkten am Rand des Kampfbereichs erscheinen, die mindestens den festgelegten Abstand zum Spieler haben, und SHALL sich dort vor dem Erscheinen für die festgelegte Ankündigungsdauer durch eine sichtbare Markierung ankündigen. Während der Ankündigung SHALL der Gegner weder Schaden nehmen noch Schaden verursachen.
+Das System SHALL den nächsten Schub einer Welle auslösen, sobald seit dem vorigen Schub die festgelegte Wartezeit vergangen ist oder höchstens ein Gegner der Welle noch lebt. Würde der Schub die Höchstzahl gleichzeitiger Gegner überschreiten, wobei angekündigte Gegner mitzählen, SHALL er warten. Nachrückende Gegner SHALL an festen Spawnpunkten am Rand des Kampfbereichs erscheinen, die mindestens den festgelegten Abstand zum Spieler haben, und SHALL sich dort vor dem Erscheinen für die festgelegte Ankündigungsdauer durch eine sichtbare Markierung ankündigen. Während der Ankündigung SHALL der Gegner weder Schaden nehmen noch Schaden verursachen.
 
 #### Scenario: Wartezeit läuft ab
-- **WHEN** seit dem vorigen Schub die Wartezeit vergangen ist und weniger Gegner als die Höchstzahl leben
+- **WHEN** seit dem vorigen Schub die Wartezeit vergangen ist und der Schub die Höchstzahl nicht überschreitet
 - **THEN** erscheinen Markierungen an Spawnpunkten am Arenarand und nach der Ankündigungsdauer die Gegner des nächsten Schubs
 
 #### Scenario: Spieler leert das Feld schnell
 - **WHEN** vor Ablauf der Wartezeit nur noch ein Gegner der Welle lebt
 - **THEN** wird der nächste Schub sofort angekündigt
 
-#### Scenario: Höchstzahl ist erreicht
-- **WHEN** die Wartezeit abgelaufen ist, aber die Höchstzahl gleichzeitiger Gegner lebt
-- **THEN** wartet der Schub, bis weniger Gegner leben
+#### Scenario: Höchstzahl würde überschritten
+- **WHEN** die Wartezeit abgelaufen ist, aber lebende Gegner und der nächste Schub zusammen die Höchstzahl überschreiten würden
+- **THEN** wartet der Schub, bis genug Gegner besiegt sind
 
 #### Scenario: Spieler steht am Spawnpunkt
 - **WHEN** ein Schub fällig wird und der Spieler näher als den Mindestabstand an einem Spawnpunkt steht

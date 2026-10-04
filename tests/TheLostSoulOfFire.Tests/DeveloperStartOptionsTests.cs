@@ -60,6 +60,9 @@ public sealed class DeveloperStartOptionsTests
         Assert.IsTrue(DeveloperStartOptions.TryParse(["--start", "arena", "--wave", "3", "--dev"], out options, out _));
         Assert.AreEqual(3, options!.Wave);
         Assert.AreEqual("DEV_START area=arena wave=3", options.Describe());
+
+        Assert.IsTrue(DeveloperStartOptions.TryParse(["--dev", "--start", "arena", "--wave", "10"], out options, out _));
+        Assert.AreEqual(10, options!.Wave);
     }
 
     [TestMethod]
@@ -69,7 +72,7 @@ public sealed class DeveloperStartOptionsTests
     [DataRow("--dev", "--start", "hub", "--wave", "2")]
     [DataRow("--dev", "--wave", "2")]
     [DataRow("--dev", "--start", "arena", "--wave", "0")]
-    [DataRow("--dev", "--start", "arena", "--wave", "5")]
+    [DataRow("--dev", "--start", "arena", "--wave", "11")]
     [DataRow("--dev", "--start", "arena", "--wave", "two")]
     [DataRow("--start", "arena")]
     [DataRow("--wave", "2")]

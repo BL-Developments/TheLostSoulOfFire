@@ -507,7 +507,7 @@ public sealed class CinematicPresentation
         batch.FillRectangle(pixel, viewport.Bounds, Color.Black * (0.18f * alpha));
         DrawLetterbox(batch, pixel, viewport, 13, 0.54f * alpha);
 
-        string label = nextWave >= 4 ? "FINAL WAVE" : $"WAVE {ToRoman(nextWave)}";
+        string label = nextWave >= GameBalance.ArenaWaveCount ? "FINAL WAVE" : $"WAVE {ToRoman(nextWave)}";
         DrawTitleRules(batch, pixel, viewport, viewport.Height * 0.5f - 28f, alpha * 0.62f);
         PixelText.DrawCentered(batch, pixel, label, viewport.Width * 0.5f, viewport.Height * 0.5f - 9f, 3, GameBalance.SoulWhite * (0.88f * alpha));
     }
@@ -614,6 +614,12 @@ public sealed class CinematicPresentation
         2 => "II",
         3 => "III",
         4 => "IV",
+        5 => "V",
+        6 => "VI",
+        7 => "VII",
+        8 => "VIII",
+        9 => "IX",
+        10 => "X",
         _ => number.ToString()
     };
 }

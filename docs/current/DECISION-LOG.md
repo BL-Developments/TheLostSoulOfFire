@@ -7,6 +7,16 @@ The entries from 2026-09-06 and earlier describe implementation work on the
 `tools/visual-max/`, `SoftShapes.cs`, Team Resonance, Severance) are not
 necessarily present on `main`.
 
+## 2026-10-04 — Arena mit zehn Wellen
+
+- Die Arena hat zehn Wellen statt vier (Change `extend-arena-waves`). Die
+  Wellen 1 bis 4 bleiben unverändert; ab Welle 5 rücken Gegner in Schüben vom
+  Arenarand nach, mit Ankündigung vor dem Erscheinen. Die Gegnerzahl steigt
+  von 3 auf 15. Alle Werte sind Arbeitswerte in `GameBalance`.
+- Geldkisten erscheinen nach den Wellen 3, 6 und 9 statt nach den Wellen 1
+  bis 3. Das ersetzt die Kistenregel im Eintrag zu #52; es bleibt bei drei
+  Kisten pro Run.
+
 ## 2026-10-04 — Zwei Währungen (#52)
 
 - Arbeitsnamen: **Geld** und **Glut** (mystische Ressource). Endgültige Namen
