@@ -31,15 +31,15 @@ public sealed partial class GameWorld
     }
 
     private bool AbilityChoicePhase => !_player.IsDead && (_phase == GamePhase.Antechamber ||
-        _phase == GamePhase.Arena && _loopState is ArenaLoopState.Intermission or ArenaLoopState.Intro);
-    private bool CanChooseAbilities => !_pauseMenu.IsOpen && !_characterMenu.IsOpen && AbilityChoicePhase;
+        _phase == GamePhase.Arena && (_sandboxActive || _loopState is ArenaLoopState.Intermission or ArenaLoopState.Intro));
+    private bool CanChooseAbilities => !_pauseMenu.IsOpen && !_characterMenu.IsOpen && !_devMenu.IsOpen && AbilityChoicePhase;
 
     private AbilityCard[] CurrentAbilityCards()
     {
         var cards = new AbilityCard[RunAbilities.Definitions.Length];
         for (int i = 0; i < cards.Length; i++)
             cards[i] = AbilityCard.Create((RunAbility)i, _abilities, _player, _wallet.Run(Currency.Glut),
-                _phase == GamePhase.Arena && _loopState == ArenaLoopState.Combat);
+                _phase == GamePhase.Arena && _loopState == ArenaLoopState.Combat, freeCast: _sandboxActive);
         return cards;
     }
 
@@ -98,10 +98,11 @@ public sealed partial class GameWorld
         if (_loopState != ArenaLoopState.Combat) { _abilities.Clear(_player); return; }
         _abilities.Update(dt, _player, ActiveCombatBounds, _enemies, _particles, ApplyEnemyDamage);
         if (!CombatActionsEnabled || _player.IsDead) return;
+        // The sandbox has no Glut; casting there is free, cooldowns still apply.
         if (input.WasKeyPressed(Keys.Z)) _abilities.TryCast(_abilities.Slots[0], _player, _wallet,
-            _lastMouseWorld, ActiveCombatBounds, _enemies, _particles);
+            _lastMouseWorld, ActiveCombatBounds, _enemies, _particles, chargeCost: !_sandboxActive);
         if (input.WasKeyPressed(Keys.X)) _abilities.TryCast(_abilities.Slots[1], _player, _wallet,
-            _lastMouseWorld, ActiveCombatBounds, _enemies, _particles);
+            _lastMouseWorld, ActiveCombatBounds, _enemies, _particles, chargeCost: !_sandboxActive);
     }
 
     private void DrawAbilityWorld(SpriteBatch batch, Texture2D pixel)

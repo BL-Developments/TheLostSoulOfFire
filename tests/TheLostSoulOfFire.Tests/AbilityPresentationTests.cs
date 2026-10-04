@@ -81,4 +81,16 @@ public sealed class AbilityPresentationTests
         }
     }
 
+    [TestMethod]
+    public void SandboxCardsShowFreeCastingInsteadOfMissingGlut()
+    {
+        var abilities = new RunAbilities();
+        var player = new Player(Vector2.Zero);
+        var card = AbilityCard.Create(RunAbility.PiercingShot, abilities, player, 0, true, freeCast: true);
+        Assert.AreEqual("FREI", card.CostText);
+        Assert.AreEqual("BEREIT", card.Status);
+        Assert.AreEqual("3 GLUT", AbilityCard.Create(RunAbility.PiercingShot, abilities, player, 0, true).CostText);
+        Assert.AreEqual("3 GLUT FEHLT", AbilityCard.Create(RunAbility.PiercingShot, abilities, player, 0, true).Status);
+    }
+
 }

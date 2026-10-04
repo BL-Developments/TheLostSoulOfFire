@@ -36,6 +36,27 @@ public sealed class RunAbilityTests
         Assert.AreEqual(GameBalance.PlayerMaxHealth, _player.Health);
         Assert.AreEqual(27, _wallet.Run(Currency.Glut));
     }
+    [TestMethod] public void FreeCast_DoesNotChargeButKeepsCooldown()
+    {
+        _wallet.BeginRun(0);
+        Assert.IsTrue(_abilities.TryCast(RunAbility.Vortex, _player, _wallet, new Vector2(650, 350), _bounds, [], _particles, chargeCost: false));
+        Assert.AreEqual(0, _wallet.Run(Currency.Glut));
+        Assert.AreEqual(RunAbilities.Definitions[(int)RunAbility.Vortex].Cooldown, _abilities.Cooldown(RunAbility.Vortex));
+        Assert.IsFalse(_abilities.TryCast(RunAbility.Vortex, _player, _wallet, new Vector2(650, 350), _bounds, [], _particles, chargeCost: false));
+        Assert.AreEqual("NOCH NICHT BEREIT", _abilities.Feedback);
+    }
+    [TestMethod] public void Healing_UsesThePlayersMaxHealth()
+    {
+        _player.SetMaxHealth(200);
+        _player.ApplyDamage(80, Vector2.Zero, _screen, true);
+        Assert.IsTrue(Cast(RunAbility.SecondWind));
+        Assert.AreEqual(145, _player.Health);
+
+        _player.SetMaxHealth(60);
+        Update(5);
+        Assert.IsFalse(Cast(RunAbility.SecondWind));
+        Assert.AreEqual("LEBEN BEREITS VOLL", _abilities.Feedback);
+    }
     [TestMethod] public void CooldownAndInsufficientFunds_DoNotSpendAgainOrTouchSecured()
     {
         _wallet.LoadSecured(new PlayerProfile { SecuredGlut = 90 });

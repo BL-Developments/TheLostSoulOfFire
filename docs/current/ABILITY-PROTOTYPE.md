@@ -33,3 +33,5 @@ Grenzen: regulärer Zufallsdraft (drei Angebote / zwei Auswahlen), lokale Koop-P
 - Start zum Ausprobieren: `dotnet run --project src/TheLostSoulOfFire -- --dev --start arena`.
 
 - Der Reiter **Skills** bleibt separat als Platzhalter erhalten. Die sechs aktiven Run-Fähigkeiten und ihre Auswahl stehen im Reiter **Fähigkeiten**.
+
+- Sandbox: Auswahl jederzeit, Kostenanzeige **FREI**, Abklingzeiten und sonstige Wirkbedingungen bleiben aktiv.

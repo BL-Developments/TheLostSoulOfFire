@@ -10,10 +10,11 @@ namespace TheLostSoulOfFire.Rendering;
 
 /// <summary>A shared live snapshot for the combat HUD and paused skill catalogue.</summary>
 public readonly record struct AbilityCard(RunAbility Ability, int Slot, string Category, string Summary,
-    string Detail, string Status, float ReadyFraction, Color Accent)
+    string Detail, string Status, float ReadyFraction, Color Accent, bool FreeCast)
 {
+    public string CostText => FreeCast ? "FREI" : $"{Definition.Cost} GLUT";
     public AbilityDefinition Definition => RunAbilities.Definitions[(int)Ability];
-    public static AbilityCard Create(RunAbility ability, RunAbilities abilities, Player player, int glut, bool combat)
+    public static AbilityCard Create(RunAbility ability, RunAbilities abilities, Player player, int glut, bool combat, bool freeCast = false)
     {
         var definition = RunAbilities.Definitions[(int)ability];
         var (category, summary, detail, accent) = ability switch
@@ -27,7 +28,7 @@ public readonly record struct AbilityCard(RunAbility Ability, int Slot, string C
         };
         float cooldown = abilities.Cooldown(ability);
         string status = !combat ? "NUR IM KAMPF" : player.IsDead ? "NICHT HANDLUNGSFAEHIG" : cooldown > 0 ? $"ABKLINGZEIT {cooldown:0.0} S" :
-            glut < definition.Cost ? $"{definition.Cost - glut} GLUT FEHLT" :
+            !freeCast && glut < definition.Cost ? $"{definition.Cost - glut} GLUT FEHLT" :
             ability == RunAbility.SecondWind && player.Health >= player.MaxHealth ? "LEBEN VOLL" :
             ability == RunAbility.Retreat && player.IsDashing ? "AUSWEICHEN AKTIV" : "BEREIT";
         if (combat && !player.IsDead)
@@ -38,7 +39,7 @@ public readonly record struct AbilityCard(RunAbility Ability, int Slot, string C
             else if (ability == RunAbility.Vortex && abilities.VortexRemaining > 0) status = $"SOG AKTIV {abilities.VortexRemaining:0.0} S";
         }
         return new(ability, Array.IndexOf(abilities.Slots, ability), category, summary, detail, status,
-            MathHelper.Clamp(1 - cooldown / definition.Cooldown, 0, 1), accent);
+            MathHelper.Clamp(1 - cooldown / definition.Cooldown, 0, 1), accent, freeCast);
     }
 }
 
@@ -58,7 +59,7 @@ public static class AbilityPresentation
         Text(batch, pixel, card.Definition.Name, bounds.X + 46, bounds.Y + 11, 2, GameBalance.SoulWhite);
         Text(batch, pixel, card.Summary, bounds.X + 12, bounds.Y + 34, 1, GameBalance.SoulWhite * 0.65f);
         Text(batch, pixel, card.Status, bounds.X + 12, bounds.Y + 51, 1, card.Accent);
-        string cost = $"{card.Definition.Cost} GLUT";
+        string cost = card.CostText;
         Text(batch, pixel, cost, bounds.Right - PixelText.Measure(cost, 1) - 12, bounds.Y + 51, 1, GameBalance.GlutBright);
         batch.FillRectangle(pixel, new Rectangle(bounds.X + 12, bounds.Bottom - 8, bounds.Width - 24, 3), new Color(40, 35, 48));
         batch.FillRectangle(pixel, new Rectangle(bounds.X + 12, bounds.Bottom - 8, (int)((bounds.Width - 24) * card.ReadyFraction), 3), card.Accent * 0.8f);
@@ -95,7 +96,7 @@ public static class AbilityPresentation
             Text(batch, pixel, card.Summary, b.X + 16, b.Y + 57, 1, GameBalance.SoulWhite * (0.85f * alpha));
             Text(batch, pixel, card.Detail, b.X + 16, b.Y + 73, 1, GameBalance.SoulWhite * (0.5f * alpha));
             batch.FillRectangle(pixel, new Rectangle(b.X + 16, b.Y + 92, b.Width - 32, 1), accent * 0.2f);
-            Text(batch, pixel, $"{card.Definition.Cost} GLUT / {card.Definition.Cooldown:0.#} S ABKLINGZEIT", b.X + 16, b.Y + 105, 1, accent);
+            Text(batch, pixel, $"{card.CostText} / {card.Definition.Cooldown:0.#} S ABKLINGZEIT", b.X + 16, b.Y + 105, 1, accent);
             Text(batch, pixel, card.Status, b.Right - PixelText.Measure(card.Status, 1) - 16, b.Y + 105, 1, GameBalance.SoulWhite * (0.7f * alpha));
         }
         PixelText.DrawCentered(batch, pixel, canChoose ? "Z / X SLOT WAEHLEN / KARTE ANKLICKEN ODER 1-6 / TAB SCHLIESSEN" : "AUSWAHL GESPERRT / WECHSEL IM HUB ODER VOR / ZWISCHEN WELLEN", viewport.Width * 0.5f, 638, 1, GameBalance.SoulWhite * (0.6f * alpha));
