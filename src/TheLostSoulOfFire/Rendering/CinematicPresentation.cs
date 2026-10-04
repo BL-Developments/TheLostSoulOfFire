@@ -67,14 +67,14 @@ public sealed class CinematicPresentation
 
     public bool ShouldDrawPlayer(ArenaLoopState loopState, bool playerDead) =>
         playerDead ||
-        loopState is ArenaLoopState.Combat or ArenaLoopState.Transition or ArenaLoopState.Complete ||
+        loopState is ArenaLoopState.Combat or ArenaLoopState.Intermission or ArenaLoopState.Transition or ArenaLoopState.Complete ||
         loopState == ArenaLoopState.Intro && (_quickIntro || _stateTime >= 0.52f);
 
     public bool ShouldDrawCombatHud(ArenaLoopState loopState, bool playerDead) =>
-        !playerDead && loopState is ArenaLoopState.Combat or ArenaLoopState.Transition;
+        !playerDead && loopState is ArenaLoopState.Combat or ArenaLoopState.Intermission or ArenaLoopState.Transition;
 
     public bool ShouldDrawAim(ArenaLoopState loopState, bool playerDead) =>
-        !playerDead && loopState is ArenaLoopState.Combat or ArenaLoopState.Transition;
+        !playerDead && loopState is ArenaLoopState.Combat or ArenaLoopState.Intermission or ArenaLoopState.Transition;
 
     public void UpdateCamera(
         Camera2D camera,
@@ -484,7 +484,7 @@ public sealed class CinematicPresentation
         return value * value * (3f - 2f * value);
     }
 
-    private static string ToRoman(int number) => number switch
+    internal static string ToRoman(int number) => number switch
     {
         1 => "I",
         2 => "II",

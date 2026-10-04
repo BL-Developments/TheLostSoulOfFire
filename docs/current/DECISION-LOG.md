@@ -7,6 +7,29 @@ The entries from 2026-09-06 and earlier describe implementation work on the
 `tools/visual-max/`, `SoftShapes.cs`, Team Resonance, Severance) are not
 necessarily present on `main`.
 
+## 2026-10-04 — Zwei Währungen (#52)
+
+- Arbeitsnamen: **Geld** und **Glut** (mystische Ressource). Endgültige Namen
+  und Lore sind offen.
+- Geld stammt aus Kisten in Levels und aus NPC-Belohnungen für eine vorgegebene
+  Anzahl besiegter Monster eines Typs. Es bezahlt Waffenkauf und Schmied.
+- Glut stammt aus besiegten Monstern, Menge je Monstertyp. Sie fliegt mit einer
+  Animation vom Monster zum Spieler; gutgeschrieben wird beim Besiegen genau
+  einmal, unabhängig von der Animation. Erlösung ist ein getrennter Vorgang
+  ohne zweite Gutschrift. Das ersetzt die frühere Herkunft „aus Erlösung“.
+- Aktive Fähigkeiten zahlen Glut aus dem Run-Bestand; Waffen- und
+  Fähigkeits-Skilltrees zahlen aus dem gesicherten Bestand.
+- Beide Währungen haben einen Run-Bestand und einen gesicherten
+  Homebase-Bestand. Bei Niederlage gehen beide Run-Bestände verloren.
+- Jeder Run beginnt mit einem kleinen kostenlosen Glut-Vorrat, der ebenfalls
+  gesichert werden darf. Gesicherte Glut wird nicht in einen Run mitgenommen.
+- Biome haben drei Levels mit dem Boss am Ende von Level 3. Geld kann am
+  Levelende gesichert werden, nach Bosssieg in der Homebase.
+- Vorläufig bis zur Entscheidung in #53 (Change `add-run-currencies`): Der
+  Arena-Abschluss sichert beide Run-Bestände vollständig; nach jeder Welle
+  außer der letzten erscheint eine Kiste mit Geld, die nach dem Öffnen
+  verschwindet. Zahlen sind Arbeitswerte.
+
 ## 2026-10-02 — Grafikstil: gemalt wie Bastion
 
 - Das Spiel soll aussehen wie gemalte, hochaufgelöste 2D-Grafik im Sinne von

@@ -29,6 +29,8 @@ public enum ArenaLoopState
 {
     Intro,
     Combat,
+    /// <summary>Pause after a cleared wave; the player starts the next one at the arena centre.</summary>
+    Intermission,
     Transition,
     Complete
 }
@@ -95,7 +97,7 @@ public sealed partial class GameWorld : IDisposable
     public bool PlayerDead => _player.IsDead;
     public bool QuitRequested { get; private set; }
     public bool CombatActionsEnabled => GameFlowRules.AllowsCombat(_phase) &&
-        !_player.IsDead && _loopState is ArenaLoopState.Combat or ArenaLoopState.Transition;
+        !_player.IsDead && _loopState is ArenaLoopState.Combat or ArenaLoopState.Intermission or ArenaLoopState.Transition;
 
     private float DoorTransitionProgress => _phase == GamePhase.EnteringArena
         ? MathHelper.Clamp(_phaseTime / DoorTransitionDuration, 0f, 1f)
@@ -105,7 +107,7 @@ public sealed partial class GameWorld : IDisposable
         ? $"The Lost Soul of Fire — DEBUG | {_phase.ToString().ToUpperInvariant()} {_loopState.ToString().ToUpperInvariant()} | Wave {_waveNumber}/4 | HP {_player.Health} | RES {(_player.ResonanceActive ? $"ACTIVE {_player.ResonanceRemaining:0.0}s" : $"{_player.Resonance:0}/{GameBalance.ResonanceRequired:0}")} | Player {GetPlayerState()} | Enemies {_enemies.Count(enemy => enemy.IsAlive)} | Souls {_souls.Count}"
         : "The Lost Soul of Fire";
 
-    public GameWorld(Viewport viewport, ArtAssets art, ContentManager content, bool skipMainMenu = false, bool skipPrologue = false, GameSettings? settings = null, Action<GameSettings>? settingsChanged = null)
+    public GameWorld(Viewport viewport, ArtAssets art, ContentManager content, bool skipMainMenu = false, bool skipPrologue = false, GameSettings? settings = null, Action<GameSettings>? settingsChanged = null, PlayerProfileStore? profileStore = null)
     {
         _skipMainMenu = skipMainMenu;
         _skipPrologue = skipPrologue;
@@ -113,6 +115,8 @@ public sealed partial class GameWorld : IDisposable
         _menu = new MenuController(_settings);
         _pauseMenu = new MenuController(_settings);
         _settingsChanged = settingsChanged;
+        _profileStore = profileStore ?? new PlayerProfileStore();
+        _wallet.LoadSecured(_profileStore.Load());
         _art = art;
         _audio = new AudioDirector(content);
         ApplyAudioSettings();
@@ -447,11 +451,13 @@ public sealed partial class GameWorld : IDisposable
         }
 
         _souls.RemoveAll(soul => soul.IsFinished);
+        UpdateCurrency(deltaTime, input);
         UpdateLoop(deltaTime);
         if (previousHealth > _player.Health)
         {
             if (_player.IsDead)
             {
+                LoseRunCurrencies();
                 _audio.SetCalm(true);
                 _audio.SetSoulSense(false);
                 _presentation.BeginDeath();
@@ -712,6 +718,7 @@ public sealed partial class GameWorld : IDisposable
                 if (_phase == GamePhase.Arena)
                 {
                     DrawArenaLoop(batch, pixel);
+                    DrawCurrencyWorld(batch, pixel);
                 }
                 _player.DrawAfterimages(batch, pixel);
                 foreach (Enemy enemy in _enemies)
@@ -867,11 +874,17 @@ public sealed partial class GameWorld : IDisposable
             if (_phase == GamePhase.Arena && _presentation.ShouldDrawCombatHud(_loopState, _player.IsDead))
             {
                 _hud.Draw(batch, pixel, viewport, _player);
+                DrawCurrencyHud(batch, pixel, viewport);
             }
 
             if (!_pauseMenu.IsOpen)
             {
                 _presentation.DrawOverlay(batch, pixel, viewport, _phase, _loopState, _player.IsDead, _waveNumber, _menu);
+                if (_phase == GamePhase.Arena && _loopState == ArenaLoopState.Complete && !_player.IsDead)
+                {
+                    float reveal = MathHelper.Clamp((_presentation.StateTime - 0.8f) / 0.6f, 0f, 1f);
+                    DrawSecuredSummary(batch, pixel, viewport, "GESICHERT", _lastSecured.Geld, _lastSecured.Glut, reveal);
+                }
             }
         }
 
@@ -909,6 +922,11 @@ public sealed partial class GameWorld : IDisposable
             viewport.Height * 0.14f,
             2,
             GameBalance.SoulWhite * (0.7f * placeAlpha));
+
+        if (_phase == GamePhase.Antechamber)
+        {
+            DrawSecuredSummary(batch, pixel, viewport, "GESICHERT", _wallet.Secured(Currency.Geld), _wallet.Secured(Currency.Glut), 1f);
+        }
 
         HubDoor? nearbyDoor = _phase == GamePhase.Antechamber ? _antechamber.DoorAt(_player.Position) : null;
         if (nearbyDoor is not null)
@@ -1194,6 +1212,7 @@ public sealed partial class GameWorld : IDisposable
     {
         _phaseTime = 0f;
         _loopState = ArenaLoopState.Intro;
+        BeginCurrencyRun();
         _player.Reset(_arena.CombatBounds.Center.ToVector2());
         _lastMouseWorld = _player.Position + Vector2.UnitX * 200f;
         _camera.Zoom = 0.9f;
@@ -1209,6 +1228,7 @@ public sealed partial class GameWorld : IDisposable
         ClearRunState();
         _phase = GameFlowRules.RetryAfterDeath();
         _phaseTime = 0f;
+        BeginCurrencyRun();
         _player.Reset(_arena.CombatBounds.Center.ToVector2());
         _loopState = ArenaLoopState.Intro;
         _presentation.BeginIntro(true);
@@ -1237,6 +1257,8 @@ public sealed partial class GameWorld : IDisposable
         _enemies.Clear();
         _souls.Clear();
         _cannonShots.Clear();
+        _chests.Clear();
+        _glutSparks.Clear();
         _particles.Clear();
         _spriteVfx.Clear();
         _combatPresentation.Clear();
@@ -1318,6 +1340,7 @@ public sealed partial class GameWorld : IDisposable
                     if (_waveNumber >= 4)
                     {
                         _loopState = ArenaLoopState.Complete;
+                        SecureRunCurrencies();
                         _player.SettleForCompletion();
                         _cannonShots.Clear();
                         _presentation.BeginCompletion();
@@ -1327,8 +1350,8 @@ public sealed partial class GameWorld : IDisposable
                     }
                     else
                     {
-                        _loopState = ArenaLoopState.Transition;
-                        _presentation.BeginWaveTransition();
+                        _loopState = ArenaLoopState.Intermission;
+                        SpawnChestAfterWave(_waveNumber);
                         _particles.EmitDeathFlame(_arena.CombatBounds.Center.ToVector2(), 12, 0.8f);
                     }
                 }
@@ -1347,6 +1370,14 @@ public sealed partial class GameWorld : IDisposable
             {
                 batch.DrawLine(pixel, new Vector2(x, gate.Top - 17), new Vector2(x, gate.Bottom + 17), GameBalance.StoneColor, 7f);
             }
+        }
+
+        if (_loopState == ArenaLoopState.Intermission)
+        {
+            float pulse = 0.5f + 0.5f * MathF.Sin(_presentationTime * 3f);
+            Vector2 center = _arena.CombatBounds.Center.ToVector2();
+            batch.DrawCircle(pixel, center, GameBalance.WaveTriggerRadius, GameBalance.DeathFlameBright * (0.22f + pulse * 0.22f), 4f, 48);
+            batch.DrawCircle(pixel, center, GameBalance.WaveTriggerRadius * 0.55f, GameBalance.DeathFlame * (0.14f + pulse * 0.14f), 3f, 36);
         }
 
         if (_loopState is ArenaLoopState.Intro or ArenaLoopState.Transition)
@@ -1460,7 +1491,7 @@ public sealed partial class GameWorld : IDisposable
         if (_phase == GamePhase.EnteringArena) return "phase16_entering_arena";
         if (_player.IsDead) return "phase05_player_down";
         if (_loopState == ArenaLoopState.Complete) return "phase15_soul_free";
-        if (_loopState == ArenaLoopState.Transition) return $"phase12_wave_{_waveNumber}_clear";
+        if (_loopState is ArenaLoopState.Intermission or ArenaLoopState.Transition) return $"phase12_wave_{_waveNumber}_clear";
         if (_loopState == ArenaLoopState.Intro) return "phase12_arena_intro";
         if (_player.ResonanceActive) return "phase11_resonance_active";
         if (_player.IsResonanceReady) return "phase11_resonance_ready";
@@ -1706,6 +1737,7 @@ public sealed partial class GameWorld : IDisposable
         enemy.ApplyDamage(damage);
         if (wasAlive && !enemy.IsAlive)
         {
+            CreditDefeatedEnemy(enemy);
             float volume = enemy is Devourer ? 0.72f : 0.52f;
             _audio.Play(AudioCue.EnemyDeath, volume);
         }

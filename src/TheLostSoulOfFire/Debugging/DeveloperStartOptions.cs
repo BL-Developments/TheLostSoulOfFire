@@ -45,6 +45,7 @@ public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave)
         "--audio-gameplay-test",
         "--audio-death-restart-test",
         "--antechamber-visual-test",
+        "--currency-visual-test",
         "--expect-audio-fallback"
     ];
 

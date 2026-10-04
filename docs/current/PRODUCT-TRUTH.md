@@ -29,7 +29,7 @@ Local shared-screen co-op is the first technical proof. Online networking is def
 
 ## Aktuelles Ausbauziel
 
-Homebase → gewähltes Biom ab Level 1 → mehrere Levels → Teilsicherung, Boss oder Extraktion/Niederlage → Homebase → neuer Run. Eine Hauptwaffe, zwei aus drei angebotenen Fähigkeiten und Ressourcen aus erfolgreicher Erlösung tragen die Risikoentscheidung zwischen unmittelbarem Einsatz und dauerhaftem Fortschritt. Kein gewöhnliches Loot-Inventar und kein Sechs-Item-Soul-Echo-Ziel.
+Homebase → gewähltes Biom ab Level 1 → mehrere Levels → Teilsicherung, Boss oder Extraktion/Niederlage → Homebase → neuer Run. Eine Hauptwaffe, zwei aus drei angebotenen Fähigkeiten und Ressourcen aus besiegten Monstern, Kisten und NPC-Prämien tragen die Risikoentscheidung zwischen unmittelbarem Einsatz und dauerhaftem Fortschritt. Kein gewöhnliches Loot-Inventar und kein Sechs-Item-Soul-Echo-Ziel.
 
 Die konkrete Reihenfolge steht in [der Roadmap](../planning/roadmap.md). Koop bleibt Produktziel; Systeme aus dem Referenzbranch werden einzeln auf `main` portiert. Die historische Reihenfolge Golden Slice → Koop-Proof → Prolog ist keine neue Behauptung über den Stand von `main`.
 
