@@ -1,3 +1,4 @@
+using System.Linq;
 using TheLostSoulOfFire.Menu;
 using TheLostSoulOfFire.Game;
 
@@ -125,15 +126,146 @@ public sealed class MenuControllerTests
     }
 
     [TestMethod]
-    public void Confirm_OnQuit_ReturnsQuitResult()
+    public void Confirm_OnQuit_AsksBeforeQuitting()
     {
         MenuController menu = new();
         menu.Open();
         menu.MoveSelection(-1); // wrap from EINZELSPIELER to BEENDEN
 
-        MenuActionResult result = menu.Confirm();
+        Assert.AreEqual(MenuActionResult.None, menu.Confirm());
+        Assert.AreEqual(MenuPages.QuitConfirm.Id, menu.CurrentPage.Id);
+        Assert.IsNotNull(menu.CurrentPage.Prompt);
 
-        Assert.AreEqual(MenuActionResult.Quit, result);
+        Assert.AreEqual(MenuActionResult.Quit, menu.Confirm()); // JA
+    }
+
+    [TestMethod]
+    public void QuitConfirmation_NoAndEscapeReturnToMainMenu()
+    {
+        MenuController menu = new();
+        menu.Open();
+        menu.MoveSelection(-1);
+        menu.Confirm();
+        menu.SetHoverIndex(1); // NEIN
+        Assert.AreEqual(MenuActionResult.None, menu.Confirm());
+        Assert.AreEqual(MenuPages.Main.Id, menu.CurrentPage.Id);
+
+        Assert.AreEqual(MenuActionResult.None, menu.HandleEscape());
+        Assert.AreEqual(MenuPages.QuitConfirm.Id, menu.CurrentPage.Id);
+        Assert.AreEqual(MenuActionResult.None, menu.HandleEscape());
+        Assert.AreEqual(MenuPages.Main.Id, menu.CurrentPage.Id);
+        Assert.IsTrue(menu.IsOpen);
+    }
+
+    [TestMethod]
+    public void OpenQuitConfirmation_ShowsQuestionOverMainMenu()
+    {
+        MenuController menu = new();
+
+        menu.OpenQuitConfirmation();
+
+        Assert.AreEqual(MenuPages.QuitConfirm.Id, menu.CurrentPage.Id);
+        Assert.AreEqual(MenuPages.Main, menu.RootPage);
+        menu.HandleEscape();
+        Assert.AreEqual(MenuPages.Main.Id, menu.CurrentPage.Id);
+    }
+
+    [TestMethod]
+    public void Escape_InSubPages_GoesBackOneLevel()
+    {
+        MenuController menu = new();
+        menu.Open();
+        menu.Confirm(); // Einzelspieler
+        Assert.AreEqual(MenuActionResult.None, menu.HandleEscape());
+        Assert.AreEqual(MenuPages.Main.Id, menu.CurrentPage.Id);
+
+        menu.SetHoverIndex(2);
+        menu.Confirm(); // Einstellungen
+        menu.SetHoverIndex(2);
+        menu.Confirm(); // Audio
+        menu.HandleEscape();
+        Assert.AreEqual(MenuPages.Settings.Id, menu.CurrentPage.Id);
+        menu.HandleEscape();
+        Assert.AreEqual(MenuPages.Main.Id, menu.CurrentPage.Id);
+    }
+
+    [TestMethod]
+    public void PauseMenu_HasFourEntriesWithResumeSelected()
+    {
+        MenuController menu = new();
+
+        menu.Open(MenuPages.Pause);
+
+        Assert.AreEqual(MenuPages.Pause.Id, menu.CurrentPage.Id);
+        CollectionAssert.AreEqual(
+            new[] { "FORTSETZEN", "EINSTELLUNGEN", "ERRUNGENSCHAFTEN UND STATISTIKEN", "BEENDEN" },
+            menu.CurrentPage.Entries.Select(entry => entry.Label).ToArray());
+        Assert.AreEqual(0, menu.SelectedIndex);
+        Assert.AreEqual(MenuActionResult.Resume, menu.Confirm());
+    }
+
+    [TestMethod]
+    public void PauseMenu_EscapeResumesAtRootAndGoesBackInSubPages()
+    {
+        MenuController menu = new();
+        menu.Open(MenuPages.Pause);
+        Assert.AreEqual(MenuActionResult.Resume, menu.HandleEscape());
+
+        menu.SetHoverIndex(1);
+        menu.Confirm();
+        Assert.AreEqual(MenuPages.Settings.Id, menu.CurrentPage.Id);
+        Assert.AreEqual(MenuActionResult.None, menu.HandleEscape());
+        Assert.AreEqual(MenuPages.Pause.Id, menu.CurrentPage.Id);
+    }
+
+    [TestMethod]
+    public void PauseMenu_AchievementsPlaceholderStaysInert()
+    {
+        MenuController menu = new();
+        menu.Open(MenuPages.Pause);
+        menu.SetHoverIndex(2);
+
+        Assert.AreEqual(MenuActionResult.None, menu.Confirm());
+        Assert.AreEqual(MenuPages.Pause.Id, menu.CurrentPage.Id);
+    }
+
+    [TestMethod]
+    public void PauseMenu_QuitOffersMainMenuDesktopAndBack()
+    {
+        MenuController menu = new();
+        menu.Open(MenuPages.Pause);
+        menu.SetHoverIndex(3);
+        Assert.AreEqual(MenuActionResult.None, menu.Confirm());
+        Assert.AreEqual(MenuPages.PauseQuit.Id, menu.CurrentPage.Id);
+
+        menu.SetHoverIndex(0);
+        Assert.AreEqual(MenuActionResult.QuitToMainMenu, menu.Confirm());
+        menu.SetHoverIndex(1);
+        Assert.AreEqual(MenuActionResult.Quit, menu.Confirm());
+        menu.SetHoverIndex(2);
+        Assert.AreEqual(MenuActionResult.None, menu.Confirm());
+        Assert.AreEqual(MenuPages.Pause.Id, menu.CurrentPage.Id);
+
+        menu.SetHoverIndex(3);
+        menu.Confirm();
+        menu.HandleEscape();
+        Assert.AreEqual(MenuPages.Pause.Id, menu.CurrentPage.Id);
+    }
+
+    [TestMethod]
+    public void PauseAndTitleMenus_ShareSettings()
+    {
+        GameSettings settings = new();
+        MenuController title = new(settings);
+        MenuController pause = new(settings);
+        pause.Open(MenuPages.Pause);
+        pause.SetHoverIndex(1);
+        pause.Confirm();
+        pause.SetHoverIndex(2);
+        pause.Confirm(); // Audio
+        pause.AdjustSelectedValue(-1);
+
+        Assert.AreEqual(90, title.Settings.MasterVolume);
     }
 
     [TestMethod]

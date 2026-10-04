@@ -247,7 +247,7 @@ public sealed class CinematicPresentation
         if (menu.IsOpen)
         {
             float menuReveal = Ease(menu.OpenTimer / MenuController.RevealDuration);
-            DrawMenuList(batch, pixel, viewport, menu, menuReveal);
+            DrawMenuList(batch, pixel, viewport, menu, menuReveal, _titleTime);
             return;
         }
 
@@ -269,6 +269,7 @@ public sealed class CinematicPresentation
     private const float MenuStartYFraction = 0.60f;
     private const float MenuHitPaddingX = 24f;
     private const float MenuHitPaddingY = 6f;
+    private const float MenuPromptOffset = 44f;
 
     /// <summary>
     /// Hit-testable bounds for each entry of <paramref name="page"/>, laid out
@@ -294,17 +295,47 @@ public sealed class CinematicPresentation
         return bounds;
     }
 
-    private void DrawMenuList(SpriteBatch batch, Texture2D pixel, Viewport viewport, MenuController menu, float reveal)
+    /// <summary>
+    /// Pause overlay drawn over the frozen world and HUD: a translucent veil keeps the
+    /// game visible, the rest mirrors the title menu's letterbox, rule, type and markers.
+    /// </summary>
+    public void DrawPauseMenu(SpriteBatch batch, Texture2D pixel, Viewport viewport, MenuController menu)
+    {
+        float reveal = Ease(menu.OpenTimer / MenuController.RevealDuration);
+        batch.FillRectangle(pixel, viewport.Bounds, Color.Black * (PauseVeilAlpha * reveal));
+        DrawLetterbox(batch, pixel, viewport, 44, 0.94f * reveal);
+
+        float centerX = viewport.Width * 0.5f;
+        float headingY = viewport.Height * 0.36f;
+        DrawTitleRules(batch, pixel, viewport, headingY - 26f, reveal);
+        PixelText.DrawCentered(batch, pixel, "PAUSIERT", centerX, headingY, 5, GameBalance.SoulWhite * reveal);
+        DrawMenuList(batch, pixel, viewport, menu, reveal, menu.OpenTimer);
+    }
+
+    private const float PauseVeilAlpha = 0.55f;
+
+    private static void DrawMenuList(SpriteBatch batch, Texture2D pixel, Viewport viewport, MenuController menu, float reveal, float time)
     {
         float centerX = viewport.Width * 0.5f;
         IReadOnlyList<MenuEntry> entries = menu.CurrentPage.Entries;
+        if (menu.CurrentPage.Prompt is { } prompt)
+        {
+            PixelText.DrawCentered(
+                batch,
+                pixel,
+                prompt,
+                centerX,
+                viewport.Height * MenuStartYFraction - MenuPromptOffset,
+                2,
+                GameBalance.DeathFlameBright * (0.8f * reveal));
+        }
         for (int i = 0; i < entries.Count; i++)
         {
             float y = viewport.Height * MenuStartYFraction + i * MenuEntrySpacing;
             bool selected = i == menu.SelectedIndex;
             Color baseColor = entries[i].IsPlaceholder ? GameBalance.SoulWhite * 0.42f : GameBalance.SoulWhite * 0.72f;
             Color color = selected ? GameBalance.DeathFlameBright : baseColor;
-            float breathe = selected ? 0.85f + MathF.Sin(_titleTime * 3f) * 0.15f : 1f;
+            float breathe = selected ? 0.85f + MathF.Sin(time * 3f) * 0.15f : 1f;
             PixelText.DrawCentered(batch, pixel, menu.GetLabel(entries[i]), centerX, y, MenuEntryScale, color * (reveal * breathe));
 
             if (selected)
