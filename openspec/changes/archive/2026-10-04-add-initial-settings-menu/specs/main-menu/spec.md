@@ -1,7 +1,7 @@
 ## RENAMED Requirements
 
-- FROM: `Hauptmenü bietet vier Einträge in fester Reihenfolge`
-- TO: `Hauptmenü bietet fünf Einträge in fester Reihenfolge`
+- FROM: `### Requirement: Hauptmenü bietet vier Einträge in fester Reihenfolge`
+- TO: `### Requirement: Hauptmenü bietet fünf Einträge in fester Reihenfolge`
 
 ## MODIFIED Requirements
 

@@ -7,7 +7,7 @@
 ## 2. Einstellungen und Vollbild
 
 - [x] 2.1 Kleine lokale Einstellungsdatei mit Standardwerten, Werteprüfung und fehlertolerantem Laden/Speichern einführen; fehlende, ungültige und nicht beschreibbare Datei durch gezielte Tests prüfen.
-- [ ] 2.2 `VOLLBILD` im Menü und `F11` an denselben gespeicherten Zustand anbinden; Neustart im Vollbild und Rückkehr zur Fenstergröße im echten DesktopGL-Lauf prüfen.
+- [x] 2.2 `VOLLBILD` im Menü und `F11` an denselben gespeicherten Zustand anbinden; Neustart im Vollbild und Rückkehr zur Fenstergröße im echten DesktopGL-Lauf prüfen.
 
 ## 3. Wirkung der Menüpunkte
 
@@ -17,4 +17,4 @@
 
 ## 4. Gesamtabnahme
 
-- [ ] 4.1 `openspec validate add-initial-settings-menu --strict` und `dotnet test` erfolgreich ausführen; Titelmenü, Unterseiten, Platzhalter, Neustart und Maus-/Tastaturbedienung bei Startgröße sowie abweichendem Fensterformat manuell prüfen und native Captures ansehen.
+- [x] 4.1 `openspec validate add-initial-settings-menu --strict` und `dotnet test` erfolgreich ausführen; Titelmenü, Unterseiten, Platzhalter, Neustart und Maus-/Tastaturbedienung bei Startgröße sowie abweichendem Fensterformat manuell prüfen und native Captures ansehen.

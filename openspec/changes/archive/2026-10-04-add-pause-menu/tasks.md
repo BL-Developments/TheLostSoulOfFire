@@ -16,4 +16,4 @@
 ## 4. Gesamtabnahme
 
 - [x] 4.1 `openspec validate add-pause-menu --strict` und `dotnet test` erfolgreich ausführen.
-- [ ] 4.2 Manuell anspielen: `dotnet run --project src/TheLostSoulOfFire -- --dev --start arena` (Pause im Kampf, Einstellungen, beide Beenden-Wege) und `-- --dev --start prologue` (Pause während der Inszenierung); `Escape` auf Titelkarte und Hauptmenü mit `JA`/`NEIN` prüfen.
+- [x] 4.2 Manuell anspielen: `dotnet run --project src/TheLostSoulOfFire -- --dev --start arena` (Pause im Kampf, Einstellungen, beide Beenden-Wege) und `-- --dev --start prologue` (Pause während der Inszenierung); `Escape` auf Titelkarte und Hauptmenü mit `JA`/`NEIN` prüfen.
