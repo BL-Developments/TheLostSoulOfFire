@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TheLostSoulOfFire.Rendering;
+using TheLostSoulOfFire.Rendering.Visuals;
 
 namespace TheLostSoulOfFire.Game;
 
@@ -69,6 +70,18 @@ public sealed class SoulFurnaceAntechamber
         new(940f, 610f)
     ];
 
+    /// <summary>
+    /// The rendered room (tools/visuals/blender/build_hub.py): each brazier stands 72 units below
+    /// its flame; the iron sconces on the six pilasters hold their flames 2.65 m up, just in front
+    /// of the wall.
+    /// </summary>
+    public static IReadOnlyList<Vector2> BrazierFeet { get; } = [new(560f, 682f), new(940f, 682f)];
+
+    private static readonly Vector2[] SconceFlames =
+    [
+        new(280f, 219f), new(460f, 219f), new(640f, 219f), new(860f, 219f), new(1040f, 219f), new(1220f, 219f)
+    ];
+
     public SoulFurnaceAntechamber()
     {
         // Left to right: I, II, III, final, IV, V, VI. Only door I is open.
@@ -122,10 +135,94 @@ public sealed class SoulFurnaceAntechamber
     public void Draw(
         SpriteBatch batch,
         Texture2D pixel,
+        ArtAssets art,
         float time,
         float soulSenseAmount,
         float doorProgress,
         bool debugVisible)
+    {
+        if (art.HasArt(VisualIds.HubFloor))
+        {
+            DrawRendered(batch, art, time, soulSenseAmount, doorProgress);
+        }
+        else
+        {
+            DrawPlaceholder(batch, pixel, time, soulSenseAmount, doorProgress);
+        }
+
+        if (debugVisible)
+        {
+            batch.DrawRectangle(pixel, MovementBounds, new Color(80, 220, 210) * 0.8f, 3f);
+            foreach (HubDoor door in Doors)
+            {
+                batch.DrawRectangle(pixel, door.InteractionZone, new Color(245, 205, 90) * 0.75f, 3f);
+            }
+        }
+    }
+
+    /// <summary>
+    /// The rendered room: painted plate, then per door its closed leaves (sliding into the wall as
+    /// the door opens) and, while sealed, the iron bar and seal; the Warden flames are drawn
+    /// live because a Warden flame is never completely still (S11).
+    /// </summary>
+    private void DrawRendered(SpriteBatch batch, ArtAssets art, float time, float soulSenseAmount, float doorProgress)
+    {
+        art.DrawEnvironment(batch, VisualIds.HubFloor, Vector2.Zero);
+        foreach (HubDoor door in Doors)
+        {
+            bool isFinal = door.Kind == HubDoorKind.Final;
+            string leaves = isFinal ? VisualIds.HubLeavesFinal : VisualIds.HubLeaves;
+            Vector2 anchor = new(door.Center.X, WallBottom);
+            float opening = door.Bounds.Width * 0.5f * Ease(door == EntryDoor ? doorProgress : 0f);
+            float half = door.Bounds.Width * 0.5f;
+            RectangleF left = new(door.Bounds.Left - 2f, door.Bounds.Top - 12f, half - opening + 2f, door.Bounds.Height + 24f);
+            RectangleF right = new(door.Center.X + opening, door.Bounds.Top - 12f, half - opening + 2f, door.Bounds.Height + 24f);
+            Color tint = door.IsSealed ? new Color(200, 196, 210) : Color.White;
+            art.DrawSpriteWindow(batch, leaves, anchor, left, new Vector2(-opening, 0f), tint);
+            art.DrawSpriteWindow(batch, leaves, anchor, right, new Vector2(opening, 0f), tint);
+            if (door.IsSealed)
+            {
+                art.DrawProp(batch, isFinal ? VisualIds.HubSealFinal : VisualIds.HubSeal, anchor, Vector2.One, 1f);
+                float sealPulse = 0.5f + MathF.Sin(time * 2.2f + door.Center.X * 0.01f) * 0.12f;
+                Vector2 seal = new(door.Center.X, door.Bounds.Bottom - door.Bounds.Height * 0.58f);
+                art.DrawSoftSpot(batch, seal, new Vector2(isFinal ? 18f : 11f), GameBalance.DeepViolet * sealPulse);
+            }
+            else
+            {
+                // The open door: Death Flame light from deep inside, through the seam and, as the
+                // leaves part, out across the floor in front of it.
+                float pulse = 0.62f + MathF.Sin(time * 3.4f) * 0.15f;
+                float open = Ease(door == EntryDoor ? doorProgress : 0f);
+                float inner = 3f + opening * 0.85f;
+                art.DrawSoftSpot(batch, new Vector2(door.Center.X, door.Bounds.Bottom - door.Bounds.Height * 0.3f),
+                    new Vector2(inner, door.Bounds.Height * 0.42f), GameBalance.DeathFlame * (0.28f * pulse + 0.35f * open));
+                art.DrawSoftSpot(batch, new Vector2(door.Center.X, door.Bounds.Bottom - door.Bounds.Height * 0.22f),
+                    new Vector2(inner * 0.45f, door.Bounds.Height * 0.3f), GameBalance.DeathFlameBright * (0.35f * pulse + 0.3f * open));
+                art.DrawSoftSpot(batch, new Vector2(door.Center.X, WallBottom + 18f),
+                    new Vector2(door.Bounds.Width * (0.35f + 0.5f * open), 16f + 14f * open), GameBalance.DeathFlame * (0.18f + 0.3f * open));
+            }
+        }
+
+        for (int index = 0; index < SconceFlames.Length; index++)
+        {
+            art.DrawWardenFlame(batch, SconceFlames[index], 26f, time + index * 1.37f, 0.9f + soulSenseAmount * 0.1f);
+        }
+    }
+
+    /// <summary>Called by the game after the actor band: brazier flames stand above their props.</summary>
+    public void DrawBrazierFlames(SpriteBatch batch, ArtAssets art, float time)
+    {
+        if (!art.HasArt(VisualIds.HubFloor))
+        {
+            return;
+        }
+        for (int index = 0; index < BrazierPositions.Length; index++)
+        {
+            art.DrawWardenFlame(batch, BrazierPositions[index] + new Vector2(0f, 1f), 40f, time + index * 0.9f);
+        }
+    }
+
+    private void DrawPlaceholder(SpriteBatch batch, Texture2D pixel, float time, float soulSenseAmount, float doorProgress)
     {
         batch.FillRectangle(pixel, Bounds, new Color(7, 7, 12));
         batch.FillRectangle(pixel, new Rectangle(0, WallBottom, Bounds.Width, Bounds.Height - WallBottom), new Color(14, 14, 21));
@@ -144,15 +241,6 @@ public sealed class SoulFurnaceAntechamber
         foreach (HubDoor door in Doors)
         {
             DrawDoor(batch, pixel, door, time, door == EntryDoor ? doorProgress : 0f);
-        }
-
-        if (debugVisible)
-        {
-            batch.DrawRectangle(pixel, MovementBounds, new Color(80, 220, 210) * 0.8f, 3f);
-            foreach (HubDoor door in Doors)
-            {
-                batch.DrawRectangle(pixel, door.InteractionZone, new Color(245, 205, 90) * 0.75f, 3f);
-            }
         }
     }
 

@@ -5,7 +5,7 @@
         --out art/production/candidates/audio/music/<cue> --prompt "..." \\
         [--duration 90] [--seeds 11 12 13] [--steps 60] [--guidance 15]
 
-The model runs on the Mac (MPS, float16) with CPU offload; no network service is called
+The model runs on the Mac (MPS, float16), optionally with CPU offload; no network service is called
 after the checkpoint is cached. Each candidate is written as <seed>.wav next to a JSON
 file with the exact prompt, seed and settings, so the selected take can be recorded in
 Content/Audio/SOURCES.md. Lyrics are always "[instrumental]".
@@ -28,12 +28,13 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--steps", type=int, default=60)
     parser.add_argument("--guidance", type=float, default=15.0)
     parser.add_argument("--checkpoint", default="", help="checkpoint directory (default: Hugging Face cache)")
+    parser.add_argument("--offload", action="store_true", help="CPU offload between stages (slower; for low memory)")
     args = parser.parse_args(argv)
 
     from acestep.pipeline_ace_step import ACEStepPipeline
 
     args.out.mkdir(parents=True, exist_ok=True)
-    pipeline = ACEStepPipeline(checkpoint_dir=args.checkpoint, dtype="bfloat16", cpu_offload=True, overlapped_decode=True)
+    pipeline = ACEStepPipeline(checkpoint_dir=args.checkpoint, dtype="bfloat16", cpu_offload=args.offload, overlapped_decode=True)
     for seed in args.seeds:
         started = time.monotonic()
         target = args.out / f"{seed}.wav"

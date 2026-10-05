@@ -5138,6 +5138,754 @@
         "status": "angenommen",
         "reason": "Hollow-Clip death (Stil B), an den Zustandszeitgeber gekoppelt"
       }
+    },
+    {
+      "id": "71104f21bde24ed6acbcadd818a20495",
+      "timestamp": "2026-10-05T23:27:53+00:00",
+      "visual_id": "environment.hub",
+      "step": "texture",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "seen straight down from high above, orthographic top-down texture, the whole image is a floor of large hand-dressed dark basalt flagstones of irregular rectangular shapes, about seven stones across, fine pale grey ash settled in the joints and in soft drifts, worn smooth paths, small chips, painted with visible soft brushwork like a hand-painted game background, calm even lighting, mid-dark charcoal grey with a faint cold violet cast, no objects, no shadows of objects",
+      "seed": 211,
+      "parameters": {
+        "steps": 4,
+        "width": 1024,
+        "height": 1024,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.hub/tex-floor-s211.png",
+          "sha256": "ba56a43952d0dd25c1808d5d203999b04d058c56b4ab7e9600e44e06a836f13d"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 69.69,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "ed135eeb273440b996cee8912c5d16a9",
+      "timestamp": "2026-10-05T23:29:47+00:00",
+      "visual_id": "environment.hub",
+      "step": "texture",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "straight-on frontal view, flat orthographic texture, the whole image is a massive wall of large dressed dark basalt ashlar blocks laid in even courses, thin dark mortar joints, soot streaks running down, fine pale ash on the upper edges of the blocks, a few chisel marks, painted with visible soft brushwork like a hand-painted game background, even lighting, dark charcoal grey with a cold violet cast, no doors, no windows, no objects",
+      "seed": 223,
+      "parameters": {
+        "steps": 4,
+        "width": 1024,
+        "height": 1024,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.hub/tex-wall-s223.png",
+          "sha256": "ed6338140a418053c2900d29f9bb20ced19e9e078efdf5345264aa518d50dc50"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 113.73,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "bf648f806a0b428a8bd1c108f0947632",
+      "timestamp": "2026-10-05T23:32:05+00:00",
+      "visual_id": "environment.hub",
+      "step": "texture",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "straight-on frontal view, flat orthographic texture, the whole image is old dark oak planks running vertically, deep grain, worn edges, black iron nails, soot and ash dust, painted with visible soft brushwork like a hand-painted game background, even lighting, very dark brown-black, no objects",
+      "seed": 227,
+      "parameters": {
+        "steps": 4,
+        "width": 1024,
+        "height": 1024,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.hub/tex-timber-s227.png",
+          "sha256": "510178f18ff1875b75e382ede511c674002de970779624e31bd9c8ac916e9116"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 137.29,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "1fb24ac2800e4df99da8bf9932b55a84",
+      "timestamp": "2026-10-05T23:33:29+00:00",
+      "visual_id": "environment.hub",
+      "step": "texture",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "seen straight down from high above, orthographic top-down texture, the whole image is an old floor of many dark basalt paving stones of different sizes laid in uneven running rows, long rectangular slabs and smaller square ones mixed, about twelve stones across the width, tight dark joints filled with fine pale ash, soft drifts of grey ash over parts of the floor, worn polished patches, chipped edges, painted with visible soft gouache brushwork like a hand-painted game background, calm even lighting, mid-dark charcoal grey with a faint cold violet cast, no objects, no shadows of objects",
+      "seed": 241,
+      "parameters": {
+        "steps": 4,
+        "width": 1024,
+        "height": 1024,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.hub/tex-floor-s241.png",
+          "sha256": "a5919708c7fe09cfe9529c4ca8a56fbe8ffc3d25114ad01b3ba0fa23b36204e1"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 82.75,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "2bee97d2561b4c95a2d30803be3e7593",
+      "timestamp": "2026-10-05T23:34:44+00:00",
+      "visual_id": "environment.hub",
+      "step": "texture",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "seen straight down from high above, orthographic top-down texture, the whole image is an old floor of many dark basalt paving stones of different sizes laid in uneven running rows, long rectangular slabs and smaller square ones mixed, about twelve stones across the width, tight dark joints filled with fine pale ash, soft drifts of grey ash over parts of the floor, worn polished patches, chipped edges, painted with visible soft gouache brushwork like a hand-painted game background, calm even lighting, mid-dark charcoal grey with a faint cold violet cast, no objects, no shadows of objects",
+      "seed": 257,
+      "parameters": {
+        "steps": 4,
+        "width": 1024,
+        "height": 1024,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.hub/tex-floor-s257.png",
+          "sha256": "8fda97d8ad39b2f60fc88c2f101c634eb8a0e60398f39ef996e729be10d28c23"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 74.68,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "d5852e06109b42fd8b74fd9fd5e9f3a0",
+      "timestamp": "2026-10-05T23:39:34+00:00",
+      "visual_id": "environment.hub",
+      "step": "texture",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "flat orthographic close-up texture, the whole image is one continuous surface of dark dressed basalt stone without any joints or edges, fine grain, faint chisel marks, small pits, soft patches of pale grey ash dust and soot, painted with visible soft gouache brushwork like a hand-painted game background, even lighting, mid-dark charcoal grey with subtle cold violet and warm grey variation, no objects, no lines across",
+      "seed": 271,
+      "parameters": {
+        "steps": 4,
+        "width": 1024,
+        "height": 1024,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.hub/tex-stone-s271.png",
+          "sha256": "fe73215432f9c45e2e153cf5c5c449b8578815574a76d259cd37fee7afbb5344"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 75.97,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "1f745e08f99f4615aac38a31294807fe",
+      "timestamp": "2026-10-05T23:40:55+00:00",
+      "visual_id": "environment.hub",
+      "step": "texture",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "flat orthographic close-up texture, the whole image is a layer of fine pale grey ash and soot dust settled on a dark surface, soft drifts and swept streaks, tiny embers of black cinder, painted with visible soft gouache brushwork, even lighting, light ash grey to charcoal, no objects",
+      "seed": 283,
+      "parameters": {
+        "steps": 4,
+        "width": 1024,
+        "height": 1024,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.hub/tex-ash-s283.png",
+          "sha256": "4dd4bae4c234f3a5f19c1715802bee237e6bb7e879434a50ca9c3d08b0b0e27f"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 80.92,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "cea0f9a5cc4a4bae87b3faa860d38360",
+      "timestamp": "2026-10-05T23:44:19+00:00",
+      "visual_id": "environment.hub",
+      "step": "place-environment",
+      "tool": {
+        "name": "place_environment.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "world": [
+          1500,
+          900
+        ],
+        "output": [
+          2250,
+          1350
+        ],
+        "tiles": [
+          2,
+          1
+        ],
+        "layer": "ground",
+        "origin": [
+          0.0,
+          0.0
+        ],
+        "crop": null,
+        "mute_reds": null,
+        "target_median": null
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.hub/plate.png",
+          "sha256": "cfe346ca871026f5d9bc1321e80aff63ede9047d929f24b50fdbb34b35ba2ffe"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Hub/plate_c0r0.png",
+          "sha256": "dce7c8769f38f2302c95a594f89227f44699e1d911fcec57e2db76b30313f126"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Hub/plate_c1r0.png",
+          "sha256": "354621b51b6d8f123778b08ba1c80ac7a04fd490ef7805da4d374934277c7a35"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.34,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Bodenplatte für das Spiel aufbereitet"
+      }
+    },
+    {
+      "id": "8671b8e510a1405bb19035dd2f0747a8",
+      "timestamp": "2026-10-05T23:44:19+00:00",
+      "visual_id": "prop.hub-brazier",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "brazier",
+        "box": [
+          799,
+          889,
+          880,
+          1040
+        ],
+        "layer": "high-prop"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.hub/brazier_full.png",
+          "sha256": "b347d7349e057419522d6886b3a85e02f4527a87b52c80cec948f46366a6fcb8"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Hub/brazier.png",
+          "sha256": "e51156f44a9417d2178a399cba552e96aefd44c673a625b9fa66843e0620d326"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.02,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "f04546bf491a488cb9958139057d2198",
+      "timestamp": "2026-10-05T23:44:19+00:00",
+      "visual_id": "environment.hub-leaves",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "leaf_biome",
+        "box": [
+          461,
+          196,
+          648,
+          510
+        ],
+        "layer": "ground"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.hub/leaf_biome_full.png",
+          "sha256": "870cd7132e05e1b083d0745d3f8ab0f7902f36359b0c41957084a5f08e614220"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Hub/leaves.png",
+          "sha256": "1858c211bdece3546b9a02de0a1210d6a6c93d1429cdd993daeef420815e98d8"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.03,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "a4605d6169d44464aa78f3034131c88f",
+      "timestamp": "2026-10-05T23:44:19+00:00",
+      "visual_id": "environment.hub-leaves-final",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "leaf_final",
+        "box": [
+          957,
+          61,
+          1293,
+          510
+        ],
+        "layer": "ground"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.hub/leaf_final_full.png",
+          "sha256": "3e7f3c89ec59d1de4ae497a67a9cb0bbac24bdf0ee1c084da4f71d67acadee53"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Hub/leaves_final.png",
+          "sha256": "0e05ea7ddd92a57e80f0e61b5c6e5ede28c264a59f0e346645fccf349acce368"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.04,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "eb6cb7d140254880b0c8a17e66f20b81",
+      "timestamp": "2026-10-05T23:44:19+00:00",
+      "visual_id": "environment.hub-seal",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "seal_biome",
+        "box": [
+          435,
+          312,
+          675,
+          373
+        ],
+        "layer": "ground"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.hub/seal_biome_full.png",
+          "sha256": "9719de1d815ec20a48be12c33ffe04153547f1e0b616a7cc959b202cb886c814"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Hub/seal.png",
+          "sha256": "ae5f23afe1f594237a9b5a9c8bd62e1448cd6e5ce30d2e88af860afde8633c8d"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.02,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "42432e90ed9343189aa20ec82b98b5fd",
+      "timestamp": "2026-10-05T23:44:19+00:00",
+      "visual_id": "environment.hub-seal-final",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "seal_final",
+        "box": [
+          931,
+          217,
+          1319,
+          311
+        ],
+        "layer": "ground"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.hub/seal_final_full.png",
+          "sha256": "d44a71e0eed60f5c924e7bd103f0c1bd2a4c2268dc1c68edcb24faf0c393a3bd"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Hub/seal_final.png",
+          "sha256": "1d9278d9ca03727516416c20306a1e08f7d1c8eeaaaf560a9622dac24e2cd411"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.02,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "837821d2b4dd405ea362d8134b2db265",
+      "timestamp": "2026-10-05T23:44:30+00:00",
+      "visual_id": "environment.hub-seal",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "seal_biome",
+        "box": [
+          435,
+          312,
+          675,
+          373
+        ],
+        "layer": "ground"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.hub/seal_biome_full.png",
+          "sha256": "9719de1d815ec20a48be12c33ffe04153547f1e0b616a7cc959b202cb886c814"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Hub/seal.png",
+          "sha256": "2a65d4e638c1b0e0ad7075484fc0e25981219426061ed07fce71b9164aa1a43f"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.02,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "4aa8b83ece754689872d678566c13083",
+      "timestamp": "2026-10-05T23:44:30+00:00",
+      "visual_id": "environment.hub-seal-final",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "seal_final",
+        "box": [
+          931,
+          217,
+          1319,
+          311
+        ],
+        "layer": "ground"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.hub/seal_final_full.png",
+          "sha256": "d44a71e0eed60f5c924e7bd103f0c1bd2a4c2268dc1c68edcb24faf0c393a3bd"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Hub/seal_final.png",
+          "sha256": "35c9b66e2d14cb0f9ca84036fe55ee331b5d523db658f8b27aafd24c74471654"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.03,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "9d95e04c3a3c4bedb32a148c6d5de3be",
+      "timestamp": "2026-10-05T23:46:26+00:00",
+      "visual_id": "prop.hub-brazier",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "brazier",
+        "box": [
+          799,
+          889,
+          880,
+          1040
+        ],
+        "layer": "high-prop"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.hub/brazier_full.png",
+          "sha256": "7496f49dbd94fbf93336016ad193012a953b1daac14853718eaba609a0025021"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Hub/brazier.png",
+          "sha256": "3c6cd481dd8ef54c6ed487b168a2b99d08419ccdcd8dc8972a2dd37a1a94b8e2"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.03,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "e0cdb1dc864543988f071376a3b8dadb",
+      "timestamp": "2026-10-05T23:46:27+00:00",
+      "visual_id": "environment.hub",
+      "step": "place-environment",
+      "tool": {
+        "name": "place_environment.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "world": [
+          1500,
+          900
+        ],
+        "output": [
+          2250,
+          1350
+        ],
+        "tiles": [
+          2,
+          1
+        ],
+        "layer": "ground",
+        "origin": [
+          0.0,
+          0.0
+        ],
+        "crop": null,
+        "mute_reds": null,
+        "target_median": null
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.hub/plate.png",
+          "sha256": "9f720e662a6b88df5b6fb0430c56b6f6c3689dfd3d255af8147da1a08fbeedb4"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Hub/plate_c0r0.png",
+          "sha256": "954abab14f4967e7423e5ad4efe115f4d7afa41f0dc71823731f80351a441ff5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Hub/plate_c1r0.png",
+          "sha256": "0b2cf70d816df92c63a01ca0a9f937ee117ffe684a4e1287a4313dbdfad2261c"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.36,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Bodenplatte für das Spiel aufbereitet"
+      }
     }
   ]
 }

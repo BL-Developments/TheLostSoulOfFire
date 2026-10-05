@@ -32,6 +32,12 @@ public static class VisualIds
     public const string ShoreCanopyPost = "prop.shore-canopy-post";
     public const string ShoreLamp = "prop.shore-lamp";
     public const string ShoreBollard = "prop.shore-bollard";
+    public const string HubFloor = "environment.hub";
+    public const string HubBrazier = "prop.hub-brazier";
+    public const string HubLeaves = "environment.hub-leaves";
+    public const string HubLeavesFinal = "environment.hub-leaves-final";
+    public const string HubSeal = "environment.hub-seal";
+    public const string HubSealFinal = "environment.hub-seal-final";
 
     public const string Scythe = "weapon.scythe";
     public const string SoulCannon = "weapon.soul-cannon";

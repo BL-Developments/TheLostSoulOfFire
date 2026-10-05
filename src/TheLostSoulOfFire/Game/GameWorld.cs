@@ -55,6 +55,9 @@ public sealed partial class GameWorld : IDisposable
     private readonly List<SceneProp> _arenaProps = Arena.Props
         .Select(placement => new SceneProp(placement.VisualId, placement.Foot, placement.FallbackSize, placement.FallbackLayer))
         .ToList();
+    private readonly List<SceneProp> _hubProps = SoulFurnaceAntechamber.BrazierFeet
+        .Select(foot => new SceneProp(VisualIds.HubBrazier, foot, new Vector2(48f, 76f), SceneLayer.HighProp))
+        .ToList();
     private readonly List<SceneProp> _shoreProps = PrologueDirector.ShoreProps
         .Select(placement => new SceneProp(placement.VisualId, placement.Foot, placement.FallbackSize, placement.FallbackLayer))
         .ToList();
@@ -818,6 +821,7 @@ public sealed partial class GameWorld : IDisposable
             _antechamber.Draw(
                 batch,
                 pixel,
+                _art,
                 _presentationTime,
                 _soulSensePresentation.SoulEmergence,
                 DoorTransitionProgress,
@@ -857,6 +861,10 @@ public sealed partial class GameWorld : IDisposable
         DrawAutomatedStaging(batch);
 
         DrawSceneProps(batch, layer => layer is SceneLayer.Occluder or SceneLayer.Foreground);
+        if (inAntechamber)
+        {
+            _antechamber.DrawBrazierFlames(batch, _art, _presentationTime);
+        }
         if (_phase == GamePhase.Prologue)
         {
             PrologueEnvironment.DrawForeground(batch, pixel, _prologue);
@@ -917,6 +925,7 @@ public sealed partial class GameWorld : IDisposable
     /// <summary>Props of the room being shown plus props staged by automated tests.</summary>
     private IEnumerable<SceneProp> ActiveSceneProps => _phase switch
     {
+        GamePhase.Antechamber or GamePhase.EnteringArena => _hubProps.Concat(_sceneProps),
         GamePhase.Arena => _arenaProps.Concat(_sceneProps),
         GamePhase.Prologue when _prologue.Sector == PrologueSector.Emergence => _shoreProps.Concat(_sceneProps),
         _ => _sceneProps
@@ -1488,8 +1497,11 @@ public sealed partial class GameWorld : IDisposable
         }
 
         float smoothing = 1f - MathF.Exp(-deltaTime * 6.5f);
-        _camera.Zoom = MathHelper.Lerp(_camera.Zoom, 1f, smoothing);
-        Vector2 target = Vector2.Lerp(_player.Position, _antechamber.EntryDoorCenter, 0.11f) + new Vector2(0f, -40f);
+        // The hub frames the whole door wall: slightly wider than a combat room and held at the
+        // height of the doors, following the player mostly sideways.
+        _camera.Zoom = MathHelper.Lerp(_camera.Zoom, HubCameraZoom, smoothing);
+        Vector2 target = new(MathHelper.Lerp(_player.Position.X, _antechamber.EntryDoorCenter.X, 0.11f),
+            MathHelper.Lerp(HubCameraHeight, _player.Position.Y, 0.15f));
         _camera.Follow(target, _antechamber.Bounds, viewport, smoothing);
 
         HubDoor? door = _antechamber.DoorAt(_player.Position);
@@ -1498,6 +1510,9 @@ public sealed partial class GameWorld : IDisposable
             BeginDoorTransition();
         }
     }
+
+    private const float HubCameraZoom = 0.88f;
+    private const float HubCameraHeight = 470f;
 
     private void BeginDoorTransition()
     {
@@ -1518,7 +1533,7 @@ public sealed partial class GameWorld : IDisposable
 
         float eased = Ease(DoorTransitionProgress);
         float smoothing = 1f - MathF.Exp(-deltaTime * 7f);
-        _camera.Zoom = MathHelper.Lerp(_camera.Zoom, MathHelper.Lerp(1f, 0.88f, eased), smoothing);
+        _camera.Zoom = MathHelper.Lerp(_camera.Zoom, MathHelper.Lerp(HubCameraZoom, 0.8f, eased), smoothing);
         _camera.Follow(
             Vector2.Lerp(_player.Position, _antechamber.EntryDoorCenter + new Vector2(0f, 90f), eased),
             _antechamber.Bounds,

@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using TheLostSoulOfFire.Combat;
 using TheLostSoulOfFire.Entities;
+using TheLostSoulOfFire.Game;
 using TheLostSoulOfFire.Rendering.Visuals;
 
 namespace TheLostSoulOfFire.Rendering;
@@ -579,6 +580,64 @@ public sealed class ArtAssets
             : RectangleF.FromFoot(foot, fallbackSize, new Vector2(0.5f, 1f));
 
     /// <summary>Draws a prop on its foot point; occluders pass a reduced <paramref name="alpha"/> while they hide something.</summary>
+    /// <summary>Whether a Visual-ID has a loaded texture (no dummy), e.g. a rendered room.</summary>
+    public bool HasArt(string id) =>
+        Registry.TryGet(id, out VisualEntry entry) && entry.TryGetClip(VisualClips.Default, out VisualClipDefinition clip) &&
+        (clip.IsTiled || GetEffect(id) is not null);
+
+    /// <summary>
+    /// Draws the part of a sprite (placed with its origin on <paramref name="anchor"/>) that falls
+    /// in <paramref name="window"/>, after shifting the sprite by <paramref name="shift"/>: door
+    /// leaves that slide into the wall, cut at the opening. Returns false without a texture.
+    /// </summary>
+    public bool DrawSpriteWindow(SpriteBatch batch, string id, Vector2 anchor, RectangleF window, Vector2 shift, Color tint)
+    {
+        SpriteClip? clip = GetEffect(id);
+        if (clip is null || !Registry.TryGet(id, out VisualEntry entry))
+        {
+            return false;
+        }
+
+        RectangleF sprite = RectangleF.FromFoot(anchor + shift, entry.WorldSize, entry.Origin);
+        float left = MathF.Max(window.X, sprite.X);
+        float top = MathF.Max(window.Y, sprite.Y);
+        float right = MathF.Min(window.Right, sprite.Right);
+        float bottom = MathF.Min(window.Bottom, sprite.Bottom);
+        if (right <= left || bottom <= top)
+        {
+            return true;
+        }
+
+        Rectangle frame = clip.GetSourceRectangle(0f);
+        float scaleX = frame.Width / sprite.Width;
+        float scaleY = frame.Height / sprite.Height;
+        Rectangle source = new(
+            frame.X + (int)MathF.Round((left - sprite.X) * scaleX),
+            frame.Y + (int)MathF.Round((top - sprite.Y) * scaleY),
+            Math.Max(1, (int)MathF.Round((right - left) * scaleX)),
+            Math.Max(1, (int)MathF.Round((bottom - top) * scaleY)));
+        Rectangle destination = new((int)MathF.Round(left), (int)MathF.Round(top), (int)MathF.Round(right - left), (int)MathF.Round(bottom - top));
+        batch.Draw(clip.Texture, destination, source, tint);
+        return true;
+    }
+
+    /// <summary>
+    /// A Warden flame (VISUAL-ART-DIRECTION S8–S11): a vertical, calm Death Flame standing on
+    /// <paramref name="base"/> in its fitting, breathing a little, never still and never wild.
+    /// </summary>
+    public void DrawWardenFlame(SpriteBatch batch, Vector2 @base, float height, float time, float alpha = 1f)
+    {
+        float breathe = 1f + 0.06f * MathF.Sin(time * 2.3f) + 0.03f * MathF.Sin(time * 5.7f + 1.3f);
+        float sway = 0.8f * MathF.Sin(time * 1.7f + 0.4f);
+        float h = height * breathe;
+        Vector2 Up(float share) => @base + new Vector2(sway * share, -h * share);
+        DrawSoftSpot(batch, Up(0.42f), new Vector2(height * 0.34f, h * 0.58f), GameBalance.DeepViolet * (0.55f * alpha));
+        DrawSoftSpot(batch, Up(0.40f), new Vector2(height * 0.22f, h * 0.44f), GameBalance.DeathFlame * (0.85f * alpha));
+        DrawSoftSpot(batch, Up(0.70f), new Vector2(height * 0.07f, h * 0.26f), GameBalance.DeathFlame * (0.7f * alpha));
+        DrawSoftSpot(batch, Up(0.33f), new Vector2(height * 0.13f, h * 0.29f), GameBalance.DeathFlameBright * alpha);
+        DrawSoftSpot(batch, Up(0.22f), new Vector2(height * 0.06f, h * 0.13f), GameBalance.SoulWhite * (0.9f * alpha));
+    }
+
     public void DrawProp(SpriteBatch batch, string id, Vector2 foot, Vector2 fallbackSize, float alpha)
     {
         RectangleF bounds = PropBounds(id, foot, fallbackSize);

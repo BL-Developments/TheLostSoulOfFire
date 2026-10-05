@@ -18,3 +18,4 @@ artifacts/
 art/production/candidates/
 tools/visuals/.venv/
 __pycache__/
+tools/audio/.venv/
