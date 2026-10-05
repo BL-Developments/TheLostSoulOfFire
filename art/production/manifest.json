@@ -4694,6 +4694,450 @@
         "status": "angenommen",
         "reason": "Spielerclip death (Stil B), an den Spielzeitgeber gekoppelt"
       }
+    },
+    {
+      "id": "0f2c258da3164816bdaa591281feebf4",
+      "timestamp": "2026-10-05T23:15:33+00:00",
+      "visual_id": "enemy.hollow",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "hit",
+        "frames": 4,
+        "fps": 12.0,
+        "frame_size": [
+          124,
+          235
+        ],
+        "origin": [
+          0.5,
+          0.8936
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.2,
+        "render_seconds": 13.3
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/enemy.hollow/render2/hit.render.json",
+          "sha256": "343d61135a7ac1a534e2e243528ce32913bea2dbd75bbde4172b367c1209babe"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit/n.png",
+          "sha256": "a2625f33fc7ff68b81b972170e09280611540ba44b72cb9834f02d56fd14d8c1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit_normal/n.png",
+          "sha256": "778a2e80d1b723e05cb0585a29eaece28dfde5e87a04d053ee02bde8a87c6130"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit/ne.png",
+          "sha256": "672a4ce5ad0973cb7d1df90b4b314594275cbe44d8e87115d8bc8714cec0b128"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit_normal/ne.png",
+          "sha256": "61c59eafe086c66e7be0f4c450f3d308c1871ece485ba0a3280f1f27c87f84ca"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit/e.png",
+          "sha256": "4fa99babdce3544631505271f1470173cf1e50ce331430dc0d52d071f024b269"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit_normal/e.png",
+          "sha256": "d2ce78bc02172a46490bb0bfc3d80c7d74d15024fe06164196bed150f5e9b2a3"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit/se.png",
+          "sha256": "18d20db44b3c1e04c8b2a3c6021303f8d702fe369344f1d49a71c897d739a224"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit_normal/se.png",
+          "sha256": "ba4b8aa94791adcec91db0a4f51de78c872d2f2e4373370acdf7ad2925ea4e73"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit/s.png",
+          "sha256": "b98bd49af1f9677c5ca3658769a26a5f495afb2a68c5e4a3074f08560f3bcd1a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit_normal/s.png",
+          "sha256": "911a395b95540820a66693ae9572e5d605e73ec41f13a5cf6946235ab75cac43"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit/sw.png",
+          "sha256": "63d76da3345d92586b50c97f99e50cb452b3b7d8affbbd336ad52d9600994ff4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit_normal/sw.png",
+          "sha256": "eb6fcdb27d90a0cab0d11618a6ce47fc7f59316e72ba5c09f85a3337807f5a81"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit/w.png",
+          "sha256": "b884cfa2c7e5d56006a4dab8e7de1370ccdb392ff513d7b084813e10fbf80979"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit_normal/w.png",
+          "sha256": "d8d4792a9e0e8274aaf6b3f0a4ad72099bed04ae1c26609962815b0eccd06e2e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit/nw.png",
+          "sha256": "a753dad42d59575b7c0a28e3837cb7de2675f05c91eb9388c3bb3f43f6bbc2f2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit_normal/nw.png",
+          "sha256": "7b2d5c06f9c52199fa230b0f118511f72341ea282d384e126ee34618cd9884a8"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.12,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Hollow-Clip hit (Stil B), an den Zustandszeitgeber gekoppelt"
+      }
+    },
+    {
+      "id": "5c96bacca4f140998d07dfc92182455c",
+      "timestamp": "2026-10-05T23:15:34+00:00",
+      "visual_id": "enemy.hollow",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "recover",
+        "frames": 6,
+        "fps": 12.0,
+        "frame_size": [
+          256,
+          243
+        ],
+        "origin": [
+          0.5,
+          0.8642
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.2,
+        "render_seconds": 18.2
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/enemy.hollow/render2/recover.render.json",
+          "sha256": "f6bf25f8248467edeec9d71aaca786d90aa902367cdc0cd1cab5004680b3059a"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover/n.png",
+          "sha256": "f9ae11197283fd7721292c685b92c548b674c892aad74abfcf99b13094f08150"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover_normal/n.png",
+          "sha256": "af0db1c759a5cb7b00a934cd575ded6146506f5d86ea1d5c42045464dc69382f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover/ne.png",
+          "sha256": "33b7b6d47144c86c3f81763f784f2fb75cb5fd1db0a74533418750ba00333a27"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover_normal/ne.png",
+          "sha256": "cabe451d7cb85bc1ed3551a706e38e4ec99a47d04b4149c153d340f084bf85ec"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover/e.png",
+          "sha256": "2c685a4eb717754f3d182d240fa9a1f88ae760319757c0924312900ec3003ae3"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover_normal/e.png",
+          "sha256": "7731cb9de818558904764fd995ebcd3ee14acf5f332b63a2522e8b5b22e7e2b2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover/se.png",
+          "sha256": "a45e03f6b469df4106b8af8ed2389f527f80d9986228f059cea1b6f01c10933d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover_normal/se.png",
+          "sha256": "d18137ad624731db7d269b47e9aa0bc8b18eb66745a2e03e573f9f7eca1c6726"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover/s.png",
+          "sha256": "d62037a7645407a132cf6d47caebb2abc5989abbe0c486cf51a47c4743cde145"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover_normal/s.png",
+          "sha256": "4e2ba4ae1e7fc72cfbb629a899b98a1584324dbd17c20d411202b437119433cc"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover/sw.png",
+          "sha256": "2d0c2f3c7510030badb75d940e17a1630cebacaaf2bfc36f98a0f1b9123667c2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover_normal/sw.png",
+          "sha256": "4257eb0ca40a5ad5f1535e0cd3c4c5488680be3efe5f414b13110539a55d3db0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover/w.png",
+          "sha256": "02455192714cd1e6cd70a51c87dcde08b43d8418d30147ce357176663fc02b0d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover_normal/w.png",
+          "sha256": "05eecc4a4e3301e53addf2463d8814c9020b443ec9842d2927cf181db37fea6e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover/nw.png",
+          "sha256": "5b80def3793de9b97187137f23559e4c5a427000f9e8019d19dd89c90f0378d8"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover_normal/nw.png",
+          "sha256": "66af799a82809433362335597b83bb9c06808491b62ab52ac231998edeee626f"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.26,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Hollow-Clip recover (Stil B), an den Zustandszeitgeber gekoppelt"
+      }
+    },
+    {
+      "id": "792468d0fd7b47f7b57b29e12c365d70",
+      "timestamp": "2026-10-05T23:15:35+00:00",
+      "visual_id": "enemy.hollow",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "stagger",
+        "frames": 12,
+        "fps": 10.0,
+        "frame_size": [
+          188,
+          240
+        ],
+        "origin": [
+          0.5,
+          0.8833
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.2,
+        "render_seconds": 35.6
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/enemy.hollow/render2/stagger.render.json",
+          "sha256": "a82b6e91d444f9888076c4574603e09bed57a18ab8e97daefd7e4daf7ff477ed"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger/n.png",
+          "sha256": "28759483e0e71e8ca022eba328c8958be13ddeebf070017cbca2371d36e1f74c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger_normal/n.png",
+          "sha256": "b4ba39c2ba32e143d0589269ba7b18356803befc43f0486c9ec38bef73db78ed"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger/ne.png",
+          "sha256": "7549dc217f21d7ed57958b4b717b6ae9318a102166aa71e1845aec00a6fe6c47"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger_normal/ne.png",
+          "sha256": "a68363aebd83e95d674522a107ce98f43bece6a04a3c70259a514666db625caf"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger/e.png",
+          "sha256": "6b867a55488063d34bc07bdb2690a899d367d0c91b4b1a4a1d55a4dd7a7b6a11"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger_normal/e.png",
+          "sha256": "5b38dfff1eecc2a61262cac1d5685ea49223161fa405dbf6fb303c02e297018b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger/se.png",
+          "sha256": "27abd97652e9369d931de96538af254d3cb31b5ce8947aef4dba244bfb13283a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger_normal/se.png",
+          "sha256": "00f73e95c76138cb69e58074554ee89b0121ac5bfcafe73a0aae6fb72ac2de78"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger/s.png",
+          "sha256": "8356c1ee0701e34e1e9e185b371b467c5d08dda4f879a1cecd4ae93f7e80e456"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger_normal/s.png",
+          "sha256": "2179058bcb87e95fd4e12d35eb5b25a0c50632d1ba1a67b6646b04e3284771ef"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger/sw.png",
+          "sha256": "fa6b203a6b278d4587354b693babbf04bb8660e76d3a80a4744ad71843529307"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger_normal/sw.png",
+          "sha256": "faacc163be8ede72c9d203f71e4408acb53454e2425ed1bcb501fe1b92f8f9ae"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger/w.png",
+          "sha256": "b4e160d898d2b7a90cb970c392f8333d15e40d809e1df94098716bff738db05a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger_normal/w.png",
+          "sha256": "a04d3a3966bb1049609cc35da57659fbc979ee904e73c68a4d96ea475103d738"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger/nw.png",
+          "sha256": "727b7cf90e47cd3186dfcfaa2954af38c7a8aefa39c00d0db027da104db765ea"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger_normal/nw.png",
+          "sha256": "6360f9510a794e92dd8dc6de3f64c4e2597658c119ded4de3aa9d143ea211574"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.38,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Hollow-Clip stagger (Stil B), an den Zustandszeitgeber gekoppelt"
+      }
+    },
+    {
+      "id": "acc6c7551c354f6383c4ac7812ac5d5b",
+      "timestamp": "2026-10-05T23:15:36+00:00",
+      "visual_id": "enemy.hollow",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "death",
+        "frames": 9,
+        "fps": 12.0,
+        "frame_size": [
+          230,
+          272
+        ],
+        "origin": [
+          0.5,
+          0.7647
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.2,
+        "render_seconds": 27.4
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/enemy.hollow/render2/death.render.json",
+          "sha256": "6a96832a8da2c8c314b22e33cef2d892d3c3996b905b09f2a032b6b832efa0f7"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death/n.png",
+          "sha256": "1973721fa6b14b7d3e1decb671b0495c3c2487a8773507ac2b71ec98f0e4695e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death_normal/n.png",
+          "sha256": "6bb71491e69d26f93814cacedb390d4ef3f8eea83aaa05613f81a37e7fed27c1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death/ne.png",
+          "sha256": "6ef3d87581fac56e6086d34a29b038879f12f13cd2b2d6846c8f8cf49f5afeed"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death_normal/ne.png",
+          "sha256": "d2c0d79ee0ff6428a3dd45bbf8b8b0e4fe0d8ff13daff9e5cbed293b99e84df3"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death/e.png",
+          "sha256": "3dd03e8ac1bb1b132f88b3b2f178e04747acf9223be97b8fb0ae785ef2ca1060"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death_normal/e.png",
+          "sha256": "4df4ed7d2b93a727fe9b4d1c0487bef945a327ec53c01e0569badd8268bd8fc6"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death/se.png",
+          "sha256": "458287369ce5a4cf36ac41149b4549a09887f618b9a341d32a73d89867ebb948"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death_normal/se.png",
+          "sha256": "a96b69fd7dc01925934f93ee61215a64071a893b854e755a6228fea4760bb4e9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death/s.png",
+          "sha256": "c506efb4efffc7a9452928cf7837fb2a4b69f83d877718a25d3f57f1e72050cc"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death_normal/s.png",
+          "sha256": "82b0df0c4903b6532ff66cd445a30d6e15faccc72f4b37a5e3dc0258b6b8beff"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death/sw.png",
+          "sha256": "8534d2e8c9064632e91e9ca65e95f44f3db2da8cc0107530f92ebfdf05a2051d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death_normal/sw.png",
+          "sha256": "a6fb0082e184f564c7f8abb1f7b87757680bb1d1e7d3638bbd115044656249b5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death/w.png",
+          "sha256": "47e90e1d9b897fcfa0355626ad12cae4ad15f0c783ad7deae6335dddfafebf05"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death_normal/w.png",
+          "sha256": "5f961963cbf9191b625d6d356d78dc26cc395d47809da547d3433d776268606c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death/nw.png",
+          "sha256": "745c8b1228f8055e92b0e6656e1426004a53ba5250780a6bf6e1e0a0636504fa"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death_normal/nw.png",
+          "sha256": "e5c914ed9bcad2d3cab7000ff339646a68c6ca36acc9fc9c7021137896be1dad"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.39,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Hollow-Clip death (Stil B), an den Zustandszeitgeber gekoppelt"
+      }
     }
   ]
 }

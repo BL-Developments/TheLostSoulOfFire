@@ -38,13 +38,38 @@ public sealed class Hollow : Enemy
     public override string StateLabel => State.ToString().ToUpperInvariant();
     public Vector2 FacingDirection => _facing;
     public override string VisualId => VisualIds.Hollow;
+    /// <summary>
+    /// The swipe clip has seven announce frames and three strike frames; the death clip ends
+    /// at a quarter of the dying time so the dissolve takes the collapsed pose.
+    /// </summary>
+    private const int SwipeFrames = 10;
+    private const int SwipeTelegraphFrames = 7;
+    private const float DeathClipShare = 0.75f;
+
     public override string? VisualClip => State switch
     {
+        HollowState.Dying when DeathProgress < DeathClipShare => VisualClips.Death,
         HollowState.Dying or HollowState.Dead => null,
-        HollowState.Approach => VisualClips.Move,
         HollowState.Telegraph or HollowState.Swipe => VisualClips.Swipe,
+        HollowState.Staggered => VisualClips.Stagger,
+        HollowState.Recovery => VisualClips.Recover,
+        _ when HitFlashRemaining > 0f => VisualClips.Hit,
+        HollowState.Approach => VisualClips.Move,
         _ => VisualClips.Idle
     };
+
+    public override float? VisualProgress => State switch
+    {
+        HollowState.Dying => DeathProgress / DeathClipShare,
+        HollowState.Telegraph => (1f - _stateTimer / GameBalance.HollowSwipeTelegraph) * (SwipeTelegraphFrames - 1) / (SwipeFrames - 1),
+        HollowState.Swipe => (SwipeTelegraphFrames + (1f - _stateTimer / GameBalance.HollowSwipeDuration) * (SwipeFrames - SwipeTelegraphFrames - 1)) / (SwipeFrames - 1),
+        HollowState.Staggered => 1f - _stateTimer / GameBalance.HollowFullCannonStagger,
+        HollowState.Recovery => 1f - _stateTimer / GameBalance.HollowRecoveryDuration,
+        _ when HitFlashRemaining > 0f => HitFlashProgress,
+        _ => null
+    };
+
+    private float DeathProgress => 1f - _deathTimer / GameBalance.HollowDeathDuration;
     public override Vector2 VisualFacing => _facing;
     public override float TelegraphRadius => State is HollowState.Telegraph or HollowState.Swipe ? GameBalance.HollowSwipeRange : 0f;
     public Vector2 CorePosition => Position + new Vector2(0f, -5f);
@@ -164,7 +189,11 @@ public sealed class Hollow : Enemy
 
         if (State == HollowState.Dying)
         {
-            DrawDying(batch, pixel);
+            // Sprite art plays its own death clip and dissolve.
+            if (!useSpriteArt)
+            {
+                DrawDying(batch, pixel);
+            }
             return;
         }
 

@@ -149,6 +149,42 @@
           "loop": false,
           "normalMap": "Textures/Enemies/Hollow/Animations/swipe_normal/{dir}",
           "origin": [0.5, 0.8642]
+        },
+        "hit": {
+          "path": "Textures/Enemies/Hollow/Animations/hit/{dir}",
+          "frameSize": [124, 235],
+          "frames": 4,
+          "fps": 12.0,
+          "loop": false,
+          "normalMap": "Textures/Enemies/Hollow/Animations/hit_normal/{dir}",
+          "origin": [0.5, 0.8936]
+        },
+        "recover": {
+          "path": "Textures/Enemies/Hollow/Animations/recover/{dir}",
+          "frameSize": [256, 243],
+          "frames": 6,
+          "fps": 12.0,
+          "loop": false,
+          "normalMap": "Textures/Enemies/Hollow/Animations/recover_normal/{dir}",
+          "origin": [0.5, 0.8642]
+        },
+        "stagger": {
+          "path": "Textures/Enemies/Hollow/Animations/stagger/{dir}",
+          "frameSize": [188, 240],
+          "frames": 12,
+          "fps": 10.0,
+          "loop": false,
+          "normalMap": "Textures/Enemies/Hollow/Animations/stagger_normal/{dir}",
+          "origin": [0.5, 0.8833]
+        },
+        "death": {
+          "path": "Textures/Enemies/Hollow/Animations/death/{dir}",
+          "frameSize": [230, 272],
+          "frames": 9,
+          "fps": 12.0,
+          "loop": false,
+          "normalMap": "Textures/Enemies/Hollow/Animations/death_normal/{dir}",
+          "origin": [0.5, 0.7647]
         }
       },
       "dissolve": {

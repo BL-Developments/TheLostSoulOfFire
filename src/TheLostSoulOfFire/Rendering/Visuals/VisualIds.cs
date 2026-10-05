@@ -93,6 +93,10 @@ public static class VisualClips
     public const string Hit = "hit";
     public const string Death = "death";
 
+    /// <summary>Enemies: the rest after an attack and the long stagger after a full cannon.</summary>
+    public const string Recover = "recover";
+    public const string Stagger = "stagger";
+
     public static string Swing(int step) => step switch
     {
         1 => Swing1,

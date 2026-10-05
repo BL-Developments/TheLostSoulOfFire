@@ -375,7 +375,8 @@ public sealed class ArtAssets
         {
             DrawSoftSpot(batch, enemy.Position + new Vector2(8f, 2f), new Vector2(enemy.Radius * 1.5f, enemy.Radius * 0.5f) * enemy.VisualScale, new Color(3, 3, 7) * 0.7f);
         }
-        DrawCharacter(batch, enemy, id, clip, enemy.VisualFacing, enemy.Position, enemy.VisualScale, tint, enemy.Radius * 2.6f);
+        DrawCharacter(batch, enemy, id, clip, enemy.VisualFacing, enemy.Position, enemy.VisualScale, tint, enemy.Radius * 2.6f,
+            progress: HasClip(id, clip) ? enemy.VisualProgress : null);
     }
 
     public void DrawCharacter(

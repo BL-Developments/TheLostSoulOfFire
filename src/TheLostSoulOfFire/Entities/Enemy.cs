@@ -27,6 +27,10 @@ public abstract class Enemy
     public bool IsAlive => Health > 0;
     public bool IsFinished { get; protected set; }
     public float HitFlashRemaining { get; private set; }
+    private float _hitFlashDuration = 0.1f;
+
+    /// <summary>Presentation only: how far the current hit flash has run (0..1; 1 without one).</summary>
+    public float HitFlashProgress => HitFlashRemaining > 0f ? 1f - HitFlashRemaining / _hitFlashDuration : 1f;
 
     public float AbilityMarkRemaining { get; private set; }
     public void MarkForFollowup() => AbilityMarkRemaining = 5f;
@@ -47,6 +51,12 @@ public abstract class Enemy
 
     /// <summary>Clip for the current state, or <c>null</c> while no sprite is shown.</summary>
     public virtual string? VisualClip => null;
+
+    /// <summary>
+    /// Presentation only: where a one-shot clip stands (0..1) when it follows a gameplay timer, or
+    /// <c>null</c> when the clip simply plays at its own frame rate.
+    /// </summary>
+    public virtual float? VisualProgress => null;
 
     public virtual Vector2 VisualFacing => Vector2.UnitY;
 
@@ -104,6 +114,7 @@ public abstract class Enemy
         Health = Math.Max(0, Health - damage.Damage);
         _knockbackVelocity += damage.Knockback;
         HitFlashRemaining = damage.IsSoulCoreHit ? 0.16f : 0.1f;
+        _hitFlashDuration = HitFlashRemaining;
 
         if (Health == 0)
         {

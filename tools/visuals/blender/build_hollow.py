@@ -22,12 +22,12 @@ from pathlib import Path
 
 import bmesh
 import bpy
-from mathutils import Vector
+from mathutils import Matrix, Vector
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from figure_kit import (  # noqa: E402
-    FINGERS, MPFB, THUMB, Poser, add_outline, attach, cloth_shell, dominant_bone, enable_mpfb, flat, ground_feet,
-    outline_material, rest_ground, shaped_coordinates, toon)
+    FINGERS, MPFB, THUMB, Poser, add_outline, attach, blend_placement, cloth_shell, dominant_bone, ease, enable_mpfb,
+    flat, ground_feet, ground_points, outline_material, place_bone, placement_of, rest_ground, shaped_coordinates, toon)
 
 CLOTH = (0.075, 0.075, 0.086)
 ASH = (0.11, 0.105, 0.11)
@@ -159,7 +159,7 @@ def build_mask(body: bpy.types.Object, rig: bpy.types.Object, mask: bpy.types.Ma
         crack.data.materials.append(ink)
         parts.append(crack)
     for part in parts:
-        attach(part, rig, "head")
+        attach(part, rig, "mask")
     return parts
 
 
@@ -296,6 +296,150 @@ def key_swipe(poser: Poser, frames: int, telegraph_frames: int) -> bpy.types.Act
     return action
 
 
+def add_mask_bone(rig: bpy.types.Object) -> None:
+    """A carrier bone for the mask, at the head; it follows the head until the death clip lets
+    the mask come off and fall."""
+    bpy.context.view_layer.objects.active = rig
+    bpy.ops.object.mode_set(mode="EDIT")
+    bones = rig.data.edit_bones
+    head = bones["head"]
+    mask = bones.new("mask")
+    mask.head, mask.tail, mask.roll = head.head.copy(), head.tail.copy(), head.roll
+    mask.parent = head
+    mask.use_deform = False
+    bpy.ops.object.mode_set(mode="OBJECT")
+
+
+ARM_HANG = {"upperarm": (0.10, 1.0, 0.12), "lowerarm": (0.22, 1.0, 0.06), "hand": (0.18, 1.0, 0.0)}
+ARM_GRAB_END = {"upperarm": (1.1, 0.35, -0.1), "lowerarm": (1.2, 0.25, -0.6), "hand": (1.0, 0.3, -0.7)}
+ARM_FLUNG = {"upperarm": (-0.25, 0.55, 0.85), "lowerarm": (-0.35, 0.7, 0.75), "hand": (-0.2, 0.9, 0.5)}
+
+
+def pose_arm(poser: Poser, side: str, a: dict, b: dict, t: float) -> None:
+    """Arm between two sets of stage directions (forward, down, out per segment)."""
+    for segment in ("upperarm", "lowerarm", "hand"):
+        mixed = [x + (y - x) * t for x, y in zip(a[segment], b[segment])]
+        poser.aim(f"{segment}_{side}", poser.world(*mixed, side))
+
+
+def key_hit(poser: Poser, frames: int) -> bpy.types.Action:
+    """Hit flash: the head jerks back, the shoulders rise, the arms twitch out."""
+    action = bpy.data.actions.new("hit")
+    poser.rig.animation_data.action = action
+    ground = rest_ground(poser.rig)
+    for frame in range(frames):
+        k = (1.0 - frame / (frames - 1)) ** 1.3
+        poser.clear()
+        stoop(poser, lean=-14 * k)
+        poser.set("head", "back", 16 * k)
+        poser.turn("spine_03", 10 * k)
+        ground_feet(poser, ground)
+        for side in ("l", "r"):
+            pose_arm(poser, side, ARM_HANG, ARM_FLUNG, 0.35 * k)
+        claws(poser, 30 + 20 * k)
+        poser.key(frame + 1)
+    return action
+
+
+def key_recover(poser: Poser, frames: int) -> bpy.types.Action:
+    """Recovery after the grab: from the end of the swipe the arm swings back down and the body
+    straightens into the stoop."""
+    action = bpy.data.actions.new("recover")
+    poser.rig.animation_data.action = action
+    ground = rest_ground(poser.rig)
+    right = "r"
+    for frame in range(frames):
+        r = ease(frame / (frames - 1))
+        poser.clear()
+        stoop(poser, lean=10 * (1 - r))
+        poser.set("head", "forward", 10 * (1 - r))
+        poser.turn("spine_01", 12 * (1 - r))
+        poser.turn("spine_03", 22 * (1 - r))
+        poser.set("thigh_l" if poser.left > 0 else "thigh_r", "forward", 14 * (1 - r))
+        ground_feet(poser, ground)
+        pose_arm(poser, right, ARM_GRAB_END, ARM_HANG, r)
+        hang_arm(poser, "l", -0.1 * (1 - r))
+        claws(poser, 64 - 34 * r)
+        poser.key(frame + 1)
+    return action
+
+
+def key_stagger(poser: Poser, frames: int) -> bpy.types.Action:
+    """Full cannon on the core (1.15 s): thrown back with arms flung, then a dazed sway with the
+    mask lolling, then the stoop returns."""
+    action = bpy.data.actions.new("stagger")
+    poser.rig.animation_data.action = action
+    ground = rest_ground(poser.rig)
+    for frame in range(frames):
+        p = frame / (frames - 1)
+        throw = ease(min(1.0, p / 0.12)) * (1.0 - ease(max(0.0, (p - 0.12) / 0.3)))
+        daze = ease(min(1.0, max(0.0, (p - 0.1) / 0.2))) * (1.0 - ease(max(0.0, (p - 0.8) / 0.2)))
+        sway = math.sin(p * math.tau * 1.5)
+        poser.clear()
+        stoop(poser, lean=-30 * throw + 6 * daze)
+        poser.set("head", "back", 28 * throw)
+        poser.set("neck_01", "left", 18 * daze * sway)
+        poser.set("head", "forward", 8 * daze)
+        poser.set("spine_02", "left", 10 * daze * sway)
+        poser.set("spine_01", "left", -5 * daze * sway)
+        poser.set("thigh_r" if poser.left > 0 else "thigh_l", "forward", -16 * throw)
+        poser.set("thigh_l" if poser.left > 0 else "thigh_r", "forward", 10 * throw)
+        for side in ("l", "r"):
+            poser.set(f"calf_{side}", "back", 10 * daze + 8 * throw)
+        ground_feet(poser, ground)
+        for side, phase in (("l", 0.0), ("r", math.pi)):
+            limp = dict(ARM_HANG)
+            limp = {k: (v[0] + 0.12 * daze * math.sin(p * math.tau * 1.5 + phase), v[1], v[2]) for k, v in limp.items()}
+            pose_arm(poser, side, limp, ARM_FLUNG, throw)
+        claws(poser, 20 + 30 * throw)
+        poser.key(frame + 1)
+    return action
+
+
+def key_death(poser: Poser, frames: int) -> bpy.types.Action:
+    """Dying: the blow, then the strings are cut: knees fold, the body slumps forward onto its
+    heels, the mask comes off and falls face up in front. The game dissolves the last pose."""
+    action = bpy.data.actions.new("death")
+    poser.rig.animation_data.action = action
+    ground = rest_ground(poser.rig)
+    contact = [("foot_l", "head"), ("foot_r", "head"), ("ball_l", "tail"), ("ball_r", "tail"),
+               ("calf_l", "head"), ("calf_r", "head"), ("hand_l", "tail"), ("hand_r", "tail")]
+    poser.clear()
+    start = placement_of(poser, "mask")
+    turn = Matrix.Rotation(math.radians(-95), 3, Vector((1, 0, 0))) @ Matrix.Rotation(math.radians(28), 3, Vector((0, 0, 1)))
+    lying = (Vector((0.30 * poser.left, -1.02, 0.07)), turn @ start[1], turn @ start[2])
+    for frame in range(frames):
+        p = frame / (frames - 1)
+        blow = max(0.0, 1.0 - p / 0.2)
+        fold = ease((p - 0.08) / 0.55)
+        slump = ease((p - 0.45) / 0.55)
+        poser.clear()
+        stoop(poser, lean=-18 * blow + 40 * fold + 25 * slump)
+        poser.set("head", "back", 20 * blow)
+        poser.set("head", "forward", 30 * fold)
+        for side in ("l", "r"):
+            poser.set(f"thigh_{side}", "forward", 78 * fold)
+            poser.set(f"calf_{side}", "back", 120 * fold)
+        if fold > 0.0:
+            ground_points(poser, ground, contact)
+        else:
+            ground_feet(poser, ground)
+        for side in ("l", "r"):
+            pose_arm(poser, side, ARM_FLUNG if blow > 0.5 else ARM_HANG,
+                     {"upperarm": (0.35, 1.0, 0.25), "lowerarm": (0.6, 0.9, 0.15), "hand": (0.6, 0.9, 0.0)}, fold)
+        claws(poser, 30 - 20 * fold)
+        bpy.context.view_layer.update()
+        attached = placement_of(poser, "mask")
+        drop = ease((p - 0.12) / 0.45)
+        centre, axis, up = blend_placement(attached, lying, drop)
+        # Thrown a little up and forward as the head snaps, then down onto the floor.
+        lift = 0.22 * math.sin(math.pi * min(1.0, drop * 1.25)) * (1.0 - drop)
+        bounce = 0.05 * math.sin(math.pi * min(1.0, max(0.0, (p - 0.6) / 0.15)))
+        place_bone(poser, "mask", centre + Vector((0.0, 0.0, lift + bounce)), axis, up)
+        poser.key(frame + 1)
+    return action
+
+
 # ---- Main -----------------------------------------------------------------------------------
 
 def main() -> None:
@@ -321,6 +465,7 @@ def main() -> None:
     shell = cloth_shell(body, per_vertex, {"torso"}, rig, materials["cloth"], "garment", push=0.014)
     pelvis_z = (rig.matrix_world @ rig.data.bones["pelvis"].head_local).z
     gown = robe(rig, materials["cloth"], waist=pelvis_z + 0.10)
+    add_mask_bone(rig)
     parts = build_mask(body, rig, materials["mask"], ink)
     parts += build_placket(rig, materials["cloth"], materials["button"], waist=pelvis_z + 0.10)
     for obj in (body, shell, gown, parts[0]):
@@ -329,7 +474,8 @@ def main() -> None:
     toe = (rig.matrix_world @ rig.data.bones["ball_l"].tail_local) - (rig.matrix_world @ rig.data.bones["foot_l"].head_local)
     poser = Poser(rig, Vector((0, toe.y, 0)).normalized())
     poser.measure_rest([f"{bone}_{side}" for bone in FINGERS + THUMB for side in ("l", "r")], "down")
-    actions = [key_idle(poser, 12), key_move(poser, 12), key_swipe(poser, 10, 7)]
+    actions = [key_idle(poser, 12), key_move(poser, 12), key_swipe(poser, 10, 7),
+               key_hit(poser, 4), key_recover(poser, 6), key_stagger(poser, 12), key_death(poser, 9)]
     for action in actions:
         action.use_fake_user = True
     rig.animation_data.action = actions[0]
