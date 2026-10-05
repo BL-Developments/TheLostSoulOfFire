@@ -88,9 +88,9 @@ def server(start: bool) -> Iterator[None]:
     install = comfyui_path()
     if install is None:
         raise SystemExit("ComfyUI-Installation nicht gefunden; COMFYUI_PATH setzen.")
-    python = install.parent / "standalone-env" / "bin" / "python3"
-    if not python.exists():
-        python = Path(sys.executable)
+    # Comfy Desktop keeps torch in ComfyUI/.venv; a plain checkout may use any environment.
+    candidates = [install / ".venv" / "bin" / "python", install.parent / "standalone-env" / "bin" / "python3"]
+    python = next((candidate for candidate in candidates if candidate.exists()), Path(sys.executable))
     port = urllib.parse.urlparse(URL).port or 8188
     command = [str(python), str(install / "main.py"), "--listen", "127.0.0.1", "--port", str(port), "--disable-auto-launch"]
     extra = sorted((DESKTOP / "instance-model-paths").glob("*.yaml")) if DESKTOP.exists() else []

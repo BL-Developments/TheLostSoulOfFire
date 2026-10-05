@@ -17,7 +17,7 @@ Stand auf dem Mac (Apple M1 Pro, 16 GB) am 05.10.2026, gemeldet von `doctor.py`:
 | Python + uv | 3.12, uv 0.12 | ja | ja | `brew install uv` bzw. Paketquelle; dann die Umgebung unten |
 | numpy, pillow, huggingface_hub, gradio_client | siehe `requirements.txt` | ja | ja | in `tools/visuals/.venv` |
 | mflux (FLUX.2 [klein] 4B, Z-Image Turbo) | 0.21.0 | ja | nein (MLX braucht Apple Silicon) | `uv tool install mflux` |
-| rembg mit BiRefNet | 2.0.85 | ja | ja | `uv tool install "rembg[cli]"` |
+| rembg mit BiRefNet | 2.0.85 | ja | ja | `uv tool install "rembg[cpu,cli]"` (mit ONNX-Laufzeit) |
 | Blender | 5.2 LTS | ja (EEVEE) | ja (Cycles auf der CPU) | blender.org oder `brew install --cask blender` |
 | MPFB2 (Blender-Erweiterung) | 2.0.17 | ja | ja | in Blender: Get Extensions → „MPFB“ |
 | ComfyUI | 0.38 (Comfy Desktop) | ja | optional, nur CPU | Mac: Comfy Desktop; VM: `git clone` von ComfyUI und `pip install -r requirements.txt` |

@@ -111,6 +111,125 @@
         "status": "kandidat",
         "reason": "Pipeline-Probe mit Testfigur (Aufgabe 6.3), keine Spielgrafik"
       }
+    },
+    {
+      "id": "d4d96af37d6e429d813de9eba57f9952",
+      "timestamp": "2026-10-05T18:57:55+00:00",
+      "visual_id": "probe.mflux",
+      "step": "probe",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "painted high resolution 2D game concept, a lonely wooden bench on a wet concrete harbour platform at night, soft painted edges, single key light from the upper left, muted slate blue and salt white palette, one small violet flame",
+      "seed": 7,
+      "parameters": {
+        "steps": 4,
+        "width": 512,
+        "height": 512,
+        "quantize": 8,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/probe.mflux/20261005-203443-flux2-klein-4b-s7.png",
+          "sha256": "95f3b3bcd75bc936c25376db34306f7e67a548249c1b0924a4aac1e095ba3d64"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 1391.42,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "8b4d45b29e4b49a599d4096c35bdc953",
+      "timestamp": "2026-10-05T18:59:25+00:00",
+      "visual_id": "probe.cutout",
+      "step": "probe",
+      "tool": {
+        "name": "rembg",
+        "version": "2.0.85"
+      },
+      "model": {
+        "name": "ZhengPeng7/BiRefNet",
+        "license": "MIT"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "rembg_model": "birefnet-general"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/probe.cutout/input.png",
+          "sha256": "d28b5727b86c41db268ce607313c40d90d4a2db694aa2d86140b7e050e6ba846"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "art/production/candidates/probe.cutout/input-cutout.png",
+          "sha256": "a2d0985527e29101e2b66f78b993d9755bd3e566377da0dd7774518fae19460a"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 178.52,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "27c36b05eadb46e59298fb47cff3d7e9",
+      "timestamp": "2026-10-05T19:00:47+00:00",
+      "visual_id": "probe.comfyui",
+      "step": "probe",
+      "tool": {
+        "name": "ComfyUI",
+        "version": "0.38.2",
+        "workflow": "tools/visuals/comfy/upscale.json"
+      },
+      "model": {
+        "name": "xinntao/Real-ESRGAN RealESRGAN_x4plus",
+        "license": "BSD-3-Clause"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "UPSCALE_MODEL": "RealESRGAN_x4plus.pth",
+        "PREFIX": "tlsof"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/probe.mflux/20261005-203443-flux2-klein-4b-s7.png",
+          "sha256": "95f3b3bcd75bc936c25376db34306f7e67a548249c1b0924a4aac1e095ba3d64"
+        },
+        {
+          "path": "tools/visuals/comfy/upscale.json",
+          "sha256": "1320319cd48d8809609a22be59c581d7e3f1a028b864f891c9ddefbcbe1022f6"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "art/production/candidates/probe.comfyui/upscale-20261005-210028.png",
+          "sha256": "6361446e0d61db2bbcbd5b735d2a39b6b544a2d328f8a5526c6f04dfc42e3b41"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 13.81,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
     }
   ]
 }

@@ -128,6 +128,7 @@ def checks() -> list[dict[str, object]]:
         ("MPFB2 (Blender-Erweiterung)", mpfb_version(), True),
         ("mflux", tool_python_version("mflux-generate", "mflux"), True),
         ("rembg", tool_python_version("rembg", "rembg"), True),
+        ("rembg-Laufzeit (onnxruntime)", tool_python_version("rembg", "onnxruntime"), True),
         ("ComfyUI", comfyui_version(comfyui_path()), True),
         ("ComfyUI-Server", comfyui_server(), False),
         ("Hugging Face", huggingface_login(), True),
