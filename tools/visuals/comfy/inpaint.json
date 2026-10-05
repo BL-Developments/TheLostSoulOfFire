@@ -1,0 +1,144 @@
+{
+  "_comment": "ComfyUI API-Format; Platzhalter {{NAME}} setzt tools/visuals/comfy.py (--set NAME=WERT). Standardwerte stehen in _defaults.",
+  "_defaults": {
+    "CLIP_TYPE": "lumina2",
+    "NEGATIVE": "",
+    "STEPS": 9,
+    "CFG": 1.0,
+    "SAMPLER": "res_multistep",
+    "SCHEDULER": "simple",
+    "DENOISE": 1.0,
+    "PREFIX": "tlsof"
+  },
+  "graph": {
+    "1": {
+      "class_type": "UNETLoader",
+      "inputs": {
+        "unet_name": "{{UNET}}",
+        "weight_dtype": "default"
+      }
+    },
+    "2": {
+      "class_type": "CLIPLoader",
+      "inputs": {
+        "clip_name": "{{CLIP}}",
+        "type": "{{CLIP_TYPE}}"
+      }
+    },
+    "3": {
+      "class_type": "VAELoader",
+      "inputs": {
+        "vae_name": "{{VAE}}"
+      }
+    },
+    "4": {
+      "class_type": "CLIPTextEncode",
+      "inputs": {
+        "text": "{{PROMPT}}",
+        "clip": [
+          "2",
+          0
+        ]
+      }
+    },
+    "5": {
+      "class_type": "CLIPTextEncode",
+      "inputs": {
+        "text": "{{NEGATIVE}}",
+        "clip": [
+          "2",
+          0
+        ]
+      }
+    },
+    "6": {
+      "class_type": "LoadImage",
+      "inputs": {
+        "image": "{{INPUT_IMAGE}}"
+      }
+    },
+    "7": {
+      "class_type": "LoadImageMask",
+      "inputs": {
+        "image": "{{MASK_IMAGE}}",
+        "channel": "alpha"
+      }
+    },
+    "8": {
+      "class_type": "InpaintModelConditioning",
+      "inputs": {
+        "positive": [
+          "4",
+          0
+        ],
+        "negative": [
+          "5",
+          0
+        ],
+        "vae": [
+          "3",
+          0
+        ],
+        "pixels": [
+          "6",
+          0
+        ],
+        "mask": [
+          "7",
+          0
+        ],
+        "noise_mask": true
+      }
+    },
+    "9": {
+      "class_type": "KSampler",
+      "inputs": {
+        "model": [
+          "1",
+          0
+        ],
+        "positive": [
+          "8",
+          0
+        ],
+        "negative": [
+          "8",
+          1
+        ],
+        "latent_image": [
+          "8",
+          2
+        ],
+        "seed": "{{SEED}}",
+        "steps": "{{STEPS}}",
+        "cfg": "{{CFG}}",
+        "sampler_name": "{{SAMPLER}}",
+        "scheduler": "{{SCHEDULER}}",
+        "denoise": "{{DENOISE}}"
+      }
+    },
+    "10": {
+      "class_type": "VAEDecode",
+      "inputs": {
+        "samples": [
+          "9",
+          0
+        ],
+        "vae": [
+          "3",
+          0
+        ]
+      }
+    },
+    "11": {
+      "class_type": "SaveImage",
+      "inputs": {
+        "images": [
+          "10",
+          0
+        ],
+        "filename_prefix": "{{PREFIX}}"
+      }
+    }
+  }
+}

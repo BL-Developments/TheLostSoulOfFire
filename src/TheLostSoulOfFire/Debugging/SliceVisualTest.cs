@@ -335,6 +335,14 @@ internal sealed class SliceVisualTest
             _world.ShowAutomatedDeathFlameTrail(TestBench);
         }, () => true, 2f, minWait: 0.3f);
 
+        Shot("arena_blender_figure", () =>
+        {
+            _world.ClearAutomatedStaging();
+            _world.PlaceAutomatedPlayer(TestBench + new Vector2(0f, 220f));
+            _world.ShowAutomatedLightingTest(TestBench + new Vector2(150f, -40f), TestBench + new Vector2(-400f, -400f), TestBench + new Vector2(-400f, -400f));
+            _world.ShowAutomatedRenderedFigures(TestBench + new Vector2(-170f, 80f));
+        }, () => true, 2f, minWait: 0.5f);
+
         Do("arena_done", () => _world.ClearAutomatedStaging());
     }
 }

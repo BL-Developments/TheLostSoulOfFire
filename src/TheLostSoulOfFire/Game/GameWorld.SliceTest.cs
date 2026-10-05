@@ -24,6 +24,8 @@ public sealed partial class GameWorld
     private readonly List<(Vector2 Position, string Clip)> _automatedLitFigures = [];
     private Vector2? _automatedLightSource;
     private Vector2? _automatedTrailCentre;
+    private Vector2? _automatedRenderedFigures;
+    private readonly object[] _renderedFigureOwners = Enumerable.Range(0, 8).Select(_ => new object()).ToArray();
 
     internal Vector2 PlayerPosition => _player.Position;
     internal Player AutomatedPlayer => _player;
@@ -72,8 +74,12 @@ public sealed partial class GameWorld
     /// <summary>Draws a Death Flame test ribbon arcing around <paramref name="centre"/>.</summary>
     internal void ShowAutomatedDeathFlameTrail(Vector2? centre) => _automatedTrailCentre = centre;
 
+    /// <summary>Stands the Blender test figure in all eight directions in a row starting at <paramref name="start"/>.</summary>
+    internal void ShowAutomatedRenderedFigures(Vector2? start) => _automatedRenderedFigures = start;
+
     internal void ClearAutomatedStaging()
     {
+        _automatedRenderedFigures = null;
         _automatedLitFigures.Clear();
         _automatedLightSource = null;
         _automatedTrailCentre = null;
@@ -104,6 +110,14 @@ public sealed partial class GameWorld
         foreach ((Vector2 position, string clip) in _automatedLitFigures)
         {
             _art.DrawSprite(batch, VisualIds.TestLitFigure, position, 1f, Color.White, clip);
+        }
+        if (_automatedRenderedFigures is { } start)
+        {
+            for (int index = 0; index < 8; index++)
+            {
+                Vector2 facing = new(MathF.Cos(index * MathHelper.PiOver4), MathF.Sin(index * MathHelper.PiOver4));
+                _art.DrawCharacter(batch, _renderedFigureOwners[index], VisualIds.TestBlenderFigure, VisualClips.Idle, facing, start + new Vector2(index * 92f, 0f), 1f, Color.White);
+            }
         }
         if (_automatedTrailCentre is { } centre)
         {

@@ -1,0 +1,116 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "id": "4328fac7031d40249947df9211a60668",
+      "timestamp": "2026-10-05T18:46:10+00:00",
+      "visual_id": "test.blender-figure",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "idle",
+        "frames": 8,
+        "fps": 8.0,
+        "frame_size": [
+          104,
+          160
+        ],
+        "origin": [
+          0.5,
+          0.8352
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.2,
+        "render_seconds": 21.3
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/test.blender-figure/render/idle.render.json",
+          "sha256": "b9464d6668ebb861f6468e3003d7ff6c8f90498a41dc50983692ebd466b3840d"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Test/BlenderFigure/Animations/idle/n.png",
+          "sha256": "2815408a0b7c5b969f5b55e72c7eab83eefd918e7ded2a5b1c5ea0f1edda31a4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Test/BlenderFigure/Animations/idle_normal/n.png",
+          "sha256": "3667ef6d776ade3b6202703a16211aa3c59b5f85aefe718281a909e974c9cfa2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Test/BlenderFigure/Animations/idle/ne.png",
+          "sha256": "85e097fa66abeda1415e3e3f79ae65021fb074f9081293756612e3215bf3ee81"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Test/BlenderFigure/Animations/idle_normal/ne.png",
+          "sha256": "a5e8f5f57637ce88ee770c60ab7de0b8a0939ebaa051cb35cdfaf9f5854d5e07"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Test/BlenderFigure/Animations/idle/e.png",
+          "sha256": "c078ef8ac91a8d1a247bc1949ac18f57b710fb912a38230f71bed5c464bc88a2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Test/BlenderFigure/Animations/idle_normal/e.png",
+          "sha256": "4bcd1d4b84420bef8b5c19c67df2267ffd9a1e2b1b3d6d06eb7c235ded8bf6dc"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Test/BlenderFigure/Animations/idle/se.png",
+          "sha256": "2f2287f75c92cc855c124f7d110d6ae9e41b9bbeccd89a2a6479b406e30f8230"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Test/BlenderFigure/Animations/idle_normal/se.png",
+          "sha256": "db2389df7ca9809658a11b246e66033c39c2a1118f0301e35eab1b3b272e5dc0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Test/BlenderFigure/Animations/idle/s.png",
+          "sha256": "305d55fb28a0c0b2097c7235ea6bea6127e98e2a41cd460a6c4eadcf2d0b68be"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Test/BlenderFigure/Animations/idle_normal/s.png",
+          "sha256": "5eaeee631b5380854ca86a259fa69f5751750b0e485d6aff9195d7b23aa38e53"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Test/BlenderFigure/Animations/idle/sw.png",
+          "sha256": "9409bd1e8578d39eb2cfb2741da23cce8b5bc0246f815cc049b5dda9e9ac8951"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Test/BlenderFigure/Animations/idle_normal/sw.png",
+          "sha256": "6b766cf5e1bf5501e315f44f35044fb97cd989b6ef5dc9f8795f0fe7fe9c8711"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Test/BlenderFigure/Animations/idle/w.png",
+          "sha256": "5a4938b565c226ee92876f01f1a06672f1cffc926d025035553edf4728b4d624"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Test/BlenderFigure/Animations/idle_normal/w.png",
+          "sha256": "adf97bf6b4f351a25f7027ca2950c4a1a2b01ea0fbdd5c745069b5f8cb864d39"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Test/BlenderFigure/Animations/idle/nw.png",
+          "sha256": "ac3f4ea7ec31c57d4cb4dc4362ee4c35ac36352935d7c3f7f00ab40a36ce3397"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Test/BlenderFigure/Animations/idle_normal/nw.png",
+          "sha256": "1ae48c437d4968e83a42dcc3dadedab785b22f7fe56f324bc1737d20e014dd66"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.12,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Pipeline-Probe mit Testfigur (Aufgabe 6.3), keine Spielgrafik"
+      }
+    }
+  ]
+}

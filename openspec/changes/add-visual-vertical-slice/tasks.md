@@ -38,7 +38,7 @@
 
 ## 6. Produktionsweg
 
-- [ ] 6.1 `tools/visuals/` mit Python-Umgebung, gemeinsamem Manifest-Schreiber (`art/production/manifest.json`) und Kostenbremse, die vor jedem bezahlten Aufruf gegen `VISUALS_BUDGET_EUR` prüft. Prüfen: Probeaufruf erzeugt einen vollständigen Manifest-Eintrag; ein Aufruf über der Grenze wird verweigert.
+- [x] 6.1 `tools/visuals/` mit Python-Umgebung, gemeinsamem Manifest-Schreiber (`art/production/manifest.json`) und Kostenbremse, die vor jedem bezahlten Aufruf gegen `VISUALS_BUDGET_EUR` prüft. Prüfen: Probeaufruf erzeugt einen vollständigen Manifest-Eintrag; ein Aufruf über der Grenze wird verweigert.
 - [ ] 6.2 Lokale Generierung als Skripte: `generate.py` (mflux, Modell, LoRA, Seed, Referenzbilder), ComfyUI-Workflows als JSON unter `tools/visuals/comfy/` (Steuerbild, Inpainting, Hochskalieren) mit Aufruf über die HTTP-API, `cutout.py` (rembg mit BiRefNet). Jeder Aufruf schreibt ins Manifest. Prüfen: je ein Probebild aus mflux und ComfyUI und ein freigestelltes Bild mit Manifest-Eintrag.
 - [ ] 6.3 Blender-Skripte `render_directions.py` (orthografische Kamera, Winkel aus der Stil-Bibel, acht Richtungen durch Drehen, Farb- und Normal-Durchgang, Ursprung am Fußpunkt) und `pack_sheets.py` (gemeinsamer Zuschnitt je Animation, Sheets wie bisher). Auf dem Mac (EEVEE) und auf der VM (Cycles auf CPU) lauffähig. Prüfen: Eine einfache Blender-Testfigur ergibt auf beiden Rechnern Sheets, die 5.1 bestehen und im Spiel über die Registry laufen.
 

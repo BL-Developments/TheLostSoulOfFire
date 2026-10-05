@@ -464,6 +464,24 @@
           "normalMap": "Textures/Test/lit_figure_normal_tilted"
         }
       }
+    },
+    {
+      "id": "test.blender-figure",
+      "kind": "character",
+      "palette": "world",
+      "worldSize": [112, 112],
+      "origin": [0.5, 0.8352],
+      "fallbackClip": "idle",
+      "clips": {
+        "idle": {
+          "path": "Textures/Test/BlenderFigure/Animations/idle/{dir}",
+          "frameSize": [104, 160],
+          "frames": 8,
+          "fps": 8.0,
+          "loop": true,
+          "normalMap": "Textures/Test/BlenderFigure/Animations/idle_normal/{dir}"
+        }
+      }
     }
   ]
 }

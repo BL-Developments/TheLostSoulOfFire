@@ -1,0 +1,44 @@
+{
+  "_comment": "ComfyUI API-Format; Platzhalter {{NAME}} setzt tools/visuals/comfy.py (--set NAME=WERT). Standardwerte stehen in _defaults.",
+  "_defaults": {
+    "UPSCALE_MODEL": "RealESRGAN_x4plus.pth",
+    "PREFIX": "tlsof"
+  },
+  "graph": {
+    "1": {
+      "class_type": "LoadImage",
+      "inputs": {
+        "image": "{{INPUT_IMAGE}}"
+      }
+    },
+    "2": {
+      "class_type": "UpscaleModelLoader",
+      "inputs": {
+        "model_name": "{{UPSCALE_MODEL}}"
+      }
+    },
+    "3": {
+      "class_type": "ImageUpscaleWithModel",
+      "inputs": {
+        "upscale_model": [
+          "2",
+          0
+        ],
+        "image": [
+          "1",
+          0
+        ]
+      }
+    },
+    "4": {
+      "class_type": "SaveImage",
+      "inputs": {
+        "images": [
+          "3",
+          0
+        ],
+        "filename_prefix": "{{PREFIX}}"
+      }
+    }
+  }
+}
