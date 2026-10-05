@@ -34,6 +34,13 @@ public static class FigureHeights
     /// <summary>How much a level circle is squashed vertically when seen from the camera (sin 35°).</summary>
     public const float LevelSquash = 0.57f;
 
+    /// <summary>
+    /// Where the chest of a fallen figure lies (death clip): about 0.75 m ahead of the feet along
+    /// the facing, a hand's breadth above the floor.
+    /// </summary>
+    public static Vector2 FallenChestOf(Vector2 foot, Vector2 facing) =>
+        foot + new Vector2(facing.X * 50f, facing.Y * 50f * LevelSquash - 8f);
+
     /// <summary>Screen position of the raised cannon's muzzle for a figure on <paramref name="foot"/> aiming along <paramref name="facing"/>.</summary>
     public static Vector2 MuzzleOf(Vector2 foot, Vector2 facing) =>
         foot + new Vector2(facing.X * MuzzleReach, facing.Y * MuzzleReach * LevelSquash - Muzzle);

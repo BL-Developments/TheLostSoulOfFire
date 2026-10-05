@@ -194,13 +194,14 @@ public static class SoulfireLighting
             : player.Position + player.FacingDirection * 2f;
         if (player.IsDead)
         {
+            Vector2 fallen = renderedPlayer ? FigureHeights.FallenChestOf(player.Position, player.FacingDirection) : player.Position;
             renderer.DrawGlow(
                 batch,
-                player.Position,
+                fallen,
                 SoulfireRenderSettings.DeathFlameGlowRadius * breathe,
                 GameBalance.DeathFlame,
                 SoulfireRenderSettings.DeathFlameGlowIntensity);
-            renderer.DrawGlow(batch, player.Position, 38f, GameBalance.SoulWhite, 0.26f);
+            renderer.DrawGlow(batch, fallen, 38f, GameBalance.SoulWhite, 0.26f);
             return;
         }
 

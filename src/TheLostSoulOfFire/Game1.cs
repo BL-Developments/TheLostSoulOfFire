@@ -39,6 +39,9 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     private readonly bool _abilityVisualTest;
     private readonly bool _sliceVisualTest;
     private SliceVisualTest? _sliceTest;
+    private readonly bool _tourVisualTest;
+    private TourVisualTest? _tourTest;
+    private TimeSpan _tourClock;
     private float _abilityTestTime;
     private int _abilityTestStep;
     private bool _abilityMenuCaptured;
@@ -130,8 +133,10 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         DeveloperStartOptions? developerStart = null,
         bool currencyVisualTest = false,
         bool abilityVisualTest = false,
-        bool sliceVisualTest = false)
+        bool sliceVisualTest = false,
+        bool tourVisualTest = false)
     {
+        _tourVisualTest = tourVisualTest;
         _sliceVisualTest = sliceVisualTest;
         _currencyVisualTest = currencyVisualTest;
         _abilityVisualTest = abilityVisualTest;
@@ -141,7 +146,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         _antechamberVisualTest = antechamberVisualTest;
         _developerStart = developerStart;
         _settings = _settingsStore.Load();
-        if (_abilityVisualTest || _sliceVisualTest) _settings.Fullscreen = false;
+        if (_abilityVisualTest || _sliceVisualTest || _tourVisualTest) _settings.Fullscreen = false;
         _graphics = new GraphicsDeviceManager(this)
         {
             PreferredBackBufferWidth = GameBalance.BackBufferWidth,
@@ -153,6 +158,12 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         IsMouseVisible = true;
         IsFixedTimeStep = true;
         TargetElapsedTime = TimeSpan.FromSeconds(1d / 60d);
+        if (_tourVisualTest)
+        {
+            // Every frame advances exactly 1/60 s however long a capture takes.
+            IsFixedTimeStep = false;
+            _graphics.SynchronizeWithVerticalRetrace = false;
+        }
         Window.Title = "The Lost Soul of Fire";
         Window.AllowUserResizing = true;
     }
@@ -160,7 +171,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     /// <summary>Automated runs must never touch the player's real profile.</summary>
     private PlayerProfileStore CreateProfileStore()
     {
-        if (!(_audioGameplayTest || _audioDeathRestartTest || _antechamberVisualTest || _currencyVisualTest || _abilityVisualTest || _sliceVisualTest))
+        if (!(_audioGameplayTest || _audioDeathRestartTest || _antechamberVisualTest || _currencyVisualTest || _abilityVisualTest || _sliceVisualTest || _tourVisualTest))
         {
             return new PlayerProfileStore();
         }
@@ -202,6 +213,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
             profileStore: CreateProfileStore());
         if (_abilityVisualTest) _world.ApplyDeveloperStart(new DeveloperStartOptions(DeveloperStartArea.Arena, 1), VirtualViewport);
         if (_sliceVisualTest) _sliceTest = new SliceVisualTest(_world, _input, VirtualViewport);
+        if (_tourVisualTest) _tourTest = new TourVisualTest(_world, _input, VirtualViewport);
         if (_developerStart is not null)
         {
             Console.WriteLine(_developerStart.Describe());
@@ -214,7 +226,19 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     protected override void Update(GameTime gameTime)
     {
         _input.Update(_resolution);
-        if (_sliceTest is not null)
+        if (_tourTest is not null)
+        {
+            _tourClock += TimeSpan.FromSeconds(1d / 60d);
+            gameTime = new GameTime(_tourClock, TimeSpan.FromSeconds(1d / 60d));
+            _tourTest.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+            if (_tourTest.Finished)
+            {
+                Environment.ExitCode = _tourTest.ExitCode;
+                Exit();
+                return;
+            }
+        }
+        else if (_sliceTest is not null)
         {
             _sliceTest.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
             if (_sliceTest.Finished)
@@ -314,6 +338,11 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
                 out string path)
                 ? $"Screenshot saved — {path}"
                 : $"Screenshot failed — {path}";
+        }
+
+        if (_tourTest?.PendingCapture is not null)
+        {
+            _tourTest.Capture(_virtualTarget);
         }
 
         if (_sliceTest?.PendingCapture is { } capture)

@@ -158,13 +158,22 @@ public sealed class CinematicPresentation
 
         if (playerDead)
         {
-            float collapse = Ease(_stateTime / 1.2f);
+            // A rendered figure falls first (death clip, 1.3 s); the Death Flame then takes the
+            // body where it lies, about 0.8 m ahead of the feet along the facing.
+            bool fallen = art.HasClip(VisualIds.Player, VisualClips.Death);
+            float delay = fallen ? 0.85f : 0f;
+            if (_stateTime < delay)
+            {
+                return;
+            }
+            Vector2 body = fallen ? FigureHeights.FallenChestOf(player.Position, player.FacingDirection) : player.Position;
+            float collapse = Ease((_stateTime - delay) / 1.2f);
             float scale = MathHelper.Lerp(0.68f, 0.34f, collapse);
-            float alpha = MathHelper.Lerp(1f, 0.34f, collapse);
-            art.DrawLoopingEffect(batch, player, VisualIds.DeathFlameLoop, player.Position, 0f, scale, Color.White * alpha);
+            float alpha = MathHelper.Lerp(1f, 0.34f, collapse) * Ease((_stateTime - delay) / 0.25f);
+            art.DrawLoopingEffect(batch, player, VisualIds.DeathFlameLoop, body, 0f, scale, Color.White * alpha);
             batch.DrawCircle(
                 pixel,
-                player.Position,
+                body,
                 MathHelper.Lerp(52f, 17f, collapse),
                 GameBalance.DeathFlameBright * (0.42f * (1f - collapse)),
                 3f,
@@ -519,12 +528,13 @@ public sealed class CinematicPresentation
 
     private void DrawDeath(SpriteBatch batch, Texture2D pixel, Viewport viewport)
     {
-        float collapse = Ease(_stateTime / 1.25f);
-        float darkness = MathHelper.Lerp(0.12f, 0.84f, collapse);
+        // The world stays visible while the figure falls (about 1.3 s); then the dark closes in.
+        float collapse = Ease((_stateTime - 0.55f) / 1.25f);
+        float darkness = MathHelper.Lerp(0.08f, 0.8f, collapse);
         batch.FillRectangle(pixel, viewport.Bounds, Color.Black * darkness);
         DrawLetterbox(batch, pixel, viewport, (int)MathHelper.Lerp(18f, 64f, collapse), 0.9f * collapse);
 
-        float titleReveal = Ease((_stateTime - 0.38f) / 0.58f);
+        float titleReveal = Ease((_stateTime - 1.05f) / 0.6f);
         float centerX = viewport.Width * 0.5f;
         float titleY = viewport.Height * 0.42f;
         DrawTitleRules(batch, pixel, viewport, titleY - 29f, titleReveal * 0.72f);

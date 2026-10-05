@@ -45,6 +45,25 @@ public sealed partial class GameWorld
 
     internal void PlaceAutomatedPlayer(Vector2 position) => _player.Reset(position);
 
+    /// <summary>Jumps into a prologue stage through the same entry the regular flow uses.</summary>
+    internal void EnterAutomatedPrologueStage(PrologueStage stage, Viewport viewport)
+    {
+        if (_phase != GamePhase.Prologue)
+        {
+            BeginPrologue(viewport);
+        }
+        if (stage == PrologueStage.Arrival)
+        {
+            ClearPrologueActivity();
+            EnterThreshold();
+        }
+        else
+        {
+            DebugEnterPrologueStage(stage);
+        }
+        _camera.Follow(_player.Position, PrologueDirector.WorldBounds, viewport, 1f);
+    }
+
     internal Hollow SpawnAutomatedHollow(Vector2 position)
     {
         Hollow hollow = new(position, _enemies.Count + 1);

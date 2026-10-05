@@ -41,6 +41,14 @@ public sealed class SoulCannon
     public float ChargeProgress => MathHelper.Clamp(_chargeTime / GetFullChargeTime(), 0f, 1f);
     public bool IsFullCharge => ChargeProgress >= 1f;
     public bool IsHandling => State != SoulCannonState.Stored;
+
+    /// <summary>Presentation only: how far the timed Drawing or Returning state has run (0..1).</summary>
+    public float StateProgress => State switch
+    {
+        SoulCannonState.Drawing => MathHelper.Clamp(1f - _stateTimer / GameBalance.CannonDrawDuration, 0f, 1f),
+        SoulCannonState.Returning => MathHelper.Clamp(1f - _stateTimer / GameBalance.CannonReturnDuration, 0f, 1f),
+        _ => 1f
+    };
     public bool CanUseScythe => State == SoulCannonState.Stored;
     public int ChargeStage => State is SoulCannonState.Stored or SoulCannonState.Returning
         ? 0

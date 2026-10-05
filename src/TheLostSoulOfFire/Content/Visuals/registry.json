@@ -64,6 +64,51 @@
           "loop": true,
           "normalMap": "Textures/Player/Animations/aim_normal/{dir}",
           "origin": [0.5, 0.8]
+        },
+        "cannon_draw": {
+          "path": "Textures/Player/Animations/cannon_draw/{dir}",
+          "frameSize": [252, 237],
+          "frames": 5,
+          "fps": 12.0,
+          "loop": false,
+          "normalMap": "Textures/Player/Animations/cannon_draw_normal/{dir}",
+          "origin": [0.5, 0.8059]
+        },
+        "cannon_fire": {
+          "path": "Textures/Player/Animations/cannon_fire/{dir}",
+          "frameSize": [260, 236],
+          "frames": 7,
+          "fps": 12.0,
+          "loop": false,
+          "normalMap": "Textures/Player/Animations/cannon_fire_normal/{dir}",
+          "origin": [0.5, 0.8093]
+        },
+        "dash": {
+          "path": "Textures/Player/Animations/dash/{dir}",
+          "frameSize": [228, 246],
+          "frames": 5,
+          "fps": 12.0,
+          "loop": false,
+          "normalMap": "Textures/Player/Animations/dash_normal/{dir}",
+          "origin": [0.5, 0.8577]
+        },
+        "hit": {
+          "path": "Textures/Player/Animations/hit/{dir}",
+          "frameSize": [252, 222],
+          "frames": 4,
+          "fps": 12.0,
+          "loop": false,
+          "normalMap": "Textures/Player/Animations/hit_normal/{dir}",
+          "origin": [0.5, 0.8874]
+        },
+        "death": {
+          "path": "Textures/Player/Animations/death/{dir}",
+          "frameSize": [366, 289],
+          "frames": 16,
+          "fps": 12.0,
+          "loop": false,
+          "normalMap": "Textures/Player/Animations/death_normal/{dir}",
+          "origin": [0.5, 0.6602]
         }
       },
       "pixelsPerUnit": 1.5

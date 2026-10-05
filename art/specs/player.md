@@ -25,7 +25,12 @@ Schlank und mittelgroß; Sensenklinge vor dem Körper oder über der linken Schu
 - `swing1`: erster Sensenhieb, 120° von links nach rechts, einmalig; Bild für Bild nach dem Fortschritt des Angriffs.
 - `swing2`: zweiter Hieb, 140° zurück, einmalig.
 - `swing3`: dritter Hieb mit Ausholen und Drehung des Oberkörpers, 198°, einmalig.
-- `aim`: Soul Cannon in der rechten Hand erhoben, Sense in der linken, Schleife.
+- `aim`: Soul Cannon in der rechten Hand erhoben, Sense in der linken, Schleife (Zustand `Charging`).
+- `cannon_draw`: Griff über die Schulter zur Kanone auf dem Rücken, Schwung nach vorn in den Anschlag; einmalig, nach dem Fortschritt des Zustands `Drawing` (0,16 s).
+- `cannon_fire`: Rückstoß (Mündung hoch, Schulter zurück, Knie federn), dann Kanone zurück auf den Rücken und Hand zurück an die Sense; einmalig, nach dem Fortschritt von `Returning` (0,28 s).
+- `dash`: tiefer Ausfallschritt in Dash-Richtung, Sense eng geführt; einmalig, nach dem Dash-Fortschritt (0,14 s).
+- `hit`: Kopf und Brust schnappen zurück, Knie geben nach; einmalig, nach dem Treffer-Aufblitzen (0,14 s).
+- `death`: Rückstoß, Knie knicken ein, die Sense fällt, Sturz nach vorn; einmalig ab dem tödlichen Treffer, 1,33 s, hält das letzte Bild. Die Death Flame nimmt danach den liegenden Körper.
 
 ## Effekte
 - `fx.scythe-slash-01`: erster Sensenhieb, 0,205 s, Treffer bei 0,062 s

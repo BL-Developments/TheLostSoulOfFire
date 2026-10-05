@@ -4139,6 +4139,561 @@
         "status": "angenommen",
         "reason": "Hollow der gemalten Scheibe: 3D-Pfad B (MPFB2 + Toon), Grundform nach Figurenblatt"
       }
+    },
+    {
+      "id": "4edb23312d9b416a99d7a7fb3719a270",
+      "timestamp": "2026-10-05T23:00:19+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "cannon_draw",
+        "frames": 5,
+        "fps": 12.0,
+        "frame_size": [
+          252,
+          237
+        ],
+        "origin": [
+          0.5,
+          0.8059
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.2,
+        "render_seconds": 14.4
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render2/cannon_draw.render.json",
+          "sha256": "4ad7cae94fbaf5ad76688a74418b5507e7ffbe719326c3bda2204776744d32c9"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw/n.png",
+          "sha256": "11dbbb76e0619a1ef9250f1d4e26d0cb27c701ceca9615042ce6a9b121ef5bcf"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw_normal/n.png",
+          "sha256": "4deebe33501ec49041742136c4e4b4c3e6601bebfc54cd1e1ae50a05213c0c90"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw/ne.png",
+          "sha256": "bc33611687498fc01f9056b079cce5f39915dabd1fa9c3c4aa289e9fb642ddb6"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw_normal/ne.png",
+          "sha256": "834038259c0a8ef0a09cbf5837db4e8c96065dade23c83cd7726c5d2edaa015a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw/e.png",
+          "sha256": "c2a7bd46439e3466dbac78aae50986d14749d0bdbc719155ef86b7b7c390f212"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw_normal/e.png",
+          "sha256": "16652db163be5c628e1da3130604ba9a5e0149051ebe36e730eb79d1d88b2d54"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw/se.png",
+          "sha256": "aadb0b3d8a73f7631be6a1d83c450de3276769efbb6f3b0d5b46bcfab0e664b4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw_normal/se.png",
+          "sha256": "8fce5f72573a35983015b2597469c97808bf4c484f8fbde64c8c1fa7a7f572c5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw/s.png",
+          "sha256": "9dfba685a4ad69adcac280a8b84806667498fd5ef3a7d515b3831d72eadb3f2e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw_normal/s.png",
+          "sha256": "8a76e86044e0f0ebb42bc73cb4ffb50f958528851394e40e0d8f4648af0e448d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw/sw.png",
+          "sha256": "14d5807dacaacb7e5f798308cb55c41b8ea08d130dacc9e3b2a751141f503113"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw_normal/sw.png",
+          "sha256": "24f6151997b9d327895b4a119fe78421fc1bb460a015732f36d61babc7a894a9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw/w.png",
+          "sha256": "a3e0e695625acabbb3034f5b87a2f7a044c9be47e96ba2b1a1a273a6146f90c3"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw_normal/w.png",
+          "sha256": "737b6c75b9f8dd5b4da793062c2795ac41e3ab24da9911b6a9023e7438c8d7a0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw/nw.png",
+          "sha256": "e1542ac4c26c324d2fe3faa40f24cf6e458c75410fe5c1404d0ab01f8b611e7e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw_normal/nw.png",
+          "sha256": "67a70ae1c1a7e3ce5b6a2c13f30212dad16ab0667a1c2c800e0c584dd6ef300c"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.2,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Spielerclip cannon_draw (Stil B), an den Spielzeitgeber gekoppelt"
+      }
+    },
+    {
+      "id": "6bc5457bc39e46a888ffc357ca28db39",
+      "timestamp": "2026-10-05T23:00:19+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "cannon_fire",
+        "frames": 7,
+        "fps": 12.0,
+        "frame_size": [
+          260,
+          236
+        ],
+        "origin": [
+          0.5,
+          0.8093
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.2,
+        "render_seconds": 19.7
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render2/cannon_fire.render.json",
+          "sha256": "32ef94b92182c62ad98fe1a6ab7382bbc819324a70aa7f5e9c6c22f3799dad7c"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/n.png",
+          "sha256": "3a10196d19cb0b68018eb05d0c15c535fc64676324eb59c99cef5c8b6864558b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/n.png",
+          "sha256": "511aebab4e0ad10c9ea7832972934b97200e2c9c4cf36b0377b0ec7144a88005"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/ne.png",
+          "sha256": "1707918adca02153bcacef78f726998e4d09e8eef5ed375c2bbdacc770ef8c0e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/ne.png",
+          "sha256": "992fbbb9dfae15b234a029cdfb6dfbeff35de03f947b11aaf47235ff599272a2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/e.png",
+          "sha256": "81f6333d779b52afec2e4f5c64581e792374f70fcc3dc5050553e255b8b4f166"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/e.png",
+          "sha256": "c8725f0d2e7ebcc00e2419b30fa2e0bfd7b83dc56437d89893baae8be00ed7af"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/se.png",
+          "sha256": "d9a21f5a23f4fd65347ffd710d7a229abe1d15332ebadcdce97aec8406fec362"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/se.png",
+          "sha256": "adf5dc78212af7045065e083fab9aa8dd5e98b8856e65842b843e4a49bc769c4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/s.png",
+          "sha256": "b9826d4d95acf31ac66ad4d234a3869731a078ac8ee2550821193243fed8989b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/s.png",
+          "sha256": "34cd42e4586944db50bdd1b42c3cad9b98a317161b73e3164019d658c3495a9e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/sw.png",
+          "sha256": "d4f5793d44d0c6cf4c4dba19c10b25896a34afdb20763162e552e5c5810b4734"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/sw.png",
+          "sha256": "baf951ae6870a291c6fe70df0763bbc533e12817f0c8b8185b4c50e8510c98e8"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/w.png",
+          "sha256": "72ca7aa4fb81266fdba988e41b51498fbfd6097dd07d5234731f61897a620ab7"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/w.png",
+          "sha256": "5bbc50db236a91940c4d8815f548e345a362c35a45c38b453c8e93d34a5bf873"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/nw.png",
+          "sha256": "f81f032f8c8041a70c6946336dc262d534774b13ecd3d73cb81cf99a94ad7880"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/nw.png",
+          "sha256": "8153cbbf531fdbe1dedd267eb18e1776f62930ef3f16464dc05a46f6c252ae62"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.3,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Spielerclip cannon_fire (Stil B), an den Spielzeitgeber gekoppelt"
+      }
+    },
+    {
+      "id": "6f5c376c657e4af5a1effcc365e45cef",
+      "timestamp": "2026-10-05T23:00:20+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "dash",
+        "frames": 5,
+        "fps": 12.0,
+        "frame_size": [
+          228,
+          246
+        ],
+        "origin": [
+          0.5,
+          0.8577
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.2,
+        "render_seconds": 14.6
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render2/dash.render.json",
+          "sha256": "dc52ddf633143c1b969ae8f2415d4878ede4f31cbb295d64283ba6f9a05c68ba"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/n.png",
+          "sha256": "73422daa30db6090c848339d883aa17d6bd6999be0b6e8fd00b690fb94bca8e2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/n.png",
+          "sha256": "b9979ea0fb9b7344412d2aaeade69958f96b840cb1fe6430b1440db73558cf04"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/ne.png",
+          "sha256": "5434c6bd56463a1569337f7ee38ce337527b89e1c7d1b71ea3789f515d4a786e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/ne.png",
+          "sha256": "741307cb010293bc3bff1040e158293d07683bb85742c2691d66a3e766aaaa35"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/e.png",
+          "sha256": "70aa4d01f8983b48a03523c620cae8d53a049d13a3a580db340926d529aac5e0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/e.png",
+          "sha256": "339c7504f77c6eacaeb93ee0b7365125e9c0b4cfacc9299a9a6a952049c042ad"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/se.png",
+          "sha256": "6abae903ca0d6f96d963eec65817b853870afd5eb398a66574f6e36d2247ebda"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/se.png",
+          "sha256": "ffd794127b06daf9834d813001e892014f7e8c5a42911f0d378a4232b56575c3"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/s.png",
+          "sha256": "05462dff67e6397ffe03d230708224c0be0ed09dcbb15411c9502f7133f533c8"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/s.png",
+          "sha256": "f3dc73dbd294f131b71020c2318b26ec2cad68eab12abfacd9cc2690ffb6bff9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/sw.png",
+          "sha256": "8d80b74a7585d932a1d08dddfa900c5e2683923af8e3d957265742b889f528f1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/sw.png",
+          "sha256": "c9e3feb49faf226987370b1ecabfd9daafd20397e901b5e998e1020099a25133"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/w.png",
+          "sha256": "4b72367247e0ca17b3379420cf46a286e188db7a6f2bc2cda607f720ecbc86b1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/w.png",
+          "sha256": "73d8def43c52e4724e2f26f7ba883996bb6aa641fc9bd39a192fe3c92fd44a4c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/nw.png",
+          "sha256": "360edb46eadad87682df4ef515493680208938a8eec3316c76b6909029de75df"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/nw.png",
+          "sha256": "bf2f80952e9bc0e87f0df441983b90e03b2905c59fb7220005161b92a1fcb0e2"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.2,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Spielerclip dash (Stil B), an den Spielzeitgeber gekoppelt"
+      }
+    },
+    {
+      "id": "d36f71457b754defa810b2ae023bba44",
+      "timestamp": "2026-10-05T23:00:20+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "hit",
+        "frames": 4,
+        "fps": 12.0,
+        "frame_size": [
+          252,
+          222
+        ],
+        "origin": [
+          0.5,
+          0.8874
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.2,
+        "render_seconds": 11.3
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render2/hit.render.json",
+          "sha256": "8f931daca29ce5108c53605e6ed3c56f13bb956daa7235f9a661431504294862"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/n.png",
+          "sha256": "1198f84906fc5d5c1cf606670a9b2380ffecd8ead2270e47d71219c5e966013a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/n.png",
+          "sha256": "b396413dffcf47c35bdea81068b602ded37caf4ee0be06a967ef6a1c0e143e41"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/ne.png",
+          "sha256": "c42505733afddbcbe28a646cf7d6cf51919e1bb9bdb5454ee857364e814594f6"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/ne.png",
+          "sha256": "8f7735ae3a617e22141ed4984a411727f54a9b3910e2c128c33f6a0fd60a7866"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/e.png",
+          "sha256": "dbee6fb1d78654b69916fd9d013a629154d20bde5bd6b50572d4ca3194f20688"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/e.png",
+          "sha256": "310e951518f403697bf16daf3a482fc96baf03942e9cb35d48e236bcf45154d2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/se.png",
+          "sha256": "df58942507ce519a81d5b45d9ff9e0bec6cdf5459d36468b83a90cfec28d912d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/se.png",
+          "sha256": "3b80a112563de330a75983578be3183fe545a725327992e382369b86c396bb3f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/s.png",
+          "sha256": "bdf89521672bdbb5e9a4c1083747d277d7482c187117579c68d9b3b56863da20"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/s.png",
+          "sha256": "d49b5a36a037c5f4eaed210ce90d6fcc5bfd813ebbc1efd5d21d07183d88ee8f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/sw.png",
+          "sha256": "eca71c88f1a900b458799a78da8804595710961a5fc2c90adf96d1979f4854c3"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/sw.png",
+          "sha256": "370f9506005fb8416199ebbedb5c2e8516b53a51c3a4a443503c12c7f12026f2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/w.png",
+          "sha256": "a6624693542a154cc21b94826cc5f48bfc56a99151d0538f72da252be772e26c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/w.png",
+          "sha256": "4a6fd2c838d92ca1ef78f4e488affbcfb7cf44a24d150b024cb7df815627ab8f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/nw.png",
+          "sha256": "d53331d309a4c1ba4c8686d98374bc765b712b3b2211e054c3201ae9447d1c56"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/nw.png",
+          "sha256": "9fc5cdef935961b2cba377cca033da40dd186b81a43a0c2c9cebd7e5437d9871"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.16,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Spielerclip hit (Stil B), an den Spielzeitgeber gekoppelt"
+      }
+    },
+    {
+      "id": "304b69f1c9a44ea5bb033b83e3639d09",
+      "timestamp": "2026-10-05T23:00:21+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "death",
+        "frames": 16,
+        "fps": 12.0,
+        "frame_size": [
+          366,
+          289
+        ],
+        "origin": [
+          0.5,
+          0.6602
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 45.3
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render2/death.render.json",
+          "sha256": "702084f477d0f61f279c4b21ae5bcac70ef81c05ce255767207794be329c46b4"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death/n.png",
+          "sha256": "838ff17728820b029631e262e76e45e2c1a321167b4b49b8e3715f8378d3c00a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death_normal/n.png",
+          "sha256": "84d9c1c297ea2517d96b40acf50236a67b79b9a6e1a8c2b923045292aa8fae3d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death/ne.png",
+          "sha256": "20341c02bf8d1e264f8713294eb99c232466c7e7c8adb5bcfb540c6c42f24374"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death_normal/ne.png",
+          "sha256": "df1bfdbe1dcedcc84dfeb19b0452728d06704eb92c79ae8b730426c229cecf13"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death/e.png",
+          "sha256": "3bfa204bb0fe880e2f3db638bf6bdb5cc9cfe9931444a0c25967d73ab1a79bed"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death_normal/e.png",
+          "sha256": "3928372c68e1830ae0113158778c2ce62e52a67ecf87ab88a6b959f3c72dc029"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death/se.png",
+          "sha256": "251b1542f53aa011749d3575b379ef3b6938a11d86289f097f3b34d9dc278e69"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death_normal/se.png",
+          "sha256": "6605b7f10af6e3aed8c793f7c42a164217af8d675afb722a158ac2168512f021"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death/s.png",
+          "sha256": "5afa5a3f26f6a425cb2e3bca015bc1623e55d338dce028022ff0bb62a43ce064"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death_normal/s.png",
+          "sha256": "bd18899a0b7e96c623655f6bbee0d07415eb1499cd974672c7fa6b54dffe638e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death/sw.png",
+          "sha256": "4eea3bee07deba65dfa975a17e5133b9fbd92cf65d5fe3a13c3c1384125391c2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death_normal/sw.png",
+          "sha256": "68019b32df00d2a0304770ceafa2fc7a99062233d722753a4b01fe8850c12a9d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death/w.png",
+          "sha256": "9b981dc5fa0c6e497ce7e05c1f7ce5ffde2f800fa1f160438a0a32a48049eca4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death_normal/w.png",
+          "sha256": "c9b4285ab0f9a6ef80217334d30512246f925c5963c01382b8b95aaf5ccda47b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death/nw.png",
+          "sha256": "688adf3571ee4aa62f5211d66f90f236d31edd7851c99cac90c85612b0d4e357"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death_normal/nw.png",
+          "sha256": "8f04c1b0acc69adf973323ccefde52202311d8e5bc1c16d3ea8de6c5caf0a4a9"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.87,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Spielerclip death (Stil B), an den Spielzeitgeber gekoppelt"
+      }
     }
   ]
 }

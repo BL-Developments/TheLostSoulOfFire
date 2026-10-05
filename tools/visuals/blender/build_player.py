@@ -24,8 +24,9 @@ from mathutils import Vector
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from figure_kit import (  # noqa: E402
-    FINGERS, THUMB, Poser, add_outline, attach, best_pole_angle, bone_world, cloth_shell, dominant_bone, enable_mpfb,
-    flat, ground_feet, loose_fists, outline_material, place_bone, rest_ground, shaped_coordinates, toon)
+    FINGERS, THUMB, Poser, add_outline, attach, best_pole_angle, blend_placement, bone_world, cloth_shell, dominant_bone,
+    ease, enable_mpfb, flat, ground_feet, ground_points, loose_fists, outline_material, place_bone, placement_of,
+    rest_ground, shaped_coordinates, toon)
 
 # Palette (linear-ish values chosen by eye under the toon ramp). Dark, but one value step above
 # the arena floor's shadows, so folds and the coat's edge still read on the painted ground.
@@ -407,6 +408,7 @@ def add_weapon_rig(rig: bpy.types.Object) -> None:
         for bone in (f"upperarm_{side}", f"lowerarm_{side}"):
             rig.pose.bones[bone].ik_stretch = 0.08
         constraint = rig.pose.bones[f"lowerarm_{side}"].constraints.new("IK")
+        constraint.name = "IK scythe"
         constraint.target, constraint.subtarget = rig, f"grip_{side}"
         constraint.pole_target, constraint.pole_subtarget = rig, f"pole_{side}"
         constraint.chain_count = 2
@@ -488,7 +490,6 @@ def add_cannon_rig(rig: bpy.types.Object) -> None:
     cannon.use_deform = False
     bpy.ops.object.mode_set(mode="OBJECT")
     arm = rig.pose.bones["lowerarm_r"]
-    arm.constraints["IK"].name = "IK scythe"
     aim = arm.constraints.new("IK")
     aim.name = "IK cannon"
     aim.target, aim.subtarget = rig, "cannon"
@@ -498,13 +499,16 @@ def add_cannon_rig(rig: bpy.types.Object) -> None:
     aim.influence = 0.0
 
 
-def key_hands(rig: bpy.types.Object, frame: int, aiming: bool) -> None:
-    """Which IK target the right hand follows, keyed per frame so every action sets it."""
-    constraints = rig.pose.bones["lowerarm_r"].constraints
-    constraints["IK scythe"].influence = 0.0 if aiming else 1.0
-    constraints["IK cannon"].influence = 1.0 if aiming else 0.0
-    for name in ("IK scythe", "IK cannon"):
-        constraints[name].keyframe_insert("influence", frame=frame)
+def key_hands(rig: bpy.types.Object, frame: int, cannon: float = 0.0, holding: float = 1.0) -> None:
+    """IK weights, keyed per frame so every action sets them: `cannon` moves the right hand from
+    the scythe's grip to the cannon's grip; `holding` 0 lets both hands go to their FK pose."""
+    right = rig.pose.bones["lowerarm_r"].constraints
+    left = rig.pose.bones["lowerarm_l"].constraints
+    right["IK scythe"].influence = (1.0 - cannon) * holding
+    right["IK cannon"].influence = cannon * holding
+    left["IK scythe"].influence = holding
+    for constraint in (right["IK scythe"], right["IK cannon"], left["IK scythe"]):
+        constraint.keyframe_insert("influence", frame=frame)
 
 
 # ---- Animation ----------------------------------------------------------------------------
@@ -523,7 +527,7 @@ def key_idle(poser: Poser, frames: int) -> bpy.types.Action:
                      Vector((poser.left, 0.0, 0.04)), Vector((0.0, 0.0, 1.0)))
         loose_fists(poser, 70)
         poser.key(frame + 1)
-        key_hands(poser.rig, frame + 1, aiming=False)
+        key_hands(poser.rig, frame + 1)
     return action
 
 
@@ -556,7 +560,7 @@ def key_run(poser: Poser, frames: int) -> bpy.types.Action:
                      Vector((0.8 * poser.left, 0.0, 0.62)), Vector((0.0, 1.0, 0.0)))
         loose_fists(poser, 70)
         poser.key(frame + 1)
-        key_hands(poser.rig, frame + 1, aiming=False)
+        key_hands(poser.rig, frame + 1)
     return action
 
 
@@ -597,7 +601,7 @@ def key_swing(poser: Poser, step: int, arc: float, frames: int) -> bpy.types.Act
         place_weapon(poser, Vector((0.0, -0.04, height)) + radial * 0.24, radial + Vector((0, 0, -0.10)), motion)
         loose_fists(poser, 75)
         poser.key(index + 1)
-        key_hands(poser.rig, index + 1, aiming=False)
+        key_hands(poser.rig, index + 1)
     return action
 
 
@@ -619,7 +623,200 @@ def key_aim(poser: Poser, frames: int) -> bpy.types.Action:
                      Vector((0.06 * poser.left, 0.55, -0.83)), Vector((poser.left, 0.0, 0.0)))
         loose_fists(poser, 75)
         poser.key(frame + 1)
-        key_hands(poser.rig, frame + 1, aiming=True)
+        key_hands(poser.rig, frame + 1, cannon=1.0)
+    return action
+
+
+# ---- Soul Cannon, dash, hit and death -------------------------------------------------------
+# These clips are sampled by the game's own timers (SoulCannon state progress, dash progress,
+# hit flash), so each pose lands on the moment the gameplay already defines.
+
+def weapon_idle(left: float) -> tuple[Vector, Vector, Vector]:
+    return Vector((0.0, -0.30, 1.0)), Vector((left, 0.0, 0.04)), Vector((0.0, 0.0, 1.0))
+
+
+def weapon_trailing(left: float) -> tuple[Vector, Vector, Vector]:
+    """The scythe in the left hand alone, blade down behind, while the right hand holds the cannon."""
+    return Vector((left * 0.25, -0.13, 1.01)), Vector((0.06 * left, 0.55, -0.83)), Vector((left, 0.0, 0.0))
+
+
+def cannon_aimed(left: float) -> tuple[Vector, Vector, Vector]:
+    return Vector((-left * 0.12, -0.42, 1.30)), Vector((0.0, -1.0, 0.0)), Vector((0.0, 0.0, 1.0))
+
+
+def torso_aim(poser: Poser, t: float) -> None:
+    """Between the combat stance (0) and the aiming stance of key_aim (1): right shoulder forward."""
+    poser.set("spine_01", "forward", 4 * t)
+    poser.set("spine_02", "forward", 2 * (1 - t))
+    poser.set("neck_01", "forward", 3 + t)
+    poser.turn("spine_02", 12 * t)
+    poser.turn("spine_03", 8 * t)
+
+
+def key_cannon_draw(poser: Poser, frames: int) -> bpy.types.Action:
+    """Drawing (0.16 s): the right hand lets go of the scythe, reaches over the shoulder for the
+    cannon on the back and swings it forward in an arc into the aim; the scythe drops to trail."""
+    action = bpy.data.actions.new("cannon_draw")
+    poser.rig.animation_data.action = action
+    left = poser.left
+    for index in range(frames):
+        p = index / (frames - 1)
+        reach = ease(min(1.0, p / 0.25))
+        pull = ease(max(0.0, (p - 0.25) / 0.75))
+        poser.clear()
+        torso_aim(poser, 0.15 * reach + 0.85 * pull)
+        poser.turn("spine_03", -14 * reach * (1 - pull))  # right shoulder back while it grabs
+        back = placement_of(poser, "cannon")
+        centre, axis, up = blend_placement(back, cannon_aimed(left), pull)
+        centre = centre + Vector((0.0, 0.0, 0.14 * math.sin(math.pi * pull)))  # over the shoulder
+        place_bone(poser, "cannon", centre, axis, up)
+        place_weapon(poser, *blend_placement(weapon_idle(left), weapon_trailing(left), ease(min(1.0, p / 0.6))))
+        loose_fists(poser, 75)
+        poser.key(index + 1)
+        key_hands(poser.rig, index + 1, cannon=reach)
+    return action
+
+
+def key_cannon_fire(poser: Poser, frames: int) -> bpy.types.Action:
+    """Returning (0.28 s after the shot): the recoil throws the muzzle up and the shoulder back,
+    the knees give, then the cannon swings back onto the back and the hand returns to the scythe."""
+    action = bpy.data.actions.new("cannon_fire")
+    poser.rig.animation_data.action = action
+    left = poser.left
+    ground = rest_ground(poser.rig)
+    for index in range(frames):
+        p = index / (frames - 1)
+        kick = max(0.0, 1.0 - p / 0.5) ** 1.3
+        stow = ease(max(0.0, (p - 0.45) / 0.55))
+        poser.clear()
+        for side in ("l", "r"):
+            poser.set(f"thigh_{side}", "forward", 16 * kick)
+            poser.set(f"calf_{side}", "back", 30 * kick)
+        poser.set("spine_01", "back", 8 * kick)
+        poser.set("spine_02", "back", 14 * kick)
+        poser.set("neck_01", "back", 12 * kick)
+        torso_aim(poser, (1 - stow) * (1 - 0.8 * kick))
+        poser.turn("spine_03", -18 * kick)
+        ground_feet(poser, ground)
+        back = placement_of(poser, "cannon")
+        aim_centre, aim_axis, aim_up = cannon_aimed(left)
+        recoiled = (aim_centre + Vector((0.0, 0.22 * kick, 0.16 * kick)),
+                    Vector((0.0, -1.0, 0.95 * kick)), Vector((0.0, 0.95 * kick, 1.0)))
+        centre, axis, up = blend_placement(recoiled, back, stow)
+        centre = centre + Vector((0.0, 0.0, 0.12 * math.sin(math.pi * stow)))
+        place_bone(poser, "cannon", centre, axis, up)
+        place_weapon(poser, *blend_placement(weapon_trailing(left), weapon_idle(left), stow))
+        loose_fists(poser, 75)
+        poser.key(index + 1)
+        # The hand stays on the cannon until it sits on the back, then takes the scythe again.
+        key_hands(poser.rig, index + 1, cannon=1.0 - ease(max(0.0, (p - 0.8) / 0.2)))
+    return action
+
+
+def key_dash(poser: Poser, frames: int) -> bpy.types.Action:
+    """Dash (0.14 s): a low lunge along the dash direction, scythe pulled close and trailing."""
+    action = bpy.data.actions.new("dash")
+    poser.rig.animation_data.action = action
+    left = poser.left
+    ground = rest_ground(poser.rig)
+    for index in range(frames):
+        p = index / (frames - 1)
+        lunge = ease(min(1.0, p / 0.3)) * (1.0 - 0.55 * ease(max(0.0, (p - 0.7) / 0.3)))
+        poser.clear()
+        poser.set("spine_01", "forward", 24 * lunge)
+        poser.set("spine_02", "forward", 8 * lunge)
+        poser.set("neck_01", "back", 14 * lunge)
+        poser.set("thigh_l", "forward", 42 * lunge)
+        poser.set("calf_l", "back", 46 * lunge)
+        poser.set("thigh_r", "forward", -34 * lunge)
+        poser.set("calf_r", "back", 24 * lunge)
+        poser.set("foot_r", "down", 20 * lunge)
+        ground_feet(poser, ground, settle=0.7)
+        bob = (poser.rig.pose.bones["pelvis"].head - poser.rig.data.bones["pelvis"].head_local).z
+        carry = (Vector((-0.02 * left, -0.27, 1.12)), Vector((0.8 * left, 0.0, 0.62)), Vector((0.0, 1.0, 0.0)))
+        low = (Vector((0.02 * left, -0.20, 0.98)), Vector((0.75 * left, 0.55, 0.12)), Vector((0.0, 0.35, 1.0)))
+        centre, axis, up = blend_placement(carry, low, lunge)
+        place_weapon(poser, centre + Vector((0.0, 0.0, bob)), axis, up)
+        loose_fists(poser, 75)
+        poser.key(index + 1)
+        key_hands(poser.rig, index + 1)
+    return action
+
+
+def key_hit(poser: Poser, frames: int) -> bpy.types.Action:
+    """Hit flash (0.14 s): the blow snaps the head and chest back, the knees give, then the stance returns."""
+    action = bpy.data.actions.new("hit")
+    poser.rig.animation_data.action = action
+    left = poser.left
+    ground = rest_ground(poser.rig)
+    for index in range(frames):
+        p = index / (frames - 1)
+        k = (1.0 - p) ** 1.4
+        poser.clear()
+        poser.set("spine_01", "back", 8 * k)
+        poser.set("spine_02", "back", 10 * k)
+        poser.set("neck_01", "back", 16 * k)
+        poser.turn("spine_03", 10 * k)
+        for side in ("l", "r"):
+            poser.set(f"thigh_{side}", "forward", 12 * k)
+            poser.set(f"calf_{side}", "back", 22 * k)
+        ground_feet(poser, ground)
+        centre, axis, up = weapon_idle(left)
+        place_weapon(poser, centre + Vector((0.0, 0.10 * k, 0.07 * k)), axis + Vector((0.0, 0.0, 0.25 * k)), up + Vector((0.0, 0.3 * k, 0.0)))
+        loose_fists(poser, 75)
+        poser.key(index + 1)
+        key_hands(poser.rig, index + 1)
+    return action
+
+
+def key_death(poser: Poser, frames: int) -> bpy.types.Action:
+    """Death: the blow throws him back, the knees buckle, the scythe slips from his hands and
+    he falls forward onto the floor. Played once from the moment Health reaches zero."""
+    action = bpy.data.actions.new("death")
+    poser.rig.animation_data.action = action
+    left = poser.left
+    ground = rest_ground(poser.rig)
+    contact = [("foot_l", "head"), ("foot_r", "head"), ("ball_l", "tail"), ("ball_r", "tail"),
+               ("calf_l", "head"), ("calf_r", "head"), ("head", "tail"), ("spine_03", "tail"),
+               ("hand_l", "tail"), ("hand_r", "tail"), ("pelvis", "head")]
+    drop_start = weapon_idle(left)
+    drop_end = (Vector((left * 0.38, -0.55, 0.035)), Vector((left * 0.92, -0.38, 0.0)), Vector((0.0, 0.0, 1.0)))
+    for index in range(frames):
+        p = index / (frames - 1)
+        recoil = max(0.0, 1.0 - p / 0.22) ** 1.2
+        kneel = ease((p - 0.12) / 0.33)
+        fall = ease((p - 0.45) / 0.4) ** 1.6
+        poser.clear()
+        poser.set("pelvis", "forward", 86 * fall)
+        poser.set("spine_01", "back", 8 * recoil)
+        poser.set("spine_01", "forward", 22 * kneel * (1 - fall))
+        poser.set("spine_02", "forward", 10 * kneel)
+        poser.set("neck_01", "back", 14 * recoil)
+        poser.set("neck_01", "forward", 20 * kneel * (1 - fall) - 25 * fall)
+        poser.set("thigh_r", "forward", 82 * kneel * (1 - fall) + 6 * fall)
+        poser.set("calf_r", "back", 112 * kneel * (1 - fall) + 18 * fall)
+        poser.set("thigh_l", "forward", 64 * kneel * (1 - fall) - 4 * fall)
+        poser.set("calf_l", "back", 70 * kneel * (1 - fall) + 30 * fall)
+        holding = 1.0 - ease((p - 0.32) / 0.12)
+        if holding < 1.0:
+            # Limp arms: hanging while he kneels, then thrown forward onto the floor.
+            hang = poser.world(0.35, 1.0, 0.25, "l"), poser.world(0.35, 1.0, 0.25, "r")
+            spread = poser.world(0.9, 0.1, 0.55, "l"), poser.world(0.7, 0.2, 0.3, "r")
+            for side, h, s in (("l", hang[0], spread[0]), ("r", hang[1], spread[1])):
+                direction = (h.lerp(s, fall)).normalized()
+                poser.aim(f"upperarm_{side}", direction)
+                poser.aim(f"lowerarm_{side}", (direction + Vector((0, 0, -0.2))).normalized())
+        if kneel > 0.0 or fall > 0.0:
+            ground_points(poser, ground, contact)
+        else:
+            ground_feet(poser, ground)
+        drop = ease((p - 0.36) / 0.3) ** 2
+        centre, axis, up = blend_placement(drop_start, drop_end, drop)
+        bounce = 0.05 * math.sin(math.pi * min(1.0, max(0.0, (p - 0.66) / 0.12)))
+        place_weapon(poser, centre + Vector((0.0, 0.0, bounce)), axis, up)
+        loose_fists(poser, 55 + 20 * holding)
+        poser.key(index + 1)
+        key_hands(poser.rig, index + 1, holding=holding)
     return action
 
 
@@ -672,7 +869,8 @@ def main() -> None:
     poser.measure_rest([f"{bone}_{side}" for bone in FINGERS + THUMB for side in ("l", "r")], "down")
     actions = [key_idle(poser, 12), key_run(poser, 12),
                key_swing(poser, 1, 120.0, 7), key_swing(poser, 2, -140.0, 8), key_swing(poser, 3, 198.0, 12),
-               key_aim(poser, 4)]
+               key_aim(poser, 4), key_cannon_draw(poser, 5), key_cannon_fire(poser, 7),
+               key_dash(poser, 5), key_hit(poser, 4), key_death(poser, 16)]
     for action in actions:
         action.use_fake_user = True
     idle = actions[0]

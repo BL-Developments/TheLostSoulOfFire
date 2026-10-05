@@ -265,6 +265,19 @@ def ground_feet(poser: Poser, ground: float, settle: float = 1.0) -> None:
     bpy.context.view_layer.update()
 
 
+def ground_points(poser: Poser, ground: float, points: list[tuple[str, str]]) -> None:
+    """Move the pelvis up or down so the lowest of the given bone ends (bone, "head"|"tail")
+    rests on the ground: for kneeling and lying poses, where knees, hands or the chest touch it."""
+    bpy.context.view_layer.update()
+    rig = poser.rig
+    lowest = min((rig.matrix_world @ getattr(rig.pose.bones[name], end)).z for name, end in points)
+    pelvis = rig.pose.bones["pelvis"]
+    world_shift = Vector((0, 0, ground - lowest))
+    local = pelvis.bone.matrix_local.to_3x3().inverted() @ (rig.matrix_world.to_3x3().inverted() @ world_shift)
+    pelvis.location = pelvis.location + local
+    bpy.context.view_layer.update()
+
+
 def rest_ground(rig: bpy.types.Object) -> float:
     points = [rig.matrix_world @ rig.data.bones[name].head_local for name in ("foot_l", "foot_r", "ball_l", "ball_r")]
     points += [rig.matrix_world @ rig.data.bones[name].tail_local for name in ("ball_l", "ball_r")]
@@ -284,8 +297,33 @@ def best_pole_angle(rig: bpy.types.Object, side: str, constraint: bpy.types.Cons
     return best
 
 
+Placement = tuple[Vector, Vector, Vector]
+
+
+def placement_of(poser: Poser, bone: str) -> Placement:
+    """Where a carrier bone is now, in rig space: (centre, axis, up), as place_bone takes it."""
+    bpy.context.view_layer.update()
+    matrix = poser.rig.pose.bones[bone].matrix
+    return matrix.translation.copy(), matrix.col[1].xyz.normalized(), matrix.col[2].xyz.normalized()
+
+
+def blend_placement(a: Placement, b: Placement, t: float) -> Placement:
+    """In-between of two placements: straight line for the centre, shortest turn for the rest."""
+    def rotation(placement: Placement):
+        y = placement[1].normalized()
+        z = (placement[2] - y * placement[2].dot(y)).normalized()
+        return Matrix((y.cross(z), y, z)).transposed().to_quaternion()
+    turned = rotation(a).slerp(rotation(b), t).to_matrix()
+    return a[0].lerp(b[0], t), turned.col[1], turned.col[2]
+
+
+def ease(t: float) -> float:
+    t = max(0.0, min(1.0, t))
+    return t * t * (3.0 - 2.0 * t)
+
+
 def place_bone(poser: Poser, bone: str, centre: Vector, axis: Vector, up: Vector) -> None:
-    """Like place_weapon, for any non-deforming carrier bone."""
+    """Put a non-deforming carrier bone at `centre` in rig space, its Y along `axis`, Z toward `up`."""
     y = axis.normalized()
     z = (up - y * up.dot(y)).normalized()
     matrix = Matrix((y.cross(z), y, z)).transposed().to_4x4()

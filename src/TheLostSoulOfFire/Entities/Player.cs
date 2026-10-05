@@ -49,6 +49,9 @@ public sealed class Player
     public float HitFlashRemaining { get; private set; }
     public float DashCooldownRemaining => _dashCooldownTimer;
     public bool IsDashing => _dashTimer > 0f;
+
+    /// <summary>Presentation only: how far the current dash has run (0..1).</summary>
+    public float DashProgress => MathHelper.Clamp(1f - _dashTimer / GameBalance.DashDuration, 0f, 1f);
     public bool IsInvulnerable => InvulnerabilityRemaining > 0f;
     public bool IsDead => Health <= 0;
     public float Resonance { get; private set; }
@@ -252,6 +255,12 @@ public sealed class Player
 
     public void Draw(SpriteBatch batch, Texture2D pixel, ArtAssets art, bool debugVisible, float soulSenseAmount = 0f)
     {
+        if (IsDead && art.HasClip(VisualIds.Player, VisualClips.Death))
+        {
+            // The rendered figure plays its fall; the Death Flame accent belongs to the presentation.
+            return;
+        }
+
         if (IsDead)
         {
             float deathPulse = 0.5f + 0.5f * MathF.Sin(_visualTime * 5f);

@@ -288,15 +288,31 @@ public sealed class ArtAssets
 
     private static string TileKey(string id, string clip, int column, int row) => $"{id}/{clip}/c{column}r{row}";
 
+    /// <summary>Normal hit flash of the player (Player.ApplyDamage); the fatal one is longer.</summary>
+    private const float PlayerHitFlash = 0.14f;
+
     public void DrawPlayer(SpriteBatch batch, Player player)
     {
         if (player.IsDead)
         {
+            // The fall plays once from the fatal hit and holds its last frame.
+            if (HasClip(VisualIds.Player, VisualClips.Death))
+            {
+                DrawCharacter(batch, player, VisualIds.Player, VisualClips.Death, player.FacingDirection, player.Position, 1f, Color.White, snapFacing: true);
+            }
             return;
         }
 
-        // Attacks and the raised cannon show their own clips, timed by gameplay; otherwise the
-        // figure runs where it moves and stands facing the aim.
+        // Every action shows its own clip, sampled by the gameplay timer that already defines it
+        // (dash, swing, cannon states, hit flash); otherwise the figure runs where it moves and
+        // stands facing the aim.
+        if (player.IsDashing && HasClip(VisualIds.Player, VisualClips.Dash))
+        {
+            DrawCharacter(batch, player, VisualIds.Player, VisualClips.Dash, player.DashDirection, player.Position, 1f, Color.White,
+                progress: player.DashProgress, snapFacing: true);
+            return;
+        }
+
         if (player.Scythe.ActiveStep > 0 && HasClip(VisualIds.Player, VisualClips.Swing(player.Scythe.ActiveStep)))
         {
             DrawCharacter(batch, player, VisualIds.Player, VisualClips.Swing(player.Scythe.ActiveStep), player.Scythe.AttackDirection,
@@ -305,9 +321,24 @@ public sealed class ArtAssets
         }
 
         bool moving = player.Velocity.LengthSquared() > 120f;
-        if (player.Cannon.State != SoulCannonState.Stored && HasClip(VisualIds.Player, VisualClips.Aim))
+        string? cannonClip = player.Cannon.State switch
         {
-            DrawCharacter(batch, player, VisualIds.Player, VisualClips.Aim, player.FacingDirection, player.Position, 1f, Color.White);
+            SoulCannonState.Drawing => VisualClips.CannonDraw,
+            SoulCannonState.Charging => VisualClips.Aim,
+            SoulCannonState.Returning => VisualClips.CannonFire,
+            _ => null
+        };
+        if (cannonClip is not null && HasClip(VisualIds.Player, cannonClip))
+        {
+            float? progress = cannonClip == VisualClips.Aim ? null : player.Cannon.StateProgress;
+            DrawCharacter(batch, player, VisualIds.Player, cannonClip, player.FacingDirection, player.Position, 1f, Color.White, progress: progress);
+            return;
+        }
+
+        if (player.HitFlashRemaining > 0f && HasClip(VisualIds.Player, VisualClips.Hit))
+        {
+            DrawCharacter(batch, player, VisualIds.Player, VisualClips.Hit, player.FacingDirection, player.Position, 1f, Color.White,
+                progress: 1f - player.HitFlashRemaining / PlayerHitFlash);
             return;
         }
 

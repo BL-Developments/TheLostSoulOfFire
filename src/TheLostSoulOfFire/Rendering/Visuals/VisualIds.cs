@@ -87,6 +87,11 @@ public static class VisualClips
     public const string Swing2 = "swing2";
     public const string Swing3 = "swing3";
     public const string Aim = "aim";
+    public const string CannonDraw = "cannon_draw";
+    public const string CannonFire = "cannon_fire";
+    public const string Dash = "dash";
+    public const string Hit = "hit";
+    public const string Death = "death";
 
     public static string Swing(int step) => step switch
     {
