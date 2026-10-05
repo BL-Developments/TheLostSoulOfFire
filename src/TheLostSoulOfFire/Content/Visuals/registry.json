@@ -21,7 +21,9 @@
           "frameSize": [128, 128],
           "frames": 9,
           "fps": 12,
-          "loop": true
+          "loop": true,
+          "progress": "distance",
+          "cycleDistance": 232
         }
       }
     },
@@ -45,7 +47,9 @@
           "frameSize": [128, 128],
           "frames": 9,
           "fps": 12,
-          "loop": true
+          "loop": true,
+          "progress": "distance",
+          "cycleDistance": 81
         },
         "swipe": {
           "path": "Textures/Enemies/Hollow/Animations/swipe/{dir}",
@@ -79,7 +83,9 @@
           "frameSize": [128, 128],
           "frames": 9,
           "fps": 14,
-          "loop": true
+          "loop": true,
+          "progress": "distance",
+          "cycleDistance": 108
         },
         "charge": {
           "path": "Textures/Enemies/Burning/Animations/charge/{dir}",
@@ -110,7 +116,9 @@
           "frameSize": [192, 192],
           "frames": 9,
           "fps": 9,
-          "loop": true
+          "loop": true,
+          "progress": "distance",
+          "cycleDistance": 72
         },
         "slam": {
           "path": "Textures/Enemies/Devourer/Animations/slam/{dir}",

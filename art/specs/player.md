@@ -18,7 +18,7 @@ Schlank und mittelgroß; Sensenklinge über einer Schulter, Cannon-Mündung übe
 
 ## Animationen
 - `idle`: Ruhe, Schleife; Waffe in Kampfhaltung quer vor dem Körper.
-- `move`: Laufen, Schleife; folgt künftig der Strecke (Clip-Fortschritt `distance`).
+- `move`: Laufen, Schleife; schreitet nach Strecke voran (Clip-Fortschritt `distance`, ein Zyklus je 232 Weltpixel).
 
 ## Effekte
 - `fx.scythe-slash-01`: erster Sensenhieb, 0,205 s, Treffer bei 0,062 s

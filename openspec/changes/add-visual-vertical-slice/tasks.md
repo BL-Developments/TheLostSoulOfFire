@@ -27,8 +27,8 @@
 - [ ] 4.3 `SpriteLit.fx`: Beleuchtungsdurchgang für Figuren mit Normal-Map, Schlüssellicht oben links und bis zu acht Soulfire-Punktlichtern aus den vorhandenen Lichtquellen. Figuren ohne Normal-Map unverändert. Prüfen: Testfigur mit flacher und mit gekippter Normal-Map neben einer Death Flame.
 - [ ] 4.4 `Dissolve.fx` und Auflösung besiegter Gegner mit Registry-Eintrag `dissolve`, ohne Einfluss auf Kollision, Welle, Prologablauf und Seelen. Prüfen: `ArenaWaveTests` und `PrologueFlowTests` unverändert grün; Aufnahme der Auflösung.
 - [ ] 4.5 `DeathFlame.fx`: Flow-Textur plus Death-Flame-Verlaufstabelle für Spurbänder und Flipbooks. Prüfen: Testspur in der Arena und Farbmessung gegen die Verlaufstabelle.
-- [ ] 4.6 Feste Ebenenreihenfolge, Sortierung von Akteuren und Props nach Fußpunkt, Occluder werden durchscheinend, solange sie Spieler, Gegner oder Telegraph verdecken. Unit-Tests für Sortierung und Verdeckungsprüfung.
-- [ ] 4.7 Sichtbare Blickrichtung mit begrenzter Drehrate und Hysterese, getrennt von der Spielrichtung; Clip-Fortschritt `distance` für Laufanimationen. Unit-Tests: schnelles Kreisen ohne Sprünge, kein Flackern an der Grenze, halbe Geschwindigkeit ergibt halbe Animationsrate, Angriffsrichtung unverändert.
+- [x] 4.6 Feste Ebenenreihenfolge, Sortierung von Akteuren und Props nach Fußpunkt, Occluder werden durchscheinend, solange sie Spieler, Gegner oder Telegraph verdecken. Unit-Tests für Sortierung und Verdeckungsprüfung.
+- [x] 4.7 Sichtbare Blickrichtung mit begrenzter Drehrate und Hysterese, getrennt von der Spielrichtung; Clip-Fortschritt `distance` für Laufanimationen. Unit-Tests: schnelles Kreisen ohne Sprünge, kein Flackern an der Grenze, halbe Geschwindigkeit ergibt halbe Animationsrate, Angriffsrichtung unverändert.
 
 ## 5. Prüfwerkzeuge
 

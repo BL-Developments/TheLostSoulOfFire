@@ -274,17 +274,19 @@ public sealed class ArtAssets
         Color tint,
         float fallbackSize = FallbackCharacterSize)
     {
-        string direction = VisualDirections.FromVector(facing);
+        FigureState figure = _figures.GetValue(owner, _ => new FigureState());
+        float deltaTime = figure.Advance(_time, position, out float distance);
+        string direction = figure.Facing.Update(facing, deltaTime);
         Vector2 worldSize = WorldSizeOf(id, new Vector2(fallbackSize)) * sizeScale;
-        SpriteClip? clip = Resolve(id, clipName, direction, out string resolvedName);
-        if (clip is null)
+        SpriteClip? clip = Resolve(id, clipName, direction, out string resolvedName, out VisualClipDefinition? definition);
+        if (clip is null || definition is null)
         {
-            batch.DrawCharacterDummy(_pixel, position, worldSize, facing, tint);
+            Vector2 drawnFacing = new(MathF.Cos(figure.Facing.Angle), MathF.Sin(figure.Facing.Angle));
+            batch.DrawCharacterDummy(_pixel, position, worldSize, drawnFacing, tint);
             return;
         }
 
-        FigureState figure = _figures.GetValue(owner, _ => new FigureState());
-        float elapsed = figure.Playback.Elapsed(ClipKey(id, resolvedName, direction), _time);
+        float elapsed = figure.PlayClip(resolvedName, definition, deltaTime, distance);
         float scale = worldSize.X / clip.FrameWidth;
         figure.RememberPose(clip, clip.GetSourceRectangle(elapsed), position, scale, tint);
         DrawFrame(batch, clip, elapsed, position, scale, tint);
@@ -307,13 +309,47 @@ public sealed class ArtAssets
     /// <summary>Per-figure presentation state; never read by gameplay.</summary>
     private sealed class FigureState
     {
-        public SpritePlayback Playback { get; } = new();
+        /// <summary>A teleport or respawn must not fast-forward the run cycle.</summary>
+        private const float MaxDistancePerDraw = 120f;
+
+        private bool _hasDrawn;
+        private float _lastTime;
+        private Vector2 _lastDrawPosition;
+        private string _clipName = string.Empty;
+        private float _elapsed;
+
+        public FacingTracker Facing { get; } = new();
         public SpriteClip? LastClip { get; private set; }
         public Rectangle LastSource { get; private set; }
         public Vector2 LastPosition { get; private set; }
         public float LastScale { get; private set; }
         public Color LastTint { get; private set; }
         public bool DissolveStarted { get; set; }
+
+        /// <summary>Time and distance since this figure was last drawn.</summary>
+        public float Advance(float time, Vector2 position, out float distance)
+        {
+            float deltaTime = _hasDrawn ? MathHelper.Clamp(time - _lastTime, 0f, 0.25f) : 0f;
+            distance = _hasDrawn ? MathF.Min(Vector2.Distance(position, _lastDrawPosition), MaxDistancePerDraw) : 0f;
+            _hasDrawn = true;
+            _lastTime = time;
+            _lastDrawPosition = position;
+            return deltaTime;
+        }
+
+        /// <summary>Elapsed playback of <paramref name="name"/>; switching clips restarts, turning does not.</summary>
+        public float PlayClip(string name, VisualClipDefinition clip, float deltaTime, float distance)
+        {
+            if (!string.Equals(_clipName, name, StringComparison.Ordinal))
+            {
+                _clipName = name;
+                _elapsed = 0f;
+                return _elapsed;
+            }
+
+            _elapsed = ClipClock.Advance(_elapsed, clip, deltaTime, distance);
+            return _elapsed;
+        }
 
         public void RememberPose(SpriteClip clip, Rectangle source, Vector2 position, float scale, Color tint)
         {
@@ -491,9 +527,13 @@ public sealed class ArtAssets
             0f);
     }
 
-    private SpriteClip? Resolve(string id, string clipName, string? direction, out string resolvedName)
+    private SpriteClip? Resolve(string id, string clipName, string? direction, out string resolvedName) =>
+        Resolve(id, clipName, direction, out resolvedName, out _);
+
+    private SpriteClip? Resolve(string id, string clipName, string? direction, out string resolvedName, out VisualClipDefinition? definition)
     {
         ClipResolution resolution = VisualResolver.Resolve(Registry, id, clipName);
+        definition = resolution.Clip;
         if (resolution.Missing is not null)
         {
             ReportMissing(resolution.Missing);
