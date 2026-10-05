@@ -33,6 +33,8 @@ public sealed class ScytheCombat
     public int ActiveStep { get; private set; }
     public bool StartedThisFrame { get; private set; }
     public Vector2 AttackDirection => _attackDirection;
+    /// <summary>True from the hit moment of the current swing until the next one starts.</summary>
+    public bool HasStruck => ActiveStep > 0 && _strikeCreated;
     public float NormalizedProgress => ActiveStep == 0 ? 0f : MathHelper.Clamp(_attackElapsed / _attackDuration, 0f, 1f);
     public string StateLabel => ActiveStep == 0 ? (_comboTimer > 0f ? $"CHAIN {_nextStep}" : "READY") : $"HIT {ActiveStep}";
 

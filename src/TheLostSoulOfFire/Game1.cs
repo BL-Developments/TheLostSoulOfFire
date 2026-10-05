@@ -37,6 +37,8 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     private readonly bool _antechamberVisualTest;
     private readonly bool _currencyVisualTest;
     private readonly bool _abilityVisualTest;
+    private readonly bool _sliceVisualTest;
+    private SliceVisualTest? _sliceTest;
     private float _abilityTestTime;
     private int _abilityTestStep;
     private bool _abilityMenuCaptured;
@@ -127,8 +129,10 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         bool antechamberVisualTest = false,
         DeveloperStartOptions? developerStart = null,
         bool currencyVisualTest = false,
-        bool abilityVisualTest = false)
+        bool abilityVisualTest = false,
+        bool sliceVisualTest = false)
     {
+        _sliceVisualTest = sliceVisualTest;
         _currencyVisualTest = currencyVisualTest;
         _abilityVisualTest = abilityVisualTest;
 
@@ -137,7 +141,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         _antechamberVisualTest = antechamberVisualTest;
         _developerStart = developerStart;
         _settings = _settingsStore.Load();
-        if (_abilityVisualTest) _settings.Fullscreen = false;
+        if (_abilityVisualTest || _sliceVisualTest) _settings.Fullscreen = false;
         _graphics = new GraphicsDeviceManager(this)
         {
             PreferredBackBufferWidth = GameBalance.BackBufferWidth,
@@ -156,7 +160,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     /// <summary>Automated runs must never touch the player's real profile.</summary>
     private PlayerProfileStore CreateProfileStore()
     {
-        if (!(_audioGameplayTest || _audioDeathRestartTest || _antechamberVisualTest || _currencyVisualTest || _abilityVisualTest))
+        if (!(_audioGameplayTest || _audioDeathRestartTest || _antechamberVisualTest || _currencyVisualTest || _abilityVisualTest || _sliceVisualTest))
         {
             return new PlayerProfileStore();
         }
@@ -197,6 +201,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
             settingsChanged: _settingsStore.Save,
             profileStore: CreateProfileStore());
         if (_abilityVisualTest) _world.ApplyDeveloperStart(new DeveloperStartOptions(DeveloperStartArea.Arena, 1), VirtualViewport);
+        if (_sliceVisualTest) _sliceTest = new SliceVisualTest(_world, _input, VirtualViewport);
         if (_developerStart is not null)
         {
             Console.WriteLine(_developerStart.Describe());
@@ -209,7 +214,17 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     protected override void Update(GameTime gameTime)
     {
         _input.Update(_resolution);
-        if (_abilityVisualTest)
+        if (_sliceTest is not null)
+        {
+            _sliceTest.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+            if (_sliceTest.Finished)
+            {
+                Environment.ExitCode = _sliceTest.ExitCode;
+                Exit();
+                return;
+            }
+        }
+        else if (_abilityVisualTest)
         {
             ConfigureAbilityVisualTest((float)gameTime.ElapsedGameTime.TotalSeconds);
         }
@@ -299,6 +314,12 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
                 out string path)
                 ? $"Screenshot saved — {path}"
                 : $"Screenshot failed — {path}";
+        }
+
+        if (_sliceTest?.PendingCapture is { } capture)
+        {
+            bool saved = ScreenshotCapture.TrySaveVirtualTarget(_virtualTarget, "slice_" + capture, out string result);
+            _sliceTest.CaptureCompleted(saved, result);
         }
 
         base.Draw(gameTime);

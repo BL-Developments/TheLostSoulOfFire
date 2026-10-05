@@ -404,7 +404,7 @@ public sealed partial class GameWorld : IDisposable
             return;
         }
 
-        _lastMouseWorld = _camera.ScreenToWorld(input.MouseVirtualPosition.ToPoint(), viewport);
+        _lastMouseWorld = AutomatedAimOr(_camera.ScreenToWorld(input.MouseVirtualPosition.ToPoint(), viewport));
 
         if (_screenEffects.IsHitStopped)
         {
@@ -752,6 +752,7 @@ public sealed partial class GameWorld : IDisposable
 
     public void Draw(SpriteBatch batch, Texture2D pixel, Viewport viewport, SoulfireRenderer renderer, RenderTarget2D? rootTarget = null)
     {
+        ApplyAutomatedOverview(viewport);
         renderer.BeginScene(viewport);
         DrawScene(batch, pixel, viewport, renderer.SceneLights);
         renderer.PresentScene(
@@ -781,6 +782,10 @@ public sealed partial class GameWorld : IDisposable
             batch.End();
         }
         renderer.DrawVignette(batch, viewport, _soulSensePresentation.WorldSuppression, _player.ResonanceActive);
+        if (_automatedHideHud)
+        {
+            return;
+        }
         DrawScreenFeedback(batch, pixel, viewport);
         DrawHud(batch, pixel, viewport);
     }
@@ -837,6 +842,7 @@ public sealed partial class GameWorld : IDisposable
             _art.DrawDissolves(batch);
         }
         DrawActorBand(batch, pixel, shouldDrawPlayer && (inAntechamber || IsCombatPhase));
+        DrawAutomatedStaging(batch);
 
         DrawSceneProps(batch, layer => layer is SceneLayer.Occluder or SceneLayer.Foreground);
         if (_phase == GamePhase.Prologue)
@@ -1033,6 +1039,13 @@ public sealed partial class GameWorld : IDisposable
             _presentation.GetLifeFlamePosition(_arena.CombatBounds),
             _presentation.GetLifeFlameAlpha(),
             drawArenaFurnaces: _phase != GamePhase.Prologue);
+
+        if (_automatedLightSource is not null)
+        {
+            renderer.BeginLighting(batch, RenderResolution.ToOutput(_camera.GetTransform(viewport, _screenEffects.CameraOffset)));
+            DrawAutomatedLights(renderer, batch);
+            batch.End();
+        }
     }
 
     private void DrawScreenFeedback(SpriteBatch batch, Texture2D pixel, Viewport viewport)
@@ -1235,6 +1248,10 @@ public sealed partial class GameWorld : IDisposable
                 coreHit);
             if (coreHit)
             {
+                _automatedCoreHits++;
+            }
+            if (coreHit)
+            {
                 _player.AddResonance(GameBalance.ResonancePerCoreHit);
                 _audio.Play(AudioCue.CoreHit, 0.7f);
             }
@@ -1392,7 +1409,7 @@ public sealed partial class GameWorld : IDisposable
         bool wasDashing,
         bool wasSoulSenseActive)
     {
-        _lastMouseWorld = _camera.ScreenToWorld(input.MousePosition, viewport);
+        _lastMouseWorld = AutomatedAimOr(_camera.ScreenToWorld(input.MousePosition, viewport));
         _player.Update(
             deltaTime,
             input,

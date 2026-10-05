@@ -24,16 +24,16 @@
 
 - [ ] 4.1 `ShadowDusk.MgcbPlugin` in `Content.mgcb` einbinden und einen Test-Shader bauen. Prüfen: `dotnet build` auf dem Mac ohne Wine und CI auf Ubuntu und Windows grün.
 - [x] 4.2 `SceneGrade.fx` in `SoulfireRenderer.PresentScene`: LUT pro Bereich (Ufer, Arena) und Soul-Sense-LUT, überblendet über die bisherige Soul-Sense-Stärke. HUD und Menüs bleiben ungegradet. Neutral-LUT als Ausgangswert für Bereiche ohne eigene LUT. Prüfen: Mit Neutral-LUT gleicht das Bild dem bisherigen; Aufnahmen mit und ohne Soul Sense.
-- [ ] 4.3 `SpriteLit.fx`: Beleuchtungsdurchgang für Figuren mit Normal-Map, Schlüssellicht oben links und bis zu acht Soulfire-Punktlichtern aus den vorhandenen Lichtquellen. Figuren ohne Normal-Map unverändert. Prüfen: Testfigur mit flacher und mit gekippter Normal-Map neben einer Death Flame.
-- [ ] 4.4 `Dissolve.fx` und Auflösung besiegter Gegner mit Registry-Eintrag `dissolve`, ohne Einfluss auf Kollision, Welle, Prologablauf und Seelen. Prüfen: `ArenaWaveTests` und `PrologueFlowTests` unverändert grün; Aufnahme der Auflösung.
-- [ ] 4.5 `DeathFlame.fx`: Flow-Textur plus Death-Flame-Verlaufstabelle für Spurbänder und Flipbooks. Prüfen: Testspur in der Arena und Farbmessung gegen die Verlaufstabelle.
+- [x] 4.3 `SpriteLit.fx`: Beleuchtungsdurchgang für Figuren mit Normal-Map, Schlüssellicht oben links und bis zu acht Soulfire-Punktlichtern aus den vorhandenen Lichtquellen. Figuren ohne Normal-Map unverändert. Prüfen: Testfigur mit flacher und mit gekippter Normal-Map neben einer Death Flame.
+- [x] 4.4 `Dissolve.fx` und Auflösung besiegter Gegner mit Registry-Eintrag `dissolve`, ohne Einfluss auf Kollision, Welle, Prologablauf und Seelen. Prüfen: `ArenaWaveTests` und `PrologueFlowTests` unverändert grün; Aufnahme der Auflösung.
+- [x] 4.5 `DeathFlame.fx`: Flow-Textur plus Death-Flame-Verlaufstabelle für Spurbänder und Flipbooks. Prüfen: Testspur in der Arena und Farbmessung gegen die Verlaufstabelle.
 - [x] 4.6 Feste Ebenenreihenfolge, Sortierung von Akteuren und Props nach Fußpunkt, Occluder werden durchscheinend, solange sie Spieler, Gegner oder Telegraph verdecken. Unit-Tests für Sortierung und Verdeckungsprüfung.
 - [x] 4.7 Sichtbare Blickrichtung mit begrenzter Drehrate und Hysterese, getrennt von der Spielrichtung; Clip-Fortschritt `distance` für Laufanimationen. Unit-Tests: schnelles Kreisen ohne Sprünge, kein Flackern an der Grenze, halbe Geschwindigkeit ergibt halbe Animationsrate, Angriffsrichtung unverändert.
 
 ## 5. Prüfwerkzeuge
 
 - [x] 5.1 Asset-Prüfungen in `dotnet test` mit StbImageSharp: Datei, Raster, acht Richtungen, Normal-Map-Maße, transparenter Rand, Schachbrett- und Hintergrundmuster, Farbbudget `death-flame`. Mit kleinen Testbildern für jeden Fehlerfall. Prüfen: Jeder Fehlerfall scheitert mit Visual-ID, Datei und Grund; alle aktuellen Ludo-Assets bestehen oder werden korrigiert.
-- [ ] 5.2 `--slice-visual-test` nach dem Muster der vorhandenen Bildtests: erst das Ufer, dann die Arena bei Welle 1, mit den Steuerhaken in `GameWorld`, die die Aufnahmen brauchen (Spieler platzieren und ausrichten, Spur mit Soul Sense, Hieb, Dash, Core-Treffer, Hollow-Swipe, Besiegen, Soul Release, Soul Sense, Occluder). Prüfen: Lauf endet mit Exitcode 0 und allen benannten Aufnahmen; ohne Hollow endet er mit Fehler und Aufnahmenamen.
+- [x] 5.2 `--slice-visual-test` nach dem Muster der vorhandenen Bildtests: erst das Ufer, dann die Arena bei Welle 1, mit den Steuerhaken in `GameWorld`, die die Aufnahmen brauchen (Spieler platzieren und ausrichten, Spur mit Soul Sense, Hieb, Dash, Core-Treffer, Hollow-Swipe, Besiegen, Soul Release, Soul Sense, Occluder). Prüfen: Lauf endet mit Exitcode 0 und allen benannten Aufnahmen; ohne Hollow endet er mit Fehler und Aufnahmenamen.
 - [ ] 5.3 `art/production/QUALITY-RUBRIC.md` aus §8, Düsternis-Charta und Stil-Bibel, mit dem Punkt „Bild erzählt die menschliche Geschichte seines Ortes“, sowie die Anleitung für die Agentenbewertung der Bildreihe nach `art/production/reviews/`. Prüfen: Eine Probebewertung der aktuellen Ludo-Arena und des Formen-Ufers liegt vor.
 
 ## 6. Produktionsweg
