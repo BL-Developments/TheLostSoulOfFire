@@ -4,7 +4,7 @@
 Das Pausenmenü hält das laufende Spiel per Escape an und bietet Fortsetzen, Einstellungen und das Beenden in Hauptmenü oder Desktop, im Stil des Hauptmenüs.
 ## Requirements
 ### Requirement: Escape pausiert das laufende Spiel
-Das System SHALL in jeder Spielphase außer der Titelphase bei `Escape` das Pausenmenü öffnen und das Spiel anhalten. Solange das Pausenmenü geöffnet ist, SHALL kein Spielzustand fortschreiten: Spieler, Gegner, Geschosse, Partikel, Kamera, Bildschirmeffekte, Inszenierungen, Übergänge und Phasentimer bleiben stehen, und Spiel- und Entwicklereingaben bleiben wirkungslos.
+Das System SHALL in jeder Spielphase außer der Titelphase bei `Escape` das Pausenmenü öffnen und das Spiel anhalten, sofern das Charaktermenü nicht geöffnet ist; bei geöffnetem Charaktermenü schließt `Escape` stattdessen das Charaktermenü. Solange das Pausenmenü geöffnet ist, SHALL kein Spielzustand fortschreiten: Spieler, Gegner, Geschosse, Partikel, Kamera, Bildschirmeffekte, Inszenierungen, Übergänge und Phasentimer bleiben stehen, und Spiel- und Entwicklereingaben bleiben wirkungslos.
 
 #### Scenario: Pause wird im Kampf geöffnet
 - **WHEN** der Spieler während eines Kampfes `Escape` drückt
@@ -21,6 +21,10 @@ Das System SHALL in jeder Spielphase außer der Titelphase bei `Escape` das Paus
 #### Scenario: Escape wird lange gehalten
 - **WHEN** der Spieler `Escape` im Spiel drückt und gedrückt hält
 - **THEN** öffnet sich das Pausenmenü genau einmal und die Anwendung wird nicht beendet
+
+#### Scenario: Escape bei geöffnetem Charaktermenü
+- **WHEN** der Spieler bei geöffnetem Charaktermenü `Escape` drückt
+- **THEN** schließt sich das Charaktermenü und das Pausenmenü erscheint nicht
 
 ### Requirement: Pausenmenü bietet vier Einträge in fester Reihenfolge
 Das System SHALL im Pausenmenü die Einträge `FORTSETZEN`, `EINSTELLUNGEN`, `ERRUNGENSCHAFTEN UND STATISTIKEN` und `BEENDEN` in dieser Reihenfolge darstellen und beim Öffnen `FORTSETZEN` auswählen. Die Bedienung per Maus und Tastatur SHALL der des Hauptmenüs entsprechen.
