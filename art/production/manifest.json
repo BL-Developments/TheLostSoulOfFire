@@ -230,6 +230,306 @@
         "status": "kandidat",
         "reason": "Probeaufruf, noch nicht bewertet"
       }
+    },
+    {
+      "id": "517b27949beb46039acfdd7d54daa286",
+      "timestamp": "2026-10-05T19:30:28+00:00",
+      "visual_id": "environment.shore",
+      "step": "style-study",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "painted high-resolution 2D game environment, three-quarter top-down view at about 35 degrees, a small harbour railway station platform at night half sunk in dark still water, concrete platform edge with granite kerb, wooden benches turned toward the water, one old leather suitcase, a tilted split-flap departure board rising out of the water, cast-iron canopy pillars painted faded green, salt crusts and tar lines, low mist over the water, soft painted edges, large readable shapes, single key light from the upper left, muted slate blue, salt white and faded green palette, one small violet flame on an iron post, melancholic and quiet, no people",
+      "seed": 11,
+      "parameters": {
+        "steps": 4,
+        "width": 1024,
+        "height": 576,
+        "quantize": 8,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/review/style-study/shore-a-s11.png",
+          "sha256": "18a4a96628a298c2c9723f954107acd38e04cea778a83f45949273ca2eb70976"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 68.02,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "e56323b59007454a9b8759a58960f5f4",
+      "timestamp": "2026-10-05T19:32:08+00:00",
+      "visual_id": "environment.shore",
+      "step": "style-study",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "painted high-resolution 2D game environment, three-quarter top-down view at about 35 degrees, a small harbour railway station platform at night half sunk in dark still water, concrete platform edge with granite kerb, wooden benches turned toward the water, one old leather suitcase, a tilted split-flap departure board rising out of the water, cast-iron canopy pillars painted faded green, salt crusts and tar lines, low mist over the water, hand-painted gouache illustration with visible brush strokes, painterly texture, large readable shapes, single key light from the upper left, muted slate blue, salt white and faded green palette, one small violet flame on an iron post, cold lamps, melancholic and quiet, no people",
+      "seed": 23,
+      "parameters": {
+        "steps": 4,
+        "width": 1024,
+        "height": 576,
+        "quantize": 8,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/review/style-study/shore-b-s23.png",
+          "sha256": "c8a5eae9916a08fb945222466b7d899a5cb3f83a776836dbdaf9ea6fc8239a47"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 68.67,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "907851643b7a4248a0858e2a90d26b1d",
+      "timestamp": "2026-10-05T19:33:37+00:00",
+      "visual_id": "environment.arena",
+      "step": "style-study",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "painted high-resolution 2D game environment, three-quarter top-down view at about 35 degrees, corner of a neo-gothic casting hall of an abandoned ironworks, pointed arches and riveted cast-iron columns, a leaning blast furnace like an altar with a violet glowing tapping hole, a rose window whose tracery is a giant flywheel, tools hanging on hooks, metal lockers, workbenches, slag, soot and chains, wide calm empty casting floor in mid-dark stone, soft painted edges, large readable shapes, single key light from the upper left, desaturated soot-dark brick red, cold steel blue grey and dull brass, violet light only at the furnace, monumental and silent, no people",
+      "seed": 11,
+      "parameters": {
+        "steps": 4,
+        "width": 1024,
+        "height": 576,
+        "quantize": 8,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/review/style-study/arena-a-s11.png",
+          "sha256": "b0c784b8edc28ab552d3deaf2b60c5aff7418117f98f4e31b780b0c514d932b0"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 89.56,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "aa383af85a624efd8c02ad0bcb65a175",
+      "timestamp": "2026-10-05T19:35:31+00:00",
+      "visual_id": "environment.arena",
+      "step": "style-study",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "painted high-resolution 2D game environment, three-quarter top-down view at about 35 degrees, corner of a neo-gothic casting hall of an abandoned ironworks, pointed arches and riveted cast-iron columns, a leaning blast furnace like an altar with a violet glowing tapping hole, a rose window whose tracery is a giant flywheel, tools hanging on hooks, metal lockers, workbenches, slag, soot and chains, wide calm empty casting floor in mid-dark stone, hand-painted gouache illustration with visible brush strokes, painterly texture, large readable shapes, single key light from the upper left, desaturated soot-dark brick red, cold steel blue grey and dull brass, violet light only at the furnace, monumental and silent, no people",
+      "seed": 23,
+      "parameters": {
+        "steps": 4,
+        "width": 1024,
+        "height": 576,
+        "quantize": 8,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/review/style-study/arena-b-s23.png",
+          "sha256": "2a34d63b164403cd6b5d2af0db45e82a61b16b91fc8b62dad3eb49b313410821"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 113.55,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "f089cfdcf1b64c9bacc4b7f9f672ec1a",
+      "timestamp": "2026-10-05T19:37:13+00:00",
+      "visual_id": "player",
+      "step": "style-study",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "character concept painting, full body standing figure, a young man in his mid twenties, slender, long dark asymmetric wool coat reaching below the knee, plain dark shirt, boots, messy dark chin-length hair, readable calm tired face, holding a scythe with a deep curved blade level across his body with both hands, a boxy blackened-iron reliquary cannon with a flared ribbed muzzle strapped on his back with a leather chest strap, a small brass compass with a carmine red enamel lid hanging on the chest strap, faint violet glow under the sternum, three-quarter front view, plain dark grey background, soft painted edges, large readable shapes, key light from the upper left, muted palette, the carmine lid is the only saturated accent, human, no wings, no horns, no hood",
+      "seed": 11,
+      "parameters": {
+        "steps": 4,
+        "width": 768,
+        "height": 1024,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/review/style-study/player-a-s11.png",
+          "sha256": "95aa6e32c839219ceddc80805c9de053d004f163eb68082b1c87f6518a013862"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 101.21,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "c1e96abbac714592ac946ac0609f4bda",
+      "timestamp": "2026-10-05T19:38:51+00:00",
+      "visual_id": "player",
+      "step": "style-study",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "character concept painting, full body standing figure, a young man in his mid twenties, slender, long dark asymmetric wool coat reaching below the knee, plain dark shirt, boots, messy dark chin-length hair, readable calm tired face, holding a scythe with a deep curved blade level across his body with both hands, a boxy blackened-iron reliquary cannon with a flared ribbed muzzle strapped on his back with a leather chest strap, a small brass compass with a carmine red enamel lid hanging on the chest strap, faint violet glow under the sternum, three-quarter front view, plain dark grey background, hand-painted gouache illustration with visible brush strokes, painterly texture, large readable shapes, key light from the upper left, muted palette, the carmine lid is the only saturated accent, human, no wings, no horns, no hood",
+      "seed": 23,
+      "parameters": {
+        "steps": 4,
+        "width": 768,
+        "height": 1024,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/review/style-study/player-b-s23.png",
+          "sha256": "50f0e85734ac7d19c365dbfb7d3130d3ae9ccd4fb746392380a46a7a7f8d8acd"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 97.12,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "0aef72f47a7d41b9b8b80ee4d21fa728",
+      "timestamp": "2026-10-05T19:39:54+00:00",
+      "visual_id": "fx.core-hit",
+      "step": "style-study",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "painted game effect concept, the impact of a scythe slash, a burst of violet-white flame tearing sideways and downward from the point of impact, sharp angular flame tongues, deep violet outside, light violet inside, near white core, small fragments flying, on a plain near-black background, soft painted edges, large readable shapes, no orange, no yellow, no red",
+      "seed": 11,
+      "parameters": {
+        "steps": 4,
+        "width": 768,
+        "height": 768,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/review/style-study/deathflame-a-s11.png",
+          "sha256": "aeb435bcf0a5cb45105b6629b36808882043deb95906d0036d3574817a94c41b"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 62.64,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "d7b7aa1e9cad49c59ca5f81fa2c111c2",
+      "timestamp": "2026-10-05T19:41:50+00:00",
+      "visual_id": "fx.core-hit",
+      "step": "style-study",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "painted game effect concept, the impact of a scythe slash, a burst of violet-white flame tearing sideways and downward from the point of impact, sharp angular flame tongues, deep violet outside, light violet inside, near white core, small fragments flying, on a plain near-black background, hand-painted gouache illustration with visible brush strokes, painterly texture, large readable shapes, no orange, no yellow, no red",
+      "seed": 23,
+      "parameters": {
+        "steps": 4,
+        "width": 768,
+        "height": 768,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/review/style-study/deathflame-b-s23.png",
+          "sha256": "71cf098c08ea235dbf2e9b78f319a7fff7548e9c6b0704dc49b79ba958e6958e"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 116.66,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
     }
   ]
 }

@@ -49,6 +49,19 @@ public sealed record VisualClipDefinition(
     ClipProgress Progress,
     float CycleDistance)
 {
+    public const string TilePlaceholder = "{tile}";
+
+    /// <summary>
+    /// Large environment layers are split into tiles (at most 2048 pixels each); the path then
+    /// contains <c>{tile}</c>, which stands for <c>c{column}r{row}</c>. One tile per frame size.
+    /// </summary>
+    public int TileColumns { get; init; } = 1;
+    public int TileRows { get; init; } = 1;
+    public bool IsTiled => TileColumns * TileRows > 1;
+
+    public string PathForTile(int column, int row) =>
+        Path.Replace(TilePlaceholder, $"c{column}r{row}", StringComparison.Ordinal);
+
     public bool IsDirectional => Path.Contains(VisualDirections.Placeholder, StringComparison.Ordinal);
 
     public float Duration => Frames / FramesPerSecond;
@@ -301,12 +314,35 @@ public sealed partial class VisualRegistry
                 }
             }
 
+            Vector2 tiles = OptionalPair(clip, "tiles") ?? Vector2.One;
+            if (tiles.X < 1 || tiles.Y < 1 || tiles.X != MathF.Floor(tiles.X) || tiles.Y != MathF.Floor(tiles.Y))
+            {
+                Error($"{prefix}.tiles", "muss [Spalten, Zeilen] aus ganzen Zahlen ≥ 1 sein.");
+            }
+            bool tiled = tiles.X * tiles.Y > 1;
+            if (path is not null && tiled != path.Contains(VisualClipDefinition.TilePlaceholder, StringComparison.Ordinal))
+            {
+                Error($"{prefix}.path", $"muss '{VisualClipDefinition.TilePlaceholder}' genau dann enthalten, wenn 'tiles' mehr als eine Kachel ergibt.");
+            }
+            if (tiled && kind != VisualKind.Environment)
+            {
+                Error($"{prefix}.tiles", "Kacheln gibt es nur für Umgebungsebenen.");
+            }
+            if (tiled && (frameSize.X > 2048 || frameSize.Y > 2048))
+            {
+                Error($"{prefix}.frameSize", "eine Kachel darf höchstens 2048 Pixel groß sein.");
+            }
+
             if (errors.Count > errorsBefore || path is null)
             {
                 return null;
             }
 
-            return new VisualClipDefinition(name, path, (int)frameSize.X, (int)frameSize.Y, frames, fps, loop, normalMap, progress, cycleDistance);
+            return new VisualClipDefinition(name, path, (int)frameSize.X, (int)frameSize.Y, frames, fps, loop, normalMap, progress, cycleDistance)
+            {
+                TileColumns = (int)tiles.X,
+                TileRows = (int)tiles.Y
+            };
         }
 
         private static readonly Dictionary<string, VisualKind> KindNames = new()

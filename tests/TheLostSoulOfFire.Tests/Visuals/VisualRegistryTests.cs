@@ -80,6 +80,31 @@ public sealed class VisualRegistryTests
     }
 
     [TestMethod]
+    public void TiledEnvironment_ParsesTilesAndTilePaths()
+    {
+        VisualRegistry registry = VisualRegistry.Parse(Registry("""
+            { "id": "environment.test", "kind": "environment", "palette": "world", "worldSize": [1800, 1000], "origin": [0, 0],
+              "clips": { "default": { "path": "T/floor_{tile}", "frameSize": [1350, 1500], "frames": 1, "fps": 1, "loop": true, "tiles": [2, 1] } } }
+            """));
+
+        VisualClipDefinition floor = registry.Entries.Single().Clips["default"];
+        Assert.IsTrue(floor.IsTiled);
+        Assert.AreEqual("T/floor_c1r0", floor.PathForTile(1, 0));
+    }
+
+    [TestMethod]
+    public void Tiles_WithoutTilePlaceholder_NameTheField()
+    {
+        string json = Registry("""
+            { "id": "environment.test", "kind": "environment", "palette": "world", "worldSize": [1800, 1000],
+              "clips": { "default": { "path": "T/floor", "frameSize": [1350, 1500], "frames": 1, "fps": 1, "loop": true, "tiles": [2, 1] } } }
+            """);
+
+        VisualRegistryException exception = Assert.ThrowsException<VisualRegistryException>(() => VisualRegistry.Parse(json));
+        StringAssert.Contains(exception.Message, "'environment.test' Feld 'clips.default.path'");
+    }
+
+    [TestMethod]
     public void DuplicateIds_AreRejected()
     {
         VisualRegistryException exception = Assert.ThrowsException<VisualRegistryException>(

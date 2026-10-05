@@ -5,7 +5,8 @@
         --visual-id environment.shore --model flux2-klein-4b \\
         --prompt "painted dark harbour station at night, soft edges, key light from the upper left" \\
         --seed 42 [--steps 4] [--width 1024 --height 576] [--quantize 8] \\
-        [--lora art/production/lora/hausstil.safetensors 0.9] [--reference img.png ...]
+        [--lora art/production/lora/hausstil.safetensors 0.9] [--reference img.png ...] \\
+        [--init layout.png --init-strength 0.55]
 
 Only models from art/production/LICENSES.md are accepted. Output goes to
 art/production/candidates/<visual-id>/ (ignored by git) unless --output is given; every run
@@ -56,6 +57,8 @@ def build_command(args: argparse.Namespace, output: Path) -> list[str]:
         parts += ["--lora-paths", args.lora[0], "--lora-scales", args.lora[1] if len(args.lora) > 1 else "1.0"]
     if args.reference:
         parts += ["--image-paths", *[str(path) for path in args.reference]]
+    if args.init:
+        parts += ["--image-path", str(args.init), "--image-strength", str(args.init_strength)]
     if args.low_ram:
         parts.append("--low-ram")
     return parts
@@ -73,6 +76,8 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--quantize", type=int, choices=[4, 8])
     parser.add_argument("--lora", nargs="+", metavar=("PATH", "SCALE"))
     parser.add_argument("--reference", nargs="+", type=Path, default=[])
+    parser.add_argument("--init", type=Path, help="init image for image-to-image, e.g. a control image from control_image.py")
+    parser.add_argument("--init-strength", type=float, default=0.55, help="share of the init image kept (mflux --image-strength)")
     parser.add_argument("--low-ram", action="store_true")
     parser.add_argument("--output", type=Path)
     parser.add_argument("--step", default="generate", help="manifest step name, e.g. style-frame, concept")
@@ -81,7 +86,7 @@ def main(argv: list[str]) -> int:
     model = common.model_info(args.model)
     output = args.output or common.CANDIDATES / args.visual_id / f"{datetime.now():%Y%m%d-%H%M%S}-{args.model}-s{args.seed}.png"
     output.parent.mkdir(parents=True, exist_ok=True)
-    inputs = list(args.reference) + ([Path(args.lora[0])] if args.lora else [])
+    inputs = list(args.reference) + ([Path(args.lora[0])] if args.lora else []) + ([args.init] if args.init else [])
     if args.lora:
         model["lora"] = common.relative(Path(args.lora[0]))
 
@@ -93,7 +98,7 @@ def main(argv: list[str]) -> int:
         prompt=args.prompt,
         seed=args.seed,
         parameters={"steps": args.steps or DEFAULT_STEPS[args.model], "width": args.width, "height": args.height,
-                    "quantize": args.quantize, "lora_scale": float(args.lora[1]) if args.lora and len(args.lora) > 1 else None},
+                    "quantize": args.quantize, "init_strength": args.init_strength if args.init else None, "lora_scale": float(args.lora[1]) if args.lora and len(args.lora) > 1 else None},
         inputs=inputs,
         outputs=[output],
     )

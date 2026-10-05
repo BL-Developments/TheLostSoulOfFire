@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using StbImageSharp;
 using TheLostSoulOfFire.Rendering.Visuals;
 
@@ -40,11 +41,16 @@ internal static class AssetChecks
     {
         foreach (VisualClipDefinition clip in entry.Clips.Values)
         {
-            IEnumerable<string?> directions = clip.IsDirectional ? VisualDirections.All : [null];
-            foreach (string? direction in directions)
+            IEnumerable<string?> variants = clip.IsDirectional
+                ? VisualDirections.All
+                : clip.IsTiled
+                    ? Enumerable.Range(0, clip.TileRows).SelectMany(row => Enumerable.Range(0, clip.TileColumns).Select(column => $"c{column}r{row}"))
+                    : [null];
+            foreach (string? variant in variants)
             {
-                string path = direction is null ? clip.Path : clip.PathFor(direction);
-                string label = direction is null ? $"{entry.Id}/{clip.Name}" : VisualDirections.Describe(entry.Id, clip.Name, direction);
+                string? direction = clip.IsDirectional ? variant : null;
+                string path = clip.IsDirectional ? clip.PathFor(variant!) : clip.IsTiled ? clip.Path.Replace(VisualClipDefinition.TilePlaceholder, variant!) : clip.Path;
+                string label = variant is null ? $"{entry.Id}/{clip.Name}" : direction is null ? $"{entry.Id}/{clip.Name}/{variant}" : VisualDirections.Describe(entry.Id, clip.Name, direction);
                 string file = path + ".png";
                 ImageData? image = load(path);
                 if (image is null)

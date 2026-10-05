@@ -118,7 +118,24 @@ public sealed class ArtAssets
         {
             foreach (VisualClipDefinition clip in entry.Clips.Values)
             {
-                if (clip.IsDirectional)
+                if (clip.IsTiled)
+                {
+                    for (int row = 0; row < clip.TileRows; row++)
+                    {
+                        for (int column = 0; column < clip.TileColumns; column++)
+                        {
+                            Texture2D? tile = TryLoad(content, clip.PathForTile(column, row));
+                            _clips[TileKey(entry.Id, clip.Name, column, row)] = tile is null
+                                ? null
+                                : new SpriteClip(tile, clip.FrameWidth, clip.FrameHeight, 1, 1f, true);
+                            if (tile is null)
+                            {
+                                ReportMissing(TileKey(entry.Id, clip.Name, column, row));
+                            }
+                        }
+                    }
+                }
+                else if (clip.IsDirectional)
                 {
                     foreach (string direction in VisualDirections.All)
                     {
@@ -221,6 +238,12 @@ public sealed class ArtAssets
 
     public void DrawEnvironment(SpriteBatch batch, string id, Vector2 position)
     {
+        if (Registry.TryGet(id, out VisualEntry tiledEntry) && tiledEntry.TryGetClip(VisualClips.Default, out VisualClipDefinition tiled) && tiled.IsTiled)
+        {
+            DrawTiled(batch, tiledEntry, tiled, position);
+            return;
+        }
+
         SpriteClip? clip = GetEffect(id);
         Vector2 size = WorldSizeOf(id, new Vector2(1800f, 1000f));
         Vector2 origin = Registry.TryGet(id, out VisualEntry entry) ? entry.Origin : Vector2.Zero;
@@ -234,6 +257,34 @@ public sealed class ArtAssets
 
         batch.Draw(clip.Texture, bounds, clip.GetSourceRectangle(0f), Color.White);
     }
+
+    private void DrawTiled(SpriteBatch batch, VisualEntry entry, VisualClipDefinition clip, Vector2 position)
+    {
+        Vector2 topLeft = position - entry.Origin * entry.WorldSize;
+        Vector2 tileSize = entry.WorldSize / new Vector2(clip.TileColumns, clip.TileRows);
+        for (int row = 0; row < clip.TileRows; row++)
+        {
+            for (int column = 0; column < clip.TileColumns; column++)
+            {
+                // Edges are rounded from the tile grid so neighbouring tiles meet without gaps.
+                int left = (int)MathF.Round(topLeft.X + column * tileSize.X);
+                int top = (int)MathF.Round(topLeft.Y + row * tileSize.Y);
+                int right = (int)MathF.Round(topLeft.X + (column + 1) * tileSize.X);
+                int bottom = (int)MathF.Round(topLeft.Y + (row + 1) * tileSize.Y);
+                Rectangle bounds = new(left, top, right - left, bottom - top);
+                if (_clips.TryGetValue(TileKey(entry.Id, clip.Name, column, row), out SpriteClip? tile) && tile is not null)
+                {
+                    batch.Draw(tile.Texture, bounds, Color.White);
+                }
+                else
+                {
+                    batch.DrawPropDummy(_pixel, bounds, new Vector2(bounds.Center.X, bounds.Bottom));
+                }
+            }
+        }
+    }
+
+    private static string TileKey(string id, string clip, int column, int row) => $"{id}/{clip}/c{column}r{row}";
 
     public void DrawPlayer(SpriteBatch batch, Player player)
     {
