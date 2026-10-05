@@ -153,3 +153,133 @@ Eine Szene besteht den visuellen Anspruch, wenn:
 - **God of War:** Kampfinszenierung und Reaktionsbefriedigung, nicht der grundlegende Artstyle.
 
 Bastion bleibt die primäre Stilreferenz. Children of Morta ergänzt Raumtiefe und Lesbarkeit. Soulfire Gothic bleibt die kreative Identität.
+
+## 10. Düsternis-Charta — PROPOSED
+
+> Entwurf für Freigabe 0 im Change `add-visual-vertical-slice`. Intern heißt
+> dieses Maß „das Diablo-Maß“; in Prompts und Stilbeschreibungen wird kein
+> Spiel genannt (§2).
+
+Die Welt ist düster, weil Menschen etwas verloren haben, nicht weil etwas
+eklig ist. Grauen entsteht aus Verlust, Größe und Stille.
+
+Jede Regel ist eine Ja/Nein-Frage an ein einzelnes Bild. Ein Bild besteht die
+Charta, wenn jede Frage die geforderte Antwort hat.
+
+### Erlaubt und verboten
+
+| Nr. | Prüffrage | Gefordert |
+| --- | --- | --- |
+| D1 | Liegt der größte Teil des Bildes im Dunkel, mit klar abgegrenzten Lichtinseln? | Ja |
+| D2 | Zeigt das Bild Verfall (Risse, Rost, Staub, Bruch) an menschengemachten Dingen? | Ja |
+| D3 | Gibt es einen Gegenstand, der zeigt, dass hier Menschen lebten oder arbeiteten (Bank, Koffer, Werkzeug, Spind)? | Ja |
+| D4 | Zeigt das Bild Blut, Wunden, offenes Fleisch, Organe oder Gore? | Nein |
+| D5 | Zeigt das Bild Körperhorror: verdrehte Gliedmaßen als Ekel, Parasiten, Schleim, Fäulnis, Maden? | Nein |
+| D6 | Liegen Leichen, Schädel oder Knochen als Dekoration im Bild? | Nein |
+| D7 | Zeigt das Bild Folterwerkzeug oder Hinrichtungsszenen? | Nein |
+| D8 | Enthält das Bild Höllen- oder Dämonenzeichen (Pentagramm, umgedrehtes Kreuz, Hörner, Fledermausflügel)? | Nein |
+| D9 | Geht die Bedrohung von Größe, Leere oder Stille aus statt von Ekel? | Ja |
+| D10 | Haben Lost Souls Masken, verkohlte oder verschlossene Gesichter statt verletzter Gesichter? | Ja |
+
+### Licht und Dunkel
+
+| Nr. | Prüffrage | Gefordert |
+| --- | --- | --- |
+| L1 | Kommt das Hauptlicht von oben links (Schlüssellicht, §5a)? | Ja |
+| L2 | Gibt es höchstens drei Lichtinseln auf einem Bildschirm? | Ja |
+| L3 | Ist die hellste Lichtinsel spiel- oder storyrelevant (Spieler, Gegner-Telegraph, Seele, Landmarke, Ausgang)? | Ja |
+| L4 | Leuchtet irgendeine Umgebungslampe warm orange? | Nein |
+
+### Wertverteilung
+
+Gemessen an der Luminanz (0–255) in sieben gleich breiten Stufen: Stufe 1 bis
+36, Stufe 2 bis 73, Stufe 3 bis 109, Stufe 4 bis 146, Stufe 5 bis 182, Stufe 6
+bis 219, Stufe 7 darüber.
+
+| Nr. | Prüffrage | Gefordert |
+| --- | --- | --- |
+| W1 | Liegen mindestens 60 % der Bildfläche in den Stufen 1 bis 3? | Ja |
+| W2 | Liegen höchstens 3 % der Bildfläche in Stufe 7? | Ja |
+| W3 | Gehört alles in Stufe 7 zu Flamme, Seele, Kernlicht oder Effekt? | Ja |
+| W4 | Liegt der Boden der Kampffläche überwiegend in Stufe 2 oder 3? | Ja |
+| W5 | Hebt sich jede Figur an ihrer Kontur um mindestens eine Stufe vom Boden dahinter ab? | Ja |
+| W6 | Gibt es innerhalb der Kampffläche eine Fläche mit Luminanz unter 8, die größer ist als eine Spielerfigur? | Nein |
+
+## 11. Symbolsatz — PROPOSED
+
+> Entwurf für Freigabe 0 im Change `add-visual-vertical-slice`.
+
+Wenige feste Zeichen mit festen Formregeln. Ein Zeichen bedeutet immer dasselbe
+und erscheint nie als bloßes Ornament.
+
+### Death Flame
+
+Übergang, Trennung, Auflösung, Warden-Kraft.
+
+| Nr. | Prüffrage | Gefordert |
+| --- | --- | --- |
+| S1 | Ist die Flamme außen tiefviolett, innen hellviolett und im Kern fast weiß? | Ja |
+| S2 | Enthält die Flamme orange, gelbe, grüne oder blaue Bereiche? | Nein |
+| S3 | Zeigt mindestens eine Flammenzunge seitwärts, abwärts oder rückwärts statt nur nach oben? | Ja |
+| S4 | Sind die Zungen spitz und teils kantig statt rund und weich? | Ja |
+
+### Life Flame
+
+Leben und Bindung. Außergewöhnlich und sparsam.
+
+| Nr. | Prüffrage | Gefordert |
+| --- | --- | --- |
+| S5 | Ist die Flamme warm orange mit gelbweißem Kern, weich und nach oben steigend? | Ja |
+| S6 | Gibt es mehr als eine Life Flame im Bild? | Nein |
+| S7 | Ist die Life Flame Teil eines Kampfeffekts? | Nein |
+
+### Wardens: die gefasste Flamme
+
+Wardens beherrschen die Death Flame. Ihr Zeichen ist eine senkrechte, ruhige
+Death Flame in einer von Hand gemachten Fassung: Warden-Marken, Suchfeuer, der
+Spalt über der Tür der Schwelle.
+
+| Nr. | Prüffrage | Gefordert |
+| --- | --- | --- |
+| S8 | Steht die Warden-Flamme senkrecht und ruhig, höchstens leicht atmend? | Ja |
+| S9 | Ist sie von bearbeitetem Material gefasst (Eisen, Stein, Holz) und in Menschengröße? | Ja |
+| S10 | Schwebt eine Warden-Flamme frei oder bewegt sie sich wild? | Nein |
+| S11 | Steht eine Flamme völlig reglos, ohne dass das Bild Vaelor oder einen Ort der Stillness zeigt? (Die reglose Flamme ist der Stillness vorbehalten.) | Nein |
+
+### The Keeper: der offene Ring
+
+The Keeper wird nie erklärt und nie gezeigt. Sein einziges Zeichen ist eine
+Abwesenheit: ein Ring mit einer Lücke oben, die Grenze, über die man sprechen,
+aber die man nicht überschreiten kann.
+
+| Nr. | Prüffrage | Gefordert |
+| --- | --- | --- |
+| S12 | Zeigt das Bild den Keeper als Gestalt, Gesicht, Auge, Hand oder Lichtquelle? | Nein |
+| S13 | Ist der offene Ring gefüllt, leuchtend oder enthält er etwas? | Nein |
+| S14 | Erscheint der offene Ring außerhalb eines Warden-Orts oder mehr als einmal im Bild? | Nein |
+
+## 12. Epochenregel für Erinnerungsorte — PROPOSED
+
+> Entwurf für Freigabe 0 im Change `add-visual-vertical-slice`.
+
+Erinnerungsorte entstehen aus menschlicher Geschichte von der
+Industrialisierung bis zur Klimazukunft der Erde. Jede Region hat eine
+**Bauepoche** (Architektur) und eine **Ereignisepoche** (Gegenstände,
+Kleidung, Technik zur Zeit des Ereignisses). Der Region-Vertrag nennt beide.
+
+| Region | Bauepoche | Ereignisepoche |
+| --- | --- | --- |
+| Prolog, Ufer | Seebahnhof um 1900 | Mitte des 20. Jahrhunderts (Fallblattanzeige, Fähre, Pappkoffer) |
+| Industrial Cathedral | Gießhalle um 1900 | Stahlkrise im späten 20. Jahrhundert |
+
+| Nr. | Prüffrage | Gefordert |
+| --- | --- | --- |
+| E1 | Stammt jedes Bauwerk und jeder Gegenstand aus der Zeit zwischen Industrialisierung (etwa 1850) und der Klimazukunft? | Ja |
+| E2 | Zeigt das Bild Mittelalter, Antike, Burgen, Ritterrüstung oder Fantasy-Zauberei? | Nein |
+| E3 | Ist ein Gegenstand jünger als die Ereignisepoche seiner Region? | Nein |
+| E4 | Sind gotische Formen als Bauten der Bauepoche erkennbar (Neugotik in Industrie, Bahnhof, Kirche) statt als mittelalterliche Ruine? | Ja |
+| E5 | Tragen Lost Souls nur Kleidungsreste ihrer Ereignisepoche? | Ja |
+| E6 | Sind Stücke einer anderen Epoche mit einem einzelnen Prop verschmolzen? | Nein |
+| E7 | Steht ein Stück einer anderen Epoche innerhalb einer Region oder ohne sichtbare Bruchkante? (Erlaubt ist es nur in der wilden Death Layer zwischen Regionen.) | Nein |
+| E8 | Zeigt Warden-Technik (Skiff, Waffen, Marken) Elektronik, Bildschirme oder Life-Flame-Technik? | Nein |
+| E9 | Zeigt ein Bild der Scheibe Technik der Life-Flame-Zeit (Life Reactors, Vital Resonance)? | Nein |
