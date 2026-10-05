@@ -17,8 +17,8 @@
 - [x] 3.1 Konstantenklasse der Visual-IDs, `Content/Visuals/registry.json` (Schema wie in `design.md`) und Lader anlegen. Die Registry wird ins Ausgabeverzeichnis kopiert. Unit-Tests: gültige Registry lädt; fehlerhafte Einträge nennen ID und Feld.
 - [x] 3.2 `ArtAssets` vollständig auf die Registry umstellen: Arena, Waffen, Seele, Life Flame, alle Directional-Clips und alle Effekte. Keine fest verdrahteten Texturpfade mehr. Prüfen: `--antechamber-visual-test` und `--currency-visual-test` liefern vorher und nachher gleich aussehende Bilder.
 - [x] 3.3 Dummy-Darstellung über `ShapeRenderer` je Art (Figur mit Blickrichtungsmarke in Weltgröße, Effekt, Prop mit Fußpunkt) und Ersatz-Clip bei fehlendem Clip. Das `F1`-Overlay listet fehlende IDs und Clips je einmal. Prüfen: Unit-Test für die Ersatzregel; manuell mit einer absichtlich entfernten ID in der Arena.
-- [ ] 3.4 `art/specs/README.md` (Vorlage, Felder, Statuswerte, Verweis auf das Lore-Blatt statt kopierter Lore) und eine Visual-Spec je vorhandener ID mit `Stil: ludo`, `Status: im-spiel`. Prüfen: Owner kann jede Spec ohne Code lesen.
-- [ ] 3.5 Tests für Registry und Specs: jede Code-ID und jede Registry-ID hat eine Spec, Pflichtfelder gefüllt, Status gültig, `im-spiel` nur mit vollständigem Registry-Eintrag. Prüfen: `dotnet test` grün, und ein absichtlich gelöschtes Spec-Feld lässt ihn mit Visual-ID scheitern.
+- [x] 3.4 `art/specs/README.md` (Vorlage, Felder, Statuswerte, Verweis auf das Lore-Blatt statt kopierter Lore) und eine Visual-Spec je vorhandener ID mit `Stil: ludo`, `Status: im-spiel`. Prüfen: Owner kann jede Spec ohne Code lesen.
+- [x] 3.5 Tests für Registry und Specs: jede Code-ID und jede Registry-ID hat eine Spec, Pflichtfelder gefüllt, Status gültig, `im-spiel` nur mit vollständigem Registry-Eintrag. Prüfen: `dotnet test` grün, und ein absichtlich gelöschtes Spec-Feld lässt ihn mit Visual-ID scheitern.
 
 ## 4. Shader und gemalte Szene
 
