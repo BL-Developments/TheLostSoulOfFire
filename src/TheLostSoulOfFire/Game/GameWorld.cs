@@ -749,7 +749,7 @@ public sealed partial class GameWorld : IDisposable
     public void Draw(SpriteBatch batch, Texture2D pixel, Viewport viewport, SoulfireRenderer renderer, RenderTarget2D? rootTarget = null)
     {
         renderer.BeginScene(viewport);
-        DrawScene(batch, pixel, viewport);
+        DrawScene(batch, pixel, viewport, renderer.SceneLights);
         renderer.PresentScene(
             batch,
             rootTarget,
@@ -781,13 +781,15 @@ public sealed partial class GameWorld : IDisposable
         DrawHud(batch, pixel, viewport);
     }
 
-    private void DrawScene(SpriteBatch batch, Texture2D pixel, Viewport viewport)
+    private void DrawScene(SpriteBatch batch, Texture2D pixel, Viewport viewport, IReadOnlyList<SceneLight> lights)
     {
+        Matrix sceneTransform = RenderResolution.ToOutput(_camera.GetTransform(viewport, _screenEffects.CameraOffset));
         batch.Begin(
             SpriteSortMode.Deferred,
             BlendState.AlphaBlend,
             SamplerState.LinearClamp,
-            transformMatrix: RenderResolution.ToOutput(_camera.GetTransform(viewport, _screenEffects.CameraOffset)));
+            transformMatrix: sceneTransform);
+        _art.BeginLitScene(sceneTransform, lights);
 
         if (_phase is GamePhase.Antechamber or GamePhase.EnteringArena)
         {
@@ -820,6 +822,7 @@ public sealed partial class GameWorld : IDisposable
                     DrawCurrencyWorld(batch, pixel);
                 }
                 _player.DrawAfterimages(batch, pixel);
+                _art.DrawDissolves(batch);
                 foreach (Enemy enemy in _enemies)
                 {
                     _art.DrawEnemy(batch, enemy);
@@ -890,6 +893,7 @@ public sealed partial class GameWorld : IDisposable
             batch.DrawLine(pixel, center - Vector2.UnitY * 28f, center + Vector2.UnitY * 28f, new Color(80, 220, 210), 2f);
         }
 
+        _art.EndLitScene();
         batch.End();
     }
 
@@ -1421,6 +1425,7 @@ public sealed partial class GameWorld : IDisposable
         _glutSparks.Clear();
         _particles.Clear();
         _spriteVfx.Clear();
+        _art.ClearTransient();
         _combatPresentation.Clear();
         _screenEffects.Clear();
         _arenaAtmosphere.Reset();

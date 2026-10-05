@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -52,6 +53,8 @@ public sealed class SoulfireRenderer : IDisposable
     private readonly GraphicsDevice _graphicsDevice;
     private readonly BlendState _lightBlend;
     private readonly Effect? _sceneGrade;
+    private List<SceneLight> _recordedLights = [];
+    private List<SceneLight> _lastFrameLights = [];
     private RenderTarget2D _sceneTarget;
     private Texture2D _solidTexture;
     private Texture2D _glowTexture;
@@ -84,6 +87,9 @@ public sealed class SoulfireRenderer : IDisposable
     /// </summary>
     public void BeginScene(Viewport viewport)
     {
+        // Glows recorded by the previous frame's lighting pass light this frame's figures.
+        (_lastFrameLights, _recordedLights) = (_recordedLights, _lastFrameLights);
+        _recordedLights.Clear();
         EnsureSceneTarget(RenderResolution.OutputWidth, RenderResolution.OutputHeight);
         _graphicsDevice.SetRenderTarget(_sceneTarget);
         _graphicsDevice.Clear(GameBalance.VoidColor);
@@ -144,8 +150,15 @@ public sealed class SoulfireRenderer : IDisposable
             SamplerState.LinearClamp,
             transformMatrix: worldTransform);
 
+    /// <summary>
+    /// Every glow of the previous frame's lighting pass, in world units. Figures with normal maps
+    /// use these as their Soulfire point lights (see <see cref="SpriteLighting"/>).
+    /// </summary>
+    public IReadOnlyList<SceneLight> SceneLights => _lastFrameLights;
+
     public void DrawGlow(SpriteBatch batch, Vector2 position, float radius, Color color, float intensity)
     {
+        _recordedLights.Add(new SceneLight(position, radius, color, MathHelper.Clamp(intensity, 0f, 1f)));
         float diameter = MathF.Max(1f, radius * 2f);
         batch.Draw(
             _glowTexture,

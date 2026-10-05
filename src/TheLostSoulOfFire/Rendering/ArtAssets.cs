@@ -81,6 +81,13 @@ public sealed class ArtAssets
     private readonly List<string> _missing = [];
     private readonly HashSet<string> _missingSet = new(StringComparer.Ordinal);
     private readonly Texture2D _pixel;
+    private readonly SpriteLighting? _lighting;
+    private readonly Effect? _dissolve;
+    private readonly Texture2D _dissolveNoise;
+    private readonly ConditionalWeakTable<object, FigureState> _figures = new();
+    private readonly List<DissolveInstance> _dissolves = [];
+    private Matrix _sceneTransform = Matrix.Identity;
+    private bool _litSceneActive;
     private float _time;
 
     public ArtAssets(ContentManager content)
@@ -99,6 +106,10 @@ public sealed class ArtAssets
         GraphicsDevice device = ((IGraphicsDeviceService)content.ServiceProvider.GetService(typeof(IGraphicsDeviceService))!).GraphicsDevice;
         _pixel = new Texture2D(device, 1, 1);
         _pixel.SetData([Color.White]);
+        Effect? spriteLit = TryLoadEffect(content, "Effects/SpriteLit");
+        _lighting = spriteLit is null ? null : new SpriteLighting(spriteLit);
+        _dissolve = TryLoadEffect(content, "Effects/Dissolve");
+        _dissolveNoise = CreateNoiseTexture(device, 64, seed: 1709);
 
         foreach (VisualEntry entry in registry.Entries)
         {
@@ -128,6 +139,59 @@ public sealed class ArtAssets
     public IReadOnlyList<string> MissingVisuals => _missing;
 
     public void Update(float deltaTime) => _time += MathF.Max(0f, deltaTime);
+
+    /// <summary>
+    /// Enables lighting for clips with normal maps until <see cref="EndLitScene"/>. Call right
+    /// after <c>batch.Begin(Deferred, AlphaBlend, LinearClamp, transformMatrix: transform)</c>.
+    /// </summary>
+    public void BeginLitScene(Matrix transform, IReadOnlyList<SceneLight> lights)
+    {
+        _sceneTransform = transform;
+        _lighting?.BeginScene(transform, lights);
+        _litSceneActive = _lighting is not null;
+    }
+
+    public void EndLitScene() => _litSceneActive = false;
+
+    /// <summary>Drops dissolves and other presentation-only leftovers, for example when a run restarts.</summary>
+    public void ClearTransient() => _dissolves.Clear();
+
+    /// <summary>
+    /// Draws the dissolving last poses of defeated figures. Purely visual: the enemy may already
+    /// be gone from the world; collision, waves and Souls never see these.
+    /// </summary>
+    public void DrawDissolves(SpriteBatch batch)
+    {
+        _dissolves.RemoveAll(dissolve => _time - dissolve.StartedAt >= dissolve.Duration);
+        foreach (DissolveInstance dissolve in _dissolves)
+        {
+            float progress = MathHelper.Clamp((_time - dissolve.StartedAt) / dissolve.Duration, 0f, 1f);
+            if (_dissolve is null || !_litSceneActive)
+            {
+                batch.Draw(dissolve.Clip.Texture, dissolve.Position, dissolve.Source, dissolve.Tint * (1f - progress), 0f, dissolve.Clip.PixelOrigin, dissolve.Scale, SpriteEffects.None, 0f);
+                continue;
+            }
+
+            Texture2D texture = dissolve.Clip.Texture;
+            EffectParameterCollection parameters = _dissolve.Parameters;
+            parameters["NoiseTexture"].SetValue(_dissolveNoise);
+            parameters["FrameUvRect"].SetValue(new Vector4(
+                (float)dissolve.Source.X / texture.Width,
+                (float)dissolve.Source.Y / texture.Height,
+                (float)dissolve.Source.Width / texture.Width,
+                (float)dissolve.Source.Height / texture.Height));
+            parameters["Progress"].SetValue(progress);
+            parameters["EdgeWidth"].SetValue(0.08f);
+            parameters["EdgeColor"].SetValue(Game.GameBalance.DeathFlame.ToVector3());
+            parameters["EdgeCore"].SetValue(Game.GameBalance.DeathFlameBright.ToVector3());
+
+            batch.End();
+            batch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, null, null, _dissolve, _sceneTransform);
+            batch.Draw(texture, dissolve.Position, dissolve.Source, dissolve.Tint, 0f, dissolve.Clip.PixelOrigin, dissolve.Scale, SpriteEffects.None, 0f);
+            batch.End();
+            batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, transformMatrix: _sceneTransform);
+        }
+    }
 
     /// <summary>The clip for an effect or sprite, or <c>null</c> (reported as missing) when there is none.</summary>
     public SpriteClip? GetEffect(string id) => Resolve(id, VisualClips.Default, null, out _);
@@ -166,8 +230,14 @@ public sealed class ArtAssets
 
     public void DrawEnemy(SpriteBatch batch, Enemy enemy)
     {
-        if (enemy.VisualId is not { } id || enemy.VisualClip is not { } clip)
+        if (enemy.VisualId is not { } id)
         {
+            return;
+        }
+
+        if (enemy.VisualClip is not { } clip)
+        {
+            StartDissolve(enemy, id);
             return;
         }
 
@@ -195,14 +265,102 @@ public sealed class ArtAssets
             return;
         }
 
-        SpritePlayback playback = _playbacks.GetValue(owner, _ => new SpritePlayback());
-        float elapsed = playback.Elapsed(ClipKey(id, resolvedName, direction), _time);
-        DrawClip(batch, clip, elapsed, position, 0f, worldSize.X / clip.FrameWidth, tint);
+        FigureState figure = _figures.GetValue(owner, _ => new FigureState());
+        float elapsed = figure.Playback.Elapsed(ClipKey(id, resolvedName, direction), _time);
+        float scale = worldSize.X / clip.FrameWidth;
+        figure.RememberPose(clip, clip.GetSourceRectangle(elapsed), position, scale, tint);
+        DrawFrame(batch, clip, elapsed, position, scale, tint);
     }
 
-    public void DrawSprite(SpriteBatch batch, string id, Vector2 position, float scale, Color color)
+    private void StartDissolve(object owner, string id)
     {
-        SpriteClip? clip = GetEffect(id);
+        if (!_figures.TryGetValue(owner, out FigureState? figure) || figure.DissolveStarted || figure.LastClip is null)
+        {
+            return;
+        }
+
+        figure.DissolveStarted = true;
+        if (Registry.TryGet(id, out VisualEntry entry) && entry.Dissolve is { } dissolve)
+        {
+            _dissolves.Add(new DissolveInstance(figure.LastClip, figure.LastSource, figure.LastPosition, figure.LastScale, figure.LastTint, dissolve.Duration, _time));
+        }
+    }
+
+    /// <summary>Per-figure presentation state; never read by gameplay.</summary>
+    private sealed class FigureState
+    {
+        public SpritePlayback Playback { get; } = new();
+        public SpriteClip? LastClip { get; private set; }
+        public Rectangle LastSource { get; private set; }
+        public Vector2 LastPosition { get; private set; }
+        public float LastScale { get; private set; }
+        public Color LastTint { get; private set; }
+        public bool DissolveStarted { get; set; }
+
+        public void RememberPose(SpriteClip clip, Rectangle source, Vector2 position, float scale, Color tint)
+        {
+            LastClip = clip;
+            LastSource = source;
+            LastPosition = position;
+            LastScale = scale;
+            LastTint = tint;
+        }
+    }
+
+    private sealed record DissolveInstance(SpriteClip Clip, Rectangle Source, Vector2 Position, float Scale, Color Tint, float Duration, float StartedAt);
+
+    /// <summary>Smooth value noise for the dissolve mask; generated once, no asset needed.</summary>
+    private static Texture2D CreateNoiseTexture(GraphicsDevice device, int size, int seed)
+    {
+        Random random = new(seed);
+        const int cells = 8;
+        float[,] grid = new float[cells + 1, cells + 1];
+        for (int y = 0; y <= cells; y++)
+        {
+            for (int x = 0; x <= cells; x++)
+            {
+                grid[x % cells, y % cells] = (float)random.NextDouble();
+            }
+        }
+
+        Color[] data = new Color[size * size];
+        for (int y = 0; y < size; y++)
+        {
+            for (int x = 0; x < size; x++)
+            {
+                float gx = (float)x / size * cells;
+                float gy = (float)y / size * cells;
+                int x0 = (int)gx, y0 = (int)gy;
+                float tx = MathHelper.SmoothStep(0f, 1f, gx - x0);
+                float ty = MathHelper.SmoothStep(0f, 1f, gy - y0);
+                float top = MathHelper.Lerp(grid[x0 % cells, y0 % cells], grid[(x0 + 1) % cells, y0 % cells], tx);
+                float bottom = MathHelper.Lerp(grid[x0 % cells, (y0 + 1) % cells], grid[(x0 + 1) % cells, (y0 + 1) % cells], tx);
+                float fine = (float)random.NextDouble() * 0.18f;
+                byte value = (byte)MathF.Round(MathHelper.Clamp(MathHelper.Lerp(top, bottom, ty) * 0.82f + fine, 0f, 1f) * 255f);
+                data[y * size + x] = new Color(value, value, value, (byte)255);
+            }
+        }
+
+        Texture2D texture = new(device, size, size);
+        texture.SetData(data);
+        return texture;
+    }
+
+    /// <summary>Draws an unrotated frame, lit when the clip has a normal map and a lit scene is running.</summary>
+    private void DrawFrame(SpriteBatch batch, SpriteClip clip, float elapsed, Vector2 position, float scale, Color color)
+    {
+        if (_litSceneActive && clip.NormalMap is not null)
+        {
+            _lighting!.Draw(batch, clip, clip.GetSourceRectangle(elapsed), position, scale, color);
+            return;
+        }
+
+        DrawClip(batch, clip, elapsed, position, 0f, scale, color);
+    }
+
+    public void DrawSprite(SpriteBatch batch, string id, Vector2 position, float scale, Color color, string clipName = VisualClips.Default)
+    {
+        SpriteClip? clip = Resolve(id, clipName, null, out _);
         Vector2 worldSize = WorldSizeOf(id, new Vector2(64f)) * scale;
         if (clip is null)
         {
@@ -211,7 +369,7 @@ public sealed class ArtAssets
             return;
         }
 
-        DrawClip(batch, clip, _time, position, 0f, worldSize.X / clip.FrameWidth, color);
+        DrawFrame(batch, clip, _time, position, worldSize.X / clip.FrameWidth, color);
     }
 
     public void DrawLostSoul(SpriteBatch batch, Soul soul)
@@ -339,6 +497,19 @@ public sealed class ArtAssets
             NormalMap = normalPath is null ? null : TryLoad(content, normalPath),
             Origin = entry.Origin
         };
+    }
+
+    private static Effect? TryLoadEffect(ContentManager content, string path)
+    {
+        try
+        {
+            return content.Load<Effect>(path);
+        }
+        catch (Exception exception) when (exception is ContentLoadException or InvalidOperationException)
+        {
+            Console.Error.WriteLine($"Shader {path} nicht geladen: {exception.Message}");
+            return null;
+        }
     }
 
     private static Texture2D? TryLoad(ContentManager content, string path)

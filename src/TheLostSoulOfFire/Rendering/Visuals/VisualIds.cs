@@ -42,6 +42,9 @@ public static class VisualIds
     public const string GradeShore = "grade.shore";
     public const string GradeArena = "grade.arena";
 
+    /// <summary>Test figure for the lighting pass: clips "flat" and "tilted" differ only in their normal map.</summary>
+    public const string TestLitFigure = "test.lit-figure";
+
     /// <summary>All IDs declared above, for tests and tooling.</summary>
     public static IReadOnlyList<string> All { get; } = typeof(VisualIds)
         .GetFields(BindingFlags.Public | BindingFlags.Static)
