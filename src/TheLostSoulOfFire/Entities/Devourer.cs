@@ -7,6 +7,7 @@ using TheLostSoulOfFire.Combat;
 using TheLostSoulOfFire.Effects;
 using TheLostSoulOfFire.Game;
 using TheLostSoulOfFire.Rendering;
+using TheLostSoulOfFire.Rendering.Visuals;
 
 namespace TheLostSoulOfFire.Entities;
 
@@ -52,6 +53,17 @@ public sealed class Devourer : Enemy
         _consumedSouls.Add(soul);
     }
     public Vector2 FacingDirection => _facing;
+    public override string VisualId => VisualIds.Devourer;
+    public override string? VisualClip => State switch
+    {
+        DevourerState.Dying or DevourerState.Dead => null,
+        DevourerState.ApproachPlayer or DevourerState.ApproachSoul => VisualClips.Move,
+        DevourerState.SlamTelegraph or DevourerState.Slam => VisualClips.Slam,
+        DevourerState.Devour => VisualClips.Devour,
+        _ => VisualClips.Idle
+    };
+    public override Vector2 VisualFacing => _facing;
+    public override float VisualScale => 1f + ConsumedSoulCount * 0.035f;
     public Vector2 TorsoPosition => Position + new Vector2(0f, -8f);
 
     public Devourer(Vector2 position)

@@ -13,6 +13,7 @@ using TheLostSoulOfFire.Entities;
 using TheLostSoulOfFire.Input;
 using TheLostSoulOfFire.Menu;
 using TheLostSoulOfFire.Rendering;
+using TheLostSoulOfFire.Rendering.Visuals;
 
 namespace TheLostSoulOfFire.Game;
 
@@ -416,7 +417,7 @@ public sealed partial class GameWorld : IDisposable
         if (!wasDashing && _player.IsDashing)
         {
             _spriteVfx.Spawn(
-                "dash_ignition",
+                VisualIds.DashIgnition,
                 _player.Position - _player.DashDirection * 24f,
                 MathF.Atan2(_player.DashDirection.Y, _player.DashDirection.X),
                 0.72f);
@@ -470,7 +471,7 @@ public sealed partial class GameWorld : IDisposable
 
             if (enemy is Devourer devourer && devourer.TryConsumeExtractionEffect(out Vector2 extractionPosition))
             {
-                _spriteVfx.Spawn("soul_release", extractionPosition, 0f, 0.72f);
+                _spriteVfx.Spawn(VisualIds.SoulRelease, extractionPosition, 0f, 0.72f);
                 _particles.EmitBurst(extractionPosition, Vector2.UnitY, 28, GameBalance.SoulWhite, 260f, 9f);
                 _particles.EmitDeathFlame(extractionPosition, 18, 1.25f);
                 _screenEffects.AddShake(0.18f, 8f);
@@ -487,7 +488,7 @@ public sealed partial class GameWorld : IDisposable
             soul.Update(deltaTime, _player, _particles);
             if (previousSoulState != SoulState.Releasing && soul.State == SoulState.Releasing)
             {
-                _spriteVfx.Spawn("soul_release", soul.Position, 0f, 0.62f);
+                _spriteVfx.Spawn(VisualIds.SoulRelease, soul.Position, 0f, 0.62f);
                 _audio.Play(AudioCue.SoulRelease, 0.62f);
             }
         }
@@ -794,7 +795,7 @@ public sealed partial class GameWorld : IDisposable
             }
             else
             {
-                _art.DrawArena(batch);
+                _art.DrawEnvironment(batch, VisualIds.ArenaFloor, Vector2.Zero);
                 _arenaAtmosphere.DrawBackground(batch, pixel, _soulSensePresentation.WorldSuppression);
             }
             if (IsCombatPhase)
@@ -845,7 +846,7 @@ public sealed partial class GameWorld : IDisposable
                 _art.DrawLoopingEffect(
                     batch,
                     _player.Cannon,
-                    "cannon_charge_loop",
+                    VisualIds.CannonChargeLoop,
                     muzzle,
                     0f,
                     _player.Cannon.IsFullCharge ? 0.68f : MathHelper.Lerp(0.28f, 0.61f, charge),
@@ -1287,7 +1288,7 @@ public sealed partial class GameWorld : IDisposable
         if (!wasDashing && _player.IsDashing)
         {
             _spriteVfx.Spawn(
-                "dash_ignition",
+                VisualIds.DashIgnition,
                 _player.Position - _player.DashDirection * 24f,
                 MathF.Atan2(_player.DashDirection.Y, _player.DashDirection.X),
                 0.72f);
@@ -1560,8 +1561,14 @@ public sealed partial class GameWorld : IDisposable
     {
         int x = viewport.Width - 324;
         int y = 24;
-        batch.FillRectangle(pixel, new Rectangle(x - 14, y - 12, 308, 216), new Color(5, 5, 9) * 0.9f);
-        batch.DrawRectangle(pixel, new Rectangle(x - 14, y - 12, 308, 216), new Color(80, 220, 210) * 0.72f, 2f);
+        IReadOnlyList<string> missingVisuals = _art.MissingVisuals;
+        const int maxMissingLines = 12;
+        int missingLines = missingVisuals.Count == 0 && _art.RegistryError is null
+            ? 0
+            : 1 + Math.Min(missingVisuals.Count, maxMissingLines) + (missingVisuals.Count > maxMissingLines ? 1 : 0);
+        int panelHeight = 216 + missingLines * 16;
+        batch.FillRectangle(pixel, new Rectangle(x - 14, y - 12, 308, panelHeight), new Color(5, 5, 9) * 0.9f);
+        batch.DrawRectangle(pixel, new Rectangle(x - 14, y - 12, 308, panelHeight), new Color(80, 220, 210) * 0.72f, 2f);
 
         Color label = new(189, 231, 226);
         PixelText.Draw(batch, pixel, $"FPS: {_fps}", new Vector2(x, y), 2, label);
@@ -1575,6 +1582,25 @@ public sealed partial class GameWorld : IDisposable
         PixelText.Draw(batch, pixel, $"SOULS: {_souls.Count}", new Vector2(x, y + 120), 2, label);
         PixelText.Draw(batch, pixel, $"PLAYER: {GetPlayerState()}", new Vector2(x, y + 144), 2, label);
         PixelText.Draw(batch, pixel, $"SENSE FORCE: {(_forceSoulSense ? "ON" : "OFF")}", new Vector2(x, y + 168), 2, label);
+
+        if (missingLines == 0)
+        {
+            return;
+        }
+
+        // Each missing Visual-ID or clip is listed once, in the order it was first drawn.
+        Color warning = new(232, 72, 196);
+        int lineY = y + 200;
+        PixelText.Draw(batch, pixel, _art.RegistryError is null ? $"GRAFIK FEHLT: {missingVisuals.Count}" : "REGISTRY FEHLERHAFT", new Vector2(x, lineY), 1, warning);
+        for (int index = 0; index < Math.Min(missingVisuals.Count, maxMissingLines); index++)
+        {
+            lineY += 16;
+            PixelText.Draw(batch, pixel, missingVisuals[index], new Vector2(x, lineY), 1, label);
+        }
+        if (missingVisuals.Count > maxMissingLines)
+        {
+            PixelText.Draw(batch, pixel, $"+{missingVisuals.Count - maxMissingLines} WEITERE", new Vector2(x, lineY + 16), 1, label);
+        }
     }
 
     private void UpdateFps(float deltaTime)

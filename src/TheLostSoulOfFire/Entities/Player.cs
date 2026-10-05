@@ -8,6 +8,7 @@ using TheLostSoulOfFire.Effects;
 using TheLostSoulOfFire.Game;
 using TheLostSoulOfFire.Input;
 using TheLostSoulOfFire.Rendering;
+using TheLostSoulOfFire.Rendering.Visuals;
 
 namespace TheLostSoulOfFire.Entities;
 
@@ -270,8 +271,8 @@ public sealed class Player
             batch.DrawLine(pixel, Position + right * 18f, Position + right * 29f - Vector2.UnitY * (37f + flare * 11f), GameBalance.DeathFlameBright * 0.7f, 6f);
         }
 
-        Cannon.DrawBack(batch, pixel, art.SoulCannon, Position, FacingDirection);
-        Scythe.Draw(batch, pixel, art.PhysicalScythe, Position, FacingDirection, debugVisible);
+        Cannon.DrawBack(batch, pixel, art.GetSpriteTexture(VisualIds.SoulCannon), Position, FacingDirection);
+        Scythe.Draw(batch, pixel, art.GetSpriteTexture(VisualIds.Scythe), Position, FacingDirection, debugVisible);
 
         Vector2 head = Position + FacingDirection * 18f;
 
@@ -301,7 +302,7 @@ public sealed class Player
             batch.DrawLine(pixel, Position + FacingDirection * 2f, Position + right * 13f + Vector2.UnitY * 13f, GameBalance.DeathFlame * 0.72f, 3f);
         }
 
-        Cannon.DrawActive(batch, pixel, art.SoulCannon, Position, FacingDirection);
+        Cannon.DrawActive(batch, pixel, art.GetSpriteTexture(VisualIds.SoulCannon), Position, FacingDirection);
 
         if (HitFlashRemaining > 0f)
         {

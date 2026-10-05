@@ -6,6 +6,7 @@ using TheLostSoulOfFire.Combat;
 using TheLostSoulOfFire.Effects;
 using TheLostSoulOfFire.Game;
 using TheLostSoulOfFire.Rendering;
+using TheLostSoulOfFire.Rendering.Visuals;
 
 namespace TheLostSoulOfFire.Entities;
 
@@ -36,6 +37,15 @@ public sealed class Hollow : Enemy
 
     public override string StateLabel => State.ToString().ToUpperInvariant();
     public Vector2 FacingDirection => _facing;
+    public override string VisualId => VisualIds.Hollow;
+    public override string? VisualClip => State switch
+    {
+        HollowState.Dying or HollowState.Dead => null,
+        HollowState.Approach => VisualClips.Move,
+        HollowState.Telegraph or HollowState.Swipe => VisualClips.Swipe,
+        _ => VisualClips.Idle
+    };
+    public override Vector2 VisualFacing => _facing;
     public Vector2 CorePosition => Position + new Vector2(0f, -5f);
 
     public Hollow(Vector2 position, int movementSeed)

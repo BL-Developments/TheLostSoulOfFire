@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using TheLostSoulOfFire.Combat;
 using TheLostSoulOfFire.Entities;
+using TheLostSoulOfFire.Rendering.Visuals;
 
 namespace TheLostSoulOfFire.Rendering;
 
@@ -17,6 +18,12 @@ public sealed record SpriteClip(
     float FramesPerSecond,
     bool Loop)
 {
+    /// <summary>Normal map in the same sheet layout, if the registry names one.</summary>
+    public Texture2D? NormalMap { get; init; }
+
+    /// <summary>Pivot as a fraction of the frame; (0.5, 0.5) is the centre.</summary>
+    public Vector2 Origin { get; init; } = new(0.5f);
+
     public float Duration => FrameCount / FramesPerSecond;
 
     public int GetFrameIndex(float elapsed)
@@ -35,6 +42,8 @@ public sealed record SpriteClip(
             FrameWidth,
             FrameHeight);
     }
+
+    public Vector2 PixelOrigin => new(FrameWidth * Origin.X, FrameHeight * Origin.Y);
 }
 
 public sealed class SpritePlayback
@@ -57,64 +66,92 @@ public sealed class SpritePlayback
         !clip.Loop && Elapsed(clipKey, globalTime) >= clip.Duration;
 }
 
+/// <summary>
+/// Loads and draws graphics by Visual-ID. Which textures, frames, sizes and normal maps
+/// belong to an ID comes only from <see cref="VisualRegistry"/>; anything missing is drawn
+/// as a dummy and listed once in <see cref="MissingVisuals"/>.
+/// </summary>
 public sealed class ArtAssets
 {
-    private static readonly string[] Directions = ["n", "ne", "e", "se", "s", "sw", "w", "nw"];
-    private readonly Dictionary<string, SpriteClip> _characterClips = [];
-    private readonly Dictionary<string, SpriteClip> _effects = [];
+    private const float FallbackCharacterSize = 100f;
+    private const float EffectDummyDuration = 0.45f;
+
+    private readonly Dictionary<string, SpriteClip?> _clips = new(StringComparer.Ordinal);
     private readonly ConditionalWeakTable<object, SpritePlayback> _playbacks = new();
+    private readonly List<string> _missing = [];
+    private readonly HashSet<string> _missingSet = new(StringComparer.Ordinal);
+    private readonly Texture2D _pixel;
     private float _time;
 
-    public Texture2D Arena { get; }
-    public Texture2D PhysicalScythe { get; }
-    public Texture2D SoulCannon { get; }
-    public Texture2D LostSoul { get; }
-    public Texture2D LifeFlame { get; }
-
     public ArtAssets(ContentManager content)
+        : this(content, LoadRegistry(out string? error))
     {
-        Arena = content.Load<Texture2D>("Textures/Environment/arena_base_1800x1000");
-        PhysicalScythe = content.Load<Texture2D>("Textures/Weapons/scythe_physical_256");
-        SoulCannon = content.Load<Texture2D>("Textures/Weapons/soul_cannon_256");
-        LostSoul = content.Load<Texture2D>("Textures/Pickups/lost_soul_64");
-        LifeFlame = content.Load<Texture2D>("Textures/Ending/life_flame_128");
-
-        LoadDirectional(content, "player", "Textures/Player/Animations", "idle", 128, 9, 9f, true);
-        LoadDirectional(content, "player", "Textures/Player/Animations", "move", 128, 9, 12f, true);
-
-        LoadDirectional(content, "hollow", "Textures/Enemies/Hollow/Animations", "idle", 128, 9, 8f, true);
-        LoadDirectional(content, "hollow", "Textures/Enemies/Hollow/Animations", "move", 128, 9, 12f, true);
-        LoadDirectional(content, "hollow", "Textures/Enemies/Hollow/Animations", "swipe", 128, 9, 18f, false);
-
-        LoadDirectional(content, "burning", "Textures/Enemies/Burning/Animations", "idle", 128, 9, 9f, true);
-        LoadDirectional(content, "burning", "Textures/Enemies/Burning/Animations", "move", 128, 9, 14f, true);
-        LoadDirectional(content, "burning", "Textures/Enemies/Burning/Animations", "charge", 128, 9, 15f, false);
-
-        LoadDirectional(content, "devourer", "Textures/Enemies/Devourer/Animations", "idle", 192, 9, 7f, true);
-        LoadDirectional(content, "devourer", "Textures/Enemies/Devourer/Animations", "move", 192, 9, 9f, true);
-        LoadDirectional(content, "devourer", "Textures/Enemies/Devourer/Animations", "slam", 192, 16, 16f, false);
-        LoadDirectional(content, "devourer", "Textures/Enemies/Devourer/Animations", "devour", 192, 9, 9f, true);
-
-        LoadEffect(content, "scythe_slash_01", "fx_scythe_slash_01", 256, 9, 24f, false);
-        LoadEffect(content, "scythe_slash_02", "fx_scythe_slash_02", 256, 9, 24f, false);
-        LoadEffect(content, "scythe_cleave", "fx_scythe_cleave", 256, 9, 22f, false);
-        LoadEffect(content, "core_hit", "fx_core_hit", 128, 9, 30f, false);
-        LoadEffect(content, "dash_ignition", "fx_dash_ignition", 128, 9, 30f, false);
-        LoadEffect(content, "cannon_charge_loop", "fx_cannon_charge_loop", 128, 9, 12f, true);
-        LoadEffect(content, "cannon_muzzle_full", "fx_cannon_muzzle_full", 256, 9, 24f, false);
-        LoadEffect(content, "cannon_projectile_full", "fx_cannon_projectile_full", 128, 9, 18f, true);
-        LoadEffect(content, "burning_detonation", "fx_burning_detonation", 256, 16, 24f, false);
-        LoadEffect(content, "soul_release", "fx_soul_release", 128, 16, 12f, false);
-        LoadEffect(content, "resonance_activate", "fx_resonance_activate", 256, 16, 24f, false);
-        LoadEffect(content, "death_flame_loop", "fx_death_flame_loop", 128, 9, 12f, true);
+        RegistryError = error;
+        if (error is not null)
+        {
+            Console.Error.WriteLine(error);
+        }
     }
+
+    public ArtAssets(ContentManager content, VisualRegistry registry)
+    {
+        Registry = registry;
+        GraphicsDevice device = ((IGraphicsDeviceService)content.ServiceProvider.GetService(typeof(IGraphicsDeviceService))!).GraphicsDevice;
+        _pixel = new Texture2D(device, 1, 1);
+        _pixel.SetData([Color.White]);
+
+        foreach (VisualEntry entry in registry.Entries)
+        {
+            foreach (VisualClipDefinition clip in entry.Clips.Values)
+            {
+                if (clip.IsDirectional)
+                {
+                    foreach (string direction in VisualDirections.All)
+                    {
+                        _clips[ClipKey(entry.Id, clip.Name, direction)] = LoadClip(content, entry, clip, direction);
+                    }
+                }
+                else
+                {
+                    _clips[ClipKey(entry.Id, clip.Name, null)] = LoadClip(content, entry, clip, null);
+                }
+            }
+        }
+    }
+
+    public VisualRegistry Registry { get; }
+
+    /// <summary>Set when the registry file could not be read; the game then draws dummies.</summary>
+    public string? RegistryError { get; }
+
+    /// <summary>Missing Visual-IDs (<c>id</c>), clips (<c>id/clip</c>) and textures (<c>id/clip/dir</c>), each once, in order of discovery.</summary>
+    public IReadOnlyList<string> MissingVisuals => _missing;
 
     public void Update(float deltaTime) => _time += MathF.Max(0f, deltaTime);
 
-    public SpriteClip GetEffect(string key) => _effects[key];
+    /// <summary>The clip for an effect or sprite, or <c>null</c> (reported as missing) when there is none.</summary>
+    public SpriteClip? GetEffect(string id) => Resolve(id, VisualClips.Default, null, out _);
 
-    public void DrawArena(SpriteBatch batch) =>
-        batch.Draw(Arena, new Rectangle(0, 0, 1800, 1000), Color.White);
+    public Texture2D? GetSpriteTexture(string id) => GetEffect(id)?.Texture;
+
+    public Vector2 WorldSizeOf(string id, Vector2 fallback) =>
+        Registry.TryGet(id, out VisualEntry entry) ? entry.WorldSize : fallback;
+
+    public void DrawEnvironment(SpriteBatch batch, string id, Vector2 position)
+    {
+        SpriteClip? clip = GetEffect(id);
+        Vector2 size = WorldSizeOf(id, new Vector2(1800f, 1000f));
+        Vector2 origin = Registry.TryGet(id, out VisualEntry entry) ? entry.Origin : Vector2.Zero;
+        Vector2 topLeft = position - origin * size;
+        Rectangle bounds = new((int)topLeft.X, (int)topLeft.Y, (int)size.X, (int)size.Y);
+        if (clip is null)
+        {
+            batch.DrawPropDummy(_pixel, bounds, position + (new Vector2(0.5f, 1f) - origin) * size);
+            return;
+        }
+
+        batch.Draw(clip.Texture, bounds, clip.GetSourceRectangle(0f), Color.White);
+    }
 
     public void DrawPlayer(SpriteBatch batch, Player player)
     {
@@ -123,62 +160,58 @@ public sealed class ArtAssets
             return;
         }
 
-        string action = player.Velocity.LengthSquared() > 120f ? "move" : "idle";
-        DrawDirectional(batch, player, "player", action, player.FacingDirection, player.Position, 100f, Color.White);
+        string clip = player.Velocity.LengthSquared() > 120f ? VisualClips.Move : VisualClips.Idle;
+        DrawCharacter(batch, player, VisualIds.Player, clip, player.FacingDirection, player.Position, 1f, Color.White);
     }
 
     public void DrawEnemy(SpriteBatch batch, Enemy enemy)
     {
-        string family;
-        string action;
-        Vector2 facing;
-        float size;
-
-        switch (enemy)
+        if (enemy.VisualId is not { } id || enemy.VisualClip is not { } clip)
         {
-            case Hollow hollow when hollow.State is not (HollowState.Dying or HollowState.Dead):
-                family = "hollow";
-                action = hollow.State switch
-                {
-                    HollowState.Approach => "move",
-                    HollowState.Telegraph or HollowState.Swipe => "swipe",
-                    _ => "idle"
-                };
-                facing = hollow.FacingDirection;
-                size = 112f;
-                break;
-
-            case Burning burning when burning.State is not (BurningState.Dying or BurningState.Detonating or BurningState.Dead):
-                family = "burning";
-                action = burning.State switch
-                {
-                    BurningState.Approach => "move",
-                    BurningState.Charge => "charge",
-                    _ => "idle"
-                };
-                facing = burning.FacingDirection;
-                size = 104f;
-                break;
-
-            case Devourer devourer when devourer.State is not (DevourerState.Dying or DevourerState.Dead):
-                family = "devourer";
-                action = devourer.State switch
-                {
-                    DevourerState.ApproachPlayer or DevourerState.ApproachSoul => "move",
-                    DevourerState.SlamTelegraph or DevourerState.Slam => "slam",
-                    DevourerState.Devour => "devour",
-                    _ => "idle"
-                };
-                facing = devourer.FacingDirection;
-                size = 174f * (1f + devourer.ConsumedSoulCount * 0.035f);
-                break;
-
-            default:
-                return;
+            return;
         }
 
         Color tint = enemy.HitFlashRemaining > 0f ? new Color(255, 235, 255) : Color.White;
-        DrawDirectional(batch, enemy, family, action, facing, enemy.Position, size, tint);
+        DrawCharacter(batch, enemy, id, clip, enemy.VisualFacing, enemy.Position, enemy.VisualScale, tint, enemy.Radius * 2.6f);
+    }
+
+    public void DrawCharacter(
+        SpriteBatch batch,
+        object owner,
+        string id,
+        string clipName,
+        Vector2 facing,
+        Vector2 position,
+        float sizeScale,
+        Color tint,
+        float fallbackSize = FallbackCharacterSize)
+    {
+        string direction = VisualDirections.FromVector(facing);
+        Vector2 worldSize = WorldSizeOf(id, new Vector2(fallbackSize)) * sizeScale;
+        SpriteClip? clip = Resolve(id, clipName, direction, out string resolvedName);
+        if (clip is null)
+        {
+            batch.DrawCharacterDummy(_pixel, position, worldSize, facing, tint);
+            return;
+        }
+
+        SpritePlayback playback = _playbacks.GetValue(owner, _ => new SpritePlayback());
+        float elapsed = playback.Elapsed(ClipKey(id, resolvedName, direction), _time);
+        DrawClip(batch, clip, elapsed, position, 0f, worldSize.X / clip.FrameWidth, tint);
+    }
+
+    public void DrawSprite(SpriteBatch batch, string id, Vector2 position, float scale, Color color)
+    {
+        SpriteClip? clip = GetEffect(id);
+        Vector2 worldSize = WorldSizeOf(id, new Vector2(64f)) * scale;
+        if (clip is null)
+        {
+            Vector2 topLeft = position - worldSize * 0.5f;
+            batch.DrawPropDummy(_pixel, new Rectangle((int)topLeft.X, (int)topLeft.Y, (int)worldSize.X, (int)worldSize.Y), position + new Vector2(0f, worldSize.Y * 0.5f));
+            return;
+        }
+
+        DrawClip(batch, clip, _time, position, 0f, worldSize.X / clip.FrameWidth, color);
     }
 
     public void DrawLostSoul(SpriteBatch batch, Soul soul)
@@ -189,57 +222,52 @@ public sealed class ArtAssets
         }
 
         float pulse = 0.94f + MathF.Sin(_time * 5f) * 0.07f;
-        batch.Draw(
-            LostSoul,
-            soul.Position,
-            null,
-            Color.White,
-            0f,
-            new Vector2(LostSoul.Width, LostSoul.Height) * 0.5f,
-            0.7f * pulse,
-            SpriteEffects.None,
-            0f);
+        DrawSprite(batch, VisualIds.LostSoul, soul.Position, pulse, Color.White);
     }
 
-    public void DrawLifeFlame(SpriteBatch batch, Vector2 position, float alpha, float scale)
-    {
-        batch.Draw(
-            LifeFlame,
-            position,
-            null,
-            Color.White * alpha,
-            0f,
-            new Vector2(LifeFlame.Width, LifeFlame.Height) * 0.5f,
-            scale,
-            SpriteEffects.None,
-            0f);
-    }
+    public void DrawLifeFlame(SpriteBatch batch, Vector2 position, float alpha, float scale) =>
+        DrawSprite(batch, VisualIds.LifeFlame, position, scale, Color.White * alpha);
 
     public void DrawLoopingEffect(
         SpriteBatch batch,
         object owner,
-        string effectKey,
+        string id,
         Vector2 position,
         float rotation,
         float scale,
         Color color)
     {
-        SpriteClip clip = _effects[effectKey];
         SpritePlayback playback = _playbacks.GetValue(owner, _ => new SpritePlayback());
-        float elapsed = playback.Elapsed($"effect/{effectKey}", _time);
-        DrawClip(batch, clip, elapsed, position, rotation, scale, color);
+        float elapsed = playback.Elapsed($"effect/{id}", _time);
+        SpriteClip? clip = GetEffect(id);
+        if (clip is null)
+        {
+            DrawEffectDummy(batch, id, position, rotation, scale, elapsed % EffectDummyDuration / EffectDummyDuration);
+            return;
+        }
+
+        DrawClip(batch, clip, elapsed, position, rotation, scale * WorldSizeOf(id, new Vector2(clip.FrameWidth)).X / clip.FrameWidth, color);
     }
+
+    /// <summary>Stand-in for an effect without graphics, sized from the registry or a default.</summary>
+    public void DrawEffectDummy(SpriteBatch batch, string id, Vector2 position, float rotation, float scale, float progress)
+    {
+        float radius = WorldSizeOf(id, new Vector2(128f)).X * 0.5f * scale;
+        batch.DrawEffectDummy(_pixel, position, radius, rotation, progress);
+    }
+
+    public static float EffectDummyLifetime => EffectDummyDuration;
 
     public void DrawCannonProjectile(SpriteBatch batch, CannonShot shot)
     {
         float rotation = MathF.Atan2(shot.Direction.Y, shot.Direction.X);
         float scale = MathHelper.Lerp(0.34f, 0.72f, shot.Charge);
         Color color = shot.IsFullCharge ? Color.White : new Color(220, 190, 255);
-        DrawLoopingEffect(batch, shot, "cannon_projectile_full", shot.Position, rotation, scale, color);
+        DrawLoopingEffect(batch, shot, VisualIds.CannonProjectileFull, shot.Position, rotation, scale, color);
     }
 
     public void DrawDeathFlame(SpriteBatch batch, object owner, Vector2 position) =>
-        DrawLoopingEffect(batch, owner, "death_flame_loop", position, 0f, 0.56f, Color.White);
+        DrawLoopingEffect(batch, owner, VisualIds.DeathFlameLoop, position, 0f, 0.56f, Color.White);
 
     public static void DrawClip(
         SpriteBatch batch,
@@ -256,90 +284,90 @@ public sealed class ArtAssets
             clip.GetSourceRectangle(elapsed),
             color,
             rotation,
-            new Vector2(clip.FrameWidth, clip.FrameHeight) * 0.5f,
+            clip.PixelOrigin,
             scale,
             SpriteEffects.None,
             0f);
     }
 
-    private void DrawDirectional(
-        SpriteBatch batch,
-        object owner,
-        string family,
-        string action,
-        Vector2 facing,
-        Vector2 position,
-        float displaySize,
-        Color color)
+    private SpriteClip? Resolve(string id, string clipName, string? direction, out string resolvedName)
     {
-        string direction = GetDirection(facing);
-        string key = $"{family}/{action}/{direction}";
-        SpriteClip clip = _characterClips[key];
-        SpritePlayback playback = _playbacks.GetValue(owner, _ => new SpritePlayback());
-        float elapsed = playback.Elapsed(key, _time);
-        DrawClip(batch, clip, elapsed, position, 0f, displaySize / clip.FrameWidth, color);
+        ClipResolution resolution = VisualResolver.Resolve(Registry, id, clipName);
+        if (resolution.Missing is not null)
+        {
+            ReportMissing(resolution.Missing);
+        }
+
+        resolvedName = resolution.Clip?.Name ?? clipName;
+        if (resolution.Clip is null)
+        {
+            return null;
+        }
+
+        string? clipDirection = resolution.Clip.IsDirectional ? direction ?? "s" : null;
+        string key = ClipKey(id, resolution.Clip.Name, clipDirection);
+        if (_clips.TryGetValue(key, out SpriteClip? clip) && clip is not null)
+        {
+            return clip;
+        }
+
+        ReportMissing(key);
+        return null;
     }
 
-    private void LoadDirectional(
-        ContentManager content,
-        string family,
-        string contentRoot,
-        string action,
-        int frameSize,
-        int frameCount,
-        float framesPerSecond,
-        bool loop)
+    private void ReportMissing(string key)
     {
-        foreach (string direction in Directions)
+        if (_missingSet.Add(key))
         {
-            Texture2D texture = content.Load<Texture2D>($"{contentRoot}/{action}/{direction}");
-            _characterClips[$"{family}/{action}/{direction}"] = new SpriteClip(
-                texture,
-                frameSize,
-                frameSize,
-                frameCount,
-                framesPerSecond,
-                loop);
+            _missing.Add(key);
         }
     }
 
-    private void LoadEffect(
-        ContentManager content,
-        string key,
-        string filename,
-        int frameSize,
-        int frameCount,
-        float framesPerSecond,
-        bool loop)
+    private SpriteClip? LoadClip(ContentManager content, VisualEntry entry, VisualClipDefinition clip, string? direction)
     {
-        Texture2D texture = content.Load<Texture2D>($"Textures/Effects/{filename}");
-        _effects[key] = new SpriteClip(texture, frameSize, frameSize, frameCount, framesPerSecond, loop);
-    }
-
-    private static string GetDirection(Vector2 direction)
-    {
-        if (direction.LengthSquared() < 0.001f)
+        string path = direction is null ? clip.Path : clip.PathFor(direction);
+        Texture2D? texture = TryLoad(content, path);
+        if (texture is null)
         {
-            return "s";
+            ReportMissing(ClipKey(entry.Id, clip.Name, direction));
+            return null;
         }
 
-        float degrees = MathHelper.ToDegrees(MathF.Atan2(direction.Y, direction.X));
-        if (degrees < 0f)
+        string? normalPath = direction is null ? clip.NormalMap : clip.NormalMapFor(direction);
+        return new SpriteClip(texture, clip.FrameWidth, clip.FrameHeight, clip.Frames, clip.FramesPerSecond, clip.Loop)
         {
-            degrees += 360f;
-        }
-
-        int sector = (int)MathF.Floor((degrees + 22.5f) / 45f) % 8;
-        return sector switch
-        {
-            0 => "e",
-            1 => "se",
-            2 => "s",
-            3 => "sw",
-            4 => "w",
-            5 => "nw",
-            6 => "n",
-            _ => "ne"
+            NormalMap = normalPath is null ? null : TryLoad(content, normalPath),
+            Origin = entry.Origin
         };
+    }
+
+    private static Texture2D? TryLoad(ContentManager content, string path)
+    {
+        try
+        {
+            return content.Load<Texture2D>(path);
+        }
+        catch (ContentLoadException)
+        {
+            return null;
+        }
+    }
+
+    private static string ClipKey(string id, string clip, string? direction) =>
+        direction is null ? $"{id}/{clip}" : $"{id}/{clip}/{direction}";
+
+    private static VisualRegistry LoadRegistry(out string? error)
+    {
+        error = null;
+        try
+        {
+            using System.IO.Stream stream = TitleContainer.OpenStream(VisualRegistry.ContentPath);
+            return VisualRegistry.Load(stream);
+        }
+        catch (Exception exception) when (exception is VisualRegistryException or System.IO.IOException)
+        {
+            error = exception.Message;
+            return VisualRegistry.Empty;
+        }
     }
 }

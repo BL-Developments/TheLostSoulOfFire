@@ -1,0 +1,401 @@
+{
+  "version": 1,
+  "visuals": [
+    {
+      "id": "player",
+      "kind": "character",
+      "palette": "world",
+      "worldSize": [100, 100],
+      "origin": [0.5, 0.5],
+      "fallbackClip": "idle",
+      "clips": {
+        "idle": {
+          "path": "Textures/Player/Animations/idle/{dir}",
+          "frameSize": [128, 128],
+          "frames": 9,
+          "fps": 9,
+          "loop": true
+        },
+        "move": {
+          "path": "Textures/Player/Animations/move/{dir}",
+          "frameSize": [128, 128],
+          "frames": 9,
+          "fps": 12,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "enemy.hollow",
+      "kind": "character",
+      "palette": "world",
+      "worldSize": [112, 112],
+      "origin": [0.5, 0.5],
+      "fallbackClip": "idle",
+      "clips": {
+        "idle": {
+          "path": "Textures/Enemies/Hollow/Animations/idle/{dir}",
+          "frameSize": [128, 128],
+          "frames": 9,
+          "fps": 8,
+          "loop": true
+        },
+        "move": {
+          "path": "Textures/Enemies/Hollow/Animations/move/{dir}",
+          "frameSize": [128, 128],
+          "frames": 9,
+          "fps": 12,
+          "loop": true
+        },
+        "swipe": {
+          "path": "Textures/Enemies/Hollow/Animations/swipe/{dir}",
+          "frameSize": [128, 128],
+          "frames": 9,
+          "fps": 18,
+          "loop": false
+        }
+      }
+    },
+    {
+      "id": "enemy.burning",
+      "kind": "character",
+      "palette": "world",
+      "worldSize": [104, 104],
+      "origin": [0.5, 0.5],
+      "fallbackClip": "idle",
+      "clips": {
+        "idle": {
+          "path": "Textures/Enemies/Burning/Animations/idle/{dir}",
+          "frameSize": [128, 128],
+          "frames": 9,
+          "fps": 9,
+          "loop": true
+        },
+        "move": {
+          "path": "Textures/Enemies/Burning/Animations/move/{dir}",
+          "frameSize": [128, 128],
+          "frames": 9,
+          "fps": 14,
+          "loop": true
+        },
+        "charge": {
+          "path": "Textures/Enemies/Burning/Animations/charge/{dir}",
+          "frameSize": [128, 128],
+          "frames": 9,
+          "fps": 15,
+          "loop": false
+        }
+      }
+    },
+    {
+      "id": "enemy.devourer",
+      "kind": "character",
+      "palette": "world",
+      "worldSize": [174, 174],
+      "origin": [0.5, 0.5],
+      "fallbackClip": "idle",
+      "clips": {
+        "idle": {
+          "path": "Textures/Enemies/Devourer/Animations/idle/{dir}",
+          "frameSize": [192, 192],
+          "frames": 9,
+          "fps": 7,
+          "loop": true
+        },
+        "move": {
+          "path": "Textures/Enemies/Devourer/Animations/move/{dir}",
+          "frameSize": [192, 192],
+          "frames": 9,
+          "fps": 9,
+          "loop": true
+        },
+        "slam": {
+          "path": "Textures/Enemies/Devourer/Animations/slam/{dir}",
+          "frameSize": [192, 192],
+          "frames": 16,
+          "fps": 16,
+          "loop": false
+        },
+        "devour": {
+          "path": "Textures/Enemies/Devourer/Animations/devour/{dir}",
+          "frameSize": [192, 192],
+          "frames": 9,
+          "fps": 9,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "environment.arena",
+      "kind": "environment",
+      "palette": "world",
+      "worldSize": [1800, 1000],
+      "origin": [0, 0],
+      "clips": {
+        "default": {
+          "path": "Textures/Environment/arena_base_1800x1000",
+          "frameSize": [1800, 1000],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "weapon.scythe",
+      "kind": "sprite",
+      "palette": "world",
+      "worldSize": [256, 256],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Weapons/scythe_physical_256",
+          "frameSize": [256, 256],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "weapon.soul-cannon",
+      "kind": "sprite",
+      "palette": "world",
+      "worldSize": [256, 256],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Weapons/soul_cannon_256",
+          "frameSize": [256, 256],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "pickup.lost-soul",
+      "kind": "sprite",
+      "palette": "world",
+      "worldSize": [44.8, 44.8],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Pickups/lost_soul_64",
+          "frameSize": [64, 64],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "ending.life-flame",
+      "kind": "sprite",
+      "palette": "life-flame",
+      "worldSize": [128, 128],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Ending/life_flame_128",
+          "frameSize": [128, 128],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "fx.scythe-slash-01",
+      "kind": "effect",
+      "palette": "death-flame",
+      "worldSize": [256, 256],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Effects/fx_scythe_slash_01",
+          "frameSize": [256, 256],
+          "frames": 9,
+          "fps": 24,
+          "loop": false
+        }
+      }
+    },
+    {
+      "id": "fx.scythe-slash-02",
+      "kind": "effect",
+      "palette": "death-flame",
+      "worldSize": [256, 256],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Effects/fx_scythe_slash_02",
+          "frameSize": [256, 256],
+          "frames": 9,
+          "fps": 24,
+          "loop": false
+        }
+      }
+    },
+    {
+      "id": "fx.scythe-cleave",
+      "kind": "effect",
+      "palette": "death-flame",
+      "worldSize": [256, 256],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Effects/fx_scythe_cleave",
+          "frameSize": [256, 256],
+          "frames": 9,
+          "fps": 22,
+          "loop": false
+        }
+      }
+    },
+    {
+      "id": "fx.core-hit",
+      "kind": "effect",
+      "palette": "death-flame",
+      "worldSize": [128, 128],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Effects/fx_core_hit",
+          "frameSize": [128, 128],
+          "frames": 9,
+          "fps": 30,
+          "loop": false
+        }
+      }
+    },
+    {
+      "id": "fx.dash-ignition",
+      "kind": "effect",
+      "palette": "death-flame",
+      "worldSize": [128, 128],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Effects/fx_dash_ignition",
+          "frameSize": [128, 128],
+          "frames": 9,
+          "fps": 30,
+          "loop": false
+        }
+      }
+    },
+    {
+      "id": "fx.cannon-charge-loop",
+      "kind": "effect",
+      "palette": "death-flame",
+      "worldSize": [128, 128],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Effects/fx_cannon_charge_loop",
+          "frameSize": [128, 128],
+          "frames": 9,
+          "fps": 12,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "fx.cannon-muzzle-full",
+      "kind": "effect",
+      "palette": "death-flame",
+      "worldSize": [256, 256],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Effects/fx_cannon_muzzle_full",
+          "frameSize": [256, 256],
+          "frames": 9,
+          "fps": 24,
+          "loop": false
+        }
+      }
+    },
+    {
+      "id": "fx.cannon-projectile-full",
+      "kind": "effect",
+      "palette": "death-flame",
+      "worldSize": [128, 128],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Effects/fx_cannon_projectile_full",
+          "frameSize": [128, 128],
+          "frames": 9,
+          "fps": 18,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "fx.burning-detonation",
+      "kind": "effect",
+      "palette": "death-flame",
+      "worldSize": [256, 256],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Effects/fx_burning_detonation",
+          "frameSize": [256, 256],
+          "frames": 16,
+          "fps": 24,
+          "loop": false
+        }
+      }
+    },
+    {
+      "id": "fx.soul-release",
+      "kind": "effect",
+      "palette": "death-flame",
+      "worldSize": [128, 128],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Effects/fx_soul_release",
+          "frameSize": [128, 128],
+          "frames": 16,
+          "fps": 12,
+          "loop": false
+        }
+      }
+    },
+    {
+      "id": "fx.resonance-activate",
+      "kind": "effect",
+      "palette": "death-flame",
+      "worldSize": [256, 256],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Effects/fx_resonance_activate",
+          "frameSize": [256, 256],
+          "frames": 16,
+          "fps": 24,
+          "loop": false
+        }
+      }
+    },
+    {
+      "id": "fx.death-flame-loop",
+      "kind": "effect",
+      "palette": "death-flame",
+      "worldSize": [128, 128],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Effects/fx_death_flame_loop",
+          "frameSize": [128, 128],
+          "frames": 9,
+          "fps": 12,
+          "loop": true
+        }
+      }
+    }
+  ]
+}

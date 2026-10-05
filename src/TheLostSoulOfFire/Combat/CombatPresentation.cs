@@ -2,6 +2,7 @@ using System;
 using Microsoft.Xna.Framework;
 using TheLostSoulOfFire.Effects;
 using TheLostSoulOfFire.Game;
+using TheLostSoulOfFire.Rendering.Visuals;
 
 namespace TheLostSoulOfFire.Combat;
 
@@ -53,9 +54,9 @@ public sealed class CombatPresentation
     {
         string effect = step switch
         {
-            2 => "scythe_slash_02",
-            3 => "scythe_cleave",
-            _ => "scythe_slash_01"
+            2 => VisualIds.ScytheSlash2,
+            3 => VisualIds.ScytheCleave,
+            _ => VisualIds.ScytheSlash1
         };
         float scale = step switch
         {
@@ -90,7 +91,7 @@ public sealed class CombatPresentation
         Color color = coreHit || step == 3 ? GameBalance.SoulWhite : GameBalance.DeathFlameBright;
         float contactScale = coreHit ? 0.66f : step switch { 1 => 0.27f, 2 => 0.38f, _ => 0.62f };
 
-        _spriteVfx.Spawn("core_hit", position, MathF.Atan2(direction.Y, direction.X), contactScale, color);
+        _spriteVfx.Spawn(VisualIds.CoreHit, position, MathF.Atan2(direction.Y, direction.X), contactScale, color);
         _particles.EmitBurst(position, direction, particleCount, color, force, size);
         if (step == 3)
         {
@@ -131,7 +132,7 @@ public sealed class CombatPresentation
     {
         Color color = request.IsFullCharge ? Color.White : new Color(205, 164, 242);
         _spriteVfx.Spawn(
-            "cannon_muzzle_full",
+            VisualIds.CannonMuzzleFull,
             origin,
             MathF.Atan2(request.Direction.Y, request.Direction.X),
             request.IsFullCharge ? 0.76f : 0.43f,
@@ -157,7 +158,7 @@ public sealed class CombatPresentation
     {
         Color color = coreHit || fullCharge ? GameBalance.SoulWhite : GameBalance.DeathFlameBright;
         _spriteVfx.Spawn(
-            "core_hit",
+            VisualIds.CoreHit,
             position,
             MathF.Atan2(direction.Y, direction.X),
             coreHit || fullCharge ? 0.82f : 0.42f,
@@ -184,7 +185,7 @@ public sealed class CombatPresentation
 
     public void PresentBurningDetonation(Vector2 position)
     {
-        _spriteVfx.Spawn("burning_detonation", position, 0f, 0.88f);
+        _spriteVfx.Spawn(VisualIds.BurningDetonation, position, 0f, 0.88f);
         _particles.EmitBurst(position, Vector2.UnitX, 42, GameBalance.DeathFlameBright, 430f, 12f);
         _particles.EmitDeathFlame(position, 24, 1.55f);
         _screenEffects.BeginHitstop(CombatFeedbackTuning.BurningDetonationHitstop);
@@ -209,7 +210,7 @@ public sealed class CombatPresentation
 
     private void PresentResonanceEruption()
     {
-        _spriteVfx.Spawn("resonance_activate", _resonancePosition, 0f, 0.78f);
+        _spriteVfx.Spawn(VisualIds.ResonanceActivate, _resonancePosition, 0f, 0.78f);
         _particles.EmitBurst(_resonancePosition, -Vector2.UnitY, 36, GameBalance.SoulWhite, 345f, 11f);
         _particles.EmitDeathFlame(_resonancePosition, 24, 1.7f);
         _screenEffects.AddShake(0.34f, 14f);

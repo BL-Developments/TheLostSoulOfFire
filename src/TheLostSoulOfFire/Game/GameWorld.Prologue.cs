@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TheLostSoulOfFire.Audio;
 using TheLostSoulOfFire.Entities;
+using TheLostSoulOfFire.Rendering.Visuals;
 
 namespace TheLostSoulOfFire.Game;
 
@@ -344,7 +345,7 @@ public sealed partial class GameWorld
     {
         _enemies.Add(enemy);
         bool heavy = enemy is Devourer;
-        _spriteVfx.Spawn("dash_ignition", enemy.Position, 0f, heavy ? 1.15f : 0.7f, GameBalance.DeathFlame * 0.6f);
+        _spriteVfx.Spawn(VisualIds.DashIgnition, enemy.Position, 0f, heavy ? 1.15f : 0.7f, GameBalance.DeathFlame * 0.6f);
         _particles.EmitDeathFlame(enemy.Position, heavy ? 22 : 11, heavy ? 1.45f : 1f);
         _particles.EmitConvergence(enemy.Position, heavy ? 20 : 12, heavy ? 128f : 84f, GameBalance.DeathFlameBright, 0.3f, heavy ? 6f : 4f);
         _arenaAtmosphere.ReactToForce(enemy.Position, heavy ? 320f : 190f, heavy ? 96f : 54f);

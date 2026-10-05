@@ -158,7 +158,7 @@ public sealed class SoulCannon
     public void DrawBack(
         SpriteBatch batch,
         Texture2D pixel,
-        Texture2D weaponTexture,
+        Texture2D? weaponTexture,
         Vector2 playerPosition,
         Vector2 facingDirection)
     {
@@ -176,7 +176,7 @@ public sealed class SoulCannon
     public void DrawActive(
         SpriteBatch batch,
         Texture2D pixel,
-        Texture2D weaponTexture,
+        Texture2D? weaponTexture,
         Vector2 playerPosition,
         Vector2 facingDirection)
     {
@@ -275,7 +275,7 @@ public sealed class SoulCannon
     private static void DrawWeapon(
         SpriteBatch batch,
         Texture2D pixel,
-        Texture2D weaponTexture,
+        Texture2D? weaponTexture,
         Vector2 stock,
         Vector2 barrel,
         float charge,
@@ -285,16 +285,8 @@ public sealed class SoulCannon
         Vector2 direction = Vector2.Normalize(barrel - stock);
         float rotation = MathF.Atan2(direction.Y, direction.X) + MathF.PI;
         float displayLength = Vector2.Distance(stock, barrel) + 36f;
-        batch.Draw(
-            weaponTexture,
-            Vector2.Lerp(stock, barrel, 0.52f),
-            null,
-            Color.White,
-            rotation,
-            new Vector2(weaponTexture.Width, weaponTexture.Height) * 0.5f,
-            displayLength / weaponTexture.Width,
-            SpriteEffects.None,
-            0f);
+        float width = weaponTexture?.Width ?? 256f;
+        batch.DrawSpriteOrDummy(pixel, weaponTexture, Vector2.Lerp(stock, barrel, 0.52f), rotation, displayLength / width, width);
 
         if (charge <= 0f)
         {

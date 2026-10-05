@@ -42,6 +42,17 @@ public abstract class Enemy
     }
     public abstract string StateLabel { get; }
 
+    /// <summary>Visual-ID this enemy is drawn with, or <c>null</c> when it draws itself.</summary>
+    public virtual string? VisualId => null;
+
+    /// <summary>Clip for the current state, or <c>null</c> while no sprite is shown.</summary>
+    public virtual string? VisualClip => null;
+
+    public virtual Vector2 VisualFacing => Vector2.UnitY;
+
+    /// <summary>Factor on the registry's world size, for example a Devourer swelling with Souls.</summary>
+    public virtual float VisualScale => 1f;
+
     /// <summary>Glut credited once when this enemy is defeated; amount depends on the type.</summary>
     public abstract int GlutReward { get; }
 

@@ -133,14 +133,14 @@ public sealed class ScytheCombat
     public void Draw(
         SpriteBatch batch,
         Texture2D pixel,
-        Texture2D physicalScythe,
+        Texture2D? physicalScythe,
         Vector2 playerPosition,
         Vector2 facingDirection,
         bool debugVisible)
     {
         if (ActiveStep == 0)
         {
-            DrawRestingScythe(batch, physicalScythe, playerPosition, facingDirection);
+            DrawRestingScythe(batch, pixel, physicalScythe, playerPosition, facingDirection);
             return;
         }
 
@@ -199,28 +199,20 @@ public sealed class ScytheCombat
 
     private static void DrawRestingScythe(
         SpriteBatch batch,
-        Texture2D physicalScythe,
+        Texture2D pixel,
+        Texture2D? physicalScythe,
         Vector2 playerPosition,
         Vector2 facingDirection)
     {
         Vector2 right = new(-facingDirection.Y, facingDirection.X);
         float rotation = MathF.Atan2(facingDirection.Y, facingDirection.X);
-        batch.Draw(
-            physicalScythe,
-            playerPosition + facingDirection * 10f + right * 3f,
-            null,
-            Color.White,
-            rotation,
-            new Vector2(physicalScythe.Width, physicalScythe.Height) * 0.5f,
-            0.52f,
-            SpriteEffects.None,
-            0f);
+        batch.DrawSpriteOrDummy(pixel, physicalScythe, playerPosition + facingDirection * 10f + right * 3f, rotation, 0.52f);
     }
 
     private void DrawAttackingScythe(
         SpriteBatch batch,
         Texture2D pixel,
-        Texture2D physicalScythe,
+        Texture2D? physicalScythe,
         Vector2 playerPosition,
         bool debugVisible)
     {
@@ -264,16 +256,7 @@ public sealed class ScytheCombat
         }
 
         Vector2 bladeDirection = new(MathF.Cos(current), MathF.Sin(current));
-        batch.Draw(
-            physicalScythe,
-            playerPosition + bladeDirection * 29f,
-            null,
-            Color.White,
-            current,
-            new Vector2(physicalScythe.Width, physicalScythe.Height) * 0.5f,
-            ActiveStep switch { 1 => 0.55f, 2 => 0.6f, _ => 0.7f },
-            SpriteEffects.None,
-            0f);
+        batch.DrawSpriteOrDummy(pixel, physicalScythe, playerPosition + bladeDirection * 29f, current, ActiveStep switch { 1 => 0.55f, 2 => 0.6f, _ => 0.7f });
 
         if (debugVisible)
         {

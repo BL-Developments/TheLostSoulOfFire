@@ -6,6 +6,7 @@ using TheLostSoulOfFire.Combat;
 using TheLostSoulOfFire.Effects;
 using TheLostSoulOfFire.Game;
 using TheLostSoulOfFire.Rendering;
+using TheLostSoulOfFire.Rendering.Visuals;
 
 namespace TheLostSoulOfFire.Entities;
 
@@ -40,6 +41,15 @@ public sealed class Burning : Enemy
     public bool IsCharging => State == BurningState.Charge;
     public bool IsAggressionCommitted => State is BurningState.Telegraph or BurningState.Charge;
     public Vector2 FacingDirection => _facing;
+    public override string VisualId => VisualIds.Burning;
+    public override string? VisualClip => State switch
+    {
+        BurningState.Dying or BurningState.Detonating or BurningState.Dead => null,
+        BurningState.Approach => VisualClips.Move,
+        BurningState.Charge => VisualClips.Charge,
+        _ => VisualClips.Idle
+    };
+    public override Vector2 VisualFacing => _facing;
 
     public Burning(Vector2 position, int movementSeed)
         : base(position, GameBalance.BurningMaxHealth, GameBalance.BurningRadius)
