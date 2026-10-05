@@ -19,6 +19,7 @@ import re
 import sys
 from pathlib import Path
 
+import numpy as np
 from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -34,6 +35,25 @@ def compact_json(value: object) -> str:
     return re.sub(r"\[\s*([-0-9.]+),\s*([-0-9.]+)\s*\]", r"[\1, \2]", text)
 
 
+def tone(plate: Image.Image, mute_reds: float | None, target_median: float | None) -> Image.Image:
+    """Optional colour corrections, recorded in the manifest parameters."""
+    if mute_reds is None and target_median is None:
+        return plate
+    rgba = np.asarray(plate).astype(np.float32) / 255.0
+    rgb = rgba[..., :3]
+    if mute_reds is not None:
+        hsv = np.asarray(plate.convert("RGB").convert("HSV")).astype(np.float32) / 255.0
+        hue_deg = hsv[..., 0] * 360
+        red = ((hue_deg <= 45) | (hue_deg >= 340))[..., None]
+        luminance = (rgb * [0.299, 0.587, 0.114]).sum(axis=-1, keepdims=True)
+        rgb = np.where(red, luminance + (rgb - luminance) * mute_reds, rgb)
+    if target_median is not None:
+        luminance = (rgb * [0.299, 0.587, 0.114]).sum(axis=-1)
+        rgb = np.clip(rgb * (target_median / 255.0) / max(float(np.median(luminance)), 1e-3), 0, 1)
+    rgba[..., :3] = rgb
+    return Image.fromarray(np.round(rgba * 255).astype(np.uint8), "RGBA")
+
+
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("plate", type=Path)
@@ -45,6 +65,10 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--layer", default="ground")
     parser.add_argument("--origin", nargs=2, type=float, default=[0.0, 0.0], metavar=("X", "Y"),
                         help="anchor as a share of the plate, e.g. 0 1 for a wall standing on its bottom-left corner")
+    parser.add_argument("--mute-reds", type=float, metavar="SATURATION",
+                        help="scale the saturation of red-orange hues (0-45 deg), e.g. 0.3, so stains never read as blood (Düsternis-Charta D4)")
+    parser.add_argument("--target-median", type=float, metavar="LUMINANCE",
+                        help="scale brightness so the median luminance lands here, e.g. 82 (value step 3)")
     parser.add_argument("--crop", nargs=4, type=int, metavar=("LEFT", "TOP", "RIGHT", "BOTTOM"),
                         help="crop the source first, e.g. to remove a painted paper margin")
     parser.add_argument("--model", default="flux2-klein-4b", help="licence-table key of the source model")
@@ -59,6 +83,7 @@ def main(argv: list[str]) -> int:
     plate = Image.open(args.plate).convert("RGBA")
     if args.crop:
         plate = plate.crop(tuple(args.crop))
+    plate = tone(plate, args.mute_reds, args.target_median)
     plate = plate.resize((width, height), Image.Resampling.LANCZOS)
     outputs: list[Path] = []
     step = common.Step(
@@ -67,7 +92,7 @@ def main(argv: list[str]) -> int:
         tool={"name": "place_environment.py", "version": "1"},
         model=common.model_info(args.model),
         parameters={"world": args.world, "output": [width, height], "tiles": [columns, rows], "layer": args.layer,
-                    "origin": args.origin, "crop": args.crop},
+                    "origin": args.origin, "crop": args.crop, "mute_reds": args.mute_reds, "target_median": args.target_median},
         inputs=[args.plate],
         reason="Bodenplatte für das Spiel aufbereitet",
     )

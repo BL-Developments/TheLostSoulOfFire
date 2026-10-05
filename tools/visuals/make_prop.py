@@ -59,31 +59,6 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--already-cut", action="store_true")
     args = parser.parse_args(argv)
 
-    with tempfile.TemporaryDirectory() as temporary:
-        source = args.image
-        if not args.already_cut:
-            source = Path(temporary) / "cut.png"
-            subprocess.run(["rembg", "i", "-m", "birefnet-general", str(args.image), str(source)], check=True,
-                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        image = Image.open(source).convert("RGBA")
-
-    pixels = np.asarray(image)
-    alpha = pixels[..., 3]
-    ys, xs = np.nonzero(alpha > 8)
-    if len(xs) == 0:
-        raise SystemExit("Nach dem Freistellen ist nichts übrig.")
-    left, top, right, bottom = xs.min(), ys.min(), xs.max() + 1, ys.max() + 1
-    cropped = image.crop((left, top, right, bottom))
-    foot = foot_row(np.asarray(cropped)[..., 3])
-
-    scale = args.height * OUTPUT_SCALE / max(foot, 1)
-    size = (max(1, round(cropped.width * scale)), max(1, round(cropped.height * scale)))
-    resized = cropped.resize(size, Image.Resampling.LANCZOS)
-    canvas = Image.new("RGBA", (size[0] + 2 * MARGIN, size[1] + 2 * MARGIN), (0, 0, 0, 0))
-    canvas.paste(resized, (MARGIN, MARGIN))
-    origin_y = (MARGIN + foot * scale) / canvas.height
-    world_size = [round(canvas.width / OUTPUT_SCALE, 1), round(canvas.height / OUTPUT_SCALE, 1)]
-
     target = CONTENT / f"{args.texture}.png"
     target.parent.mkdir(parents=True, exist_ok=True)
     step = common.Step(
@@ -91,13 +66,38 @@ def main(argv: list[str]) -> int:
         step="make-prop",
         tool={"name": "make_prop.py + rembg", "version": "1"},
         model=common.model_info(args.model),
-        parameters={"height": args.height, "layer": args.layer, "world_size": world_size, "origin_y": round(origin_y, 4)},
+        parameters={"height": args.height, "layer": args.layer},
         inputs=[args.image],
         outputs=[target],
         decision="angenommen",
-        reason="Prop für die gemalte Arena der Scheibe (Schnellpfad, Basismodell vor LoRA)",
+        reason="Prop für die gemalte Scheibe (Schnellpfad, Basismodell vor LoRA)",
     )
-    with common.record_step(step):
+    with common.record_step(step) as recorded:
+        with tempfile.TemporaryDirectory() as temporary:
+            source = args.image
+            if not args.already_cut:
+                source = Path(temporary) / "cut.png"
+                subprocess.run(["rembg", "i", "-m", "birefnet-general", str(args.image), str(source)], check=True,
+                               stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            image = Image.open(source).convert("RGBA")
+
+        pixels = np.asarray(image)
+        alpha = pixels[..., 3]
+        ys, xs = np.nonzero(alpha > 8)
+        if len(xs) == 0:
+            raise SystemExit("Nach dem Freistellen ist nichts übrig.")
+        left, top, right, bottom = xs.min(), ys.min(), xs.max() + 1, ys.max() + 1
+        cropped = image.crop((left, top, right, bottom))
+        foot = foot_row(np.asarray(cropped)[..., 3])
+
+        scale = args.height * OUTPUT_SCALE / max(foot, 1)
+        size = (max(1, round(cropped.width * scale)), max(1, round(cropped.height * scale)))
+        resized = cropped.resize(size, Image.Resampling.LANCZOS)
+        canvas = Image.new("RGBA", (size[0] + 2 * MARGIN, size[1] + 2 * MARGIN), (0, 0, 0, 0))
+        canvas.paste(resized, (MARGIN, MARGIN))
+        origin_y = (MARGIN + foot * scale) / canvas.height
+        world_size = [round(canvas.width / OUTPUT_SCALE, 1), round(canvas.height / OUTPUT_SCALE, 1)]
+        recorded.parameters.update({"world_size": world_size, "origin_y": round(origin_y, 4)})
         canvas.save(target)
         registry = json.loads(REGISTRY.read_text(encoding="utf-8"))
         entry = next((item for item in registry["visuals"] if item["id"] == args.visual_id), None)

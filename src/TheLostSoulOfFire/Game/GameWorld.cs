@@ -55,6 +55,9 @@ public sealed partial class GameWorld : IDisposable
     private readonly List<SceneProp> _arenaProps = Arena.Props
         .Select(placement => new SceneProp(placement.VisualId, placement.Foot, placement.FallbackSize, placement.FallbackLayer))
         .ToList();
+    private readonly List<SceneProp> _shoreProps = PrologueDirector.ShoreProps
+        .Select(placement => new SceneProp(placement.VisualId, placement.Foot, placement.FallbackSize, placement.FallbackLayer))
+        .ToList();
     private readonly List<DepthItem> _actorBand = [];
     private readonly List<(RectangleF Bounds, float FootY)> _occlusionTargets = [];
     private readonly CombatPresentation _combatPresentation;
@@ -897,8 +900,12 @@ public sealed partial class GameWorld : IDisposable
     }
 
     /// <summary>Props of the room being shown plus props staged by automated tests.</summary>
-    private IEnumerable<SceneProp> ActiveSceneProps =>
-        _phase is GamePhase.Arena ? _arenaProps.Concat(_sceneProps) : _sceneProps;
+    private IEnumerable<SceneProp> ActiveSceneProps => _phase switch
+    {
+        GamePhase.Arena => _arenaProps.Concat(_sceneProps),
+        GamePhase.Prologue when _prologue.Sector == PrologueSector.Emergence => _shoreProps.Concat(_sceneProps),
+        _ => _sceneProps
+    };
 
     /// <summary>Enemies, the player and high props, drawn back to front by foot point.</summary>
     private void DrawActorBand(SpriteBatch batch, Texture2D pixel, bool drawPlayer)

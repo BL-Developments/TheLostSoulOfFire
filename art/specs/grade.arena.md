@@ -1,7 +1,7 @@
 # Visual-Spec: grade.arena
 
 Art: grade
-Status: dummy
+Status: im-spiel
 Stil: hausstil
 Weltgröße: 1024 × 32 (LUT-Streifen, nicht in der Welt)
 Akzentfarbe: nach dem Farbskript der Arena: Oxidrot, Stahlblaugrau, stumpfes Messing
@@ -9,7 +9,7 @@ Lore: [Region-Vertrag Industrial Cathedral](../../docs/current/regions/industria
 
 ## Merkmale
 - Farbgrading der Arena hinter Tür I.
-- Bis zur eigenen LUT gilt `grade.neutral`.
+- Erzeugt mit `tools/visuals/make_lut.py` (Voreinstellung im Skript); Death-Flame-Violett und Life-Flame-Orange sind geschützt und bleiben unverändert.
 - Death-Flame- und Life-Flame-Farben bleiben gleich.
 
 ## Silhouette

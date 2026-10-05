@@ -902,8 +902,8 @@
       "cost_eur": 0.0,
       "duration_s": 0.42,
       "decision": {
-        "status": "kandidat",
-        "reason": "Bodenplatte für das Spiel aufbereitet"
+        "status": "verworfen",
+        "reason": "ersetzt: Steinplatten zu groß gegenüber den Figuren; neu mit floorplate2-s97"
       }
     },
     {
@@ -1294,8 +1294,8 @@
       "cost_eur": 0.0,
       "duration_s": 0.0,
       "decision": {
-        "status": "angenommen",
-        "reason": "Prop für die gemalte Arena der Scheibe (Schnellpfad, Basismodell vor LoRA)"
+        "status": "verworfen",
+        "reason": "ersetzt durch größere Fassung (Maßstab neben den Figuren)"
       }
     },
     {
@@ -1339,7 +1339,7 @@
       "duration_s": 0.0,
       "decision": {
         "status": "verworfen",
-        "reason": "Fußpunkt an der Tischplatte statt an den Beinen erkannt; neu mit Schwelle 1/6"
+        "reason": "ersetzt durch größere Fassung (Maßstab neben den Figuren)"
       }
     },
     {
@@ -1382,8 +1382,8 @@
       "cost_eur": 0.0,
       "duration_s": 0.0,
       "decision": {
-        "status": "angenommen",
-        "reason": "Prop für die gemalte Arena der Scheibe (Schnellpfad, Basismodell vor LoRA)"
+        "status": "verworfen",
+        "reason": "ersetzt durch größere Fassung (Maßstab neben den Figuren)"
       }
     },
     {
@@ -1426,8 +1426,8 @@
       "cost_eur": 0.0,
       "duration_s": 0.0,
       "decision": {
-        "status": "angenommen",
-        "reason": "Prop für die gemalte Arena der Scheibe (Schnellpfad, Basismodell vor LoRA)"
+        "status": "verworfen",
+        "reason": "ersetzt durch größere Fassung (Maßstab neben den Figuren)"
       }
     },
     {
@@ -1470,8 +1470,8 @@
       "cost_eur": 0.0,
       "duration_s": 0.0,
       "decision": {
-        "status": "angenommen",
-        "reason": "Prop für die gemalte Arena der Scheibe (Schnellpfad, Basismodell vor LoRA)"
+        "status": "verworfen",
+        "reason": "ersetzt durch größere Fassung (Maßstab neben den Figuren)"
       }
     },
     {
@@ -1514,8 +1514,8 @@
       "cost_eur": 0.0,
       "duration_s": 0.0,
       "decision": {
-        "status": "angenommen",
-        "reason": "Prop für die gemalte Arena der Scheibe (Schnellpfad, Basismodell vor LoRA)"
+        "status": "verworfen",
+        "reason": "ersetzt durch größere Fassung (Maßstab neben den Figuren)"
       }
     },
     {
@@ -1558,8 +1558,1254 @@
       "cost_eur": 0.0,
       "duration_s": 0.01,
       "decision": {
+        "status": "verworfen",
+        "reason": "ersetzt durch größere Fassung (Maßstab neben den Figuren)"
+      }
+    },
+    {
+      "id": "1eda116defc74fac96bc93dc08b2e746",
+      "timestamp": "2026-10-05T20:26:38+00:00",
+      "visual_id": "grade.arena",
+      "step": "make-lut",
+      "tool": {
+        "name": "make_lut.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "procedural colour script",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "shadow_tint": [
+          0.92,
+          0.94,
+          1.1
+        ],
+        "highlight_tint": [
+          1.05,
+          1.0,
+          0.92
+        ],
+        "saturation": 0.86,
+        "contrast": 1.08,
+        "black_lift": 0.012,
+        "gamma": 1.04
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Grading/lut_arena.png",
+          "sha256": "83e9fbb6d902f5d78d9abb2e3e40613a6d620853b8e48e00b246e2a568e54082"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.2,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Bereichs-Grading der Scheibe; Flammenfarben geschützt"
+      }
+    },
+    {
+      "id": "c1acde15f43443d8b8a1e4769722cac3",
+      "timestamp": "2026-10-05T20:26:39+00:00",
+      "visual_id": "grade.shore",
+      "step": "make-lut",
+      "tool": {
+        "name": "make_lut.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "procedural colour script",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "shadow_tint": [
+          0.88,
+          0.97,
+          1.12
+        ],
+        "highlight_tint": [
+          0.97,
+          1.0,
+          1.04
+        ],
+        "saturation": 0.8,
+        "contrast": 0.96,
+        "black_lift": 0.03,
+        "gamma": 1.0
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Grading/lut_shore.png",
+          "sha256": "de2d293d34f7745214db9b99bd1a92b7a63dde944d1d2a3d2ae730697ab856cb"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.03,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Bereichs-Grading der Scheibe; Flammenfarben geschützt"
+      }
+    },
+    {
+      "id": "6884a233e1f24b3a9e6b41bcf1b0974c",
+      "timestamp": "2026-10-05T20:26:44+00:00",
+      "visual_id": "environment.arena",
+      "step": "floor-candidate",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "seen straight down from high above, orthographic top-down game floor, a vast hall floor made of many small rectangular flagstones laid in neat staggered rows, about twenty stones across the width of the image, soot stains, hairline cracks, faint rust and slag marks, slightly darker towards the image edges, the floor is calm, even and mid-dark grey-violet, no walls, no objects, no perspective, hand-painted gouache illustration with visible brush strokes, painterly texture, single key light from the upper left, muted grey-violet stone with rust accents, no people, no text",
+      "seed": 83,
+      "parameters": {
+        "steps": 4,
+        "width": 1440,
+        "height": 800,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.arena/floorplate2-s83.png",
+          "sha256": "dea32f75257ed3a14534e8bc9353da3980c58cb55f81082a216462438e6cac5b"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 105.66,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "db4e76b556e54e8698e6fa5f0eea8410",
+      "timestamp": "2026-10-05T20:29:00+00:00",
+      "visual_id": "environment.arena",
+      "step": "floor-candidate",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "seen straight down from high above, orthographic top-down game floor, a vast hall floor made of many small rectangular flagstones laid in neat staggered rows, about twenty stones across the width of the image, soot stains, hairline cracks, faint rust and slag marks, slightly darker towards the image edges, the floor is calm, even and mid-dark grey-violet, no walls, no objects, no perspective, hand-painted gouache illustration with visible brush strokes, painterly texture, single key light from the upper left, muted grey-violet stone with rust accents, no people, no text",
+      "seed": 97,
+      "parameters": {
+        "steps": 4,
+        "width": 1440,
+        "height": 800,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.arena/floorplate2-s97.png",
+          "sha256": "9bd4da9ea3207ae327f014508371bf8b5bba9f6aa777b0f882f0f4ce8e037df5"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 136.04,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "cdd231365ef34cd49397a0ce0dc0be7b",
+      "timestamp": "2026-10-05T20:29:32+00:00",
+      "visual_id": "environment.arena",
+      "step": "place-environment",
+      "tool": {
+        "name": "place_environment.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "world": [
+          1800,
+          910
+        ],
+        "output": [
+          2700,
+          1365
+        ],
+        "tiles": [
+          2,
+          1
+        ],
+        "layer": "ground",
+        "origin": [
+          0.0,
+          0.0
+        ],
+        "crop": [
+          0,
+          36,
+          1440,
+          764
+        ],
+        "mute_reds": 0.3,
+        "target_median": 80.0
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.arena/floorplate2-s97.png",
+          "sha256": "9bd4da9ea3207ae327f014508371bf8b5bba9f6aa777b0f882f0f4ce8e037df5"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Arena/floor_c0r0.png",
+          "sha256": "ee9974f1797533476816ada859fd62e832a698662186568187d70eebd754825d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Arena/floor_c1r0.png",
+          "sha256": "f26b2e55a13ba5bf3fbdec69bb6bce38e60d3eee3fa39d15892bb28b05075964"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.39,
+      "decision": {
+        "status": "angenommen",
+        "reason": "kleinere versetzte Steine, Rot entsättigt (keine Blutwirkung), Median Stufe 3"
+      }
+    },
+    {
+      "id": "7eec6bac4abc4256b72e0ea4dbc66220",
+      "timestamp": "2026-10-05T20:31:57+00:00",
+      "visual_id": "prop.arena-lockers",
+      "step": "make-prop",
+      "tool": {
+        "name": "make_prop.py + rembg",
+        "version": "1"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "height": 140.0,
+        "layer": "high-prop",
+        "world_size": [
+          174.0,
+          154.0
+        ],
+        "origin_y": 0.9264
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.arena/lockers.png",
+          "sha256": "a9a75e0acb0c4f854b0315188eab911f5e0967c3ca604626c5daac2c33ce7bf3"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Arena/lockers.png",
+          "sha256": "ac17d9773031629a049fab044ad8134c47823cdfba028214e956e8fb1a2c6201"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.01,
+      "decision": {
         "status": "angenommen",
         "reason": "Prop für die gemalte Arena der Scheibe (Schnellpfad, Basismodell vor LoRA)"
+      }
+    },
+    {
+      "id": "38662b9622284c4f8bb0ed94cef24e23",
+      "timestamp": "2026-10-05T20:33:09+00:00",
+      "visual_id": "prop.arena-workbench",
+      "step": "make-prop",
+      "tool": {
+        "name": "make_prop.py + rembg",
+        "version": "1"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "height": 82.0,
+        "layer": "high-prop",
+        "world_size": [
+          107.3,
+          98.0
+        ],
+        "origin_y": 0.8639
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.arena/workbench.png",
+          "sha256": "e51010ce8923c081cae9dc9b49859b4a07a6a32d405b55bd6fe1d8e67e829374"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Arena/workbench.png",
+          "sha256": "595bac1c33906b33e2f3392ee70c192b02c337675d6b31e0d5452c311a0ef3ac"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.0,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Prop für die gemalte Arena der Scheibe (Schnellpfad, Basismodell vor LoRA)"
+      }
+    },
+    {
+      "id": "2f41f1243d804659be0551b2b6940d56",
+      "timestamp": "2026-10-05T20:34:28+00:00",
+      "visual_id": "prop.arena-toolrack",
+      "step": "make-prop",
+      "tool": {
+        "name": "make_prop.py + rembg",
+        "version": "1"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "height": 140.0,
+        "layer": "high-prop",
+        "world_size": [
+          162.7,
+          152.7
+        ],
+        "origin_y": 0.9345
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.arena/toolrack.png",
+          "sha256": "a7e0b938631db02a576a11a3ea34151c9a749d61a223f7b8a4f41234c579bb63"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Arena/toolrack.png",
+          "sha256": "40b2fc788a3ff38688ea1473883a03388f243fe38f8755eff8408b7ddc5680bd"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.01,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Prop für die gemalte Arena der Scheibe (Schnellpfad, Basismodell vor LoRA)"
+      }
+    },
+    {
+      "id": "e54d2642f16f4e538f4c6da729dd38b9",
+      "timestamp": "2026-10-05T20:35:26+00:00",
+      "visual_id": "prop.arena-slag",
+      "step": "make-prop",
+      "tool": {
+        "name": "make_prop.py + rembg",
+        "version": "1"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "height": 58.0,
+        "layer": "low-prop",
+        "world_size": [
+          94.0,
+          66.0
+        ],
+        "origin_y": 0.9192
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.arena/slag.png",
+          "sha256": "ef294d63813adb3379048732aca9c2284541a12fb422c309c49db200879bdbab"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Arena/slag.png",
+          "sha256": "20f7c2c93d0db7a92c58eef16444bb2fc8aafe560580daa3b66068ba4828e616"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.0,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Prop für die gemalte Arena der Scheibe (Schnellpfad, Basismodell vor LoRA)"
+      }
+    },
+    {
+      "id": "60999f9fbae646178d2a5f2d3dc84a1e",
+      "timestamp": "2026-10-05T20:36:47+00:00",
+      "visual_id": "prop.arena-chains",
+      "step": "make-prop",
+      "tool": {
+        "name": "make_prop.py + rembg",
+        "version": "1"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "height": 44.0,
+        "layer": "low-prop",
+        "world_size": [
+          64.0,
+          50.7
+        ],
+        "origin_y": 0.9211
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.arena/chains.png",
+          "sha256": "4f52a4143aca69be56be432b3fe2bfe868fc0e31dac1c08084e75fc5ffdfd90d"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Arena/chains.png",
+          "sha256": "bc179f58d17d07c7e96656f777adc5c9d6e5bbff59111c52d07a5aa270509bf8"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.0,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Prop für die gemalte Arena der Scheibe (Schnellpfad, Basismodell vor LoRA)"
+      }
+    },
+    {
+      "id": "8a36988870724b6ab5312ccf7db0e30f",
+      "timestamp": "2026-10-05T20:37:56+00:00",
+      "visual_id": "prop.arena-gate",
+      "step": "make-prop",
+      "tool": {
+        "name": "make_prop.py + rembg",
+        "version": "1"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "height": 150.0,
+        "layer": "occluder",
+        "world_size": [
+          306.0,
+          164.7
+        ],
+        "origin_y": 0.9271
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.arena/gate.png",
+          "sha256": "556b9cb016d49eb477cae6b364e5f812bc98fdce8e9913195d45bcb27e2ff268"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Arena/gate.png",
+          "sha256": "007db2091d3f7494b280574fba7dc7c1dc508c5a979dfe810521fb59f6e6b94e"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.01,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Prop für die gemalte Arena der Scheibe (Schnellpfad, Basismodell vor LoRA)"
+      }
+    },
+    {
+      "id": "7e9e583869754b2d9fee5236bb2c6769",
+      "timestamp": "2026-10-05T20:38:33+00:00",
+      "visual_id": "environment.shore",
+      "step": "floor-candidate",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "seen straight down from high above, orthographic top-down game level, a long wide wet concrete railway platform of a small harbour station fills the middle of the image, granite kerb stones along all its edges, dark still harbour water with faint mist around the platform on all four sides, the platform surface has large concrete slabs, a faded painted safety line near the edge, puddles reflecting a cold sky, salt crusts and tar lines, a few old rails sunk in the water along the bottom, hand-painted gouache illustration with visible brush strokes, painterly texture, single key light from the upper left, muted slate blue, salt white and faded green palette, melancholic, no objects on the platform, no people, no text",
+      "seed": 83,
+      "parameters": {
+        "steps": 8,
+        "width": 1440,
+        "height": 800,
+        "quantize": 8,
+        "init_strength": 0.3,
+        "lora_scale": null
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.shore/layout-1440.png",
+          "sha256": "f6bb8fc6cff220b024f6dfeb0a9c8c1291ff36d9a0ef7554d7838d3c59325329"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.shore/plate-s83.png",
+          "sha256": "11dfc59dd6d3b3eb95d4690c02be56ac5d885d80922d29c5cbaa03c97bdb1773"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 572.34,
+      "decision": {
+        "status": "verworfen",
+        "reason": "Steuerbild mit Stärke 0,3 bleibt flach; Ufer wird aus Wasser- und Belagtextur zusammengesetzt"
+      }
+    },
+    {
+      "id": "3e9b96e9e44c4e37b7b61447a50ebe1d",
+      "timestamp": "2026-10-05T20:41:45+00:00",
+      "visual_id": "environment.shore",
+      "step": "water-texture",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "seen straight down from high above, orthographic top-down, the whole image is dark still harbour water at night, faint drifting mist, soft reflections of a cold sky, gentle ripples, no objects, no shore, no perspective, hand-painted gouache illustration with visible brush strokes, painterly texture, single key light from the upper left, deep slate blue and blue-grey with salt-white mist, melancholic, no text",
+      "seed": 83,
+      "parameters": {
+        "steps": 4,
+        "width": 1440,
+        "height": 800,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.shore/water-s83.png",
+          "sha256": "caa9eb8eb13eadbe2970ed0a57f79f88e4cc1764dc16b39f87426ebe3706126d"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 148.73,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "6ef79f5493e54a9baff8d2dc1633cebf",
+      "timestamp": "2026-10-05T20:44:06+00:00",
+      "visual_id": "environment.shore",
+      "step": "platform-texture",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "seen straight down from high above, orthographic top-down game floor, the whole image is the wet concrete surface of an old railway platform made of large rectangular concrete slabs, shallow puddles reflecting a cold sky, salt crusts, tar lines along the joints, a few cracks and moss spots, calm and even, mid-dark slate grey with a hint of blue, no objects, no edges, no perspective, hand-painted gouache illustration with visible brush strokes, painterly texture, single key light from the upper left, no text",
+      "seed": 83,
+      "parameters": {
+        "steps": 4,
+        "width": 1440,
+        "height": 800,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.shore/slabs-s83.png",
+          "sha256": "7ccbd6a971d5fc49cbfe35cd0b5d0a0e1514bafe5ad71fd260b86a55973e1d91"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 141.25,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "ff71756f0760417190a8cdb198f5d1d3",
+      "timestamp": "2026-10-05T20:45:28+00:00",
+      "visual_id": "prop.shore-bench",
+      "step": "prop-candidate",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "single game prop, isolated on a plain flat light grey background, centred, whole object visible with space around it, seen from above in a three-quarter top-down view, soft contact shadow under it, hand-painted gouache illustration with visible brush strokes, painterly texture, single key light from the upper left, muted slate blue, faded green, salt white and weathered wood, an old wooden station bench with cast-iron legs painted faded green, worn armrests, seen from behind",
+      "seed": 83,
+      "parameters": {
+        "steps": 4,
+        "width": 768,
+        "height": 768,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.shore/bench.png",
+          "sha256": "56b0b26a555dd2b31d874ce04d25afe6cdf12ea8a25f7b275097b9be0d7cd7e3"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 81.45,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "bce1710a6c0b485e8722db1d45a44244",
+      "timestamp": "2026-10-05T20:46:41+00:00",
+      "visual_id": "prop.shore-suitcase",
+      "step": "prop-candidate",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "single game prop, isolated on a plain flat light grey background, centred, whole object visible with space around it, seen from above in a three-quarter top-down view, soft contact shadow under it, hand-painted gouache illustration with visible brush strokes, painterly texture, single key light from the upper left, muted slate blue, faded green, salt white and weathered wood, one old brown leather suitcase with straps and a paper luggage tag, standing upright",
+      "seed": 83,
+      "parameters": {
+        "steps": 4,
+        "width": 512,
+        "height": 512,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.shore/suitcase.png",
+          "sha256": "26b13aafce05193646f2bceed9b87b03edaffb1c6d0a5db496738b8a9c77cdd0"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 72.89,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "fb1249803c4e4563aca8969f5d05494d",
+      "timestamp": "2026-10-05T20:48:13+00:00",
+      "visual_id": "prop.shore-board",
+      "step": "prop-candidate",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "single game prop, isolated on a plain flat light grey background, centred, whole object visible with space around it, seen from above in a three-quarter top-down view, soft contact shadow under it, hand-painted gouache illustration with visible brush strokes, painterly texture, single key light from the upper left, muted slate blue, faded green, salt white and weathered wood, a large split-flap departure board of an old station on two iron posts, tilted to one side and half sunk, black flaps with white letters, water stains",
+      "seed": 83,
+      "parameters": {
+        "steps": 4,
+        "width": 768,
+        "height": 1024,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.shore/board.png",
+          "sha256": "aeaf21c04be77163808e453b4a1b0bb8f5e31501bd9b503d08aad74cf4d4e3f7"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 90.85,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "400e24f4baee4bf0a43f72709683e2f4",
+      "timestamp": "2026-10-05T20:49:04+00:00",
+      "visual_id": "prop.shore-canopy-post",
+      "step": "prop-candidate",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "single game prop, isolated on a plain flat light grey background, centred, whole object visible with space around it, seen from above in a three-quarter top-down view, soft contact shadow under it, hand-painted gouache illustration with visible brush strokes, painterly texture, single key light from the upper left, muted slate blue, faded green, salt white and weathered wood, a tall cast-iron station canopy post painted faded green with a decorative bracket at the top",
+      "seed": 83,
+      "parameters": {
+        "steps": 4,
+        "width": 512,
+        "height": 1024,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.shore/canopypost.png",
+          "sha256": "01cc14cc79189f5e223166359602b313e7c47720a2f9aa00e524c9210ef5a7c1"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 51.5,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "fb99b40063004da7bb24f96bc6dcaff7",
+      "timestamp": "2026-10-05T20:50:07+00:00",
+      "visual_id": "prop.shore-lamp",
+      "step": "prop-candidate",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "single game prop, isolated on a plain flat light grey background, centred, whole object visible with space around it, seen from above in a three-quarter top-down view, soft contact shadow under it, hand-painted gouache illustration with visible brush strokes, painterly texture, single key light from the upper left, muted slate blue, faded green, salt white and weathered wood, an old cast-iron station lamp post with a cold white glowing lantern",
+      "seed": 83,
+      "parameters": {
+        "steps": 4,
+        "width": 512,
+        "height": 1024,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.shore/lamp.png",
+          "sha256": "eeca90ad4c304ccba8281c09352037bb80867eb517dfe4d4f1c8a3c3d14079b3"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 62.81,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "ceb30bac4b9048d5bc010352cdd4de35",
+      "timestamp": "2026-10-05T20:50:41+00:00",
+      "visual_id": "prop.shore-bollard",
+      "step": "prop-candidate",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "single game prop, isolated on a plain flat light grey background, centred, whole object visible with space around it, seen from above in a three-quarter top-down view, soft contact shadow under it, hand-painted gouache illustration with visible brush strokes, painterly texture, single key light from the upper left, muted slate blue, faded green, salt white and weathered wood, a short iron mooring bollard with a frayed rope wound around it, tar stains",
+      "seed": 83,
+      "parameters": {
+        "steps": 4,
+        "width": 512,
+        "height": 512,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.shore/bollard.png",
+          "sha256": "c3622b92f3495feabc2ef3f6fd69706948de5f306af977fb20fdef3eed284f7c"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 33.64,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "3d2a5cc395744a6a893118c66bab580f",
+      "timestamp": "2026-10-05T20:52:10+00:00",
+      "visual_id": "prop.shore-bench",
+      "step": "make-prop",
+      "tool": {
+        "name": "make_prop.py + rembg",
+        "version": "1"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "height": 62.0,
+        "layer": "high-prop",
+        "world_size": [
+          115.3,
+          90.7
+        ],
+        "origin_y": 0.7132
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.shore/bench.png",
+          "sha256": "56b0b26a555dd2b31d874ce04d25afe6cdf12ea8a25f7b275097b9be0d7cd7e3"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Shore/bench.png",
+          "sha256": "2e0ffa8350d618d993718abf7d49dab522eba6eae21ce12568d30ffeee4d963b"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 68.26,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Prop für die gemalte Scheibe (Schnellpfad, Basismodell vor LoRA)"
+      }
+    },
+    {
+      "id": "58abdba9ce754940931f4e8288325784",
+      "timestamp": "2026-10-05T20:53:04+00:00",
+      "visual_id": "prop.shore-suitcase",
+      "step": "make-prop",
+      "tool": {
+        "name": "make_prop.py + rembg",
+        "version": "1"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "height": 38.0,
+        "layer": "high-prop",
+        "world_size": [
+          38.0,
+          45.3
+        ],
+        "origin_y": 0.8971
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.shore/suitcase.png",
+          "sha256": "26b13aafce05193646f2bceed9b87b03edaffb1c6d0a5db496738b8a9c77cdd0"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Shore/suitcase.png",
+          "sha256": "affed6ec6e174c4b7e7513560cf985fab833c17d26c976bf3748fd852394f2dd"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 54.01,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Prop für die gemalte Scheibe (Schnellpfad, Basismodell vor LoRA)"
+      }
+    },
+    {
+      "id": "0cd06f43e9824bb29aacbb13f4bee472",
+      "timestamp": "2026-10-05T20:54:06+00:00",
+      "visual_id": "prop.shore-board",
+      "step": "make-prop",
+      "tool": {
+        "name": "make_prop.py + rembg",
+        "version": "1"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "height": 190.0,
+        "layer": "occluder",
+        "world_size": [
+          186.7,
+          205.3
+        ],
+        "origin_y": 0.9383
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.shore/board.png",
+          "sha256": "aeaf21c04be77163808e453b4a1b0bb8f5e31501bd9b503d08aad74cf4d4e3f7"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Shore/board.png",
+          "sha256": "76572a59ca510066d07a8a01506639f2933187ec8077be845d9d48e8ffb1bba1"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 62.03,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Prop für die gemalte Scheibe (Schnellpfad, Basismodell vor LoRA)"
+      }
+    },
+    {
+      "id": "6d73eb7faeb3421c8cbc0b0023518386",
+      "timestamp": "2026-10-05T20:54:17+00:00",
+      "visual_id": "environment.shore",
+      "step": "platform-texture",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "seen straight down from high above, orthographic top-down game floor, the whole image is the wet concrete surface of an old railway platform made of many small rectangular concrete slabs laid in staggered rows, about sixteen slabs across the width of the image, shallow puddles reflecting a cold sky, salt crusts, tar lines along the joints, a few cracks and moss spots, calm and even, mid-dark slate grey with a hint of blue, no objects, no edges, no perspective, hand-painted gouache illustration with visible brush strokes, painterly texture, single key light from the upper left, no text",
+      "seed": 101,
+      "parameters": {
+        "steps": 4,
+        "width": 1440,
+        "height": 800,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.shore/slabs2-s101.png",
+          "sha256": "14342c68ae555ea2dce386bb33b43a57d52ca079daf161b93b5d8af747d245e7"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 213.71,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "61ed1fcdfdc249eb967b9b1bab838273",
+      "timestamp": "2026-10-05T20:55:58+00:00",
+      "visual_id": "prop.shore-canopy-post",
+      "step": "make-prop",
+      "tool": {
+        "name": "make_prop.py + rembg",
+        "version": "1"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "height": 250.0,
+        "layer": "high-prop",
+        "world_size": [
+          64.7,
+          259.3
+        ],
+        "origin_y": 0.9743
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.shore/canopypost.png",
+          "sha256": "01cc14cc79189f5e223166359602b313e7c47720a2f9aa00e524c9210ef5a7c1"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Shore/canopypost.png",
+          "sha256": "b6c4d701de3298fa5f37c370f8824f236007686048a72103e28fbce10c8a6280"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 111.48,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Prop für die gemalte Scheibe (Schnellpfad, Basismodell vor LoRA)"
+      }
+    },
+    {
+      "id": "71e0f49e0cec464885835e8ebbc7bc71",
+      "timestamp": "2026-10-05T20:56:32+00:00",
+      "visual_id": "prop.shore-lamp",
+      "step": "make-prop",
+      "tool": {
+        "name": "make_prop.py + rembg",
+        "version": "1"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "height": 175.0,
+        "layer": "high-prop",
+        "world_size": [
+          61.3,
+          183.3
+        ],
+        "origin_y": 0.9691
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.shore/lamp.png",
+          "sha256": "eeca90ad4c304ccba8281c09352037bb80867eb517dfe4d4f1c8a3c3d14079b3"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Shore/lamp.png",
+          "sha256": "3fa51864759dcb6d57f5d42ef2a25aa3ff87ce09231c39843ae8692599df40f6"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 34.15,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Prop für die gemalte Scheibe (Schnellpfad, Basismodell vor LoRA)"
+      }
+    },
+    {
+      "id": "8d5f35d6d2a84d8e933d901ba4097f57",
+      "timestamp": "2026-10-05T20:57:05+00:00",
+      "visual_id": "prop.shore-bollard",
+      "step": "make-prop",
+      "tool": {
+        "name": "make_prop.py + rembg",
+        "version": "1"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "height": 42.0,
+        "layer": "high-prop",
+        "world_size": [
+          28.7,
+          48.0
+        ],
+        "origin_y": 0.9306
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.shore/bollard.png",
+          "sha256": "c3622b92f3495feabc2ef3f6fd69706948de5f306af977fb20fdef3eed284f7c"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Shore/bollard.png",
+          "sha256": "e82e0ebd55bf852ab19157ccf34738a642aff10c7d1339326117215ce264cabb"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 32.54,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Prop für die gemalte Scheibe (Schnellpfad, Basismodell vor LoRA)"
+      }
+    },
+    {
+      "id": "928fa031ca6b4749b097bfb9b0946f5e",
+      "timestamp": "2026-10-05T20:57:46+00:00",
+      "visual_id": "environment.shore",
+      "step": "platform-texture",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "seen straight down from high above, orthographic top-down game floor, the whole image is the wet concrete surface of an old railway platform made of many small rectangular concrete slabs laid in staggered rows, about sixteen slabs across the width of the image, shallow puddles reflecting a cold sky, salt crusts, tar lines along the joints, a few cracks and moss spots, calm and even, mid-dark slate grey with a hint of blue, no objects, no edges, no perspective, hand-painted gouache illustration with visible brush strokes, painterly texture, single key light from the upper left, no text",
+      "seed": 113,
+      "parameters": {
+        "steps": 4,
+        "width": 1440,
+        "height": 800,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.shore/slabs2-s113.png",
+          "sha256": "08039a3750d0e6213e7d9f9402b024cc78fa9b6b7e044a5843f1bc510c2b93ce"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 208.41,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "e68f330bc0a3445c885252207d96a1ff",
+      "timestamp": "2026-10-05T20:58:10+00:00",
+      "visual_id": "environment.shore",
+      "step": "place-environment",
+      "tool": {
+        "name": "place_environment.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "world": [
+          1800,
+          1000
+        ],
+        "output": [
+          2700,
+          1500
+        ],
+        "tiles": [
+          2,
+          1
+        ],
+        "layer": "ground",
+        "origin": [
+          0.0,
+          0.0
+        ],
+        "crop": null,
+        "mute_reds": null,
+        "target_median": 70.0
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.shore/plate-composed.png",
+          "sha256": "fe90f88ade193136a60ec75a433039508b2ac69b33f8b4cbe598976a51c55735"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Shore/plate_c0r0.png",
+          "sha256": "cb9dd65074a1b7726e65a9183b5625866c5e9faf33c6649a131ead81d2b604de"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Shore/plate_c1r0.png",
+          "sha256": "49cd6538f998cd67677fb99be6119424904d4979d3e48adc5e5648a3cac3ecda"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.41,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Bodenplatte für das Spiel aufbereitet"
       }
     }
   ]

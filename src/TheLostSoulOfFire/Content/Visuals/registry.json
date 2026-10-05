@@ -524,13 +524,13 @@
       "id": "prop.arena-lockers",
       "kind": "prop",
       "palette": "world",
-      "worldSize": [139.3, 124.0],
-      "origin": [0.5, 0.8683],
+      "worldSize": [174.0, 154.0],
+      "origin": [0.5, 0.9264],
       "layer": "high-prop",
       "clips": {
         "default": {
           "path": "Textures/Props/Arena/lockers",
-          "frameSize": [209, 186],
+          "frameSize": [261, 231],
           "frames": 1,
           "fps": 1,
           "loop": true
@@ -541,13 +541,13 @@
       "id": "prop.arena-workbench",
       "kind": "prop",
       "palette": "world",
-      "worldSize": [82.7, 75.3],
-      "origin": [0.5, 0.8584],
+      "worldSize": [107.3, 98.0],
+      "origin": [0.5, 0.8639],
       "layer": "high-prop",
       "clips": {
         "default": {
           "path": "Textures/Props/Arena/workbench",
-          "frameSize": [124, 113],
+          "frameSize": [161, 147],
           "frames": 1,
           "fps": 1,
           "loop": true
@@ -558,13 +558,13 @@
       "id": "prop.arena-toolrack",
       "kind": "prop",
       "palette": "world",
-      "worldSize": [134.0, 126.0],
-      "origin": [0.5, 0.8942],
+      "worldSize": [162.7, 152.7],
+      "origin": [0.5, 0.9345],
       "layer": "high-prop",
       "clips": {
         "default": {
           "path": "Textures/Props/Arena/toolrack",
-          "frameSize": [201, 189],
+          "frameSize": [244, 229],
           "frames": 1,
           "fps": 1,
           "loop": true
@@ -575,13 +575,13 @@
       "id": "prop.arena-slag",
       "kind": "prop",
       "palette": "world",
-      "worldSize": [68.7, 49.3],
-      "origin": [0.5, 0.8649],
+      "worldSize": [94.0, 66.0],
+      "origin": [0.5, 0.9192],
       "layer": "low-prop",
       "clips": {
         "default": {
           "path": "Textures/Props/Arena/slag",
-          "frameSize": [103, 74],
+          "frameSize": [141, 99],
           "frames": 1,
           "fps": 1,
           "loop": true
@@ -592,13 +592,13 @@
       "id": "prop.arena-chains",
       "kind": "prop",
       "palette": "world",
-      "worldSize": [45.3, 36.7],
-      "origin": [0.5, 0.8909],
+      "worldSize": [64.0, 50.7],
+      "origin": [0.5, 0.9211],
       "layer": "low-prop",
       "clips": {
         "default": {
           "path": "Textures/Props/Arena/chains",
-          "frameSize": [68, 55],
+          "frameSize": [96, 76],
           "frames": 1,
           "fps": 1,
           "loop": true
@@ -609,16 +609,168 @@
       "id": "prop.arena-gate",
       "kind": "prop",
       "palette": "world",
-      "worldSize": [246.0, 132.7],
-      "origin": [0.5, 0.9246],
+      "worldSize": [306.0, 164.7],
+      "origin": [0.5, 0.9271],
       "layer": "occluder",
       "clips": {
         "default": {
           "path": "Textures/Props/Arena/gate",
-          "frameSize": [369, 199],
+          "frameSize": [459, 247],
           "frames": 1,
           "fps": 1,
           "loop": true
+        }
+      }
+    },
+    {
+      "id": "grade.arena",
+      "kind": "grade",
+      "palette": "world",
+      "worldSize": [1024, 32],
+      "origin": [0, 0],
+      "clips": {
+        "default": {
+          "path": "Textures/Grading/lut_arena",
+          "frameSize": [1024, 32],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "grade.shore",
+      "kind": "grade",
+      "palette": "world",
+      "worldSize": [1024, 32],
+      "origin": [0, 0],
+      "clips": {
+        "default": {
+          "path": "Textures/Grading/lut_shore",
+          "frameSize": [1024, 32],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "prop.shore-bench",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [115.3, 90.7],
+      "origin": [0.5, 0.7132],
+      "layer": "high-prop",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Shore/bench",
+          "frameSize": [173, 136],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "prop.shore-suitcase",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [38.0, 45.3],
+      "origin": [0.5, 0.8971],
+      "layer": "high-prop",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Shore/suitcase",
+          "frameSize": [57, 68],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "prop.shore-board",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [186.7, 205.3],
+      "origin": [0.5, 0.9383],
+      "layer": "occluder",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Shore/board",
+          "frameSize": [280, 308],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "prop.shore-canopy-post",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [64.7, 259.3],
+      "origin": [0.5, 0.9743],
+      "layer": "high-prop",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Shore/canopypost",
+          "frameSize": [97, 389],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "prop.shore-lamp",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [61.3, 183.3],
+      "origin": [0.5, 0.9691],
+      "layer": "high-prop",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Shore/lamp",
+          "frameSize": [92, 275],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "prop.shore-bollard",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [28.7, 48.0],
+      "origin": [0.5, 0.9306],
+      "layer": "high-prop",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Shore/bollard",
+          "frameSize": [43, 72],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "environment.shore",
+      "kind": "environment",
+      "palette": "world",
+      "worldSize": [1800, 1000],
+      "origin": [0.0, 0.0],
+      "layer": "ground",
+      "clips": {
+        "default": {
+          "path": "Textures/Environment/Shore/plate_{tile}",
+          "frameSize": [1350, 1500],
+          "frames": 1,
+          "fps": 1,
+          "loop": true,
+          "tiles": [2, 1]
         }
       }
     }

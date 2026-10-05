@@ -35,10 +35,16 @@ public sealed class Arena
         new(VisualIds.ArenaPillar, new Vector2(1748f, 620f), new Vector2(95f, 330f), SceneLayer.HighProp),
         new(VisualIds.ArenaPillar, new Vector2(1748f, 910f), new Vector2(95f, 330f), SceneLayer.HighProp),
         new(VisualIds.ArenaToolRack, new Vector2(330f, 112f), new Vector2(190f, 180f), SceneLayer.HighProp),
+        new(VisualIds.ArenaToolRack, new Vector2(1010f, 110f), new Vector2(190f, 180f), SceneLayer.HighProp),
+        new(VisualIds.ArenaWorkbench, new Vector2(170f, 150f), new Vector2(190f, 150f), SceneLayer.HighProp),
         new(VisualIds.ArenaWorkbench, new Vector2(1260f, 128f), new Vector2(190f, 150f), SceneLayer.HighProp),
-        new(VisualIds.ArenaLockers, new Vector2(1545f, 120f), new Vector2(210f, 210f), SceneLayer.HighProp),
-        new(VisualIds.ArenaChains, new Vector2(400f, 862f), new Vector2(150f, 100f), SceneLayer.LowProp),
-        new(VisualIds.ArenaSlag, new Vector2(1430f, 870f), new Vector2(160f, 110f), SceneLayer.LowProp),
+        new(VisualIds.ArenaLockers, new Vector2(1500f, 120f), new Vector2(210f, 210f), SceneLayer.HighProp),
+        new(VisualIds.ArenaLockers, new Vector2(1660f, 122f), new Vector2(210f, 210f), SceneLayer.HighProp),
+        new(VisualIds.ArenaChains, new Vector2(400f, 868f), new Vector2(150f, 100f), SceneLayer.LowProp),
+        new(VisualIds.ArenaChains, new Vector2(1640f, 470f), new Vector2(150f, 100f), SceneLayer.LowProp),
+        new(VisualIds.ArenaSlag, new Vector2(1430f, 876f), new Vector2(160f, 110f), SceneLayer.LowProp),
+        new(VisualIds.ArenaSlag, new Vector2(190f, 420f), new Vector2(160f, 110f), SceneLayer.LowProp),
+        new(VisualIds.ArenaSlag, new Vector2(1660f, 760f), new Vector2(160f, 110f), SceneLayer.LowProp),
         new(VisualIds.ArenaGate, new Vector2(900f, 1000f), new Vector2(300f, 170f), SceneLayer.Occluder)
     ];
 

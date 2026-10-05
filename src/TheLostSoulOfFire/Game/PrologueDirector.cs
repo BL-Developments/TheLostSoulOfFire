@@ -1,4 +1,7 @@
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using TheLostSoulOfFire.Rendering;
+using TheLostSoulOfFire.Rendering.Visuals;
 
 namespace TheLostSoulOfFire.Game;
 
@@ -50,6 +53,26 @@ public sealed class PrologueDirector
     public static readonly Vector2 SoulTrace = new(805f, 520f);
     public static readonly Vector2 SearchExitBeacon = new(1370f, 545f);
     public static readonly Vector2 VehicleDock = new(1510f, 600f);
+
+    /// <summary>
+    /// Props of the shore (docs/current/regions/prologue.md): the bench of the waiting and the
+    /// suitcase at the trace, canopy posts along the north kerb, a cold lamp at the exit,
+    /// bollards on the south kerb and the tilted departure board rising from the water in front
+    /// of the platform. Visual only; none of them collide.
+    /// </summary>
+    public static IReadOnlyList<PropPlacement> ShoreProps { get; } =
+    [
+        new(VisualIds.ShoreBench, new Vector2(790f, 478f), new Vector2(170f, 90f), SceneLayer.HighProp),
+        new(VisualIds.ShoreBench, new Vector2(480f, 212f), new Vector2(170f, 90f), SceneLayer.HighProp),
+        new(VisualIds.ShoreSuitcase, new Vector2(872f, 596f), new Vector2(50f, 45f), SceneLayer.HighProp),
+        new(VisualIds.ShoreCanopyPost, new Vector2(330f, 262f), new Vector2(40f, 240f), SceneLayer.HighProp),
+        new(VisualIds.ShoreCanopyPost, new Vector2(720f, 262f), new Vector2(40f, 240f), SceneLayer.HighProp),
+        new(VisualIds.ShoreCanopyPost, new Vector2(1110f, 262f), new Vector2(40f, 240f), SceneLayer.HighProp),
+        new(VisualIds.ShoreLamp, new Vector2(1600f, 455f), new Vector2(50f, 220f), SceneLayer.HighProp),
+        new(VisualIds.ShoreBollard, new Vector2(260f, 878f), new Vector2(45f, 45f), SceneLayer.HighProp),
+        new(VisualIds.ShoreBollard, new Vector2(1500f, 878f), new Vector2(45f, 45f), SceneLayer.HighProp),
+        new(VisualIds.ShoreBoard, new Vector2(1180f, 992f), new Vector2(180f, 200f), SceneLayer.Occluder)
+    ];
 
     public PrologueStage Stage { get; private set; } = PrologueStage.Dormant;
     public PrologueSector Sector => Stage switch
