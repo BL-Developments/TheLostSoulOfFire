@@ -15,7 +15,9 @@ public enum VisualKind
     Effect,
     Environment,
     Prop,
-    Sprite
+    Sprite,
+    /// <summary>A colour lookup table for scene grading (32³ strip, 1024×32).</summary>
+    Grade
 }
 
 public enum VisualPalette
@@ -301,7 +303,8 @@ public sealed partial class VisualRegistry
             ["effect"] = VisualKind.Effect,
             ["environment"] = VisualKind.Environment,
             ["prop"] = VisualKind.Prop,
-            ["sprite"] = VisualKind.Sprite
+            ["sprite"] = VisualKind.Sprite,
+            ["grade"] = VisualKind.Grade
         };
 
         private static readonly Dictionary<string, VisualPalette> PaletteNames = new()

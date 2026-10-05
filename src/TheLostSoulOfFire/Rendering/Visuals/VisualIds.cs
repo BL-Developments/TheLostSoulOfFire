@@ -36,6 +36,12 @@ public static class VisualIds
     public const string ResonanceActivate = "fx.resonance-activate";
     public const string DeathFlameLoop = "fx.death-flame-loop";
 
+    /// <summary>Scene grading: one LUT per area plus Soul Sense; areas without a LUT use the neutral one.</summary>
+    public const string GradeNeutral = "grade.neutral";
+    public const string GradeSoulSense = "grade.soul-sense";
+    public const string GradeShore = "grade.shore";
+    public const string GradeArena = "grade.arena";
+
     /// <summary>All IDs declared above, for tests and tooling.</summary>
     public static IReadOnlyList<string> All { get; } = typeof(VisualIds)
         .GetFields(BindingFlags.Public | BindingFlags.Static)

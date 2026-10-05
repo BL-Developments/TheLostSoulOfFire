@@ -202,7 +202,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
             Console.WriteLine(_developerStart.Describe());
             _world.ApplyDeveloperStart(_developerStart, VirtualViewport);
         }
-        _soulfireRenderer = new SoulfireRenderer(GraphicsDevice);
+        _soulfireRenderer = new SoulfireRenderer(GraphicsDevice, Content);
         _resolution.Update(GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight);
     }
 

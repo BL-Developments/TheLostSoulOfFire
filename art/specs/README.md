@@ -41,7 +41,7 @@ Wie die Figur als schwarzer Schattenriss lesbar bleibt.
 
 | Feld | Inhalt |
 | --- | --- |
-| `Art` | `character`, `effect`, `environment`, `prop` oder `sprite`; gleich der Art in der Registry |
+| `Art` | `character`, `effect`, `environment`, `prop`, `sprite` oder `grade` (Farb-LUT für das Szenengrading); gleich der Art in der Registry |
 | `Status` | `dummy`, `konzept`, `freigegeben` oder `im-spiel` (siehe unten) |
 | `Stil` | `ludo` (Grafik aus der Ludo-Runde vom 29.08.2026, muss neu gemacht werden) oder `hausstil` (aus dem trainierten Hausstil) |
 | `Weltgröße` | Breite × Höhe in Weltpixeln, wie in der Registry (`worldSize`) |

@@ -95,6 +95,14 @@ public sealed partial class GameWorld : IDisposable
     /// <summary>Pause, character or dev menu is open; the world is frozen under each of them.</summary>
     private bool IsGamePaused => _pauseMenu.IsOpen || _characterMenu.IsOpen || _devMenu.IsOpen;
     private bool IsCombatPhase => _phase is GamePhase.Arena or GamePhase.Prologue;
+
+    /// <summary>The colour grade of the area being shown; areas without their own LUT fall back to neutral.</summary>
+    private string CurrentGradeId => _phase switch
+    {
+        GamePhase.Prologue when _prologue.Sector == PrologueSector.Emergence => VisualIds.GradeShore,
+        GamePhase.Arena => VisualIds.GradeArena,
+        _ => VisualIds.GradeNeutral
+    };
     private Rectangle ActiveCombatBounds => _phase == GamePhase.Prologue ? _prologue.MovementBounds : _arena.CombatBounds;
     private Rectangle ActiveWorldBounds => _phase == GamePhase.Prologue ? PrologueDirector.WorldBounds : _arena.Bounds;
     private ArenaLoopState CameraLoopState => _phase == GamePhase.Prologue && _loopState == ArenaLoopState.Complete
@@ -742,7 +750,13 @@ public sealed partial class GameWorld : IDisposable
     {
         renderer.BeginScene(viewport);
         DrawScene(batch, pixel, viewport);
-        renderer.PresentScene(batch, rootTarget, viewport, _soulSensePresentation.WorldSuppression);
+        renderer.PresentScene(
+            batch,
+            rootTarget,
+            viewport,
+            _soulSensePresentation.WorldSuppression,
+            _art.GetSpriteTexture(CurrentGradeId) ?? _art.GetSpriteTexture(VisualIds.GradeNeutral),
+            _art.GetSpriteTexture(VisualIds.GradeSoulSense));
         DrawSoulfireLighting(batch, renderer, viewport);
         _soulSensePresentation.DrawSoulLayer(
             batch,

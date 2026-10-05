@@ -1512,3 +1512,32 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/Weapons/soul_cannon_256.png
+
+#begin Effects/SceneGrade.fx
+/importer:ShadowDuskEffectImporter
+/processor:ShadowDuskEffectProcessor
+/build:Effects/SceneGrade.fx
+
+#begin Textures/Grading/lut_neutral.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=False
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/Grading/lut_neutral.png
+
+#begin Textures/Grading/lut_soul_sense.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=False
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/Grading/lut_soul_sense.png

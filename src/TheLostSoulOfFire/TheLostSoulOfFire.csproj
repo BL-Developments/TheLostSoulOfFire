@@ -9,6 +9,9 @@
     <TieredCompilation>false</TieredCompilation>
   </PropertyGroup>
   <PropertyGroup>
+    <MonoGameMGCBAdditionalArguments>/quiet /reference:&quot;$(PkgShadowDusk_MgcbPlugin)/tools/net8.0/any/ShadowDusk.MgcbPlugin.dll&quot;</MonoGameMGCBAdditionalArguments>
+  </PropertyGroup>
+  <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
@@ -31,5 +34,7 @@
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.*" />
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.*" />
     <PackageReference Include="MonoGame.Extended" Version="6.0.0" />
+    <!-- Builds .fx shaders inside MGCB on Windows, macOS and Linux without Wine (build-time only). -->
+    <PackageReference Include="ShadowDusk.MgcbPlugin" Version="0.20.0" PrivateAssets="all" GeneratePathProperty="true" />
   </ItemGroup>
 </Project>

@@ -396,6 +396,38 @@
           "loop": true
         }
       }
+    },
+    {
+      "id": "grade.neutral",
+      "kind": "grade",
+      "palette": "world",
+      "worldSize": [1024, 32],
+      "origin": [0, 0],
+      "clips": {
+        "default": {
+          "path": "Textures/Grading/lut_neutral",
+          "frameSize": [1024, 32],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "grade.soul-sense",
+      "kind": "grade",
+      "palette": "world",
+      "worldSize": [1024, 32],
+      "origin": [0, 0],
+      "clips": {
+        "default": {
+          "path": "Textures/Grading/lut_soul_sense",
+          "frameSize": [1024, 32],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
     }
   ]
 }

@@ -1,5 +1,6 @@
 using System;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using TheLostSoulOfFire.Core;
 using TheLostSoulOfFire.Game;
@@ -50,6 +51,7 @@ public sealed class SoulfireRenderer : IDisposable
 {
     private readonly GraphicsDevice _graphicsDevice;
     private readonly BlendState _lightBlend;
+    private readonly Effect? _sceneGrade;
     private RenderTarget2D _sceneTarget;
     private Texture2D _solidTexture;
     private Texture2D _glowTexture;
@@ -57,9 +59,10 @@ public sealed class SoulfireRenderer : IDisposable
     private int _targetWidth;
     private int _targetHeight;
 
-    public SoulfireRenderer(GraphicsDevice graphicsDevice)
+    public SoulfireRenderer(GraphicsDevice graphicsDevice, ContentManager? content = null)
     {
         _graphicsDevice = graphicsDevice;
+        _sceneGrade = TryLoadEffect(content, "Effects/SceneGrade");
         _lightBlend = new BlendState
         {
             ColorSourceBlend = Blend.One,
@@ -86,7 +89,18 @@ public sealed class SoulfireRenderer : IDisposable
         _graphicsDevice.Clear(GameBalance.VoidColor);
     }
 
-    public void PresentScene(SpriteBatch batch, RenderTarget2D? rootTarget, Viewport viewport, float soulSenseWorldSuppression = 0f)
+    /// <summary>
+    /// Composites the scene target with the area grade (<paramref name="areaLut"/>) blended toward
+    /// the Soul Sense grade by <paramref name="soulSenseWorldSuppression"/>. HUD and menus are drawn
+    /// afterwards and stay ungraded. Without LUTs or shader the scene is drawn as before.
+    /// </summary>
+    public void PresentScene(
+        SpriteBatch batch,
+        RenderTarget2D? rootTarget,
+        Viewport viewport,
+        float soulSenseWorldSuppression = 0f,
+        Texture2D? areaLut = null,
+        Texture2D? soulSenseLut = null)
     {
         _graphicsDevice.SetRenderTarget(rootTarget);
         _graphicsDevice.Clear(GameBalance.VoidColor);
@@ -97,7 +111,14 @@ public sealed class SoulfireRenderer : IDisposable
             SoulfireRenderSettings.SceneGrade,
             GameBalance.SoulSenseWorldGrade,
             suppression);
-        batch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp);
+        Effect? grade = _sceneGrade is not null && areaLut is not null ? _sceneGrade : null;
+        if (grade is not null)
+        {
+            grade.Parameters["AreaLut"].SetValue(areaLut);
+            grade.Parameters["SoulSenseLut"].SetValue(soulSenseLut ?? areaLut);
+            grade.Parameters["SoulSense"].SetValue(soulSenseLut is null ? 0f : suppression);
+        }
+        batch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp, effect: grade);
         batch.Draw(_sceneTarget, destination, sceneGrade);
         batch.End();
 
@@ -153,6 +174,24 @@ public sealed class SoulfireRenderer : IDisposable
             RenderResolution.OutputBounds,
             Color.White * MathHelper.Clamp(opacity, 0f, 1f));
         batch.End();
+    }
+
+    private static Effect? TryLoadEffect(ContentManager? content, string path)
+    {
+        if (content is null)
+        {
+            return null;
+        }
+
+        try
+        {
+            return content.Load<Effect>(path);
+        }
+        catch (Exception exception) when (exception is ContentLoadException or NoSuitableGraphicsDeviceException or InvalidOperationException)
+        {
+            Console.Error.WriteLine($"Shader {path} nicht geladen: {exception.Message}");
+            return null;
+        }
     }
 
     public void Dispose()

@@ -23,7 +23,7 @@
 ## 4. Shader und gemalte Szene
 
 - [ ] 4.1 `ShadowDusk.MgcbPlugin` in `Content.mgcb` einbinden und einen Test-Shader bauen. Prüfen: `dotnet build` auf dem Mac ohne Wine und CI auf Ubuntu und Windows grün.
-- [ ] 4.2 `SceneGrade.fx` in `SoulfireRenderer.PresentScene`: LUT pro Bereich (Ufer, Arena) und Soul-Sense-LUT, überblendet über die bisherige Soul-Sense-Stärke. HUD und Menüs bleiben ungegradet. Neutral-LUT als Ausgangswert für Bereiche ohne eigene LUT. Prüfen: Mit Neutral-LUT gleicht das Bild dem bisherigen; Aufnahmen mit und ohne Soul Sense.
+- [x] 4.2 `SceneGrade.fx` in `SoulfireRenderer.PresentScene`: LUT pro Bereich (Ufer, Arena) und Soul-Sense-LUT, überblendet über die bisherige Soul-Sense-Stärke. HUD und Menüs bleiben ungegradet. Neutral-LUT als Ausgangswert für Bereiche ohne eigene LUT. Prüfen: Mit Neutral-LUT gleicht das Bild dem bisherigen; Aufnahmen mit und ohne Soul Sense.
 - [ ] 4.3 `SpriteLit.fx`: Beleuchtungsdurchgang für Figuren mit Normal-Map, Schlüssellicht oben links und bis zu acht Soulfire-Punktlichtern aus den vorhandenen Lichtquellen. Figuren ohne Normal-Map unverändert. Prüfen: Testfigur mit flacher und mit gekippter Normal-Map neben einer Death Flame.
 - [ ] 4.4 `Dissolve.fx` und Auflösung besiegter Gegner mit Registry-Eintrag `dissolve`, ohne Einfluss auf Kollision, Welle, Prologablauf und Seelen. Prüfen: `ArenaWaveTests` und `PrologueFlowTests` unverändert grün; Aufnahme der Auflösung.
 - [ ] 4.5 `DeathFlame.fx`: Flow-Textur plus Death-Flame-Verlaufstabelle für Spurbänder und Flipbooks. Prüfen: Testspur in der Arena und Farbmessung gegen die Verlaufstabelle.

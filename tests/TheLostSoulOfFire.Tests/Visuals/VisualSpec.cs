@@ -26,7 +26,8 @@ internal sealed partial record VisualSpec(
         ["effect"] = VisualKind.Effect,
         ["environment"] = VisualKind.Environment,
         ["prop"] = VisualKind.Prop,
-        ["sprite"] = VisualKind.Sprite
+        ["sprite"] = VisualKind.Sprite,
+        ["grade"] = VisualKind.Grade
     };
 
     [GeneratedRegex(@"^(?<name>[A-Za-zÄÖÜäöüß]+):[ \t]*(?<value>.*)$")]

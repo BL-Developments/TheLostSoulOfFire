@@ -28,12 +28,13 @@ public sealed class VisualRegistryTests
         $$"""{ "version": 1, "visuals": [ {{string.Join(",", entries)}} ] }""";
 
     [TestMethod]
-    public void CheckedInRegistry_Loads_AndCoversEveryCodeId()
+    public void CheckedInRegistry_Loads()
     {
+        // Code IDs without an entry are allowed while their Visual-Spec is not "im-spiel";
+        // VisualSpecTests enforces that.
         VisualRegistry registry = VisualRegistry.Parse(File.ReadAllText(RepositoryPaths.Registry));
 
-        string[] missing = VisualIds.All.Where(id => !registry.TryGet(id, out _)).ToArray();
-        Assert.AreEqual(0, missing.Length, "Code-IDs ohne Registry-Eintrag: " + string.Join(", ", missing));
+        Assert.IsTrue(registry.TryGet(VisualIds.Player, out _));
     }
 
     [TestMethod]
