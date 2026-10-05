@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       change:
-        description: Name des Changes unter openspec/changes (mehrere durch Leerzeichen getrennt)
+        description: Namen der Changes unter openspec/changes, durch Leerzeichen getrennt, in Archivierungsreihenfolge
         required: true
         type: string
 
@@ -49,13 +49,14 @@ jobs:
           INPUT_CHANGE: ${{ inputs.change }}
         run: |
           # Im PR-Text markiert eine Zeile "OpenSpec-Archive: <name> [<name> ...]"
-          # die Changes, die nach dem Merge archiviert werden sollen.
+          # die Changes, die nach dem Merge archiviert werden sollen. Die
+          # Reihenfolge bleibt erhalten, weil spätere Changes auf früheren aufbauen.
           if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
             changes="$INPUT_CHANGE"
           else
             changes="$(printf '%s\n' "$PR_BODY" | tr -d '\r' \
               | sed -nE 's/^[[:space:]]*OpenSpec-Archive:[[:space:]]*(.*)$/\1/Ip' \
-              | tr -d '`' | tr -s ', \t' '\n' | sed '/^$/d' | sort -u | tr '\n' ' ' || true)"
+              | tr -d '`' | tr -s ', \t' '\n' | sed '/^$/d' | awk '!seen[$0]++' | tr '\n' ' ' || true)"
           fi
           echo "Markierte Changes: ${changes:-keine}"
           {
@@ -64,7 +65,7 @@ jobs:
             echo "EOF_CHANGES"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Archive changes and open follow-up pull requests
+      - name: Archive changes and open a follow-up pull request
         env:
           GH_TOKEN: ${{ secrets.OPENSPEC_ARCHIVE_TOKEN || github.token }}
           CHANGES: ${{ steps.changes.outputs.changes }}
