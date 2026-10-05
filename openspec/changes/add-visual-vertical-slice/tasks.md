@@ -34,7 +34,7 @@
 
 - [x] 5.1 Asset-Prüfungen in `dotnet test` mit StbImageSharp: Datei, Raster, acht Richtungen, Normal-Map-Maße, transparenter Rand, Schachbrett- und Hintergrundmuster, Farbbudget `death-flame`. Mit kleinen Testbildern für jeden Fehlerfall. Prüfen: Jeder Fehlerfall scheitert mit Visual-ID, Datei und Grund; alle aktuellen Ludo-Assets bestehen oder werden korrigiert.
 - [x] 5.2 `--slice-visual-test` nach dem Muster der vorhandenen Bildtests: erst das Ufer, dann die Arena bei Welle 1, mit den Steuerhaken in `GameWorld`, die die Aufnahmen brauchen (Spieler platzieren und ausrichten, Spur mit Soul Sense, Hieb, Dash, Core-Treffer, Hollow-Swipe, Besiegen, Soul Release, Soul Sense, Occluder). Prüfen: Lauf endet mit Exitcode 0 und allen benannten Aufnahmen; ohne Hollow endet er mit Fehler und Aufnahmenamen.
-- [ ] 5.3 `art/production/QUALITY-RUBRIC.md` aus §8, Düsternis-Charta und Stil-Bibel, mit dem Punkt „Bild erzählt die menschliche Geschichte seines Ortes“, sowie die Anleitung für die Agentenbewertung der Bildreihe nach `art/production/reviews/`. Prüfen: Eine Probebewertung der aktuellen Ludo-Arena und des Formen-Ufers liegt vor.
+- [x] 5.3 `art/production/QUALITY-RUBRIC.md` aus §8, Düsternis-Charta und Stil-Bibel, mit dem Punkt „Bild erzählt die menschliche Geschichte seines Ortes“, sowie die Anleitung für die Agentenbewertung der Bildreihe nach `art/production/reviews/`. Prüfen: Eine Probebewertung der aktuellen Ludo-Arena und des Formen-Ufers liegt vor.
 
 ## 6. Produktionsweg
 
