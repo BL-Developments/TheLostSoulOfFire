@@ -10,7 +10,7 @@
 - [x] 2.2 Region-Vertrag Industrial Cathedral in `docs/current/regions/industrial-cathedral.md`: alle 18 Felder, die Arena hinter Tür I als Gold-Standard-Raum, Status `PROPOSED`. Prüfen wie 2.1.
 - [x] 2.3 Figurenblätter in `docs/current/characters/` nach der Lost-Soul-Grammatik (§4): Protagonist, Hollow, Burning und Devourer ausführlich (wer im Leben, Epoche, Kleidung, Gesicht, Haltung, Silhouette, Materialien, Akzentfarbe, was die Figur festhält); Bruder und Vaelor kurz. Status `PROPOSED`. Prüfen: Jedes Blatt beantwortet die Fragen der Lost-Soul-Grammatik und widerspricht weder `CANON-STATUS.md` noch §5b.
 - [x] 2.4 Neue Abschnitte in `VISUAL-ART-DIRECTION.md`, Status `PROPOSED`: Düsternis-Charta (das Diablo-Maß: erlaubt und verboten, Licht und Dunkel, Wertverteilung), Symbolsatz (Death Flame, Wardens, Keeper, je mit Formregel) und Epochenregel für Erinnerungsorte. Prüfen: Jede Regel ist als Ja/Nein an einem Bild prüfbar formuliert.
-- [ ] 2.5 **Freigabe 0:** Owner korrigiert und gibt frei. Danach: freigegebene Teile auf `WORKING CANON` in `CANON-STATUS.md`, Eintrag im `DECISION-LOG`, `REGION-SEEDS.md` verlinkt die Verträge, §5 „wie Diablo“ in `VISUAL-ART-DIRECTION.md` um die Stimmung erweitert. Prüfen: Kein Lore-Dokument der Scheibe trägt noch `PROPOSED`.
+- [x] 2.5 **Freigabe 0:** Owner korrigiert und gibt frei. Danach: freigegebene Teile auf `WORKING CANON` in `CANON-STATUS.md`, Eintrag im `DECISION-LOG`, `REGION-SEEDS.md` verlinkt die Verträge, §5 „wie Diablo“ in `VISUAL-ART-DIRECTION.md` um die Stimmung erweitert. Prüfen: Kein Lore-Dokument der Scheibe trägt noch `PROPOSED`.
 
 ## 3. Visual-Registry
 

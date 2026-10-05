@@ -1,8 +1,8 @@
 # Region-Vertrag: Industrial Cathedral — Die Gießhalle
 
-**Status: PROPOSED** (Entwurf für Freigabe 0 im Change
+**Status: WORKING CANON** (Freigabe 0 am 05.10.2026 im Change
 [`add-visual-vertical-slice`](../../../openspec/changes/add-visual-vertical-slice/tasks.md)).
-Nichts hier ist Canon, bevor der Owner es freigibt. Grundlage:
+Grundlage:
 [WORLD-GRAMMAR.md](../WORLD-GRAMMAR.md) §2–§8, der Seed „Industrial Cathedral“ in
 [REGION-SEEDS.md](../REGION-SEEDS.md), die Arena-Beschreibung „Abandoned Soul
 Furnace“ in `docs/mvp/14_ARENA.md` und die Arena auf `main` (`Arena`,

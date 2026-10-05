@@ -1,6 +1,6 @@
 # Figurenblatt: Vaelor (kurz)
 
-**Status: PROPOSED** (Entwurf für Freigabe 0 im Change
+**Status: WORKING CANON** (Freigabe 0 am 05.10.2026 im Change
 [`add-visual-vertical-slice`](../../../openspec/changes/add-visual-vertical-slice/tasks.md)).
 Kurzblatt, damit Vaelor später zur Welt passt. Grundlage:
 [COSMOLOGY-AND-WARDENS.md](../COSMOLOGY-AND-WARDENS.md) §6–§8,

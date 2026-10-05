@@ -7,6 +7,34 @@ The entries from 2026-09-06 and earlier describe implementation work on the
 `tools/visual-max/`, `SoftShapes.cs`, Team Resonance, Severance) are not
 necessarily present on `main`.
 
+## 2026-10-05 — Freigabe 0: Lore-Grundlage der visuellen Scheibe
+
+Der Owner gibt die Lore-Grundlage des Changes `add-visual-vertical-slice` mit
+Korrekturen frei. Sie ist damit WORKING CANON:
+
+- Region-Verträge [Prolog „Das unvollendete Ufer“](regions/prologue.md)
+  (Seebahnhof, Fähre, Warten) und
+  [Industrial Cathedral „Die Gießhalle“](regions/industrial-cathedral.md).
+  Das Ufer und der Seed „The Drowned Line“ bestehen nebeneinander.
+- Figurenblätter unter [`characters/`](characters/): Protagonist, Hollow,
+  Burning, Devourer, Bruder und Vaelor.
+- Düsternis-Charta, Symbolsatz und Epochenregel in
+  [VISUAL-ART-DIRECTION.md](VISUAL-ART-DIRECTION.md) §10–§12; §5 „wie Diablo“
+  umfasst jetzt auch die Stimmung.
+
+Korrekturen gegenüber dem Entwurf:
+
+- Der Protagonist ist Mitte zwanzig und trägt keine Kapuze. Er trägt **keinen
+  Schal**; der rostrote Schal aus Session 3 (06.09.2026) ist damit ersetzt.
+  Sein einziges persönliches Stück aus dem Leben ist ein **Kompass**; was er
+  bedeutet, bleibt offen (Anchor UNRESOLVED).
+- Der Bruder ist **nicht grün**. Sein Unterscheidungsmerkmal neben Kapuze und
+  Schultermantel ist ein **aufgerolltes Bergungsseil** über der Schulter; er ist
+  der, der Verlorene herauszieht. Woran er festhält, bleibt offen.
+- Ob persönliche Gegenstände wie Kompass oder Seil eine Wirkung im Spiel haben,
+  wird später eigens entschieden. Die Figurenblätter legen nur das Aussehen fest;
+  Spielregeln ändern sich nicht.
+
 ## 2026-10-05 — Produktionsweg der gemalten Grafik
 
 Der Owner gibt den Change

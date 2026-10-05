@@ -1,6 +1,6 @@
 # Figurenblatt: Devourer
 
-**Status: PROPOSED** (Entwurf für Freigabe 0 im Change
+**Status: WORKING CANON** (Freigabe 0 am 05.10.2026 im Change
 [`add-visual-vertical-slice`](../../../openspec/changes/add-visual-vertical-slice/tasks.md)).
 Grundlage: `docs/mvp/12_ENEMY_DEVOURER.md`, die Region-Verträge
 [Prolog](../regions/prologue.md) und [Industrial Cathedral](../regions/industrial-cathedral.md).

@@ -103,6 +103,13 @@ Die Detailabschnitte sind mit den Beschlüssen vom 29.09. und 02.10.2026 abgegli
 - Ein Death-Flame-angetriebenes Warden-Gefährt mit Soul Cannons ist ein bevorzugtes frühes Setpiece, aber noch nicht fest in Ablauf und Mechanik.
 - God of War dient als Referenz für befriedigende zeitkritische Reaktionen und Counter, nicht für Perspektive, Präsentation oder direkte Mechanikkopie.
 
+### Lore-Grundlage der visuellen Scheibe — Freigabe 0 am 05.10.2026
+
+- Das Startgebiet des Prologs ist [„Das unvollendete Ufer“](regions/prologue.md): ein Seebahnhof, von dem eine Abendfähre im Sturm auslief und nie ankam; die Wartenden und die Ertrunkenen halten aneinander fest. Es besteht neben dem Seed „The Drowned Line“.
+- Die Industrial Cathedral ist [„Die Gießhalle“](regions/industrial-cathedral.md): ein Hüttenwerk, dessen letzte Schicht das Ausblasen des Ofens verweigerte und beim Durchbruch starb. Die Arena hinter Tür I ist ihr Gold-Standard-Raum; ob sie das erste Biom wird, bleibt offen (#10).
+- Aussehen von Protagonist, Hollow, Burning, Devourer, Bruder und Vaelor nach den [Figurenblättern](characters/). Der Protagonist trägt einen Kompass als einziges persönliches Stück, keinen Schal; der Bruder trägt ein Bergungsseil. Bedeutung und Wirkung beider Gegenstände bleiben offen.
+- Düsternis-Charta, Symbolsatz (Death Flame, Life Flame, gefasste Warden-Flamme, offener Ring des Keepers) und Epochenregel in [VISUAL-ART-DIRECTION.md](VISUAL-ART-DIRECTION.md) §10–§12.
+
 ## UNRESOLVED
 
 ### Protagonist

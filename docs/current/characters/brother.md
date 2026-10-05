@@ -1,6 +1,6 @@
 # Figurenblatt: Bruder (kurz)
 
-**Status: PROPOSED** (Entwurf für Freigabe 0 im Change
+**Status: WORKING CANON** (Freigabe 0 am 05.10.2026 im Change
 [`add-visual-vertical-slice`](../../../openspec/changes/add-visual-vertical-slice/tasks.md)).
 Kurzblatt, damit der Bruder später zum Protagonisten passt. Grundlage:
 [PROTAGONIST-AND-WARDEN-SOCIETY.md](../PROTAGONIST-AND-WARDEN-SOCIETY.md) §10,
@@ -12,11 +12,13 @@ bleiben UNRESOLVED.
 | --- | --- |
 | Wer | Der ältere Bruder des Protagonisten, bereits Warden, als dieser erwacht. Spieler 2 im Koop. |
 | Epoche | Seine Kleidung gehört zur selben undatierbaren Moderne wie die des Protagonisten, dazu Warden-Stücke aus der Siedlung. |
-| Kleidung | Kapuze und ein weiter Schultermantel über dem Mantel; kein Schal. Das ist der strukturelle Unterschied (§5b), nicht Farbe oder Größe allein. |
+| Kleidung | Kapuze und ein weiter Schultermantel über dem Mantel. Das ist zusammen mit dem Bergungsseil der strukturelle Unterschied (§5b), nicht Farbe oder Größe allein. |
+| Bergungsseil | Sein eigener Gegenstand: ein aufgerolltes Seil quer über der Schulter, mit einem eisernen Haken am Ende. Er ist der, der Verlorene herauszieht. Das Seil verbreitert seine Schulterlinie und bleibt aus jeder Richtung lesbar. |
 | Gesicht | Älter, ruhiger, unter der Kapuze teils im Schatten, aber auf Spielgröße lesbar. |
 | Haltung | Aufrechter und ruhiger als der Protagonist; er hat seinen Tod stärker angenommen. |
-| Silhouette | Spitze Kapuze und breiter Schultermantel; aus jeder Richtung vom Protagonisten unterscheidbar, auch als Schattenriss. |
+| Silhouette | Spitze Kapuze, breiter Schultermantel und die Seilrolle über der Schulter; aus jeder Richtung vom Protagonisten unterscheidbar, auch als Schattenriss. |
 | Waffen | Dieselben Waffen wie der Protagonist (keine zweite Klasse); Form und Tragweise dürfen abweichen. |
-| Akzentfarbe | Vorschlag: ein verblasstes Patina-Grün an einer Warden-Spange. Offen für den Owner. |
+| Akzentfarbe | Kobaltblau: die gefärbte Markierungsschnur, die das Seil zusammenhält. Nicht Violett, nicht Orange oder Gelb, nicht Weiß, nicht Grün und klar anders als das Karminrot des Protagonisten. |
 | Death Flame | Ruhiger und gleichmäßiger als beim Protagonisten: Er beherrscht sie länger. |
-| Was die Figur festhält | Offen. Möglich ist, dass er an seinem Bruder festhält; das darf nicht ohne Owner-Entscheidung festgelegt werden. |
+| Was die Figur festhält | Offen. |
+| Wirkung des Gegenstands | Offen, eigene Entscheidung. Dieses Blatt legt nur das Aussehen fest. |

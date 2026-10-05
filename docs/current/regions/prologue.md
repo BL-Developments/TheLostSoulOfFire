@@ -1,8 +1,8 @@
 # Region-Vertrag: Prolog — Das unvollendete Ufer
 
-**Status: PROPOSED** (Entwurf für Freigabe 0 im Change
+**Status: WORKING CANON** (Freigabe 0 am 05.10.2026 im Change
 [`add-visual-vertical-slice`](../../../openspec/changes/add-visual-vertical-slice/tasks.md)).
-Nichts hier ist Canon, bevor der Owner es freigibt. Grundlage:
+Grundlage:
 [WORLD-GRAMMAR.md](../WORLD-GRAMMAR.md) §2–§8, [REGION-SEEDS.md](../REGION-SEEDS.md)
 (Prolog), [STORY-OPENING.md](../STORY-OPENING.md) und der Prolog auf `main`
 (`PrologueDirector`, `PrologueEnvironment`).
@@ -182,7 +182,7 @@ Anzeige und Blickachse nach Osten bleiben.
 | Ist der menschliche Ursprung ohne Lore-Text erkennbar? | Ja, wenn Bahnsteigkante, Bank, Koffer und Fallblattanzeige als Gruppe lesbar bleiben. Die Stil-Bibel sperrt diese vier Elemente als Pflicht-Props des Ufers. |
 | Tragen Ort, Gegner, Hazard und Boss dasselbe Thema? | Ja: Warten. Der Hollow greift, der Burning rennt zu spät, der Devourer hält fest, die Gezeiten steigen mit dem Warten, die Fahrdienstleiterin hält aus Mitgefühl alle fest. |
 | Echte emotionale Widersprüchlichkeit statt Bösewicht? | Ja: Treue zu den Verlorenen gegen das eigene Weitergehen. Niemand ist schuld; selbst die Abfahrt im Sturm geschah, um Fahrgästen eine Nacht im Bahnhof zu ersparen. |
-| Unterscheidet sich die Region in Raumgefühl, Material und Bewegung? | Ja: offen, horizontal, nass und leise, mit Himmel und Wasser statt Decke. Gegenüber dem Seed „The Drowned Line“ fehlen Untergrund, Masse und Panik; hier wartet eine kleine Gemeinschaft, dort flieht eine Großstadt. Der Owner sollte bei Freigabe 0 bestätigen, dass beide nebeneinander bestehen sollen. |
+| Unterscheidet sich die Region in Raumgefühl, Material und Bewegung? | Ja: offen, horizontal, nass und leise, mit Himmel und Wasser statt Decke. Gegenüber dem Seed „The Drowned Line“ fehlen Untergrund, Masse und Panik; hier wartet eine kleine Gemeinschaft, dort flieht eine Großstadt. Beide bestehen nebeneinander (Freigabe 0). |
 | Bleiben Death Flame und Life Flame konsistent? | Ja: Violett nur an Warden-Marken, Suchfeuern, Seelen und Kampf; kein Orange, auch keine warmen Lampen. |
 | Gibt es einen Release-Moment statt eines Siegesmoments? | Ja: die aufgezogene Zeile und die leere Bank; im Prolog der Scheibe der Release des ersten Hollow. |
 | Verändert die Region das Verständnis des Protagonisten? | Ja: Er erkennt sein eigenes „Ich kann nicht gehen“ in den Wartenden und erfährt, dass jemand nach ihm sucht. |
@@ -192,4 +192,3 @@ Anzeige und Blickachse nach Osten bleiben.
 - Arbeitsname „Das unvollendete Ufer“ für das ganze Startgebiet oder nur für Abschnitt I.
 - Ob die Fahrdienstleiterin beim Wiederbesuch Boss, Begegnung ohne Kampf oder beides ist.
 - Ob Ertrunkene der Fähre als eigene Gegnervariante gestaltet werden oder die drei bestehenden Typen bleiben.
-- Abgrenzung zu „The Drowned Line“ (siehe §8).

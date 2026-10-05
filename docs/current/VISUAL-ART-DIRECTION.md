@@ -85,7 +85,12 @@ Für die großen Death-Layer-Karten:
 - Aussichtspunkte, die spätere Wege und das Warden-Gefährt zeigen können;
 - wiederkehrende visuelle Marker für Warden-Sicherheit und Lost-Soul-Gefahr.
 
-„Wie Diablo“ meint größere navigierbare Flächen und Reisegefühl, nicht Loot-Überladung oder optische Nachahmung.
+„Wie Diablo“ meint zweierlei:
+
+- **Struktur:** größere navigierbare Flächen und Reisegefühl, nicht Loot-Überladung oder optische Nachahmung.
+- **Stimmung:** eine düstere Welt aus Dunkelheit mit Lichtinseln, Verfall und sakralen Ruinen, deren Bedrohung aus Größe und Stille kommt. Das Grauen entsteht aus Verlust, nicht aus Ekel: kein Blut, kein Gore, kein Körperhorror. Das genaue Maß, als Ja/Nein-Fragen an ein Bild, steht in der [Düsternis-Charta](#10-düsternis-charta--working-canon).
+
+In Prompts und Stilbeschreibungen wird Diablo nicht genannt (§2); dort stehen die Eigenschaften.
 
 ## 5a. Bildsprache — gültig seit 02.10.2026
 
@@ -154,9 +159,9 @@ Eine Szene besteht den visuellen Anspruch, wenn:
 
 Bastion bleibt die primäre Stilreferenz. Children of Morta ergänzt Raumtiefe und Lesbarkeit. Soulfire Gothic bleibt die kreative Identität.
 
-## 10. Düsternis-Charta — PROPOSED
+## 10. Düsternis-Charta — WORKING CANON
 
-> Entwurf für Freigabe 0 im Change `add-visual-vertical-slice`. Intern heißt
+> Freigegeben am 05.10.2026 (Freigabe 0, Change `add-visual-vertical-slice`). Intern heißt
 > dieses Maß „das Diablo-Maß“; in Prompts und Stilbeschreibungen wird kein
 > Spiel genannt (§2).
 
@@ -205,9 +210,9 @@ bis 219, Stufe 7 darüber.
 | W5 | Hebt sich jede Figur an ihrer Kontur um mindestens eine Stufe vom Boden dahinter ab? | Ja |
 | W6 | Gibt es innerhalb der Kampffläche eine Fläche mit Luminanz unter 8, die größer ist als eine Spielerfigur? | Nein |
 
-## 11. Symbolsatz — PROPOSED
+## 11. Symbolsatz — WORKING CANON
 
-> Entwurf für Freigabe 0 im Change `add-visual-vertical-slice`.
+> Freigegeben am 05.10.2026 (Freigabe 0, Change `add-visual-vertical-slice`).
 
 Wenige feste Zeichen mit festen Formregeln. Ein Zeichen bedeutet immer dasselbe
 und erscheint nie als bloßes Ornament.
@@ -258,9 +263,9 @@ aber die man nicht überschreiten kann.
 | S13 | Ist der offene Ring gefüllt, leuchtend oder enthält er etwas? | Nein |
 | S14 | Erscheint der offene Ring außerhalb eines Warden-Orts oder mehr als einmal im Bild? | Nein |
 
-## 12. Epochenregel für Erinnerungsorte — PROPOSED
+## 12. Epochenregel für Erinnerungsorte — WORKING CANON
 
-> Entwurf für Freigabe 0 im Change `add-visual-vertical-slice`.
+> Freigegeben am 05.10.2026 (Freigabe 0, Change `add-visual-vertical-slice`).
 
 Erinnerungsorte entstehen aus menschlicher Geschichte von der
 Industrialisierung bis zur Klimazukunft der Erde. Jede Region hat eine
