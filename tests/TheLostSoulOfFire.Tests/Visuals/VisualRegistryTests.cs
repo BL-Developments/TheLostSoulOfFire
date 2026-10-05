@@ -69,6 +69,8 @@ public sealed class VisualRegistryTests
     [DataRow("\"cycleDistance\": 180", "\"cycleDistance\": 0", "clips.move.cycleDistance")]
     [DataRow("\"fps\": 8", "\"fps\": \"fast\"", "clips.idle.fps")]
     [DataRow("\"palette\": \"world\"", "\"palette\": \"orange\"", "palette")]
+    [DataRow("\"palette\": \"world\"", "\"palette\": \"world\", \"pixelsPerUnit\": 0", "pixelsPerUnit")]
+    [DataRow("\"frames\": 9, \"fps\": 8", "\"frames\": 9, \"origin\": [0.5, 1.4], \"fps\": 8", "clips.idle.origin")]
     public void InvalidEntry_NamesIdAndField(string valid, string broken, string field)
     {
         string json = Registry(ValidEntry.Replace(valid, broken));
@@ -77,6 +79,25 @@ public sealed class VisualRegistryTests
 
         StringAssert.Contains(exception.Message, "'enemy.test'");
         StringAssert.Contains(exception.Message, $"Feld '{field}'");
+    }
+
+    [TestMethod]
+    public void RenderedFigure_KeepsOnePixelScale_AndAnOriginPerClip()
+    {
+        // A scythe sweep is cropped wider than standing; both clips share the scale but not the frame.
+        VisualRegistry registry = VisualRegistry.Parse(Registry("""
+            { "id": "player", "kind": "character", "palette": "world", "worldSize": [100, 100], "pixelsPerUnit": 1.5,
+              "clips": {
+                "idle": { "path": "P/idle/{dir}", "frameSize": [252, 213], "frames": 12, "fps": 8, "loop": true, "origin": [0.5, 0.9] },
+                "swing1": { "path": "P/swing1/{dir}", "frameSize": [308, 195], "frames": 7, "fps": 12, "loop": false, "origin": [0.5, 0.856] },
+                "move": { "path": "P/move/{dir}", "frameSize": [198, 248], "frames": 12, "fps": 12, "loop": true } } }
+            """));
+
+        VisualEntry player = registry.Entries.Single();
+        Assert.AreEqual(1.5f, player.PixelsPerUnit!.Value, 0.0001f);
+        Assert.AreEqual(new Vector2(0.5f, 0.9f), player.Clips["idle"].Origin);
+        Assert.AreEqual(new Vector2(0.5f, 0.856f), player.Clips["swing1"].Origin);
+        Assert.IsNull(player.Clips["move"].Origin, "without its own origin a clip uses the entry's");
     }
 
     [TestMethod]

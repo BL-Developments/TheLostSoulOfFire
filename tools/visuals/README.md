@@ -64,7 +64,10 @@ Nötige vorhanden ist und die Kostenbremse bezahlte Aufrufe verweigert.
 | `cutout.py` | Freistellen mit rembg und BiRefNet |
 | `blender/render_directions.py` | Figur in acht Richtungen rendern, Farb- und Normal-Durchgang, Fußpunkt fest |
 | `blender/test_figure.py` | prozedurale Testfigur für die Pipeline |
-| `pack_sheets.py` | Frames zu Sheets packen, gemeinsamer Zuschnitt, Registry und `Content.mgcb` eintragen |
+| `blender/build_player.py` | Spielfigur: MPFB2-Körper, Mantel, Sense und Cannon im Rig (IK an den Griffen), Aktionen idle, run, swing1–3, aim |
+| `blender/build_hollow.py` | Hollow: großer, dünner MPFB2-Körper, ausfransendes Gewand, Maske, Aktionen idle, move, swipe |
+| `blender/figure_kit.py` | gemeinsame Bausteine: Toon-Material mit Pinselrauschen, Konturhülle, Poser nach Bühnenrichtungen, Kleidung aus dem Körper, Bodenkontakt |
+| `pack_sheets.py` | Frames zu Sheets packen, gemeinsamer Zuschnitt, Registry und `Content.mgcb` eintragen; mit `--pixels-per-unit` ein Zuschnitt und Ursprung je Clip bei festem Maßstab |
 | `feather_frame_edges.py` | äußere Pixel jedes Frames ausblenden (transparenter Rand) |
 | `value_distribution.py` | Wertverteilung der Düsternis-Charta (W1, W2, W4, W6) an Aufnahmen messen |
 
@@ -80,12 +83,19 @@ tools/visuals/.venv/bin/python tools/visuals/fetch_models.py realesrgan-x4plus
 tools/visuals/.venv/bin/python tools/visuals/comfy.py run upscale --start-server \
   --visual-id environment.shore --model realesrgan-x4plus --image INPUT_IMAGE=bild.png
 
-# Figur rendern und packen
-blender -b figur.blend -P tools/visuals/blender/render_directions.py -- \
-  --out art/production/candidates/player/render --animation idle --frames 12
+# Figur bauen, rendern und packen (320 px auf 3,2 m = 1,5 Pixel je Weltpixel, 66,7 Weltpixel je Meter)
+blender -b -P tools/visuals/blender/build_player.py -- --out art/production/candidates/player/player.blend
+blender -b art/production/candidates/player/player.blend -P tools/visuals/blender/render_directions.py -- \
+  --out art/production/candidates/player/render --action run --animation move --frames 12 \
+  --resolution 320 --ortho-scale 3.2 --foot 0.8
 tools/visuals/.venv/bin/python tools/visuals/pack_sheets.py --render art/production/candidates/player/render \
-  --animation idle --visual-id player --texture-dir Textures/Player/Animations --register
+  --animation move --fps 12 --visual-id player --texture-dir Textures/Player/Animations \
+  --pixels-per-unit 1.5 --progress-distance 180 --decision angenommen --reason "..." --register
 ```
+
+Gerenderte Figuren stehen mit den Füßen auf ihrer Spielposition. Was fliegt
+(Schüsse, Funken, Hiebe), zeichnet das Spiel auf Körperhöhe darüber
+(`Rendering/FigureHeights.cs`).
 
 Prompts beschreiben Eigenschaften (gemalt, weiche Kanten, Schlüssellicht oben
 links, wenige Materialfamilien), nie ein anderes Spiel.

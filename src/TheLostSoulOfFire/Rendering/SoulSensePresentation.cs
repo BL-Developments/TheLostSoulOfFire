@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TheLostSoulOfFire.Entities;
 using TheLostSoulOfFire.Game;
+using TheLostSoulOfFire.Rendering.Visuals;
 
 namespace TheLostSoulOfFire.Rendering;
 
@@ -56,7 +57,8 @@ public sealed class SoulSensePresentation
         Player player,
         IReadOnlyList<Enemy> enemies,
         IReadOnlyList<Soul> souls,
-        float presentationTime)
+        float presentationTime,
+        ArtAssets? art = null)
     {
         float amount = SoulEmergence;
         if (amount <= 0.001f)
@@ -72,8 +74,8 @@ public sealed class SoulSensePresentation
 
         DrawTraces(batch, pixel, presentationTime, amount);
         DrawSouls(batch, pixel, souls, presentationTime, amount);
-        DrawEnemySouls(batch, pixel, enemies, presentationTime, amount);
-        DrawPlayerResponse(batch, pixel, player, presentationTime, amount);
+        DrawEnemySouls(batch, pixel, enemies, presentationTime, amount, art);
+        DrawPlayerResponse(batch, pixel, player, presentationTime, amount, art?.IsRendered(VisualIds.Player) == true);
 
         batch.End();
     }
@@ -156,7 +158,8 @@ public sealed class SoulSensePresentation
         Texture2D pixel,
         IReadOnlyList<Enemy> enemies,
         float time,
-        float amount)
+        float amount,
+        ArtAssets? art)
     {
         float pulse = 0.5f + 0.5f * MathF.Sin(time * 5.2f);
         foreach (Enemy enemy in enemies)
@@ -169,7 +172,11 @@ public sealed class SoulSensePresentation
             switch (enemy)
             {
                 case Hollow hollow:
-                    DrawCriticalCore(batch, pixel, hollow.CorePosition, 13f, pulse, amount);
+                    // A rendered Hollow carries its core in the chest, where shots fly (FigureHeights.Air).
+                    Vector2 core = art?.IsRendered(hollow.VisualId) == true
+                        ? hollow.CorePosition - new Vector2(0f, FigureHeights.Air)
+                        : hollow.CorePosition;
+                    DrawCriticalCore(batch, pixel, core, 13f, pulse, amount);
                     break;
 
                 case Burning burning:
@@ -229,7 +236,8 @@ public sealed class SoulSensePresentation
         Texture2D pixel,
         Player player,
         float time,
-        float amount)
+        float amount,
+        bool rendered)
     {
         if (player.IsDead)
         {
@@ -237,10 +245,14 @@ public sealed class SoulSensePresentation
         }
 
         float pulse = 0.5f + 0.5f * MathF.Sin(time * 4.8f);
-        Vector2 core = player.Position + player.FacingDirection * 2f;
-        Vector2 eye = player.Position + player.FacingDirection * 26f;
+        Vector2 core = rendered ? player.Position - new Vector2(0f, FigureHeights.Core) : player.Position + player.FacingDirection * 2f;
         batch.DrawCircle(pixel, core, 11f + pulse * 2f, GameBalance.DeathFlameBright * (0.28f * amount), 1.5f, 16);
-        batch.FillCircle(pixel, eye, 2f, GameBalance.SoulWhite * (0.9f * amount));
+        if (!rendered)
+        {
+            // The rendered figure's eyes burn in Player.Draw.
+            Vector2 eye = player.Position + player.FacingDirection * 26f;
+            batch.FillCircle(pixel, eye, 2f, GameBalance.SoulWhite * (0.9f * amount));
+        }
     }
 
     private static Vector2 PointAlongPath(Vector2[] path, float amount)

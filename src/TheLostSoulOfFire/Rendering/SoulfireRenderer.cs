@@ -156,8 +156,15 @@ public sealed class SoulfireRenderer : IDisposable
     /// </summary>
     public IReadOnlyList<SceneLight> SceneLights => _lastFrameLights;
 
+    /// <summary>
+    /// Added to every glow while set: glows of things in the air (shots, sparks) sit at body
+    /// height, like their sprites (<see cref="FigureHeights.Air"/>).
+    /// </summary>
+    public Vector2 GlowOffset { get; set; }
+
     public void DrawGlow(SpriteBatch batch, Vector2 position, float radius, Color color, float intensity)
     {
+        position += GlowOffset;
         _recordedLights.Add(new SceneLight(position, radius, color, MathHelper.Clamp(intensity, 0f, 1f)));
         float diameter = MathF.Max(1f, radius * 2f);
         batch.Draw(

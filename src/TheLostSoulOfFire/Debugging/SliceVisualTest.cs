@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using TheLostSoulOfFire.Combat;
 using TheLostSoulOfFire.Entities;
 using TheLostSoulOfFire.Game;
 using TheLostSoulOfFire.Input;
@@ -300,6 +301,13 @@ internal sealed class SliceVisualTest
                     }
                 });
         }
+
+        Shot("arena_cannon_aim", () =>
+        {
+            _world.PlaceAutomatedPlayer(ArenaCentre);
+            _world.SetAutomatedAim(Vector2.Normalize(new Vector2(1f, 0.6f)));
+        }, () => _world.AutomatedPlayer.Cannon.State == SoulCannonState.Charging && _world.AutomatedPlayer.Cannon.ChargeProgress > 0.45f, 3f,
+            everyFrame: () => _input.InjectMousePresses(left: false, right: true));
 
         Shot("arena_dash_ignition", () =>
         {

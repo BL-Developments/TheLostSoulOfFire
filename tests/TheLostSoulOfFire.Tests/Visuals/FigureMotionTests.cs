@@ -96,6 +96,18 @@ public sealed class FigureMotionTests
     }
 
     [TestMethod]
+    public void Snap_TurnsAtOnce_ForASwing()
+    {
+        // A scythe swing must read in its own direction from its first frame.
+        FacingTracker tracker = new();
+        tracker.Update(At(0f), Frame);
+
+        Assert.AreEqual("w", tracker.Snap(At(180f)));
+        Assert.AreEqual(MathHelper.Pi, MathF.Abs(tracker.Angle), 0.001f);
+        Assert.AreEqual("w", tracker.Update(At(180f), Frame), "after the snap, turning carries on from there");
+    }
+
+    [TestMethod]
     public void HalfSpeed_GivesHalfTheAnimationRate()
     {
         VisualClipDefinition run = new("move", "P/move/{dir}", 128, 128, 9, 12f, true, null, ClipProgress.Distance, 232f);

@@ -59,6 +59,13 @@ public sealed record VisualClipDefinition(
     public int TileRows { get; init; } = 1;
     public bool IsTiled => TileColumns * TileRows > 1;
 
+    /// <summary>
+    /// Anchor of this clip's frames, overriding the entry's origin. Rendered figures crop each
+    /// clip on its own (a scythe sweep needs a wider frame than standing), so each clip carries
+    /// where the foot point sits in its frame.
+    /// </summary>
+    public Vector2? Origin { get; init; }
+
     public string PathForTile(int column, int row) =>
         Path.Replace(TilePlaceholder, $"c{column}r{row}", StringComparison.Ordinal);
 
@@ -84,6 +91,12 @@ public sealed record VisualEntry(
     VisualDissolve? Dissolve,
     SceneLayer Layer)
 {
+    /// <summary>
+    /// Texture pixels per world unit for every clip of a rendered figure. Clips then differ in
+    /// frame size but share one scale; without it a clip is stretched to <see cref="WorldSize"/>.
+    /// </summary>
+    public float? PixelsPerUnit { get; init; }
+
     public bool TryGetClip(string name, out VisualClipDefinition clip) => Clips.TryGetValue(name, out clip!);
 }
 
@@ -201,6 +214,15 @@ public sealed partial class VisualRegistry
             {
                 Error("origin", "beide Werte müssen zwischen 0 und 1 liegen.");
             }
+            float? pixelsPerUnit = null;
+            if (element.TryGetProperty("pixelsPerUnit", out _))
+            {
+                pixelsPerUnit = RequiredFloat(element, "pixelsPerUnit", "pixelsPerUnit");
+                if (pixelsPerUnit <= 0f)
+                {
+                    Error("pixelsPerUnit", "muss größer als 0 sein.");
+                }
+            }
 
             Dictionary<string, VisualClipDefinition> clips = new(StringComparer.Ordinal);
             if (!element.TryGetProperty("clips", out JsonElement clipsElement) || clipsElement.ValueKind != JsonValueKind.Object)
@@ -257,7 +279,10 @@ public sealed partial class VisualRegistry
                 return null;
             }
 
-            return new VisualEntry(id, kind, palette, worldSize, origin, fallback, clips, dissolve, layer);
+            return new VisualEntry(id, kind, palette, worldSize, origin, fallback, clips, dissolve, layer)
+            {
+                PixelsPerUnit = pixelsPerUnit
+            };
         }
 
         private VisualClipDefinition? ReadClip(string name, JsonElement clip, VisualKind kind)
@@ -314,6 +339,12 @@ public sealed partial class VisualRegistry
                 }
             }
 
+            Vector2? clipOrigin = OptionalPair(clip, "origin");
+            if (clipOrigin is { } anchor && (anchor.X is < 0f or > 1f || anchor.Y is < 0f or > 1f))
+            {
+                Error($"{prefix}.origin", "beide Werte müssen zwischen 0 und 1 liegen.");
+            }
+
             Vector2 tiles = OptionalPair(clip, "tiles") ?? Vector2.One;
             if (tiles.X < 1 || tiles.Y < 1 || tiles.X != MathF.Floor(tiles.X) || tiles.Y != MathF.Floor(tiles.Y))
             {
@@ -341,7 +372,8 @@ public sealed partial class VisualRegistry
             return new VisualClipDefinition(name, path, (int)frameSize.X, (int)frameSize.Y, frames, fps, loop, normalMap, progress, cycleDistance)
             {
                 TileColumns = (int)tiles.X,
-                TileRows = (int)tiles.Y
+                TileRows = (int)tiles.Y,
+                Origin = clipOrigin
             };
         }
 

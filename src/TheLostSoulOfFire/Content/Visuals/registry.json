@@ -11,21 +11,62 @@
       "clips": {
         "idle": {
           "path": "Textures/Player/Animations/idle/{dir}",
-          "frameSize": [128, 128],
-          "frames": 9,
-          "fps": 9,
-          "loop": true
+          "frameSize": [252, 213],
+          "frames": 12,
+          "fps": 8.0,
+          "loop": true,
+          "normalMap": "Textures/Player/Animations/idle_normal/{dir}",
+          "origin": [0.5, 0.9014]
         },
         "move": {
           "path": "Textures/Player/Animations/move/{dir}",
-          "frameSize": [128, 128],
-          "frames": 9,
-          "fps": 12,
+          "frameSize": [198, 248],
+          "frames": 12,
+          "fps": 12.0,
           "loop": true,
+          "normalMap": "Textures/Player/Animations/move_normal/{dir}",
           "progress": "distance",
-          "cycleDistance": 232
+          "cycleDistance": 180.0,
+          "origin": [0.5, 0.8629]
+        },
+        "swing1": {
+          "path": "Textures/Player/Animations/swing1/{dir}",
+          "frameSize": [308, 195],
+          "frames": 7,
+          "fps": 12.0,
+          "loop": false,
+          "normalMap": "Textures/Player/Animations/swing1_normal/{dir}",
+          "origin": [0.5, 0.8564]
+        },
+        "swing2": {
+          "path": "Textures/Player/Animations/swing2/{dir}",
+          "frameSize": [306, 193],
+          "frames": 8,
+          "fps": 12.0,
+          "loop": false,
+          "normalMap": "Textures/Player/Animations/swing2_normal/{dir}",
+          "origin": [0.5, 0.8549]
+        },
+        "swing3": {
+          "path": "Textures/Player/Animations/swing3/{dir}",
+          "frameSize": [306, 195],
+          "frames": 12,
+          "fps": 12.0,
+          "loop": false,
+          "normalMap": "Textures/Player/Animations/swing3_normal/{dir}",
+          "origin": [0.5, 0.8564]
+        },
+        "aim": {
+          "path": "Textures/Player/Animations/aim/{dir}",
+          "frameSize": [214, 220],
+          "frames": 4,
+          "fps": 6.0,
+          "loop": true,
+          "normalMap": "Textures/Player/Animations/aim_normal/{dir}",
+          "origin": [0.5, 0.8]
         }
-      }
+      },
+      "pixelsPerUnit": 1.5
     },
     {
       "id": "enemy.hollow",
@@ -37,31 +78,38 @@
       "clips": {
         "idle": {
           "path": "Textures/Enemies/Hollow/Animations/idle/{dir}",
-          "frameSize": [128, 128],
-          "frames": 9,
-          "fps": 8,
-          "loop": true
+          "frameSize": [106, 235],
+          "frames": 12,
+          "fps": 6.0,
+          "loop": true,
+          "normalMap": "Textures/Enemies/Hollow/Animations/idle_normal/{dir}",
+          "origin": [0.5, 0.8936]
         },
         "move": {
           "path": "Textures/Enemies/Hollow/Animations/move/{dir}",
-          "frameSize": [128, 128],
-          "frames": 9,
-          "fps": 12,
+          "frameSize": [162, 247],
+          "frames": 12,
+          "fps": 12.0,
           "loop": true,
+          "normalMap": "Textures/Enemies/Hollow/Animations/move_normal/{dir}",
           "progress": "distance",
-          "cycleDistance": 81
+          "cycleDistance": 92.0,
+          "origin": [0.5, 0.8623]
         },
         "swipe": {
           "path": "Textures/Enemies/Hollow/Animations/swipe/{dir}",
-          "frameSize": [128, 128],
-          "frames": 9,
-          "fps": 18,
-          "loop": false
+          "frameSize": [260, 243],
+          "frames": 10,
+          "fps": 18.0,
+          "loop": false,
+          "normalMap": "Textures/Enemies/Hollow/Animations/swipe_normal/{dir}",
+          "origin": [0.5, 0.8642]
         }
       },
       "dissolve": {
         "duration": 0.9
-      }
+      },
+      "pixelsPerUnit": 1.5
     },
     {
       "id": "enemy.burning",

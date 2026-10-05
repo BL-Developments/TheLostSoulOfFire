@@ -27,6 +27,20 @@ public sealed class FacingTracker
     public int Sector { get; private set; } = 2;
     public string Direction => VisualDirections.FromSector(Sector);
 
+    /// <summary>Turns at once, for actions that must read in their own direction (a scythe swing).</summary>
+    public string Snap(Vector2 facing)
+    {
+        if (facing.LengthSquared() < 0.0001f)
+        {
+            return Direction;
+        }
+
+        _initialised = true;
+        Angle = MathF.Atan2(facing.Y, facing.X);
+        Sector = VisualDirections.SectorOf(Angle);
+        return Direction;
+    }
+
     public string Update(Vector2 facing, float deltaTime)
     {
         if (facing.LengthSquared() < 0.0001f)

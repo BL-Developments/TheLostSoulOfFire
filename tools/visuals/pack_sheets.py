@@ -4,7 +4,8 @@
     tools/visuals/.venv/bin/python tools/visuals/pack_sheets.py \\
         --render art/production/candidates/test.blender-figure/render --animation idle \\
         --visual-id test.blender-figure --texture-dir Textures/Test/BlenderFigure/Animations \\
-        [--fps 8] [--margin 3] [--world-size 112] [--register]
+        [--fps 8] [--margin 3] [--world-size 112] [--register] \\
+        [--pixels-per-unit 1.5] [--once] [--progress-distance 180] [--decision angenommen --reason TEXT]
 
 All frames of all eight directions share one crop, so the foot point stays on the same pixel
 in every frame and direction. Sheets are laid out row by row like the existing ones
@@ -13,6 +14,11 @@ maps to <texture-dir>/<animation>_normal/<dir>.png under src/TheLostSoulOfFire/C
 
 --register adds or updates the clip in Content/Visuals/registry.json (origin = foot point) and
 the textures in Content.mgcb. Every run appends one entry to art/production/manifest.json.
+
+With --pixels-per-unit each clip keeps its own crop and records its own origin; the entry gets
+`pixelsPerUnit`, so a wide scythe sweep and a narrow idle share one scale. Render with
+--resolution / --ortho-scale chosen so that this number of pixels covers one world unit
+(the slice: 320 px over 3.2 m and 1.5 px per unit, 66.7 units per metre).
 """
 from __future__ import annotations
 
@@ -91,15 +97,23 @@ def register(args: argparse.Namespace, frame: tuple[int, int], frames: int, orig
                  "worldSize": [args.world_size, args.world_size], "origin": [0.5, 0.5],
                  "fallbackClip": args.animation, "clips": {}}
         registry["visuals"].append(entry)
-    entry["origin"] = [round(origin[0], 4), round(origin[1], 4)]
-    entry["clips"][args.animation] = {
+    clip = {
         "path": f"{args.texture_dir}/{args.animation}/{{dir}}",
         "frameSize": [frame[0], frame[1]],
         "frames": frames,
         "fps": args.fps,
-        "loop": True,
+        "loop": not args.once,
         "normalMap": f"{args.texture_dir}/{args.animation}_normal/{{dir}}",
     }
+    if args.progress_distance:
+        clip["progress"] = "distance"
+        clip["cycleDistance"] = args.progress_distance
+    if args.pixels_per_unit:
+        entry["pixelsPerUnit"] = args.pixels_per_unit
+        clip["origin"] = [round(origin[0], 4), round(origin[1], 4)]
+    else:
+        entry["origin"] = [round(origin[0], 4), round(origin[1], 4)]
+    entry["clips"][args.animation] = clip
     REGISTRY.write_text(compact_json(registry), encoding="utf-8")
 
     text = MGCB.read_text(encoding="utf-8")
@@ -129,6 +143,11 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--world-size", type=float, default=112)
     parser.add_argument("--model", default="blender-procedural", help="licence-table key of the source model")
     parser.add_argument("--register", action="store_true")
+    parser.add_argument("--pixels-per-unit", type=float, help="texture pixels per world unit; per-clip origins")
+    parser.add_argument("--once", action="store_true", help="a one-shot clip (no loop), e.g. an attack")
+    parser.add_argument("--progress-distance", type=float, help="advance by distance, one cycle per this many world units")
+    parser.add_argument("--decision", default="kandidat", choices=["kandidat", "angenommen", "verworfen"])
+    parser.add_argument("--reason", default="Pipeline-Probe mit Testfigur (Aufgabe 6.3), keine Spielgrafik")
     args = parser.parse_args(argv)
 
     info_path = args.render / f"{args.animation}.render.json"
@@ -151,8 +170,8 @@ def main(argv: list[str]) -> int:
                     "origin": [round(origin[0], 4), round(origin[1], 4)], "elevation_deg": info["elevation_deg"],
                     "ortho_scale": info["ortho_scale"], "render_seconds": info["seconds"]},
         inputs=[info_path],
-        decision="kandidat",
-        reason="Pipeline-Probe mit Testfigur (Aufgabe 6.3), keine Spielgrafik",
+        decision=args.decision,
+        reason=args.reason,
     )
     with common.record_step(step) as recorded:
         for direction in DIRECTIONS:

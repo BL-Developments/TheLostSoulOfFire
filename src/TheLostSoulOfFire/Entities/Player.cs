@@ -262,18 +262,93 @@ public sealed class Player
 
         Vector2 right = new(-FacingDirection.Y, FacingDirection.X);
         float pulse = 0.5f + 0.5f * MathF.Sin(_visualTime * 4f);
+        // A rendered figure stands on Position and carries scythe and cannon in its frames; the
+        // overlays then sit on its body. The older flat art is drawn around Position instead.
+        bool rendered = art.HasClip(VisualIds.Player, VisualClips.Swing1);
+        Vector2 body = rendered ? Position - new Vector2(0f, FigureHeights.Core) : Position;
 
         if (ResonanceActive)
         {
             float flare = 0.5f + 0.5f * MathF.Sin(_visualTime * 11f);
-            batch.DrawCircle(pixel, Position, 34f + flare * 6f, GameBalance.DeathFlame * 0.72f, 8f, 28);
-            batch.DrawLine(pixel, Position - right * 20f, Position - right * 32f - Vector2.UnitY * (30f + flare * 15f), GameBalance.DeathFlame * 0.62f, 8f);
-            batch.DrawLine(pixel, Position + right * 18f, Position + right * 29f - Vector2.UnitY * (37f + flare * 11f), GameBalance.DeathFlameBright * 0.7f, 6f);
+            batch.DrawCircle(pixel, body, 34f + flare * 6f, GameBalance.DeathFlame * 0.72f, 8f, 28);
+            batch.DrawLine(pixel, body - right * 20f, body - right * 32f - Vector2.UnitY * (30f + flare * 15f), GameBalance.DeathFlame * 0.62f, 8f);
+            batch.DrawLine(pixel, body + right * 18f, body + right * 29f - Vector2.UnitY * (37f + flare * 11f), GameBalance.DeathFlameBright * 0.7f, 6f);
         }
 
-        Cannon.DrawBack(batch, pixel, art.GetSpriteTexture(VisualIds.SoulCannon), Position, FacingDirection);
-        Scythe.Draw(batch, pixel, art.GetSpriteTexture(VisualIds.Scythe), Position, FacingDirection, debugVisible);
+        if (!rendered)
+        {
+            Cannon.DrawBack(batch, pixel, art.GetSpriteTexture(VisualIds.SoulCannon), Position, FacingDirection);
+        }
+        Scythe.Draw(batch, pixel, art.GetSpriteTexture(VisualIds.Scythe), Position, FacingDirection, debugVisible, rendered);
 
+        if (rendered)
+        {
+            DrawBodyMarks(batch, pixel, art, body, pulse, soulSenseAmount);
+        }
+        else
+        {
+            DrawFlatMarks(batch, pixel, right, pulse, soulSenseAmount);
+            Cannon.DrawActive(batch, pixel, art.GetSpriteTexture(VisualIds.SoulCannon), Position, FacingDirection);
+        }
+
+        if (HitFlashRemaining > 0f)
+        {
+            float flash = MathHelper.Clamp(HitFlashRemaining / 0.14f, 0f, 1f);
+            batch.DrawCircle(pixel, body, 29f, GameBalance.SoulWhite * (0.72f * flash), 4f, 24);
+            batch.FillCircle(pixel, body + FacingDirection * 2f, 7f, GameBalance.SoulWhite * (0.88f * flash));
+        }
+
+        if (IsDashing)
+        {
+            Vector2 ignitionOrigin = Position - _dashDirection * 15f;
+            batch.DrawLine(pixel, ignitionOrigin - right * 8f, ignitionOrigin - _dashDirection * 23f - right * 11f, GameBalance.DeathFlame, 7f);
+            batch.DrawLine(pixel, ignitionOrigin + right * 8f, ignitionOrigin - _dashDirection * 27f + right * 12f, GameBalance.DeathFlameBright, 5f);
+        }
+
+        if (debugVisible)
+        {
+            batch.DrawCircle(pixel, Position, Radius, new Color(80, 220, 210), 2f);
+            batch.DrawLine(pixel, Position, Position + FacingDirection * 70f, new Color(80, 220, 210) * 0.8f, 2f);
+        }
+    }
+
+    /// <summary>
+    /// Core and Soul Sense on a rendered figure: the core glows faintly under the sternum and
+    /// rings when Resonance is ready; under Soul Sense the eyes burn violet.
+    /// </summary>
+    private void DrawBodyMarks(SpriteBatch batch, Texture2D pixel, ArtAssets art, Vector2 core, float pulse, float soulSenseAmount)
+    {
+        bool coreReady = IsResonanceReady;
+        // Seen from behind, the core is hidden by the body; its readiness ring stays visible.
+        float front = MathHelper.Clamp(0.5f + FacingDirection.Y, 0f, 1f);
+        Vector2 sternum = core + new Vector2(FacingDirection.X * 6f, FacingDirection.Y * 4f);
+        if (front > 0f)
+        {
+            float glow = (ResonanceActive || coreReady || SoulSenseActive ? 0.85f : 0.4f) * front;
+            float size = 7f + pulse * (coreReady ? 3f : 1f);
+            art.DrawSoftSpot(batch, sternum, new Vector2(size), GameBalance.DeathFlame * (0.8f * glow));
+            art.DrawSoftSpot(batch, sternum, new Vector2(size * 0.4f), GameBalance.SoulWhite * glow);
+        }
+        if (coreReady)
+        {
+            batch.DrawCircle(pixel, core, 14f + pulse * 5f, GameBalance.DeathFlameBright * 0.78f, 3f, 20);
+        }
+
+        float sense = MathHelper.Clamp(soulSenseAmount, 0f, 1f);
+        if (sense > 0.001f && FacingDirection.Y > -0.35f)
+        {
+            Vector2 eyes = Position - new Vector2(0f, FigureHeights.Eyes) + new Vector2(FacingDirection.X * 6f, FacingDirection.Y * 3f);
+            Vector2 across = new(MathF.Abs(FacingDirection.Y) * 3.5f + 1f, 0f);
+            art.DrawSoftSpot(batch, eyes, new Vector2(11f, 8f), GameBalance.DeathFlame * (0.5f * sense));
+            art.DrawSoftSpot(batch, eyes - across, new Vector2(2.6f), GameBalance.SoulWhite * sense);
+            art.DrawSoftSpot(batch, eyes + across, new Vector2(2.6f), GameBalance.SoulWhite * sense);
+            batch.DrawLine(pixel, core, eyes, GameBalance.DeathFlame * (0.35f * sense), 2f);
+        }
+    }
+
+    /// <summary>Eye bar and core on the older flat, top-down art.</summary>
+    private void DrawFlatMarks(SpriteBatch batch, Texture2D pixel, Vector2 right, float pulse, float soulSenseAmount)
+    {
         Vector2 head = Position + FacingDirection * 18f;
 
         Vector2 eye = head + FacingDirection * 8f;
@@ -300,28 +375,6 @@ public sealed class Player
         {
             batch.DrawLine(pixel, Position + FacingDirection * 2f, Position - right * 14f - Vector2.UnitY * 15f, GameBalance.DeathFlameBright * 0.72f, 3f);
             batch.DrawLine(pixel, Position + FacingDirection * 2f, Position + right * 13f + Vector2.UnitY * 13f, GameBalance.DeathFlame * 0.72f, 3f);
-        }
-
-        Cannon.DrawActive(batch, pixel, art.GetSpriteTexture(VisualIds.SoulCannon), Position, FacingDirection);
-
-        if (HitFlashRemaining > 0f)
-        {
-            float flash = MathHelper.Clamp(HitFlashRemaining / 0.14f, 0f, 1f);
-            batch.DrawCircle(pixel, Position, 29f, GameBalance.SoulWhite * (0.72f * flash), 4f, 24);
-            batch.FillCircle(pixel, Position + FacingDirection * 2f, 7f, GameBalance.SoulWhite * (0.88f * flash));
-        }
-
-        if (IsDashing)
-        {
-            Vector2 ignitionOrigin = Position - _dashDirection * 15f;
-            batch.DrawLine(pixel, ignitionOrigin - right * 8f, ignitionOrigin - _dashDirection * 23f - right * 11f, GameBalance.DeathFlame, 7f);
-            batch.DrawLine(pixel, ignitionOrigin + right * 8f, ignitionOrigin - _dashDirection * 27f + right * 12f, GameBalance.DeathFlameBright, 5f);
-        }
-
-        if (debugVisible)
-        {
-            batch.DrawCircle(pixel, Position, Radius, new Color(80, 220, 210), 2f);
-            batch.DrawLine(pixel, Position, Position + FacingDirection * 70f, new Color(80, 220, 210) * 0.8f, 2f);
         }
     }
 

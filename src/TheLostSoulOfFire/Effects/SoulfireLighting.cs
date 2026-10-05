@@ -20,13 +20,16 @@ public static class SoulfireLighting
         SoulFurnaceAntechamber antechamber,
         float presentationTime,
         float soulSenseAmount,
-        float gateProgress)
+        float gateProgress,
+        bool renderedPlayer = false)
     {
         renderer.BeginLighting(batch, worldTransform);
         float breathe = 0.88f + MathF.Sin(presentationTime * 4.6f) * 0.12f;
         antechamber.DrawLighting(batch, renderer, presentationTime, soulSenseAmount, gateProgress);
+        renderer.GlowOffset = new Vector2(0f, -FigureHeights.Air);
         particles.DrawLighting(batch, renderer);
-        DrawPlayerEnergy(batch, renderer, player, presentationTime, soulSenseAmount, breathe);
+        renderer.GlowOffset = Vector2.Zero;
+        DrawPlayerEnergy(batch, renderer, player, presentationTime, soulSenseAmount, breathe, renderedPlayer);
         batch.End();
     }
 
@@ -45,7 +48,9 @@ public static class SoulfireLighting
         bool endingComplete,
         Vector2 lifeFlamePosition,
         float lifeFlameAlpha,
-        bool drawArenaFurnaces = true)
+        bool drawArenaFurnaces = true,
+        bool renderedPlayer = false,
+        Func<Enemy, bool>? renderedEnemy = null)
     {
         renderer.BeginLighting(batch, worldTransform);
         float breathe = 0.88f + MathF.Sin(presentationTime * 4.6f) * 0.12f;
@@ -54,11 +59,15 @@ public static class SoulfireLighting
         {
             arenaAtmosphere.DrawLighting(batch, renderer, soulSenseAmount);
         }
+        // Sparks and shots are drawn at body height; so is their light.
+        renderer.GlowOffset = new Vector2(0f, -FigureHeights.Air);
         particles.DrawLighting(batch, renderer);
+        DrawShotEnergy(batch, renderer, cannonShots);
+        renderer.GlowOffset = Vector2.Zero;
         DrawSouls(batch, renderer, souls, soulSenseAmount, breathe);
-        DrawEnemyEnergy(batch, renderer, enemies, soulSenseAmount, breathe);
-        DrawCannonEnergy(batch, renderer, player, cannonShots);
-        DrawPlayerEnergy(batch, renderer, player, presentationTime, soulSenseAmount, breathe);
+        DrawEnemyEnergy(batch, renderer, enemies, soulSenseAmount, breathe, renderedEnemy);
+        DrawChargeEnergy(batch, renderer, player, renderedPlayer);
+        DrawPlayerEnergy(batch, renderer, player, presentationTime, soulSenseAmount, breathe, renderedPlayer);
         DrawEndingLight(batch, renderer, endingComplete, lifeFlamePosition, lifeFlameAlpha, breathe);
 
         batch.End();
@@ -92,7 +101,8 @@ public static class SoulfireLighting
         SoulfireRenderer renderer,
         IReadOnlyList<Enemy> enemies,
         float soulSenseAmount,
-        float breathe)
+        float breathe,
+        Func<Enemy, bool>? renderedEnemy)
     {
         foreach (Enemy enemy in enemies)
         {
@@ -118,7 +128,10 @@ public static class SoulfireLighting
             switch (enemy)
             {
                 case Hollow hollow when hollow.State is not (HollowState.Dying or HollowState.Dead):
-                    renderer.DrawGlow(batch, hollow.CorePosition, 50f * breathe, GameBalance.SoulWhite, 0.38f * soulSenseAmount);
+                    Vector2 core = renderedEnemy?.Invoke(hollow) == true
+                        ? hollow.CorePosition - new Vector2(0f, FigureHeights.Air)
+                        : hollow.CorePosition;
+                    renderer.DrawGlow(batch, core, 50f * breathe, GameBalance.SoulWhite, 0.38f * soulSenseAmount);
                     break;
                 case Devourer devourer when devourer.State != DevourerState.Dead:
                     float torsoIntensity = 0.22f + devourer.ConsumedSoulCount * 0.07f;
@@ -128,10 +141,9 @@ public static class SoulfireLighting
         }
     }
 
-    private static void DrawCannonEnergy(
+    private static void DrawShotEnergy(
         SpriteBatch batch,
         SoulfireRenderer renderer,
-        Player player,
         IReadOnlyList<CannonShot> cannonShots)
     {
         foreach (CannonShot shot in cannonShots)
@@ -145,14 +157,19 @@ public static class SoulfireLighting
             Color color = shot.IsFullCharge ? GameBalance.SoulWhite : GameBalance.DeathFlameBright;
             renderer.DrawGlow(batch, shot.Position, radius, color, 0.25f + shot.Charge * 0.24f);
         }
+    }
 
+    private static void DrawChargeEnergy(SpriteBatch batch, SoulfireRenderer renderer, Player player, bool renderedPlayer)
+    {
         if (player.Cannon.State != SoulCannonState.Charging)
         {
             return;
         }
 
         float charge = player.Cannon.ChargeProgress;
-        Vector2 muzzle = player.Position + player.FacingDirection * 74f;
+        Vector2 muzzle = renderedPlayer
+            ? FigureHeights.MuzzleOf(player.Position, player.FacingDirection)
+            : player.Position + player.FacingDirection * 74f;
         float chargeRadius = SoulfireRenderSettings.CannonGlowRadius * MathHelper.Lerp(0.68f, 1.55f, charge);
         Color chargeColor = player.Cannon.IsFullCharge ? GameBalance.SoulWhite : GameBalance.DeathFlameBright;
         float intensity = SoulfireRenderSettings.CannonGlowIntensity * MathHelper.Lerp(0.55f, 1.35f, charge);
@@ -169,9 +186,12 @@ public static class SoulfireLighting
         Player player,
         float presentationTime,
         float soulSenseAmount,
-        float breathe)
+        float breathe,
+        bool renderedPlayer)
     {
-        Vector2 playerCore = player.Position + player.FacingDirection * 2f;
+        Vector2 playerCore = renderedPlayer
+            ? player.Position - new Vector2(0f, FigureHeights.Core)
+            : player.Position + player.FacingDirection * 2f;
         if (player.IsDead)
         {
             renderer.DrawGlow(
@@ -193,7 +213,9 @@ public static class SoulfireLighting
 
         if (soulSenseAmount > 0.001f)
         {
-            Vector2 eye = player.Position + player.FacingDirection * 26f;
+            Vector2 eye = renderedPlayer
+                ? player.Position - new Vector2(0f, FigureHeights.Eyes)
+                : player.Position + player.FacingDirection * 26f;
             renderer.DrawGlow(batch, eye, 34f, GameBalance.SoulWhite, 0.25f * soulSenseAmount);
         }
 

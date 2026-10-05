@@ -776,7 +776,8 @@ public sealed partial class GameWorld : IDisposable
             _player,
             _enemies,
             _souls,
-            _presentationTime);
+            _presentationTime,
+            _art);
         if (_phase is GamePhase.Antechamber or GamePhase.EnteringArena)
         {
             batch.Begin(
@@ -868,17 +869,31 @@ public sealed partial class GameWorld : IDisposable
                 _art.DrawLostSoul(batch, soul);
                 soul.Draw(batch, pixel, _player, false, true);
             }
+        }
+        DrawAbilityWorld(batch, pixel);
+
+        // What flies (shots, sparks, slashes) is drawn at body height above its gameplay
+        // position, because figures stand with their feet on their positions.
+        batch.End();
+        Matrix airTransform = Matrix.CreateTranslation(0f, -FigureHeights.Air, 0f) * sceneTransform;
+        batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, transformMatrix: airTransform);
+        _art.BeginLitScene(airTransform, lights);
+        if (IsCombatPhase)
+        {
             foreach (CannonShot shot in _cannonShots)
             {
                 shot.Draw(batch, pixel, true);
                 _art.DrawCannonProjectile(batch, shot);
             }
         }
-        DrawAbilityWorld(batch, pixel);
         _particles.Draw(batch, pixel);
+        _spriteVfx.Draw(batch);
+        batch.End();
+        batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, transformMatrix: sceneTransform);
+        _art.BeginLitScene(sceneTransform, lights);
+
         DrawSceneProps(batch, layer => layer == SceneLayer.Atmosphere);
         _presentation.DrawWorldAccents(batch, pixel, _art, _phase, _loopState, _player.IsDead, _player, ActiveCombatBounds);
-        _spriteVfx.Draw(batch);
 
         if (IsCombatPhase && _presentation.ShouldDrawAim(_loopState, _player.IsDead))
         {
@@ -947,12 +962,23 @@ public sealed partial class GameWorld : IDisposable
 
     private void DrawPlayerActor(SpriteBatch batch, Texture2D pixel)
     {
-        batch.FillCircle(pixel, _player.Position + new Vector2(3f, 8f), 24f, new Color(3, 3, 7) * 0.55f);
+        bool rendered = _art.HasClip(VisualIds.Player, VisualClips.Aim);
+        if (rendered)
+        {
+            // Contact shadow under the feet, cast toward the lower right (key light upper left).
+            _art.DrawSoftSpot(batch, _player.Position + new Vector2(8f, 2f), new Vector2(38f, 13f), new Color(3, 3, 7) * 0.7f);
+        }
+        else
+        {
+            batch.FillCircle(pixel, _player.Position + new Vector2(3f, 8f), 24f, new Color(3, 3, 7) * 0.55f);
+        }
         _art.DrawPlayer(batch, _player);
         _player.Draw(batch, pixel, _art, _debugVisible, _soulSensePresentation.SoulEmergence);
         if (IsCombatPhase && _player.Cannon.State == SoulCannonState.Charging)
         {
-            Vector2 muzzle = _player.Position + _player.FacingDirection * 74f;
+            Vector2 muzzle = rendered
+                ? FigureHeights.MuzzleOf(_player.Position, _player.FacingDirection)
+                : _player.Position + _player.FacingDirection * 74f;
             float charge = _player.Cannon.ChargeProgress;
             Color chargeColor = _player.Cannon.IsFullCharge
                 ? Color.White
@@ -1038,7 +1064,8 @@ public sealed partial class GameWorld : IDisposable
                 _antechamber,
                 _presentationTime,
                 _soulSensePresentation.SoulEmergence,
-                DoorTransitionProgress);
+                DoorTransitionProgress,
+                renderedPlayer: _art.HasClip(VisualIds.Player, VisualClips.Aim));
             return;
         }
 
@@ -1057,7 +1084,9 @@ public sealed partial class GameWorld : IDisposable
             _phase == GamePhase.Arena && _loopState == ArenaLoopState.Complete,
             _presentation.GetLifeFlamePosition(_arena.CombatBounds),
             _presentation.GetLifeFlameAlpha(),
-            drawArenaFurnaces: _phase != GamePhase.Prologue);
+            drawArenaFurnaces: _phase != GamePhase.Prologue,
+            renderedPlayer: _art.HasClip(VisualIds.Player, VisualClips.Aim),
+            renderedEnemy: enemy => _art.IsRendered(enemy.VisualId));
 
         if (_automatedLightSource is not null)
         {

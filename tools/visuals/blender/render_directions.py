@@ -49,6 +49,8 @@ def parse(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--engine", choices=["eevee", "cycles"], default="eevee")
     parser.add_argument("--samples", type=int, default=16)
     parser.add_argument("--test-figure", action="store_true", help="build the procedural test figure first")
+    parser.add_argument("--action", help="action to play on --object (or its armature), e.g. run")
+    parser.add_argument("--frame-start", type=int, help="first frame of the animation (default: scene start)")
     return parser.parse_args(argv[argv.index("--") + 1:] if "--" in argv else [])
 
 
@@ -157,6 +159,13 @@ def main() -> None:
     if figure is None:
         raise SystemExit(f"Objekt '{args.object}' nicht gefunden.")
 
+    if args.action:
+        action = bpy.data.actions.get(args.action)
+        if action is None:
+            raise SystemExit(f"Aktion '{args.action}' nicht gefunden.")
+        figure.animation_data_create().action = action
+    if args.frame_start is not None:
+        scene.frame_start = args.frame_start
     engine = setup_engine(scene, args.engine, args.samples)
     camera = setup_camera(scene, args.elevation, args.ortho_scale, args.foot)
     setup_key_light(scene, camera)
@@ -169,9 +178,15 @@ def main() -> None:
 
     out = args.out.resolve()
     render_pass(scene, figure, out / args.animation, args.frames, "Standard")
+    # Outlines are an inverted hull; in the normal pass they would cover the figure.
+    outlines = [m for o in bpy.data.objects for m in getattr(o, "modifiers", []) if m.name == "Outline"]
+    for modifier in outlines:
+        modifier.show_render = False
     scene.view_layers[0].material_override = normal_material()
     render_pass(scene, figure, out / f"{args.animation}_normal", args.frames, "Raw")
     scene.view_layers[0].material_override = None
+    for modifier in outlines:
+        modifier.show_render = True
 
     info = {
         "animation": args.animation,

@@ -85,6 +85,7 @@ public sealed class ArtAssets
     private readonly Effect? _dissolve;
     private readonly DeathFlameRenderer? _deathFlame;
     private readonly Texture2D _dissolveNoise;
+    private readonly Texture2D _softSpot;
     private readonly ConditionalWeakTable<object, FigureState> _figures = new();
     private readonly List<DissolveInstance> _dissolves = [];
     private Matrix _sceneTransform = Matrix.Identity;
@@ -113,6 +114,7 @@ public sealed class ArtAssets
         Effect? deathFlame = TryLoadEffect(content, "Effects/DeathFlame");
         _deathFlame = deathFlame is null ? null : new DeathFlameRenderer(device, deathFlame);
         _dissolveNoise = CreateNoiseTexture(device, 64, seed: 1709);
+        _softSpot = CreateSoftSpotTexture(device, 64);
 
         foreach (VisualEntry entry in registry.Entries)
         {
@@ -293,9 +295,36 @@ public sealed class ArtAssets
             return;
         }
 
-        string clip = player.Velocity.LengthSquared() > 120f ? VisualClips.Move : VisualClips.Idle;
-        DrawCharacter(batch, player, VisualIds.Player, clip, player.FacingDirection, player.Position, 1f, Color.White);
+        // Attacks and the raised cannon show their own clips, timed by gameplay; otherwise the
+        // figure runs where it moves and stands facing the aim.
+        if (player.Scythe.ActiveStep > 0 && HasClip(VisualIds.Player, VisualClips.Swing(player.Scythe.ActiveStep)))
+        {
+            DrawCharacter(batch, player, VisualIds.Player, VisualClips.Swing(player.Scythe.ActiveStep), player.Scythe.AttackDirection,
+                player.Position, 1f, Color.White, progress: player.Scythe.NormalizedProgress, snapFacing: true);
+            return;
+        }
+
+        bool moving = player.Velocity.LengthSquared() > 120f;
+        if (player.Cannon.State != SoulCannonState.Stored && HasClip(VisualIds.Player, VisualClips.Aim))
+        {
+            DrawCharacter(batch, player, VisualIds.Player, VisualClips.Aim, player.FacingDirection, player.Position, 1f, Color.White);
+            return;
+        }
+
+        Vector2 facing = moving && HasClip(VisualIds.Player, VisualClips.Swing1) ? player.Velocity : player.FacingDirection;
+        DrawCharacter(batch, player, VisualIds.Player, moving ? VisualClips.Move : VisualClips.Idle, facing, player.Position, 1f, Color.White);
     }
+
+    /// <summary>
+    /// Whether a Visual-ID is a rendered figure (it has a fixed pixel scale): it stands with its
+    /// feet on its position, so marks on its body sit <see cref="FigureHeights"/> above it.
+    /// </summary>
+    public bool IsRendered(string? id) =>
+        id is not null && Registry.TryGet(id, out VisualEntry entry) && entry.PixelsPerUnit is not null;
+
+    /// <summary>Whether a Visual-ID has its own clip of that name (no fallback).</summary>
+    public bool HasClip(string id, string clipName) =>
+        Registry.TryGet(id, out VisualEntry entry) && entry.TryGetClip(clipName, out _);
 
     public void DrawEnemy(SpriteBatch batch, Enemy enemy)
     {
@@ -311,6 +340,10 @@ public sealed class ArtAssets
         }
 
         Color tint = enemy.HitFlashRemaining > 0f ? new Color(255, 235, 255) : Color.White;
+        if (IsRendered(id))
+        {
+            DrawSoftSpot(batch, enemy.Position + new Vector2(8f, 2f), new Vector2(enemy.Radius * 1.5f, enemy.Radius * 0.5f) * enemy.VisualScale, new Color(3, 3, 7) * 0.7f);
+        }
         DrawCharacter(batch, enemy, id, clip, enemy.VisualFacing, enemy.Position, enemy.VisualScale, tint, enemy.Radius * 2.6f);
     }
 
@@ -323,11 +356,13 @@ public sealed class ArtAssets
         Vector2 position,
         float sizeScale,
         Color tint,
-        float fallbackSize = FallbackCharacterSize)
+        float fallbackSize = FallbackCharacterSize,
+        float? progress = null,
+        bool snapFacing = false)
     {
         FigureState figure = _figures.GetValue(owner, _ => new FigureState());
         float deltaTime = figure.Advance(_time, position, out float distance);
-        string direction = figure.Facing.Update(facing, deltaTime);
+        string direction = snapFacing ? figure.Facing.Snap(facing) : figure.Facing.Update(facing, deltaTime);
         Vector2 worldSize = WorldSizeOf(id, new Vector2(fallbackSize)) * sizeScale;
         SpriteClip? clip = Resolve(id, clipName, direction, out string resolvedName, out VisualClipDefinition? definition);
         if (clip is null || definition is null)
@@ -338,7 +373,16 @@ public sealed class ArtAssets
         }
 
         float elapsed = figure.PlayClip(resolvedName, definition, deltaTime, distance);
-        float scale = worldSize.X / clip.FrameWidth;
+        if (progress is { } share)
+        {
+            // Frame i was rendered at progress i / (frames - 1); sample the middle of that frame.
+            int frame = (int)MathF.Round(MathHelper.Clamp(share, 0f, 1f) * (clip.FrameCount - 1));
+            elapsed = (frame + 0.5f) / clip.FramesPerSecond;
+        }
+
+        float scale = Registry.TryGet(id, out VisualEntry entry) && entry.PixelsPerUnit is { } pixelsPerUnit
+            ? sizeScale / pixelsPerUnit
+            : worldSize.X / clip.FrameWidth;
         figure.RememberPose(clip, clip.GetSourceRectangle(elapsed), position, scale, tint);
         DrawFrame(batch, clip, elapsed, position, scale, tint);
     }
@@ -413,6 +457,35 @@ public sealed class ArtAssets
     }
 
     private sealed record DissolveInstance(SpriteClip Clip, Rectangle Source, Vector2 Position, float Scale, Color Tint, float Duration, float StartedAt);
+
+    /// <summary>
+    /// A soft round spot stretched to <paramref name="radii"/>: contact shadows under feet and small
+    /// glows on bodies, without the stepped edges of shapes built from lines.
+    /// </summary>
+    public void DrawSoftSpot(SpriteBatch batch, Vector2 center, Vector2 radii, Color color) =>
+        batch.Draw(_softSpot, center, null, color, 0f, new Vector2(_softSpot.Width, _softSpot.Height) * 0.5f,
+            radii * 2f / _softSpot.Width, SpriteEffects.None, 0f);
+
+    /// <summary>Premultiplied white with a smooth falloff to the edge.</summary>
+    private static Texture2D CreateSoftSpotTexture(GraphicsDevice device, int size)
+    {
+        Color[] data = new Color[size * size];
+        Vector2 center = new((size - 1) * 0.5f);
+        for (int y = 0; y < size; y++)
+        {
+            for (int x = 0; x < size; x++)
+            {
+                float distance = Vector2.Distance(new Vector2(x, y), center) / (size * 0.5f);
+                float alpha = MathHelper.SmoothStep(1f, 0f, MathHelper.Clamp((distance - 0.35f) / 0.65f, 0f, 1f));
+                byte value = (byte)MathF.Round(alpha * 255f);
+                data[y * size + x] = new Color(value, value, value, value);
+            }
+        }
+
+        Texture2D texture = new(device, size, size);
+        texture.SetData(data);
+        return texture;
+    }
 
     /// <summary>Smooth value noise for the dissolve mask; generated once, no asset needed.</summary>
     private static Texture2D CreateNoiseTexture(GraphicsDevice device, int size, int seed)
@@ -629,7 +702,7 @@ public sealed class ArtAssets
         return new SpriteClip(texture, clip.FrameWidth, clip.FrameHeight, clip.Frames, clip.FramesPerSecond, clip.Loop)
         {
             NormalMap = normalPath is null ? null : TryLoad(content, normalPath),
-            Origin = entry.Origin
+            Origin = clip.Origin ?? entry.Origin
         };
     }
 

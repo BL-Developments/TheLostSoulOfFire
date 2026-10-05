@@ -2807,6 +2807,1338 @@
         "status": "kandidat",
         "reason": "Bodenplatte für das Spiel aufbereitet"
       }
+    },
+    {
+      "id": "ba5917b0741b4e548e66fbf83e6065e5",
+      "timestamp": "2026-10-05T21:36:40+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "idle",
+        "frames": 12,
+        "fps": 8.0,
+        "frame_size": [
+          252,
+          213
+        ],
+        "origin": [
+          0.5,
+          0.9014
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.2,
+        "render_seconds": 33.7
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/idle.render.json",
+          "sha256": "48da5f340d13305e29fab90f0e0e1286699436b2aed4cea59825eceda8175639"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle/n.png",
+          "sha256": "2d58feba6b651ac0e553f62be8847643cb3a19f196a67cfb3d8d28afbc60250a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle_normal/n.png",
+          "sha256": "c42cf787f7493778cdea3135706828ca451aa6b1e086b2f309c0f9ca26b6ae9f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle/ne.png",
+          "sha256": "749be4ee996b55602c816e1db23d6352a6a4012a3f231ba816edb84a005a04b9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle_normal/ne.png",
+          "sha256": "8dcbefc1fb400ae91c11d0ca92a0bf242175eede0cde57ac250fc637e11fad01"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle/e.png",
+          "sha256": "3595e93f9d57b48ac82916285b32a661cf0312b463e6c7dc1aa31632564d5bf7"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle_normal/e.png",
+          "sha256": "3f891390267746bd6ee1bc1e8439ab1b2fcd8ca8edcd7c8ee980321022240cef"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle/se.png",
+          "sha256": "a07b285320af8d25d887892262052b8a6d0bc4b45d2b660d07510bedeeda4183"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle_normal/se.png",
+          "sha256": "3ee202f6923c70c2f75b166eca68d45ae36d448ee9fe751fd53b08fbdcb29858"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle/s.png",
+          "sha256": "412b530c3d6a753d8981dcf70b533367d7424bfb3a26f8a6ca7dbbc00bfa7d50"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle_normal/s.png",
+          "sha256": "74a07f8b88533c895b1d841af5d930610c496757a63e09ce1ba90e54e0f99dbb"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle/sw.png",
+          "sha256": "71c6f229df687fabe432003ca9074896896c1c2f9ab61dec857d4c34ad4219f1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle_normal/sw.png",
+          "sha256": "0cab55d1156ecff62a0d8a1d7c434e0d7a09416f7e2fed547442ed37ffef7439"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle/w.png",
+          "sha256": "983fc60273c069485915803977966237ca1131932d88620b741af289f216f6c6"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle_normal/w.png",
+          "sha256": "c9cc0abbddccc172f078b085a38836f5b12c8b3e88788c623112914988cda517"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle/nw.png",
+          "sha256": "62edde4753e1ce40b53ce7ec6a9e96490764c2bfc0b55b1a2ef5b9cc20723d05"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle_normal/nw.png",
+          "sha256": "d8bd928749d8e08d1b67d14d2e75b0cc88aceb93bdf96dba847f44b431d15584"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.37,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Spielfigur der gemalten Scheibe: 3D-Pfad B (MPFB2 + Toon), Sense und Cannon im Rig"
+      }
+    },
+    {
+      "id": "3fea1ca0d3e549ef92502c53a4c06a18",
+      "timestamp": "2026-10-05T21:36:40+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "move",
+        "frames": 12,
+        "fps": 12.0,
+        "frame_size": [
+          198,
+          248
+        ],
+        "origin": [
+          0.5,
+          0.8629
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.2,
+        "render_seconds": 33.1
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/move.render.json",
+          "sha256": "8b6cf40010869433f0d912fb882f1e61d202bc8d91f7b01ae40fd07328d592d9"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move/n.png",
+          "sha256": "5e5558618120d0f0d59b00b053a2c488a259d805c6e059b94528a6f0af7c07b0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move_normal/n.png",
+          "sha256": "bbd3b69932e13e11513ea33b3efe4919c7f888520a7a2f1cffc7694beb02dfe0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move/ne.png",
+          "sha256": "77538d3c0ae78c0e80d2b14c28820d55f7abdefe0f4b6cdcb802ed2224fbd850"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move_normal/ne.png",
+          "sha256": "71b542e676e8d146dfdad9b15d251324301e7d2dd7954d8ad2495f854fd75594"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move/e.png",
+          "sha256": "cf79d57cc9a2f5f642097ffb6ad361269d486db638012842fd46299648f87d30"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move_normal/e.png",
+          "sha256": "37e37e1528abe702b32aef18298b0a35676054c832572583914aadd304088e52"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move/se.png",
+          "sha256": "4f4b5a5db7fcfe8a6c5aaf62ac72bbf4d4a4afa44719669fe2888f4059f423e2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move_normal/se.png",
+          "sha256": "ca3d601d180356cdbe2e62d967dbcda106c0e9e9210b59b6d5d5ef3536980dae"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move/s.png",
+          "sha256": "efe86aaf92d37ae1a2367e7f5813db9e7184ae679d73ea258521909884a828e5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move_normal/s.png",
+          "sha256": "38cdb5150261a14d46b41f86315574a2410b0942950b8f5ed9ee3a3d556bd330"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move/sw.png",
+          "sha256": "508508a7abcb113ff2a1da6b2dc415dfcc38167259a60d49127ccb80bb53c739"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move_normal/sw.png",
+          "sha256": "f2a76f161ab8cd77aa9a212a737b24231a316bb21afa06cdf6721033e5ec5898"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move/w.png",
+          "sha256": "55d3a98045ef04d6eaecb004cd5ae40f292fbc14e5af88799725802f9981bc4f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move_normal/w.png",
+          "sha256": "48bf65c10117bb00eb11d189867502414924f956bf875ecaf446fcd271c2f460"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move/nw.png",
+          "sha256": "f13790be1f27d9ad22cef8ccfdb58f67b0cb69597cade104da06958c8f659303"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move_normal/nw.png",
+          "sha256": "d24bdcdd7961decc4e9d124f52f1e84fd2b2d26b356b0ca1b1feeaa36ab03750"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.37,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Spielfigur der gemalten Scheibe: 3D-Pfad B (MPFB2 + Toon), Sense und Cannon im Rig"
+      }
+    },
+    {
+      "id": "321332021cdb45b9a76b054bba27f23a",
+      "timestamp": "2026-10-05T21:36:41+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "swing1",
+        "frames": 7,
+        "fps": 12.0,
+        "frame_size": [
+          308,
+          195
+        ],
+        "origin": [
+          0.5,
+          0.8564
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.2,
+        "render_seconds": 20.5
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/swing1.render.json",
+          "sha256": "b9141bd23fdac8e8780c6880a1de603a720351aa814fdb01a9fcaa0cc38f8810"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/n.png",
+          "sha256": "30ffc061ee6078fb845c08d72eef2c810f7084a517ec73db9cc44220216960ce"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/n.png",
+          "sha256": "8c61955fcaf37b280156d270dc0e52cd400263622604cf52fca31b338f1420a5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/ne.png",
+          "sha256": "3771d92c717ef7c325e905498b6dd5091529f6eb5baa448acfbe6fb9cbe216e9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/ne.png",
+          "sha256": "939660fb3738df4f80019aba3a46e75e7fc785986473b28b60b9e424ce3574b4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/e.png",
+          "sha256": "be8403f901f0ec645d8460bca424a9cebe1ddd5b07b1da090e3753de0b3fbea9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/e.png",
+          "sha256": "dd28766a7f142a23254d7b0722e184cb6320fe2f52e5948643fe50df5aa1c3b2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/se.png",
+          "sha256": "443fcae60008f6fd1de105b557e376484eaeec1fd38546849a30e601c7eaf38c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/se.png",
+          "sha256": "b9f9706a482baa47460cb653942ebfd7d132204ab4d0362c4d4a7d4c48c5549d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/s.png",
+          "sha256": "01741aae20a606ebf188a7ff5873e95edacf07064ecad73d9a387b9cf5f4670f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/s.png",
+          "sha256": "4f19eac213ffe2098c7ba160bd78603f1d99b695b2872f15b9053fa40262800a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/sw.png",
+          "sha256": "0da69b01031f3f86880b74724392780fd543dbc92196da14213270e2bc5d5371"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/sw.png",
+          "sha256": "161c9f90e8f65039d2c0ecf1f376ba0a231090d16cf4615291d61b204375d02d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/w.png",
+          "sha256": "b074401794aaa07b7e3c810bd380eb81129cb0ec2860fd4413d1ff62e25080ed"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/w.png",
+          "sha256": "dc774b82ca4088bfbef3785c4b477a1d270069de6e513224d82cbc8486cbfc75"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/nw.png",
+          "sha256": "085a16a8aaebd4e9ae102336ca0dda5539e66341ddea6b1a356201b91d6b2e09"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/nw.png",
+          "sha256": "6956edf33a64d7656d909082f81107ee60dc0a9262f187e2fb82c1ac9c76f1f1"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.29,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Spielfigur der gemalten Scheibe: 3D-Pfad B (MPFB2 + Toon), Sense und Cannon im Rig"
+      }
+    },
+    {
+      "id": "dd68a43e24bd48c2b71922d335fecd7b",
+      "timestamp": "2026-10-05T21:36:42+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "swing2",
+        "frames": 8,
+        "fps": 12.0,
+        "frame_size": [
+          306,
+          193
+        ],
+        "origin": [
+          0.5,
+          0.8549
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.2,
+        "render_seconds": 21.9
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/swing2.render.json",
+          "sha256": "9e4e93863f20faabc258d22846bbf0b62025caac7d123699eeaf2f46e44160a5"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/n.png",
+          "sha256": "24c3edb4f6a1e6706b4073c16c5a344d0e33ed844759a387aed3898cce81408b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/n.png",
+          "sha256": "28f1d70249a6160689001cee182a2c40ac3e1e48adcdec72c559716c402eb1c5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/ne.png",
+          "sha256": "1c1a4ca91bb637c7e6343d60c1912d8903d6449ae63acc27d8ee30f75c17aae2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/ne.png",
+          "sha256": "8283baf63e0cb859072eb7ef1f331f1be51664f27b31bfb11b70847b7a4e98d5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/e.png",
+          "sha256": "3153a9347abb7931491db184ad1eb1fb723664eb4a501378b6ba498e115a24a1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/e.png",
+          "sha256": "e29c51f5820a14a19dc99867d72c839ab7fcbcf9dd57a99c2ae6f51d7b2904cd"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/se.png",
+          "sha256": "e1fc8eebde3935587b6f2d7e902447defc2a25ee2b3cf7ba33497a42a10c1910"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/se.png",
+          "sha256": "ea91721662dd5b4402579f25233edbc0f6091dde0d4190a9d5f9e8a8401704c7"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/s.png",
+          "sha256": "55a7b44dee75e4c2b4eb413270547fe562724663a7607fe6123555def8b0fb5b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/s.png",
+          "sha256": "cdc852874fe1f09ffdb724864ae585a4eed6f5edfef8c36b21be1c7497796d84"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/sw.png",
+          "sha256": "d53913cb6be54286f5ec5f2a6fe77e0b2f80ee46d86117c3076b179799966f37"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/sw.png",
+          "sha256": "93da3953adc7ad562d3adb21af61ee4c9b45f710110613cdcb34b525de7730e5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/w.png",
+          "sha256": "887ee955c65f81c683103d7d83bb09a87ece8ce8ab7f49195cc5706998ce435a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/w.png",
+          "sha256": "6ab49be33cf013b8ec3fba4a93402124943eed632daeec84053454fc7c46dbe1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/nw.png",
+          "sha256": "19d0d33894a9768f6bcb9443e5c619c57a6f88b9738467e728b1fd9c6861c5b6"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/nw.png",
+          "sha256": "8facd0afe9c28b9061cda006aba06370ba9acfcc4da4fc96bdb2e3e265ced5cf"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.29,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Spielfigur der gemalten Scheibe: 3D-Pfad B (MPFB2 + Toon), Sense und Cannon im Rig"
+      }
+    },
+    {
+      "id": "eec0c1a1ce7f4377a3437e2cd7b06720",
+      "timestamp": "2026-10-05T21:36:42+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "swing3",
+        "frames": 12,
+        "fps": 12.0,
+        "frame_size": [
+          306,
+          195
+        ],
+        "origin": [
+          0.5,
+          0.8564
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.2,
+        "render_seconds": 32.8
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/swing3.render.json",
+          "sha256": "40f1e81579b98908f022155978ac2163566a3da175788be66f6e94d15538fee1"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/n.png",
+          "sha256": "5dabbaca2f71c637b03074e164cc0a536c859d5060287038220127da0351aa52"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/n.png",
+          "sha256": "eb5d80d82a8a5f333bb93c8f588c3cac6f7450ab001788364ce13580022e078c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/ne.png",
+          "sha256": "5662050c746aee77fb8c416efe0bd5912f3fdf8e08d545381c195674177e2f9f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/ne.png",
+          "sha256": "dc21d37ab31ac23ddb8abc2ce79b5245601e7476dc0448c2685584a4bed66952"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/e.png",
+          "sha256": "ae1dfcd12a8d5fe605fd23dc5458d2be1858d408a5f8ad5ff45d089015e10cec"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/e.png",
+          "sha256": "c144643ba289893a226a96250ad857474962c4fd1ca8ed1bdc18ddef683165fb"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/se.png",
+          "sha256": "5ebcbfe81e1036c8c71593da759b66f431e7e383591142c9c3cbf4612b945be0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/se.png",
+          "sha256": "e8e24e8727f73835d6bbc360b3bba12283f52ec0a9ed26de87522e9538e67dd4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/s.png",
+          "sha256": "586e364082441b0d8df04f1793d2e15f835680750cde3372285ab8eafea3383a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/s.png",
+          "sha256": "4f5c98da5468e2234d82055fc23f087a39dd06fefbf72c3bdff555f4e9738abe"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/sw.png",
+          "sha256": "45422a62efe1b8fc4cb936e8e4e4359ceb7bb2607326cea36ad678340ff0ff17"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/sw.png",
+          "sha256": "455ef4e5a82d78361273999d21579cf6146188d359c6e08a0194b01914690bf3"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/w.png",
+          "sha256": "02f523e2d7b4ab2e7b43a7957076631dcc4c83b95d1082d966295388717d8ad9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/w.png",
+          "sha256": "c4b8192f7b7d19f143a5a560517bb74d7fc52a09798a18b86ca797b3172e96d0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/nw.png",
+          "sha256": "b3f66f97b706333c1044f8539eb83a770854a19bd231a3540a7eede85987ea5c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/nw.png",
+          "sha256": "5236781ace6e13170d89d3413fbf4943bbd4ab3a9a97ed1bdc0eacb1326f8b48"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.39,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Spielfigur der gemalten Scheibe: 3D-Pfad B (MPFB2 + Toon), Sense und Cannon im Rig"
+      }
+    },
+    {
+      "id": "1af0b6ce82e54018a9ccc13be47b674f",
+      "timestamp": "2026-10-05T21:36:43+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "aim",
+        "frames": 4,
+        "fps": 6.0,
+        "frame_size": [
+          214,
+          220
+        ],
+        "origin": [
+          0.5,
+          0.8
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.2,
+        "render_seconds": 11.4
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/aim.render.json",
+          "sha256": "50fc49b4fdd78ff050b96c1b470f1efe9cd3c709a4eb1b52b9fe17d376b9f64e"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim/n.png",
+          "sha256": "fbe9abc0d92d5fbdf753f9d5e0dcc6fee1b8bbc5c4e09278189d29f123aac834"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_normal/n.png",
+          "sha256": "c9cdb3369d8c447118adedc94d1ae3c4468225d5b91149f4aba497102816daee"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim/ne.png",
+          "sha256": "64be953a65cfe28fd538b13e12ff27ac8bae09c00b8470c3a49cb07a82d1d758"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_normal/ne.png",
+          "sha256": "81e066dc1f750c42d68d90b7706a6ad21ebb7171cfbd0756b4ff22ddea9588e7"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim/e.png",
+          "sha256": "ab893a1954233d90080c77e8de595495d8ff415aac6bacc99b95136c5725c60a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_normal/e.png",
+          "sha256": "673dc58a991a04dada7b4b95a1d72b36cf83ce6a69d354d534ee78ff17d1c432"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim/se.png",
+          "sha256": "6188039f2e055dea50cba6572b9955611fe3ddcf2a85024f21ec513a4c08aef3"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_normal/se.png",
+          "sha256": "42e9a490af6cb0d17811bda66ae7dc93c6cbc90a24bfb5652a83bd82069fc943"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim/s.png",
+          "sha256": "204fbbb3d97f3de676fef70604ed665d79b5b5d8917b0873e199743efb37ce58"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_normal/s.png",
+          "sha256": "8f84a5a85ea688aa950438ae7aad5011b5b3931b882c599cc3bddb83f79dbda3"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim/sw.png",
+          "sha256": "11848bc60bf8ec384ab3e9b4e89d0338ab955d8162987fd59e526137dfc58523"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_normal/sw.png",
+          "sha256": "ff19512ccbfd700c2b63558b28a81f2e957cb9ffe7f4681e52e88e0afb34c2ff"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim/w.png",
+          "sha256": "8374e0779fbed1b1271d63969c56eee736ef0d5bff394aee31228a4be03ba1cd"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_normal/w.png",
+          "sha256": "8432cd74063e210ae6c52e87bde44bd879ec1b78e5721fc049bbf36b23a22e03"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim/nw.png",
+          "sha256": "cc16fe2abbcd1d7af6e25922a431d8bdaa9d11da5aa56c6ccdd6803fcb3b9844"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_normal/nw.png",
+          "sha256": "b10acf081a1c1e721ca445eb6277bb251d7030452dad0b51f3045493cd68fa37"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.12,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Spielfigur der gemalten Scheibe: 3D-Pfad B (MPFB2 + Toon), Sense und Cannon im Rig"
+      }
+    },
+    {
+      "id": "1dabbb796cf34bf58601f5a935daff70",
+      "timestamp": "2026-10-05T21:51:04+00:00",
+      "visual_id": "enemy.hollow",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "idle",
+        "frames": 12,
+        "fps": 6.0,
+        "frame_size": [
+          106,
+          235
+        ],
+        "origin": [
+          0.5,
+          0.8936
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.2,
+        "render_seconds": 32.0
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/enemy.hollow/render/idle.render.json",
+          "sha256": "0d75b6b9d6127eb4092719992ac0a113b35862d5c42c06e85a6cbbaaced9aa4f"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle/n.png",
+          "sha256": "49d061e652ce14676846169011fcdfdaf1d1312027e705587d8e0e6ff266d476"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle_normal/n.png",
+          "sha256": "eab5d2af187f8ae0866684a3c45136b5ac95e2f5e4e7c69883187bcb3c9ba957"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle/ne.png",
+          "sha256": "deac3522f5ce8f42c5792a0c74af76b44b451dbe6c0f7547c2bb35cb5f64f6a8"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle_normal/ne.png",
+          "sha256": "0b58b0f5289cd67e4959d19c383a6ee700e5082f015350aca2ab85718add441f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle/e.png",
+          "sha256": "641d594d9f591b4155c6f9b4934f0fbfde4abc4107463c83ecc6bed7e4ff0bc7"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle_normal/e.png",
+          "sha256": "cc2cda3f342d96c6db1aa3bd67e0eccba489330924121683b734d9537e799417"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle/se.png",
+          "sha256": "f18cb11f11c9478be49162960a5a323e02974e8a10e3012c40d283c55a2a83f0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle_normal/se.png",
+          "sha256": "e220121bd244a7d9772d871b583025efd4b806bf8ded5b4c905e51887dbfae25"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle/s.png",
+          "sha256": "2564d7d2d00e92db2bae98cb372b62a68815a7e26241e171b4b3f1162260d606"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle_normal/s.png",
+          "sha256": "9d13e780daa7e7c6ab3d87826d2fa20fc86d404cd80d76f06621010c8fbc36b2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle/sw.png",
+          "sha256": "953edf37768f33028e02449134c38a845d31cca58ea35af85199baf95d2498d9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle_normal/sw.png",
+          "sha256": "e304bce72377ff307f14250d1ec4d83de52c1020372792f20b21e095b14c8af2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle/w.png",
+          "sha256": "e7cf71e1584251a7601f1f0eb2b9fcc6ec165c2f9a26d34b73d95ffcd39e55ee"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle_normal/w.png",
+          "sha256": "823cda829cbb303402f952a57a02e12e400cc2a0305875a2eeb4db1a4b1e145d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle/nw.png",
+          "sha256": "e4d8834169ecd1caa62b573e9bf6d97f618658caf00c23be3672223f913d2c66"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle_normal/nw.png",
+          "sha256": "27ee801c4178a3f6f378a8d4c2f2c5de637cd62131a1400e33883b3598935936"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.22,
+      "decision": {
+        "status": "verworfen",
+        "reason": "Maske zu dunkel, im Spiel kaum lesbar; ersetzt durch den Lauf mit hellerer Maske"
+      }
+    },
+    {
+      "id": "3d2a514f7efb4e2eadc9b3ddc2d67ed0",
+      "timestamp": "2026-10-05T21:51:05+00:00",
+      "visual_id": "enemy.hollow",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "move",
+        "frames": 12,
+        "fps": 12.0,
+        "frame_size": [
+          162,
+          247
+        ],
+        "origin": [
+          0.5,
+          0.8623
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.2,
+        "render_seconds": 31.7
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/enemy.hollow/render/move.render.json",
+          "sha256": "db8d3a44c7371e739211a2b14125905dca579107f259bc3c7bcd3cfd69a751c9"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move/n.png",
+          "sha256": "bf15f1b2f516141549cc5d28ab6367dec4de9cbf5f6dabf98e71c3f00c671b96"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move_normal/n.png",
+          "sha256": "cbe701f48aabcf5a9e1fdf164181c7541ae66ddfdb3b8115c7dd8d983ce1b5d0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move/ne.png",
+          "sha256": "74c9e124d069732444647832fa7cea5c81e1c98094352b57a50258d065dcf841"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move_normal/ne.png",
+          "sha256": "6d5363000f0cb7eaf072c2d349c2dfa6339e08899b94cee32637a0002e0ebd66"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move/e.png",
+          "sha256": "eb3343452b59e2fa139c5dfeaac1dafe65b0dea68754bdda076a374de388fe9b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move_normal/e.png",
+          "sha256": "f9bc1717fb8ac7c41d43e8ae29d301a4a3b4083fe164052059d0a4db5619a83c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move/se.png",
+          "sha256": "8d856a5f63bfe17b8d333dc4a554e0d8ecf7190527b3c805d8ffcc3f3b2e4630"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move_normal/se.png",
+          "sha256": "487fb31d6583ea3ccf587a61157139270b2a3094edde22bc983e21fdc35a75a9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move/s.png",
+          "sha256": "ead865de55577b49cd99c598c295c8eeeadc47d0fb6d4dcde90faf7d4d369be6"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move_normal/s.png",
+          "sha256": "95778a51208a8b4ec45208d9c64a45da35781664f1d360b899e09cb053948955"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move/sw.png",
+          "sha256": "007fae91243cc1636183e8b315623569df863097d69d5da1ebea32206d20cf81"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move_normal/sw.png",
+          "sha256": "89672f48c37bc2da6fde1e212d5fa8b574894ecbb1f2b8800881af2a7afd7428"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move/w.png",
+          "sha256": "ccf54e3a0b63fd895ffd405fb4025220fcbed00136ba872a0898b3ddd5040372"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move_normal/w.png",
+          "sha256": "8a1c7ad41bef42893666f7b8d8bbd870da9a6c51ca83fef5c16bf7013c3c4726"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move/nw.png",
+          "sha256": "82522cd5ca27f68e65f96a10c1017dc5f46c25db6e142aac4fef962d984775ff"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move_normal/nw.png",
+          "sha256": "e645efba72e3954ac02126422dc416bfe1be1047fddbc78b84d6b8bbf52d2349"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.38,
+      "decision": {
+        "status": "verworfen",
+        "reason": "Maske zu dunkel, im Spiel kaum lesbar; ersetzt durch den Lauf mit hellerer Maske"
+      }
+    },
+    {
+      "id": "89900af1a0264c9b964d938b7056e8f6",
+      "timestamp": "2026-10-05T21:51:06+00:00",
+      "visual_id": "enemy.hollow",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "swipe",
+        "frames": 10,
+        "fps": 18.0,
+        "frame_size": [
+          260,
+          243
+        ],
+        "origin": [
+          0.5,
+          0.8642
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.2,
+        "render_seconds": 26.4
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/enemy.hollow/render/swipe.render.json",
+          "sha256": "dacb43832fbeb01cad272721d1f3005554166d2389ffef0099d4fded72122dfd"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/n.png",
+          "sha256": "13f69d681dc416ada6fe7937213ce283e437e602221f06411bdc7ef59a7aa969"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/n.png",
+          "sha256": "0482fc0af71c35a2b3279f8b071fd9bcca6f54cf21bce338bbe35f34b5553fe5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/ne.png",
+          "sha256": "0e3c0bf844d6a980825a0f11d63af1bb248935371aae1dcaeb76bfa3f8f52386"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/ne.png",
+          "sha256": "cbebc5b5e2b8f25814e26cb0de13b908d2e337f3ec3e4b8b7d679cc731de77d0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/e.png",
+          "sha256": "7e144758b741acdadc4ec9f635bb3bc0e0ada0eee387f73eecc3f2289062c453"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/e.png",
+          "sha256": "673ecdbab5b7f2354d1e2513921bba8aa397ae8f3fa2e63a4168c635a2d7e4f5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/se.png",
+          "sha256": "3a5daeeb353d675deabe746e709cb52a73e1f50fbc0ac25e331c9ea219b4754f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/se.png",
+          "sha256": "537d03d1c512ff30c5273e87527ddaf2d6f6b162fefbf3cccad030fab33874cf"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/s.png",
+          "sha256": "604431d5eedfd6d8c1b9029ddf776571405840587698ce6bda7eeb6171e599f8"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/s.png",
+          "sha256": "b7f85a4b46031f0f8a38d520136eb3ae2de1a892aaa78f413c3a3732ceca9d12"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/sw.png",
+          "sha256": "d86a1ca6c4bd0bb52af9c129f4c0f0563dfdf7254b4330accf28a14364831109"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/sw.png",
+          "sha256": "65acb669f16903e74e15205dc5d8747304929422e50c5c30d84b44c15c95f568"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/w.png",
+          "sha256": "e901cdc8d2ae6421f4c3d0eb65a52e96259a25d42537ba7d75424053b4b9ffac"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/w.png",
+          "sha256": "0c4699278f3b7a09b03840e19758cbff0dae1cc0203c717224dd9393fc4d1789"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/nw.png",
+          "sha256": "b95e63fa3ea659f47921f683402b240582d28e35658cf7ac10eb2b704f8cc543"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/nw.png",
+          "sha256": "dc7bca72fadaf823b7260353e5a0a9e551cc8352d3c5a25db17dbd0d0719a655"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.44,
+      "decision": {
+        "status": "verworfen",
+        "reason": "Maske zu dunkel, im Spiel kaum lesbar; ersetzt durch den Lauf mit hellerer Maske"
+      }
+    },
+    {
+      "id": "8a043f870ee84f769081cfc0bdd61122",
+      "timestamp": "2026-10-05T21:55:18+00:00",
+      "visual_id": "enemy.hollow",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "idle",
+        "frames": 12,
+        "fps": 6.0,
+        "frame_size": [
+          106,
+          235
+        ],
+        "origin": [
+          0.5,
+          0.8936
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.2,
+        "render_seconds": 32.4
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/enemy.hollow/render/idle.render.json",
+          "sha256": "a88ac60bd1f11bf80683de063991f644f4a03ff74f096d60b09fb844909a5947"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle/n.png",
+          "sha256": "49d061e652ce14676846169011fcdfdaf1d1312027e705587d8e0e6ff266d476"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle_normal/n.png",
+          "sha256": "eab5d2af187f8ae0866684a3c45136b5ac95e2f5e4e7c69883187bcb3c9ba957"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle/ne.png",
+          "sha256": "25395aeec90a44e11a24a6552e6d3c86951527864cf232fcb9c54f08d5f3445d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle_normal/ne.png",
+          "sha256": "0b58b0f5289cd67e4959d19c383a6ee700e5082f015350aca2ab85718add441f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle/e.png",
+          "sha256": "66c29cc7ca2489e2bb939f6878e9bb9229417ea605cf97588cc3fd5877b1a6b6"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle_normal/e.png",
+          "sha256": "cc2cda3f342d96c6db1aa3bd67e0eccba489330924121683b734d9537e799417"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle/se.png",
+          "sha256": "65b7e45287939b28f3d8f88c2db542c08c705e35304af1425a05dfb2d6afc150"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle_normal/se.png",
+          "sha256": "8ee7f4a0c24ff184ddec13a7d61f55f0c32e4e3bb9f36d599bdd07aeb6d12826"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle/s.png",
+          "sha256": "c932e03acf67db4d7420d1b9138be76aa1f6ba726bdbcca3c5559c4ba881ebd5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle_normal/s.png",
+          "sha256": "9d13e780daa7e7c6ab3d87826d2fa20fc86d404cd80d76f06621010c8fbc36b2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle/sw.png",
+          "sha256": "e644ba1cb8af3b4ad583a26b3b32bb1b1e9e001c892d04cc6f6db2aa48f18ca9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle_normal/sw.png",
+          "sha256": "66056b6bde3c8f43287393a9243c4405c42394e13bbf56d4996e2c4b135706d8"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle/w.png",
+          "sha256": "44901e66b3cb8deeee0083c2c85b5ca35d9c5b5bd40250b572c8aa1098f56453"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle_normal/w.png",
+          "sha256": "823cda829cbb303402f952a57a02e12e400cc2a0305875a2eeb4db1a4b1e145d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle/nw.png",
+          "sha256": "cbfea0a6225f62f5547a513807bd5594db7542776bd8356ab0d474191c64bbb0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle_normal/nw.png",
+          "sha256": "27ee801c4178a3f6f378a8d4c2f2c5de637cd62131a1400e33883b3598935936"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.22,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Hollow der gemalten Scheibe: 3D-Pfad B (MPFB2 + Toon), Grundform nach Figurenblatt"
+      }
+    },
+    {
+      "id": "02cb7bd5c9514d95af31267d6a6a4470",
+      "timestamp": "2026-10-05T21:55:18+00:00",
+      "visual_id": "enemy.hollow",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "move",
+        "frames": 12,
+        "fps": 12.0,
+        "frame_size": [
+          162,
+          247
+        ],
+        "origin": [
+          0.5,
+          0.8623
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.2,
+        "render_seconds": 32.0
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/enemy.hollow/render/move.render.json",
+          "sha256": "5348e064e4e61d84f53f40dd9cdbf68fa18f71567df04e3d2d23d2d27681df5f"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move/n.png",
+          "sha256": "bf15f1b2f516141549cc5d28ab6367dec4de9cbf5f6dabf98e71c3f00c671b96"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move_normal/n.png",
+          "sha256": "cbe701f48aabcf5a9e1fdf164181c7541ae66ddfdb3b8115c7dd8d983ce1b5d0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move/ne.png",
+          "sha256": "83d8567b750e39751c33356375ead1cd41e0a92c208058d162777065e7c7ef68"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move_normal/ne.png",
+          "sha256": "6d5363000f0cb7eaf072c2d349c2dfa6339e08899b94cee32637a0002e0ebd66"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move/e.png",
+          "sha256": "1d94e9bffa6879c1825ae2cc2142ed1ba6fe06cfaf3396e5e258d4b96ed4b033"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move_normal/e.png",
+          "sha256": "f9bc1717fb8ac7c41d43e8ae29d301a4a3b4083fe164052059d0a4db5619a83c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move/se.png",
+          "sha256": "82b3c7a1e70b807bae5b2844125071a82edc17d2ecc9be66b1fa0cf02169d683"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move_normal/se.png",
+          "sha256": "487fb31d6583ea3ccf587a61157139270b2a3094edde22bc983e21fdc35a75a9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move/s.png",
+          "sha256": "a859e5a7149c2ba31174a476290974ea9775408ae67ebfc5d9708a238bddca31"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move_normal/s.png",
+          "sha256": "95778a51208a8b4ec45208d9c64a45da35781664f1d360b899e09cb053948955"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move/sw.png",
+          "sha256": "1b67caa15bca071b2d4e77dd901a9372c9bfdf1879a6f4cf9d3e3bacb2038306"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move_normal/sw.png",
+          "sha256": "89672f48c37bc2da6fde1e212d5fa8b574894ecbb1f2b8800881af2a7afd7428"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move/w.png",
+          "sha256": "5d364266accf38aec77fc05eb9704947224e27488590112e0ab2240344d0a298"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move_normal/w.png",
+          "sha256": "8a1c7ad41bef42893666f7b8d8bbd870da9a6c51ca83fef5c16bf7013c3c4726"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move/nw.png",
+          "sha256": "d36e529651ff42d947567a51b61fa422793e5d3aa3e35ba6ad7959f937de60b2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move_normal/nw.png",
+          "sha256": "e645efba72e3954ac02126422dc416bfe1be1047fddbc78b84d6b8bbf52d2349"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.38,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Hollow der gemalten Scheibe: 3D-Pfad B (MPFB2 + Toon), Grundform nach Figurenblatt"
+      }
+    },
+    {
+      "id": "ef77c37b993d4d6dbeafdf25cb9be220",
+      "timestamp": "2026-10-05T21:55:19+00:00",
+      "visual_id": "enemy.hollow",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "swipe",
+        "frames": 10,
+        "fps": 18.0,
+        "frame_size": [
+          260,
+          243
+        ],
+        "origin": [
+          0.5,
+          0.8642
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.2,
+        "render_seconds": 26.5
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/enemy.hollow/render/swipe.render.json",
+          "sha256": "71b57afa34e6c4a97e5ddef72b148ab061b69390ea45120303a6f6c183dfff2f"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/n.png",
+          "sha256": "366b94f4fd655be23815aa06e17bd1223ac1c9c905a964fc5ce43a8955a986ee"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/n.png",
+          "sha256": "0482fc0af71c35a2b3279f8b071fd9bcca6f54cf21bce338bbe35f34b5553fe5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/ne.png",
+          "sha256": "b147771c7a61d7ebc32ede61ac894827c0a80f81fb7aa397676691658f19c012"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/ne.png",
+          "sha256": "cbebc5b5e2b8f25814e26cb0de13b908d2e337f3ec3e4b8b7d679cc731de77d0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/e.png",
+          "sha256": "8092701a8c0cec1a3ecf6cf5ad78f01e8300b5b1b8b0524f5b9725240e451477"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/e.png",
+          "sha256": "b9374437a5bc6c7f4719c97c6314acc446a45e804d00ee1e73d0f37dcc90ede3"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/se.png",
+          "sha256": "ee6fc4e013df36f7a348b90a5b637b304b98c5e8fd49a9968eb48f2d354bad15"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/se.png",
+          "sha256": "9e8efd52934dc1df2a2dea361c8d9a8a1091c1a0b7c4c7147e00583c7516d67f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/s.png",
+          "sha256": "ab0745bb0976fc8769c0b81f1316fecbb434f326856186379c5c56228f861518"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/s.png",
+          "sha256": "b7f85a4b46031f0f8a38d520136eb3ae2de1a892aaa78f413c3a3732ceca9d12"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/sw.png",
+          "sha256": "5a8e3e1c7b8e54b22e61b717cc1031ae2f79d221eb329e6660be57e1dbdb03d4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/sw.png",
+          "sha256": "299b9ae65cc338ba0e56825a60c50cc6f50f7aeb78521b186f13f8fad8761bc1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/w.png",
+          "sha256": "cc5b1a4aac9f1438e64121971ceacc1f0656fe9585514bfb842643eedc81f98b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/w.png",
+          "sha256": "0c4699278f3b7a09b03840e19758cbff0dae1cc0203c717224dd9393fc4d1789"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/nw.png",
+          "sha256": "71dc9631f35059313bb12b321851847d7e9469ac9136f5b2b0ac7489931b1fe5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/nw.png",
+          "sha256": "dc7bca72fadaf823b7260353e5a0a9e551cc8352d3c5a25db17dbd0d0719a655"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.44,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Hollow der gemalten Scheibe: 3D-Pfad B (MPFB2 + Toon), Grundform nach Figurenblatt"
+      }
     }
   ]
 }

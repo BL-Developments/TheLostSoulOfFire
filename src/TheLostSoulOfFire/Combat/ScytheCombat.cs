@@ -138,15 +138,19 @@ public sealed class ScytheCombat
         Texture2D? physicalScythe,
         Vector2 playerPosition,
         Vector2 facingDirection,
-        bool debugVisible)
+        bool debugVisible,
+        bool figureCarriesScythe = false)
     {
         if (ActiveStep == 0)
         {
-            DrawRestingScythe(batch, pixel, physicalScythe, playerPosition, facingDirection);
+            if (!figureCarriesScythe)
+            {
+                DrawRestingScythe(batch, pixel, physicalScythe, playerPosition, facingDirection);
+            }
             return;
         }
 
-        DrawAttackingScythe(batch, pixel, physicalScythe, playerPosition, debugVisible);
+        DrawAttackingScythe(batch, pixel, physicalScythe, playerPosition, debugVisible, figureCarriesScythe);
     }
 
     private void StartAttack(Vector2 facingDirection, Vector2 playerPosition, ParticleSystem particles)
@@ -216,8 +220,13 @@ public sealed class ScytheCombat
         Texture2D pixel,
         Texture2D? physicalScythe,
         Vector2 playerPosition,
-        bool debugVisible)
+        bool debugVisible,
+        bool figureCarriesScythe)
     {
+        // A rendered figure swings the scythe itself; the Death Flame trail then follows its
+        // blade: a level circle at hand height, seen from the camera's angle.
+        Vector2 trailCentre = figureCarriesScythe ? playerPosition - new Vector2(0f, FigureHeights.Hold) : playerPosition;
+        float squash = figureCarriesScythe ? FigureHeights.LevelSquash : 1f;
         float aim = MathF.Atan2(_attackDirection.Y, _attackDirection.X);
         float attackProgress = NormalizedProgress;
         float swingProgress = ActiveStep == 3
@@ -250,15 +259,18 @@ public sealed class ScytheCombat
         float trailAlpha = 1f - MathHelper.Clamp((attackProgress - fadeStart) / (1f - fadeStart), 0f, 1f);
         float visibleSweep = totalArc * MathHelper.Clamp(eased, 0.08f, 1f);
         float outerThickness = thickness + (ActiveStep switch { 1 => 3f, 2 => 6f, _ => 10f });
-        batch.DrawArc(pixel, playerPosition, radius, start, visibleSweep, GameBalance.DeepViolet * (0.62f * trailAlpha), outerThickness, ActiveStep == 3 ? 34 : 24);
-        batch.DrawArc(pixel, playerPosition, radius, start, visibleSweep, trail * trailAlpha, thickness, ActiveStep == 3 ? 34 : 24);
+        batch.DrawArc(pixel, trailCentre, radius, start, visibleSweep, GameBalance.DeepViolet * (0.62f * trailAlpha), outerThickness, ActiveStep == 3 ? 34 : 24, squash);
+        batch.DrawArc(pixel, trailCentre, radius, start, visibleSweep, trail * trailAlpha, thickness, ActiveStep == 3 ? 34 : 24, squash);
         if (ActiveStep == 3)
         {
-            batch.DrawArc(pixel, playerPosition, radius + 3f, start, visibleSweep, GameBalance.SoulWhite * (0.82f * trailAlpha), 4.5f, 34);
+            batch.DrawArc(pixel, trailCentre, radius + 3f, start, visibleSweep, GameBalance.SoulWhite * (0.82f * trailAlpha), 4.5f, 34, squash);
         }
 
-        Vector2 bladeDirection = new(MathF.Cos(current), MathF.Sin(current));
-        batch.DrawSpriteOrDummy(pixel, physicalScythe, playerPosition + bladeDirection * 29f, current, ActiveStep switch { 1 => 0.55f, 2 => 0.6f, _ => 0.7f });
+        if (!figureCarriesScythe)
+        {
+            Vector2 bladeDirection = new(MathF.Cos(current), MathF.Sin(current));
+            batch.DrawSpriteOrDummy(pixel, physicalScythe, playerPosition + bladeDirection * 29f, current, ActiveStep switch { 1 => 0.55f, 2 => 0.6f, _ => 0.7f });
+        }
 
         if (debugVisible)
         {

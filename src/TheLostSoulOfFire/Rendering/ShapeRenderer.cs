@@ -68,13 +68,18 @@ public static class ShapeRenderer
         }
     }
 
-    public static void DrawArc(this SpriteBatch batch, Texture2D pixel, Vector2 center, float radius, float startAngle, float sweep, Color color, float thickness, int segments = 24)
+    public static void DrawArc(this SpriteBatch batch, Texture2D pixel, Vector2 center, float radius, float startAngle, float sweep, Color color, float thickness, int segments = 24) =>
+        batch.DrawArc(pixel, center, radius, startAngle, sweep, color, thickness, segments, squash: 1f);
+
+    /// <summary>An arc of a level circle seen at an angle: <paramref name="squash"/> scales its height.</summary>
+    public static void DrawArc(this SpriteBatch batch, Texture2D pixel, Vector2 center, float radius, float startAngle, float sweep, Color color, float thickness, int segments, float squash)
     {
-        Vector2 previous = center + new Vector2(MathF.Cos(startAngle), MathF.Sin(startAngle)) * radius;
+        Vector2 scale = new(radius, radius * squash);
+        Vector2 previous = center + new Vector2(MathF.Cos(startAngle), MathF.Sin(startAngle)) * scale;
         for (int i = 1; i <= segments; i++)
         {
             float angle = startAngle + sweep * i / segments;
-            Vector2 next = center + new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * radius;
+            Vector2 next = center + new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * scale;
             batch.DrawLine(pixel, previous, next, color, thickness);
             previous = next;
         }

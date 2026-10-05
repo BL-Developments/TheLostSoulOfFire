@@ -2,23 +2,30 @@
 
 Art: character
 Status: im-spiel
-Stil: ludo
+Stil: hausstil
 Weltgröße: 100 × 100
 Akzentfarbe: Karminrot des Kompassdeckels; Death Flame als Emission am Kern
 Lore: [Figurenblatt Protagonist](../../docs/current/characters/protagonist.md)
 
 ## Merkmale
-- Mensch zuerst: lesbares Gesicht, Hände und Beine.
-- Langer, asymmetrischer dunkler Mantel, Brustriemen, Kompass mit karminrotem Deckel am Riemen.
-- Sense und Soul Cannon sind Teil der Figur; die Ludo-Grafik zeichnet sie noch getrennt.
-- Schwacher violetter Kern unter dem Brustbein.
+- Mensch zuerst: lesbares Gesicht (Brauen, dunkle Augen), Hände und Beine.
+- Langer, asymmetrischer dunkler Wollmantel mit Stehkragen, auf der Waffenseite länger; Ledergürtel; Brustriemen mit Kompass, karminroter Deckel.
+- Sense (S-Stiel, Klinge mit Rückensporn, Manschette mit Death-Flame-Kern, Dorn) und Soul Cannon (Reliquienkasten mit Gitterkammer und gerippter Mündung, auf dem Rücken) sind Teil der Frames.
+- Schwacher violetter Kern unter dem Brustbein (vom Spiel gezeichnet).
 
 ## Silhouette
-Schlank und mittelgroß; Sensenklinge über einer Schulter, Cannon-Mündung über der anderen, schräger Mantelsaum. Aus allen acht Richtungen dieselbe Figur.
+Schlank und mittelgroß; Sensenklinge vor dem Körper oder über der linken Schulter, Cannon-Mündung über der rechten, schräger Mantelsaum. Aus allen acht Richtungen dieselbe Figur.
+
+## Herstellung
+3D-Pfad B: MPFB2-Körper mit Kleidung, Sense und Cannon per Skript (`tools/visuals/blender/build_player.py`), Toon-Rampe mit Pinselrauschen und Konturhülle, 8 Richtungen mit Normalmap (`render_directions.py`, 320 px auf 3,2 m, 35°), gepackt mit `pack_sheets.py --pixels-per-unit 1.5`. Die Füße stehen auf der Spielposition.
 
 ## Animationen
-- `idle`: Ruhe, Schleife; Waffe in Kampfhaltung quer vor dem Körper.
-- `move`: Laufen, Schleife; schreitet nach Strecke voran (Clip-Fortschritt `distance`, ein Zyklus je 232 Weltpixel).
+- `idle`: Ruhe, Schleife; Sense waagerecht quer vor dem Körper, Klinge links oben.
+- `move`: Laufen, Schleife; Sense schräg vor der Brust, Klinge über der Schulter; schreitet nach Strecke voran (Clip-Fortschritt `distance`, ein Zyklus je 180 Weltpixel).
+- `swing1`: erster Sensenhieb, 120° von links nach rechts, einmalig; Bild für Bild nach dem Fortschritt des Angriffs.
+- `swing2`: zweiter Hieb, 140° zurück, einmalig.
+- `swing3`: dritter Hieb mit Ausholen und Drehung des Oberkörpers, 198°, einmalig.
+- `aim`: Soul Cannon in der rechten Hand erhoben, Sense in der linken, Schleife.
 
 ## Effekte
 - `fx.scythe-slash-01`: erster Sensenhieb, 0,205 s, Treffer bei 0,062 s

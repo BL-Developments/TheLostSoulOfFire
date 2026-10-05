@@ -81,4 +81,17 @@ public static class VisualClips
     public const string Charge = "charge";
     public const string Slam = "slam";
     public const string Devour = "devour";
+
+    /// <summary>Player: the three steps of the scythe combo and the raised Soul Cannon.</summary>
+    public const string Swing1 = "swing1";
+    public const string Swing2 = "swing2";
+    public const string Swing3 = "swing3";
+    public const string Aim = "aim";
+
+    public static string Swing(int step) => step switch
+    {
+        1 => Swing1,
+        2 => Swing2,
+        _ => Swing3
+    };
 }
