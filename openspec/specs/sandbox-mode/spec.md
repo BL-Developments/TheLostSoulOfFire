@@ -147,3 +147,10 @@ Das System SHALL im Abschnitt `GEGNER` unter den Spawn-Aktionen die Aktion `ALLE
 - **WHEN** vier Gegner auf dem Feld stehen und der Spieler `ALLE GEGNER ENTFERNEN` auslöst
 - **THEN** zeigt die Zeile 0 und nach dem Schließen ist das Feld leer
 
+### Requirement: Die Trainingspuppe lässt sich im Dev-Menü spawnen
+Das System SHALL im Abschnitt `GEGNER` des Dev-Menüs die Aktion `TRAININGSPUPPE` nach den übrigen Gegnertypen und vor `ALLE GEGNER ENTFERNEN` anzeigen. Sie SHALL eine Trainingspuppe nach denselben Regeln wie andere Gegner in Sichtweite des Spielers setzen; `ALLE GEGNER ENTFERNEN` SHALL auch Trainingspuppen entfernen.
+
+#### Scenario: Puppe spawnen und entfernen
+- **WHEN** der Spieler im Dev-Menü `TRAININGSPUPPE` auslöst und später `ALLE GEGNER ENTFERNEN`
+- **THEN** steht zuerst eine Puppe in Sichtweite und die Zeile zeigt 1, danach ist sie verschwunden
+
