@@ -1587,3 +1587,8 @@
 /importer:ShadowDuskEffectImporter
 /processor:ShadowDuskEffectProcessor
 /build:Effects/Dissolve.fx
+
+#begin Effects/DeathFlame.fx
+/importer:ShadowDuskEffectImporter
+/processor:ShadowDuskEffectProcessor
+/build:Effects/DeathFlame.fx

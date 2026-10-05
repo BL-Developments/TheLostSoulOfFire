@@ -83,6 +83,7 @@ public sealed class ArtAssets
     private readonly Texture2D _pixel;
     private readonly SpriteLighting? _lighting;
     private readonly Effect? _dissolve;
+    private readonly DeathFlameRenderer? _deathFlame;
     private readonly Texture2D _dissolveNoise;
     private readonly ConditionalWeakTable<object, FigureState> _figures = new();
     private readonly List<DissolveInstance> _dissolves = [];
@@ -109,6 +110,8 @@ public sealed class ArtAssets
         Effect? spriteLit = TryLoadEffect(content, "Effects/SpriteLit");
         _lighting = spriteLit is null ? null : new SpriteLighting(spriteLit);
         _dissolve = TryLoadEffect(content, "Effects/Dissolve");
+        Effect? deathFlame = TryLoadEffect(content, "Effects/DeathFlame");
+        _deathFlame = deathFlame is null ? null : new DeathFlameRenderer(device, deathFlame);
         _dissolveNoise = CreateNoiseTexture(device, 64, seed: 1709);
 
         foreach (VisualEntry entry in registry.Entries)
@@ -152,6 +155,21 @@ public sealed class ArtAssets
     }
 
     public void EndLitScene() => _litSceneActive = false;
+
+    /// <summary>
+    /// Draws a Death Flame ribbon along <paramref name="path"/> (tail first) inside the lit scene.
+    /// Without the shader nothing is drawn; callers keep their own fallback.
+    /// </summary>
+    public bool DrawDeathFlameTrail(SpriteBatch batch, IReadOnlyList<Vector2> path, float width, float opacity)
+    {
+        if (_deathFlame is null || !_litSceneActive)
+        {
+            return false;
+        }
+
+        _deathFlame.DrawTrail(batch, _sceneTransform, path, width, opacity, _time);
+        return true;
+    }
 
     /// <summary>Drops dissolves and other presentation-only leftovers, for example when a run restarts.</summary>
     public void ClearTransient() => _dissolves.Clear();
