@@ -43,6 +43,10 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--scale", type=float, default=1.5)
     parser.add_argument("--tile-max", type=int, default=2048)
     parser.add_argument("--layer", default="ground")
+    parser.add_argument("--origin", nargs=2, type=float, default=[0.0, 0.0], metavar=("X", "Y"),
+                        help="anchor as a share of the plate, e.g. 0 1 for a wall standing on its bottom-left corner")
+    parser.add_argument("--crop", nargs=4, type=int, metavar=("LEFT", "TOP", "RIGHT", "BOTTOM"),
+                        help="crop the source first, e.g. to remove a painted paper margin")
     parser.add_argument("--model", default="flux2-klein-4b", help="licence-table key of the source model")
     args = parser.parse_args(argv)
 
@@ -52,14 +56,18 @@ def main(argv: list[str]) -> int:
     tile_w, tile_h = math.ceil(width / columns), math.ceil(height / rows)
     width, height = tile_w * columns, tile_h * rows
 
-    plate = Image.open(args.plate).convert("RGBA").resize((width, height), Image.Resampling.LANCZOS)
+    plate = Image.open(args.plate).convert("RGBA")
+    if args.crop:
+        plate = plate.crop(tuple(args.crop))
+    plate = plate.resize((width, height), Image.Resampling.LANCZOS)
     outputs: list[Path] = []
     step = common.Step(
         visual_id=args.visual_id,
         step="place-environment",
         tool={"name": "place_environment.py", "version": "1"},
         model=common.model_info(args.model),
-        parameters={"world": args.world, "output": [width, height], "tiles": [columns, rows], "layer": args.layer},
+        parameters={"world": args.world, "output": [width, height], "tiles": [columns, rows], "layer": args.layer,
+                    "origin": args.origin, "crop": args.crop},
         inputs=[args.plate],
         reason="Bodenplatte für das Spiel aufbereitet",
     )
@@ -77,7 +85,7 @@ def main(argv: list[str]) -> int:
         if entry is None:
             entry = {"id": args.visual_id, "kind": "environment", "palette": "world"}
             registry["visuals"].append(entry)
-        entry.update({"worldSize": list(args.world), "origin": [0, 0], "layer": args.layer})
+        entry.update({"worldSize": list(args.world), "origin": [args.origin[0], args.origin[1]], "layer": args.layer})
         clip = {"path": f"{args.texture}_{{tile}}" if columns * rows > 1 else args.texture,
                 "frameSize": [tile_w, tile_h], "frames": 1, "fps": 1, "loop": True}
         if columns * rows > 1:

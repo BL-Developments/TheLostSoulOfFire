@@ -530,6 +530,1037 @@
         "status": "kandidat",
         "reason": "Probeaufruf, noch nicht bewertet"
       }
+    },
+    {
+      "id": "9f2a5b5af8714a019ab90579b06e2593",
+      "timestamp": "2026-10-05T19:47:19+00:00",
+      "visual_id": "environment.arena",
+      "step": "floor-candidate",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "hand-painted gouache illustration with visible brush strokes, painterly texture, game level background seen from above in a steep three-quarter top-down view, the stone casting floor of a neo-gothic ironworks hall fills almost the whole image, large worn flagstones with soot, cracks and faint slag stains, the floor is calm, even and mid-dark so figures read on it, only along the image edges: soot-dark brick walls with pointed arches and riveted cast-iron columns, tool racks, metal lockers and workbenches pushed against the walls, at the top edge left of centre a leaning blast furnace like an altar with a violet glowing tapping hole and a round flywheel window above it, at the bottom edge a closed iron gate, single key light from the upper left, desaturated soot brick red, cold steel blue grey and dull brass, violet light only at the furnace, no people, no text",
+      "seed": 31,
+      "parameters": {
+        "steps": 4,
+        "width": 1440,
+        "height": 800,
+        "quantize": 8,
+        "init_strength": 0.42,
+        "lora_scale": null
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.arena/layout-1440.png",
+          "sha256": "10bdbf3a6144f6b00ebb620e661fd065fbde8df5d6553a7c619963503bde4cfc"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.arena/floor-s31.png",
+          "sha256": "5bc94647b19f5c94f65f500d7fb6bba6d696b56fdc299277341181229f71ae19"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 138.67,
+      "decision": {
+        "status": "verworfen",
+        "reason": "Steuerbild zu stark (Stärke 0,42 bei 4 Schritten): Layout bleibt flach, kaum gemalt"
+      }
+    },
+    {
+      "id": "1bdc312881734c3eab422d15e946ac5a",
+      "timestamp": "2026-10-05T19:52:47+00:00",
+      "visual_id": "environment.arena",
+      "step": "floor-candidate",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "hand-painted gouache illustration with visible brush strokes, painterly texture, game level background seen from above in a steep three-quarter top-down view, the stone casting floor of a neo-gothic ironworks hall fills almost the whole image, large worn flagstones with soot, cracks and faint slag stains, the floor is calm, even and mid-dark so figures read on it, only along the image edges: soot-dark brick walls with pointed arches and riveted cast-iron columns, tool racks, metal lockers and workbenches pushed against the walls, at the top edge left of centre a leaning blast furnace like an altar with a violet glowing tapping hole and a round flywheel window above it, at the bottom edge a closed iron gate, single key light from the upper left, desaturated soot brick red, cold steel blue grey and dull brass, violet light only at the furnace, no people, no text",
+      "seed": 31,
+      "parameters": {
+        "steps": 8,
+        "width": 1440,
+        "height": 800,
+        "quantize": 8,
+        "init_strength": 0.2,
+        "lora_scale": null
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.arena/layout-1440.png",
+          "sha256": "10bdbf3a6144f6b00ebb620e661fd065fbde8df5d6553a7c619963503bde4cfc"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.arena/floor-a-s31.png",
+          "sha256": "03cfbc38979e046a8633258d9c6933325cfcdc1ae06a76013d6d6852b276ed07"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 291.03,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "7332e637e71a4b3caaccd185847069b9",
+      "timestamp": "2026-10-05T20:01:12+00:00",
+      "visual_id": "environment.arena",
+      "step": "floor-candidate",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "Turn the flat layout in the first image into a finished game level background painted in the style of the second image. Keep the layout exactly: the large calm stone floor in the middle, walls only along the edges, the furnace with the violet glow at the top left of centre, the gate at the bottom. Seen from above in a steep three-quarter top-down view. Hand-painted gouache with visible brush strokes, soot brick red, steel blue grey, dull brass, worn flagstones, lockers and tool racks against the walls, key light from the upper left, no people, no text",
+      "seed": 31,
+      "parameters": {
+        "steps": 6,
+        "width": 1440,
+        "height": 800,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.arena/layout-1440.png",
+          "sha256": "10bdbf3a6144f6b00ebb620e661fd065fbde8df5d6553a7c619963503bde4cfc"
+        },
+        {
+          "path": "art/production/review/style-study/arena-b-s23.png",
+          "sha256": "2a34d63b164403cd6b5d2af0db45e82a61b16b91fc8b62dad3eb49b313410821"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.arena/floor-b-s31.png",
+          "sha256": "8bac07dca9f7faaf1278e796a7fcaca3c48eb07228042f214b7a26e80f5f5a9d"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 504.43,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "59f78726501e47a89f82811e6015ea6f",
+      "timestamp": "2026-10-05T20:03:52+00:00",
+      "visual_id": "environment.arena",
+      "step": "floor-candidate",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "seen straight from above, orthographic top-down game floor, the whole image is one flat stone floor of large worn flagstones of an old ironworks casting hall, soot stains, hairline cracks, faint rust and slag marks, a few scattered small stones, the floor is calm, even and mid-dark grey-violet, no walls, no objects, no perspective, hand-painted gouache illustration with visible brush strokes, painterly texture, muted soot brick red, cold steel blue grey, dull brass and grey-violet stone, single key light from the upper left, no people, no text",
+      "seed": 61,
+      "parameters": {
+        "steps": 4,
+        "width": 1440,
+        "height": 800,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.arena/floorplate-s61.png",
+          "sha256": "a0bc55b0745ed5a0f3e55f9ead74040795150cbdb2ebc66aab8e2c87cdf5c8c2"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 100.03,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "7b1916f48d5344579438d8ea4c4af3b5",
+      "timestamp": "2026-10-05T20:05:07+00:00",
+      "visual_id": "environment.arena-wall",
+      "step": "wall-candidate",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "straight-on frontal elevation of the long north wall of a neo-gothic ironworks casting hall, seen slightly from above, soot-dark brick wall with a row of pointed arches between riveted cast-iron columns, left of centre a leaning blast furnace built like an altar with a violet glowing tapping hole at its foot, above it a large round window whose tracery is a flywheel, chains hanging, the base of the wall meets a stone floor edge along the bottom of the image, hand-painted gouache illustration with visible brush strokes, painterly texture, muted soot brick red, cold steel blue grey, dull brass and grey-violet stone, single key light from the upper left, violet light only at the furnace, no people, no text",
+      "seed": 61,
+      "parameters": {
+        "steps": 4,
+        "width": 1536,
+        "height": 384,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.arena/wall-s61.png",
+          "sha256": "95c514de66ff98cf2c277b5aacfb6adfedd593988d27d1486d224b8e9f45d548"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 74.88,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "20a5ea8b70454534a2ac9568ecab2dc7",
+      "timestamp": "2026-10-05T20:07:07+00:00",
+      "visual_id": "environment.arena",
+      "step": "floor-candidate",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "seen straight from above, orthographic top-down game floor, the whole image is one flat stone floor of large worn flagstones of an old ironworks casting hall, soot stains, hairline cracks, faint rust and slag marks, a few scattered small stones, the floor is calm, even and mid-dark grey-violet, no walls, no objects, no perspective, hand-painted gouache illustration with visible brush strokes, painterly texture, muted soot brick red, cold steel blue grey, dull brass and grey-violet stone, single key light from the upper left, no people, no text",
+      "seed": 73,
+      "parameters": {
+        "steps": 4,
+        "width": 1440,
+        "height": 800,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.arena/floorplate-s73.png",
+          "sha256": "2e081195806fb585165b2229d9687a2ea5f6686773378d42cd1f436b4875c76c"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 119.36,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "b6b22373327943a1aaea49bf00d662fa",
+      "timestamp": "2026-10-05T20:07:37+00:00",
+      "visual_id": "environment.arena-wall",
+      "step": "place-environment",
+      "tool": {
+        "name": "place_environment.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "world": [
+          1800,
+          454
+        ],
+        "output": [
+          2700,
+          681
+        ],
+        "tiles": [
+          2,
+          1
+        ],
+        "layer": "background",
+        "origin": [
+          0.0,
+          1.0
+        ],
+        "crop": [
+          18,
+          2,
+          1516,
+          380
+        ]
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.arena/wall-s61.png",
+          "sha256": "95c514de66ff98cf2c277b5aacfb6adfedd593988d27d1486d224b8e9f45d548"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Arena/north_wall_c0r0.png",
+          "sha256": "12ef26b93e63d458feadfa09cc5e5bc02b89230eefa8b840a2ad211f5cf1ccb4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Arena/north_wall_c1r0.png",
+          "sha256": "b408746f65da5a10c47af44de6926601a89d59f32eda19e684296361a8707479"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.21,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Bodenplatte für das Spiel aufbereitet"
+      }
+    },
+    {
+      "id": "818848d2af2541bdad777eea1f688f79",
+      "timestamp": "2026-10-05T20:07:38+00:00",
+      "visual_id": "environment.arena",
+      "step": "place-environment",
+      "tool": {
+        "name": "place_environment.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "world": [
+          1800,
+          910
+        ],
+        "output": [
+          2700,
+          1365
+        ],
+        "tiles": [
+          2,
+          1
+        ],
+        "layer": "ground",
+        "origin": [
+          0.0,
+          0.0
+        ],
+        "crop": [
+          0,
+          36,
+          1440,
+          764
+        ]
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.arena/floorplate-s61.png",
+          "sha256": "a0bc55b0745ed5a0f3e55f9ead74040795150cbdb2ebc66aab8e2c87cdf5c8c2"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Arena/floor_c0r0.png",
+          "sha256": "d703da26c8580e55a9cb24f89be4a2e06fc35b6c83f8e6aad2ff76dda1362c03"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Arena/floor_c1r0.png",
+          "sha256": "43a56c966fa03a7182a5ba6a9c449dc94a1d1aa3144ad3e05be0be6319ed73c5"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.42,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Bodenplatte für das Spiel aufbereitet"
+      }
+    },
+    {
+      "id": "3b9f9ad449ff4801bc6c97b59f882a49",
+      "timestamp": "2026-10-05T20:08:46+00:00",
+      "visual_id": "environment.arena-wall",
+      "step": "wall-candidate",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "straight-on frontal elevation of the long north wall of a neo-gothic ironworks casting hall, seen slightly from above, soot-dark brick wall with a row of pointed arches between riveted cast-iron columns, left of centre a leaning blast furnace built like an altar with a violet glowing tapping hole at its foot, above it a large round window whose tracery is a flywheel, chains hanging, the base of the wall meets a stone floor edge along the bottom of the image, hand-painted gouache illustration with visible brush strokes, painterly texture, muted soot brick red, cold steel blue grey, dull brass and grey-violet stone, single key light from the upper left, violet light only at the furnace, no people, no text",
+      "seed": 73,
+      "parameters": {
+        "steps": 4,
+        "width": 1536,
+        "height": 384,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.arena/wall-s73.png",
+          "sha256": "74ecff29eb3ea156c856b43c15ec1669b47e311025e8e844d07a0c09f873fae4"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 99.08,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "206d103c57584bca911cafbb11f9f0cb",
+      "timestamp": "2026-10-05T20:09:31+00:00",
+      "visual_id": "prop.arena-pillar",
+      "step": "prop-candidate",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "single game prop, isolated on a plain flat light grey background, centred, whole object visible with space around it, seen from above in a three-quarter top-down view, soft contact shadow under it, hand-painted gouache illustration with visible brush strokes, painterly texture, muted soot brick red, cold steel blue grey, dull brass and grey-violet stone, single key light from the upper left, a tall riveted cast-iron column of a neo-gothic hall with a soot-dark brick plinth and a crane rail bracket at the top",
+      "seed": 61,
+      "parameters": {
+        "steps": 4,
+        "width": 512,
+        "height": 1024,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.arena/column.png",
+          "sha256": "0fea64ffe6e5ff99c05b58f6b86e9e0b7de72c77768973df1b1f609196fe497e"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 45.04,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "acbeeea5b3d84bdb83c4ef04b2c8e938",
+      "timestamp": "2026-10-05T20:10:40+00:00",
+      "visual_id": "prop.arena-lockers",
+      "step": "prop-candidate",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "single game prop, isolated on a plain flat light grey background, centred, whole object visible with space around it, seen from above in a three-quarter top-down view, soft contact shadow under it, hand-painted gouache illustration with visible brush strokes, painterly texture, muted soot brick red, cold steel blue grey, dull brass and grey-violet stone, single key light from the upper left, a row of three dented steel workers lockers with name plates, one door ajar",
+      "seed": 61,
+      "parameters": {
+        "steps": 4,
+        "width": 768,
+        "height": 768,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.arena/lockers.png",
+          "sha256": "a9a75e0acb0c4f854b0315188eab911f5e0967c3ca604626c5daac2c33ce7bf3"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 68.55,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "d564760236344649b586495dcdbe0ca2",
+      "timestamp": "2026-10-05T20:12:38+00:00",
+      "visual_id": "prop.arena-workbench",
+      "step": "prop-candidate",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "single game prop, isolated on a plain flat light grey background, centred, whole object visible with space around it, seen from above in a three-quarter top-down view, soft contact shadow under it, hand-painted gouache illustration with visible brush strokes, painterly texture, muted soot brick red, cold steel blue grey, dull brass and grey-violet stone, single key light from the upper left, a heavy wooden workbench with a vice, hammer, tongs and soot",
+      "seed": 61,
+      "parameters": {
+        "steps": 4,
+        "width": 768,
+        "height": 768,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.arena/workbench.png",
+          "sha256": "e51010ce8923c081cae9dc9b49859b4a07a6a32d405b55bd6fe1d8e67e829374"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 117.13,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "2541da87aea943b1b4073ffe8d20df6a",
+      "timestamp": "2026-10-05T20:14:54+00:00",
+      "visual_id": "prop.arena-toolrack",
+      "step": "prop-candidate",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "single game prop, isolated on a plain flat light grey background, centred, whole object visible with space around it, seen from above in a three-quarter top-down view, soft contact shadow under it, hand-painted gouache illustration with visible brush strokes, painterly texture, muted soot brick red, cold steel blue grey, dull brass and grey-violet stone, single key light from the upper left, a wall-mounted iron tool rack with long tapping bars, shovels and tongs hanging on hooks",
+      "seed": 61,
+      "parameters": {
+        "steps": 4,
+        "width": 768,
+        "height": 768,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.arena/toolrack.png",
+          "sha256": "a7e0b938631db02a576a11a3ea34151c9a749d61a223f7b8a4f41234c579bb63"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 136.43,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "b5e2566b464c45d99a3fbd058551bce6",
+      "timestamp": "2026-10-05T20:16:44+00:00",
+      "visual_id": "prop.arena-slag",
+      "step": "prop-candidate",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "single game prop, isolated on a plain flat light grey background, centred, whole object visible with space around it, seen from above in a three-quarter top-down view, soft contact shadow under it, hand-painted gouache illustration with visible brush strokes, painterly texture, muted soot brick red, cold steel blue grey, dull brass and grey-violet stone, single key light from the upper left, a low heap of dark slag lumps and broken firebricks with a few faint violet embers",
+      "seed": 61,
+      "parameters": {
+        "steps": 4,
+        "width": 768,
+        "height": 768,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.arena/slag.png",
+          "sha256": "ef294d63813adb3379048732aca9c2284541a12fb422c309c49db200879bdbab"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 109.41,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "959421f5f97d48b5a467f1633e4b8ffa",
+      "timestamp": "2026-10-05T20:17:42+00:00",
+      "visual_id": "prop.arena-chains",
+      "step": "prop-candidate",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "single game prop, isolated on a plain flat light grey background, centred, whole object visible with space around it, seen from above in a three-quarter top-down view, soft contact shadow under it, hand-painted gouache illustration with visible brush strokes, painterly texture, muted soot brick red, cold steel blue grey, dull brass and grey-violet stone, single key light from the upper left, a coil of heavy rusty chain with a crane hook lying on the floor",
+      "seed": 61,
+      "parameters": {
+        "steps": 4,
+        "width": 768,
+        "height": 768,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.arena/chains.png",
+          "sha256": "4f52a4143aca69be56be432b3fe2bfe868fc0e31dac1c08084e75fc5ffdfd90d"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 57.29,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "719d144ba1584f6284e00d47e2703ca6",
+      "timestamp": "2026-10-05T20:19:34+00:00",
+      "visual_id": "prop.arena-pillar",
+      "step": "make-prop",
+      "tool": {
+        "name": "make_prop.py + rembg",
+        "version": "1"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "height": 330.0,
+        "layer": "high-prop",
+        "world_size": [
+          90.0,
+          348.0
+        ],
+        "origin_y": 0.9559
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.arena/column.png",
+          "sha256": "0fea64ffe6e5ff99c05b58f6b86e9e0b7de72c77768973df1b1f609196fe497e"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Arena/column.png",
+          "sha256": "c14c023c0adec8340b63033a66aa2fdd9a93fa390afb43ac915b617c6c2f6ec4"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.01,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Prop für die gemalte Arena der Scheibe (Schnellpfad, Basismodell vor LoRA)"
+      }
+    },
+    {
+      "id": "fcc6a5bdb1c040e39334f95324378cfe",
+      "timestamp": "2026-10-05T20:19:46+00:00",
+      "visual_id": "prop.arena-gate",
+      "step": "prop-candidate",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "single game prop, isolated on a plain flat light grey background, centred, whole object visible with space around it, seen from above in a three-quarter top-down view, soft contact shadow under it, hand-painted gouache illustration with visible brush strokes, painterly texture, muted soot brick red, cold steel blue grey, dull brass and grey-violet stone, single key light from the upper left, a closed iron works gate with two wings of vertical bars and riveted cross braces, set in a short soot brick wall section",
+      "seed": 61,
+      "parameters": {
+        "steps": 4,
+        "width": 1024,
+        "height": 768,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.arena/gate.png",
+          "sha256": "556b9cb016d49eb477cae6b364e5f812bc98fdce8e9913195d45bcb27e2ff268"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 124.24,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "a702f8ad803e46c8af5c165d12559a37",
+      "timestamp": "2026-10-05T20:20:12+00:00",
+      "visual_id": "prop.arena-lockers",
+      "step": "make-prop",
+      "tool": {
+        "name": "make_prop.py + rembg",
+        "version": "1"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "height": 105.0,
+        "layer": "high-prop",
+        "world_size": [
+          139.3,
+          124.0
+        ],
+        "origin_y": 0.8683
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.arena/lockers.png",
+          "sha256": "a9a75e0acb0c4f854b0315188eab911f5e0967c3ca604626c5daac2c33ce7bf3"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Arena/lockers.png",
+          "sha256": "0c30688a3aa654c6098a587309f1efa4bc349580deb9099e0936f00a9efd202c"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.0,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Prop für die gemalte Arena der Scheibe (Schnellpfad, Basismodell vor LoRA)"
+      }
+    },
+    {
+      "id": "9d63f618ee9d4350a58a66257e39f836",
+      "timestamp": "2026-10-05T20:20:40+00:00",
+      "visual_id": "prop.arena-workbench",
+      "step": "make-prop",
+      "tool": {
+        "name": "make_prop.py + rembg",
+        "version": "1"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "height": 62.0,
+        "layer": "high-prop",
+        "world_size": [
+          103.3,
+          94.0
+        ],
+        "origin_y": 0.6879
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.arena/workbench.png",
+          "sha256": "e51010ce8923c081cae9dc9b49859b4a07a6a32d405b55bd6fe1d8e67e829374"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Arena/workbench.png",
+          "sha256": "96df645bac93f18daeb54250be890ab3e5346ca73fc25703f18b9b551bc8d5de"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.0,
+      "decision": {
+        "status": "verworfen",
+        "reason": "Fußpunkt an der Tischplatte statt an den Beinen erkannt; neu mit Schwelle 1/6"
+      }
+    },
+    {
+      "id": "c6a32bce61ed4dc9bdc71679a1fba28c",
+      "timestamp": "2026-10-05T20:21:03+00:00",
+      "visual_id": "prop.arena-toolrack",
+      "step": "make-prop",
+      "tool": {
+        "name": "make_prop.py + rembg",
+        "version": "1"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "height": 110.0,
+        "layer": "high-prop",
+        "world_size": [
+          134.0,
+          126.0
+        ],
+        "origin_y": 0.8942
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.arena/toolrack.png",
+          "sha256": "a7e0b938631db02a576a11a3ea34151c9a749d61a223f7b8a4f41234c579bb63"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Arena/toolrack.png",
+          "sha256": "a1ae1d44c4dde496a2d418539ddd901826eace2d4d25ea3a394c5d237ec7ee30"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.0,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Prop für die gemalte Arena der Scheibe (Schnellpfad, Basismodell vor LoRA)"
+      }
+    },
+    {
+      "id": "3adfdcc64dc540a3be664a6d781c0d7a",
+      "timestamp": "2026-10-05T20:21:26+00:00",
+      "visual_id": "prop.arena-slag",
+      "step": "make-prop",
+      "tool": {
+        "name": "make_prop.py + rembg",
+        "version": "1"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "height": 40.0,
+        "layer": "low-prop",
+        "world_size": [
+          68.7,
+          49.3
+        ],
+        "origin_y": 0.8649
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.arena/slag.png",
+          "sha256": "ef294d63813adb3379048732aca9c2284541a12fb422c309c49db200879bdbab"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Arena/slag.png",
+          "sha256": "6daa07ae501f93373c0b10eb90d7a36209f50944fc58971ce04078ce0c8426dd"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.0,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Prop für die gemalte Arena der Scheibe (Schnellpfad, Basismodell vor LoRA)"
+      }
+    },
+    {
+      "id": "cf3cbf84b2734a8c8fceff247c2cc1fb",
+      "timestamp": "2026-10-05T20:21:49+00:00",
+      "visual_id": "prop.arena-chains",
+      "step": "make-prop",
+      "tool": {
+        "name": "make_prop.py + rembg",
+        "version": "1"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "height": 30.0,
+        "layer": "low-prop",
+        "world_size": [
+          45.3,
+          36.7
+        ],
+        "origin_y": 0.8909
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.arena/chains.png",
+          "sha256": "4f52a4143aca69be56be432b3fe2bfe868fc0e31dac1c08084e75fc5ffdfd90d"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Arena/chains.png",
+          "sha256": "26c3a2c4dc3c8d74d7963a4a8f2fdacdc0252c4c81bd622abca0b5f852f1bdd7"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.0,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Prop für die gemalte Arena der Scheibe (Schnellpfad, Basismodell vor LoRA)"
+      }
+    },
+    {
+      "id": "1c1cb12581994f8ab390e49229bcce89",
+      "timestamp": "2026-10-05T20:22:35+00:00",
+      "visual_id": "prop.arena-workbench",
+      "step": "make-prop",
+      "tool": {
+        "name": "make_prop.py + rembg",
+        "version": "1"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "height": 62.0,
+        "layer": "high-prop",
+        "world_size": [
+          82.7,
+          75.3
+        ],
+        "origin_y": 0.8584
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.arena/workbench.png",
+          "sha256": "e51010ce8923c081cae9dc9b49859b4a07a6a32d405b55bd6fe1d8e67e829374"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Arena/workbench.png",
+          "sha256": "1048e6addc5800e5d61d925209961c17dcad627ea5b732503a554c78b513d170"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.0,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Prop für die gemalte Arena der Scheibe (Schnellpfad, Basismodell vor LoRA)"
+      }
+    },
+    {
+      "id": "4a85ed4bef7b415094256f95ee3cc462",
+      "timestamp": "2026-10-05T20:22:57+00:00",
+      "visual_id": "prop.arena-gate",
+      "step": "make-prop",
+      "tool": {
+        "name": "make_prop.py + rembg",
+        "version": "1"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "height": 120.0,
+        "layer": "occluder",
+        "world_size": [
+          246.0,
+          132.7
+        ],
+        "origin_y": 0.9246
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.arena/gate.png",
+          "sha256": "556b9cb016d49eb477cae6b364e5f812bc98fdce8e9913195d45bcb27e2ff268"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Arena/gate.png",
+          "sha256": "30f59c0bba6fdcaa048defa3fa280d7205d3a0b11adfc046b6494bea81ba48ad"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.01,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Prop für die gemalte Arena der Scheibe (Schnellpfad, Basismodell vor LoRA)"
+      }
     }
   ]
 }

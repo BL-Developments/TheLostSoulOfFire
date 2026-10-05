@@ -17,7 +17,15 @@ public static class VisualIds
     public const string Devourer = "enemy.devourer";
 
     public const string ArenaFloor = "environment.arena";
+    public const string ArenaWall = "environment.arena-wall";
     public const string ArenaPillar = "prop.arena-pillar";
+    public const string ArenaLockers = "prop.arena-lockers";
+    public const string ArenaWorkbench = "prop.arena-workbench";
+    public const string ArenaToolRack = "prop.arena-toolrack";
+    public const string ArenaSlag = "prop.arena-slag";
+    public const string ArenaChains = "prop.arena-chains";
+    public const string ArenaGate = "prop.arena-gate";
+    public const string ShoreFloor = "environment.shore";
 
     public const string Scythe = "weapon.scythe";
     public const string SoulCannon = "weapon.soul-cannon";

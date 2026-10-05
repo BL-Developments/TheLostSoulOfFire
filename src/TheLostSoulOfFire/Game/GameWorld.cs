@@ -52,6 +52,9 @@ public sealed partial class GameWorld : IDisposable
     private readonly ArtAssets _art;
     private readonly SpriteVfxSystem _spriteVfx;
     private readonly List<SceneProp> _sceneProps = [];
+    private readonly List<SceneProp> _arenaProps = Arena.Props
+        .Select(placement => new SceneProp(placement.VisualId, placement.Foot, placement.FallbackSize, placement.FallbackLayer))
+        .ToList();
     private readonly List<DepthItem> _actorBand = [];
     private readonly List<(RectangleF Bounds, float FootY)> _occlusionTargets = [];
     private readonly CombatPresentation _combatPresentation;
@@ -821,11 +824,16 @@ public sealed partial class GameWorld : IDisposable
             if (_phase == GamePhase.Prologue)
             {
                 PrologueEnvironment.DrawGround(batch, pixel, _prologue, _presentationTime, _soulSensePresentation.WorldSuppression);
+                if (_prologue.Sector == PrologueSector.Emergence)
+                {
+                    _art.DrawEnvironment(batch, VisualIds.ShoreFloor, Vector2.Zero);
+                }
                 PrologueEnvironment.DrawProps(batch, pixel, _prologue, _presentationTime, _soulSensePresentation.WorldSuppression);
             }
             else
             {
-                _art.DrawEnvironment(batch, VisualIds.ArenaFloor, Vector2.Zero);
+                _art.DrawEnvironment(batch, VisualIds.ArenaWall, Arena.WallFoot);
+                _art.DrawEnvironment(batch, VisualIds.ArenaFloor, Arena.FloorTopLeft);
                 _arenaAtmosphere.DrawBackground(batch, pixel, _soulSensePresentation.WorldSuppression);
             }
             DrawSceneProps(batch, layer => layer < SceneLayer.Actor);
@@ -888,6 +896,10 @@ public sealed partial class GameWorld : IDisposable
         batch.End();
     }
 
+    /// <summary>Props of the room being shown plus props staged by automated tests.</summary>
+    private IEnumerable<SceneProp> ActiveSceneProps =>
+        _phase is GamePhase.Arena ? _arenaProps.Concat(_sceneProps) : _sceneProps;
+
     /// <summary>Enemies, the player and high props, drawn back to front by foot point.</summary>
     private void DrawActorBand(SpriteBatch batch, Texture2D pixel, bool drawPlayer)
     {
@@ -909,7 +921,7 @@ public sealed partial class GameWorld : IDisposable
         {
             _actorBand.Add(new DepthItem(_player.Position.Y + GameBalance.PlayerRadius, order++, () => DrawPlayerActor(batch, pixel)));
         }
-        foreach (SceneProp prop in _sceneProps)
+        foreach (SceneProp prop in ActiveSceneProps)
         {
             SceneProp current = prop;
             SceneLayer layer = _art.LayerOf(prop.VisualId, prop.FallbackLayer);
@@ -955,7 +967,7 @@ public sealed partial class GameWorld : IDisposable
 
     private void DrawSceneProps(SpriteBatch batch, Func<SceneLayer, bool> inBand)
     {
-        foreach (SceneProp prop in _sceneProps)
+        foreach (SceneProp prop in ActiveSceneProps)
         {
             if (inBand(_art.LayerOf(prop.VisualId, prop.FallbackLayer)))
             {
@@ -967,7 +979,7 @@ public sealed partial class GameWorld : IDisposable
     /// <summary>Fades occluders while they hide the player, an enemy or a telegraph.</summary>
     private void UpdateSceneProps(float deltaTime)
     {
-        if (_sceneProps.Count == 0)
+        if (!ActiveSceneProps.Any())
         {
             return;
         }
@@ -988,7 +1000,7 @@ public sealed partial class GameWorld : IDisposable
             }
         }
 
-        foreach (SceneProp prop in _sceneProps)
+        foreach (SceneProp prop in ActiveSceneProps)
         {
             SceneLayer layer = _art.LayerOf(prop.VisualId, prop.FallbackLayer);
             float target = layer is SceneLayer.HighProp or SceneLayer.Occluder or SceneLayer.Foreground

@@ -140,17 +140,19 @@
       "id": "environment.arena",
       "kind": "environment",
       "palette": "world",
-      "worldSize": [1800, 1000],
-      "origin": [0, 0],
+      "worldSize": [1800, 910],
+      "origin": [0.0, 0.0],
       "clips": {
         "default": {
-          "path": "Textures/Environment/arena_base_1800x1000",
-          "frameSize": [1800, 1000],
+          "path": "Textures/Environment/Arena/floor_{tile}",
+          "frameSize": [1350, 1365],
           "frames": 1,
           "fps": 1,
-          "loop": true
+          "loop": true,
+          "tiles": [2, 1]
         }
-      }
+      },
+      "layer": "ground"
     },
     {
       "id": "weapon.scythe",
@@ -480,6 +482,143 @@
           "fps": 8.0,
           "loop": true,
           "normalMap": "Textures/Test/BlenderFigure/Animations/idle_normal/{dir}"
+        }
+      }
+    },
+    {
+      "id": "environment.arena-wall",
+      "kind": "environment",
+      "palette": "world",
+      "worldSize": [1800, 454],
+      "origin": [0.0, 1.0],
+      "layer": "background",
+      "clips": {
+        "default": {
+          "path": "Textures/Environment/Arena/north_wall_{tile}",
+          "frameSize": [1350, 681],
+          "frames": 1,
+          "fps": 1,
+          "loop": true,
+          "tiles": [2, 1]
+        }
+      }
+    },
+    {
+      "id": "prop.arena-pillar",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [90.0, 348.0],
+      "origin": [0.5, 0.9559],
+      "layer": "high-prop",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Arena/column",
+          "frameSize": [135, 522],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "prop.arena-lockers",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [139.3, 124.0],
+      "origin": [0.5, 0.8683],
+      "layer": "high-prop",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Arena/lockers",
+          "frameSize": [209, 186],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "prop.arena-workbench",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [82.7, 75.3],
+      "origin": [0.5, 0.8584],
+      "layer": "high-prop",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Arena/workbench",
+          "frameSize": [124, 113],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "prop.arena-toolrack",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [134.0, 126.0],
+      "origin": [0.5, 0.8942],
+      "layer": "high-prop",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Arena/toolrack",
+          "frameSize": [201, 189],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "prop.arena-slag",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [68.7, 49.3],
+      "origin": [0.5, 0.8649],
+      "layer": "low-prop",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Arena/slag",
+          "frameSize": [103, 74],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "prop.arena-chains",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [45.3, 36.7],
+      "origin": [0.5, 0.8909],
+      "layer": "low-prop",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Arena/chains",
+          "frameSize": [68, 55],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "prop.arena-gate",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [246.0, 132.7],
+      "origin": [0.5, 0.9246],
+      "layer": "occluder",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Arena/gate",
+          "frameSize": [369, 199],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
         }
       }
     }

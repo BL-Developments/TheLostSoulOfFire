@@ -29,10 +29,45 @@ ROOMS = {
         "columns_x": (55, 1745),
         "columns_y": (230, 500, 770),
     },
+    # Prologue, section I: walkable area from PrologueDirector.ExplorationBounds, trace at
+    # SoulTrace, the first Hollow at (1160, 545), exit marker at (1535, 515).
+    "shore": {
+        "world": (1800, 1000),
+        "combat": (110, 125, 1690, 875),
+    },
 }
 
 
+def draw_shore(width: int) -> Image.Image:
+    spec = ROOMS["shore"]
+    world_w, world_h = spec["world"]
+    scale = width / world_w
+    height = round(world_h * scale)
+
+    def box(rect: tuple[float, float, float, float]) -> tuple[int, int, int, int]:
+        return tuple(round(value * scale) for value in rect)  # type: ignore[return-value]
+
+    image = Image.new("RGB", (width, height), (22, 30, 38))  # dark still water
+    pen = ImageDraw.Draw(image)
+    left, top, right, bottom = spec["combat"]
+    pen.rectangle(box((left - 15, top - 12, right + 15, bottom + 12)), fill=(88, 92, 98))  # granite kerb
+    pen.rectangle(box(spec["combat"]), fill=(70, 74, 80))  # wet concrete platform
+    for x in range(left, right, 180):
+        pen.line(box((x, top, x, bottom)), fill=(62, 66, 72), width=max(1, round(3 * scale)))
+    # Memory group at the trace (805, 520): a bench facing the water, the suitcase beside it.
+    pen.rectangle(box((690, 440, 880, 470)), fill=(78, 58, 44))
+    pen.rectangle(box((835, 560, 885, 595)), fill=(92, 60, 40))
+    # Landmark: the tilted departure board rising out of the water north of the platform.
+    pen.polygon([tuple(round(v * scale) for v in point) for point in ((1060, 112), (1110, 6), (1290, 30), (1250, 118))], fill=(46, 50, 56))
+    # Cast-iron canopy pillars along the north kerb, a lamp post near the exit.
+    for x in (330, 720, 1450):
+        pen.rectangle(box((x - 12, top - 10, x + 12, top + 26)), fill=(60, 82, 70))
+    return image.filter(ImageFilter.GaussianBlur(radius=max(1, round(3 * scale))))
+
+
 def draw(room: str, width: int) -> Image.Image:
+    if room == "shore":
+        return draw_shore(width)
     spec = ROOMS[room]
     world_w, world_h = spec["world"]
     scale = width / world_w

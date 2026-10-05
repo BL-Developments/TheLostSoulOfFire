@@ -1,19 +1,19 @@
-# Visual-Spec: prop.arena-pillar
+# Visual-Spec: prop.arena-slag
 
 Art: prop
 Status: im-spiel
 Stil: hausstil
-Weltgröße: 90 × 348 (Fußpunkt bei 0.96 der Höhe)
+Weltgröße: 68.7 × 49.3 (Fußpunkt bei 0.86 der Höhe)
 Akzentfarbe: keine; Klinkerrot, Stahlblaugrau, stumpfes Messing
 Lore: [Region-Vertrag Industrial Cathedral, Gold-Standard-Raum](../../docs/current/regions/industrial-cathedral.md)
 
 ## Merkmale
-- Gusseisensäule der Seitenschiffe mit Klinkersockel und Kranbahnkonsole; steht in den Randstreifen links und rechts außerhalb der Kampffläche.
+- Niedriger Haufen aus Schlacke und Schamottebrocken mit schwachem violettem Glimmen.
 - Gouache-Stil der Stilstudie, Variante B; FLUX.2 [klein] 4B vor dem Hausstil-LoRA, freigestellt mit rembg/BiRefNet.
-- Ebene: hoher Prop; nach Fußpunkt mit den Figuren sortiert, ohne Kollision.
+- Ebene: niedriger Prop; nach Fußpunkt mit den Figuren sortiert, ohne Kollision.
 
 ## Silhouette
-Schmal und hoch, ragt bis über die Wandkante.
+Flacher Haufen, Bodenebene.
 
 ## Animationen
 - `default`: Standbild.

@@ -1,14 +1,46 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TheLostSoulOfFire.Rendering;
+using TheLostSoulOfFire.Rendering.Visuals;
 
 namespace TheLostSoulOfFire.Game;
+
+/// <summary>Where a prop of a painted room stands. Visual only: props never collide.</summary>
+public sealed record PropPlacement(string VisualId, Vector2 Foot, Vector2 FallbackSize, SceneLayer FallbackLayer);
 
 public sealed class Arena
 {
     public Rectangle Bounds => GameBalance.ArenaBounds;
     public Rectangle CombatBounds => GameBalance.CombatBounds;
+
+    /// <summary>The north wall stands on the top edge of the combat area (its bottom-left corner).</summary>
+    public static readonly Vector2 WallFoot = new(0f, 95f);
+
+    /// <summary>Top-left corner of the painted floor plate, just under the wall foot.</summary>
+    public static readonly Vector2 FloorTopLeft = new(0f, 90f);
+
+    /// <summary>
+    /// Props of the casting hall (docs/current/regions/industrial-cathedral.md, "Gold-Standard-Raum"):
+    /// cast-iron columns in the side aisles, the workers' things against the north wall, slag and
+    /// chains near the edges, the works gate in the south. The central casting floor stays clear.
+    /// </summary>
+    public static IReadOnlyList<PropPlacement> Props { get; } =
+    [
+        new(VisualIds.ArenaPillar, new Vector2(52f, 330f), new Vector2(95f, 330f), SceneLayer.HighProp),
+        new(VisualIds.ArenaPillar, new Vector2(52f, 620f), new Vector2(95f, 330f), SceneLayer.HighProp),
+        new(VisualIds.ArenaPillar, new Vector2(52f, 910f), new Vector2(95f, 330f), SceneLayer.HighProp),
+        new(VisualIds.ArenaPillar, new Vector2(1748f, 330f), new Vector2(95f, 330f), SceneLayer.HighProp),
+        new(VisualIds.ArenaPillar, new Vector2(1748f, 620f), new Vector2(95f, 330f), SceneLayer.HighProp),
+        new(VisualIds.ArenaPillar, new Vector2(1748f, 910f), new Vector2(95f, 330f), SceneLayer.HighProp),
+        new(VisualIds.ArenaToolRack, new Vector2(330f, 112f), new Vector2(190f, 180f), SceneLayer.HighProp),
+        new(VisualIds.ArenaWorkbench, new Vector2(1260f, 128f), new Vector2(190f, 150f), SceneLayer.HighProp),
+        new(VisualIds.ArenaLockers, new Vector2(1545f, 120f), new Vector2(210f, 210f), SceneLayer.HighProp),
+        new(VisualIds.ArenaChains, new Vector2(400f, 862f), new Vector2(150f, 100f), SceneLayer.LowProp),
+        new(VisualIds.ArenaSlag, new Vector2(1430f, 870f), new Vector2(160f, 110f), SceneLayer.LowProp),
+        new(VisualIds.ArenaGate, new Vector2(900f, 1000f), new Vector2(300f, 170f), SceneLayer.Occluder)
+    ];
 
     public void Draw(SpriteBatch batch, Texture2D pixel)
     {

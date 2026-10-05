@@ -146,7 +146,11 @@ public static class GameBalance
     public const float CannonProjectileLifetime = 1.25f;
     public const float CannonCoreDamageMultiplier = 1.35f;
 
-    public static readonly Rectangle ArenaBounds = new(0, 0, 1800, 1000);
+    /// <summary>
+    /// What the camera may show of the arena. It reaches 355 units above the combat area so the
+    /// painted north wall (Arena.WallFoot) can be seen; only the camera uses it.
+    /// </summary>
+    public static readonly Rectangle ArenaBounds = new(0, -355, 1800, 1355);
     public static readonly Rectangle CombatBounds = new(105, 95, 1590, 810);
 
     public static readonly Color VoidColor = new(7, 6, 12);
