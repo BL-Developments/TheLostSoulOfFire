@@ -64,6 +64,7 @@ public sealed class Devourer : Enemy
     };
     public override Vector2 VisualFacing => _facing;
     public override float VisualScale => 1f + ConsumedSoulCount * 0.035f;
+    public override float TelegraphRadius => State is DevourerState.SlamTelegraph or DevourerState.Slam ? GameBalance.DevourerSlamRange : 0f;
     public Vector2 TorsoPosition => Position + new Vector2(0f, -8f);
 
     public Devourer(Vector2 position)

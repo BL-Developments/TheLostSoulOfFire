@@ -50,6 +50,9 @@ public abstract class Enemy
 
     public virtual Vector2 VisualFacing => Vector2.UnitY;
 
+    /// <summary>Reach of a telegraphed attack while it is being announced or delivered, else 0.</summary>
+    public virtual float TelegraphRadius => 0f;
+
     /// <summary>Factor on the registry's world size, for example a Devourer swelling with Souls.</summary>
     public virtual float VisualScale => 1f;
 

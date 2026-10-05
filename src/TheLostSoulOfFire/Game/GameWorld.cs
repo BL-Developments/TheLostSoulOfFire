@@ -51,6 +51,9 @@ public sealed partial class GameWorld : IDisposable
     private readonly CinematicPresentation _presentation = new();
     private readonly ArtAssets _art;
     private readonly SpriteVfxSystem _spriteVfx;
+    private readonly List<SceneProp> _sceneProps = [];
+    private readonly List<DepthItem> _actorBand = [];
+    private readonly List<(RectangleF Bounds, float FootY)> _occlusionTargets = [];
     private readonly CombatPresentation _combatPresentation;
     private readonly MenuController _menu;
     private readonly MenuController _pauseMenu;
@@ -212,6 +215,7 @@ public sealed partial class GameWorld : IDisposable
         SoulCannonState previousCannonState = _player.Cannon.State;
         int previousHealth = _player.Health;
         _art.Update(deltaTime);
+        UpdateSceneProps(deltaTime);
         _spriteVfx.Update(deltaTime);
         UpdateFps(deltaTime);
         _screenEffects.Update(deltaTime);
@@ -791,7 +795,13 @@ public sealed partial class GameWorld : IDisposable
             transformMatrix: sceneTransform);
         _art.BeginLitScene(sceneTransform, lights);
 
-        if (_phase is GamePhase.Antechamber or GamePhase.EnteringArena)
+        bool inAntechamber = _phase is GamePhase.Antechamber or GamePhase.EnteringArena;
+        bool shouldDrawPlayer = inAntechamber ||
+            IsCombatPhase && _presentation.ShouldDrawPlayer(_loopState, _player.IsDead);
+
+        // Back to front, as in VISUAL-ART-DIRECTION §4: ground and low props, then actors and
+        // high props by foot point, then occluders and foreground, then emission and effects.
+        if (inAntechamber)
         {
             _antechamber.Draw(
                 batch,
@@ -800,7 +810,6 @@ public sealed partial class GameWorld : IDisposable
                 _soulSensePresentation.SoulEmergence,
                 DoorTransitionProgress,
                 _debugVisible);
-            _player.DrawAfterimages(batch, pixel);
         }
         else
         {
@@ -814,69 +823,45 @@ public sealed partial class GameWorld : IDisposable
                 _art.DrawEnvironment(batch, VisualIds.ArenaFloor, Vector2.Zero);
                 _arenaAtmosphere.DrawBackground(batch, pixel, _soulSensePresentation.WorldSuppression);
             }
-            if (IsCombatPhase)
+            DrawSceneProps(batch, layer => layer < SceneLayer.Actor);
+            if (IsCombatPhase && _phase == GamePhase.Arena)
             {
-                if (_phase == GamePhase.Arena)
-                {
-                    DrawArenaLoop(batch, pixel);
-                    DrawCurrencyWorld(batch, pixel);
-                }
-                _player.DrawAfterimages(batch, pixel);
-                _art.DrawDissolves(batch);
-                foreach (Enemy enemy in _enemies)
-                {
-                    _art.DrawEnemy(batch, enemy);
-                    enemy.Draw(batch, pixel, _debugVisible, false, true);
-                }
-                foreach (Soul soul in _souls)
-                {
-                    _art.DrawLostSoul(batch, soul);
-                    soul.Draw(batch, pixel, _player, false, true);
-                }
-                foreach (CannonShot shot in _cannonShots)
-                {
-                    shot.Draw(batch, pixel, true);
-                    _art.DrawCannonProjectile(batch, shot);
-                }
+                DrawArenaLoop(batch, pixel);
+                DrawCurrencyWorld(batch, pixel);
             }
         }
-        DrawAbilityWorld(batch, pixel);
-        _particles.Draw(batch, pixel);
-        bool shouldDrawPlayer = _phase is GamePhase.Antechamber or GamePhase.EnteringArena ||
-            IsCombatPhase && _presentation.ShouldDrawPlayer(_loopState, _player.IsDead);
-        if (shouldDrawPlayer)
-        {
-            batch.FillCircle(pixel, _player.Position + new Vector2(3f, 8f), 24f, new Color(3, 3, 7) * 0.55f);
-            _art.DrawPlayer(batch, _player);
-            _player.Draw(batch, pixel, _art, _debugVisible, _soulSensePresentation.SoulEmergence);
-            if (IsCombatPhase && _player.Cannon.State == SoulCannonState.Charging)
-            {
-                Vector2 muzzle = _player.Position + _player.FacingDirection * 74f;
-                float charge = _player.Cannon.ChargeProgress;
-                Color chargeColor = _player.Cannon.IsFullCharge
-                    ? Color.White
-                    : _player.Cannon.ChargeStage >= 3
-                        ? new Color(238, 219, 255)
-                        : _player.Cannon.ChargeStage == 2
-                            ? GameBalance.DeathFlameBright
-                            : new Color(155, 94, 220);
-                _art.DrawLoopingEffect(
-                    batch,
-                    _player.Cannon,
-                    VisualIds.CannonChargeLoop,
-                    muzzle,
-                    0f,
-                    _player.Cannon.IsFullCharge ? 0.68f : MathHelper.Lerp(0.28f, 0.61f, charge),
-                    chargeColor);
-            }
-        }
-        _presentation.DrawWorldAccents(batch, pixel, _art, _phase, _loopState, _player.IsDead, _player, ActiveCombatBounds);
-        _spriteVfx.Draw(batch);
 
+        _player.DrawAfterimages(batch, pixel);
+        if (IsCombatPhase)
+        {
+            _art.DrawDissolves(batch);
+        }
+        DrawActorBand(batch, pixel, shouldDrawPlayer && (inAntechamber || IsCombatPhase));
+
+        DrawSceneProps(batch, layer => layer is SceneLayer.Occluder or SceneLayer.Foreground);
         if (_phase == GamePhase.Prologue)
         {
             PrologueEnvironment.DrawForeground(batch, pixel, _prologue);
         }
+
+        if (IsCombatPhase)
+        {
+            foreach (Soul soul in _souls)
+            {
+                _art.DrawLostSoul(batch, soul);
+                soul.Draw(batch, pixel, _player, false, true);
+            }
+            foreach (CannonShot shot in _cannonShots)
+            {
+                shot.Draw(batch, pixel, true);
+                _art.DrawCannonProjectile(batch, shot);
+            }
+        }
+        DrawAbilityWorld(batch, pixel);
+        _particles.Draw(batch, pixel);
+        DrawSceneProps(batch, layer => layer == SceneLayer.Atmosphere);
+        _presentation.DrawWorldAccents(batch, pixel, _art, _phase, _loopState, _player.IsDead, _player, ActiveCombatBounds);
+        _spriteVfx.Draw(batch);
 
         if (IsCombatPhase && _presentation.ShouldDrawAim(_loopState, _player.IsDead))
         {
@@ -895,6 +880,124 @@ public sealed partial class GameWorld : IDisposable
 
         _art.EndLitScene();
         batch.End();
+    }
+
+    /// <summary>Enemies, the player and high props, drawn back to front by foot point.</summary>
+    private void DrawActorBand(SpriteBatch batch, Texture2D pixel, bool drawPlayer)
+    {
+        _actorBand.Clear();
+        int order = 0;
+        if (IsCombatPhase)
+        {
+            foreach (Enemy enemy in _enemies)
+            {
+                Enemy current = enemy;
+                _actorBand.Add(new DepthItem(enemy.Position.Y + enemy.Radius, order++, () =>
+                {
+                    _art.DrawEnemy(batch, current);
+                    current.Draw(batch, pixel, _debugVisible, false, true);
+                }));
+            }
+        }
+        if (drawPlayer)
+        {
+            _actorBand.Add(new DepthItem(_player.Position.Y + GameBalance.PlayerRadius, order++, () => DrawPlayerActor(batch, pixel)));
+        }
+        foreach (SceneProp prop in _sceneProps)
+        {
+            SceneProp current = prop;
+            SceneLayer layer = _art.LayerOf(prop.VisualId, prop.FallbackLayer);
+            if (layer is SceneLayer.Actor or SceneLayer.HighProp)
+            {
+                _actorBand.Add(new DepthItem(prop.Foot.Y, order++, () => _art.DrawProp(batch, current.VisualId, current.Foot, current.FallbackSize, current.Alpha)));
+            }
+        }
+
+        DepthSort.Sort(_actorBand);
+        foreach (DepthItem item in _actorBand)
+        {
+            item.Draw();
+        }
+    }
+
+    private void DrawPlayerActor(SpriteBatch batch, Texture2D pixel)
+    {
+        batch.FillCircle(pixel, _player.Position + new Vector2(3f, 8f), 24f, new Color(3, 3, 7) * 0.55f);
+        _art.DrawPlayer(batch, _player);
+        _player.Draw(batch, pixel, _art, _debugVisible, _soulSensePresentation.SoulEmergence);
+        if (IsCombatPhase && _player.Cannon.State == SoulCannonState.Charging)
+        {
+            Vector2 muzzle = _player.Position + _player.FacingDirection * 74f;
+            float charge = _player.Cannon.ChargeProgress;
+            Color chargeColor = _player.Cannon.IsFullCharge
+                ? Color.White
+                : _player.Cannon.ChargeStage >= 3
+                    ? new Color(238, 219, 255)
+                    : _player.Cannon.ChargeStage == 2
+                        ? GameBalance.DeathFlameBright
+                        : new Color(155, 94, 220);
+            _art.DrawLoopingEffect(
+                batch,
+                _player.Cannon,
+                VisualIds.CannonChargeLoop,
+                muzzle,
+                0f,
+                _player.Cannon.IsFullCharge ? 0.68f : MathHelper.Lerp(0.28f, 0.61f, charge),
+                chargeColor);
+        }
+    }
+
+    private void DrawSceneProps(SpriteBatch batch, Func<SceneLayer, bool> inBand)
+    {
+        foreach (SceneProp prop in _sceneProps)
+        {
+            if (inBand(_art.LayerOf(prop.VisualId, prop.FallbackLayer)))
+            {
+                _art.DrawProp(batch, prop.VisualId, prop.Foot, prop.FallbackSize, prop.Alpha);
+            }
+        }
+    }
+
+    /// <summary>Fades occluders while they hide the player, an enemy or a telegraph.</summary>
+    private void UpdateSceneProps(float deltaTime)
+    {
+        if (_sceneProps.Count == 0)
+        {
+            return;
+        }
+
+        _occlusionTargets.Clear();
+        _occlusionTargets.Add((RectangleF.Around(_player.Position - new Vector2(0f, 20f), new Vector2(60f, 110f)), _player.Position.Y + GameBalance.PlayerRadius));
+        foreach (Enemy enemy in _enemies)
+        {
+            if (!enemy.IsAlive)
+            {
+                continue;
+            }
+            float size = enemy.Radius * 2.6f;
+            _occlusionTargets.Add((RectangleF.Around(enemy.Position, new Vector2(size)), enemy.Position.Y + enemy.Radius));
+            if (enemy.TelegraphRadius > 0f)
+            {
+                _occlusionTargets.Add((RectangleF.Around(enemy.Position, new Vector2(enemy.TelegraphRadius * 2f)), enemy.Position.Y + enemy.Radius));
+            }
+        }
+
+        foreach (SceneProp prop in _sceneProps)
+        {
+            SceneLayer layer = _art.LayerOf(prop.VisualId, prop.FallbackLayer);
+            float target = layer is SceneLayer.HighProp or SceneLayer.Occluder or SceneLayer.Foreground
+                ? OccluderFade.TargetAlpha(_art.PropBounds(prop.VisualId, prop.Foot, prop.FallbackSize), prop.Foot.Y, layer, _occlusionTargets)
+                : 1f;
+            prop.Alpha = OccluderFade.Approach(prop.Alpha, target, deltaTime);
+        }
+    }
+
+    /// <summary>Test hook: stands an arena pillar (a dummy until it has graphics) on <paramref name="foot"/>.</summary>
+    internal SceneProp PlaceAutomatedOccluder(Vector2 foot)
+    {
+        SceneProp pillar = new(VisualIds.ArenaPillar, foot, new Vector2(120f, 330f), SceneLayer.HighProp);
+        _sceneProps.Add(pillar);
+        return pillar;
     }
 
     private void DrawSoulfireLighting(SpriteBatch batch, SoulfireRenderer renderer, Viewport viewport)

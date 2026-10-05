@@ -46,6 +46,7 @@ public sealed class Hollow : Enemy
         _ => VisualClips.Idle
     };
     public override Vector2 VisualFacing => _facing;
+    public override float TelegraphRadius => State is HollowState.Telegraph or HollowState.Swipe ? GameBalance.HollowSwipeRange : 0f;
     public Vector2 CorePosition => Position + new Vector2(0f, -5f);
 
     public Hollow(Vector2 position, int movementSeed)

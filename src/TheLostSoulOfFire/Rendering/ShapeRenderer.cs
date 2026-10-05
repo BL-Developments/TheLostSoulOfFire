@@ -121,14 +121,14 @@ public static class ShapeRenderer
     }
 
     /// <summary>A box standing on its foot point, for props, environment layers and sprites.</summary>
-    public static void DrawPropDummy(this SpriteBatch batch, Texture2D pixel, Rectangle bounds, Vector2 foot)
+    public static void DrawPropDummy(this SpriteBatch batch, Texture2D pixel, Rectangle bounds, Vector2 foot, float alpha = 1f)
     {
-        batch.FillRectangle(pixel, bounds, DummyFill * 0.55f);
-        batch.DrawRectangle(pixel, bounds, DummyLine, 2f);
-        batch.DrawLine(pixel, new Vector2(bounds.Left, bounds.Top), new Vector2(bounds.Right, bounds.Bottom), DummyLine * 0.5f, 1f);
-        batch.DrawLine(pixel, new Vector2(bounds.Right, bounds.Top), new Vector2(bounds.Left, bounds.Bottom), DummyLine * 0.5f, 1f);
-        batch.DrawLine(pixel, foot - new Vector2(8f, 0f), foot + new Vector2(8f, 0f), DummyLine, 3f);
-        batch.DrawLine(pixel, foot - new Vector2(0f, 8f), foot + new Vector2(0f, 8f), DummyLine, 3f);
+        batch.FillRectangle(pixel, bounds, DummyFill * (0.85f * alpha));
+        batch.DrawRectangle(pixel, bounds, DummyLine * alpha, 2f);
+        batch.DrawLine(pixel, new Vector2(bounds.Left, bounds.Top), new Vector2(bounds.Right, bounds.Bottom), DummyLine * (0.5f * alpha), 1f);
+        batch.DrawLine(pixel, new Vector2(bounds.Right, bounds.Top), new Vector2(bounds.Left, bounds.Bottom), DummyLine * (0.5f * alpha), 1f);
+        batch.DrawLine(pixel, foot - new Vector2(8f, 0f), foot + new Vector2(8f, 0f), DummyLine * alpha, 3f);
+        batch.DrawLine(pixel, foot - new Vector2(0f, 8f), foot + new Vector2(0f, 8f), DummyLine * alpha, 3f);
     }
 
     /// <summary>

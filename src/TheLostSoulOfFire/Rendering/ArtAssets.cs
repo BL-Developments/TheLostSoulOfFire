@@ -376,6 +376,31 @@ public sealed class ArtAssets
         DrawClip(batch, clip, elapsed, position, 0f, scale, color);
     }
 
+    /// <summary>The drawing band of an environment layer or prop; <paramref name="fallback"/> without a registry entry.</summary>
+    public SceneLayer LayerOf(string id, SceneLayer fallback) =>
+        Registry.TryGet(id, out VisualEntry entry) ? entry.Layer : fallback;
+
+    /// <summary>World bounds of a prop standing on <paramref name="foot"/>.</summary>
+    public RectangleF PropBounds(string id, Vector2 foot, Vector2 fallbackSize) =>
+        Registry.TryGet(id, out VisualEntry entry)
+            ? RectangleF.FromFoot(foot, entry.WorldSize, entry.Origin)
+            : RectangleF.FromFoot(foot, fallbackSize, new Vector2(0.5f, 1f));
+
+    /// <summary>Draws a prop on its foot point; occluders pass a reduced <paramref name="alpha"/> while they hide something.</summary>
+    public void DrawProp(SpriteBatch batch, string id, Vector2 foot, Vector2 fallbackSize, float alpha)
+    {
+        RectangleF bounds = PropBounds(id, foot, fallbackSize);
+        SpriteClip? clip = GetEffect(id);
+        if (clip is null)
+        {
+            batch.DrawPropDummy(_pixel, new Rectangle((int)bounds.X, (int)bounds.Y, (int)bounds.Width, (int)bounds.Height), foot, alpha);
+            return;
+        }
+
+        Rectangle destination = new((int)MathF.Round(bounds.X), (int)MathF.Round(bounds.Y), (int)MathF.Round(bounds.Width), (int)MathF.Round(bounds.Height));
+        batch.Draw(clip.Texture, destination, clip.GetSourceRectangle(_time), Color.White * alpha);
+    }
+
     public void DrawSprite(SpriteBatch batch, string id, Vector2 position, float scale, Color color, string clipName = VisualClips.Default)
     {
         SpriteClip? clip = Resolve(id, clipName, null, out _);

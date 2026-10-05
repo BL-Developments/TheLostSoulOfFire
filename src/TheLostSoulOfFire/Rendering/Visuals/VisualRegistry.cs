@@ -68,7 +68,8 @@ public sealed record VisualEntry(
     Vector2 Origin,
     string? FallbackClip,
     IReadOnlyDictionary<string, VisualClipDefinition> Clips,
-    VisualDissolve? Dissolve)
+    VisualDissolve? Dissolve,
+    SceneLayer Layer)
 {
     public bool TryGetClip(string name, out VisualClipDefinition clip) => Clips.TryGetValue(name, out clip!);
 }
@@ -227,12 +228,23 @@ public sealed partial class VisualRegistry
                 dissolve = new VisualDissolve(duration);
             }
 
+            SceneLayer layer = kind switch
+            {
+                VisualKind.Environment => SceneLayer.Ground,
+                VisualKind.Prop => SceneLayer.HighProp,
+                _ => SceneLayer.Actor
+            };
+            if (element.TryGetProperty("layer", out _))
+            {
+                layer = RequiredEnum(element, "layer", LayerNames);
+            }
+
             if (errors.Count > errorsBefore || id is null)
             {
                 return null;
             }
 
-            return new VisualEntry(id, kind, palette, worldSize, origin, fallback, clips, dissolve);
+            return new VisualEntry(id, kind, palette, worldSize, origin, fallback, clips, dissolve, layer);
         }
 
         private VisualClipDefinition? ReadClip(string name, JsonElement clip, VisualKind kind)
@@ -312,6 +324,19 @@ public sealed partial class VisualRegistry
             ["death-flame"] = VisualPalette.DeathFlame,
             ["life-flame"] = VisualPalette.LifeFlame,
             ["world"] = VisualPalette.World
+        };
+
+        private static readonly Dictionary<string, SceneLayer> LayerNames = new()
+        {
+            ["far-background"] = SceneLayer.FarBackground,
+            ["background"] = SceneLayer.Background,
+            ["ground"] = SceneLayer.Ground,
+            ["ground-detail"] = SceneLayer.GroundDetail,
+            ["low-prop"] = SceneLayer.LowProp,
+            ["high-prop"] = SceneLayer.HighProp,
+            ["occluder"] = SceneLayer.Occluder,
+            ["foreground"] = SceneLayer.Foreground,
+            ["atmosphere"] = SceneLayer.Atmosphere
         };
 
         private static readonly Dictionary<string, ClipProgress> ProgressNames = new()

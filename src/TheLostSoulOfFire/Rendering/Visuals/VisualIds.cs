@@ -17,6 +17,7 @@ public static class VisualIds
     public const string Devourer = "enemy.devourer";
 
     public const string ArenaFloor = "environment.arena";
+    public const string ArenaPillar = "prop.arena-pillar";
 
     public const string Scythe = "weapon.scythe";
     public const string SoulCannon = "weapon.soul-cannon";

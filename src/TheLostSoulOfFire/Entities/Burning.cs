@@ -50,6 +50,7 @@ public sealed class Burning : Enemy
         _ => VisualClips.Idle
     };
     public override Vector2 VisualFacing => _facing;
+    public override float TelegraphRadius => State is BurningState.Telegraph or BurningState.Charge ? Radius * 4f : 0f;
 
     public Burning(Vector2 position, int movementSeed)
         : base(position, GameBalance.BurningMaxHealth, GameBalance.BurningRadius)
