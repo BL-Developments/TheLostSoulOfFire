@@ -18,7 +18,7 @@ bleiben UNRESOLVED.
 | Haltung | Aufrechter und ruhiger als der Protagonist; er hat seinen Tod stärker angenommen. |
 | Silhouette | Spitze Kapuze, breiter Schultermantel und die Seilrolle über der Schulter; aus jeder Richtung vom Protagonisten unterscheidbar, auch als Schattenriss. |
 | Waffen | Dieselben Waffen wie der Protagonist (keine zweite Klasse); Form und Tragweise dürfen abweichen. |
-| Akzentfarbe | Kobaltblau: die gefärbte Markierungsschnur, die das Seil zusammenhält. Nicht Violett, nicht Orange oder Gelb, nicht Weiß, nicht Grün und klar anders als das Karminrot des Protagonisten. |
+| Akzentfarbe | Sand/Kamel, ein heller Wildleder-Ton: die Markierungsschnur, die das Seil zusammenhält. Er unterscheidet sich über die Helligkeit: Der Protagonist trägt einen dunklen, gesättigten roten Punkt (Karminrot), der Bruder ein helles, ruhiges Band. Damit bleiben beide im Koop auch auf Spielgröße und bei Rot-Grün-Sehschwäche unterscheidbar, weil der Unterschied nicht nur im Farbton liegt. Sand wirkt zugleich wie Material (Wildleder, Hanf) und passt zum Seil. Grenzen: Sättigung höchstens etwa 25 % und Helligkeit mindestens etwa 70 %, damit er nie wie Ocker oder Life-Flame-Orange liest. Ausgeschlossen sind Violett, Orange, Gelb, Weiß, Grün, Blau, Ocker, Stahlgrau und Rot (Owner, Freigabe 0). |
 | Death Flame | Ruhiger und gleichmäßiger als beim Protagonisten: Er beherrscht sie länger. |
 | Was die Figur festhält | Offen. |
 | Wirkung des Gegenstands | Offen, eigene Entscheidung. Dieses Blatt legt nur das Aussehen fest. |
