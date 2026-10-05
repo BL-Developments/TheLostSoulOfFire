@@ -32,7 +32,7 @@ Wird Weg A genutzt, steht „Built with DINOv3“ in den Credits des Spiels.
 | MPFB2 | Grundkörper und Rig, Weg B | Code GPL-3.0, Assets CC0 1.0; Ausgaben ohne Einschränkung | frei | [LICENSE.md](https://github.com/makehumancommunity/mpfb2/blob/master/LICENSE.md) |
 | Quaternius Universal Animation Library (Standard, kostenlos) | Ruhe, Laufen, Dash als Ausgangsbewegungen | CC0 1.0 | frei | [quaternius.com](https://quaternius.com/packs/universalanimationlibrary.html), [itch.io](https://quaternius.itch.io/universal-animation-library) |
 | ShadowDusk.MgcbPlugin (NuGet) | `.fx` ohne Wine bauen | MIT (Repository `kaltinril/ShadowDusk`); nur zur Build-Zeit, nichts davon liegt im ausgelieferten Spiel | – | [GitHub](https://github.com/kaltinril/ShadowDusk), [NuGet](https://www.nuget.org/packages/ShadowDusk.MgcbPlugin) |
-| StbImageSharp (NuGet, über MonoGame) | Bildprüfungen in `dotnet test` | Public Domain | – | [GitHub](https://github.com/StbSharp/StbImageSharp) |
+| StbImageSharp 2.30.16 (NuGet, nur im Testprojekt) | Bildprüfungen in `dotnet test` | Unlicense OR MIT | – | [NuGet](https://www.nuget.org/packages/StbImageSharp), [GitHub](https://github.com/StbSharp/StbImageSharp) |
 
 Die kostenlose Standardfassung der Quaternius-Bibliothek enthält 45 Bewegungen.
 Die Pro- und Source-Fassungen sind kostenpflichtig und fallen unter den
