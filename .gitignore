@@ -11,3 +11,10 @@ obj/
 TestResults/
 artifacts/
 
+
+# Visual production: secrets and unaccepted candidates stay local
+.env
+.env.*
+art/production/candidates/
+tools/visuals/.venv/
+__pycache__/

@@ -7,6 +7,31 @@ The entries from 2026-09-06 and earlier describe implementation work on the
 `tools/visual-max/`, `SoftShapes.cs`, Team Resonance, Severance) are not
 necessarily present on `main`.
 
+## 2026-10-05 — Produktionsweg der gemalten Grafik
+
+Der Owner gibt den Change
+[`add-visual-vertical-slice`](../../openspec/changes/add-visual-vertical-slice/proposal.md)
+frei. Damit gilt:
+
+- **Figuren entstehen über 3D und Sprite-Rendering.** Konzept, 3D-Modell, ein
+  Rig und Blender-Rendering liefern alle acht Richtungen aus einem Modell
+  (§5b in `VISUAL-ART-DIRECTION.md`). Reine 2D-Generierung pro Frame, Spine und
+  Laufzeit-3D sind verworfen.
+- **Ein trainierter Hausstil** (LoRA auf einem frei lizenzierten Basismodell)
+  trägt alle Umgebungs- und Konzeptbilder, statt den Stil in jedem Prompt neu
+  zu beschreiben. Keine Bilder anderer Spiele als Trainings- oder
+  Referenzeingabe, kein Spielname im Prompt.
+- **Die Stilbasis umfasst den ganzen Prolog und die Arena:** Ufer, Suchgang,
+  Überfahrt, Schwelle und Arena bekommen Stil-Frames, Farbskript und gesperrte
+  Key-Arts. Fertig im Spiel sind in der Scheibe nur Ufer und Arena (Welle 1).
+- **Vier Owner-Freigaben:** Lore-Grundlage (0), Stil-Frames mit Basismodell (1),
+  3D-Modell des Spielers vor der Animation (2), Abnahme der Scheibe im Spiel (3).
+  Dazwischen arbeiten Agenten ohne Rückfrage.
+- **Kostenlose Werkzeuge zuerst.** Nur frei lokal ausführbare Modelle und
+  Werkzeuge mit Lizenzen, die ein kommerzielles Spiel erlauben
+  (`art/production/LICENSES.md`). Bezahlte Dienste sind ein Notweg, den nur der
+  Owner nach einer Freigabe öffnet; bis dahin steht `VISUALS_BUDGET_EUR` auf 0.
+
 ## 2026-10-04 — Arena mit zehn Wellen
 
 - Die Arena hat zehn Wellen statt vier (Change `extend-arena-waves`). Die

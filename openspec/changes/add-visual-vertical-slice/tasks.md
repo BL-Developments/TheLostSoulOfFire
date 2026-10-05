@@ -1,8 +1,8 @@
 ## 1. Rahmen
 
-- [ ] 1.1 Nach Freigabe des Changes im `DECISION-LOG` datieren: Figuren über 3D und Sprite-Rendering, trainierter Hausstil, Stilbasis über Prolog und Arena, vier Owner-Freigaben, kostenlose Werkzeuge zuerst und bezahlte Dienste nur als Notweg auf Owner-Entscheidung. Prüfen: Eintrag vorhanden und verlinkt diesen Change.
+- [x] 1.1 Nach Freigabe des Changes im `DECISION-LOG` datieren: Figuren über 3D und Sprite-Rendering, trainierter Hausstil, Stilbasis über Prolog und Arena, vier Owner-Freigaben, kostenlose Werkzeuge zuerst und bezahlte Dienste nur als Notweg auf Owner-Entscheidung. Prüfen: Eintrag vorhanden und verlinkt diesen Change.
 - [ ] 1.2 Werkzeuge auf Mac und VM installiert (Liste in `tools/visuals/README.md`), `VISUALS_BUDGET_EUR=0`. Prüfen: `tools/visuals/doctor.py` meldet auf beiden Rechnern jedes Werkzeug mit Version, und die Skripte aus 6.1 verweigern jeden bezahlten Aufruf.
-- [ ] 1.3 Kostenloses Konto bei Hugging Face (Token `HF_TOKEN`), Token nur in der Umgebung. `.gitignore` deckt `.env` und `art/production/candidates/` ab. Lizenztabelle aller Modelle und Werkzeuge mit Quelle in `art/production/LICENSES.md`. Prüfen: `git status` zeigt nach einem Probelauf weder Tokens noch Kandidaten.
+- [x] 1.3 Kostenloses Konto bei Hugging Face (Token `HF_TOKEN`), Token nur in der Umgebung. `.gitignore` deckt `.env` und `art/production/candidates/` ab. Lizenztabelle aller Modelle und Werkzeuge mit Quelle in `art/production/LICENSES.md`. Prüfen: `git status` zeigt nach einem Probelauf weder Tokens noch Kandidaten.
 
 ## 2. Lore-Grundlage (Freigabe 0)
 
