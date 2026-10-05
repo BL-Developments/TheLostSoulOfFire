@@ -36,6 +36,67 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     private readonly bool _audioDeathRestartTest;
     private readonly bool _antechamberVisualTest;
     private readonly bool _currencyVisualTest;
+    private readonly bool _abilityVisualTest;
+    private float _abilityTestTime;
+    private int _abilityTestStep;
+    private bool _abilityMenuCaptured;
+    private int _abilityMenuTestStep;
+    private void ConfigureAbilityVisualTest(float dt)
+    {
+        _abilityTestTime += dt;
+        if (_world.PlayerDead) { Console.WriteLine("ABILITY_VISUAL_TEST_FAIL player died" ); Environment.ExitCode = 1; Exit(); return; }
+        if (!_abilityMenuCaptured && _world.Phase == GamePhase.Arena &&
+            _world.LoopState == ArenaLoopState.Intro)
+        {
+            _input.InjectKeyPress(Keys.C);
+            _abilityMenuCaptured = true;
+            _abilityTestTime = 0;
+        }
+        else if (_abilityMenuCaptured && _abilityTestStep == 0 && _abilityTestTime > 0.35f)
+        {
+            switch (_abilityMenuTestStep++)
+            {
+                case 0: _screenshotRequested = true; break;
+                case 1: _input.InjectKeyPress(Keys.X); _input.InjectKeyPress(Keys.D4); break;
+                case 2: _screenshotRequested = true; break;
+                case 3: _input.InjectKeyPress(Keys.Z); _input.InjectKeyPress(Keys.D5); break;
+                case 4: _world.VerifyAutomatedSkillLoadout(); _screenshotRequested = true; break;
+                default: _input.InjectKeyPress(Keys.Enter); _abilityTestStep = 1; break;
+            }
+            _abilityTestTime = 0;
+        }
+        if (_world.LoopState != ArenaLoopState.Combat) return;
+        if (_abilityTestTime > 2f)
+        {
+            if (_abilityTestStep is >= 1 and <= 6)
+            {
+                _world.ShowAutomatedAbility((TheLostSoulOfFire.Combat.RunAbility)(_abilityTestStep - 1));
+                _screenshotRequested = true;
+                _abilityTestStep++;
+                _abilityTestTime = 0;
+            }
+            else if (_abilityTestStep == 7)
+            {
+                _world.ShowAutomatedSkillsMenu(true);
+                _input.InjectKeyPress(Keys.D3);
+                _abilityTestStep++;
+                _abilityTestTime = 0;
+            }
+            else if (_abilityTestStep == 8)
+            {
+                _world.VerifyAutomatedSkillLoadout();
+                _screenshotRequested = true;
+                _abilityTestStep++;
+                _abilityTestTime = 0;
+            }
+            else if (_abilityTestStep > 8)
+            {
+                Console.WriteLine("ABILITY_VISUAL_TEST_PASS sixCasts=true menu=true skills=true selection=true combatLocked=true profile=isolated");
+                Exit();
+            }
+        }
+    }
+
     private string? _testProfilePath;
     private float _currencyTestStateTime;
     private string _currencyTestState = string.Empty;
@@ -65,14 +126,18 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         bool audioDeathRestartTest = false,
         bool antechamberVisualTest = false,
         DeveloperStartOptions? developerStart = null,
-        bool currencyVisualTest = false)
+        bool currencyVisualTest = false,
+        bool abilityVisualTest = false)
     {
         _currencyVisualTest = currencyVisualTest;
+        _abilityVisualTest = abilityVisualTest;
+
         _audioGameplayTest = audioGameplayTest;
         _audioDeathRestartTest = audioDeathRestartTest;
         _antechamberVisualTest = antechamberVisualTest;
         _developerStart = developerStart;
         _settings = _settingsStore.Load();
+        if (_abilityVisualTest) _settings.Fullscreen = false;
         _graphics = new GraphicsDeviceManager(this)
         {
             PreferredBackBufferWidth = GameBalance.BackBufferWidth,
@@ -91,7 +156,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     /// <summary>Automated runs must never touch the player's real profile.</summary>
     private PlayerProfileStore CreateProfileStore()
     {
-        if (!(_audioGameplayTest || _audioDeathRestartTest || _antechamberVisualTest || _currencyVisualTest))
+        if (!(_audioGameplayTest || _audioDeathRestartTest || _antechamberVisualTest || _currencyVisualTest || _abilityVisualTest))
         {
             return new PlayerProfileStore();
         }
@@ -131,6 +196,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
             settings: _settings,
             settingsChanged: _settingsStore.Save,
             profileStore: CreateProfileStore());
+        if (_abilityVisualTest) _world.ApplyDeveloperStart(new DeveloperStartOptions(DeveloperStartArea.Arena, 1), VirtualViewport);
         if (_developerStart is not null)
         {
             Console.WriteLine(_developerStart.Describe());
@@ -143,7 +209,11 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     protected override void Update(GameTime gameTime)
     {
         _input.Update(_resolution);
-        if (_antechamberVisualTest)
+        if (_abilityVisualTest)
+        {
+            ConfigureAbilityVisualTest((float)gameTime.ElapsedGameTime.TotalSeconds);
+        }
+        else if (_antechamberVisualTest)
         {
             ConfigureAntechamberVisualTest((float)gameTime.ElapsedGameTime.TotalSeconds);
         }

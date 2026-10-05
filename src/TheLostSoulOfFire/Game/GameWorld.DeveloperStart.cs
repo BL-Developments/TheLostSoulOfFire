@@ -52,6 +52,10 @@ public sealed partial class GameWorld
                 // The intro always spawns the wave after the current one.
                 _waveNumber = options.Wave - 1;
                 return;
+
+            case DeveloperStartArea.Sandbox:
+                BeginSandbox(viewport);
+                return;
         }
     }
 

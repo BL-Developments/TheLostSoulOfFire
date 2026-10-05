@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TheLostSoulOfFire.Combat;
 
 namespace TheLostSoulOfFire.Menu;
 
@@ -6,7 +7,8 @@ public enum CharacterMenuTab
 {
     Character,
     Map,
-    Skills
+    Skills,
+    Abilities
 }
 
 /// <summary>
@@ -17,23 +19,50 @@ public enum CharacterMenuTab
 public sealed class CharacterMenu
 {
     public static IReadOnlyList<CharacterMenuTab> Tabs { get; } =
-        [CharacterMenuTab.Character, CharacterMenuTab.Map, CharacterMenuTab.Skills];
+        [CharacterMenuTab.Character, CharacterMenuTab.Map, CharacterMenuTab.Skills, CharacterMenuTab.Abilities];
 
     private float _openTimer;
 
     public bool IsOpen { get; private set; }
     public CharacterMenuTab SelectedTab { get; private set; }
     public float OpenTimer => _openTimer;
+    public int SelectedSkillSlot { get; private set; }
+    public string SkillFeedback { get; private set; } = "";
+
+    public void SelectSkillSlot(int slot)
+    {
+        if (slot is < 0 or > 1) return;
+        SelectedSkillSlot = slot;
+        SkillFeedback = "";
+    }
+
+    public bool EquipSkill(RunAbilities abilities, RunAbility ability, bool canChoose)
+    {
+        if (!IsOpen || SelectedTab != CharacterMenuTab.Abilities) return false;
+        if (!canChoose)
+        {
+            SkillFeedback = "WECHSEL NUR IM HUB ODER VOR / ZWISCHEN WELLEN";
+            return false;
+        }
+        if (!abilities.Equip(SelectedSkillSlot, ability))
+        {
+            SkillFeedback = "BEREITS IM ANDEREN SLOT AUSGERUESTET";
+            return false;
+        }
+        SkillFeedback = $"{RunAbilities.Definitions[(int)ability].Name} AUF {(SelectedSkillSlot == 0 ? "Z" : "X")} AUSGERUESTET";
+        return true;
+    }
 
     public static string GetLabel(CharacterMenuTab tab) => tab switch
     {
         CharacterMenuTab.Character => "CHARAKTER",
         CharacterMenuTab.Map => "MAP",
-        _ => "SKILLS"
+        CharacterMenuTab.Skills => "SKILLS",
+        _ => "FÄHIGKEITEN"
     };
 
-    /// <summary>Map and Skills are selectable but have no content yet.</summary>
-    public static bool IsPlaceholder(CharacterMenuTab tab) => tab != CharacterMenuTab.Character;
+    /// <summary>Map and Skills are placeholders.</summary>
+    public static bool IsPlaceholder(CharacterMenuTab tab) => tab is CharacterMenuTab.Map or CharacterMenuTab.Skills;
 
     /// <summary>Opens on the character tab every time.</summary>
     public void Open()
@@ -41,6 +70,8 @@ public sealed class CharacterMenu
         IsOpen = true;
         SelectedTab = CharacterMenuTab.Character;
         _openTimer = 0f;
+        SelectedSkillSlot = 0;
+        SkillFeedback = "";
     }
 
     public void Close() => IsOpen = false;

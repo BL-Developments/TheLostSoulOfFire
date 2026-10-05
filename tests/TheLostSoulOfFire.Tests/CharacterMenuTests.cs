@@ -18,7 +18,7 @@ public sealed class CharacterMenuTests
         Assert.IsTrue(menu.IsOpen);
         Assert.AreEqual(CharacterMenuTab.Character, menu.SelectedTab);
         CollectionAssert.AreEqual(
-            new[] { "CHARAKTER", "MAP", "SKILLS" },
+            new[] { "CHARAKTER", "MAP", "SKILLS", "FÄHIGKEITEN" },
             CharacterMenu.Tabs.Select(CharacterMenu.GetLabel).ToArray());
     }
 
@@ -36,7 +36,9 @@ public sealed class CharacterMenuTests
         menu.SelectNext();
         Assert.AreEqual(CharacterMenuTab.Skills, menu.SelectedTab);
         menu.SelectNext();
-        Assert.AreEqual(CharacterMenuTab.Skills, menu.SelectedTab);
+        Assert.AreEqual(CharacterMenuTab.Abilities, menu.SelectedTab);
+        menu.SelectNext();
+        Assert.AreEqual(CharacterMenuTab.Abilities, menu.SelectedTab);
     }
 
     [TestMethod]
@@ -53,11 +55,12 @@ public sealed class CharacterMenuTests
     }
 
     [TestMethod]
-    public void OnlyMapAndSkillsArePlaceholders()
+    public void MapAndSkillsArePlaceholders()
     {
         Assert.IsFalse(CharacterMenu.IsPlaceholder(CharacterMenuTab.Character));
         Assert.IsTrue(CharacterMenu.IsPlaceholder(CharacterMenuTab.Map));
         Assert.IsTrue(CharacterMenu.IsPlaceholder(CharacterMenuTab.Skills));
+        Assert.IsFalse(CharacterMenu.IsPlaceholder(CharacterMenuTab.Abilities));
     }
 
     [TestMethod]
@@ -105,7 +108,7 @@ public sealed class CharacterMenuTests
         [
             sheet.HealthText, sheet.WeaponDamageText, sheet.AbilityDamageText, sheet.ArmorReductionText,
             sheet.GeldRunText!, sheet.GeldSecuredText, sheet.GlutRunText!, sheet.GlutSecuredText, "LEBEN", "STÄRKE", "FÄHIGKEITSSTÄRKE", "RÜSTUNG", "WÄHRUNGEN",
-            "NOCH NICHT VERFÜGBAR", "CHARAKTER", "MAP", "SKILLS"
+            "NOCH NICHT VERFÜGBAR", "CHARAKTER", "MAP", "SKILLS", "FÄHIGKEITEN"
         ];
 
         foreach (char character in string.Concat(texts).Where(character => character != ' '))
@@ -131,4 +134,34 @@ public sealed class CharacterMenuTests
             }
         }
     }
+    [TestMethod]
+    public void SkillSelection_ChangesTargetSlotAndRejectsDuplicatesAndCombatChanges()
+    {
+        var menu = new CharacterMenu();
+        var abilities = new RunAbilities();
+        menu.Open();
+        menu.Select(CharacterMenuTab.Abilities);
+        menu.SelectSkillSlot(1);
+        Assert.IsTrue(menu.EquipSkill(abilities, RunAbility.Vortex, true));
+        Assert.AreEqual(RunAbility.Vortex, abilities.Slots[1]);
+        Assert.AreEqual(RunAbility.SecondWind, abilities.Slots[0]);
+        menu.SelectSkillSlot(0);
+        Assert.IsFalse(menu.EquipSkill(abilities, RunAbility.Vortex, true));
+        Assert.IsTrue(menu.SkillFeedback.Contains("ANDEREN SLOT"));
+        Assert.AreEqual(RunAbility.SecondWind, abilities.Slots[0]);
+        Assert.IsFalse(menu.EquipSkill(abilities, RunAbility.Revenge, false));
+        Assert.AreEqual(RunAbility.SecondWind, abilities.Slots[0]);
+        Assert.IsTrue(menu.SkillFeedback.Contains("WECHSEL NUR"));
+        Assert.IsTrue(menu.EquipSkill(abilities, RunAbility.Revenge, true));
+        Assert.AreEqual(RunAbility.Revenge, abilities.Slots[0]);
+        menu.Select(CharacterMenuTab.Skills);
+        Assert.IsFalse(menu.EquipSkill(abilities, RunAbility.Setup, true));
+        menu.Select(CharacterMenuTab.Character);
+        Assert.IsFalse(menu.EquipSkill(abilities, RunAbility.Setup, true));
+        menu.Close();
+        menu.Open();
+        Assert.AreEqual(0, menu.SelectedSkillSlot);
+        Assert.AreEqual("", menu.SkillFeedback);
+    }
+
 }

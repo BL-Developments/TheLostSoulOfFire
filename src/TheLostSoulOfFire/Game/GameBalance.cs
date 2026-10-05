@@ -25,7 +25,11 @@ public static class GameBalance
     public const float ScytheRange1 = 112f;
     public const float ScytheRange2 = 120f;
     public const float ScytheRange3 = 138f;
-    public const int DummyMaxHealth = 180;
+    /// <summary>Sandbox training dummy: never dies, refills after <see cref="TrainingDummyRefillDelay"/> without hits.</summary>
+    public const int TrainingDummyMaxHealth = 1000;
+    public const float TrainingDummyRadius = 30f;
+    public const float TrainingDummyRefillDelay = 2.5f;
+    public const float TrainingDummyNumberLifetime = 0.9f;
 
     public const int HollowMaxHealth = 100;
     public const float HollowRadius = 27f;

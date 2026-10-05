@@ -38,7 +38,7 @@ public sealed class HudRenderer
 
         const int healthTextX = trackX + trackWidth + 8;
         // The panel grows with the measured width of the largest health value.
-        int panelRight = healthTextX + PixelText.Measure(GameBalance.PlayerMaxHealth.ToString(), 1) + 3;
+        int panelRight = healthTextX + PixelText.Measure(player.MaxHealth.ToString(), 1) + 3;
         Rectangle panelBounds = new(x + 13, y + 4, panelRight - (x + 13), 23);
         batch.FillRectangle(pixel, panelBounds, Panel);
         DrawCornerFrame(batch, pixel, panelBounds, Frame);
@@ -49,7 +49,7 @@ public sealed class HudRenderer
         batch.DrawLine(pixel, soulCenter - new Vector2(13f, 0f), soulCenter + new Vector2(13f, 0f), new Color(25, 23, 31), 2f);
         batch.FillRectangle(pixel, new Rectangle(trackX, trackY, trackWidth, trackHeight), Empty);
 
-        float healthFill = MathHelper.Clamp(player.Health / (float)GameBalance.PlayerMaxHealth, 0f, 1f);
+        float healthFill = MathHelper.Clamp(player.Health / (float)player.MaxHealth, 0f, 1f);
         int fillWidth = (int)MathF.Round(trackWidth * healthFill);
         if (fillWidth > 0)
         {
