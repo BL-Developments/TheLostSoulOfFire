@@ -820,7 +820,9 @@ public sealed class AudioDirector : IDisposable
                 if (_paused) loop.Pause();
                 _presence[kind] = loop;
             }
-            loop.Volume = Math.Clamp(PresenceAssets[kind].Volume * current * (1f - 0.5f * _focus), 0f, 1f);
+            // In Soul Sense the world grows quiet and the souls come forward (16_AUDIO_DIRECTION).
+            float sense = _soulSense ? 1.5f : 1f;
+            loop.Volume = Math.Clamp(PresenceAssets[kind].Volume * current * sense * (1f - 0.5f * _focus), 0f, 1f);
             loop.Pan = Math.Clamp(pan, -1f, 1f);
         }
         catch
