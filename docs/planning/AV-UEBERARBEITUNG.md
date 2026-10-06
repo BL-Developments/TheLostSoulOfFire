@@ -121,8 +121,9 @@ mit jedem Meilenstein aktualisiert.
 **Geprüft:** 257 Unit-Tests; Rundgang über 17 Stationen (rund 440 Aufnahmen, Schlüsselbilder und
 Bildserien gesichtet; er schlägt fehl, sobald irgendwo ein Platzhalter gezeichnet wird – keiner
 gefunden). Leistung auf dem M1 Pro: CPU-Zeit je Frame im Mittel 0,3–0,6 ms; Wandzeit ohne
-Bildsynchronisation (CPU und GPU) im Mittel rund 1 ms, 95. Perzentil höchstens rund 2 ms,
-Ausreißer nur beim Laden; Slice-,
+Bildsynchronisation (CPU und GPU) im Mittel rund 1 ms, 95. Perzentil höchstens rund 2 ms;
+seit die Atmosphären und Musik aller Zonen beim Start geladen werden, bleibt jeder Frame nach
+dem Start unter 12 ms (Zonenwechsel vorher bis 18 ms); Slice-,
 Fähigkeiten-, Vorhallen- und Währungstest; Audio-Laufzeit-, Gameplay- und Tod-Neustart-Test;
 `validate_audio.py` (75 Assets); `mix_report.py` (alle Zonen im Band); CLAP als Hörprobe für
 neue Klänge.
@@ -131,7 +132,8 @@ neue Klänge.
 - Ich kann nicht hören. CLAP, Spektrogramme und Lautheitsmessung sind Ersatz; die Hörabnahme
   im Spiel (Musik, Atmosphären, Schritte, Mix) steht beim Owner aus.
 - Stable Audio Open ist auf Hugging Face zugangsbeschränkt (Lizenzzustimmung des Owners
-  fehlt); ACE-Step läuft auf diesem Rechner nicht (Arbeitsspeicher bei laufendem Docker).
+  fehlt). ACE-Step läuft auf diesem Rechner nicht, solange Docker läuft: ein zweiter Versuch
+  am 06.10. mit CPU-Auslagerung trieb den Swap auf 23,9 von 24,5 GB und wurde abgebrochen.
   Musik und Klänge sind deshalb lokal synthetisiert.
 - Die Leistungswerte stammen von einem Mac (M1 Pro); schwächere Rechner und andere
   Grafiktreiber sind nicht gemessen.

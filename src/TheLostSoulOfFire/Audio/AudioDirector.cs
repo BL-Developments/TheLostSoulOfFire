@@ -272,6 +272,13 @@ public sealed class AudioDirector : IDisposable
             _ambience.Play();
 
             TryStartMusic(content);
+            // Beds and songs of every zone load now, not at the moment a zone is entered, so a
+            // zone change never stalls a frame while a long ambience is read from disk.
+            foreach (AudioZone zone in AmbienceAssets.Keys)
+            {
+                Bed(zone);
+                SongFor(zone);
+            }
             ApplyMix();
         }
         catch
