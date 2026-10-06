@@ -17,6 +17,7 @@ Implementiertes Verhalten wird separat in `openspec/specs/` und am Code auf `mai
 |---|---|
 | Spielidentität und Qualitätsanspruch | [PRODUCT-TRUTH.md](PRODUCT-TRUTH.md) |
 | Verbindliche Spielregeln, Umfang und Beispiele | [GAME-RULES.md](GAME-RULES.md) |
+| Run-Wirtschaft: Sichern, Extraktion, Niederlage | [ECONOMY.md](ECONOMY.md) |
 | Offene Entscheidungen mit zuständigen Issues | [OPEN-QUESTIONS.md](OPEN-QUESTIONS.md) |
 | Beschlüsse und Revisionen | [DECISION-LOG.md](DECISION-LOG.md) |
 | Canon, Arbeitsfassungen und verworfene Erklärungen | [CANON-STATUS.md](CANON-STATUS.md) |
