@@ -408,11 +408,14 @@ Rahmen wie oben (nur Darstellung und Ton).
 - Wellenstart-Markierung der Zwischenpause: eine ruhige, atmende Zone statt zweier kräftiger Ringe
   (mit den Zonen-Texturen doppelte sich die Linie); Radius unverändert.
 
-**Geprüft (Stand 06.10.2026, 22:40):** voller Rundgang über 18 Stationen (497 Aufnahmen, kein
-Platzhalter), CPU je Frame 0,24–0,52 ms, Wandzeit im Mittel 0,9–1,6 ms (95. Perzentil höchstens
-5,7 ms); 258 Unit-Tests; Slice-, Fähigkeiten-, Vorhallen- und Währungstest; Audio-Laufzeit-,
-Gameplay- (10 Wellen) und Tod-Neustart-Test; `validate_audio.py` (169 Assets);
-`mix_report.py` (Arena, 55 Töne, keiner außerhalb des Bands).
+**Geprüft (Stand 06.10.2026, 23:40):** voller Rundgang über 19 Stationen (535 Aufnahmen, kein
+Platzhalter), CPU je Frame 0,27–0,55 ms, Wandzeit im Mittel 0,9–1,8 ms; in diesem Lauf fielen
+die letzten fünf Stationen ab der Truhe gemeinsam auf 42 fps (auch die Menüs), einzeln
+nachgemessen liefen Truhe, Tod und Menüs wieder mit 1,0–1,1 ms und das Ende des Devourer mit
+1,2 ms – das System hat im Hintergrund gedrosselt, kein Spielfehler. 258 Unit-Tests; Slice-,
+Fähigkeiten-, Vorhallen- (mit Seelensinn) und Währungstest; Audio-Laufzeit-, Gameplay-
+(10 Wellen) und Tod-Neustart-Test; zuvor `validate_audio.py` (169 Assets) und `mix_report.py`
+(Arena, 55 Töne, keiner außerhalb des Bands).
 
 **Nächste Schritte (nach Wirkung):**
 1. Hörabnahme durch den Owner: Wuchtschichten der Hiebe, sanfte Seelenglocke, Präsenz der
