@@ -193,6 +193,12 @@ public sealed partial class GameWorld : IDisposable
     {
         float deltaTime = MathF.Min((float)gameTime.ElapsedGameTime.TotalSeconds, 1f / 20f);
         _audio.SetZone(CurrentAudioZone);
+        // After the last wave the Life Flame is heard from the furnace as it kindles, and the
+        // music turns to the theme in which the lost soul's motif resolves.
+        bool ending = _phase == GamePhase.Arena && _loopState == ArenaLoopState.Complete;
+        _audio.SetEnding(ending);
+        _audio.SetLifeFlame(ending ? _presentation.GetLifeFlameAlpha() * _presentation.GetLifeFlameKindle() : 0f,
+            PanOf(_presentation.GetLifeFlamePosition()) * 0.7f);
         if (_devMenu.IsOpen)
         {
             _audio.Update(deltaTime);

@@ -254,3 +254,48 @@ def threshold(rng) -> np.ndarray:
     dsp.place(bell, dsp.pan(dsp.lowpass(dsp.bell(123.5, 10.0, rng, brightness=0.5), 1600) * 0.05, 0.2), dsp.seconds(9.0))
     mix = dsp.reverb(tone + gusts + flames + bell, space, wet=0.5, loop=True)
     return dsp.normalise_loudness(mix, -34.0, peak_ceiling_db=-10.0)
+
+
+def _pop(rng, body: bool) -> np.ndarray:
+    """One crackle of burning wood: a 1-4 ms burst, bright or with a short woody body."""
+    n = dsp.seconds(0.06)
+    width = rng.uniform(0.0008, 0.003)
+    burst = rng.standard_normal(n) * np.exp(-np.arange(n) / (dsp.RATE * width))
+    centre = rng.uniform(1500, 6000)
+    out = dsp.bandpass(burst, centre * 0.5, min(centre * 1.8, 16000))
+    if body:
+        out = out * 0.6 + dsp.resonator(burst, rng.uniform(280, 900), rng.uniform(4, 9)) * 0.8
+    return out
+
+
+@recipe("life-flame", "Life Flame im kalten Ofen: warmes, ruhiges Feuer, Knistern in Büscheln, springende Glut, tiefes Brausen; Punktquelle (mono), nahtlos", loop=True)
+def life_flame(rng) -> np.ndarray:
+    seconds = 9.0
+    n = dsp.seconds(seconds)
+    # A low, warm roar under everything, breathing slowly: the fire is felt more than heard.
+    roar = dsp.circular(lambda x: dsp.bandpass(x, 45, 240), dsp.brown(n, rng))
+    roar = roar / (np.std(roar) + 1e-9) * (0.7 + 0.3 * dsp.smooth_loop(n, 0.25, rng))
+    # Crackling comes in irregular clusters, a few loud, most small (heavy-tailed gains).
+    crackle = np.zeros(n)
+    for _ in range(int(seconds * 2.6)):
+        at = int(rng.integers(0, n))
+        for _ in range(int(rng.integers(1, 7))):
+            gain = min(1.0, 0.08 * rng.pareto(1.6) + 0.04)
+            dsp.place(crackle, _pop(rng, rng.random() < 0.35), at, gain)
+            at = (at + dsp.seconds(rng.uniform(0.004, 0.045))) % n
+    # A sap pocket bursting now and then: loud, woody.
+    for _ in range(int(seconds * 0.5)):
+        dsp.place(crackle, _pop(rng, True), int(rng.integers(0, n)), rng.uniform(0.6, 1.0))
+    # Sizzle: a faint bed of tiny ticks.
+    sizzle = np.zeros(n)
+    for _ in range(int(seconds * 45)):
+        dsp.place(sizzle, _pop(rng, False), int(rng.integers(0, n)), rng.uniform(0.01, 0.05))
+    mix = roar * 0.09 + crackle + sizzle
+    room = dsp.impulse_response(0.9, rng, damping_hz=5000, predelay=0.008)
+    mix = dsp.reverb(mix, room, wet=0.14, loop=True).mean(axis=1)
+    mix = dsp.circular(lambda x: dsp.highpass(x, 35), mix)
+    # The loop is seamless all round; start it where two neighbouring samples are nearly silent,
+    # so its ends meet without a step.
+    quiet = np.abs(mix) + np.abs(np.roll(mix, 1))
+    mix = np.roll(mix, -int(np.argmin(quiet)))
+    return dsp.normalise_loudness(mix, -24.0, peak_ceiling_db=-4.0)

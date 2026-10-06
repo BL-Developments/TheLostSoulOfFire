@@ -9883,3 +9883,8 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/Player/Animations/aim_move_normal/nw.png
+
+#begin Audio/Sfx/life_flame_loop.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/life_flame_loop.wav

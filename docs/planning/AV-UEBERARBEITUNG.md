@@ -227,14 +227,27 @@ Rahmen wie oben (nur Darstellung und Ton).
   ≤ 0,3/255); die Schritte bleiben auf den Aufsätzen (Phase 0,26/0,77). Nebenbei behoben: Das
   erste Ruhebild des Hollow war eine aufrechte Fehlpose (er zuckte jeden Zyklus hoch).
 
-**Befunde, offen (nach Wirkung):**
-1. Ende: Die Life Flame ist klein, weit rechts oben und wirft kaum Licht; der Abschluss des
-   Spiels hat keine Wirkung (warmes Licht gegen die violette Welt fehlt).
-2. Vorhalle: Aschehaufen am Wandfuß rendern als helle, flache Ovale; Feuerschalen und
-   Warden-Flammen werfen kaum Licht auf den Boden, der Raum wirkt gleichmäßig grau.
-3. Prolog II: Bodentextur des Suchgangs wiederholt sich sichtbar (dunkle Flecken im Raster).
-4. Prolog I: große, leere Steinplatten, wenig Material.
-5. Arena im Spielausschnitt: Boden gleichmäßig hell, wenig Lichtgefälle.
-6. Sprache: Erzähltexte englisch, HUD deutsch (Inhaltsfrage, nicht ohne Owner ändern).
+- Ende: Die Life Flame entzündet sich, wie ihre Spezifikation sagt, im kalten Ofen der Nordwand
+  (`Arena.FurnaceHearth`, am Wandbild vermessen) statt frei über dem Boden. Glutbett, Wachsen
+  aus einer niedrigen Zunge, Funken; warmes Licht auf Wand, Boden und Figur; die Kamera wendet
+  sich dem Ofen zu (Herd bei ~22 % Bildhöhe, Zoom 0,6–0,9 je nach Abstand der Figur), die Figur
+  dreht sich zur Flamme. Ton: Die Musik wechselt zum Schwellen-Thema, in dem sich das Motiv
+  auflöst; die Flamme knistert als Mono-Schleife aus Richtung des Ofens (Rezept `life-flame`,
+  CLAP „fireplace“ 0,78 + „campfire“ 0,18, etwa 3 LU unter der Musik). Rundgang protokolliert
+  `TOUR_AUDIO song=threshold_theme life_flame=0.44`; Gameplay-Audiotest (10 Wellen, Ende,
+  Neustart) und `validate_audio.py` (125 Assets) bestehen.
 
-**Verworfen:** –
+**Befunde, offen (nach Wirkung):**
+1. Vorhalle: Aschehaufen am Wandfuß rendern als helle, flache Ovale; Feuerschalen und
+   Warden-Flammen werfen kaum Licht auf den Boden, der Raum wirkt gleichmäßig grau.
+2. Prolog II: Bodentextur des Suchgangs wiederholt sich sichtbar (dunkle Flecken im Raster).
+3. Prolog I: große, leere Steinplatten, wenig Material.
+4. Arena im Spielausschnitt: Boden gleichmäßig hell, wenig Lichtgefälle.
+5. Sprache: Erzähltexte englisch, HUD deutsch (Inhaltsfrage, nicht ohne Owner ändern).
+
+6. Arena: Die Nordwand wirkt im Endbild hinter einem leichten Dunstschleier (Luftperspektive
+   nach Bildhöhe trifft die Wand); prüfen, ob die Wand davon ausgenommen werden sollte.
+
+**Verworfen:**
+- Feuerknistern mit kräftigem Brausen und Atemband: CLAP hörte „Wind“ (0,5–0,8); das Brausen
+  ist jetzt leise und tief, das Knistern trägt.

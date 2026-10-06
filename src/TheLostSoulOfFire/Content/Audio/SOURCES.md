@@ -216,3 +216,16 @@ Anlauf des Burning und ein eigener Tod je Gegner. Takes einer Gruppe auf ±0,5 L
 | `Audio/Sfx/scythe_swing_1_lead.wav` | scythe_swing_1.wav, erste 30 ms gekürzt (Körper früher, Animation) | 0.15 s, 1 Kanal, -12.8 LUFS, Spitze -3.0 dBFS |
 | `Audio/Sfx/scythe_swing_1_lead_v2.wav` | scythe_swing_1_v2.wav, erste 30 ms gekürzt (Körper früher, Animation) | 0.14 s, 1 Kanal, -12.8 LUFS, Spitze -2.8 dBFS |
 | `Audio/Sfx/scythe_swing_1_lead_v3.wav` | scythe_swing_1_v3.wav, erste 30 ms gekürzt (Körper früher, Animation) | 0.16 s, 1 Kanal, -12.9 LUFS, Spitze -3.0 dBFS |
+
+## Ende (Durchgang 3, 06.10.2026)
+
+Rezept `life-flame` in `tools/audio/recipes/ambiences.py`: das Feuer der Life Flame im kalten Ofen
+nach der letzten Welle, eine nahtlose Mono-Schleife (das Spiel setzt sie in Richtung des Ofens und
+blendet sie mit der wachsenden Flamme ein). Tiefes, leises Brausen; Knistern in unregelmäßigen
+Büscheln mit wenigen lauten Pops (Holzkörper bei etwa einem Drittel), ein feines Zischbett. CLAP
+ordnet die Takes als „fireplace with burning wood“ (0,78) und „campfire crackling“ (0,18) ein; die
+erste Fassung mit stärkerem Brausen hörte es als Wind und wurde verworfen.
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/life_flame_loop.wav` | life-flame Seed 2 | 9.00 s, 1 Kanal, -27.7 LUFS, Spitze -4.0 dBFS, Naht -90 dBFS |

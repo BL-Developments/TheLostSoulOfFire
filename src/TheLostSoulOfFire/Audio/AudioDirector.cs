@@ -229,6 +229,9 @@ public sealed class AudioDirector : IDisposable
     private AudioZone _zone = AudioZone.Arena;
     private AudioZone _fadingZone = AudioZone.Arena;
     private SoundEffectInstance? _fadingAmbience;
+    private SoundEffect? _lifeFlameSound;
+    private SoundEffectInstance? _lifeFlame;
+    private const float LifeFlameVolume = 0.44f;
     private float _zoneBlend = 1f;
     private Song? _wantedSong;
     private float _musicGain = 1f;
@@ -255,6 +258,10 @@ public sealed class AudioDirector : IDisposable
 
     public int FallbackSoundCount => _ownedFallbackSounds.Count;
     public bool MusicPlaying => _musicPlaying && MediaPlayer.State == MediaState.Playing;
+
+    /// <summary>Diagnostics for the tour: what plays now (song asset, Life Flame loop level).</summary>
+    public string DescribeEnding() => string.Create(System.Globalization.CultureInfo.InvariantCulture,
+        $"song={_music?.Name ?? "none"} gain={_musicGain:0.00} life_flame={(_lifeFlame?.State == SoundState.Playing ? _lifeFlame.Volume : 0f):0.00}");
 
     public AudioDirector(ContentManager content)
     {
@@ -590,6 +597,8 @@ public sealed class AudioDirector : IDisposable
                     else if (!paused && instance.State == SoundState.Paused) instance.Resume();
                 }
             }
+            if (paused && _lifeFlame?.State == SoundState.Playing) _lifeFlame.Pause();
+            else if (!paused && _lifeFlame?.State == SoundState.Paused) _lifeFlame.Resume();
         }
         catch
         {
@@ -598,9 +607,48 @@ public sealed class AudioDirector : IDisposable
         ApplyMix();
     }
 
+    /// <summary>
+    /// The Life Flame's fire after the last wave: a quiet crackling loop from the furnace.
+    /// <paramref name="level"/> (0..1) follows the flame as it kindles; 0 stops it.
+    /// </summary>
+    public void SetLifeFlame(float level, float pan)
+    {
+        if (!_available || (level <= 0.001f && _lifeFlame is null))
+        {
+            return;
+        }
+
+        try
+        {
+            if (level <= 0.001f)
+            {
+                _lifeFlame!.Stop();
+                _lifeFlame.Dispose();
+                _lifeFlame = null;
+                return;
+            }
+            if (_lifeFlame is null)
+            {
+                _lifeFlameSound ??= _content.Load<SoundEffect>("Audio/Sfx/life_flame_loop");
+                _lifeFlame = _lifeFlameSound.CreateInstance();
+                _lifeFlame.IsLooped = true;
+                _lifeFlame.Volume = 0f;
+                _lifeFlame.Play();
+                if (_paused) _lifeFlame.Pause();
+            }
+            _lifeFlame.Volume = Math.Clamp(LifeFlameVolume * level, 0f, 1f);
+            _lifeFlame.Pan = Math.Clamp(pan, -1f, 1f);
+        }
+        catch (ContentLoadException)
+        {
+            _lifeFlame = null;
+        }
+    }
+
     /// <summary>Discards every running or paused effect, e.g. when a run is abandoned.</summary>
     public void StopEffects()
     {
+        SetLifeFlame(0f, 0f);
         foreach (List<SoundEffectInstance> instances in _activeInstances.Values)
         {
             foreach (SoundEffectInstance instance in instances)
@@ -609,6 +657,24 @@ public sealed class AudioDirector : IDisposable
             }
             instances.Clear();
         }
+    }
+
+    private bool _ending;
+
+    /// <summary>
+    /// After the last wave the music turns to the threshold's theme, where the lost soul's motif
+    /// finally resolves; the arena's bed stays. Calling it every frame with the same value is free.
+    /// </summary>
+    public void SetEnding(bool ending)
+    {
+        if (!_available || ending == _ending)
+        {
+            return;
+        }
+
+        _ending = ending;
+        _wantedSong = SongFor(ending ? AudioZone.Threshold : _zone);
+        ApplyMix();
     }
 
     public void SetCalm(bool calm)
@@ -796,7 +862,7 @@ public sealed class AudioDirector : IDisposable
     {
         float ambienceBase = AmbienceLevel(_zone);
         float fadingBase = AmbienceLevel(_fadingZone);
-        float musicBase = MusicLevel(_zone) * _musicGain;
+        float musicBase = MusicLevel(_ending ? AudioZone.Threshold : _zone) * _musicGain;
         if (_soulSense)
         {
             ambienceBase *= 0.52f;

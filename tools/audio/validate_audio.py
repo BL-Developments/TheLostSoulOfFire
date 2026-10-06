@@ -98,7 +98,12 @@ AUTHORED_SFX_DURATIONS = {
     **{f"death_hollow_{index}.wav": 0.9 for index in range(1, 3)},
     **{f"death_burning_{index}.wav": 0.9 for index in range(1, 3)},
     **{f"death_devourer_{index}.wav": 1.4 for index in range(1, 3)},
+    # The Life Flame's fire after the last wave (tools/audio/recipes/ambiences.py), looped.
+    "life_flame_loop.wav": 9.0,
 }
+
+#: Looping point sources: mono (the game pans them) and seamless like the beds.
+POINT_LOOPS = {"life_flame_loop.wav"}
 
 #: Ambience beds and music per zone (AudioDirector.AmbienceAssets / MusicAssets).
 ZONE_AMBIENCES = ["shore_ambience.wav", "hub_ambience.wav", "harbour_ambience.wav", "causeway_ambience.wav",
@@ -255,7 +260,7 @@ def main() -> int:
             failures.append(f"{relative}: ambience duration must be 20–45s")
         if path.name in ZONE_MUSIC and not 45.0 <= metrics["duration"] <= 150.0:
             failures.append(f"{relative}: music duration must be 45–150s")
-        if path.name in loops and metrics["seam_db"] > -45.0:
+        if (path.name in loops or path.name in POINT_LOOPS) and metrics["seam_db"] > -45.0:
             failures.append(f"{relative}: endpoint discontinuity is {metrics['seam_db']:.1f} dBFS")
 
         block = expected_manifest_block(relative, processor)

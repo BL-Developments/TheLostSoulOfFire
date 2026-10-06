@@ -594,6 +594,7 @@ internal sealed class TourVisualTest
         Do("clear", () => _world.DefeatAutomatedEnemies(), 0.2f);
         Wait("complete", () => _world.LoopState == ArenaLoopState.Complete, 20f);
         Series("ending", 16, 27);
+        Do("ending_audio", () => Console.WriteLine($"TOUR_AUDIO station=arena_complete {_world.AutomatedAudio.DescribeEnding()}"));
     }
 
     private void BuildSandbox()
