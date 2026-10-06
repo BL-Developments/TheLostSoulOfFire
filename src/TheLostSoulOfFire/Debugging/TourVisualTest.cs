@@ -488,6 +488,7 @@ internal sealed class TourVisualTest
         Do("rest", () => { }, 0.6f);
         Do("listen_cannon", () => _world.AutomatedAudio.CuePlayed += LogCannon);
         Series("cannon_draw_charge", 30, 2, () => _input.InjectMousePresses(left: false, right: true));
+        Do("hum_audio", () => Console.WriteLine($"TOUR_AUDIO station=arena_player charging {_world.AutomatedAudio.DescribePresence()}"), 0.0f);
         Series("cannon_fire", 30, 1);
         Do("stop_listening_cannon", () => _world.AutomatedAudio.CuePlayed -= LogCannon);
         // Charging on the move: aiming right while backing away to the left walks the legs backward.

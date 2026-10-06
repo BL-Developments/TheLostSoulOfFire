@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Media;
@@ -284,6 +285,9 @@ public sealed class AudioDirector : IDisposable
     private readonly Dictionary<EnemyPresence, SoundEffect?> _presenceSounds = [];
     private readonly Dictionary<EnemyPresence, SoundEffectInstance> _presence = [];
     private readonly Dictionary<EnemyPresence, float> _presenceLevel = [];
+    private SoundEffect? _humSound;
+    private SoundEffectInstance? _hum;
+    private float _humLevel;
     private SoundEffect? _resonanceSound;
     private SoundEffectInstance? _resonance;
     private float _resonanceLevel;
@@ -321,7 +325,7 @@ public sealed class AudioDirector : IDisposable
     /// <summary>Diagnostics for the tour: the volume and pan of each presence loop that plays.</summary>
     public string DescribePresence() => string.Join(" ", _presence.Select(pair => string.Create(
         System.Globalization.CultureInfo.InvariantCulture, $"{pair.Key}={pair.Value.Volume:0.00}@{pair.Value.Pan:+0.00;-0.00}"))) +
-        string.Create(System.Globalization.CultureInfo.InvariantCulture, $" resonance={_resonance?.Volume ?? 0f:0.00}");
+        string.Create(System.Globalization.CultureInfo.InvariantCulture, $" resonance={_resonance?.Volume ?? 0f:0.00} hum={_hum?.Volume ?? 0f:0.00}@{_hum?.Pitch ?? 0f:+0.00;-0.00}");
 
     /// <summary>Diagnostics for the tour: what plays now (song asset, Life Flame loop level).</summary>
     public string DescribeEnding() => string.Create(System.Globalization.CultureInfo.InvariantCulture,
@@ -717,7 +721,7 @@ public sealed class AudioDirector : IDisposable
                     else if (!paused && instance.State == SoundState.Paused) instance.Resume();
                 }
             }
-            foreach (SoundEffectInstance tail in _hallInstances.Concat(_presence.Values).Concat(_resonance is null ? [] : [_resonance]))
+            foreach (SoundEffectInstance tail in _hallInstances.Concat(_presence.Values).Concat(_resonance is null ? [] : [_resonance]).Concat(_hum is null ? [] : [_hum]))
             {
                 if (paused && tail.State == SoundState.Playing) tail.Pause();
                 else if (!paused && tail.State == SoundState.Paused) tail.Resume();
@@ -826,6 +830,49 @@ public sealed class AudioDirector : IDisposable
     }
 
     /// <summary>
+    /// The Soul Cannon's chamber while it charges (16_AUDIO_DIRECTION: the charge audibly rises):
+    /// a hum whose pitch and level climb with <paramref name="charge"/> and hold, vibrating, at
+    /// full; null when not charging, and it is gone at once (the shot carries the moment).
+    /// </summary>
+    public void SetCannonHum(float? charge, float deltaTime)
+    {
+        if (!_available || (charge is null && _hum is null))
+        {
+            return;
+        }
+
+        _humLevel = charge is not null
+            ? MathF.Min(1f, _humLevel + deltaTime / 0.12f)
+            : MathF.Max(0f, _humLevel - deltaTime / 0.06f);
+        try
+        {
+            if (_humLevel <= 0.001f)
+            {
+                _hum?.Stop();
+                _hum?.Dispose();
+                _hum = null;
+                return;
+            }
+            if (_hum is null)
+            {
+                _humSound ??= _content.Load<SoundEffect>("Audio/Sfx/cannon_hum");
+                _hum = _humSound.CreateInstance();
+                _hum.IsLooped = true;
+                _hum.Volume = 0f;
+                _hum.Play();
+                if (_paused) _hum.Pause();
+            }
+            float c = MathHelper.Clamp(charge ?? 1f, 0f, 1f);
+            _hum.Pitch = MathHelper.Clamp(-0.4f + 0.5f * c + (c >= 1f ? 0.1f : 0f), -1f, 1f);
+            _hum.Volume = Math.Clamp((0.1f + 0.22f * c) * _humLevel, 0f, 1f);
+        }
+        catch (ContentLoadException)
+        {
+            _hum = null;
+        }
+    }
+
+    /// <summary>
     /// While Resonance burns (16_AUDIO_DIRECTION: a subtle flame rumble, never a siren), the
     /// player's own Death Flame is heard: it swells in with the activation and dies away after.
     /// </summary>
@@ -872,6 +919,10 @@ public sealed class AudioDirector : IDisposable
         _resonance?.Dispose();
         _resonance = null;
         _resonanceLevel = 0f;
+        _hum?.Stop();
+        _hum?.Dispose();
+        _hum = null;
+        _humLevel = 0f;
         foreach (SoundEffectInstance loop in _presence.Values)
         {
             try { loop.Stop(); loop.Dispose(); } catch { }

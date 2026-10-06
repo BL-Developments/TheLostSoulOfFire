@@ -201,6 +201,8 @@ public sealed partial class GameWorld : IDisposable
             PanOf(_presentation.GetLifeFlamePosition()) * 0.7f);
         UpdateEnemyPresence(deltaTime);
         _audio.SetResonanceRumble(IsCombatPhase && _player.ResonanceActive && !_player.IsDead, deltaTime);
+        _audio.SetCannonHum(IsCombatPhase && !_player.IsDead && _player.Cannon.State == SoulCannonState.Charging
+            ? _player.Cannon.ChargeProgress : null, deltaTime);
         if (_devMenu.IsOpen)
         {
             _audio.Update(deltaTime);

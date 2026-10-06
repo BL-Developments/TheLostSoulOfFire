@@ -339,6 +339,11 @@ Rahmen wie oben (nur Darstellung und Ton).
   fire“ 0,78, keine Sirene), blendet in 0,6 s ein und 1,2 s aus; Rundgang aktiviert die Resonanz
   jetzt wirklich (R) und protokolliert `resonance=0.40`.
 
+- Kanonenladung hörbar ansteigend (16_AUDIO_DIRECTION): Ladebrummen `cannon_hum` (Kammer,
+  Seelenwimmern, Vibrieren) unter dem Ludo-Ladeton, Tonhöhe −0,4 → +0,2 und Pegel mit der Ladung,
+  hält beim vollen Laden vibrierend, nach dem Schuss sofort weg; passt zur wachsenden Kanone.
+  Rundgang: `hum=0.25@-0.07` beim Laden, `0.00` danach.
+
 **Befunde, offen (nach Wirkung):**
 1. Sprache: Erzähltexte englisch, HUD deutsch (Inhaltsfrage, nicht ohne Owner ändern).
 

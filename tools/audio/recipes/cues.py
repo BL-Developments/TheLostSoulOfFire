@@ -337,3 +337,18 @@ def cannon_stow(rng) -> np.ndarray:
     x = clunk + rattle + _strap(rng, n, 0.03, 0.2, 0.55)
     x = _room(x, rng, 0.4, 0.12)
     return _finish(x, -23.0, -4.0)
+
+
+@recipe("cannon-hum", "Seelenkanone lädt: Brummen der Kammer, darüber ein Seelenwimmern, leises Vibrieren; nahtlose Mono-Schleife, das Spiel hebt Tonhöhe und Pegel mit der Ladung")
+def cannon_hum(rng) -> np.ndarray:
+    seconds = 2.0  # every frequency below completes whole cycles in the loop: seamless
+    n = dsp.seconds(seconds)
+    t = dsp.time_axis(n)
+    hum = sum(np.sin(2 * np.pi * f * t + rng.uniform(0, 6.3)) * a for f, a in ((55, 0.6), (110, 1.0), (165, 0.45), (220, 0.3), (330, 0.12)))
+    vibrato = 1.0 + 0.004 * np.sin(2 * np.pi * 5.0 * t)
+    whine = (np.sin(2 * np.pi * 880 * np.cumsum(vibrato) / dsp.RATE) + 0.35 * np.sin(2 * np.pi * 1320 * np.cumsum(vibrato) / dsp.RATE))
+    whine *= 0.5 + 0.5 * np.sin(2 * np.pi * 1.5 * t) ** 2
+    tremolo = 0.82 + 0.18 * np.sin(2 * np.pi * 18.0 * t)
+    grit = dsp.circular(lambda x: dsp.bandpass(x, 2000, 6000), dsp.white(n, rng)) * 0.02
+    x = (hum * 0.55 + whine * 0.12) * tremolo + grit
+    return dsp.normalise_loudness(x, -22.0, peak_ceiling_db=-4.0)

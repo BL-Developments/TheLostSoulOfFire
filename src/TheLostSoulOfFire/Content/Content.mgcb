@@ -10634,3 +10634,8 @@
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /build:Audio/Sfx/resonance_rumble.wav
+
+#begin Audio/Sfx/cannon_hum.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/cannon_hum.wav

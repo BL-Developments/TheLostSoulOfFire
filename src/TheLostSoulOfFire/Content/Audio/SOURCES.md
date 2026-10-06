@@ -298,3 +298,11 @@ Rezept `resonance-rumble`: die eigene Death Flame während der Resonanz (16_AUDI
 | Datei | Quelle | Messung |
 | --- | --- | --- |
 | `Audio/Sfx/resonance_rumble.wav` | resonance-rumble Seed 2 | 4.00 s, 1 Kanal/Kanäle, -25.0 LUFS, Spitze -9.4 dBFS |
+
+## Ladebrummen der Seelenkanone (Durchgang 3, 06.10.2026)
+
+Rezept `cannon-hum` in `tools/audio/recipes/cues.py`: Brummen der Kammer (55–330 Hz), Seelenwimmern (880/1320 Hz mit Vibrato), Vibrieren (Tremolo 18 Hz); alle Frequenzen in ganzen Perioden über 2 s, also nahtlos. Das Spiel hebt Tonhöhe (−0,4 bis +0,2) und Pegel mit der Ladung (16_AUDIO_DIRECTION: hörbar ansteigende Ladung). CLAP „electric hum of a charging energy weapon“ 0,85.
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/cannon_hum.wav` | cannon-hum Seed 1 | 2.00 s, 1 Kanal/Kanäle, -22.0 LUFS, Spitze -11.8 dBFS |
