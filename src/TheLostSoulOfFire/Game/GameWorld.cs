@@ -1130,8 +1130,11 @@ public sealed partial class GameWorld : IDisposable
         batch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.LinearClamp, transformMatrix: _art.SceneTransform);
         float breathe = 1f + 0.04f * MathF.Sin(_presentationTime * 0.21f);
         Color window = new(205, 196, 236);
-        _art.DrawSoftSpot(batch, RoseWindowPool, new Vector2(470f, 230f) * breathe, window * 0.07f);
-        _art.DrawSoftSpot(batch, RoseWindowPool + new Vector2(-20f, -30f), new Vector2(260f, 120f) * breathe, window * 0.06f);
+        // The landmark's light: a clear island in the nave, brightest under the window, so the hall
+        // has a lit heart and darker aisles instead of one even value. (The additive blend weighs
+        // colour by alpha, so the strength goes into the colour at full alpha.)
+        _art.DrawSoftSpot(batch, RoseWindowPool, new Vector2(560f, 270f) * breathe, new Color(window.ToVector3() * 0.09f));
+        _art.DrawSoftSpot(batch, RoseWindowPool + new Vector2(-20f, -30f), new Vector2(300f, 140f) * breathe, new Color(window.ToVector3() * 0.07f));
         // Dust turning slowly in the light: only where the pool is, fading in and out.
         for (int index = 0; index < 16; index++)
         {

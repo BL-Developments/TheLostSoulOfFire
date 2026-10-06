@@ -320,11 +320,16 @@ Rahmen wie oben (nur Darstellung und Ton).
   hochgeworfenen Armen, auf die Knie, Sturz nach vorn. Rundgang-Station `arena_devourer_end`
   zeigt beides (vorher war der Spieler dort schon tot).
 
-**Befunde, offen (nach Wirkung):**
-1. Arena im Spielausschnitt: Boden gleichmäßig hell, wenig Lichtgefälle.
-2. Sprache: Erzähltexte englisch, HUD deutsch (Inhaltsfrage, nicht ohne Owner ändern).
+- Arena-Licht: Die Lichtinsel des Rosettenfensters wirkte nur mit rund 0,5 % statt der gemeinten
+  7 % (die additive Mischung gewichtet die vormultiplizierte Farbe ein zweites Mal mit Alpha).
+  Stärke jetzt in der Farbe bei vollem Alpha (9 %/7 %, etwas größer): das Mittelschiff hat ein
+  helles Herz, großflächige Helligkeitsstreuung 10,5 → 13,5 (Gauß 90 px), Figuren als dunkle
+  Silhouetten darin gut lesbar.
 
-3. Arena: Die Nordwand wirkt im Endbild hinter einem leichten Dunstschleier (Luftperspektive
+**Befunde, offen (nach Wirkung):**
+1. Sprache: Erzähltexte englisch, HUD deutsch (Inhaltsfrage, nicht ohne Owner ändern).
+
+2. Arena: Die Nordwand wirkt im Endbild hinter einem leichten Dunstschleier (Luftperspektive
    nach Bildhöhe trifft die Wand); prüfen, ob die Wand davon ausgenommen werden sollte.
 
 **Hinweis:** Nach `place_environment.py` immer `dotnet build` vor dem Rundgang, sonst zeigt
