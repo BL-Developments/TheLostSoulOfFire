@@ -60,6 +60,7 @@ CLASS = {
     "ScytheSwing1": "action", "ScytheSwing2": "action", "SoulCleave": "action", "Dash": "action",
     "CannonCharge": "action", "CannonFull": "action", "CannonFire": "action", "SoulRelease": "action",
     "CannonDraw": "action", "CannonStow": "action",
+    "ScytheWeight1": "action", "ScytheWeight2": "action", "ScytheWeight3": "action",
     "EnemyEmerge": "event",
     "Footstep": "step", "FootstepWood": "step", "HollowStep": "step", "BurningStep": "step", "DevourerStep": "step",
     "UiMove": "ui", "UiBack": "ui", "UiOpen": "ui", "UiClose": "ui", "CurrencyGain": "ui",

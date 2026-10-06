@@ -139,6 +139,17 @@ AUTHORED_SFX_DURATIONS = {
     "resonance_rumble.wav": 4.000,
     # The Soul Cannon's charge hum (recipes/cues.py), looped; the game raises its pitch with the charge.
     "cannon_hum.wav": 2.000,
+    # A soft soul release (recipes/cues.py) in place of the bright Ludo take, which beeped in crowds.
+    "soul_release_soft_1.wav": 1.100,
+    "soul_release_soft_2.wav": 1.100,
+    "soul_release_soft_3.wav": 1.100,
+    # Weight under the scythe swings (recipes/combat.py), peaking at the strike's contact.
+    "scythe_weight_1_1.wav": 0.420,
+    "scythe_weight_1_2.wav": 0.420,
+    "scythe_weight_2_1.wav": 0.480,
+    "scythe_weight_2_2.wav": 0.480,
+    "scythe_weight_3_1.wav": 0.700,
+    "scythe_weight_3_2.wav": 0.700,
     # The Life Flame's fire after the last wave (tools/audio/recipes/ambiences.py), looped.
     "life_flame_loop.wav": 9.0,
 }

@@ -363,6 +363,17 @@ Rahmen wie oben (nur Darstellung und Ton).
   Rand heller, weicher Rand exakt auf dem Radius) statt Haarlinien; gilt überall (Wellenstart,
   Erscheinen, Detonation, Schlag, Truhe, Fähigkeiten, Hollow-Griff).
 
+- Schläge mächtiger (Owner): Wuchtschicht `scythe-weight-1/2/3` unter jedem Ludo-Schwung
+  (schwerer Luftstoß mit Maximum zur Kontaktzeit, Auflodern der Flamme, dunkler Klingenklang;
+  dritter Hieb mit tiefem Druckstoß; CLAP „heavy sword swing whoosh“ 0,99), etwa +2,6/+4,0/+6,2 LU
+  über dem Bett; jeder Treffer mit Druckstoß (`HitHeavy` 0,32/0,42/0,62), `ScytheHit` lauter
+  (0,82/0,95, jetzt +5,7 LU). Treffer bleiben über den Schwüngen.
+- Seelen einsammeln subtiler (Owner): der helle Ludo-Freigabeton (8,4 kHz, CLAP „piercing
+  electronic beep“ 0,64) durch eine weiche tiefe Glocke ersetzt (`soul-release-soft`, 1,8 kHz,
+  „bell“ 0,64, „beep“ 0,09); schnell aufeinanderfolgende Freigaben werden je um Faktor 0,62
+  leiser (bis 0,3), und nur die erste einer Folge duckt die Musik (vorher pumpte sie bei jeder).
+  Gleiches Abklingen für die Währungstöne.
+
 **Befunde, offen (nach Wirkung):**
 1. Sprache: Erzähltexte englisch, HUD deutsch (Inhaltsfrage, nicht ohne Owner ändern).
 
@@ -375,6 +386,7 @@ Luftperspektive auf die Wand begrenzt: Kontrast unverändert, Änderung zurückg
 Taumeln und -Tod, Burning-Tod, Burning-Angriff, HUD, Seelensinn der Vorhalle.
 
 **Verworfen:**
+- Alten Freigabeton nur in den Höhen absenken: Grundton selbst zu hoch, blieb ein Piepen.
 - Devourer-Präsenz aus Rauschgrollen und gehauchtem Chor: CLAP hörte „wind“ (0,7–0,9); jetzt
   tonale Kehle (Pulsfolge durch Formanten) und tonaler Chor.
 - Ziehende Rauchschatten über dem Arenaboden (gegen das gleichmäßige Licht): dunkelten vor allem

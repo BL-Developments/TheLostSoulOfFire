@@ -352,3 +352,20 @@ def cannon_hum(rng) -> np.ndarray:
     grit = dsp.circular(lambda x: dsp.bandpass(x, 2000, 6000), dsp.white(n, rng)) * 0.02
     x = (hum * 0.55 + whine * 0.12) * tremolo + grit
     return dsp.normalise_loudness(x, -22.0, peak_ceiling_db=-4.0)
+
+
+@recipe("soul-release-soft", "Seele frei: ein ruhiger, warmer Seelenton, eine weiche tiefe Glocke, ein leises Ausatmen nach oben; nicht schrill, damit er im Gedränge nicht piept")
+def soul_release_soft(rng) -> np.ndarray:
+    n = dsp.seconds(1.1)
+    t = dsp.time_axis(n)
+    # A soft bell in G-sharp minor's colour (the music's key), struck gently: few, low partials.
+    base = rng.choice([311.1, 370.0, 415.3])  # D#4, F#4, G#4
+    bell = sum(np.sin(2 * np.pi * base * r * t + rng.uniform(0, 6.3)) * a * np.exp(-t * d)
+               for r, a, d in ((1.0, 1.0, 3.2), (2.0, 0.28, 5.0), (2.76, 0.12, 7.5), (0.5, 0.35, 2.4)))
+    bell *= np.clip(t / 0.012, 0, 1)
+    # The soul leaving: a breathy rise, quiet, filtered so it never hisses.
+    breath = dsp.bandpass(rng.standard_normal(n), 500, 2400) * np.exp(-((t - 0.35) / 0.22) ** 2) * 0.25
+    tone = np.sin(2 * np.pi * base * 2 * t * (1 + 0.04 * t)) * np.exp(-((t - 0.3) / 0.25) ** 2) * 0.12
+    x = _room(bell * 0.6 + breath + tone, rng, 1.2, 0.3, damping=3500)
+    x = dsp.lowpass(x, 5000)
+    return _finish(x, -22.0, -4.0)

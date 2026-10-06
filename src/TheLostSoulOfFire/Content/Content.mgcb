@@ -10639,3 +10639,48 @@
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /build:Audio/Sfx/cannon_hum.wav
+
+#begin Audio/Sfx/soul_release_soft_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/soul_release_soft_1.wav
+
+#begin Audio/Sfx/soul_release_soft_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/soul_release_soft_2.wav
+
+#begin Audio/Sfx/soul_release_soft_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/soul_release_soft_3.wav
+
+#begin Audio/Sfx/scythe_weight_1_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/scythe_weight_1_1.wav
+
+#begin Audio/Sfx/scythe_weight_1_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/scythe_weight_1_2.wav
+
+#begin Audio/Sfx/scythe_weight_2_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/scythe_weight_2_1.wav
+
+#begin Audio/Sfx/scythe_weight_2_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/scythe_weight_2_2.wav
+
+#begin Audio/Sfx/scythe_weight_3_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/scythe_weight_3_1.wav
+
+#begin Audio/Sfx/scythe_weight_3_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/scythe_weight_3_2.wav

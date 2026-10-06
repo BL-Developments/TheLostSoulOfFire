@@ -1692,12 +1692,11 @@ public sealed partial class GameWorld : IDisposable
         }
 
         _combatPresentation.PresentScytheImpact(strike.Step, strike.Direction, firstContact);
-        if (strike.Step == 3)
-        {
-            _audio.Play(AudioCue.HitHeavy, 0.55f, 0f, PanOf(firstContact) * 0.5f);
-        }
+        // Every landed blow has body: the pressure stroke under the Soul Cleave, a lighter one under
+        // the first two swings.
+        _audio.Play(AudioCue.HitHeavy, strike.Step switch { 1 => 0.32f, 2 => 0.42f, _ => 0.62f }, 0f, PanOf(firstContact) * 0.5f);
         // A landed hit sits above the swing that carried it.
-        _audio.Play(AudioCue.ScytheHit, strike.Step == 3 ? 0.85f : 0.68f, strike.Step == 2 ? 0.08f : 0f);
+        _audio.Play(AudioCue.ScytheHit, strike.Step == 3 ? 0.95f : 0.82f, strike.Step == 2 ? 0.08f : 0f);
     }
 
     private void SpawnWave(int waveNumber)
@@ -2736,6 +2735,14 @@ public sealed partial class GameWorld : IDisposable
                 _ => AudioCue.ScytheSwing1
             };
             _audio.Play(cue, _player.Scythe.ActiveStep == 3 ? 0.72f : 0.42f);
+            // The weight of the big blade under the light Ludo whoosh, peaking at contact.
+            (AudioCue weight, float level) = _player.Scythe.ActiveStep switch
+            {
+                2 => (AudioCue.ScytheWeight2, 0.58f),
+                3 => (AudioCue.ScytheWeight3, 0.6f),
+                _ => (AudioCue.ScytheWeight1, 0.64f)
+            };
+            _audio.Play(weight, level);
         }
 
         if (!wasDashing && _player.IsDashing)

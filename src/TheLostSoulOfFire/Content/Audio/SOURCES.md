@@ -306,3 +306,26 @@ Rezept `cannon-hum` in `tools/audio/recipes/cues.py`: Brummen der Kammer (55–3
 | Datei | Quelle | Messung |
 | --- | --- | --- |
 | `Audio/Sfx/cannon_hum.wav` | cannon-hum Seed 1 | 2.00 s, 1 Kanal/Kanäle, -22.0 LUFS, Spitze -11.8 dBFS |
+
+## Sanfte Seelenfreigabe (Durchgang 3, 06.10.2026)
+
+Owner: Das Einsammeln der Seelen und die Piep-Töne werden in Kämpfen mit vielen Gegnern nervig. Der Ludo-Take `soul_release` (Klangschwerpunkt 8,4 kHz, CLAP „piercing electronic beep“ 0,64) wird durch das Rezept `soul-release-soft` ersetzt: weiche tiefe Glocke in der Tonart der Musik (D#4/F#4/G#4), leises Ausatmen, Tiefpass 5 kHz; Schwerpunkt 1,8 kHz, CLAP „bell“ 0,64 + „soft calm chime“ 0,17, „beep“ 0,09. Eine Höhenabsenkung des alten Takes allein half nicht (Grundton zu hoch; verworfen). Der alte Take bleibt im Bestand, wird aber nicht mehr gespielt.
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/soul_release_soft_1.wav` | soul-release-soft Seed 2 | 1.10 s, 1 Kanal/Kanäle, -22.0 LUFS, Spitze -9.0 dBFS |
+| `Audio/Sfx/soul_release_soft_2.wav` | soul-release-soft Seed 4 | 1.10 s, 1 Kanal/Kanäle, -22.0 LUFS, Spitze -6.9 dBFS |
+| `Audio/Sfx/soul_release_soft_3.wav` | soul-release-soft Seed 1 | 1.10 s, 1 Kanal/Kanäle, -22.0 LUFS, Spitze -7.8 dBFS |
+
+## Wucht der Sensenhiebe (Durchgang 3, 06.10.2026)
+
+Owner: Der Klang beim Schlagen muss mächtiger werden. Rezepte `scythe-weight-1/2/3` in `tools/audio/recipes/combat.py` liegen unter den Ludo-Schwüngen: schwerer Luftstoß mit aufwärts gleitendem Band, am lautesten zur Kontaktzeit (0,062/0,085/0,155 s nach Hiebbeginn, gemessen 0,067/0,088/0,167 s), Auflodern der Death Flame zu Beginn des Durchziehens, kurzer dunkler Klingenklang; beim dritten Hieb ein tiefer Druckstoß. CLAP „heavy sword swing whoosh“ 0,99.
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/scythe_weight_1_1.wav` | scythe-weight-1 Seed 1 | 0.42 s, 1 Kanal/Kanäle, -19.8 LUFS, Spitze -2.0 dBFS |
+| `Audio/Sfx/scythe_weight_1_2.wav` | scythe-weight-1 Seed 2 | 0.42 s, 1 Kanal/Kanäle, -18.0 LUFS, Spitze -2.3 dBFS |
+| `Audio/Sfx/scythe_weight_2_1.wav` | scythe-weight-2 Seed 1 | 0.48 s, 1 Kanal/Kanäle, -18.9 LUFS, Spitze -2.0 dBFS |
+| `Audio/Sfx/scythe_weight_2_2.wav` | scythe-weight-2 Seed 2 | 0.48 s, 1 Kanal/Kanäle, -19.6 LUFS, Spitze -2.0 dBFS |
+| `Audio/Sfx/scythe_weight_3_1.wav` | scythe-weight-3 Seed 1 | 0.70 s, 1 Kanal/Kanäle, -19.3 LUFS, Spitze -2.0 dBFS |
+| `Audio/Sfx/scythe_weight_3_2.wav` | scythe-weight-3 Seed 2 | 0.70 s, 1 Kanal/Kanäle, -19.9 LUFS, Spitze -2.0 dBFS |

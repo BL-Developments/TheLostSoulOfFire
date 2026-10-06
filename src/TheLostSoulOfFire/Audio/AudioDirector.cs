@@ -74,7 +74,11 @@ public enum AudioCue
     DeathDevourer,
     /// <summary>The heavy Soul Cannon swung from the back into the hands, and laid back again.</summary>
     CannonDraw,
-    CannonStow
+    CannonStow,
+    /// <summary>The weight under each scythe swing: air, flame and blade, peaking at contact.</summary>
+    ScytheWeight1,
+    ScytheWeight2,
+    ScytheWeight3
 }
 
 /// <summary>The enemy kinds that are heard where they stand, between their steps and attacks.</summary>
@@ -183,7 +187,10 @@ public sealed class AudioDirector : IDisposable
         [AudioCue.DeathBurning] = new(0.05f, 3, 0.03f, CueGroup.Enemy),
         [AudioCue.DeathDevourer] = new(0.2f, 1, 0.02f, CueGroup.Enemy),
         [AudioCue.CannonDraw] = new(0.12f, 1, 0.03f),
-        [AudioCue.CannonStow] = new(0.12f, 1, 0.03f)
+        [AudioCue.CannonStow] = new(0.12f, 1, 0.03f),
+        [AudioCue.ScytheWeight1] = new(0.04f, 2, 0.03f),
+        [AudioCue.ScytheWeight2] = new(0.05f, 2, 0.03f),
+        [AudioCue.ScytheWeight3] = new(0.12f, 1, 0.02f)
     };
 
     /// <summary>
@@ -194,7 +201,8 @@ public sealed class AudioDirector : IDisposable
     [
         AudioCue.ScytheSwing1, AudioCue.ScytheSwing2, AudioCue.SoulCleave, AudioCue.Dash, AudioCue.CannonCharge,
         AudioCue.Footstep, AudioCue.FootstepWood, AudioCue.HollowStep, AudioCue.BurningStep, AudioCue.DevourerStep,
-        AudioCue.EnemyEmerge, AudioCue.SoulRelease, AudioCue.CannonDraw, AudioCue.CannonStow
+        AudioCue.EnemyEmerge, AudioCue.SoulRelease, AudioCue.CannonDraw, AudioCue.CannonStow,
+        AudioCue.ScytheWeight1, AudioCue.ScytheWeight2, AudioCue.ScytheWeight3
     ];
 
     /// <summary>
@@ -222,6 +230,11 @@ public sealed class AudioDirector : IDisposable
     private const int MaximumHallTails = 6;
     private readonly Dictionary<(AudioCue Cue, AudioZone Hall), (SoundEffect Tail, float Send)> _hallTails = [];
     private readonly List<SoundEffectInstance> _hallInstances = [];
+
+    /// <summary>Cues that soften when they repeat quickly, and their recent count.</summary>
+    private static readonly HashSet<AudioCue> Streaking = [AudioCue.SoulRelease, AudioCue.CurrencyGain];
+    private readonly Dictionary<AudioCue, int> _streak = [];
+    private readonly Dictionary<AudioCue, float> _streakTimer = [];
 
     /// <summary>Extra takes of a cue (e.g. footsteps); Play picks one at random so repeats never match exactly.</summary>
     private readonly Dictionary<AudioCue, List<SoundEffect>> _variants = [];
@@ -347,7 +360,8 @@ public sealed class AudioDirector : IDisposable
             Add(content, AudioCue.BurningCharge, "Audio/Sfx/burning_charge", 145f, 0.23f, 0.5f, 0.24f, rising: true);
             Add(content, AudioCue.BurningDetonation, "Audio/Sfx/burning_detonation", 48f, 0.34f, 0.82f, 0.8f);
             Add(content, AudioCue.CoreHit, "Audio/Sfx/core_hit", 910f, 0.13f, 0.42f, 0.08f);
-            Add(content, AudioCue.SoulRelease, "Audio/Sfx/soul_release", 560f, 0.45f, 0.28f, 0.02f, rising: true);
+            // A soft bell in place of the bright Ludo take, which beeped in crowded fights.
+            AddVariants(content, AudioCue.SoulRelease, "Audio/Sfx/soul_release_soft", 3, 415f, 0.9f, 0.25f, 0.05f);
             Add(content, AudioCue.ResonanceReady, "Audio/Sfx/resonance_ready", 360f, 0.3f, 0.42f, 0.08f);
             Add(content, AudioCue.ResonanceActivate, "Audio/Sfx/resonance_activate", 55f, 0.5f, 0.88f, 0.5f, rising: true);
             Add(content, AudioCue.PlayerHit, "Audio/Sfx/player_hit", 96f, 0.12f, 0.62f, 0.56f);
@@ -369,7 +383,7 @@ public sealed class AudioDirector : IDisposable
                 (AudioCue.ScytheHit, "Audio/Sfx/scythe_hit"), (AudioCue.CoreHit, "Audio/Sfx/core_hit"),
                 (AudioCue.CannonImpact, "Audio/Sfx/cannon_impact"), (AudioCue.EnemyDeath, "Audio/Sfx/enemy_death"),
                 (AudioCue.Dash, "Audio/Sfx/dash"), (AudioCue.HollowSwipe, "Audio/Sfx/hollow_swipe"),
-                (AudioCue.SoulCleave, "Audio/Sfx/soul_cleave"), (AudioCue.SoulRelease, "Audio/Sfx/soul_release"),
+                (AudioCue.SoulCleave, "Audio/Sfx/soul_cleave"),
                 (AudioCue.CannonFire, "Audio/Sfx/cannon_fire"), (AudioCue.BurningDetonation, "Audio/Sfx/burning_detonation"),
                 (AudioCue.BurningCharge, "Audio/Sfx/burning_charge"), (AudioCue.PlayerHit, "Audio/Sfx/player_hit")
             })
@@ -398,6 +412,9 @@ public sealed class AudioDirector : IDisposable
             Add(content, AudioCue.AbilityGuard, "Audio/Sfx/ability_guard", 330f, 0.5f, 0.4f, 0.1f);
             Add(content, AudioCue.AbilityMark, "Audio/Sfx/ability_mark", 1661f, 0.3f, 0.3f, 0.3f);
             Add(content, AudioCue.DoorAwaken, "Audio/Sfx/door_awaken", 104f, 1.2f, 0.5f, 0.3f);
+            AddVariants(content, AudioCue.ScytheWeight1, "Audio/Sfx/scythe_weight_1", 2, 180f, 0.3f, 0.3f, 0.6f);
+            AddVariants(content, AudioCue.ScytheWeight2, "Audio/Sfx/scythe_weight_2", 2, 160f, 0.35f, 0.3f, 0.6f);
+            AddVariants(content, AudioCue.ScytheWeight3, "Audio/Sfx/scythe_weight_3", 2, 120f, 0.5f, 0.35f, 0.6f);
             Add(content, AudioCue.CannonDraw, "Audio/Sfx/cannon_draw", 140f, 0.3f, 0.3f, 0.4f);
             Add(content, AudioCue.CannonStow, "Audio/Sfx/cannon_stow", 120f, 0.3f, 0.3f, 0.4f);
             AddVariants(content, AudioCue.HitHollow, "Audio/Sfx/hit_hollow", 3, 180f, 0.1f, 0.3f, 0.7f);
@@ -464,6 +481,18 @@ public sealed class AudioDirector : IDisposable
         }
 
         _focus = MathF.Max(0f, _focus - deltaTime / 0.4f);
+        foreach (AudioCue cue in Streaking)
+        {
+            if (_streakTimer.TryGetValue(cue, out float left) && (left -= deltaTime) <= 0f)
+            {
+                _streakTimer.Remove(cue);
+                _streak.Remove(cue);
+            }
+            else if (_streakTimer.ContainsKey(cue))
+            {
+                _streakTimer[cue] = left;
+            }
+        }
         _duckTimer = MathF.Max(0f, _duckTimer - deltaTime);
         if (_duckTimer <= 0f)
         {
@@ -625,6 +654,15 @@ public sealed class AudioDirector : IDisposable
         if (Yielding.Contains(cue))
         {
             volume *= 1f - 0.4f * _focus;
+        }
+        if (Streaking.Contains(cue))
+        {
+            // The same cue again within a moment (souls released one after another in a crowd):
+            // each comes in softer, so a big fight never turns into a string of chimes.
+            int recent = _streak.GetValueOrDefault(cue);
+            volume *= MathF.Max(0.3f, MathF.Pow(0.62f, recent));
+            _streak[cue] = recent + 1;
+            _streakTimer[cue] = 1.2f;
         }
         if (!policy.Danger)
         {
@@ -1104,7 +1142,12 @@ public sealed class AudioDirector : IDisposable
                 BeginDuck(1.05f, 0.68f);
                 break;
             case AudioCue.SoulRelease:
-                BeginDuck(0.72f, 0.48f);
+                // Only the first release of a run of them lets the fight fall away (16_AUDIO_DIRECTION);
+                // ducking on every one made the music pump in a crowd.
+                if (_streak.GetValueOrDefault(cue) <= 1)
+                {
+                    BeginDuck(0.6f, 0.32f);
+                }
                 break;
             case AudioCue.WaveClear:
                 BeginDuck(0.62f, 0.34f);

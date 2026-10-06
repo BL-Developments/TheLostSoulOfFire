@@ -251,3 +251,52 @@ def death_devourer(rng) -> np.ndarray:
         choir += voice * rise * np.exp(-np.maximum(t - 0.9, 0) / 0.25)
     x = fall + tear + choir
     return _finish(_room(x, rng, 1.2, 0.25, 3500), -18.0, -2.0, 0.25)
+
+
+# ---- weight under the scythe swings -----------------------------------------------------------
+# The Ludo swings are light whooshes. Under each the stroke's weight: a heavy air displacement that
+# peaks at the moment of contact (ScytheCombat strike times 0.062 / 0.085 / 0.155 s after the
+# swing starts, which is when the cue plays), the Death Flame flaring as the fast stroke begins
+# (StrokeStart: 0.02 / 0.03 / 0.10 s) and a short, dark ring of the big blade.
+
+def _swing_weight(rng, length: float, stroke: float, contact: float, low: float, high: float, flare: float,
+                  sub: float = 0.0) -> np.ndarray:
+    n = dsp.seconds(length)
+    t = dsp.time_axis(n)
+    # Air: band noise whose centre sweeps up through the stroke (the blade passing close), with
+    # a fast rise into contact and a slower fall after it.
+    rise = np.clip((t - stroke * 0.5) / max(1e-3, contact - stroke * 0.5), 0, 1) ** 2.2
+    fall = np.exp(-np.clip(t - contact, 0, None) / 0.07)
+    envelope = rise * fall
+    centre = low + (high - low) * np.clip((t - stroke) / max(1e-3, contact + 0.06 - stroke), 0, 1)
+    air = dsp.swept_bandpass(rng.standard_normal(n), centre, q=1.6) * envelope
+    air = air / (np.max(np.abs(air)) + 1e-9)
+    # The flame flaring: a low whump with a little crackle as the stroke begins.
+    flame = dsp.lowpass(_burst(rng, n, stroke, 70, 520, 0.06, 1.0), 600)
+    flame += _grains(rng, n, stroke + 0.01, 0.12, int(rng.integers(6, 12)), 1500, 6000, 0.25)
+    flame = flame / (np.max(np.abs(flame)) + 1e-9)
+    # The blade: a short, dark metallic ring at contact (no bright ping).
+    blade = _ring(n, [(rng.uniform(1100, 1300), 0.5, 0.05), (rng.uniform(1900, 2200), 0.3, 0.035),
+                      (rng.uniform(3100, 3400), 0.12, 0.02)], rng, at=contact - 0.01)
+    x = air * 1.0 + flame * flare + blade * 0.18
+    if sub > 0:
+        x += _thump(n, 75, 38, 0.09, at=contact) * sub
+    return x
+
+
+@recipe("scythe-weight-1", "Wucht unter dem schnellen Schnitt: schwerer Luftstoß zur Kontaktzeit, die Death Flame lodert auf, dunkler Klingenklang")
+def scythe_weight_1(rng) -> np.ndarray:
+    x = _swing_weight(rng, 0.42, 0.02, 0.062, 160, 900, 0.45)
+    return _finish(_room(x, rng, 0.4, 0.12, 4000), -18.0, -2.0, 0.08)
+
+
+@recipe("scythe-weight-2", "Wucht unter der Rückhand: schwerer und länger, die Flamme lodert stärker")
+def scythe_weight_2(rng) -> np.ndarray:
+    x = _swing_weight(rng, 0.48, 0.03, 0.085, 140, 820, 0.6)
+    return _finish(_room(x, rng, 0.45, 0.13, 3800), -17.0, -2.0, 0.08)
+
+
+@recipe("scythe-weight-3", "Wucht unter der Seelenspaltung: ein gewaltiger Luftstoß, die Flamme bricht auf, ein tiefer Druckstoß beim Kontakt")
+def scythe_weight_3(rng) -> np.ndarray:
+    x = _swing_weight(rng, 0.7, 0.10, 0.155, 110, 760, 0.85, sub=0.9)
+    return _finish(_room(x, rng, 0.6, 0.16, 3200), -15.5, -2.0, 0.12)
