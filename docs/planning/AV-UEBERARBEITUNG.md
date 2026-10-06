@@ -299,11 +299,14 @@ Rahmen wie oben (nur Darstellung und Ton).
   Kleidung). Geprüft: Vorschauen in vier Richtungen, Rundgang (Ziehen, Laden, Schuss, Gehen mit
   Kanone), Slice- und Fähigkeitentest, 258 Unit-Tests.
 
+- Truhe: Offen verschmolz der Deckel (dunkle Holzinnenseite) mit dem Kasten. Jetzt mit dunkelrotem
+  Samt gefüttert, vom Goldlicht getroffen, darunter ein Münzhaufen (Geld); geschlossene Truhe
+  pixelgleich, Öffnen-Zeit unverändert. Verworfen: heller Samt (brannte weiß aus).
+
 **Befunde, offen (nach Wirkung):**
 1. Arena im Spielausschnitt: Boden gleichmäßig hell, wenig Lichtgefälle.
 2. Sprache: Erzähltexte englisch, HUD deutsch (Inhaltsfrage, nicht ohne Owner ändern).
 
-4. Truhe: springt in einem Bild auf, keine sichtbare Deckelbewegung.
 3. Arena: Die Nordwand wirkt im Endbild hinter einem leichten Dunstschleier (Luftperspektive
    nach Bildhöhe trifft die Wand); prüfen, ob die Wand davon ausgenommen werden sollte.
 

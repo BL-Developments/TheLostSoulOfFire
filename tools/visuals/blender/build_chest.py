@@ -46,6 +46,7 @@ def materials() -> dict[str, bpy.types.Material]:
         "iron": kit.painted("iron", (0.04, 0.038, 0.046), (0.16, 0.155, 0.17), scale=6.0, roughness=0.45, bump=0.5),
         "brass": kit.painted("brass", (0.42, 0.29, 0.10), (0.85, 0.64, 0.30), scale=8.0, roughness=0.3, bump=0.2),
         "lining": kit.painted("lining", (0.05, 0.035, 0.025), (0.11, 0.075, 0.05), scale=6.0, roughness=0.9, bump=0.1),
+        "cloth": kit.painted("cloth", (0.06, 0.025, 0.04), (0.12, 0.05, 0.08), scale=9.0, roughness=0.95, bump=0.1),
         "soul": kit.emissive("soul", (0.57, 0.28, 1.0), 2.2),
         "gold": kit.emissive("gold", (1.0, 0.80, 0.42), 0.0),
     }
@@ -90,9 +91,18 @@ def build(m) -> tuple[list[bpy.types.Object], bpy.types.Object, bpy.types.Materi
                                  (0.055, 0.055, HEIGHT + 0.01), m["brass"], bevel=0.008))
             parts.append(kit.box(f"foot_{sx}{sy}", base + Vector((sx * (WIDTH / 2 - 0.05), sy * (DEPTH / 2 - 0.05), 0.012)),
                                  (0.07, 0.07, 0.024), m["iron"], bevel=0.005))
-    # Gold light inside, revealed as the lid rises.
-    gold = kit.box("gold", base + Vector((0, 0, HEIGHT * 0.78)), (WIDTH - 0.12, DEPTH - 0.12, 0.02), m["gold"])
+    # Gold light inside, revealed as the lid rises, over a heap of Geld: coins in loose stacks.
+    gold = kit.box("gold", base + Vector((0, 0, HEIGHT * 0.62)), (WIDTH - 0.12, DEPTH - 0.12, 0.02), m["gold"])
     parts.append(gold)
+    import random
+    rng = random.Random(23)
+    for index in range(46):
+        x = rng.uniform(-WIDTH / 2 + 0.09, WIDTH / 2 - 0.09)
+        y = rng.uniform(-DEPTH / 2 + 0.08, DEPTH / 2 - 0.08)
+        heap = 1.0 - (abs(x) / (WIDTH / 2)) ** 2 - (abs(y) / (DEPTH / 2)) ** 2
+        z = HEIGHT * 0.66 + 0.07 * max(0.0, heap) + rng.uniform(0.0, 0.015)
+        parts.append(kit.cylinder(f"coin_{index}", base + Vector((x, y, z)), 0.028, 0.008, m["brass"], vertices=12,
+                                  rotation=(rng.uniform(-0.5, 0.5), rng.uniform(-0.5, 0.5), 0.0)))
 
     # Lid: a flattened half cylinder along x, hinged on the back top edge. The camera looks
     # along +y from the south, so "front" (toward the viewer) is -y in Blender.
@@ -102,6 +112,9 @@ def build(m) -> tuple[list[bpy.types.Object], bpy.types.Object, bpy.types.Materi
     lid_parts = [dome("lid", 0.0, DEPTH / 2, WIDTH, LID, m["timber"])]
     for x in (-WIDTH * 0.28, WIDTH * 0.28):
         lid_parts.append(dome(f"lid_band_{x:+.2f}", x, DEPTH / 2 + 0.008, 0.05, LID + 0.008, m["iron"]))
+    # The lid's underside is lined with dark red velvet: open, it stands behind the box and catches the
+    # gold light, so the open lid reads against the dark body.
+    lid_parts.append(kit.box("lid_lining", Vector((0.0, 0.0, -0.006)), (WIDTH - 0.06, DEPTH - 0.05, 0.01), m["cloth"]))
     for obj in lid_parts:
         obj.location = Vector((obj.location.x, -DEPTH / 2, 0))
     # Lock: a brass plate with a violet soul glass on the front of the lid.
@@ -111,7 +124,7 @@ def build(m) -> tuple[list[bpy.types.Object], bpy.types.Object, bpy.types.Materi
     for obj in lid_parts:
         obj.parent = hinge
     parts += lid_parts
-    light = kit.point_light("chest_glow", base + Vector((0, 0, HEIGHT * 0.9)), 0.0, (1.0, 0.8, 0.45), radius=0.2)
+    light = kit.point_light("chest_glow", base + Vector((0, -0.06, HEIGHT * 0.95)), 0.0, (1.0, 0.8, 0.45), radius=0.2)
     return parts, hinge, light
 
 
@@ -134,7 +147,7 @@ def main() -> None:
         settle = math.sin(max(0.0, (t - 0.8) / 0.2) * math.pi) * 0.04
         hinge.rotation_euler = (-math.radians(108) * (swing - settle), 0.0, 0.0)
         gold.inputs["Emission Strength"].default_value = 7.0 * swing
-        light.data.energy = 60.0 * swing
+        light.data.energy = 100.0 * swing
         kit.render(scene, out / "open" / f"{frame + 1:04d}.png", transparent=True)
     info = {"frames": FRAMES, "frame": FRAME, "foot_px": [FOOT[0] * 1.5, FOOT[1] * 1.5], "ppu": 1.5}
     (out / "chest.json").write_text(json.dumps(info, indent=2) + "\n")

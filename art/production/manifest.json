@@ -16634,6 +16634,91 @@
         "status": "kandidat",
         "reason": "Bodenplatte für das Spiel aufbereitet"
       }
+    },
+    {
+      "id": "e928d2306e9f4b1588e170d789534204",
+      "timestamp": "2026-10-06T18:24:12+00:00",
+      "visual_id": "prop.arena-chest",
+      "step": "pack-prop-clip",
+      "tool": {
+        "name": "Blender + pack_prop_clip.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "clip": "open",
+        "frames": 10,
+        "box": [
+          59,
+          40,
+          151,
+          158
+        ]
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/prop.arena-chest/v2/open/0001.png",
+          "sha256": "91321bca2a077baa0cd3bd7ce79e1ef1121621f6df77382897c240b033cbb381"
+        },
+        {
+          "path": "art/production/candidates/prop.arena-chest/v2/open/0002.png",
+          "sha256": "fec8e8d08aa527930430587331d5f241119a58a9b7213ca26b26ab5215663190"
+        },
+        {
+          "path": "art/production/candidates/prop.arena-chest/v2/open/0003.png",
+          "sha256": "c32d4cad1033ec3e7160f7c26d2003e3b1ee316287a064172d3b787f1f7d414d"
+        },
+        {
+          "path": "art/production/candidates/prop.arena-chest/v2/open/0004.png",
+          "sha256": "75aa37b04120cd2e88f639b9d614e7692faba9c9f79a6c8b7d7c70af848f5cf7"
+        },
+        {
+          "path": "art/production/candidates/prop.arena-chest/v2/open/0005.png",
+          "sha256": "379939c6687187f83cc6afd9732f612e32bf2cd9aae8a12a41ec585d549a7502"
+        },
+        {
+          "path": "art/production/candidates/prop.arena-chest/v2/open/0006.png",
+          "sha256": "d1ca9bc1a5af4f50c89b35ecfa97e59c477c61251e0c6fb40fec684d87005586"
+        },
+        {
+          "path": "art/production/candidates/prop.arena-chest/v2/open/0007.png",
+          "sha256": "0b7a2be26e18e576ede0b2df4b7dbe46e7947a18e61c4096f376cd0664ca60ac"
+        },
+        {
+          "path": "art/production/candidates/prop.arena-chest/v2/open/0008.png",
+          "sha256": "12669b117adec960d1ca8d8a47408d22039dc6b730e34e9f4c5f0c0f458e4857"
+        },
+        {
+          "path": "art/production/candidates/prop.arena-chest/v2/open/0009.png",
+          "sha256": "f99afc103c0950cc3c50c28b1e45367f1dd397a99e88ed09eb18d62f54ae5647"
+        },
+        {
+          "path": "art/production/candidates/prop.arena-chest/v2/open/0010.png",
+          "sha256": "d731b058ca5f7dd6fd370f9779987d887b3eaac3ada5936b730df4930de61723"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Arena/chest.png",
+          "sha256": "dc5bb15ed017a734cd6e42c92c094d20af9716836f72e71e425717d1b95e6339"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Arena/chest_closed.png",
+          "sha256": "71fa73004d7ecfbf0b7154f4edd442be4e71a1a2540034aa39c680f4f36ac7ca"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.01,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Animiertes Prop aus Blender mit der Spielkamera"
+      }
     }
   ]
 }
