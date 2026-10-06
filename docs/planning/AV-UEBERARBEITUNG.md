@@ -391,6 +391,15 @@ Rahmen wie oben (nur Darstellung und Ton).
 - Seelensinn ohne Striche: Spuren der Echos (Prolog, Arena) und der Weg durch Tür I in der
   Vorhalle als Lichtreste, die einzeln flackern und langsam in Gehrichtung treiben
   (`SoulSensePresentation.DrawResidueTrail`); Knoten als weiches Licht statt Kreise.
+- Warden-Flammen als Klangquellen: In der Vorhalle waren die Flammen in die Atmosphäre eingebacken
+  und standen still, wo immer man ging. Jetzt flattern Feuerschalen (voll) und Wandleuchter
+  (schwächer) dort, wo sie brennen, lauter im Vorbeigehen, auch die Flammen des Prologs
+  (`warden-flame`, CLAP „torch flame“ 0,92; `PresenceSource.WardenFlames`, im Seelensinn
+  leiser). Im Vorbeigehen 5 LU unter Bett und Musik, direkt daneben gleichauf.
+  `ambience-hub` ohne die alte Flammenschicht neu erzeugt (gleicher Seed). Rundgang protokolliert
+  Pegel und Seite (Vorhalle 0,19 rechts beim Ankommen, 0,53 mittig nach dem Gang nach rechts).
+- Schwelle: Die Titelkarte „YOU ARE NOT ALONE“ stand genau über der Figur im Tor; jetzt im
+  Dunkel über dem Tor, die Raute der unteren Trennlinie sitzt über der Torflamme.
 - Burning ohne Blase, Strahl und Bodenring: Beim Aufladen der Detonation saß der Kern in einer
   Seifenblase (Ring, Striche zu den Bruchstellen, harte weiße Scheibe), beim Anlauf zog ein
   gerader Strahl hinterher, die Druckwelle war ein Ring. Jetzt sammelt sich Licht im Kern und
@@ -458,6 +467,9 @@ kein Ersatzklang), Gameplay- und Tod-Neustart-Test.
 
 **Befunde, offen (nach Wirkung):**
 1. Sprache: Erzähltexte englisch, HUD deutsch (Inhaltsfrage, nicht ohne Owner ändern).
+2. Ofen der Arena als Klangquelle: zwei Rezepte (`furnace-breath`) hörte CLAP als Wind oder
+   Donner (tiefes Brausen, dumpfes Aufwallen); nicht eingebaut. Nächster Versuch: die
+   Warden-Flamme tiefer gestimmt.
 
 
 **Hinweis:** Nach `place_environment.py` immer `dotnet build` vor dem Rundgang, sonst zeigt

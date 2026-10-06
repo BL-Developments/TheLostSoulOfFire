@@ -112,7 +112,7 @@ Ergebnisse sind eigene Arbeit des Projekts.
 | Datei | Rezept und Seed | Eigenschaften |
 |---|---|---|
 | `Audio/Ambience/shore_ambience.wav` | ambience-shore Seed 2 | 40.00 s, 2 Kanal/Kanäle, -29.0 LUFS, Spitze -16.8 dBFS |
-| `Audio/Ambience/hub_ambience.wav` | ambience-hub Seed 2 | 32.00 s, 2 Kanal/Kanäle, -30.0 LUFS, Spitze -12.0 dBFS |
+| `Audio/Ambience/hub_ambience.wav` | ambience-hub Seed 2 (07.10.2026 ohne eingebackene Flammen) | 32.00 s, 2 Kanal/Kanäle, -30.0 LUFS, Spitze -11.9 dBFS |
 | `Audio/Ambience/harbour_ambience.wav` | ambience-harbour Seed 1 | 36.00 s, 2 Kanal/Kanäle, -29.0 LUFS, Spitze -15.0 dBFS |
 | `Audio/Ambience/causeway_ambience.wav` | ambience-causeway Seed 1 | 36.00 s, 2 Kanal/Kanäle, -27.0 LUFS, Spitze -14.4 dBFS |
 | `Audio/Ambience/crossing_ambience.wav` | ambience-crossing Seed 1, Naht 1,5 s überblendet | 22.50 s, 2 Kanal/Kanäle, -26.0 LUFS, Spitze -13.1 dBFS |
@@ -316,6 +316,14 @@ Owner: Das Einsammeln der Seelen und die Piep-Töne werden in Kämpfen mit viele
 | `Audio/Sfx/soul_release_soft_1.wav` | soul-release-soft Seed 2 | 1.10 s, 1 Kanal/Kanäle, -22.0 LUFS, Spitze -9.0 dBFS |
 | `Audio/Sfx/soul_release_soft_2.wav` | soul-release-soft Seed 4 | 1.10 s, 1 Kanal/Kanäle, -22.0 LUFS, Spitze -6.9 dBFS |
 | `Audio/Sfx/soul_release_soft_3.wav` | soul-release-soft Seed 1 | 1.10 s, 1 Kanal/Kanäle, -22.0 LUFS, Spitze -7.8 dBFS |
+
+## Warden-Flammen als Punktquellen (Durchgang 3, 07.10.2026)
+
+Die Flammen der Vorhalle waren in die Atmosphäre eingebacken (links −0,35, rechts 0,3) und standen still, wo immer man ging. Rezept `warden-flame`: weiches, tiefes Brausen, das schnell flattert, wenig Luft darüber, ein leises Summen in Gis, selten ein weicher Glutknack; Mono-Schleife. Das Spiel spielt sie dort, wo Feuerschalen (voll) und Wandleuchter (schwächer) brennen, lauter im Vorbeigehen. CLAP: „torch flame burning“ 0,92, „wind“ 0,04, „rain“ 0,02. Erste Fassungen mit hellem Zischen und Ticken hörte CLAP als „rain“ (bis 0,57), mit langsamem Flattern als „wind“ (bis 0,52). `ambience-hub` neu ohne die eingebackene Flammenschicht (gleicher Seed, Zufallsstrom unverändert, damit alle übrigen Schichten gleich bleiben).
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/warden_flame_loop.wav` | warden-flame Seed 3 | 6.00 s, 1 Kanal/Kanäle, -26.0 LUFS, Spitze -10.5 dBFS |
 
 ## Pochen der gebundenen Seele (Durchgang 3, 06.10.2026)
 

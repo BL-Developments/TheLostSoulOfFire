@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TheLostSoulOfFire.Rendering;
@@ -81,6 +82,10 @@ public sealed class SoulFurnaceAntechamber
     [
         new(280f, 219f), new(460f, 219f), new(640f, 219f), new(860f, 219f), new(1040f, 219f), new(1220f, 219f)
     ];
+
+    /// <summary>Where the Warden flames burn, for their sound: the braziers in full, the sconces high on the pilasters fainter.</summary>
+    public static IReadOnlyList<(Vector2 Position, float Weight)> HeardFlames { get; } =
+        BrazierPositions.Select(flame => (flame, 1f)).Concat(SconceFlames.Select(flame => (flame, 0.3f))).ToArray();
 
     public SoulFurnaceAntechamber()
     {

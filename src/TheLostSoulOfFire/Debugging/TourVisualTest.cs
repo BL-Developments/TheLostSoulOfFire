@@ -384,6 +384,7 @@ internal sealed class TourVisualTest
     {
         Do("enter", () => _world.ApplyDeveloperStart(new DeveloperStartOptions(DeveloperStartArea.PrologueSearch, 1), _viewport));
         Shot("arrive", minWait: 0.9f);
+        Do("flames", () => Console.WriteLine($"TOUR_AUDIO station=prologue_search arrive {_world.AutomatedAudio.DescribePresence()}"));
         Overview("overview");
         Shot("hollows", () => _world.PlaceAutomatedPlayer(new Vector2(540f, 600f)),
             () => _world.AutomatedEnemies.Count(enemy => enemy.IsAlive) >= 2, 6f, 1.2f);
@@ -435,7 +436,10 @@ internal sealed class TourVisualTest
         Do("enter", () => _world.ApplyDeveloperStart(new DeveloperStartOptions(DeveloperStartArea.Hub, 1), _viewport));
         Shot("arrive", minWait: 1f);
         Overview("overview");
+        Do("flames_arrive", () => Console.WriteLine($"TOUR_AUDIO station=hub arrive {_world.AutomatedAudio.DescribePresence()}"));
         Shot("walk", () => _world.SetAutomatedAim(Vector2.UnitX), minWait: 0.9f, everyFrame: () => _input.InjectKeyDown(Keys.D));
+        // The Warden flames are heard where they burn: walking right, the right brazier comes forward.
+        Do("flames_walk", () => Console.WriteLine($"TOUR_AUDIO station=hub walk {_world.AutomatedAudio.DescribePresence()}"));
         Shot("soul_sense", () => _world.SetAutomatedSoulSense(true), minWait: 1f);
         Do("sense_off", () => _world.SetAutomatedSoulSense(false));
         Shot("door_i", () => _world.PlaceAutomatedPlayerAtDoor(0), minWait: 0.8f);

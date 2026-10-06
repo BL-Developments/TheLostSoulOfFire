@@ -52,7 +52,7 @@ def _crackle(rng) -> np.ndarray:
     return dsp.bandpass(pop, 900, 5000) * rng.uniform(0.3, 1.0)
 
 
-@recipe("ambience-hub", "Aschene Vorhalle: Ofen hinter den Türen, Raum, Asche, Warden-Flammen, Ketten, ferne Werksglocke", loop=True)
+@recipe("ambience-hub", "Aschene Vorhalle: Ofen hinter den Türen, Raum, Asche, Ketten, ferne Werksglocke (die Warden-Flammen sind Punktquellen im Spiel)", loop=True)
 def hub(rng) -> np.ndarray:
     n = dsp.seconds(32.0)
     room = dsp.impulse_response(3.2, rng, damping_hz=3500, predelay=0.02)
@@ -62,7 +62,9 @@ def hub(rng) -> np.ndarray:
     rumble += np.stack([drone, drone], axis=-1)
     # Room tone: still air in a large stone hall.
     air = _bed(n, rng, "pink", 180, 1800, 0.035, movement=0.25, rate=0.05)
-    # Warden flames: a soft, breathing hiss near the braziers (left and right of centre) with rare crackles.
+    # The Warden flames are point sources in the game now (warden-flame), heard where they burn;
+    # their old baked-in layer is still drawn, so the random stream and every other layer stay
+    # as they were, but no longer mixed.
     flames = np.zeros((n, 2))
     for position in (-0.35, 0.3):
         breath = dsp.circular(lambda x: dsp.bandpass(x, 400, 2600), dsp.pink(n, rng))
@@ -75,7 +77,7 @@ def hub(rng) -> np.ndarray:
     toll = np.zeros((n, 2))
     bell = dsp.lowpass(dsp.bell(98.0, 9.0, rng, brightness=0.6), 1400) * 0.05
     dsp.place(toll, dsp.pan(bell, -0.1), dsp.seconds(11.0))
-    mix = rumble + air + flames + ash + chains + toll
+    mix = rumble + air + ash + chains + toll
     mix = dsp.reverb(mix, room, wet=0.35, loop=True)
     return dsp.normalise_loudness(mix, -30.0, peak_ceiling_db=-9.0)
 
@@ -431,3 +433,57 @@ def resonance_rumble(rng) -> np.ndarray:
     mix = body * 0.3 + shimmer + beat * 0.6 + sparks
     mix = dsp.circular(lambda x: dsp.highpass(x, 28), mix)
     return dsp.normalise_loudness(_seamless(mix), -25.0, peak_ceiling_db=-4.0)
+
+
+@recipe("warden-flame", "Warden-Flamme (Feuerschale, Wandleuchter): weich atmendes Zischen der Death Flame, leckendes Flattern, ein leises tiefes Summen in Gis, seltenes weiches Knistern; Punktquelle (mono), nahtlos", loop=True)
+def warden_flame(rng) -> np.ndarray:
+    seconds = 6.0
+    n = dsp.seconds(seconds)
+    t = dsp.time_axis(n)
+    # The flame's body: a low, soft roar that flutters as the tongues lick (several times a second)
+    # and swells slowly, with only a little air on top.
+    roar = dsp.circular(lambda x: dsp.bandpass(x, 120, 900), dsp.brown(n, rng) + dsp.pink(n, rng) * 0.3)
+    roar = roar / (np.std(roar) + 1e-9)
+    lick = np.clip(0.4 + 0.5 * dsp.smooth_loop(n, 12.0, rng) + 0.15 * dsp.smooth_loop(n, 2.2, rng), 0.05, None)
+    roar *= lick * (0.75 + 0.25 * dsp.smooth_loop(n, 0.35, rng))
+    air = dsp.circular(lambda x: dsp.bandpass(x, 900, 2600), dsp.pink(n, rng))
+    air = air / (np.std(air) + 1e-9) * lick ** 2
+    # The Death Flame's voice under it: a faint hum in G-sharp, wavering.
+    hum = sum(np.sin(2 * np.pi * f * t + rng.uniform(0, 6.3)) * g for f, g in ((51.9, 1.0), (103.8, 0.5), (155.7, 0.2)))
+    hum *= 0.75 + 0.25 * dsp.smooth_loop(n, 0.3, rng)
+    # Rarely a soft tick of an ember, never the snap of wood.
+    ticks = np.zeros(n)
+    for _ in range(int(seconds * 0.7)):
+        dsp.place(ticks, _pop(rng, False), int(rng.integers(0, n)), rng.uniform(0.03, 0.08))
+    ticks = dsp.circular(lambda x: dsp.lowpass(x, 3000), ticks)
+    mix = roar * 0.07 + air * 0.012 + hum * 0.03 + ticks
+    mix = dsp.circular(lambda x: dsp.highpass(x, 38), mix)
+    return dsp.normalise_loudness(_seamless(mix), -26.0, peak_ceiling_db=-6.0)
+
+
+@recipe("furnace-breath", "Seelenofen der Gießhalle in der Nordwand: tiefes, langsam atmendes Brausen der Death Flame im Schlund, flackernd, selten ein dumpfes Aufwallen, leise Glut; Punktquelle (mono), nahtlos", loop=True)
+def furnace_breath(rng) -> np.ndarray:
+    seconds = 8.0
+    n = dsp.seconds(seconds)
+    t = dsp.time_axis(n)
+    # The furnace mouth: a broad, low flame roar, flickering fast like a big fire and breathing
+    # slowly as the draught pulls.
+    roar = dsp.circular(lambda x: dsp.bandpass(x, 80, 700), dsp.brown(n, rng) + dsp.pink(n, rng) * 0.25)
+    roar = roar / (np.std(roar) + 1e-9)
+    flicker = np.clip(0.4 + 0.5 * dsp.smooth_loop(n, 11.0, rng) + 0.15 * dsp.smooth_loop(n, 1.8, rng), 0.05, None)
+    breath = 0.65 + 0.35 * dsp.smooth_loop(n, 0.22, rng)
+    roar *= flicker * breath
+    air = dsp.circular(lambda x: dsp.bandpass(x, 700, 2200), dsp.pink(n, rng))
+    air = air / (np.std(air) + 1e-9) * flicker ** 2 * breath
+    # A soft swell once a loop as the fire draws in, felt rather than heard.
+    swell = dsp.circular(lambda x: dsp.lowpass(x, 120), dsp.brown(n, rng))
+    swell = swell / (np.std(swell) + 1e-9) * np.exp(-((t - rng.uniform(1.5, 6.5)) / 0.5) ** 2)
+    # The Death Flame's voice deep inside: a faint hum on G-sharp.
+    hum = (np.sin(2 * np.pi * 51.9 * t) + 0.4 * np.sin(2 * np.pi * 77.8 * t + 1.1)) * (0.8 + 0.2 * dsp.smooth_loop(n, 0.2, rng))
+    ticks = np.zeros(n)
+    for _ in range(int(seconds * 2.0)):
+        dsp.place(ticks, _pop(rng, rng.random() < 0.3), int(rng.integers(0, n)), rng.uniform(0.02, 0.07))
+    ticks = dsp.circular(lambda x: dsp.lowpass(x, 3000), ticks)
+    mix = roar * 0.08 + air * 0.012 + swell * 0.03 + hum * 0.02 + ticks
+    mix = dsp.circular(lambda x: dsp.highpass(x, 30), mix)
+    return dsp.normalise_loudness(_seamless(mix), -25.0, peak_ceiling_db=-6.0)

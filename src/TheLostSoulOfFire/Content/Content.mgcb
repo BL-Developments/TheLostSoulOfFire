@@ -10694,3 +10694,8 @@
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /build:Audio/Sfx/soul_throb_2.wav
+
+#begin Audio/Sfx/warden_flame_loop.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/warden_flame_loop.wav

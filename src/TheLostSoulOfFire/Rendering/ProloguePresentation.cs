@@ -70,10 +70,11 @@ public static class ProloguePresentation
         if (prologue.Stage == PrologueStage.Complete)
         {
             batch.FillRectangle(pixel, viewport.Bounds, Color.Black * 0.32f);
-            UiKit.Divider(batch, pixel, centerX, viewport.Height * 0.40f - 22f, 520f, GameBalance.DeathFlameBright * 0.6f);
-            PixelText.DrawCentered(batch, pixel, "YOU ARE NOT ALONE", centerX, viewport.Height * 0.40f, 5, GameBalance.SoulWhite);
-            PixelText.DrawCentered(batch, pixel, "THE WARDEN THRESHOLD", centerX, viewport.Height * 0.50f, 3, GameBalance.DeathFlameBright);
-            UiKit.Divider(batch, pixel, centerX, viewport.Height * 0.50f + 34f, 360f, GameBalance.DeathFlameBright * 0.35f);
+            // The title sits in the dark above the gate, so the figure standing in it stays seen.
+            UiKit.Divider(batch, pixel, centerX, viewport.Height * 0.12f - 22f, 520f, GameBalance.DeathFlameBright * 0.6f);
+            PixelText.DrawCentered(batch, pixel, "YOU ARE NOT ALONE", centerX, viewport.Height * 0.12f, 5, GameBalance.SoulWhite);
+            PixelText.DrawCentered(batch, pixel, "THE WARDEN THRESHOLD", centerX, viewport.Height * 0.19f, 3, GameBalance.DeathFlameBright);
+            UiKit.Divider(batch, pixel, centerX, viewport.Height * 0.19f + 34f, 360f, GameBalance.DeathFlameBright * 0.35f);
             DrawObjective(batch, pixel, centerX, viewport.Height * 0.67f, prologue.Objective, new Color(170, 164, 184));
         }
     }

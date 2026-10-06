@@ -82,12 +82,16 @@ public enum AudioCue
     SoulThrob
 }
 
-/// <summary>The enemy kinds that are heard where they stand, between their steps and attacks.</summary>
-public enum EnemyPresence
+/// <summary>
+/// What is heard where it stands as a quiet loop: the enemy kinds between their steps and
+/// attacks, and the Warden flames burning in the hall.
+/// </summary>
+public enum PresenceSource
 {
     Hollow,
     Burning,
-    Devourer
+    Devourer,
+    WardenFlames
 }
 
 /// <summary>Where the player is, for the ambience bed and the music (presentation only).</summary>
@@ -291,19 +295,21 @@ public sealed class AudioDirector : IDisposable
     private SoundEffectInstance? _fadingAmbience;
     /// <summary>
     /// Presence loops (16_AUDIO_DIRECTION): a Burning crackles, a Hollow breathes and whispers,
-    /// trapped souls murmur in a Devourer. One quiet loop per kind, placed toward the nearest
-    /// of its kind; danger signals push them back like the swings and steps.
+    /// trapped souls murmur in a Devourer, the Warden flames flutter where they burn. One quiet
+    /// loop per source, placed toward the nearest; danger signals push them back like the swings
+    /// and steps.
     /// </summary>
-    private static readonly Dictionary<EnemyPresence, (string Asset, float Volume)> PresenceAssets = new()
+    private static readonly Dictionary<PresenceSource, (string Asset, float Volume)> PresenceAssets = new()
     {
-        [EnemyPresence.Hollow] = ("Audio/Sfx/presence_hollow", 0.3f),
-        [EnemyPresence.Burning] = ("Audio/Sfx/presence_burning", 0.34f),
-        [EnemyPresence.Devourer] = ("Audio/Sfx/presence_devourer", 0.42f)
+        [PresenceSource.Hollow] = ("Audio/Sfx/presence_hollow", 0.3f),
+        [PresenceSource.Burning] = ("Audio/Sfx/presence_burning", 0.34f),
+        [PresenceSource.Devourer] = ("Audio/Sfx/presence_devourer", 0.42f),
+        [PresenceSource.WardenFlames] = ("Audio/Sfx/warden_flame_loop", 0.5f)
     };
 
-    private readonly Dictionary<EnemyPresence, SoundEffect?> _presenceSounds = [];
-    private readonly Dictionary<EnemyPresence, SoundEffectInstance> _presence = [];
-    private readonly Dictionary<EnemyPresence, float> _presenceLevel = [];
+    private readonly Dictionary<PresenceSource, SoundEffect?> _presenceSounds = [];
+    private readonly Dictionary<PresenceSource, SoundEffectInstance> _presence = [];
+    private readonly Dictionary<PresenceSource, float> _presenceLevel = [];
     private SoundEffect? _humSound;
     private SoundEffectInstance? _hum;
     private float _humLevel;
@@ -825,7 +831,7 @@ public sealed class AudioDirector : IDisposable
     /// shaped), <paramref name="pan"/> toward the nearest one. Levels glide, so enemies appearing,
     /// dying or walking past fade in and out; at 0 the loop stops.
     /// </summary>
-    public void SetPresence(EnemyPresence kind, float level, float pan, float deltaTime)
+    public void SetPresence(PresenceSource kind, float level, float pan, float deltaTime)
     {
         if (!_available)
         {
@@ -866,8 +872,9 @@ public sealed class AudioDirector : IDisposable
                 if (_paused) loop.Pause();
                 _presence[kind] = loop;
             }
-            // In Soul Sense the world grows quiet and the souls come forward (16_AUDIO_DIRECTION).
-            float sense = _soulSense ? 1.5f : 1f;
+            // In Soul Sense the world grows quiet and the souls come forward (16_AUDIO_DIRECTION):
+            // enemies, souls within, are heard more, the flames of the hall less.
+            float sense = !_soulSense ? 1f : kind == PresenceSource.WardenFlames ? 0.6f : 1.5f;
             loop.Volume = Math.Clamp(PresenceAssets[kind].Volume * current * sense * (1f - 0.5f * _focus), 0f, 1f);
             loop.Pan = Math.Clamp(pan, -1f, 1f);
         }

@@ -143,6 +143,8 @@ AUTHORED_SFX_DURATIONS = {
     "soul_release_soft_1.wav": 1.100,
     "soul_release_soft_2.wav": 1.100,
     "soul_release_soft_3.wav": 1.100,
+    # The Warden flames of the hall (recipes/ambiences.py), looped, heard where they burn.
+    "warden_flame_loop.wav": 6.000,
     # The bound soul throbbing when health runs low (recipes/cues.py), one double beat per take.
     "soul_throb_1.wav": 0.620,
     "soul_throb_2.wav": 0.620,
@@ -158,7 +160,7 @@ AUTHORED_SFX_DURATIONS = {
 }
 
 #: Looping point sources: mono (the game pans them) and seamless like the beds.
-POINT_LOOPS = {"life_flame_loop.wav", "presence_burning.wav", "presence_hollow.wav", "presence_devourer.wav", "resonance_rumble.wav", "cannon_hum.wav"}
+POINT_LOOPS = {"warden_flame_loop.wav", "life_flame_loop.wav", "presence_burning.wav", "presence_hollow.wav", "presence_devourer.wav", "resonance_rumble.wav", "cannon_hum.wav"}
 
 #: Ambience beds and music per zone (AudioDirector.AmbienceAssets / MusicAssets).
 ZONE_AMBIENCES = ["shore_ambience.wav", "hub_ambience.wav", "harbour_ambience.wav", "causeway_ambience.wav",

@@ -203,6 +203,7 @@ public sealed partial class GameWorld : IDisposable
         _audio.SetLifeFlame(ending ? _presentation.GetLifeFlameAlpha() * _presentation.GetLifeFlameKindle() : 0f,
             PanOf(_presentation.GetLifeFlamePosition()) * 0.7f);
         UpdateEnemyPresence(deltaTime);
+        UpdateWardenFlames(deltaTime);
         _audio.SetResonanceRumble(IsCombatPhase && _player.ResonanceActive && !_player.IsDead, deltaTime);
         _audio.SetCannonHum(IsCombatPhase && !_player.IsDead && _player.Cannon.State == SoulCannonState.Charging
             ? _player.Cannon.ChargeProgress : null, deltaTime);
@@ -2020,7 +2021,7 @@ public sealed partial class GameWorld : IDisposable
     private void UpdateEnemyPresence(float deltaTime)
     {
         bool heard = IsCombatPhase && !_player.IsDead;
-        foreach (EnemyPresence kind in PresenceKinds)
+        foreach (PresenceSource kind in PresenceKinds)
         {
             Enemy? nearest = null;
             float best = float.MaxValue;
@@ -2056,13 +2057,51 @@ public sealed partial class GameWorld : IDisposable
         }
     }
 
-    private static readonly EnemyPresence[] PresenceKinds = [EnemyPresence.Hollow, EnemyPresence.Burning, EnemyPresence.Devourer];
-
-    private static EnemyPresence? PresenceOf(Enemy enemy) => enemy switch
+    /// <summary>
+    /// The Warden flames are heard where they burn (presentation only): each louder the closer the
+    /// player walks by, the hall's sconces high on the pilasters fainter, larger flames of the
+    /// prologue fuller, the sum panned toward the nearer flames.
+    /// </summary>
+    private void UpdateWardenFlames(float deltaTime)
     {
-        Hollow => EnemyPresence.Hollow,
-        Burning => EnemyPresence.Burning,
-        Devourer => EnemyPresence.Devourer,
+        _flameLevel = 0f;
+        _flamePan = 0f;
+        if (_phase is GamePhase.Antechamber or GamePhase.EnteringArena)
+        {
+            foreach ((Vector2 flame, float weight) in SoulFurnaceAntechamber.HeardFlames)
+            {
+                HearFlame(flame, weight);
+            }
+        }
+        else if (_phase == GamePhase.Prologue && PrologueEnvironment.PlateOf(_prologue) is { } dressed && _art.HasArt(dressed))
+        {
+            foreach ((Vector2 flameBase, float height) in PrologueDirector.WardenFlames(_prologue.Sector, _prologue.IsVehicleRide))
+            {
+                HearFlame(flameBase, MathHelper.Clamp(height / 40f, 0.3f, 1.2f));
+            }
+        }
+        _audio.SetPresence(PresenceSource.WardenFlames, MathHelper.Clamp(_flameLevel, 0f, 1.2f),
+            _flameLevel > 0.001f ? _flamePan / _flameLevel : 0f, deltaTime);
+    }
+
+    private float _flameLevel;
+    private float _flamePan;
+
+    private void HearFlame(Vector2 flame, float weight)
+    {
+        float nearness = MathHelper.Clamp(1f - Vector2.Distance(flame, _player.Position) / 620f, 0f, 1f);
+        float share = weight * nearness * nearness;
+        _flameLevel += share;
+        _flamePan += share * PanOf(flame);
+    }
+
+    private static readonly PresenceSource[] PresenceKinds = [PresenceSource.Hollow, PresenceSource.Burning, PresenceSource.Devourer];
+
+    private static PresenceSource? PresenceOf(Enemy enemy) => enemy switch
+    {
+        Hollow => PresenceSource.Hollow,
+        Burning => PresenceSource.Burning,
+        Devourer => PresenceSource.Devourer,
         _ => null
     };
 
