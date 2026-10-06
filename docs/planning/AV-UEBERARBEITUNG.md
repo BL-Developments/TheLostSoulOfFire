@@ -449,17 +449,12 @@ Rahmen wie oben (nur Darstellung und Ton).
 - Wellenstart-Markierung der Zwischenpause: eine ruhige, atmende Zone statt zweier kräftiger Ringe
   (mit den Zonen-Texturen doppelte sich die Linie); Radius unverändert.
 
-**Geprüft (Stand 06.10.2026, 23:40):** voller Rundgang über 19 Stationen (535 Aufnahmen, kein
-Platzhalter), CPU je Frame 0,27–0,55 ms, Wandzeit im Mittel 0,9–1,8 ms; in diesem Lauf fielen
-die letzten fünf Stationen ab der Truhe gemeinsam auf 42 fps (auch die Menüs), einzeln
-nachgemessen liefen Truhe, Tod und Menüs wieder mit 1,0–1,1 ms und das Ende des Devourer mit
-1,2 ms – das System hat im Hintergrund gedrosselt, kein Spielfehler. 258 Unit-Tests; Slice-,
-Fähigkeiten-, Vorhallen- (mit Seelensinn) und Währungstest; Audio-Laufzeit-, Gameplay-
-(10 Wellen) und Tod-Neustart-Test; zuvor `validate_audio.py` (169 Assets) und `mix_report.py`
-(Arena, 55 Töne, keiner außerhalb des Bands). Nachtrag 23:45 (Pochen bei wenig Leben): 263 Unit-Tests,
-`validate_audio.py` (171 Assets), `mix_report.py` in allen vier Zonen ohne Ausreißer (Pochen
-2,8–4,2 LU über dem Bett), Stationen `prologue_search` und `arena_death`, Audio-Laufzeit- (64 Töne,
-kein Ersatzklang), Gameplay- und Tod-Neustart-Test.
+**Geprüft (Stand 07.10.2026, 00:45):** voller Rundgang über 21 Stationen (611 Aufnahmen, kein
+Platzhalter; neu `arena_devour`, `arena_spawn`, Serien `arena_death_low` und `arena_swings_sweep`),
+CPU je Frame 0,25–0,57 ms, Wandzeit im Mittel höchstens 1,6 ms (ohne den Titel mit dem
+Programmstart); 263 Unit-Tests; Fähigkeiten-, Vorhallen- und Währungstest; Audio-Laufzeit- (64
+Töne, kein Ersatzklang), Gameplay- (10 Wellen) und Tod-Neustart-Test; `validate_audio.py` (172
+Assets); `mix_report.py` in Arena, Überfahrt, Vorhalle und Ufer ohne Ausreißer.
 
 **Nächste Schritte (nach Wirkung):**
 1. Hörabnahme durch den Owner: Wuchtschichten der Hiebe, sanfte Seelenglocke, Präsenz der
