@@ -511,6 +511,8 @@ internal sealed class TourVisualTest
         Do("open", () => _input.InjectKeyPress(Keys.E), 0.05f);
         Series("open", 10, 4);
         Shot("wave_trigger", () => _world.PlaceAutomatedPlayerAtWaveTrigger(), minWait: 0.8f);
+        Do("next_wave", () => _world.RequestAutomatedNextWave());
+        Series("wave_banner", 6, 8);
     }
 
     private void BuildDeath()

@@ -644,8 +644,13 @@ public sealed class CinematicPresentation
         DrawLetterbox(batch, pixel, viewport, 13, 0.54f * alpha);
 
         string label = nextWave >= GameBalance.ArenaWaveCount ? "FINAL WAVE" : $"WAVE {ToRoman(nextWave)}";
-        DrawTitleRules(batch, pixel, viewport, viewport.Height * 0.5f - 28f, alpha * 0.62f);
-        PixelText.DrawCentered(batch, pixel, label, viewport.Width * 0.5f, viewport.Height * 0.5f - 9f, 3, GameBalance.SoulWhite * (0.88f * alpha));
+        // Above the figure (the camera centres it), settling down a little as it fades in.
+        bool final = nextWave >= GameBalance.ArenaWaveCount;
+        float y = viewport.Height * 0.18f + (1f - open) * 10f;
+        DrawTitleRules(batch, pixel, viewport, y - 24f, alpha * 0.7f);
+        PixelText.DrawCentered(batch, pixel, label, viewport.Width * 0.5f, y, 5,
+            (final ? GameBalance.DeathFlameBright : GameBalance.SoulWhite) * (0.92f * alpha));
+        DrawTitleRules(batch, pixel, viewport, y + 50f, alpha * 0.4f);
     }
 
     private void DrawDeath(SpriteBatch batch, Texture2D pixel, Viewport viewport)
