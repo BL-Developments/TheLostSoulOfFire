@@ -1,8 +1,9 @@
-"""The prologue sectors after the shore as 3D scenes, rendered with the game camera.
+"""The prologue sectors as 3D scenes, rendered with the game camera.
 
     blender -b -P tools/visuals/blender/build_prologue.py -- --sector search --out DIR [--samples 48]
 
-Sectors (docs/current/regions/prologue.md, room grammar): `search` (II, the harbour quarter),
+Sectors (docs/current/regions/prologue.md, room grammar): `shore` (I, the unfinished shore: a
+railway platform ending in the sea), `search` (II, the harbour quarter),
 `causeway` (III, the broken railway causeway to the ferry landing), `deck` (the Warden skiff
 during the crossing) and `threshold` (the Warden threshold). The world is 1800x1000 like the
 shore; walkable areas come from PrologueDirector and stay calm and readable. Each run writes
@@ -46,7 +47,7 @@ def texture(name: str, folder: Path = TEXTURES) -> str:
 
 def parse(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(prog="build_prologue.py")
-    parser.add_argument("--sector", required=True, choices=["search", "causeway", "deck", "threshold", "sea", "passing"])
+    parser.add_argument("--sector", required=True, choices=["shore", "search", "causeway", "deck", "threshold", "sea", "passing"])
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--samples", type=int, default=48)
     return parser.parse_args(argv[argv.index("--") + 1:] if "--" in argv else [])
@@ -66,7 +67,7 @@ def materials() -> dict[str, bpy.types.Material]:
         "brick": kit.stone("brick", brick, 3.0, tint=(0.33, 0.24, 0.23), spread=0.3, axes="XZ"),
         "basalt": kit.stone("basalt", stone, 3.0, tint=(0.62, 0.61, 0.68), spread=0.3, axes="XZ"),
         "basalt_floor": kit.stone("basalt_floor", stone, 4.0, tint=(0.55, 0.54, 0.6), spread=0.3),
-        "ballast": kit.painted("ballast", (0.05, 0.05, 0.058), (0.13, 0.125, 0.135), scale=6.0, bump=0.6),
+        "ballast": kit.painted("ballast", (0.035, 0.035, 0.042), (0.10, 0.098, 0.108), scale=6.0, bump=0.6),
         "water": water_material(water),
         "iron": kit.painted("iron", (0.045, 0.045, 0.052), (0.11, 0.105, 0.115), scale=3.0, roughness=0.5, bump=0.4),
         "rust": kit.painted("rust", (0.06, 0.035, 0.03), (0.16, 0.085, 0.06), scale=4.0, roughness=0.8, bump=0.5),
@@ -84,7 +85,54 @@ def materials() -> dict[str, bpy.types.Material]:
         "backing": kit.painted("backing", (0.012, 0.011, 0.015), (0.03, 0.028, 0.034), bump=0.0),
         "grout_dark": kit.painted("grout_dark", (0.02, 0.02, 0.024), (0.05, 0.05, 0.055), scale=2.0, roughness=1.0, bump=0.0),
         "slate": kit.painted("slate", (0.016, 0.018, 0.024), (0.045, 0.05, 0.06), scale=4.0, roughness=0.7, bump=0.3),
+        "slab_wet": kit.stone("slab_wet", stone, 5.0, tint=(0.66, 0.70, 0.80), spread=0.45, ash_amount=0.35,
+                              ash_tint=(0.11, 0.12, 0.15), roughness=0.45),
+        "slab_old": kit.stone("slab_old", concrete, 7.0, tint=(0.44, 0.47, 0.53), spread=0.4, ash_amount=0.35,
+                              ash_tint=(0.11, 0.12, 0.15), roughness=0.5),
+        "joint_moss": kit.painted("joint_moss", (0.02, 0.035, 0.03), (0.07, 0.11, 0.08), scale=6.0, roughness=0.9, bump=0.3),
+        "puddle": puddle_material(),
+        "paint": kit.painted("paint", (0.42, 0.42, 0.40), (0.62, 0.62, 0.58), scale=9.0, roughness=0.7, bump=0.05),
+        "lamp_glass": kit.emissive("lamp_glass", (0.62, 0.74, 1.0), 2.0),
+        "flap": kit.painted("flap", (0.48, 0.47, 0.43), (0.66, 0.65, 0.60), scale=12.0, roughness=0.6, bump=0.0),
     }
+
+
+def puddle_material() -> bpy.types.Material:
+    """Standing rain water: nearly black, mirror-smooth, so it picks up the lamps and the sky."""
+    material = bpy.data.materials.new("puddle")
+    material.use_nodes = True
+    bsdf = material.node_tree.nodes.get("Principled BSDF")
+    bsdf.inputs["Base Color"].default_value = (0.035, 0.04, 0.055, 1.0)
+    bsdf.inputs["Roughness"].default_value = 0.1
+    bsdf.inputs["Specular IOR Level"].default_value = 0.8
+    return material
+
+
+def puddles(m, rng: random.Random, area: tuple[float, float, float, float], count: int, z: float, name: str) -> list[bpy.types.Object]:
+    """Irregular puddles (world area x0, y0, x1, y1): flat blobs with a noisy outline."""
+    import bmesh
+    parts = []
+    for index in range(count):
+        centre = ground(rng.uniform(area[0], area[2]), rng.uniform(area[1], area[3]), z)
+        rx, ry = rng.uniform(0.4, 1.2), rng.uniform(0.3, 0.8)
+        mesh = bpy.data.meshes.new(f"{name}_{index}")
+        bm = bmesh.new()
+        verts = []
+        phases = [rng.uniform(0, math.tau) for _ in range(3)]
+        for k in range(28):
+            a = k / 28 * math.tau
+            wobble = 1 + 0.22 * math.sin(a * 3 + phases[0]) + 0.12 * math.sin(a * 5 + phases[1]) + 0.08 * math.sin(a * 9 + phases[2])
+            verts.append(bm.verts.new((math.cos(a) * rx * wobble, math.sin(a) * ry * wobble, 0.0)))
+        bm.faces.new(verts)
+        bm.to_mesh(mesh)
+        bm.free()
+        obj = bpy.data.objects.new(f"{name}_{index}", mesh)
+        bpy.context.collection.objects.link(obj)
+        obj.location = centre
+        obj.rotation_euler = (0, 0, rng.uniform(0, math.pi))
+        obj.data.materials.append(m["puddle"])
+        parts.append(obj)
+    return parts
 
 
 def water_material(image: str) -> bpy.types.Material:
@@ -169,6 +217,179 @@ def suitcase(m, at: Vector, size=(0.62, 0.22, 0.44), yaw: float = 0.0, standing:
 def common_lights(scene, key: float = 1.8, fill: float = 380.0, centre=(900, 500)) -> None:
     kit.key_light(scene, energy=key, colour=NIGHT_KEY, angle_deg=8.0)
     kit.area_light("fill", ground(centre[0], centre[1], 10.0), 16.0, fill, (0.70, 0.76, 0.92))
+
+
+# ---- I Shore --------------------------------------------------------------------------------
+
+def station_bench(m, foot: Vector, name: str, length: float = 1.8) -> list[bpy.types.Object]:
+    """A platform bench: cast-iron ends, wooden seat and back slats, facing south (the camera)."""
+    parts = []
+    for side in (-1, 1):
+        x = side * (length / 2 - 0.12)
+        parts.append(kit.box(f"{name}_leg_front_{side}", foot + Vector((x, -0.2, 0.22)), (0.06, 0.05, 0.44), m["iron"]))
+        parts.append(kit.box(f"{name}_leg_back_{side}", foot + Vector((x, 0.18, 0.42)), (0.06, 0.05, 0.84), m["iron"], rotation=(0.18, 0, 0)))
+        parts.append(kit.box(f"{name}_arm_{side}", foot + Vector((x, -0.02, 0.62)), (0.06, 0.46, 0.05), m["iron"], bevel=0.01))
+    for k in range(4):
+        parts.append(kit.box(f"{name}_seat_{k}", foot + Vector((0, -0.2 + k * 0.11, 0.45)), (length, 0.09, 0.035), m["plank"], bevel=0.008))
+    for k in range(2):
+        parts.append(kit.box(f"{name}_back_{k}", foot + Vector((0, 0.24 + k * 0.03, 0.62 + k * 0.18)), (length, 0.035, 0.11), m["plank"],
+                             bevel=0.008, rotation=(0.18, 0, 0)))
+    return parts
+
+
+def canopy_post(m, foot: Vector, name: str) -> list[bpy.types.Object]:
+    """A cast-iron canopy column of the old station: fluted shaft, ornamental head and the stubs
+    of the canopy brackets it once carried, broken off north and south."""
+    parts = [kit.box(f"{name}_plinth", foot + Vector((0, 0, 0.12)), (0.36, 0.36, 0.24), m["iron"], bevel=0.03),
+             kit.cylinder(f"{name}_shaft", foot + Vector((0, 0, 1.85)), 0.085, 3.3, m["iron"], vertices=12),
+             kit.cylinder(f"{name}_collar", foot + Vector((0, 0, 0.42)), 0.12, 0.12, m["iron"], vertices=12),
+             kit.cylinder(f"{name}_capital", foot + Vector((0, 0, 3.55)), 0.16, 0.14, m["iron"], vertices=12),
+             kit.box(f"{name}_head", foot + Vector((0, 0, 3.72)), (0.3, 0.3, 0.2), m["iron"], bevel=0.02)]
+    for side, length in ((-1, 1.1), (1, 0.6)):
+        parts.append(kit.box(f"{name}_beam_{side}", foot + Vector((0, side * length / 2, 3.86)), (0.12, length, 0.16), m["iron"]))
+        parts.append(kit.box(f"{name}_strut_{side}", foot + Vector((0, side * 0.35, 3.45)), (0.05, 0.7, 0.05), m["iron"],
+                             rotation=(side * -0.75, 0, 0)))
+    return parts
+
+
+def platform_lamp(m, foot: Vector, name: str) -> list[bpy.types.Object]:
+    """A cold platform lamp at the exit: an iron post with a glazed lantern."""
+    parts = [kit.box(f"{name}_foot", foot + Vector((0, 0, 0.1)), (0.3, 0.3, 0.2), m["iron"], bevel=0.02),
+             kit.cylinder(f"{name}_post", foot + Vector((0, 0, 1.4)), 0.06, 2.6, m["iron"], vertices=10),
+             kit.box(f"{name}_lantern", foot + Vector((0, 0, 2.86)), (0.3, 0.3, 0.42), m["lamp_glass"]),
+             kit.box(f"{name}_roof", foot + Vector((0, 0, 3.12)), (0.4, 0.4, 0.08), m["iron"], bevel=0.02),
+             kit.cylinder(f"{name}_finial", foot + Vector((0, 0, 3.22)), 0.04, 0.14, m["iron"], vertices=8)]
+    for side in (-1, 1):
+        parts.append(kit.box(f"{name}_frame_{side}", foot + Vector((side * 0.15, -0.15, 2.86)), (0.03, 0.03, 0.44), m["iron"]))
+    kit.point_light(f"{name}_light", foot + Vector((0, -0.3, 2.86)), 140.0, (0.75, 0.85, 1.0), radius=0.2)
+    return parts
+
+
+def departure_board(m, foot: Vector) -> list[bpy.types.Object]:
+    """The split-flap departure board standing tilted in the water in front of the platform:
+    two legs, a slate panel with rows of flaps, some lost, a header strip without words."""
+    parent = bpy.data.objects.new("board_tilt", None)
+    bpy.context.collection.objects.link(parent)
+    parent.location = foot
+    parent.rotation_euler = (math.radians(-11), math.radians(7), math.radians(-6))
+    rng = random.Random(77)
+    parts = []
+    for side in (-1, 1):
+        parts.append(kit.box(f"board_leg_{side}", Vector((side * 1.15, 0, 1.0)), (0.12, 0.12, 3.0), m["iron"]))
+    panel_z, width, height = 2.25, 2.9, 1.55
+    parts.append(kit.box("board_panel", Vector((0, 0.04, panel_z)), (width, 0.08, height), m["slate"], bevel=0.02))
+    parts.append(kit.box("board_frame_top", Vector((0, -0.01, panel_z + height / 2 + 0.05)), (width + 0.12, 0.12, 0.1), m["iron"]))
+    parts.append(kit.box("board_frame_bottom", Vector((0, -0.01, panel_z - height / 2 - 0.05)), (width + 0.12, 0.12, 0.1), m["iron"]))
+    parts.append(kit.box("board_header", Vector((0, -0.01, panel_z + height / 2 - 0.14)), (width - 0.2, 0.02, 0.16), m["paint"]))
+    rows, columns = 4, 12
+    for r in range(rows):
+        for c in range(columns):
+            if rng.random() < 0.14:
+                continue  # a lost flap
+            x = -width / 2 + 0.22 + c * (width - 0.44) / (columns - 1)
+            z = panel_z + height / 2 - 0.42 - r * 0.3
+            tilt = rng.uniform(-0.05, 0.05) if rng.random() < 0.8 else rng.uniform(0.3, 0.7)
+            parts.append(kit.box(f"flap_{r}_{c}", Vector((x, -0.02, z)), (0.18, 0.015, 0.24), m["flap"], rotation=(tilt, 0, 0)))
+            parts.append(kit.box(f"flap_split_{r}_{c}", Vector((x, -0.03, z)), (0.18, 0.012, 0.012), m["dark"]))
+    for obj in parts:
+        obj.parent = parent
+    return parts
+
+
+def dam_remnant(m, x0: float, x1: float, y: float, rise_left: bool, name: str) -> list[bpy.types.Object]:
+    """A broken stretch of the old railway dam slanting into the sea, a bent rail on top."""
+    a, b = ground(x0, y), ground(x1, y)
+    length = b.x - a.x
+    tilt = 0.12 if rise_left else -0.12
+    centre = Vector(((a.x + b.x) / 2, a.y, -0.55))
+    parts = [kit.box(f"{name}_body", centre, (length, 2.4, 1.2), m["slate"], bevel=0.08, rotation=(0, tilt, 0)),
+             kit.box(f"{name}_ballast", centre + Vector((0, 0, 0.66)), (length - 0.4, 2.0, 0.16), m["ballast"], rotation=(0, tilt, 0))]
+    for side in (-0.7, 0.7):
+        parts.append(kit.box(f"{name}_rail_{side}", centre + Vector((0, side, 0.78)), (length * 0.8, 0.07, 0.06), m["rust"],
+                             rotation=(0.04, tilt * 1.3, 0.05 * side)))
+    return parts
+
+
+def build_shore(m, scene) -> dict[str, list]:
+    """I, the unfinished shore: the end of a railway platform where the line ran into the sea.
+    Concrete slabs with a worn white edge line, granite kerbs sagging into the water at two
+    places; a flooded track bed to the north, drowned roofs beyond it; to the south the sea,
+    the tilted split-flap board standing in it and two broken stretches of the old dam. The
+    benches of the waiting, the suitcase at the trace, the canopy columns, the cold lamp at the
+    exit, bollards and the Warden mark are their own pieces (PrologueDirector.ShoreProps)."""
+    pieces: dict[str, list] = {}
+    rng = random.Random(3)
+    water(m)
+    platform = quay(m, -60, 1900, 120, 915, seed=11, kerb_north=True, slab=(2.4, 3.8), row=1.8)
+    for obj in platform:
+        if obj.name.startswith("slab"):
+            obj.data.materials[0] = m["slab_old"] if rng.random() < 0.25 else m["slab_wet"]
+    # Moss and wet dirt in the joints between the slabs.
+    kit.plane("joints", ground(-60, 122, -0.07), ground(1900, 913, -0.07), m["joint_moss"])
+    puddles(m, rng, (150, 180, 1650, 860), 11, 0.024, "puddle")
+    # The white edge line, worn away in places, a stride inside both kerbs.
+    for y in (148, 887):
+        x = -60
+        while x < 1900:
+            length = rng.uniform(80, 220)
+            if rng.random() > 0.18:
+                kit.box(f"edge_line_{y}_{x:.0f}", ground(x + length / 2, y, 0.022), (metres(length), 0.14, 0.01), m["paint"])
+            x += length + rng.uniform(4, 30)
+    # Two places where the platform edge broke and sank: slabs tipped toward the water.
+    for index, (x0, x1, y, sign) in enumerate(((1180, 1420, 128, 1), (430, 650, 905, -1))):
+        for k in range(3):
+            px = x0 + (k + 0.5) * (x1 - x0) / 3 + rng.uniform(-8, 8)
+            kit.box(f"sunk_{index}_{k}", ground(px, y, -0.42 - rng.uniform(0, 0.2)), (metres((x1 - x0) / 3) - 0.12, 1.5, 0.16), m["slab_old"],
+                    bevel=0.02, rotation=(sign * rng.uniform(0.45, 0.65), rng.uniform(-0.12, 0.12), rng.uniform(-0.1, 0.1)))
+    # The flooded track bed north of the platform, rails half under water, drowned roofs beyond.
+    # The bed is washed out in places: islands of ballast with water between them, the rails
+    # running on over the gaps and sagging, sleepers only where the bed still holds.
+    yy = ground(0, 70).y
+    x = -80.0
+    while x < 1900:
+        length = rng.uniform(140, 320)
+        top = rng.uniform(-0.86, -0.74)
+        kit.box(f"track_bed_{x:.0f}", Vector((metres(x + length / 2), yy, top - 0.2)), (metres(length), rng.uniform(2.0, 2.6), 0.4),
+                m["ballast"], bevel=0.25)
+        k = x + rng.uniform(8, 20)
+        while k < x + length - 10:
+            kit.box(f"flooded_sleeper_{k:.0f}", Vector((metres(k), yy, top + 0.02)), (0.24, 2.4, 0.05), m["plank"],
+                    rotation=(0, 0, rng.uniform(-0.06, 0.06)))
+            k += rng.uniform(40, 48)
+        x += length + rng.uniform(40, 140)
+    for side in (-0.72, 0.72):
+        kit.box(f"flooded_rail_{side}", Vector((metres(900), yy + side, -0.74)), (metres(2200), 0.07, 0.06), m["rust"], rotation=(0.0, 0.0, side * 0.004))
+    drowned_roofs(m, 7, y_range=(0, 30), count=6)
+    # Masts of the old overhead line stand in the flooded bed, some leaning, one fallen across.
+    for index, x in enumerate((160, 610, 1060, 1510)):
+        lean = rng.uniform(-0.18, 0.18)
+        mast = ground(x, 92, -0.9)
+        kit.box(f"catenary_{index}", mast + Vector((0, 0, 1.9)), (0.14, 0.14, 4.6), m["rust"], rotation=(lean * 0.4, lean, 0))
+        kit.box(f"catenary_arm_{index}", mast + Vector((0.6 * (1 if index % 2 else -1), 0, 3.9)), (1.4, 0.08, 0.08), m["rust"], rotation=(0, lean, 0))
+    kit.box("fallen_girder", ground(820, 60, -0.75), (6.0, 0.22, 0.3), m["rust"], rotation=(0.1, 0.05, 0.12))
+    dam_remnant(m, -40, 300, 965, True, "dam_west")
+    dam_remnant(m, 1520, 1860, 960, False, "dam_east")
+    # Props as pieces (camera-hidden in the plate, still casting their shadows).
+    benches = [station_bench(m, ground(790, 478), "bench_a"), station_bench(m, ground(480, 212), "bench_b")]
+    pieces["bench"] = benches[0]
+    case = suitcase(m, ground(872, 596), size=(0.58, 0.22, 0.42), yaw=0.35, name="shore_case")
+    pieces["suitcase"] = case
+    posts = [canopy_post(m, ground(x, 262), f"post_{x}") for x in (330, 720, 1110)]
+    pieces["canopy_post"] = posts[1]
+    lamp = platform_lamp(m, ground(1600, 455), "exit_lamp")
+    pieces["lamp"] = lamp
+    bollards = [bollard(m, ground(x, 878), f"shore_bollard_{x}") for x in (260, 1500)]
+    pieces["bollard"] = bollards[0]
+    board = departure_board(m, ground(1180, 992, -0.9))
+    pieces["board"] = board
+    mark = warden_marker(m, ground(1535, 515), "exit_mark")
+    pieces["marker"] = mark
+    for group in benches + posts + bollards + [case, lamp, board, mark]:
+        kit.camera_only_hidden(group)
+    common_lights(scene, key=2.3, fill=240.0, centre=(900, 520))
+    # Moonlight grazing from the north-east over the sea picks out the wet surfaces.
+    kit.area_light("moon", ground(1500, -200, 12.0), 8.0, 900.0, (0.55, 0.62, 0.85))
+    return pieces
 
 
 # ---- II Searchway ---------------------------------------------------------------------------
@@ -625,7 +846,7 @@ def gatehouse(m, foot: Vector) -> list[bpy.types.Object]:
 
 # ---- main -----------------------------------------------------------------------------------
 
-BUILDERS = {"search": build_search, "causeway": build_causeway, "deck": build_deck, "threshold": build_threshold,
+BUILDERS = {"shore": build_shore, "search": build_search, "causeway": build_causeway, "deck": build_deck, "threshold": build_threshold,
             "sea": build_sea, "passing": build_passing}
 
 

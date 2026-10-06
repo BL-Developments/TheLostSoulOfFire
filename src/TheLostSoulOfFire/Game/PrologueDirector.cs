@@ -57,8 +57,9 @@ public sealed class PrologueDirector
     /// <summary>
     /// Props of the shore (docs/current/regions/prologue.md): the bench of the waiting and the
     /// suitcase at the trace, canopy posts along the north kerb, a cold lamp at the exit,
-    /// bollards on the south kerb and the tilted departure board rising from the water in front
-    /// of the platform. Visual only; none of them collide.
+    /// bollards on the south kerb, the tilted departure board rising from the water in front
+    /// of the platform and the Warden mark at the exit; all rendered with the platform
+    /// (tools/visuals/blender/build_prologue.py, sector shore). Visual only; none of them collide.
     /// </summary>
     public static IReadOnlyList<PropPlacement> ShoreProps { get; } =
     [
@@ -71,7 +72,8 @@ public sealed class PrologueDirector
         new(VisualIds.ShoreLamp, new Vector2(1600f, 455f), new Vector2(50f, 220f), SceneLayer.HighProp),
         new(VisualIds.ShoreBollard, new Vector2(260f, 878f), new Vector2(45f, 45f), SceneLayer.HighProp),
         new(VisualIds.ShoreBollard, new Vector2(1500f, 878f), new Vector2(45f, 45f), SceneLayer.HighProp),
-        new(VisualIds.ShoreBoard, new Vector2(1180f, 992f), new Vector2(180f, 200f), SceneLayer.Occluder)
+        new(VisualIds.ShoreBoard, new Vector2(1180f, 992f), new Vector2(180f, 200f), SceneLayer.Occluder),
+        new(VisualIds.WardenMarker, new Vector2(1535f, 515f), new Vector2(30f, 90f), SceneLayer.HighProp)
     ];
 
     /// <summary>
@@ -122,6 +124,7 @@ public sealed class PrologueDirector
     /// <summary>Warden flames standing in the fittings of a sector's props: base point and height.</summary>
     public static IReadOnlyList<(Vector2 Base, float Height)> WardenFlames(PrologueSector sector, bool ride) => sector switch
     {
+        PrologueSector.Emergence => [(new Vector2(1535f, 436f), 24f)],
         PrologueSector.Search =>
         [
             (new Vector2(548f, 353f), 24f), (new Vector2(1038f, 573f), 24f), (new Vector2(1416f, 454f), 24f),

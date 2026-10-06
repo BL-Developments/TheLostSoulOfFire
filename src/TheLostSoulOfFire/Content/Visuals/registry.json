@@ -875,13 +875,13 @@
       "id": "prop.shore-bench",
       "kind": "prop",
       "palette": "world",
-      "worldSize": [115.3, 90.7],
-      "origin": [0.5, 0.7132],
+      "worldSize": [130.67, 77.33],
+      "origin": [0.5, 0.819],
       "layer": "high-prop",
       "clips": {
         "default": {
           "path": "Textures/Props/Shore/bench",
-          "frameSize": [173, 136],
+          "frameSize": [196, 116],
           "frames": 1,
           "fps": 1,
           "loop": true
@@ -892,13 +892,13 @@
       "id": "prop.shore-suitcase",
       "kind": "prop",
       "palette": "world",
-      "worldSize": [38.0, 45.3],
-      "origin": [0.5, 0.8971],
+      "worldSize": [53.33, 50.0],
+      "origin": [0.5, 0.7333],
       "layer": "high-prop",
       "clips": {
         "default": {
           "path": "Textures/Props/Shore/suitcase",
-          "frameSize": [57, 68],
+          "frameSize": [80, 75],
           "frames": 1,
           "fps": 1,
           "loop": true
@@ -909,13 +909,13 @@
       "id": "prop.shore-board",
       "kind": "prop",
       "palette": "world",
-      "worldSize": [186.7, 205.3],
-      "origin": [0.5, 0.9383],
+      "worldSize": [226.67, 172.0],
+      "origin": [0.4088, 0.938],
       "layer": "occluder",
       "clips": {
         "default": {
           "path": "Textures/Props/Shore/board",
-          "frameSize": [280, 308],
+          "frameSize": [340, 258],
           "frames": 1,
           "fps": 1,
           "loop": true
@@ -926,13 +926,13 @@
       "id": "prop.shore-canopy-post",
       "kind": "prop",
       "palette": "world",
-      "worldSize": [64.7, 259.3],
-      "origin": [0.5, 0.9743],
+      "worldSize": [36.0, 256.67],
+      "origin": [0.5, 0.9506],
       "layer": "high-prop",
       "clips": {
         "default": {
           "path": "Textures/Props/Shore/canopypost",
-          "frameSize": [97, 389],
+          "frameSize": [54, 385],
           "frames": 1,
           "fps": 1,
           "loop": true
@@ -943,13 +943,13 @@
       "id": "prop.shore-lamp",
       "kind": "prop",
       "palette": "world",
-      "worldSize": [61.3, 183.3],
-      "origin": [0.5, 0.9691],
+      "worldSize": [38.67, 198.67],
+      "origin": [0.5, 0.9413],
       "layer": "high-prop",
       "clips": {
         "default": {
           "path": "Textures/Props/Shore/lamp",
-          "frameSize": [92, 275],
+          "frameSize": [58, 298],
           "frames": 1,
           "fps": 1,
           "loop": true
@@ -960,13 +960,13 @@
       "id": "prop.shore-bollard",
       "kind": "prop",
       "palette": "world",
-      "worldSize": [28.7, 48.0],
-      "origin": [0.5, 0.9306],
+      "worldSize": [40.0, 69.33],
+      "origin": [0.5, 0.8269],
       "layer": "high-prop",
       "clips": {
         "default": {
           "path": "Textures/Props/Shore/bollard",
-          "frameSize": [43, 72],
+          "frameSize": [60, 104],
           "frames": 1,
           "fps": 1,
           "loop": true

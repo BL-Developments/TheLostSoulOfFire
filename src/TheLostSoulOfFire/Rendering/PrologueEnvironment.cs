@@ -91,7 +91,7 @@ public static class PrologueEnvironment
         switch (prologue.Sector)
         {
             case PrologueSector.Emergence:
-                DrawShoreGuides(batch, pixel, time, soulSense);
+                DrawShoreGuides(batch, pixel, time, soulSense, painted);
                 break;
             case PrologueSector.Search:
                 DrawSearchTower(batch, pixel);
@@ -118,7 +118,7 @@ public static class PrologueEnvironment
 
     public static void DrawForeground(SpriteBatch batch, Texture2D pixel, PrologueDirector prologue, bool painted = false)
     {
-        if (painted && prologue.Sector != PrologueSector.Emergence)
+        if (painted)
         {
             return;
         }
@@ -224,7 +224,7 @@ public static class PrologueEnvironment
     /// What the painted shore cannot show by itself: the Soul Sense trace, the waiting dead on
     /// the bench (only with Soul Sense) and the Warden mark at the eastern exit.
     /// </summary>
-    private static void DrawShoreGuides(SpriteBatch batch, Texture2D pixel, float time, float sense)
+    private static void DrawShoreGuides(SpriteBatch batch, Texture2D pixel, float time, float sense, bool painted)
     {
         float flicker = 0.5f + 0.5f * MathF.Sin(time * 1.7f);
         batch.FillEllipse(pixel, PrologueDirector.SoulTrace + new Vector2(0f, 40f), 112f, 36f, GameBalance.DeepViolet * ((0.05f + flicker * 0.025f) * (1f + sense)));
@@ -238,7 +238,11 @@ public static class PrologueEnvironment
                 batch.DrawLine(pixel, seated - new Vector2(0f, 18f), seated + new Vector2(0f, 16f), echo, 7f);
             }
         }
-        DrawWardenMarker(batch, pixel, new Vector2(1535f, 515f), time, 0.62f);
+        if (!painted)
+        {
+            // The rendered shore carries the mark as a prop with its flame.
+            DrawWardenMarker(batch, pixel, new Vector2(1535f, 515f), time, 0.62f);
+        }
     }
 
     private static void DrawHumanLuggage(SpriteBatch batch, Texture2D pixel, Vector2 p)

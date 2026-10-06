@@ -9618,6 +9618,668 @@
         "status": "angenommen",
         "reason": "Animiertes Prop aus Blender mit der Spielkamera"
       }
+    },
+    {
+      "id": "d469447126a0464b8b7d56dde73d51cf",
+      "timestamp": "2026-10-06T02:27:56+00:00",
+      "visual_id": "environment.shore",
+      "step": "place-environment",
+      "tool": {
+        "name": "place_environment.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "world": [
+          1800,
+          1000
+        ],
+        "output": [
+          2700,
+          1500
+        ],
+        "tiles": [
+          2,
+          1
+        ],
+        "layer": "ground",
+        "origin": [
+          0.0,
+          0.0
+        ],
+        "crop": null,
+        "mute_reds": null,
+        "target_median": null
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/shore/plate.png",
+          "sha256": "43ad687c7eb970498ca3d4892e47b216506489b99d0b87d1287b22193d13e067"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Shore/plate_c0r0.png",
+          "sha256": "c806048a2892078ce6a19bed3e7990b34d87c492d267fbf4851c279c203d66a1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Shore/plate_c1r0.png",
+          "sha256": "bbfe3f09e858340133d5f142dc1abf582d86da1750b429d2c7fa7be007fe52a1"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.49,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Bodenplatte für das Spiel aufbereitet"
+      }
+    },
+    {
+      "id": "6a0ed95649c1498ba42056d7717523ca",
+      "timestamp": "2026-10-06T02:28:04+00:00",
+      "visual_id": "prop.shore-bench",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "bench",
+        "box": [
+          1091,
+          626,
+          1279,
+          734
+        ],
+        "layer": "high-prop"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/shore/bench_full.png",
+          "sha256": "ea41776130fb6b301ef63f53b16a75ec9a834bd02ae3d95e487f262054079310"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Shore/bench.png",
+          "sha256": "6839b945710bd95000123aa738ce75379c20a41fbfa33654e0bbc67a69f855a5"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.03,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "2301851cd10b45b59839c8a1e40fc96a",
+      "timestamp": "2026-10-06T02:28:04+00:00",
+      "visual_id": "prop.shore-suitcase",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "suitcase",
+        "box": [
+          1272,
+          843,
+          1344,
+          910
+        ],
+        "layer": "high-prop"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/shore/suitcase_full.png",
+          "sha256": "c738e9bbfaeddefea47ac6c31704d3005d65576e6d51861e15cefb3cc20206a5"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Shore/suitcase.png",
+          "sha256": "6d16f146f2f05f8d6577e0f8eb141a508eb95f572e7ac706d08925ff501fad3c"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.03,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "a6b984e6a2bd429b89a80da1bea262a1",
+      "timestamp": "2026-10-06T02:28:05+00:00",
+      "visual_id": "prop.shore-canopy-post",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "canopy_post",
+        "box": [
+          1057,
+          31,
+          1103,
+          408
+        ],
+        "layer": "high-prop"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/shore/canopy_post_full.png",
+          "sha256": "3bd0803eea287156cda7b8b009b993e8b27bf6f553258c329770d16dc92de659"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Shore/canopypost.png",
+          "sha256": "f010a217eea65276eb347cb0ff05b8df5e5483e53017c5421ec6dfb70ea24a4a"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.03,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "28baf8a32e3b4a859b103eda00fcfdab",
+      "timestamp": "2026-10-06T02:28:05+00:00",
+      "visual_id": "prop.shore-lamp",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "lamp",
+        "box": [
+          2375,
+          406,
+          2425,
+          696
+        ],
+        "layer": "high-prop"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/shore/lamp_full.png",
+          "sha256": "47da283ec290d6eb36311fd5ca3e07e294d00f5a816d313bebf83af9aa555679"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Shore/lamp.png",
+          "sha256": "4a4ca221e7e568f20d74af3ab9b03a4d86ee9c5ef06772acf5848d4a2e306f28"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.03,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "1f20b397e38047c1a6300fc6f8313ab2",
+      "timestamp": "2026-10-06T02:28:05+00:00",
+      "visual_id": "prop.shore-bollard",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "bollard",
+        "box": [
+          364,
+          1235,
+          416,
+          1331
+        ],
+        "layer": "high-prop"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/shore/bollard_full.png",
+          "sha256": "5b086d64189631b4b8e3f75669ca7eb6d430fe71cae6b645269db66ba5b7c07d"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Shore/bollard.png",
+          "sha256": "964b821bad12d21b1aaa4c674cae88343670b11a630e18c4738782783f8a50d0"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.02,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "54f2a1e3d38b446993047b7a7225002e",
+      "timestamp": "2026-10-06T02:28:05+00:00",
+      "visual_id": "prop.shore-board",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "board",
+        "box": [
+          1635,
+          1250,
+          1967,
+          1500
+        ],
+        "layer": "occluder"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/shore/board_full.png",
+          "sha256": "a099466dcbf1f0c01dfba80ef6aaa938f1a8960de3172fd8c7537dc0d7d0da10"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Shore/board.png",
+          "sha256": "2028b0f1ff320f437254d0e5d646445a56ed5b948a071bf82c8eb236a1b1cc49"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.04,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "5cee434c531f4c95b253befa08a5fda1",
+      "timestamp": "2026-10-06T02:29:38+00:00",
+      "visual_id": "environment.shore",
+      "step": "place-environment",
+      "tool": {
+        "name": "place_environment.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "world": [
+          1800,
+          1000
+        ],
+        "output": [
+          2700,
+          1500
+        ],
+        "tiles": [
+          2,
+          1
+        ],
+        "layer": "ground",
+        "origin": [
+          0.0,
+          0.0
+        ],
+        "crop": null,
+        "mute_reds": null,
+        "target_median": null
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/shore/plate.png",
+          "sha256": "a3eb139a6513405969f68ce3ff485803ead6eb3f13940b9b1c66cbbfd756cbbd"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Shore/plate_c0r0.png",
+          "sha256": "1296aaa9b9b19b303ed4031a600165327598f9e1166492825ed4e131bcaf2e58"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Shore/plate_c1r0.png",
+          "sha256": "bb7e29e05cbaf2bff0c29d6142cf418c4a50c3bdca25d1ff4d603467d3d60c16"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.49,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Bodenplatte für das Spiel aufbereitet"
+      }
+    },
+    {
+      "id": "4cb615791140498a9619fec990cc216d",
+      "timestamp": "2026-10-06T02:29:38+00:00",
+      "visual_id": "prop.shore-bench",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "bench",
+        "box": [
+          1091,
+          626,
+          1279,
+          734
+        ],
+        "layer": "high-prop"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/shore/bench_full.png",
+          "sha256": "3dfacae1bf73d7dd0a08d7f34a8982c0501a38fa4aa691b3d16decd3e3a7ec23"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Shore/bench.png",
+          "sha256": "5b4bcedc166c23173a1c06572dc30be2135f03e6c964d0a484074be4d1ed8d77"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.03,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "45579adcaf394823a38b64d7d98f0a48",
+      "timestamp": "2026-10-06T02:29:38+00:00",
+      "visual_id": "prop.shore-suitcase",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "suitcase",
+        "box": [
+          1272,
+          843,
+          1344,
+          910
+        ],
+        "layer": "high-prop"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/shore/suitcase_full.png",
+          "sha256": "95ceed4e221c05b8abace652d94fc214269b755b4e34d60b038c751a2eb3c5f3"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Shore/suitcase.png",
+          "sha256": "a0b626787941742fcb0e5f8f3783a27563889d95be941e29152114a3899dbffb"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.02,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "595af80dd35e43ebba4531b04dbb78a6",
+      "timestamp": "2026-10-06T02:29:38+00:00",
+      "visual_id": "prop.shore-canopy-post",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "canopy_post",
+        "box": [
+          1057,
+          31,
+          1103,
+          408
+        ],
+        "layer": "high-prop"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/shore/canopy_post_full.png",
+          "sha256": "d8f1fd30d5ec6d7d30975c969c3569b78bf97e67acd1233a899ddf3c2170ffd8"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Shore/canopypost.png",
+          "sha256": "e8621571c7843774a08de6ec1ebe85da36b78e827fa36c6938915252a84837de"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.03,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "181c2d68e0914e2287f3b20bdd789036",
+      "timestamp": "2026-10-06T02:29:38+00:00",
+      "visual_id": "prop.shore-lamp",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "lamp",
+        "box": [
+          2375,
+          406,
+          2425,
+          696
+        ],
+        "layer": "high-prop"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/shore/lamp_full.png",
+          "sha256": "5f573a5df93b2c9da5d1589645be0982f35e1a52503cf04d0979682d65868d46"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Shore/lamp.png",
+          "sha256": "15f3d1ba58dbfcbf2b9bcd49425236f875a9d6da785f1e1cfe7a89d5d5767fd5"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.03,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "c29c69f1249246f48df9e2857058c97c",
+      "timestamp": "2026-10-06T02:29:38+00:00",
+      "visual_id": "prop.shore-bollard",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "bollard",
+        "box": [
+          364,
+          1235,
+          416,
+          1331
+        ],
+        "layer": "high-prop"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/shore/bollard_full.png",
+          "sha256": "af2fb5421b8196cf4fbcdf230e18dc64fd1e215bb5bb6e32e07e322a7e77773f"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Shore/bollard.png",
+          "sha256": "3ffc875ad8da20ce690e2fe7142925b2b060d79b0694a35562c3f20a9a4b039d"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.02,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "15075b9e39c54d32b10f224ff45e8df5",
+      "timestamp": "2026-10-06T02:29:38+00:00",
+      "visual_id": "prop.shore-board",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "board",
+        "box": [
+          1635,
+          1250,
+          1967,
+          1500
+        ],
+        "layer": "occluder"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/shore/board_full.png",
+          "sha256": "9cea1f56ea91cbecfcfca59b73870c4814a88015c3194fc7ad730504f4a188a1"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Shore/board.png",
+          "sha256": "7267f1299ef3304d4025e5328e2a826947db543e6badf08ffdaced7e503f1c3e"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.04,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
     }
   ]
 }
