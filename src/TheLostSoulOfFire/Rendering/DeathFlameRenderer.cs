@@ -135,7 +135,12 @@ public sealed class DeathFlameRenderer
     /// just behind the blade, rounded at the head. <paramref name="heat"/> lifts the intensity, so a
     /// heavier stroke burns toward white. Ends and restarts the running deferred scene batch.
     /// </summary>
-    public void DrawSlash(SpriteBatch batch, Matrix sceneTransform, IReadOnlyList<Vector2> path, float headWidth, float opacity, float heat, float time)
+    /// <remarks>
+    /// <paramref name="mask"/> (one value per path point, 0–1) hides parts of the slash, so a
+    /// sweep can be drawn in two passes: the part behind a figure before it, the rest after it.
+    /// </remarks>
+    public void DrawSlash(SpriteBatch batch, Matrix sceneTransform, IReadOnlyList<Vector2> path, float headWidth, float opacity, float heat, float time,
+        IReadOnlyList<float>? mask = null)
     {
         if (path.Count < 2)
         {
@@ -160,6 +165,10 @@ public sealed class DeathFlameRenderer
             float head = along > 0.86f ? MathF.Sqrt(MathF.Max(0f, 1f - MathF.Pow((along - 0.86f) / 0.14f, 2f))) : 1f;
             float halfWidth = headWidth * 0.5f * MathF.Max(0.06f, body * head);
             float intensity = MathHelper.Clamp(opacity * (0.25f + 0.75f * along) * heat, 0f, 1f);
+            if (mask is not null)
+            {
+                intensity *= MathHelper.Clamp(mask[index], 0f, 1f);
+            }
             Color color = new(1f, 1f, 1f, intensity);
             _vertices[index * 2] = new VertexPositionColorTexture(new Vector3(path[index] + normal * halfWidth, 0f), color, new Vector2(along, 0f));
             _vertices[index * 2 + 1] = new VertexPositionColorTexture(new Vector3(path[index] - normal * halfWidth, 0f), color, new Vector2(along, 1f));

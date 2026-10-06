@@ -14,6 +14,7 @@ are found by measuring, not assumed, so the script survives other rigs with the 
 from __future__ import annotations
 
 import argparse
+import json
 import math
 import sys
 from pathlib import Path
@@ -27,6 +28,9 @@ from figure_kit import (  # noqa: E402
     FINGERS, THUMB, Poser, add_outline, attach, best_pole_angle, blend_placement, bone_world, cloth_shell, dominant_bone,
     ease, enable_mpfb, flat, ground_feet, ground_points, loose_fists, outline_material, place_bone, placement_of,
     rest_ground, shaped_coordinates, toon)
+from combat_kit import (  # noqa: E402
+    Feet, Keys, add_leg_ik, bone_point, chest_point, finish_rekey, fit_pelvis, impulse_drift, key_legs, measure_axes,
+    move_pelvis, replace_action, smooth, stage_coordinates, step_arc, twist, window)
 
 # Palette (linear-ish values chosen by eye under the toon ramp). Dark, but one value step above
 # the arena floor's shadows, so folds and the coat's edge still read on the painted ground.
@@ -55,6 +59,8 @@ CARMINE = (0.42, 0.015, 0.05)
 def parse(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(prog="build_player.py")
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--rekey", help="comma-separated actions to key again on the opened .blend (no rebuild)")
+    parser.add_argument("--paths", type=Path, help="JSON file for the blade paths of the swings")
     return parser.parse_args(argv[argv.index("--") + 1:] if "--" in argv else [])
 
 
@@ -564,44 +570,210 @@ def key_run(poser: Poser, frames: int) -> bpy.types.Action:
     return action
 
 
-def swing_progress(step: int, p: float) -> float:
-    """The game's swing easing (ScytheCombat.DrawAttackingScythe), so frames match the arc VFX.
-    Step 3 winds back a little before the sweep."""
-    if step == 3:
-        if p < 0.2:
-            return -0.10 * (p / 0.2)
-        swing = min(1.0, (p - 0.2) / 0.58)
-        return 1.0 - (1.0 - swing) ** 2.35
-    return 1.0 - (1.0 - p) ** 3
+# ---- Scythe combo ---------------------------------------------------------------------------
+# Each swing is a few key poses over the game's swing progress (ScytheCombat: swing 1 lasts
+# 0.205 s and strikes at 30 %, swing 2 0.255 s / 33 %, swing 3 0.42 s / 37 %). The swings differ
+# in character: a quick flat cut stepping onto the right foot, a heavier rising backhand
+# stepping through onto the left, and the Soul Cleave, which winds high over the left shoulder
+# and spins into a low lunge. Feet stand on IK; the game pushes the figure forward during a
+# swing (Player._attackImpulse), so planted feet are moved back by that drift and stay put in
+# the world. Blade headings are game degrees from the aim, positive clockwise on screen.
+
+SWINGS = {
+    # step: (seconds, forward impulse in units/s, swing direction: +1 clockwise)
+    1: (0.205, 105.0, 1.0),
+    2: (0.255, 132.0, -1.0),
+    3: (0.42, 225.0, 1.0),
+}
+
+#: Ball of each foot on the floor in the rest pose (rig space), for stances below.
+STANCE_WIDTH = 0.21
+
+SWING_KEYS = {
+    1: Keys([
+        # Loaded: blade back on the left at shoulder height, chest coiled toward it.
+        (0.00, dict(blade=-80, reach=0.13, height=1.22, tilt=0.12, roll=12, chest=34, hips=10, lean=4, crouch=0.0, hip_fwd=-0.03, hip_side=0.02)),
+        (0.12, dict(blade=-68, reach=0.16, height=1.20, tilt=0.10, chest=30, hips=8)),
+        (0.22, dict(blade=-24, reach=0.26, height=1.12, tilt=0.0, roll=4, chest=8, hips=-2, lean=8)),
+        # Contact: arms long, the cut flat at waist height, weight arriving on the right foot.
+        (0.30, dict(blade=22, reach=0.31, height=1.05, tilt=-0.12, roll=0, chest=-18, hips=-12, lean=11, crouch=0.05, hip_fwd=0.10, hip_side=-0.03)),
+        (0.42, dict(blade=56, reach=0.28, height=1.00, tilt=-0.20, chest=-36, hips=-18, lean=12)),
+        # Follow-through: the blade carries on past the arc, the chest over-rotates.
+        (0.60, dict(blade=74, reach=0.22, height=0.98, tilt=-0.24, roll=-6, chest=-44, hips=-20, lean=12, crouch=0.06, hip_fwd=0.14)),
+        (0.82, dict(blade=68, reach=0.20, height=1.02, tilt=-0.20, chest=-38, hips=-17, lean=10)),
+        (1.00, dict(blade=62, reach=0.19, height=1.06, tilt=-0.15, roll=0, chest=-32, hips=-14, lean=8, crouch=0.04, hip_fwd=0.13, hip_side=-0.02)),
+    ]),
+    2: Keys([
+        # Coiled low on the right, blade near the floor behind: the rising backhand starts here.
+        (0.00, dict(blade=84, reach=0.12, height=0.92, tilt=-0.46, roll=-14, chest=-40, hips=-15, lean=14, crouch=0.07, hip_fwd=0.0, hip_side=-0.03)),
+        (0.14, dict(blade=64, reach=0.15, height=0.90, tilt=-0.50, chest=-32, hips=-12, lean=15, crouch=0.08)),
+        (0.24, dict(blade=22, reach=0.26, height=0.99, tilt=-0.26, roll=-6, chest=-10, hips=-3, lean=12)),
+        # Contact: rising through the aim, the step onto the left foot lands.
+        (0.33, dict(blade=-18, reach=0.31, height=1.12, tilt=0.04, roll=6, chest=16, hips=8, lean=8, crouch=0.04, hip_fwd=0.14, hip_side=0.03)),
+        (0.46, dict(blade=-52, reach=0.28, height=1.26, tilt=0.30, roll=14, chest=34, hips=16, lean=5)),
+        # Follow-through high on the left, the body opening up.
+        (0.62, dict(blade=-76, reach=0.21, height=1.33, tilt=0.46, roll=18, chest=42, hips=19, lean=2, crouch=0.02, hip_fwd=0.18)),
+        (0.82, dict(blade=-72, reach=0.19, height=1.29, tilt=0.40, chest=38, hips=17, lean=3)),
+        (1.00, dict(blade=-68, reach=0.18, height=1.25, tilt=0.36, roll=14, chest=34, hips=15, lean=4, crouch=0.02, hip_fwd=0.17, hip_side=0.02)),
+    ]),
+    3: Keys([
+        # From the backhand's end, the Soul Cleave winds back: blade raised high behind the
+        # left shoulder, body sinking and leaning away, the right foot unweighted.
+        (0.00, dict(blade=-100, reach=0.15, height=1.26, tilt=0.38, roll=14, chest=38, hips=15, lean=4, crouch=0.02, hip_fwd=0.0, hip_side=0.02)),
+        (0.10, dict(blade=-112, reach=0.11, height=1.38, tilt=0.72, roll=24, chest=54, hips=22, lean=-3, crouch=0.06, hip_fwd=-0.06)),
+        (0.20, dict(blade=-120, reach=0.10, height=1.42, tilt=0.86, roll=28, chest=62, hips=26, lean=-2, crouch=0.10, hip_fwd=-0.08, hip_side=0.04)),
+        # Release: the blade comes down and round while the right foot lunges far forward.
+        (0.28, dict(blade=-68, reach=0.22, height=1.12, tilt=0.12, roll=8, chest=30, hips=10, lean=10, crouch=0.10)),
+        (0.37, dict(blade=6, reach=0.33, height=0.86, tilt=-0.34, roll=-4, chest=-6, hips=-8, lean=22, crouch=0.17, hip_fwd=0.30, hip_side=-0.04)),
+        (0.50, dict(blade=62, reach=0.33, height=0.80, tilt=-0.40, chest=-40, hips=-24, lean=24, crouch=0.19)),
+        (0.66, dict(blade=96, reach=0.29, height=0.82, tilt=-0.38, chest=-62, hips=-32, lean=22, crouch=0.18)),
+        # Held finish: the blade overshoots behind on the right, then the figure starts to rise.
+        (0.80, dict(blade=110, reach=0.24, height=0.86, tilt=-0.34, roll=-8, chest=-68, hips=-35, lean=18, crouch=0.16, hip_fwd=0.40)),
+        (1.00, dict(blade=102, reach=0.20, height=0.96, tilt=-0.25, roll=-4, chest=-58, hips=-30, lean=12, crouch=0.10, hip_fwd=0.40, hip_side=-0.03)),
+    ]),
+}
 
 
-def key_swing(poser: Poser, step: int, arc: float, frames: int) -> bpy.types.Action:
-    """Scythe sweep of `arc` degrees around the aim (positive: clockwise on screen, as in the
-    game). The shaft points outward from the body, the blade leads, the torso follows."""
-    action = bpy.data.actions.new(f"swing{step}")
-    poser.rig.animation_data.action = action
-    ground = rest_ground(poser.rig)
+def swing_feet(step: int, p: float) -> dict[str, tuple[Vector, float, float, float]]:
+    """Where each foot is in the world frame of the swing (start position = origin, metres):
+    ball position, yaw, heel lift and lift. Swing 1 steps onto the right foot, swing 2 brings
+    the left foot through, the Soul Cleave lunges far onto the right."""
+    def at(forward: float, side: float) -> Vector:
+        # rig space: forward is -Y, the figure's left is +X (Poser.left)
+        return Vector((side, -0.144 - forward, 0.0))
+
+    w = STANCE_WIDTH
+    if step == 1:
+        right, lift_r = step_arc(p, 0.06, 0.26, at(0.0, -w), at(0.22, -w + 0.03), 0.06)
+        left = at(-0.02, w)
+        return {"r": (right, -14 * window(p, 0.1, 0.3), 0.0, lift_r),
+                "l": (left, -10 * window(p, 0.2, 0.6), 16 * window(p, 0.3, 0.6) * (1 - 0.4 * window(p, 0.8, 1.0)), 0.0)}
+    if step == 2:
+        right = at(0.06, -w + 0.02)
+        left, lift_l = step_arc(p, 0.08, 0.30, at(-0.14, w), at(0.30, w - 0.03), 0.07)
+        return {"l": (left, 14 * window(p, 0.12, 0.32), 0.0, lift_l),
+                "r": (right, 8 * window(p, 0.2, 0.6), 18 * window(p, 0.3, 0.62) * (1 - 0.4 * window(p, 0.8, 1.0)), 0.0)}
+    left = at(0.08, w - 0.02)
+    right, lift_r = step_arc(p, 0.16, 0.36, at(-0.16, -w), at(0.62, -w + 0.06), 0.09)
+    return {"r": (right, -24 * window(p, 0.2, 0.4), 0.0, lift_r),
+            "l": (left, -20 * window(p, 0.3, 0.7), 24 * window(p, 0.36, 0.6), 0.0)}
+
+
+def scythe_placement(poser: Poser, chest: Vector, blade: float, reach: float, height: float, tilt: float,
+                     roll: float, direction: float) -> tuple[Vector, Vector, Vector]:
+    """The scythe swung around the chest: shaft heading `blade` (game degrees from the aim), hands
+    `reach` metres out from the chest at `height`, the shaft climbing by `tilt` per metre outward;
+    the blade leads in the swing's direction and rolls up by `roll` degrees."""
+    phi = math.radians(-90.0 - blade)
+    radial = Vector((math.cos(phi), math.sin(phi), 0.0))
+    tangent = Vector((math.sin(phi), -math.cos(phi), 0.0)) * direction
+    centre = Vector((chest.x, chest.y, 0.0)) + radial * reach
+    centre.z = height
+    axis = (radial + Vector((0.0, 0.0, tilt))).normalized()
+    r = math.radians(roll)
+    up = tangent * math.cos(r) + Vector((0.0, 0.0, 1.0)) * math.sin(r)
+    return centre, axis, up
+
+
+#: Blade points in the scythe's own frame (build_scythe): tip, middle of the crescent and root.
+BLADE_TIP = Vector((0.0, SHAFT_TOP + 0.02 - 0.30, 0.73))
+BLADE_MID = Vector((0.0, SHAFT_TOP + 0.02 - 0.075, 0.38))
+#: The Death Flame core in the iron collar below the blade: the game's flame ribbon streams from it.
+BLADE_CORE = Vector((0.024, SHAFT_TOP - 0.03, 0.0))
+
+
+def pose_body(poser: Poser, keys: Keys, p: float, drift: float, feet: dict, lean_bone_share: float = 1.0) -> None:
+    """Hips, spine and head from the channels; feet planted from `feet` (world frame), all moved
+    back by the game's forward drift so the planted feet hold still in the world."""
+    back = Vector((0.0, drift, 0.0))  # rig +Y is backward
+    planter = Feet(poser)
+    for side, (ball, yaw, heel, lift) in feet.items():
+        planter.plant(side, ball + back, yaw=yaw, heel=heel, lift=lift, knee_out=0.08)
+    hips = keys("hips", p)
+    chest = keys("chest", p)
+    poser.turn("pelvis", hips)
+    move_pelvis(poser, Vector((poser.left * keys("hip_side", p), -keys("hip_fwd", p), -keys("crouch", p))) + back)
+    poser.set("spine_01", "forward", keys("lean", p) * 0.55 * lean_bone_share)
+    poser.set("spine_02", "forward", keys("lean", p) * 0.45 * lean_bone_share)
+    twist(poser, chest - hips)
+    # The head keeps looking along the aim: it turns back against most of the chest's twist.
+    poser.set("neck_01", "forward", 4 - keys("lean", p) * 0.35)
+    poser.turn("neck_01", -chest * 0.55)
+    poser.turn("head", -chest * 0.2)
+    fit_pelvis(poser)
+    planter.settle()
+
+
+def key_swing(poser: Poser, step: int, frames: int, paths: dict) -> bpy.types.Action:
+    """Scythe swing `step` (1-3) over `frames` frames; records the blade's path for the game."""
+    action = replace_action(poser.rig, f"swing{step}")
+    seconds, impulse, direction = SWINGS[step]
+    keys = SWING_KEYS[step]
+    path = []
     for index in range(frames):
         p = index / (frames - 1)
-        offset = -arc / 2 + arc * swing_progress(step, p)  # game degrees from the aim
-        phi = math.radians(-90.0 - offset)  # Blender: the figure faces -Y; clockwise on screen = clockwise from above
-        radial = Vector((math.cos(phi), math.sin(phi), 0.0))
-        motion = Vector((math.sin(phi), -math.cos(phi), 0.0)) * (1.0 if arc > 0 else -1.0)
         poser.clear()
-        poser.set("spine_01", "forward", 10 if step < 3 else 16)
-        for side in ("l", "r"):
-            poser.set(f"thigh_{side}", "forward", 14)
-            poser.set(f"calf_{side}", "back", 26)
-        poser.set("thigh_l" if arc > 0 else "thigh_r", "forward", 8)
-        twist = max(-60.0, min(60.0, -offset * (0.6 if step < 3 else 0.65)))
-        for bone, share in (("spine_01", 0.3), ("spine_02", 0.35), ("spine_03", 0.35)):
-            poser.turn(bone, twist * share)
-        ground_feet(poser, ground)
-        height = 1.05 if step < 3 else 0.98
-        place_weapon(poser, Vector((0.0, -0.04, height)) + radial * 0.24, radial + Vector((0, 0, -0.10)), motion)
-        loose_fists(poser, 75)
+        pose_body(poser, keys, p, impulse_drift(impulse, p * seconds), swing_feet(step, p))
+        chest = chest_point(poser)
+        place_weapon(poser, *scythe_placement(poser, chest, keys("blade", p), keys("reach", p), keys("height", p),
+                                              keys("tilt", p), keys("roll", p), direction))
+        loose_fists(poser, 78)
         poser.key(index + 1)
         key_hands(poser.rig, index + 1)
+        key_legs(poser.rig, index + 1, 1.0)
+        tip = bone_point(poser, "weapon", BLADE_TIP)
+        mid = bone_point(poser, "weapon", BLADE_MID)
+        drift = impulse_drift(impulse, p * seconds)
+        core = bone_point(poser, "weapon", BLADE_CORE)
+        path.append({"p": round(p, 4), "tip": stage_coordinates(poser, tip), "mid": stage_coordinates(poser, mid),
+                     "core": stage_coordinates(poser, core), "heading": round(keys("blade", p), 2),
+                     "drift": round(drift, 4)})
+    paths[f"swing{step}"] = path
+    return action
+
+
+def key_swing_return(poser: Poser, step: int, frames: int) -> bpy.types.Action:
+    """After a swing, standing still: the figure gathers itself from the swing's last pose back
+    into the guard, the trailing foot stepping in. Played on the combo timer after the swing."""
+    action = replace_action(poser.rig, f"swing{step}_return")
+    seconds, impulse, direction = SWINGS[step]
+    keys = SWING_KEYS[step]
+    drift = impulse_drift(impulse, seconds)
+    end_feet = swing_feet(step, 1.0)
+    # Swing end pose, to read the weapon's placement from it.
+    poser.clear()
+    pose_body(poser, keys, 1.0, drift, end_feet)
+    end_weapon = scythe_placement(poser, chest_point(poser), keys("blade", 1.0), keys("reach", 1.0), keys("height", 1.0),
+                                  keys("tilt", 1.0), keys("roll", 1.0), direction)
+    rest = {side: (Vector((STANCE_WIDTH if side == "l" else -STANCE_WIDTH, -0.144, 0.0)) * Vector((poser.left, 1, 1)), 0.0, 0.0, 0.0)
+            for side in ("l", "r")}
+    channels = ("hips", "chest", "lean", "crouch", "hip_fwd", "hip_side")
+    for index in range(frames):
+        p = index / (frames - 1)
+        t = smooth(p)
+        # The body settles first, the weapon a little after it (overlap).
+        body = smooth(min(1.0, p / 0.8))
+        weapon = smooth(max(0.0, (p - 0.1) / 0.9))
+        # The swing's channels are in the world frame of the swing; here the rig is the frame, so
+        # the hips start where the swing left them (moved back by the drift) and come home.
+        end = {c: keys(c, 1.0) - (drift if c == "hip_fwd" else 0.0) for c in channels}
+        mixed = Keys([(0.0, {c: end[c] * (1 - body) + (2.0 if c == "lean" else 0.0) * body for c in channels})])
+        feet = {}
+        for side in ("l", "r"):
+            ball, yaw, heel, _ = end_feet[side]
+            start = ball + Vector((0.0, drift, 0.0))
+            target = rest[side][0]
+            # The trailing foot (the one further back) steps in on an arc; the other one shuffles.
+            trailing = start.y > target.y + 0.02 or (start - target).length > 0.12
+            moved, lift = step_arc(p, 0.05, 0.6, start, target, 0.05 if trailing else 0.015)
+            feet[side] = (moved, yaw * (1 - t), heel * (1 - window(p, 0.0, 0.4)), lift)
+        poser.clear()
+        pose_body(poser, mixed, 0.0, 0.0, feet)
+        place_weapon(poser, *blend_placement(end_weapon, weapon_idle(poser.left), weapon))
+        loose_fists(poser, 78 - 8 * t)
+        poser.key(index + 1)
+        key_hands(poser.rig, index + 1)
+        key_legs(poser.rig, index + 1, 1.0)
     return action
 
 
@@ -678,30 +850,35 @@ def key_cannon_draw(poser: Poser, frames: int) -> bpy.types.Action:
 
 
 def key_cannon_fire(poser: Poser, frames: int) -> bpy.types.Action:
-    """Returning (0.28 s after the shot): the recoil throws the muzzle up and the shoulder back,
-    the knees give, then the cannon swings back onto the back and the hand returns to the scythe."""
-    action = bpy.data.actions.new("cannon_fire")
-    poser.rig.animation_data.action = action
+    """Returning (0.28 s after the shot): the recoil throws the muzzle up and the right shoulder
+    back, the right foot is driven back half a step and the knees soak up the kick; the figure
+    comes forward again, swings the cannon back over the shoulder and takes the scythe again."""
+    action = replace_action(poser.rig, "cannon_fire")
     left = poser.left
-    ground = rest_ground(poser.rig)
+    w = STANCE_WIDTH
     for index in range(frames):
         p = index / (frames - 1)
-        kick = max(0.0, 1.0 - p / 0.5) ** 1.3
-        stow = ease(max(0.0, (p - 0.45) / 0.55))
+        # A sharp kick (peak in the first frames) that decays with a small rebound.
+        kick = math.exp(-p * 7.0) * (1.0 - 0.1 * math.sin(p * 12.0))
+        settle = smooth(max(0.0, (p - 0.2) / 0.5))
+        stow = smooth(max(0.0, (p - 0.42) / 0.58))
         poser.clear()
-        for side in ("l", "r"):
-            poser.set(f"thigh_{side}", "forward", 16 * kick)
-            poser.set(f"calf_{side}", "back", 30 * kick)
-        poser.set("spine_01", "back", 8 * kick)
-        poser.set("spine_02", "back", 14 * kick)
-        poser.set("neck_01", "back", 12 * kick)
+        feet = Feet(poser)
+        back_r = Vector((-w * left, -0.144 + 0.12 * (1 - settle) * smooth(p / 0.12), 0.0))
+        feet.plant("r", back_r, yaw=-8 * (1 - settle), lift=0.035 * math.sin(math.pi * min(1.0, p / 0.14)))
+        feet.plant("l", Vector((w * left, -0.15, 0.0)), heel=10 * kick)
+        move_pelvis(poser, Vector((0.0, 0.06 * kick, -0.07 * kick)))
+        poser.set("spine_01", "back", 10 * kick)
+        poser.set("spine_02", "back", 16 * kick)
+        poser.set("neck_01", "back", 14 * kick)
         torso_aim(poser, (1 - stow) * (1 - 0.8 * kick))
-        poser.turn("spine_03", -18 * kick)
-        ground_feet(poser, ground)
+        poser.turn("spine_03", -22 * kick)
+        fit_pelvis(poser)
+        feet.settle()
         back = placement_of(poser, "cannon")
         aim_centre, aim_axis, aim_up = cannon_aimed(left)
-        recoiled = (aim_centre + Vector((0.0, 0.22 * kick, 0.16 * kick)),
-                    Vector((0.0, -1.0, 0.95 * kick)), Vector((0.0, 0.95 * kick, 1.0)))
+        recoiled = (aim_centre + Vector((0.0, 0.24 * kick, 0.18 * kick)),
+                    Vector((0.0, -1.0, 1.05 * kick)), Vector((0.0, 1.05 * kick, 1.0)))
         centre, axis, up = blend_placement(recoiled, back, stow)
         centre = centre + Vector((0.0, 0.0, 0.12 * math.sin(math.pi * stow)))
         place_bone(poser, "cannon", centre, axis, up)
@@ -710,62 +887,82 @@ def key_cannon_fire(poser: Poser, frames: int) -> bpy.types.Action:
         poser.key(index + 1)
         # The hand stays on the cannon until it sits on the back, then takes the scythe again.
         key_hands(poser.rig, index + 1, cannon=1.0 - ease(max(0.0, (p - 0.8) / 0.2)))
+        key_legs(poser.rig, index + 1, 1.0)
     return action
 
 
 def key_dash(poser: Poser, frames: int) -> bpy.types.Action:
-    """Dash (0.14 s): a low lunge along the dash direction, scythe pulled close and trailing."""
-    action = bpy.data.actions.new("dash")
-    poser.rig.animation_data.action = action
+    """Dash (0.14 s): an explosive push-off from the right foot, a long low glide with the left
+    knee driving and the right leg trailing, the scythe pulled in low; at the end the left foot
+    catches the body and the knees soak up the stop."""
+    action = replace_action(poser.rig, "dash")
     left = poser.left
     ground = rest_ground(poser.rig)
+    keys = Keys([
+        (0.00, dict(lean=22, thigh_l=30, calf_l=44, thigh_r=-16, calf_r=20, foot_r=16, neck=10, carry=0.35)),
+        (0.18, dict(lean=34, thigh_l=52, calf_l=62, thigh_r=-38, calf_r=30, foot_r=26, neck=18, carry=0.7)),
+        (0.55, dict(lean=30, thigh_l=48, calf_l=54, thigh_r=-36, calf_r=48, foot_r=22, neck=16, carry=1.0)),
+        (0.82, dict(lean=22, thigh_l=34, calf_l=44, thigh_r=-18, calf_r=40, foot_r=12, neck=10, carry=0.9)),
+        (1.00, dict(lean=16, thigh_l=26, calf_l=48, thigh_r=-4, calf_r=34, foot_r=6, neck=6, carry=0.6)),
+    ])
     for index in range(frames):
         p = index / (frames - 1)
-        lunge = ease(min(1.0, p / 0.3)) * (1.0 - 0.55 * ease(max(0.0, (p - 0.7) / 0.3)))
         poser.clear()
-        poser.set("spine_01", "forward", 24 * lunge)
-        poser.set("spine_02", "forward", 8 * lunge)
-        poser.set("neck_01", "back", 14 * lunge)
-        poser.set("thigh_l", "forward", 42 * lunge)
-        poser.set("calf_l", "back", 46 * lunge)
-        poser.set("thigh_r", "forward", -34 * lunge)
-        poser.set("calf_r", "back", 24 * lunge)
-        poser.set("foot_r", "down", 20 * lunge)
-        ground_feet(poser, ground, settle=0.7)
+        poser.set("spine_01", "forward", keys("lean", p) * 0.65)
+        poser.set("spine_02", "forward", keys("lean", p) * 0.35)
+        poser.set("neck_01", "back", keys("neck", p))
+        poser.set("thigh_l", "forward", keys("thigh_l", p))
+        poser.set("calf_l", "back", keys("calf_l", p))
+        poser.set("thigh_r", "forward", keys("thigh_r", p))
+        poser.set("calf_r", "back", keys("calf_r", p))
+        poser.set("foot_r", "down", keys("foot_r", p))
+        # In the air the body floats a little; on the catch it settles fully onto the floor.
+        ground_feet(poser, ground, settle=0.55 + 0.45 * window(p, 0.75, 1.0))
         bob = (poser.rig.pose.bones["pelvis"].head - poser.rig.data.bones["pelvis"].head_local).z
         carry = (Vector((-0.02 * left, -0.27, 1.12)), Vector((0.8 * left, 0.0, 0.62)), Vector((0.0, 1.0, 0.0)))
-        low = (Vector((0.02 * left, -0.20, 0.98)), Vector((0.75 * left, 0.55, 0.12)), Vector((0.0, 0.35, 1.0)))
-        centre, axis, up = blend_placement(carry, low, lunge)
+        low = (Vector((0.04 * left, -0.16, 0.94)), Vector((0.7 * left, 0.62, 0.05)), Vector((0.0, 0.3, 1.0)))
+        centre, axis, up = blend_placement(carry, low, keys("carry", p))
         place_weapon(poser, centre + Vector((0.0, 0.0, bob)), axis, up)
-        loose_fists(poser, 75)
+        loose_fists(poser, 80)
         poser.key(index + 1)
         key_hands(poser.rig, index + 1)
+        key_legs(poser.rig, index + 1, 0.0)
     return action
 
 
 def key_hit(poser: Poser, frames: int) -> bpy.types.Action:
-    """Hit flash (0.14 s): the blow snaps the head and chest back, the knees give, then the stance returns."""
-    action = bpy.data.actions.new("hit")
-    poser.rig.animation_data.action = action
+    """Hit (0.14 s): the blow lands at once, snapping head and chest back and round, the knees
+    buckle and the right foot is knocked back; then the guard comes back up, still hunched."""
+    action = replace_action(poser.rig, "hit")
     left = poser.left
-    ground = rest_ground(poser.rig)
+    w = STANCE_WIDTH
+    keys = Keys([
+        (0.00, dict(back=16, neck=26, turn=16, crouch=0.07, step=0.10, lift=0.3)),
+        (0.25, dict(back=12, neck=18, turn=12, crouch=0.09, step=0.13, lift=0.2)),
+        (0.60, dict(back=4, neck=6, turn=5, crouch=0.06, step=0.12, lift=0.06)),
+        (1.00, dict(back=0, neck=0, turn=0, crouch=0.03, step=0.11, lift=0.0)),
+    ])
     for index in range(frames):
         p = index / (frames - 1)
-        k = (1.0 - p) ** 1.4
         poser.clear()
-        poser.set("spine_01", "back", 8 * k)
-        poser.set("spine_02", "back", 10 * k)
-        poser.set("neck_01", "back", 16 * k)
-        poser.turn("spine_03", 10 * k)
-        for side in ("l", "r"):
-            poser.set(f"thigh_{side}", "forward", 12 * k)
-            poser.set(f"calf_{side}", "back", 22 * k)
-        ground_feet(poser, ground)
+        feet = Feet(poser)
+        feet.plant("r", Vector((-w * left, -0.144 + keys("step", p), 0.0)), yaw=-10 * smooth(p * 3), lift=0.03 * math.sin(math.pi * min(1.0, p / 0.3)))
+        feet.plant("l", Vector((w * left, -0.15, 0.0)), heel=6 * (1 - p))
+        move_pelvis(poser, Vector((0.0, 0.05 * (1 - p), -keys("crouch", p))))
+        poser.set("spine_01", "back", keys("back", p) * 0.5)
+        poser.set("spine_02", "back", keys("back", p) * 0.7)
+        poser.set("neck_01", "back", keys("neck", p))
+        poser.turn("spine_03", keys("turn", p))
+        poser.turn("neck_01", -keys("turn", p) * 0.4)
+        fit_pelvis(poser)
+        feet.settle()
+        lift = keys("lift", p)
         centre, axis, up = weapon_idle(left)
-        place_weapon(poser, centre + Vector((0.0, 0.10 * k, 0.07 * k)), axis + Vector((0.0, 0.0, 0.25 * k)), up + Vector((0.0, 0.3 * k, 0.0)))
+        place_weapon(poser, centre + Vector((0.0, 0.10 * lift * 2, 0.10 * lift)), axis + Vector((0.0, 0.0, 0.6 * lift)), up + Vector((0.0, 0.6 * lift, 0.0)))
         loose_fists(poser, 75)
         poser.key(index + 1)
         key_hands(poser.rig, index + 1)
+        key_legs(poser.rig, index + 1, 1.0)
     return action
 
 
@@ -867,12 +1064,14 @@ def main() -> None:
     attach(cannon, rig, "cannon")
     poser = Poser(rig, forward)
     poser.measure_rest([f"{bone}_{side}" for bone in FINGERS + THUMB for side in ("l", "r")], "down")
-    actions = [key_idle(poser, 12), key_run(poser, 12),
-               key_swing(poser, 1, 120.0, 7), key_swing(poser, 2, -140.0, 8), key_swing(poser, 3, 198.0, 12),
-               key_aim(poser, 4), key_cannon_draw(poser, 5), key_cannon_fire(poser, 7),
-               key_dash(poser, 5), key_hit(poser, 4), key_death(poser, 16)]
+    add_leg_ik(rig)
+    paths: dict = {}
+    actions = [key_idle(poser, 12), key_run(poser, 12), key_aim(poser, 4), key_cannon_draw(poser, 5), key_death(poser, 16)]
+    actions += [combat_action(poser, name, paths) for name in COMBAT_FRAMES]
     for action in actions:
         action.use_fake_user = True
+    if args.paths:
+        write_paths(args.paths, paths)
     idle = actions[0]
     rig.animation_data.action = idle
     bpy.context.scene.frame_start, bpy.context.scene.frame_end = 1, 12
@@ -883,4 +1082,57 @@ def main() -> None:
     print(f"BUILD_PLAYER_DONE {args.out} forward={tuple(round(v, 2) for v in forward)} height={rig.dimensions.z:.2f}")
 
 
-main()
+#: Frames of every combat action (key poses are written over progress, so these only set the
+#: sampling); the render and pack steps take the same counts.
+COMBAT_FRAMES = {
+    "swing1": 14, "swing2": 16, "swing3": 26,
+    "swing1_return": 8, "swing2_return": 8, "swing3_return": 10,
+    "dash": 8, "hit": 6, "cannon_fire": 10,
+}
+
+
+def combat_action(poser: Poser, name: str, paths: dict) -> bpy.types.Action:
+    frames = COMBAT_FRAMES[name]
+    if name.startswith("swing") and name.endswith("_return"):
+        return key_swing_return(poser, int(name[5]), frames)
+    if name.startswith("swing"):
+        return key_swing(poser, int(name[5]), frames, paths)
+    return {"dash": key_dash, "hit": key_hit, "cannon_fire": key_cannon_fire}[name](poser, frames)
+
+
+def write_paths(path: Path, paths: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    existing = json.loads(path.read_text()) if path.exists() else {}
+    existing.update(paths)
+    path.write_text(json.dumps(existing, indent=1) + "\n")
+
+
+def rekey(args: argparse.Namespace) -> None:
+    """Key the named combat actions again on the opened figure; the body, clothes and the other
+    actions stay exactly as built."""
+    rig = bpy.data.objects["figure"]
+    toe = (rig.matrix_world @ rig.data.bones["ball_l"].tail_local) - (rig.matrix_world @ rig.data.bones["foot_l"].head_local)
+    poser = Poser(rig, Vector((0, toe.y, 0)).normalized())
+    add_leg_ik(rig)
+    measure_axes(poser, [(f"{bone}_{side}", "down") for bone in FINGERS + THUMB for side in ("l", "r")]
+                 + [(bone, way) for bone in ("pelvis", "spine_01", "spine_02", "spine_03", "neck_01")
+                    for way in ("forward", "back")]
+                 + [(f"{bone}_{side}", way) for bone in ("thigh", "calf", "foot") for side in ("l", "r")
+                    for way in ("forward", "back", "down")])
+    paths: dict = {}
+    names = [name.strip() for name in args.rekey.split(",") if name.strip()]
+    for name in names:
+        combat_action(poser, name, paths)
+        print(f"REKEYED {name} frames={COMBAT_FRAMES[name]}")
+    if args.paths and paths:
+        write_paths(args.paths, paths)
+    finish_rekey(rig, "idle", args.out.resolve())
+    print(f"REKEY_PLAYER_DONE {args.out} actions={','.join(names)}")
+
+
+if __name__ == "__main__":
+    arguments = parse(sys.argv)
+    if arguments.rekey:
+        rekey(arguments)
+    else:
+        main()

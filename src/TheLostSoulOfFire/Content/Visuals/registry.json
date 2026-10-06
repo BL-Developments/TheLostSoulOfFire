@@ -31,30 +31,30 @@
         },
         "swing1": {
           "path": "Textures/Player/Animations/swing1/{dir}",
-          "frameSize": [308, 195],
-          "frames": 7,
-          "fps": 12.0,
+          "frameSize": [310, 223],
+          "frames": 14,
+          "fps": 24.0,
           "loop": false,
           "normalMap": "Textures/Player/Animations/swing1_normal/{dir}",
-          "origin": [0.5, 0.8564]
+          "origin": [0.5, 0.87]
         },
         "swing2": {
           "path": "Textures/Player/Animations/swing2/{dir}",
-          "frameSize": [306, 193],
-          "frames": 8,
-          "fps": 12.0,
+          "frameSize": [310, 277],
+          "frames": 16,
+          "fps": 24.0,
           "loop": false,
           "normalMap": "Textures/Player/Animations/swing2_normal/{dir}",
-          "origin": [0.5, 0.8549]
+          "origin": [0.5, 0.8375]
         },
         "swing3": {
           "path": "Textures/Player/Animations/swing3/{dir}",
-          "frameSize": [306, 195],
-          "frames": 12,
-          "fps": 12.0,
+          "frameSize": [308, 319],
+          "frames": 26,
+          "fps": 24.0,
           "loop": false,
           "normalMap": "Textures/Player/Animations/swing3_normal/{dir}",
-          "origin": [0.5, 0.8564]
+          "origin": [0.5, 0.8056]
         },
         "aim": {
           "path": "Textures/Player/Animations/aim/{dir}",
@@ -76,30 +76,30 @@
         },
         "cannon_fire": {
           "path": "Textures/Player/Animations/cannon_fire/{dir}",
-          "frameSize": [260, 236],
-          "frames": 7,
-          "fps": 12.0,
+          "frameSize": [258, 237],
+          "frames": 10,
+          "fps": 24.0,
           "loop": false,
           "normalMap": "Textures/Player/Animations/cannon_fire_normal/{dir}",
-          "origin": [0.5, 0.8093]
+          "origin": [0.5, 0.8059]
         },
         "dash": {
           "path": "Textures/Player/Animations/dash/{dir}",
-          "frameSize": [228, 246],
-          "frames": 5,
-          "fps": 12.0,
+          "frameSize": [234, 231],
+          "frames": 8,
+          "fps": 24.0,
           "loop": false,
           "normalMap": "Textures/Player/Animations/dash_normal/{dir}",
-          "origin": [0.5, 0.8577]
+          "origin": [0.5, 0.8442]
         },
         "hit": {
           "path": "Textures/Player/Animations/hit/{dir}",
-          "frameSize": [252, 222],
-          "frames": 4,
-          "fps": 12.0,
+          "frameSize": [252, 220],
+          "frames": 6,
+          "fps": 24.0,
           "loop": false,
           "normalMap": "Textures/Player/Animations/hit_normal/{dir}",
-          "origin": [0.5, 0.8874]
+          "origin": [0.5, 0.8818]
         },
         "death": {
           "path": "Textures/Player/Animations/death/{dir}",
@@ -109,6 +109,33 @@
           "loop": false,
           "normalMap": "Textures/Player/Animations/death_normal/{dir}",
           "origin": [0.5, 0.6602]
+        },
+        "swing1_return": {
+          "path": "Textures/Player/Animations/swing1_return/{dir}",
+          "frameSize": [280, 241],
+          "frames": 8,
+          "fps": 24.0,
+          "loop": false,
+          "normalMap": "Textures/Player/Animations/swing1_return_normal/{dir}",
+          "origin": [0.5, 0.888]
+        },
+        "swing2_return": {
+          "path": "Textures/Player/Animations/swing2_return/{dir}",
+          "frameSize": [266, 239],
+          "frames": 8,
+          "fps": 24.0,
+          "loop": false,
+          "normalMap": "Textures/Player/Animations/swing2_return_normal/{dir}",
+          "origin": [0.5, 0.9038]
+        },
+        "swing3_return": {
+          "path": "Textures/Player/Animations/swing3_return/{dir}",
+          "frameSize": [280, 239],
+          "frames": 10,
+          "fps": 24.0,
+          "loop": false,
+          "normalMap": "Textures/Player/Animations/swing3_return_normal/{dir}",
+          "origin": [0.5, 0.7992]
         }
       },
       "pixelsPerUnit": 1.5

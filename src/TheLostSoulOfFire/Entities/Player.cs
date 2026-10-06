@@ -47,6 +47,9 @@ public sealed class Player
     public float Radius => GameBalance.PlayerRadius;
     public float InvulnerabilityRemaining { get; private set; }
     public float HitFlashRemaining { get; private set; }
+
+    /// <summary>Presentation only: the direction the last blow pushed the player (normalised).</summary>
+    public Vector2 LastHitDirection { get; private set; } = Vector2.UnitY;
     public float DashCooldownRemaining => _dashCooldownTimer;
     public bool IsDashing => _dashTimer > 0f;
 
@@ -450,6 +453,10 @@ public sealed class Player
         if (IsDead) AbilityEffects.Clear();
         HitFlashRemaining = Health == 0 ? 0.24f : 0.14f;
         _damageKnockback += knockback;
+        if (knockback.LengthSquared() > 0.01f)
+        {
+            LastHitDirection = Vector2.Normalize(knockback);
+        }
         InvulnerabilityRemaining = 0.5f;
         screenEffects.BeginHitstop(Health == 0 ? 0.12f : 0.045f);
         screenEffects.AddShake(Health == 0 ? 0.28f : 0.12f, Health == 0 ? 9f : 5f);

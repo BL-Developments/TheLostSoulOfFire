@@ -29,6 +29,9 @@ public abstract class Enemy
     public float HitFlashRemaining { get; private set; }
     private float _hitFlashDuration = 0.1f;
 
+    /// <summary>Presentation only: the direction the last blow came from (its knockback, normalised).</summary>
+    public Vector2 LastHitDirection { get; private set; } = Vector2.UnitY;
+
     /// <summary>Presentation only: how far the current hit flash has run (0..1; 1 without one).</summary>
     public float HitFlashProgress => HitFlashRemaining > 0f ? 1f - HitFlashRemaining / _hitFlashDuration : 1f;
 
@@ -119,6 +122,10 @@ public abstract class Enemy
 
         Health = Math.Max(0, Health - damage.Damage);
         _knockbackVelocity += damage.Knockback;
+        if (damage.Knockback.LengthSquared() > 0.01f)
+        {
+            LastHitDirection = Vector2.Normalize(damage.Knockback);
+        }
         HitFlashRemaining = damage.IsSoulCoreHit ? 0.16f : 0.1f;
         _hitFlashDuration = HitFlashRemaining;
 

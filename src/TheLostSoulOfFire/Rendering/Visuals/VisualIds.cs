@@ -125,4 +125,19 @@ public static class VisualClips
         2 => Swing2,
         _ => Swing3
     };
+
+    /// <summary>Player: gathering back into the guard after a swing, while standing still.</summary>
+    public const string Swing1Return = "swing1_return";
+    public const string Swing2Return = "swing2_return";
+    public const string Swing3Return = "swing3_return";
+
+    public static string SwingReturn(int step) => step switch
+    {
+        1 => Swing1Return,
+        2 => Swing2Return,
+        _ => Swing3Return
+    };
+
+    /// <summary>How long the return after each swing plays (the Soul Cleave settles longest).</summary>
+    public static float SwingReturnDuration(int step) => step == 3 ? 0.36f : 0.26f;
 }

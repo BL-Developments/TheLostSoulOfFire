@@ -880,6 +880,8 @@ public sealed partial class GameWorld : IDisposable
     private void DrawScene(SpriteBatch batch, Texture2D pixel, Viewport viewport, IReadOnlyList<SceneLight> lights)
     {
         Matrix sceneTransform = RenderResolution.ToOutput(_camera.GetTransform(viewport, _screenEffects.CameraOffset));
+        (Vector3 backLight, Vector2 backLightFrom) = BackLight;
+        _art.SetBackLight(backLight, backLightFrom);
         batch.Begin(
             SpriteSortMode.Deferred,
             BlendState.AlphaBlend,
@@ -1014,6 +1016,18 @@ public sealed partial class GameWorld : IDisposable
         _art.EndLitScene();
         batch.End();
     }
+
+    /// <summary>
+    /// The room's back light on the figures (colour times strength, and the screen direction it
+    /// comes from): the furnace and Warden flames in the north walls of the foundry and the
+    /// antechamber, the cold sea light over the prologue. A thin rim, never a second key light.
+    /// </summary>
+    private (Vector3 Color, Vector2 From) BackLight => _phase switch
+    {
+        GamePhase.Antechamber or GamePhase.EnteringArena => (GameBalance.DeathFlame.ToVector3() * 0.26f, new Vector2(0f, -1f)),
+        GamePhase.Prologue => (new Vector3(0.42f, 0.52f, 0.72f) * 0.3f, new Vector2(-0.35f, -1f)),
+        _ => (GameBalance.DeathFlame.ToVector3() * 0.3f, new Vector2(0.15f, -1f))
+    };
 
     /// <summary>
     /// Painted shade over the evenly lit foundry floor (presentation only): the foot of the north
@@ -1164,6 +1178,10 @@ public sealed partial class GameWorld : IDisposable
         else
         {
             batch.FillCircle(pixel, _player.Position + new Vector2(3f, 8f), 24f, new Color(3, 3, 7) * 0.55f);
+        }
+        if (rendered && !_player.IsDead)
+        {
+            _player.Scythe.DrawBehindFigure(batch, _player.Position, _art);
         }
         _art.DrawPlayer(batch, _player);
         _player.Draw(batch, pixel, _art, _debugVisible, _soulSensePresentation.SoulEmergence);

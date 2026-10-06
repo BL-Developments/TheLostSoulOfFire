@@ -32,6 +32,10 @@ float PointLightStrength;
 float PointLightSpill;    // share of the light added on top, so dark cloth still catches colour
 float MaxPointLight;      // cap that keeps faces, hands and weapons from blowing out
 
+float3 RimColor;          // colour times strength of the room's back light; zero switches it off
+float2 RimDirection;      // screen direction the back light comes from (normalised, y down like n here)
+float4 FlashColor;        // rgb of a hit flash, a = how far the figure is washed into it
+
 float4 LitPS(SpriteVertexOutput input) : COLOR
 {
     float2 uv = input.TextureCoordinates;
@@ -58,6 +62,14 @@ float4 LitPS(SpriteVertexOutput input) : COLOR
     pointLight = min(pointLight * PointLightStrength, float3(MaxPointLight, MaxPointLight, MaxPointLight));
 
     float3 lit = albedo.rgb * (key + pointLight) + pointLight * PointLightSpill * albedo.a;
+
+    // Back light: surfaces turned away from the camera and toward the light catch a thin rim,
+    // which lifts dark figures off the floor and ties them to the room's light.
+    float edge = 1.0 - saturate(n.z);
+    float facing = saturate(dot(normalize(n.xy + float2(0.0001, 0.0)), RimDirection));
+    lit += RimColor * (edge * edge * facing) * albedo.a;
+
+    lit = lerp(lit, FlashColor.rgb * albedo.a, saturate(FlashColor.a));
     return float4(lit, albedo.a);
 }
 

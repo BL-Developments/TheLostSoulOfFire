@@ -51,6 +51,8 @@ def parse(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--test-figure", action="store_true", help="build the procedural test figure first")
     parser.add_argument("--action", help="action to play on --object (or its armature), e.g. run")
     parser.add_argument("--frame-start", type=int, help="first frame of the animation (default: scene start)")
+    parser.add_argument("--directions", help="comma-separated subset of e,se,s,sw,w,nw,n,ne (previews); default all")
+    parser.add_argument("--no-normals", action="store_true", help="skip the normal pass (previews)")
     return parser.parse_args(argv[argv.index("--") + 1:] if "--" in argv else [])
 
 
@@ -135,9 +137,10 @@ def normal_material() -> bpy.types.Material:
     return material
 
 
-def render_pass(scene: bpy.types.Scene, figure: bpy.types.Object, out: Path, frames: int, view_transform: str) -> None:
+def render_pass(scene: bpy.types.Scene, figure: bpy.types.Object, out: Path, frames: int, view_transform: str,
+                directions: dict[str, int] = DIRECTIONS) -> None:
     scene.view_settings.view_transform = view_transform
-    for name, angle in DIRECTIONS.items():
+    for name, angle in directions.items():
         figure.rotation_euler = (0.0, 0.0, math.radians(90 - angle))
         directory = out / name
         directory.mkdir(parents=True, exist_ok=True)
@@ -177,13 +180,19 @@ def main() -> None:
     scene.render.image_settings.color_depth = "8"
 
     out = args.out.resolve()
-    render_pass(scene, figure, out / args.animation, args.frames, "Standard")
+    directions = DIRECTIONS
+    if args.directions:
+        directions = {name: DIRECTIONS[name] for name in args.directions.split(",")}
+    render_pass(scene, figure, out / args.animation, args.frames, "Standard", directions)
+    if args.no_normals:
+        print("RENDER_DIRECTIONS_DONE preview " + args.animation)
+        return
     # Outlines are an inverted hull; in the normal pass they would cover the figure.
     outlines = [m for o in bpy.data.objects for m in getattr(o, "modifiers", []) if m.name == "Outline"]
     for modifier in outlines:
         modifier.show_render = False
     scene.view_layers[0].material_override = normal_material()
-    render_pass(scene, figure, out / f"{args.animation}_normal", args.frames, "Raw")
+    render_pass(scene, figure, out / f"{args.animation}_normal", args.frames, "Raw", directions)
     scene.view_layers[0].material_override = None
     for modifier in outlines:
         modifier.show_render = True

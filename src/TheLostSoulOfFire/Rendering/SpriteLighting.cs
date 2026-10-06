@@ -37,6 +37,10 @@ public sealed class SpriteLighting
     private Matrix _transform;
     private IReadOnlyList<SceneLight> _lights = [];
 
+    /// <summary>The room's back light on figures (colour times strength, zero for none) and where it comes from.</summary>
+    public Vector3 RimColor { get; set; }
+    public Vector2 RimDirection { get; set; } = new(0f, -1f);
+
     public SpriteLighting(Effect effect)
     {
         _effect = effect;
@@ -59,10 +63,24 @@ public sealed class SpriteLighting
         Rectangle source,
         Vector2 position,
         float scale,
-        Color color)
+        Color color) => Draw(batch, clip, source, position, new Vector2(scale), 0f, color, Vector4.Zero);
+
+    /// <summary>
+    /// Draws one frame lit, turned by <paramref name="rotation"/> about its origin (the feet) and
+    /// scaled unevenly, washed toward <paramref name="flash"/> (rgb, w = amount) by a hit.
+    /// </summary>
+    public void Draw(
+        SpriteBatch batch,
+        SpriteClip clip,
+        Rectangle source,
+        Vector2 position,
+        Vector2 scale2,
+        float rotation,
+        Color color,
+        Vector4 flash)
     {
-        Vector2 size = new Vector2(source.Width, source.Height) * scale;
-        Vector2 topLeft = position - clip.PixelOrigin * scale;
+        Vector2 size = new Vector2(source.Width, source.Height) * scale2;
+        Vector2 topLeft = position - clip.PixelOrigin * scale2;
         int count = SelectLights(_lights, position, MathF.Min(size.X, size.Y) * 0.3f, _chosen);
         for (int index = 0; index < MaxPointLights; index++)
         {
@@ -96,10 +114,13 @@ public sealed class SpriteLighting
         parameters["PointLightStrength"].SetValue(PointLightStrength);
         parameters["PointLightSpill"].SetValue(PointLightSpill);
         parameters["MaxPointLight"].SetValue(MaxPointLight);
+        parameters["RimColor"].SetValue(RimColor);
+        parameters["RimDirection"].SetValue(RimDirection.LengthSquared() > 0.0001f ? Vector2.Normalize(RimDirection) : new Vector2(0f, -1f));
+        parameters["FlashColor"].SetValue(flash);
 
         batch.End();
         batch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, null, null, _effect, _transform);
-        batch.Draw(texture, position, source, color, 0f, clip.PixelOrigin, scale, SpriteEffects.None, 0f);
+        batch.Draw(texture, position, source, color, rotation, clip.PixelOrigin, scale2, SpriteEffects.None, 0f);
         batch.End();
         batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, transformMatrix: _transform);
     }

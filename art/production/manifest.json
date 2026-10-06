@@ -10325,6 +10325,1005 @@
         "status": "angenommen",
         "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
       }
+    },
+    {
+      "id": "91394e8e8da74ac7b1b03ef32a43e2ff",
+      "timestamp": "2026-10-06T14:26:05+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "swing1",
+        "frames": 14,
+        "fps": 24.0,
+        "frame_size": [
+          310,
+          223
+        ],
+        "origin": [
+          0.5,
+          0.87
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.0,
+        "render_seconds": 36.7
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/swing1.render.json",
+          "sha256": "cf351ca962885e6dfb7065859836a73c49508ddc2fc9703ff1e67eb92bcc71bc"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/n.png",
+          "sha256": "91fad3038442ae716c602b64fa91100aec19d1a04575c3c64308e53f60deaecb"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/n.png",
+          "sha256": "35df473a881f2eb874d1fe2174f2d15e19f7f3b7cd9ba09e3fbeadeb537ab870"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/ne.png",
+          "sha256": "578864e6364972d55aa6fb03b1e5e51b48a95482d627489cb64e223149b8674f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/ne.png",
+          "sha256": "31828696a2e821e64faab670e62c13c35412477d60d0b0cabc30e3bd952bde22"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/e.png",
+          "sha256": "94f05df8bda3ba138bc7c9860ef94a4c9f0ee9bdace43fdc29c418d1ee3b1f86"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/e.png",
+          "sha256": "854a46f16362a072342b60577265fd2cd29b9489097ff00537c18958355c6367"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/se.png",
+          "sha256": "9d057726e575fa25eb547f8f3fa7fbf98d0f82f7fc54aab7d56700f6319efe21"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/se.png",
+          "sha256": "ef3a43397459835ffd035b9f625d37457bbef8bb20c0f1b89e0764eda1e267ac"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/s.png",
+          "sha256": "132ee4f81da60a82f00af76b2bdb23f71f1784313ed81024dcd7942603006794"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/s.png",
+          "sha256": "43962f28b013d204d7fbfff30462e0a5f423403fe7bb198d77d103feef85b1d4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/sw.png",
+          "sha256": "6f3b929f4682eccf1d4044de57c875ebe6424d1567817adc53573b98ebb76f0e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/sw.png",
+          "sha256": "7c3bd0142895e19bef481d4e1d5f623c754056e1b89a73e87c71802b57c5d363"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/w.png",
+          "sha256": "13bfc31f37650e81ecc0c8a780dce3c8dfde65aa014647c20804e3fe7e3dbddd"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/w.png",
+          "sha256": "3c203526bcf9a366e7dff8d977554e9d11bef6f865e5f1f402d7b99b9ad75ac4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/nw.png",
+          "sha256": "1423b4586222bdcc982e0d843db33f033b175d3c40b40c51254f59768e98d483"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/nw.png",
+          "sha256": "e067f2c2cadcfacfbf91e22c9ca560983fa68d6bf40ab8c9130b448e1c012b8b"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.64,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Polish-Durchgang: Kampfanimation mit Ausholen, Gewichtsverlagerung, Schritt und Nachschwung (Beine auf IK), an den Spielzeitgeber gekoppelt"
+      }
+    },
+    {
+      "id": "7bba1c023cf047b5940ba80bf6147006",
+      "timestamp": "2026-10-06T14:26:06+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "swing2",
+        "frames": 16,
+        "fps": 24.0,
+        "frame_size": [
+          310,
+          277
+        ],
+        "origin": [
+          0.5,
+          0.8375
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.0,
+        "render_seconds": 42.4
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/swing2.render.json",
+          "sha256": "920867f337110a747f729bb659fa8609831c70d8472c8144d60fcb365e7fd49b"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/n.png",
+          "sha256": "8fe20a2d45397cff9adb2cc7c766535e0696ee43decc761dc583daf253595f12"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/n.png",
+          "sha256": "ac585b471a573e5fe0cc9551ac476b66d0718d5138e19ba96dc3078bfeeb0ada"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/ne.png",
+          "sha256": "1519bc6d26edf7dd724ebf30999b65e4a024e606f5a60540942a781d7dad3894"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/ne.png",
+          "sha256": "e18ecdbd3673a703023f717bae5a81644e0f7eff9452d9b648aa149e680f1491"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/e.png",
+          "sha256": "fb019631ef36c75d007fad23e1a804db364d1166119221547907eb2e0b18c6ce"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/e.png",
+          "sha256": "b32420f19d73b43c5f9ffbbf02085c242ba762188200eaf1101c9b5cfb9ce16f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/se.png",
+          "sha256": "4aa5a139237bbff293a2c0f2979c6ab755e1e5c0c585d55e51d178fa09d4ba61"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/se.png",
+          "sha256": "069fa43512c1bb568ac9d17e1f5adbb3564da45bcd104305af4f386c339cb0ce"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/s.png",
+          "sha256": "7772970ad79163c19b4e70459df74436709140fb9fe207c1c2b8eab149faee00"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/s.png",
+          "sha256": "3d6356a5083154d592519980cf35f933fcc5696fd96870e8f9fb2206cee6dd85"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/sw.png",
+          "sha256": "0b18cc8cd17c27f93a60314ce16a063105f95285a912d2589abe88e192e82bb0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/sw.png",
+          "sha256": "937d567af249520f24f956336015142bc77864a6809b0a3718802eb34adbb6da"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/w.png",
+          "sha256": "d0308e2cd1e41b5e891e98eb15ed9b108ed00fc74e165209bf930aed2b458b7a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/w.png",
+          "sha256": "25939937eb5b57de28a8f4e11b9f35eeac14fd6a0e04b6fe373d7d54157d28b1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/nw.png",
+          "sha256": "f9205df80a622379ef82df64cb0967949984b31b2badf1d65adb4abeba1aaadf"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/nw.png",
+          "sha256": "083eab0374d3753d161e4542f58e5e2029ac780a8922d0045d4bfd8c1152c5ff"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.81,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Polish-Durchgang: Kampfanimation mit Ausholen, Gewichtsverlagerung, Schritt und Nachschwung (Beine auf IK), an den Spielzeitgeber gekoppelt"
+      }
+    },
+    {
+      "id": "535802e69824424da672b64834dff3ae",
+      "timestamp": "2026-10-06T14:26:08+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "swing3",
+        "frames": 26,
+        "fps": 24.0,
+        "frame_size": [
+          308,
+          319
+        ],
+        "origin": [
+          0.5,
+          0.8056
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.0,
+        "render_seconds": 69.8
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/swing3.render.json",
+          "sha256": "8366b3138a1ccc994e997c3ce4af3fc5200be04bd1c4366d709ce67f60ed9933"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/n.png",
+          "sha256": "30ef42129625f6ec086823338cdc21f982f4a613ef7d5cb962e183ac2f3e6163"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/n.png",
+          "sha256": "40ba7faf319f1d8aa4d56b16975019ec9649b0fc7737e93c8edc5e41b31e173b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/ne.png",
+          "sha256": "c3587d1b977dd184070c53655df402aed9f0874a26857a0edb45c8fa14adca37"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/ne.png",
+          "sha256": "44679ca0d48652e0b6100b4a21fff11e58b4eab56baa09f46333d377483a8d83"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/e.png",
+          "sha256": "cf726dfb987ceda0edff8669647d87cfa18ea0f67cd729d2d572153346ec0043"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/e.png",
+          "sha256": "1f7ff3e63bda0e7726109c69a1d383d001e961cc118bdbaa04527c702fbe6d01"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/se.png",
+          "sha256": "ab2b522aa770e1544449e0e013069c9f262a9dd7b60bb87eb01f04a93bbb7067"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/se.png",
+          "sha256": "648fd53ea06e8563741dcd4b88a1716fe51b55d175e01fc65972ab13337785c5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/s.png",
+          "sha256": "0b71a4aec763f5224cd5340d4e9c3f4d3da0e2d75c4b7798c3d536e2916ee12c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/s.png",
+          "sha256": "e01993ad9d4eb122c100e740f6cd4ddfd63e2854fcd305711415781b9b11fb88"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/sw.png",
+          "sha256": "0b3e626d28844a8874ad2251f67d16b6f2cbcdc9d6e14cd42b5f597d45cfead7"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/sw.png",
+          "sha256": "86c794dfb7e40a80da48880b9709af7c6638b4defbf7c497ec1c8afbf21a3ac2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/w.png",
+          "sha256": "5fb3926bdd834b24e3c3c918e0becc461419680a1d3a941d91720ff8d1928a36"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/w.png",
+          "sha256": "8cc457a2511d4e5aa540b1bba2430a9f376a45b517d7168441d3ba4e01bc147d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/nw.png",
+          "sha256": "bae0d2420362a0eb2209e90e54c2517855b0476dffc11ff9a04d45e0f3902b9b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/nw.png",
+          "sha256": "c5dca152a6bc187b8a32340baad90f5813cac9afc065458d22d434a3ff74219d"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 1.59,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Polish-Durchgang: Kampfanimation mit Ausholen, Gewichtsverlagerung, Schritt und Nachschwung (Beine auf IK), an den Spielzeitgeber gekoppelt"
+      }
+    },
+    {
+      "id": "5390cf7cc71c4ecabb895cb04c09fe23",
+      "timestamp": "2026-10-06T14:26:09+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "swing1_return",
+        "frames": 8,
+        "fps": 24.0,
+        "frame_size": [
+          280,
+          241
+        ],
+        "origin": [
+          0.5,
+          0.888
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.0,
+        "render_seconds": 21.8
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/swing1_return.render.json",
+          "sha256": "48bc42fa266f14d02a32dfc15aab1880cbd77c96103fc35694d25118387fa749"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return/n.png",
+          "sha256": "a0ccc40275520c736285c567243c6ffb2b6ff9c8faa10eef82322cfcc1140b33"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return_normal/n.png",
+          "sha256": "2bed0c006727a27bca6acf7cc98a7216f8f1093d1f9061ba7341beb5de1874e9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return/ne.png",
+          "sha256": "c1cba608610ea466dbe4ea4bf2e6e17536d334fbac35da8ef29b294f69c0da43"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return_normal/ne.png",
+          "sha256": "b8fb84d013fff3cc18608231215a8732fe21462cd4d085a66a18c219123b0c46"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return/e.png",
+          "sha256": "a629236b2c8f5316e8afc65780715506b76a141220ef870d8a3c2092149f7a3a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return_normal/e.png",
+          "sha256": "9a302e172b6180e2fbefc2d3c9dd6c453aa6a965a69cd42ea66de642e76d8c34"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return/se.png",
+          "sha256": "19036b43e1430a491293e7c9d59bd7882ac39661d98aac436eb81347fe8944fe"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return_normal/se.png",
+          "sha256": "63c852e28f1bdced46552040094aaa0034c2351a135779a72b45ec795b5003aa"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return/s.png",
+          "sha256": "4088bd2e0b19b34061f1927499bebc0f766ad5e08c3f4b6f9041a1756bae8c49"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return_normal/s.png",
+          "sha256": "93eeb080d228736736edfc38c2646afe91bd2eee81095605e3ffe2f83cfacb6e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return/sw.png",
+          "sha256": "48139e8a84e2444b0befe3b2bfdb451a07d9962ec7323f405d437626d8b628f8"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return_normal/sw.png",
+          "sha256": "7ce5715bfc14aa2eb7a16c2296190c8c28ddbd4720f1c00499850f1517283e05"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return/w.png",
+          "sha256": "c3a4fad5b76ad7d362e65ae6e0838ec96d8b102366279f4f91b64283eaeaf8be"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return_normal/w.png",
+          "sha256": "c5ae821983bead3572953e43d22bd0426e34bdf0dec5b5c33d2232f7bcc0a228"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return/nw.png",
+          "sha256": "510e0481c89062c8cb7b72a90506c231d49afced26aa0eea679dde22a954a336"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return_normal/nw.png",
+          "sha256": "743de15ba083508e33aa48ce200184d79d0eb6131a3bfe388fabc941a822a33c"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.37,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Polish-Durchgang: Kampfanimation mit Ausholen, Gewichtsverlagerung, Schritt und Nachschwung (Beine auf IK), an den Spielzeitgeber gekoppelt"
+      }
+    },
+    {
+      "id": "752e0ea77a7247c18a80e40aecd005dd",
+      "timestamp": "2026-10-06T14:26:10+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "swing2_return",
+        "frames": 8,
+        "fps": 24.0,
+        "frame_size": [
+          266,
+          239
+        ],
+        "origin": [
+          0.5,
+          0.9038
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.0,
+        "render_seconds": 22.0
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/swing2_return.render.json",
+          "sha256": "5d45cd89a4424b98fe7b551c7ef5a02ce39b4a67f30df1ddb95c8cc1fe5c6f29"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return/n.png",
+          "sha256": "77bdd0a3325e7408ddf3cb91e4494741488827341625182931024c097dd789ca"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return_normal/n.png",
+          "sha256": "a01b827c736d5a49b209b574e810d582552c8477b11b9785bc460281185362ff"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return/ne.png",
+          "sha256": "5b2d54e1b139d1e74369e517275911b9f930b7a39d799f1c94b12b46a59dd150"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return_normal/ne.png",
+          "sha256": "430d36775d4e04617e7817849cf77b6b7c63df19fad4b772e367fa3cb3ca05f6"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return/e.png",
+          "sha256": "1c621f53020781c83bc97d1009a36254fd97148ea650815a3e8cfe92e0bb5688"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return_normal/e.png",
+          "sha256": "c0cd298737dd94d9dc8494839b10d706cf9ea3d3e844042ed39c824ab9af44f1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return/se.png",
+          "sha256": "86e2cb9c950e032dbcc610f8a282eb01d8ad40901208d1b17be37be58d294f54"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return_normal/se.png",
+          "sha256": "c1b1a1a883db40a99d7fc3eb0a143358be2db0e4500e203dea155a1cc358e1c0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return/s.png",
+          "sha256": "959a30bb33c903869a5df1de66b74762febdb250a035681c9fdc04d951572c66"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return_normal/s.png",
+          "sha256": "08087ef4ce9c44c75250ff07d18edc680ac2cc1d0f42f9508d952dccdb37239f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return/sw.png",
+          "sha256": "3559ffeb923303ba374aaaa067c3719c1f4e470381c428c33554d5f854a34dea"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return_normal/sw.png",
+          "sha256": "367dbeb7105bc5587056d160ee5f07d321eb369d889a555e3d9c694a8ad9c3dd"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return/w.png",
+          "sha256": "2ed9da357204ab03fd5c96883a067b6543c5741ad28b747cb239152ae0cf79ec"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return_normal/w.png",
+          "sha256": "042039f668f0ff4ab4432135abb3f5032f29811b1c8ac1d0f1a2807f00a53546"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return/nw.png",
+          "sha256": "45f28837f92ca2c8bd67afce4b6179e86a3e1afebcd74a2d4d187c03c50d067e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return_normal/nw.png",
+          "sha256": "8673dacd6ba20012535fe8587f5fdf841eedb5b0cef296eec94ac3746f1b10ca"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.35,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Polish-Durchgang: Kampfanimation mit Ausholen, Gewichtsverlagerung, Schritt und Nachschwung (Beine auf IK), an den Spielzeitgeber gekoppelt"
+      }
+    },
+    {
+      "id": "84c50536527c4611b2f96ebee649254c",
+      "timestamp": "2026-10-06T14:26:11+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "swing3_return",
+        "frames": 10,
+        "fps": 24.0,
+        "frame_size": [
+          280,
+          239
+        ],
+        "origin": [
+          0.5,
+          0.7992
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.0,
+        "render_seconds": 26.7
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/swing3_return.render.json",
+          "sha256": "9842001cdf1e67e7f1859d2dda1b4fc012ad497789febcaed0f15d9e4f6aa393"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return/n.png",
+          "sha256": "20a313d2ee6121c8493bebcc2ce87fbb0bbea0dd9d0efa2492acc34d8944acc3"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return_normal/n.png",
+          "sha256": "43a8d50d0737c55e1a54430b78322a97dfe16b79dbf68965cc0457346ca9a099"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return/ne.png",
+          "sha256": "ba7aaf61e989c7a2af0ecb44d5ce881a48ac86a754bba8aae9aa01bf510feb42"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return_normal/ne.png",
+          "sha256": "49eacdb8f3ff0f56c2795a5bdf55616b349e03f1fdaee6fc2c0a5963012dec88"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return/e.png",
+          "sha256": "ac69972d793d0007cc7fd6cb769e1c08eb67ff6e0d58a7c7e1efa2d24985190b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return_normal/e.png",
+          "sha256": "8b88b267fc059f66a1e6fe01e710bbc008eae150212c4e5423000b3fdbcd2a8f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return/se.png",
+          "sha256": "e0b06d28f1e98b31a21e0df6ed657b321b73960cfaf51c9a6887e0edc85ad86b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return_normal/se.png",
+          "sha256": "b46c043f8a4dc781abd672aea56bcb0e0ee4a81439be2d808b2e8996eef4744e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return/s.png",
+          "sha256": "a43ff9f4b89ecd72e1b589a292d5dd6fc181cb320918e69d47e9df03b48325cd"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return_normal/s.png",
+          "sha256": "3477a2606f90a04f074fe90c1e9c6ced9354a6941cae5d2cb34fb9f628f727d0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return/sw.png",
+          "sha256": "2c53765af24ca8045c25bc09470eb11fb3453365ca254b36544ba1d8819f4629"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return_normal/sw.png",
+          "sha256": "c9a86b5b195dc81164fac9275e7817f628662bac30c328ae49b444adaef320e6"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return/w.png",
+          "sha256": "cc9d87c86b593abd1abb65b719d037ba3c467018494a433c1119fc0ae2b02f01"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return_normal/w.png",
+          "sha256": "18884ed757b72dec5e4caebade0b9705b8c0d3f2893e4b697c6dedfd9811ed60"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return/nw.png",
+          "sha256": "e984645af1aabc17321ed3a9b24d31f340b1c0e754b5acfe9bf8ed79025dabc9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return_normal/nw.png",
+          "sha256": "42d90dcd50d9d920557548f07a538e684daed66db5b28e53ea8f8c5f0df37af7"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.46,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Polish-Durchgang: Kampfanimation mit Ausholen, Gewichtsverlagerung, Schritt und Nachschwung (Beine auf IK), an den Spielzeitgeber gekoppelt"
+      }
+    },
+    {
+      "id": "e2d1604060614323b72bf76260d103ba",
+      "timestamp": "2026-10-06T14:26:11+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "dash",
+        "frames": 8,
+        "fps": 24.0,
+        "frame_size": [
+          234,
+          231
+        ],
+        "origin": [
+          0.5,
+          0.8442
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.0,
+        "render_seconds": 21.9
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/dash.render.json",
+          "sha256": "33ea0358da0114cc8426733922ca8f405ec19b67901c3baf0a99f55f6d8bc6bd"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/n.png",
+          "sha256": "d36cc64ebe618523422ad36b0c148ab76865aebaf8ac72f333309b3abbc4b233"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/n.png",
+          "sha256": "5bc337ac78d4c8f85f186a91edc16c945651565f1225279f0cc6524d87499386"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/ne.png",
+          "sha256": "5563b306ae99b07eff8a31cba444bedd8bff74e7879a6bf1ad2f7306477fa367"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/ne.png",
+          "sha256": "a6702a7d70e9d8bf1785bb6dccb5aa7331f60a806e18ee472c12aff3cdf3dd8e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/e.png",
+          "sha256": "e1b51df1626ba957a94c0d403bf3a68832d668488157bf91822d55d9867ae08f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/e.png",
+          "sha256": "086fdad9f06c90a20cfa9cd4cc737282d8dee2a38f47304ab812c096441d889c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/se.png",
+          "sha256": "129703e244edb23fbb9645c7f2d865003e2d3d2ee9650bdaa7a872acad79df44"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/se.png",
+          "sha256": "be13600a067ba1c5141cc5ec63c666f18f2edc9aaf851c9b4ca6ae9e294090fb"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/s.png",
+          "sha256": "ce8e720dc6e91588d250266b5f53acb884c082191602e5c97cb9aeb45610c27d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/s.png",
+          "sha256": "7dbe146fc8bff46a251d6b7348d667ec38a42938193a22182ea4509da7383891"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/sw.png",
+          "sha256": "abcddc12bbe0e7051fc3853add1773be64a497912b3a36fbe455340903d11fdc"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/sw.png",
+          "sha256": "f28c40ed44177e482f986afb17ed5673d52e377734d12980089511fbc43fdbab"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/w.png",
+          "sha256": "2856dc4511fef953fa9b98ad3658c03f81f0e11b21f2b1253d1f365cf84f2a50"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/w.png",
+          "sha256": "b088446eb3e0930ad216916db8372181b35a2263ac5d2c38bb94bbc864445b01"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/nw.png",
+          "sha256": "fa49a35b20d7100f261be436da7b22a49ba817079b9c2a5190fc847a653d49c4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/nw.png",
+          "sha256": "d153702060c347a54314f10f90b3f070ad20120d0195a17e869f219a2ac2f283"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.31,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Polish-Durchgang: Kampfanimation mit Ausholen, Gewichtsverlagerung, Schritt und Nachschwung (Beine auf IK), an den Spielzeitgeber gekoppelt"
+      }
+    },
+    {
+      "id": "2aba8d319b6e48379a7d07e73b718011",
+      "timestamp": "2026-10-06T14:26:12+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "hit",
+        "frames": 6,
+        "fps": 24.0,
+        "frame_size": [
+          252,
+          220
+        ],
+        "origin": [
+          0.5,
+          0.8818
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.0,
+        "render_seconds": 16.2
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/hit.render.json",
+          "sha256": "d870f33960cc794d319c2d954eb7acbda9ef0ccddd3d59b5338a145da37effdc"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/n.png",
+          "sha256": "250ba8a12a59b15709a81faddeb8eca933884f46de7690d6ffdac1d4c8a714d6"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/n.png",
+          "sha256": "9a293b02594e1106e09bd6f0cd1965d66c1c33be89ee026f8190811080f7a5f6"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/ne.png",
+          "sha256": "4f7b666effb5033d6e27633e4f49356898dabeb9fb777e8fc86b66d7c4edd71a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/ne.png",
+          "sha256": "bb2c506e5ff0bad421a7f96a71ec4e02f88abb9c7aa3b93ee925be005e9f9995"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/e.png",
+          "sha256": "0bbe01041f9246b9029363817d0be7ac3feb0b0cfc6de59a251f9b6bedd7b895"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/e.png",
+          "sha256": "339bbe4b47eea72503ad6256d176eaec2aad198df8323ae6e762b5e2b4a6867b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/se.png",
+          "sha256": "8b81a41de070b8ab6ab192b57926fa755481b3b1a21ba0a4290332e493c77d07"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/se.png",
+          "sha256": "4dcef1efadc822bc1444de41e8b96effdc118d9c289e5dcdd49df12884c48964"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/s.png",
+          "sha256": "4e1c45e3d4e7239a0b6188b6409d37dbdd21ccc9960f6cf71212037a37813837"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/s.png",
+          "sha256": "3eb006fb829b82ce25553255d04ec53e53f0ecde93fd2500778d633ad9c55d12"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/sw.png",
+          "sha256": "8377eb568bf82989f5dca00123f3fcf998a46953cb208885ad57b907bc8ebff9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/sw.png",
+          "sha256": "1f268b8998f13b7eecd5c79290b284cb7d39697896d51f863407faa3f1f938ec"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/w.png",
+          "sha256": "cf9472c6ddfe2489888549cb8dac84386594e4bb55cd10dce34ae46173aaa6ca"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/w.png",
+          "sha256": "9f396a5ef5e33ce700cdd072f6b29cc585e74a18ae0656a676ee9870c66bbf55"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/nw.png",
+          "sha256": "7cb419e9d935e40c8f0d24699d3cfa62a7b1a6381d9024951514bfa9f27645bf"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/nw.png",
+          "sha256": "be1653fa47c8a1faa37e24ee42817ee7d61394388993114bb15f9e1ae75d4ce2"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.23,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Polish-Durchgang: Kampfanimation mit Ausholen, Gewichtsverlagerung, Schritt und Nachschwung (Beine auf IK), an den Spielzeitgeber gekoppelt"
+      }
+    },
+    {
+      "id": "3f58c6f4f0d149d1b2bee91aa7f83336",
+      "timestamp": "2026-10-06T14:26:13+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "cannon_fire",
+        "frames": 10,
+        "fps": 24.0,
+        "frame_size": [
+          258,
+          237
+        ],
+        "origin": [
+          0.5,
+          0.8059
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.0,
+        "render_seconds": 27.2
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/cannon_fire.render.json",
+          "sha256": "2d6fdcec44e89068fcc7e872cdc86b14d15b80f8670d80703d3e7f5f0269468e"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/n.png",
+          "sha256": "baa80941cd2996dc57e2467d85cb6702f4aea824d5b2050957b9b6f1cdff713b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/n.png",
+          "sha256": "4f74ba158b0b382017a1b3709af90178369f4e5615038d19195f3035c7859ee9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/ne.png",
+          "sha256": "1bf261ecfc83ade362a45c2c4f9c417a48adab48cdf672751adec0a5f02ecb8e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/ne.png",
+          "sha256": "41d223bc634a9843c8b6593cf8f580950c34acc354a8670a119a56d61d51f960"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/e.png",
+          "sha256": "54a0a373253b267a4568d6dfbab6ec839e8233ac8b84c6ebf64ec7c5becf3bc8"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/e.png",
+          "sha256": "b7c38c67e15230c31a4bab536163610012bfd7669f163c2ac4db908079882e26"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/se.png",
+          "sha256": "35f9a7f54f4021c372723e3af1c10c130437dd07dff438ee2dcb60d2da039e8a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/se.png",
+          "sha256": "17edb2e7eda4eec29cca0ef9b474bd5f44b4713195906665b26511c20f225ce8"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/s.png",
+          "sha256": "ae184998d57425c05285d71bbb0d7bc9a8650f4d19dece10cb4bdbb0f072bb44"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/s.png",
+          "sha256": "f19c2294b04ded56a6c45ce22cf8bae4e1540bd98bc6e48462bb26bceae0af98"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/sw.png",
+          "sha256": "8eab31bb8c8f7839d12e9841d475311c446f2db506dfc39a0c23ccd61d352ed5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/sw.png",
+          "sha256": "119141c73d499cf8ba60d2707564df0b8b7c3db202e9724a2c6b9b92ff9a10c7"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/w.png",
+          "sha256": "e4fb10e4da483540cdc2a1128ed0bfc47989825cf053872054c211b2868cdb40"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/w.png",
+          "sha256": "f313c4702bbd0534c76de57b7a12918de5330cfbb64b0b6e33b46fa5479b6476"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/nw.png",
+          "sha256": "0ca4d45cb14daf6266348d27ca5f9c450e7a225eff453935b3c58f15bbbb962e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/nw.png",
+          "sha256": "45c3384499f63e7c5e45864d633ecb372ae1a5871b00d2a1659efb425e055eb3"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.42,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Polish-Durchgang: Kampfanimation mit Ausholen, Gewichtsverlagerung, Schritt und Nachschwung (Beine auf IK), an den Spielzeitgeber gekoppelt"
+      }
     }
   ]
 }

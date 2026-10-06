@@ -217,14 +217,15 @@ public sealed class ArtAssets
     }
 
     /// <summary>A Death Flame slash along <paramref name="path"/> (tail first); false without the shader.</summary>
-    public bool DrawDeathFlameSlash(SpriteBatch batch, IReadOnlyList<Vector2> path, float headWidth, float opacity, float heat)
+    public bool DrawDeathFlameSlash(SpriteBatch batch, IReadOnlyList<Vector2> path, float headWidth, float opacity, float heat,
+        IReadOnlyList<float>? mask = null)
     {
         if (_deathFlame is null || !_litSceneActive)
         {
             return false;
         }
 
-        _deathFlame.DrawSlash(batch, _sceneTransform, path, headWidth, opacity, heat, _time);
+        _deathFlame.DrawSlash(batch, _sceneTransform, path, headWidth, opacity, heat, _time, mask);
         return true;
     }
 
@@ -416,6 +417,17 @@ public sealed class ArtAssets
             return;
         }
 
+        // Standing still after a swing, the figure gathers itself back into the guard instead of
+        // snapping there; moving cuts the return short and runs.
+        int lastStep = player.Scythe.LastStep;
+        if (!moving && lastStep > 0 && player.Scythe.SinceSwingEnd < VisualClips.SwingReturnDuration(lastStep) &&
+            HasClip(VisualIds.Player, VisualClips.SwingReturn(lastStep)))
+        {
+            DrawCharacter(batch, player, VisualIds.Player, VisualClips.SwingReturn(lastStep), player.Scythe.AttackDirection, player.Position, 1f, Color.White,
+                progress: player.Scythe.SinceSwingEnd / VisualClips.SwingReturnDuration(lastStep), snapFacing: true);
+            return;
+        }
+
         Vector2 facing = moving && HasClip(VisualIds.Player, VisualClips.Swing1) ? player.Velocity : player.FacingDirection;
         DrawCharacter(batch, player, VisualIds.Player, moving ? VisualClips.Move : VisualClips.Idle, facing, player.Position, 1f, Color.White);
     }
@@ -451,7 +463,7 @@ public sealed class ArtAssets
             return;
         }
 
-        Color tint = enemy.HitFlashRemaining > 0f ? new Color(255, 235, 255) : Color.White;
+        Color tint = enemy.HitFlashRemaining > 0f && !_litSceneActive ? new Color(255, 235, 255) : Color.White;
         if (IsRendered(id))
         {
             DrawSoftSpot(batch, enemy.Position + new Vector2(8f, 2f), new Vector2(enemy.Radius * 1.5f, enemy.Radius * 0.5f) * enemy.VisualScale, new Color(3, 3, 7) * 0.7f);
@@ -475,6 +487,15 @@ public sealed class ArtAssets
     {
         FigureState figure = _figures.GetValue(owner, _ => new FigureState());
         float deltaTime = figure.Advance(_time, position, out float distance);
+        switch (owner)
+        {
+            case Enemy enemy:
+                figure.TrackImpact(_time, enemy.HitFlashRemaining, enemy.LastHitDirection);
+                break;
+            case Player hurt:
+                figure.TrackImpact(_time, hurt.HitFlashRemaining, hurt.LastHitDirection);
+                break;
+        }
         string direction = snapFacing ? figure.Facing.Snap(facing) : figure.Facing.Update(facing, deltaTime);
         Vector2 worldSize = WorldSizeOf(id, new Vector2(fallbackSize)) * sizeScale;
         SpriteClip? clip = Resolve(id, clipName, direction, out string resolvedName, out VisualClipDefinition? definition);
@@ -496,7 +517,8 @@ public sealed class ArtAssets
         float scale = Registry.TryGet(id, out VisualEntry entry) && entry.PixelsPerUnit is { } pixelsPerUnit
             ? sizeScale / pixelsPerUnit
             : worldSize.X / clip.FrameWidth;
-        DrawFrame(batch, clip, elapsed, position, scale, tint);
+        (Vector2 impactScale, float lean, float flash) = figure.ImpactPose(_time);
+        DrawFrame(batch, clip, elapsed, position, scale * impactScale, lean, tint, new Vector4(HitFlashColor, flash));
         if (figure.SettleRemaining > 0f && figure.Settling is { } previous)
         {
             // The pose being left lies over the new one and fades out, moving with the figure.
@@ -566,6 +588,47 @@ public sealed class ArtAssets
         private float _elapsed;
 
         public FacingTracker Facing { get; } = new();
+
+        private float _lastHitRemaining;
+        private float _impactAt = float.NegativeInfinity;
+        private Vector2 _impactDirection;
+        private float _impactStrength;
+
+        /// <summary>A hit flash that starts (or restarts) marks a new blow; remember when and from where.</summary>
+        public void TrackImpact(float time, float hitRemaining, Vector2 direction)
+        {
+            if (hitRemaining > _lastHitRemaining + 0.0001f)
+            {
+                _impactAt = time;
+                _impactDirection = direction;
+                // Longer flashes belong to heavier blows (core hits, the fatal one).
+                _impactStrength = hitRemaining >= 0.155f ? 1.35f : 1f;
+            }
+            _lastHitRemaining = hitRemaining;
+        }
+
+        /// <summary>
+        /// How the figure reacts to the last blow, as a pose on top of its clip: it is squashed
+        /// for a moment, leans with the blow and rocks back once, and is washed light for the
+        /// first frames. Never moves the figure's feet off its position.
+        /// </summary>
+        public (Vector2 Scale, float Lean, float Flash) ImpactPose(float time)
+        {
+            float t = time - _impactAt;
+            if (t < 0f || t > 0.45f)
+            {
+                return (Vector2.One, 0f, 0f);
+            }
+
+            float strength = _impactStrength;
+            float attack = MathHelper.Clamp(t / 0.03f, 0f, 1f);
+            float after = MathF.Max(0f, t - 0.03f);
+            float lean = 0.075f * strength * _impactDirection.X * attack * MathF.Exp(-after / 0.09f) * MathF.Cos(after * 15f);
+            float squash = strength * MathF.Exp(-t / 0.07f);
+            Vector2 scale = new(1f + 0.035f * squash, 1f - 0.055f * squash);
+            float flash = t < 0.11f ? 0.82f * MathF.Pow(1f - t / 0.11f, 2f) * MathF.Min(1f, strength) : 0f;
+            return (scale, lean, flash);
+        }
         public SpriteClip? LastClip { get; private set; }
         public Rectangle LastSource { get; private set; }
         public Vector2 LastPosition { get; private set; }
@@ -752,6 +815,34 @@ public sealed class ArtAssets
         Texture2D texture = new(device, size, size);
         texture.SetData(data);
         return texture;
+    }
+
+    /// <summary>The colour a figure is washed into for an instant when a blow lands.</summary>
+    private static readonly Vector3 HitFlashColor = new(0.96f, 0.92f, 1f);
+
+    /// <summary>
+    /// The room's back light on lit figures: colour times strength (zero for none) and the
+    /// screen direction it comes from. Set per area before the scene is drawn.
+    /// </summary>
+    public void SetBackLight(Vector3 color, Vector2 from)
+    {
+        if (_lighting is not null)
+        {
+            _lighting.RimColor = color;
+            _lighting.RimDirection = from;
+        }
+    }
+
+    /// <summary>A frame turned about its feet and scaled unevenly (a figure reacting to a blow), lit when possible.</summary>
+    private void DrawFrame(SpriteBatch batch, SpriteClip clip, float elapsed, Vector2 position, Vector2 scale, float rotation, Color color, Vector4 flash)
+    {
+        if (_litSceneActive && clip.NormalMap is not null)
+        {
+            _lighting!.Draw(batch, clip, clip.GetSourceRectangle(elapsed), position, scale, rotation, color, flash);
+            return;
+        }
+
+        batch.Draw(clip.Texture, position, clip.GetSourceRectangle(elapsed), color, rotation, clip.PixelOrigin, scale, SpriteEffects.None, 0f);
     }
 
     /// <summary>Draws an unrotated frame, lit when the clip has a normal map and a lit scene is running.</summary>

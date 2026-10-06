@@ -33,6 +33,12 @@ public sealed class ScytheCombat
 
     public int ActiveStep { get; private set; }
     public bool StartedThisFrame { get; private set; }
+
+    /// <summary>Presentation only: the step of the swing that ended last (0 before any swing).</summary>
+    public int LastStep { get; private set; }
+
+    /// <summary>Presentation only: seconds since the last swing ended, while no swing runs.</summary>
+    public float SinceSwingEnd { get; private set; }
     public Vector2 AttackDirection => _attackDirection;
     /// <summary>True from the hit moment of the current swing until the next one starts.</summary>
     public bool HasStruck => ActiveStep > 0 && _strikeCreated;
@@ -49,6 +55,9 @@ public sealed class ScytheCombat
         _queuedAttack = false;
         _nextStep = 1;
         ActiveStep = 0;
+        LastStep = 0;
+        SinceSwingEnd = 0f;
+        _ignitionPending = false;
     }
 
     public void Update(
@@ -67,6 +76,7 @@ public sealed class ScytheCombat
 
         if (ActiveStep == 0)
         {
+            SinceSwingEnd += deltaTime;
             _comboTimer = MathF.Max(0f, _comboTimer - deltaTime);
             if (_comboTimer <= 0f)
             {
@@ -88,6 +98,10 @@ public sealed class ScytheCombat
         }
 
         _attackElapsed += deltaTime;
+        if (_ignitionPending && NormalizedProgress >= StrokeStart(ActiveStep))
+        {
+            EmitIgnition(playerPosition, particles);
+        }
         if (!_strikeCreated && _attackElapsed >= _strikeTime)
         {
             _strikeCreated = true;
@@ -99,6 +113,8 @@ public sealed class ScytheCombat
             return;
         }
 
+        LastStep = ActiveStep;
+        SinceSwingEnd = 0f;
         ActiveStep = 0;
         _comboTimer = GameBalance.ComboResetTime;
         if (canStartAttack && _queuedAttack)
@@ -131,6 +147,18 @@ public sealed class ScytheCombat
             _ => 0f
         };
         return impulse * (_resonanceActive ? 1.18f : 1f);
+    }
+
+    /// <summary>
+    /// The part of the swing's Death Flame that passes behind the rendered figure; drawn before
+    /// the figure, so the sweep wraps around the body instead of lying on top of it.
+    /// </summary>
+    public void DrawBehindFigure(SpriteBatch batch, Vector2 playerPosition, ArtAssets art)
+    {
+        if (ActiveStep > 0)
+        {
+            DrawFlameSlash(batch, art, playerPosition, behind: true);
+        }
     }
 
     public void Draw(
@@ -171,30 +199,100 @@ public sealed class ScytheCombat
             _ => (0.42f, 0.155f)
         };
 
+        _ignitionPending = true;
+    }
+
+    private bool _ignitionPending;
+
+    /// <summary>Swing progress where the blade's fast stroke begins (after the wind-up).</summary>
+    private static float StrokeStart(int step) => step switch { 1 => 0.10f, 2 => 0.12f, _ => 0.235f };
+
+    /// <summary>
+    /// The Death Flame core flares as the stroke begins: sparks leave the scythe's collar along
+    /// the blade's path, not the aim, so a wind-up behind the body does not spark in front of it.
+    /// </summary>
+    private void EmitIgnition(Vector2 playerPosition, ParticleSystem particles)
+    {
+        _ignitionPending = false;
+        ScytheBladePaths.Sample core = ScytheBladePaths.At(ActiveStep, NormalizedProgress);
+        float angle = MathF.Atan2(_attackDirection.Y, _attackDirection.X) + MathHelper.ToRadians(core.Heading);
+        Vector2 at = playerPosition + ScytheBladePaths.Project(angle, core.Distance * ScytheBladePaths.UnitsPerMetre, core.Height)
+            + new Vector2(0f, FigureHeights.Air);
+        float turn = ActiveStep == 2 ? -MathHelper.PiOver2 : MathHelper.PiOver2;
+        Vector2 along = new(MathF.Cos(angle + turn), MathF.Sin(angle + turn));
         Color flame = ActiveStep == 3 ? GameBalance.DeathFlameBright : GameBalance.DeathFlame;
         int ignitionParticles = ActiveStep switch { 1 => 2, 2 => 4, _ => 8 };
-        particles.EmitBurst(
-            playerPosition + _attackDirection * 42f,
-            _attackDirection,
-            ignitionParticles,
-            flame,
-            ActiveStep == 3 ? 115f : 60f,
-            ActiveStep == 3 ? 6f : 3f);
+        particles.EmitBurst(at, along, ignitionParticles, flame, ActiveStep == 3 ? 115f : 60f, ActiveStep == 3 ? 6f : 3f);
     }
 
     private readonly List<Vector2> _slashPath = new(40);
+    private readonly List<float> _slashMask = new(40);
 
     /// <summary>
-    /// The swing as a Death Flame ribbon on the blade's level circle: it trails the blade by up
-    /// to a third of a turn, then burns out from the tail as the swing settles. Presentation
-    /// only; the strike itself is resolved elsewhere.
+    /// The swing as a Death Flame ribbon streaming from the core in the scythe's collar: it
+    /// follows the recorded path of the rendered blade (<see cref="ScytheBladePaths"/>) in
+    /// heading, height and timing, trailing the blade over the last part of the stroke, and
+    /// burns out from the tail as the swing settles. Older parts of the ribbon are flung a
+    /// little outward, so the sweep shows the strike's reach. Presentation only; the strike
+    /// itself is resolved elsewhere. With <paramref name="behind"/> only the part behind the
+    /// figure is drawn, otherwise only the part in front of it.
     /// </summary>
-    private bool DrawFlameSlash(SpriteBatch batch, ArtAssets art, Vector2 centre, float radius, float squash,
-        float start, float totalArc, float eased, float alpha)
+    private bool DrawFlameSlash(SpriteBatch batch, ArtAssets art, Vector2 feet, bool behind)
     {
-        if (!art.CanDrawDeathFlame || alpha <= 0.01f)
+        if (!art.CanDrawDeathFlame)
         {
-            return art.CanDrawDeathFlame;
+            return false;
+        }
+
+        float progress = NormalizedProgress;
+        float fadeStart = ActiveStep == 3 ? 0.7f : 0.62f;
+        float alpha = 1f - MathHelper.Clamp((progress - fadeStart) / (1f - fadeStart), 0f, 1f);
+        if (alpha <= 0.01f)
+        {
+            return true;
+        }
+
+        // Trail length in swing progress, where the fast part of the stroke begins, and how far
+        // the oldest flame is flung out beyond the blade.
+        (float trail, float flung) = ActiveStep switch
+        {
+            1 => (0.17f, 1.04f),
+            2 => (0.17f, 1.12f),
+            _ => (0.22f, 1.37f)
+        };
+        float activeFrom = StrokeStart(ActiveStep);
+        float settle = MathHelper.Clamp((progress - 0.55f) / 0.45f, 0f, 1f);
+        float head = progress;
+        float tail = MathF.Max(activeFrom, head - trail * (1f - settle * 0.85f));
+        if (head <= tail + 0.004f)
+        {
+            return true;
+        }
+
+        float aim = MathF.Atan2(_attackDirection.Y, _attackDirection.X);
+        float reach = _resonanceActive ? GameBalance.ResonanceScytheRangeMultiplier : 1f;
+        _slashPath.Clear();
+        _slashMask.Clear();
+        bool any = false;
+        const int points = 28;
+        for (int index = 0; index < points; index++)
+        {
+            float along = index / (points - 1f);
+            ScytheBladePaths.Sample sample = ScytheBladePaths.At(ActiveStep, MathHelper.Lerp(tail, head, along));
+            float angle = aim + MathHelper.ToRadians(sample.Heading);
+            float distance = sample.Distance * ScytheBladePaths.UnitsPerMetre * reach * MathHelper.Lerp(flung, 1f, along);
+            _slashPath.Add(feet + ScytheBladePaths.Project(angle, distance, sample.Height));
+            // Level depth of the point relative to the body: negative is farther from the camera.
+            float depth = MathF.Sin(angle) * distance;
+            float front = MathHelper.SmoothStep(0f, 1f, MathHelper.Clamp((depth + 10f) / 20f, 0f, 1f));
+            float share = behind ? 1f - front : front;
+            _slashMask.Add(share);
+            any |= share > 0.01f;
+        }
+
+        if (!any)
+        {
+            return true;
         }
 
         float headWidth = ActiveStep switch { 1 => 24f, 2 => 32f, _ => 50f };
@@ -205,27 +303,9 @@ public sealed class ScytheCombat
             heat *= 1.15f;
         }
 
-        float reach = MathF.Abs(totalArc) * (ActiveStep == 3 ? 0.6f : 0.5f);
-        float head = start + totalArc * MathF.Max(eased, 0.04f);
-        float sweep = MathF.Min(MathF.Abs(totalArc * MathF.Max(eased, 0.04f)), reach) * MathF.Sign(totalArc);
-        // As the swing ends the tail catches up with the blade.
-        float settle = MathHelper.Clamp((NormalizedProgress - 0.55f) / 0.45f, 0f, 1f);
-        sweep *= 1f - settle * 0.7f;
-        float tail = head - sweep;
-
-        _slashPath.Clear();
-        const int points = 32;
-        for (int index = 0; index < points; index++)
-        {
-            float angle = MathHelper.Lerp(tail, head, index / (points - 1f));
-            // The edge flares out a little toward the blade, like cloth of flame thrown off it.
-            float r = radius * (0.94f + 0.06f * index / (points - 1f));
-            _slashPath.Add(centre + new Vector2(MathF.Cos(angle) * r, MathF.Sin(angle) * r * squash));
-        }
-
         // A wide, dim veil of flame under a narrower, hotter edge.
-        art.DrawDeathFlameSlash(batch, _slashPath, headWidth * 1.8f, alpha * 0.8f, heat * 0.75f);
-        art.DrawDeathFlameSlash(batch, _slashPath, headWidth, alpha, heat);
+        art.DrawDeathFlameSlash(batch, _slashPath, headWidth * 1.8f, alpha * 0.8f, heat * 0.75f, _slashMask);
+        art.DrawDeathFlameSlash(batch, _slashPath, headWidth, alpha, heat, _slashMask);
         return true;
     }
 
@@ -308,7 +388,7 @@ public sealed class ScytheCombat
         float fadeStart = ActiveStep == 3 ? 0.7f : 0.62f;
         float trailAlpha = 1f - MathHelper.Clamp((attackProgress - fadeStart) / (1f - fadeStart), 0f, 1f);
         float visibleSweep = totalArc * MathHelper.Clamp(eased, 0.08f, 1f);
-        if (!(figureCarriesScythe && art is not null && DrawFlameSlash(batch, art, trailCentre, radius, squash, start, totalArc, eased, trailAlpha)))
+        if (!(figureCarriesScythe && art is not null && DrawFlameSlash(batch, art, playerPosition, behind: false)))
         {
             float outerThickness = thickness + (ActiveStep switch { 1 => 3f, 2 => 6f, _ => 10f });
             batch.DrawArc(pixel, trailCentre, radius, start, visibleSweep, GameBalance.DeepViolet * (0.62f * trailAlpha), outerThickness, ActiveStep == 3 ? 34 : 24, squash);
