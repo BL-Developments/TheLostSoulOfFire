@@ -18,11 +18,11 @@ Das System SHALL eine ungestörte exponierte Seele nach einem zeitlich lesbaren 
 - **THEN** verbindet sich Death Flame mit ihr, sie hellt bis nahe Weiß auf, verlässt die Welt und hinterlässt Soul Residue
 
 ### Requirement: Nur erfolgreiche Freisetzung erzeugt Resonance
-Das System SHALL Resonance erst nach erfolgreichem Soul Release erhöhen und MUST NOT eine verschlungene Seele als Spielerressource verbuchen.
+Das System SHALL Resonance erst nach erfolgreichem Soul Release erhöhen und MUST NOT für eine verschlungene Seele Resonance verbuchen. Soul Release MUST NOT Geld oder Glut gutschreiben; Glut entsteht ausschließlich beim Besiegen des Gegners.
 
 #### Scenario: Soul Release wird abgeschlossen
 - **WHEN** eine Seele erfolgreich die Welt verlässt
-- **THEN** bewegt sich Soul Residue zum Spieler-Core und erhöht dessen Resonance
+- **THEN** bewegt sich Soul Residue zum Spieler-Core und erhöht dessen Resonance, ohne einen Währungsbestand zu verändern
 
 #### Scenario: Seele wird verschlungen
 - **WHEN** ein Devourer den Verschlingvorgang abschließt
