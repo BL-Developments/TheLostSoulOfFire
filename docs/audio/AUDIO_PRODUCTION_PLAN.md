@@ -122,3 +122,15 @@ What the game had no sound for was added, authored locally from recipes (`tools/
 - **Listening.** Candidates were judged by loudness, spectrogram, loop seam and a LAION-CLAP
   ranking against text descriptions (`tools/audio/listen.py`); a final listening pass in the
   game by a person is still open.
+
+## Mixprüfung ohne Gehör (ab 06.10.2026)
+
+`tools/audio/mix_report.py --zone arena|hub|shore|crossing` liest jede Abspielstelle mit ihrer
+Lautstärke aus dem Code, misst die lauteste Momentan-Lautheit (400 ms, K-gewichtet) jedes Assets
+und stellt sie dem Bett der Zone gegenüber (Atmosphäre und Musik mit ihren Spielpegeln;
+Menütöne gegen das pausierte Bett). Bänder in LU über dem Bett: Gefahr +6 … +20, Treffer
++4 … +18, Aktionen 0 … +14, Schritte −14 … +2, Menü −12 … +4, Seelensinn −12 … +6, Ereignisse
++2 … +18. Stand 06.10.: alle vier Zonen ohne Ausreißer (Überfahrt-Bett um 2,6 dB gesenkt, damit
+Gefahrensignale auf dem Deck nicht untergehen; Prolog-Kampfmusik etwas voller; Warn- und
+Schritt-Cues nachgezogen). Maskierung nach Frequenz und die Dynamik eines echten Kampfs bildet
+der Bericht nicht ab; die Hörabnahme im Spiel bleibt offen.

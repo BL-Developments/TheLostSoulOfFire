@@ -81,10 +81,10 @@ Außerhalb der Arena läuft nur die Arena-Atmosphäre leise; Musik gibt es nur i
 | --- | --- | --- |
 | E1 | Musik: Titel, Ufer/Hafen, Damm, Überfahrt, Schwelle, Hub; Überblendung zwischen Zonen | ☑ (Hörabnahme durch Owner offen) |
 | E2 | Atmosphären je Bereich: Ufer, Hafen, Damm, Deck, Schwelle, Hub | ☑ (Hörabnahme durch Owner offen) |
-| E3 | Schritte des Spielers (Stein, Planken; Varianten); Gegner-Schritte offen | ◐ |
+| E3 | Schritte des Spielers (Stein, Planken) und der Gegner (Hollow, Burning, Devourer; je vier Takes, nach Abstand und Seite) | ☑ (Hörabnahme durch Owner offen) |
 | E4 | UI-Töne: Navigation, Zurück, Menü öffnen und schließen, Reiter, Werte | ☑ |
 | E5 | Fehlende Spielsignale: Kiste, Währung, Fähigkeiten (6), Hub-Tür | ☑ |
-| E6 | Mix: Treffer über Schwüngen, Schaden und Gefahrensignale angehoben, Zonenpegel | ◐ |
+| E6 | Mix: Treffer über Schwüngen, Gefahrensignale angehoben, Zonenpegel; `mix_report.py` prüft alle Cues gegen das Bett jeder Zone (alle im Band) | ☑ (Hörabnahme durch Owner offen) |
 
 Werkzeuge: Ludo-Bank (Ableitungen erlaubt), lokale Synthese (numpy/scipy), ACE-Step v1
 (Apache-2.0) für Musik, CLAP (Apache-2.0) und Spektralanalyse als Hörprobe.

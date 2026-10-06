@@ -222,7 +222,7 @@ public sealed partial class GameWorld : IDisposable
         {
             _pauseMenu.Open(MenuPages.Pause);
             _audio.SetPaused(true);
-            _audio.Play(AudioCue.UiOpen, 0.6f);
+            _audio.Play(AudioCue.UiOpen, 0.45f);
             return;
         }
 
@@ -230,7 +230,7 @@ public sealed partial class GameWorld : IDisposable
         {
             _characterMenu.Open();
             _audio.SetPaused(true);
-            _audio.Play(AudioCue.UiOpen, 0.6f);
+            _audio.Play(AudioCue.UiOpen, 0.45f);
             return;
         }
 
@@ -503,11 +503,11 @@ public sealed partial class GameWorld : IDisposable
             if (enemy is Hollow hollowAfter && previousHollowState != HollowState.Swipe && hollowAfter.State == HollowState.Swipe)
             {
                 // The grab is a danger signal: clearly above the room, below a hit.
-                _audio.Play(AudioCue.HollowSwipe, 0.64f);
+                _audio.Play(AudioCue.HollowSwipe, 0.7f);
             }
             if (enemy is Burning burningAfter && previousBurningState != BurningState.Telegraph && burningAfter.State == BurningState.Telegraph)
             {
-                _audio.Play(AudioCue.BurningCharge, 0.72f);
+                _audio.Play(AudioCue.BurningCharge, 0.85f);
             }
             if (enemy is Devourer devourerAfter)
             {
@@ -631,7 +631,7 @@ public sealed partial class GameWorld : IDisposable
             case MenuActionResult.Resume:
                 _pauseMenu.Close();
                 _audio.SetPaused(false);
-                _audio.Play(AudioCue.UiClose, 0.55f);
+                _audio.Play(AudioCue.UiClose, 0.45f);
                 break;
             case MenuActionResult.QuitToMainMenu:
                 _pauseMenu.Close();
@@ -654,7 +654,7 @@ public sealed partial class GameWorld : IDisposable
         {
             _characterMenu.Close();
             _audio.SetPaused(false);
-            _audio.Play(AudioCue.UiClose, 0.55f);
+            _audio.Play(AudioCue.UiClose, 0.45f);
             return;
         }
 
@@ -1728,8 +1728,8 @@ public sealed partial class GameWorld : IDisposable
         {
             (AudioCue cue, float stride, float loudness) = enemy switch
             {
-                Devourer => (AudioCue.DevourerStep, 105f, 0.62f),
-                Burning => (AudioCue.BurningStep, 70f, 0.34f),
+                Devourer => (AudioCue.DevourerStep, 105f, 0.5f),
+                Burning => (AudioCue.BurningStep, 70f, 0.4f),
                 Hollow => (AudioCue.HollowStep, 72f, 0.4f),
                 _ => (AudioCue.Footstep, 0f, 0f)
             };
@@ -2202,7 +2202,7 @@ public sealed partial class GameWorld : IDisposable
         {
             _arenaAtmosphere.ReactToForce(origin, 460f, 135f);
         }
-        _audio.Play(AudioCue.CannonFire, request.IsFullCharge ? 0.9f : 0.58f, request.IsFullCharge ? -0.08f : 0.08f);
+        _audio.Play(AudioCue.CannonFire, request.IsFullCharge ? 0.8f : 0.58f, request.IsFullCharge ? -0.08f : 0.08f);
         _player.ApplyCannonRecoil(request.Direction, request.Charge);
     }
 
@@ -2387,7 +2387,7 @@ public sealed partial class GameWorld : IDisposable
         }
         else if (wasSoulSenseActive && !_player.SoulSenseActive)
         {
-            _audio.Play(AudioCue.SoulSenseOff, 0.3f);
+            _audio.Play(AudioCue.SoulSenseOff, 0.5f);
         }
 
         if (wasSoulSenseActive != _player.SoulSenseActive)

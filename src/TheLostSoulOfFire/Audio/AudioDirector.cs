@@ -655,7 +655,7 @@ public sealed class AudioDirector : IDisposable
         AudioZone.Arena => Lerp(0.048f, _calm ? 0.035f : 0.12f, _arenaMix),
         AudioZone.Title => 0.07f,
         AudioZone.Hub => 0.13f,
-        AudioZone.Crossing => _calm ? 0.13f : 0.16f,
+        AudioZone.Crossing => 0.1f,
         _ => _calm ? 0.15f : 0.11f
     };
 
@@ -665,9 +665,9 @@ public sealed class AudioDirector : IDisposable
         AudioZone.Arena => (_calm ? MusicCalmVolume : MusicGameplayVolume) * _arenaMix,
         AudioZone.Title => 0.5f,
         AudioZone.Hub => 0.3f,
-        AudioZone.Crossing => 0.46f,
+        AudioZone.Crossing => 0.32f,
         AudioZone.Threshold => 0.34f,
-        _ => _calm ? 0.26f : 0.4f
+        _ => _calm ? 0.26f : 0.5f
     };
 
     private void ApplyMix()
