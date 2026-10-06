@@ -2366,8 +2366,12 @@ public sealed partial class GameWorld : IDisposable
 
         if (_loopState is ArenaLoopState.Intro or ArenaLoopState.Transition)
         {
+            // The Death Flame gathers in the middle of the hall as the wave arrives: soft light
+            // breathing on the floor, no ring.
             float pulse = 0.5f + 0.5f * MathF.Sin(_presentation.StateTime * 8f);
-            WorldMarks.Ring(batch, pixel, _arena.CombatBounds.Center.ToVector2(), 118f + pulse * 14f, GameBalance.DeathFlame * (0.16f + pulse * 0.14f));
+            Color gather = GameBalance.DeathFlame * (0.1f + pulse * 0.06f);
+            gather.A = 0;
+            _art.DrawSoftSpot(batch, _arena.CombatBounds.Center.ToVector2(), new Vector2(150f + pulse * 14f, 90f + pulse * 8f), gather);
         }
     }
 

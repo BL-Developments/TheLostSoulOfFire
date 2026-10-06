@@ -382,6 +382,8 @@ Rahmen wie oben (nur Darstellung und Ton).
 - Tod: Das Licht der Death Flame lag ab dem ersten Bild am Boden, wo der Körper erst nach 1,3 s
   liegt. Jetzt sinkt das Kernlicht mit dem Fall und flammt auf, wenn die Flamme den Körper nimmt
   (0,85 s, wie die Darstellung); `Player.SinceDeath` als Darstellungszeit.
+- Arena-Intro, Wellenwechsel und Tod: die Ringe um Figur und Hallenmitte durch weiches,
+  atmendes Licht ersetzt (die Flamme sammelt sich, statt als Kreislinie zu erscheinen).
 - Eigener Treffer: weicher Lichtstoß aus dem Körper statt hellem Ring; Dash: weiche Flammenspur
   statt zweier gerader Strahlen.
 

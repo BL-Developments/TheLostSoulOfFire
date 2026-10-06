@@ -188,7 +188,10 @@ public sealed class CinematicPresentation
             float scale = MathHelper.Lerp(0.68f, 0.34f, collapse);
             float alpha = MathHelper.Lerp(1f, 0.34f, collapse) * Ease((_stateTime - delay) / 0.25f);
             art.DrawLoopingEffect(batch, player, VisualIds.DeathFlameLoop, body, 0f, scale, Color.White * alpha);
-            WorldMarks.Ring(batch, pixel, body, MathHelper.Lerp(52f, 17f, collapse), GameBalance.DeathFlameBright * (0.55f * (1f - collapse)), false, 3f);
+            // The flame gathering the body in: soft light closing in, no ring.
+            Color gather = GameBalance.DeathFlameBright * (0.35f * (1f - collapse));
+            gather.A = 0;
+            art.DrawSoftSpot(batch, body, new Vector2(MathHelper.Lerp(52f, 17f, collapse), MathHelper.Lerp(30f, 10f, collapse)), gather);
             return;
         }
 
@@ -197,7 +200,9 @@ public sealed class CinematicPresentation
             float reveal = 1f - MathF.Abs(_stateTime - 0.82f) / 0.38f;
             reveal = MathHelper.Clamp(reveal, 0f, 1f);
             art.DrawLoopingEffect(batch, this, VisualIds.DeathFlameLoop, player.Position, 0f, 0.46f, Color.White * (0.58f * reveal));
-            WorldMarks.Ring(batch, pixel, player.Position, 24f + reveal * 31f, GameBalance.DeathFlameBright * (0.45f * reveal), false, 3f);
+            Color bloom = GameBalance.DeathFlameBright * (0.3f * reveal);
+            bloom.A = 0;
+            art.DrawSoftSpot(batch, player.Position, new Vector2(30f + reveal * 34f, 18f + reveal * 20f), bloom);
         }
 
         if (loopState == ArenaLoopState.Complete)
