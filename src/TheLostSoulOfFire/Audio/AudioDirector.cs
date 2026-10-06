@@ -84,14 +84,15 @@ public enum AudioCue
 
 /// <summary>
 /// What is heard where it stands as a quiet loop: the enemy kinds between their steps and
-/// attacks, and the Warden flames burning in the hall.
+/// attacks, the Warden flames burning in the hall and the furnace in the foundry's north wall.
 /// </summary>
 public enum PresenceSource
 {
     Hollow,
     Burning,
     Devourer,
-    WardenFlames
+    WardenFlames,
+    Furnace
 }
 
 /// <summary>Where the player is, for the ambience bed and the music (presentation only).</summary>
@@ -299,12 +300,14 @@ public sealed class AudioDirector : IDisposable
     /// loop per source, placed toward the nearest; danger signals push them back like the swings
     /// and steps.
     /// </summary>
-    private static readonly Dictionary<PresenceSource, (string Asset, float Volume)> PresenceAssets = new()
+    private static readonly Dictionary<PresenceSource, (string Asset, float Volume, float Pitch)> PresenceAssets = new()
     {
-        [PresenceSource.Hollow] = ("Audio/Sfx/presence_hollow", 0.3f),
-        [PresenceSource.Burning] = ("Audio/Sfx/presence_burning", 0.34f),
-        [PresenceSource.Devourer] = ("Audio/Sfx/presence_devourer", 0.42f),
-        [PresenceSource.WardenFlames] = ("Audio/Sfx/warden_flame_loop", 0.5f)
+        [PresenceSource.Hollow] = ("Audio/Sfx/presence_hollow", 0.3f, 0f),
+        [PresenceSource.Burning] = ("Audio/Sfx/presence_burning", 0.34f, 0f),
+        [PresenceSource.Devourer] = ("Audio/Sfx/presence_devourer", 0.42f, 0f),
+        [PresenceSource.WardenFlames] = ("Audio/Sfx/warden_flame_loop", 0.5f, 0f),
+        // The furnace in the hall's north wall burns the same Death Flame, larger and deeper.
+        [PresenceSource.Furnace] = ("Audio/Sfx/warden_flame_loop", 0.8f, -0.3f)
     };
 
     private readonly Dictionary<PresenceSource, SoundEffect?> _presenceSounds = [];
@@ -868,13 +871,14 @@ public sealed class AudioDirector : IDisposable
                 loop = sound.CreateInstance();
                 loop.IsLooped = true;
                 loop.Volume = 0f;
+                loop.Pitch = PresenceAssets[kind].Pitch;
                 loop.Play();
                 if (_paused) loop.Pause();
                 _presence[kind] = loop;
             }
             // In Soul Sense the world grows quiet and the souls come forward (16_AUDIO_DIRECTION):
             // enemies, souls within, are heard more, the flames of the hall less.
-            float sense = !_soulSense ? 1f : kind == PresenceSource.WardenFlames ? 0.6f : 1.5f;
+            float sense = !_soulSense ? 1f : kind is PresenceSource.WardenFlames or PresenceSource.Furnace ? 0.6f : 1.5f;
             loop.Volume = Math.Clamp(PresenceAssets[kind].Volume * current * sense * (1f - 0.5f * _focus), 0f, 1f);
             loop.Pan = Math.Clamp(pan, -1f, 1f);
         }

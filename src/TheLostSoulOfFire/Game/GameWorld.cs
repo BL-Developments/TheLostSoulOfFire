@@ -2082,6 +2082,16 @@ public sealed partial class GameWorld : IDisposable
         }
         _audio.SetPresence(PresenceSource.WardenFlames, MathHelper.Clamp(_flameLevel, 0f, 1.2f),
             _flameLevel > 0.001f ? _flamePan / _flameLevel : 0f, deltaTime);
+
+        // The furnace in the north wall of the foundry, louder toward the wall; in the ending the
+        // Life Flame burns there instead.
+        float furnace = 0f;
+        if (_phase == GamePhase.Arena && _loopState != ArenaLoopState.Complete)
+        {
+            float nearness = MathHelper.Clamp(1f - Vector2.Distance(Arena.FurnaceHearth, _player.Position) / 1000f, 0f, 1f);
+            furnace = 0.15f + 0.85f * nearness * nearness;
+        }
+        _audio.SetPresence(PresenceSource.Furnace, furnace, PanOf(Arena.FurnaceHearth) * 0.8f, deltaTime);
     }
 
     private float _flameLevel;

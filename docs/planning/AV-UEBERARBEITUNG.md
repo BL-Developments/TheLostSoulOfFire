@@ -398,6 +398,11 @@ Rahmen wie oben (nur Darstellung und Ton).
   leiser). Im Vorbeigehen 5 LU unter Bett und Musik, direkt daneben gleichauf.
   `ambience-hub` ohne die alte Flammenschicht neu erzeugt (gleicher Seed). Rundgang protokolliert
   Pegel und Seite (Vorhalle 0,19 rechts beim Ankommen, 0,53 mittig nach dem Gang nach rechts).
+- Ofen der Gießhalle als Klangquelle: dieselbe Death Flame wie die Warden-Flammen, tiefer
+  gestimmt (Tonhöhe −0,3; CLAP gestimmt „torch flame“ 0,77), aus der Nordwand, lauter zur Wand
+  hin (Mitte etwa −10 LU, an der Wand −4 LU unter dem Bett), im Ende übernimmt die Life Flame.
+  Verworfen: eigenes Rezept `furnace-breath` (CLAP „wind“ bis 0,74 bzw. „thunder“ bis 0,46 –
+  tiefes Brausen klingt nach Wind, dumpfes Aufwallen nach Donner).
 - Schwelle: Die Titelkarte „YOU ARE NOT ALONE“ stand genau über der Figur im Tor; jetzt im
   Dunkel über dem Tor, die Raute der unteren Trennlinie sitzt über der Torflamme.
 - Burning ohne Blase, Strahl und Bodenring: Beim Aufladen der Detonation saß der Kern in einer
@@ -467,9 +472,7 @@ kein Ersatzklang), Gameplay- und Tod-Neustart-Test.
 
 **Befunde, offen (nach Wirkung):**
 1. Sprache: Erzähltexte englisch, HUD deutsch (Inhaltsfrage, nicht ohne Owner ändern).
-2. Ofen der Arena als Klangquelle: zwei Rezepte (`furnace-breath`) hörte CLAP als Wind oder
-   Donner (tiefes Brausen, dumpfes Aufwallen); nicht eingebaut. Nächster Versuch: die
-   Warden-Flamme tiefer gestimmt.
+
 
 
 **Hinweis:** Nach `place_environment.py` immer `dotnet build` vor dem Rundgang, sonst zeigt
