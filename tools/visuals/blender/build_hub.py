@@ -84,6 +84,10 @@ def materials() -> dict[str, bpy.types.Material]:
         "timber": kit.textured("timber", timber, 2.4, tint=(0.42, 0.38, 0.40), axes="XZ", bump=0.4) if timber
         else kit.painted("timber", TIMBER, (0.12, 0.085, 0.062), scale=2.0, roughness=0.8),
         "ash": kit.painted("ash", (0.20, 0.195, 0.205), (0.36, 0.35, 0.36), scale=1.5, roughness=1.0, bump=0.15),
+        # Drifted ash: one value step above the paving, so it reads as fine grey dust on basalt,
+        # not as pale stones.
+        "ash_drift": kit.painted("ash_drift", (0.05, 0.048, 0.053), (0.11, 0.106, 0.112), scale=4.0, roughness=1.0,
+                                 bump=0.35),
         "glow": kit.emissive("glow", DEATH_FLAME, 6.0),
         "cinder": kit.painted("cinder", (0.02, 0.018, 0.024), (0.07, 0.05, 0.09), scale=8.0, roughness=1.0),
     }
@@ -101,17 +105,28 @@ def build_floor(m) -> list[bpy.types.Object]:
     # Ash drifted against the wall foot and in the corners.
     import random
     rng = random.Random(7)
-    bpy.ops.mesh.primitive_uv_sphere_add(segments=16, ring_count=8, radius=1.0)
+    # Drifts, not domes: a subdivided sphere whose outline and top are broken by noise, low and
+    # stretched along the wall, so no two read as the same pebble.
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=32, ring_count=16, radius=1.0)
     heap = bpy.context.active_object
-    heap.data.materials.append(m["ash"])
+    heap.data.materials.append(m["ash_drift"])
+    drift = bpy.data.textures.new("ash_drift", type="CLOUDS")
+    drift.noise_scale = 0.55
+    displace = heap.modifiers.new("drift", "DISPLACE")
+    displace.texture = drift
+    displace.texture_coords = "GLOBAL"
+    displace.strength = 0.45
+    displace.mid_level = 0.6
     points = []
     for x in range(20, WORLD[0], 46):
         if any(abs(x - cx) < (125 if final else 75) for _, cx, final in DOORS):
             continue
-        points.append(ground(x + rng.uniform(-14, 14), WALL_FOOT + rng.uniform(4, 16), -0.05))
-    heaps = kit.scatter("ash", heap, points, seed=3, scale_range=(0.18, 0.42))
+        points.append(ground(x + rng.uniform(-14, 14), WALL_FOOT + rng.uniform(2, 12), -0.02))
+    heaps = kit.scatter("ash", heap, points, seed=3, scale_range=(0.2, 0.4))
     for obj in heaps:
-        obj.scale.z *= 0.35
+        obj.scale.x *= rng.uniform(1.3, 2.0)
+        obj.scale.z *= 0.3
+        obj.rotation_euler.z = rng.uniform(-0.25, 0.25)
     return parts + heaps
 
 

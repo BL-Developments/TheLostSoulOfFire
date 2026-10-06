@@ -280,10 +280,23 @@ public sealed class SoulFurnaceAntechamber
         float soulSenseAmount,
         float doorProgress)
     {
-        float breathe = 0.9f + MathF.Sin(time * 3.1f) * 0.1f;
-        foreach (Vector2 brazier in BrazierPositions)
+        for (int index = 0; index < BrazierPositions.Length; index++)
         {
-            renderer.DrawGlow(batch, brazier - Vector2.UnitY * 10f, 110f * breathe, GameBalance.DeathFlame, 0.15f);
+            // Each bowl breathes on its own, with a small quicker flicker: a pool on the floor
+            // around the stand and a hotter core at the flame.
+            float phase = time + index * 0.7f;
+            float breathe = 0.9f + MathF.Sin(phase * 3.1f) * 0.07f + MathF.Sin(phase * 8.3f + 1.1f) * 0.03f;
+            Vector2 flame = BrazierPositions[index];
+            renderer.DrawGlow(batch, flame + new Vector2(0f, 40f), 210f * breathe, GameBalance.DeathFlame, 0.15f);
+            renderer.DrawGlow(batch, flame - Vector2.UnitY * 10f, 96f * breathe, GameBalance.DeathFlameBright, 0.16f);
+        }
+
+        // The Warden flames on the pilasters light the stone around them.
+        for (int index = 0; index < SconceFlames.Length; index++)
+        {
+            float phase = time + index * 1.37f;
+            float flicker = 0.92f + MathF.Sin(phase * 2.7f) * 0.05f + MathF.Sin(phase * 7.9f + index) * 0.03f;
+            renderer.DrawGlow(batch, SconceFlames[index] - Vector2.UnitY * 8f, 84f * flicker, GameBalance.DeathFlame, 0.13f);
         }
 
         renderer.DrawGlow(batch, EntryDoorCenter, 96f + doorProgress * 110f, GameBalance.DeathFlameBright, 0.2f + doorProgress * 0.25f);
