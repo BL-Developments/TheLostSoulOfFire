@@ -232,7 +232,11 @@ public sealed class AudioDirector : IDisposable
     private readonly List<SoundEffectInstance> _hallInstances = [];
 
     /// <summary>Cues that soften when they repeat quickly, and their recent count.</summary>
-    private static readonly HashSet<AudioCue> Streaking = [AudioCue.SoulRelease, AudioCue.CurrencyGain];
+    private static readonly HashSet<AudioCue> Streaking =
+    [
+        AudioCue.SoulRelease, AudioCue.CurrencyGain, AudioCue.EnemyEmerge, AudioCue.EnemyDeath,
+        AudioCue.DeathHollow, AudioCue.DeathBurning
+    ];
     private readonly Dictionary<AudioCue, int> _streak = [];
     private readonly Dictionary<AudioCue, float> _streakTimer = [];
 
