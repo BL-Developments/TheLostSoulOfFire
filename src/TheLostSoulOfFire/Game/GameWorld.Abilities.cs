@@ -151,7 +151,7 @@ public sealed partial class GameWorld
 
     private void DrawAbilityHud(SpriteBatch batch, Texture2D pixel, Viewport viewport)
     {
-        if (_characterMenu.IsOpen || _player.IsDead) return;
+        if (_characterMenu.IsOpen || _pauseMenu.IsOpen || _devMenu.IsOpen || _player.IsDead) return;
         if (_phase != GamePhase.Arena && _phase != GamePhase.Antechamber) return;
         if (_phase == GamePhase.Arena && _loopState == ArenaLoopState.Complete) return;
         var cards = CurrentAbilityCards();

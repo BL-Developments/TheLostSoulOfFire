@@ -182,6 +182,10 @@ public sealed partial class GameWorld
 
     private void DrawSandboxHud(SpriteBatch batch, Texture2D pixel, Viewport viewport)
     {
-        PixelText.DrawCentered(batch, pixel, "SANDBOX · F DEV-MENÜ", viewport.Width * 0.5f, 28f, 2, GameBalance.DeathFlameBright * 0.7f);
+        float width = PixelText.MeasureFace("SANDBOX", TextFace.Display, 12f, 2f) + 22f + UiKit.KeyLineWidth("F", "DEV-MENÜ", 1);
+        float left = viewport.Width * 0.5f - width * 0.5f;
+        PixelText.DrawFace(batch, pixel, "SANDBOX", new Vector2(left, 27f), TextFace.Display, 12f, GameBalance.DeathFlameBright * 0.8f, 2f);
+        float keyLeft = left + PixelText.MeasureFace("SANDBOX", TextFace.Display, 12f, 2f) + 22f;
+        UiKit.KeyLine(batch, pixel, keyLeft + UiKit.KeyLineWidth("F", "DEV-MENÜ", 1) * 0.5f, 29f, "F", "DEV-MENÜ", GameBalance.SoulWhite * 0.7f, 1);
     }
 }

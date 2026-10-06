@@ -389,11 +389,22 @@ public sealed class CinematicPresentation
         float centerX = viewport.Width * 0.5f;
         float headingY = viewport.Height * 0.36f;
         DrawTitleRules(batch, pixel, viewport, headingY - 26f, reveal);
-        PixelText.DrawCentered(batch, pixel, "PAUSIERT", centerX, headingY, 5, GameBalance.SoulWhite * reveal);
+        PixelText.DrawCentered(batch, pixel, PauseHeading(menu.CurrentPage.Id), centerX, headingY, 5, GameBalance.SoulWhite * reveal);
         DrawMenuList(batch, pixel, viewport, menu, reveal, menu.OpenTimer);
     }
 
     private const float PauseVeilAlpha = 0.66f;
+
+    /// <summary>The heading names the page the pause menu shows.</summary>
+    private static string PauseHeading(string pageId) => pageId switch
+    {
+        "settings" => "EINSTELLUNGEN",
+        "settings_gameplay" => "GAMEPLAY",
+        "settings_graphics" => "GRAFIK",
+        "settings_audio" => "AUDIO",
+        "pause_quit" => "BEENDEN",
+        _ => "PAUSIERT"
+    };
 
     /// <summary>The veil over the frozen world: darkened, deeper at the edges, letterboxed.</summary>
     private void DrawVeil(SpriteBatch batch, Texture2D pixel, Viewport viewport, float reveal)
@@ -569,8 +580,27 @@ public sealed class CinematicPresentation
                 int width = PixelText.Measure(menu.GetLabel(entries[i]), MenuEntryScale);
                 DrawSelection(batch, pixel, centerX, y, width, 17, reveal);
             }
-            PixelText.DrawCentered(batch, pixel, menu.GetLabel(entries[i]), centerX, y, MenuEntryScale, color * (reveal * breathe));
+            DrawEntryLabel(batch, pixel, menu.GetLabel(entries[i]), centerX, y, color * (reveal * breathe), reveal);
         }
+    }
+
+    /// <summary>An entry; a setting written "NAME: VALUE" shows its value in the flame colour.</summary>
+    private static void DrawEntryLabel(SpriteBatch batch, Texture2D pixel, string label, float centerX, float y, Color color, float reveal)
+    {
+        int split = label.IndexOf(": ", StringComparison.Ordinal);
+        if (split < 0)
+        {
+            PixelText.DrawCentered(batch, pixel, label, centerX, y, MenuEntryScale, color);
+            return;
+        }
+
+        string name = label[..(split + 2)];
+        string value = label[(split + 2)..];
+        float left = centerX - PixelText.Measure(label, MenuEntryScale) * 0.5f;
+        PixelText.Draw(batch, pixel, name, new Vector2(left, y), MenuEntryScale, color);
+        float alpha = color.A / 255f;
+        PixelText.Draw(batch, pixel, value, new Vector2(left + PixelText.Measure(name, MenuEntryScale), y), MenuEntryScale,
+            Color.Lerp(GameBalance.DeathFlameBright, GameBalance.SoulWhite, 0.25f) * alpha);
     }
 
     private static void DrawSelectionMarker(SpriteBatch batch, Texture2D pixel, Vector2 center, Color color)
