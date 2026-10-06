@@ -2,6 +2,7 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using TheLostSoulOfFire.Audio;
 using TheLostSoulOfFire.Combat;
 using TheLostSoulOfFire.Input;
 using TheLostSoulOfFire.Rendering;
@@ -99,10 +100,27 @@ public sealed partial class GameWorld
         _abilities.Update(dt, _player, ActiveCombatBounds, _enemies, _particles, ApplyEnemyDamage);
         if (!CombatActionsEnabled || _player.IsDead) return;
         // The sandbox has no Glut; casting there is free, cooldowns still apply.
-        if (input.WasKeyPressed(Keys.Z)) _abilities.TryCast(_abilities.Slots[0], _player, _wallet,
-            _lastMouseWorld, ActiveCombatBounds, _enemies, _particles, chargeCost: !_sandboxActive);
-        if (input.WasKeyPressed(Keys.X)) _abilities.TryCast(_abilities.Slots[1], _player, _wallet,
-            _lastMouseWorld, ActiveCombatBounds, _enemies, _particles, chargeCost: !_sandboxActive);
+        if (input.WasKeyPressed(Keys.Z) && _abilities.TryCast(_abilities.Slots[0], _player, _wallet,
+            _lastMouseWorld, ActiveCombatBounds, _enemies, _particles, chargeCost: !_sandboxActive))
+            PlayAbilityCue(_abilities.Slots[0]);
+        if (input.WasKeyPressed(Keys.X) && _abilities.TryCast(_abilities.Slots[1], _player, _wallet,
+            _lastMouseWorld, ActiveCombatBounds, _enemies, _particles, chargeCost: !_sandboxActive))
+            PlayAbilityCue(_abilities.Slots[1]);
+    }
+
+    /// <summary>Each ability has its own sound when it is actually cast (presentation only).</summary>
+    private void PlayAbilityCue(RunAbility ability)
+    {
+        AudioCue cue = ability switch
+        {
+            RunAbility.SecondWind => AudioCue.AbilityHeal,
+            RunAbility.PiercingShot => AudioCue.AbilityPierce,
+            RunAbility.Retreat => AudioCue.AbilityLeap,
+            RunAbility.Vortex => AudioCue.AbilityVortex,
+            RunAbility.Revenge => AudioCue.AbilityGuard,
+            _ => AudioCue.AbilityMark
+        };
+        _audio.Play(cue, 0.72f);
     }
 
     private void DrawAbilityWorld(SpriteBatch batch, Texture2D pixel)

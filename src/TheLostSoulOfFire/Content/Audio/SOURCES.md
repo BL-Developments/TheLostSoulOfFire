@@ -83,3 +83,64 @@ Every entry uses the Ludo commercial-use license and verified metered API entitl
 - `--audio-gameplay-test` runs all four waves, ending reveal, completion, and restart.
 - `--audio-death-restart-test` verifies fatal damage, death cue/state, and restart.
 - Add `--expect-audio-fallback` after making one built SFX XNB unavailable; the test fails unless the synthesized emergency fallback was created.
+
+## Lokal synthetisierte Klänge (tools/audio, ab 2026-10-06)
+
+Für Bereiche und Aktionen, die bisher keinen eigenen Klang hatten, entstanden Atmosphären,
+Musikbetten und Cues lokal aus Rezepten in `tools/audio/recipes/*.py` (numpy/scipy, Seed
+festgehalten). Es gibt keine Samples, keine fremden Aufnahmen und keinen Netzdienst. Die
+Ergebnisse sind eigene Arbeit des Projekts.
+
+- **Werkzeuge:** `tools/audio/dsp.py` (Rauschen, Filter, Glocken, Zupf- und Streicherklänge,
+  Chor, synthetischer Raum), `author.py` (rendert ein Rezept mit Seed, Spektrogramm und
+  Bericht mit LUFS, Spitze und Naht), `install.py` (übernimmt die gewählte Aufnahme nach
+  `Content/Audio`).
+- **Musik:** sechs Stücke in der Tonart der Arena-Musik (gis-Moll) mit einem gemeinsamen
+  Motiv dis–cis–h–gis, das auf ais stehen bleibt. Erst an der Schwelle löst es sich nach H.
+  Kodiert als Ogg Vorbis q5 mit 48 kHz Stereo.
+- **Loops:** Der Raumhall läuft über die Loopgrenze zurück an den Anfang. An den Rändern
+  liegt eine Blende von 8 ms.
+- **Prüfung (Hören ersetzt):**
+  - Lautheit nach EBU R128 mit pyloudnorm und Spitzenpegel.
+  - Spektrogramme.
+  - Nahtprüfung (`validate_audio.py`).
+  - LAION-CLAP (`laion/clap-htsat-unfused`, Apache-2.0) über `tools/audio/listen.py`: Es ordnet
+    jeden Kandidaten gegen Textbeschreibungen ein, damit er nicht als Rauschen oder
+    Tanzmusik gelesen wird.
+  - Die endgültige Abnahme im Spiel durch Hören steht beim Owner aus.
+
+| Datei | Rezept und Seed | Eigenschaften |
+|---|---|---|
+| `Audio/Ambience/shore_ambience.wav` | ambience-shore Seed 2 | 40.00 s, 2 Kanal/Kanäle, -29.0 LUFS, Spitze -16.8 dBFS |
+| `Audio/Ambience/hub_ambience.wav` | ambience-hub Seed 2 | 32.00 s, 2 Kanal/Kanäle, -30.0 LUFS, Spitze -12.0 dBFS |
+| `Audio/Ambience/harbour_ambience.wav` | ambience-harbour Seed 1 | 36.00 s, 2 Kanal/Kanäle, -29.0 LUFS, Spitze -15.0 dBFS |
+| `Audio/Ambience/causeway_ambience.wav` | ambience-causeway Seed 1 | 36.00 s, 2 Kanal/Kanäle, -27.0 LUFS, Spitze -14.4 dBFS |
+| `Audio/Ambience/crossing_ambience.wav` | ambience-crossing Seed 2 | 24.00 s, 2 Kanal/Kanäle, -26.0 LUFS, Spitze -11.8 dBFS |
+| `Audio/Ambience/threshold_ambience.wav` | ambience-threshold Seed 5 | 32.00 s, 2 Kanal/Kanäle, -34.0 LUFS, Spitze -25.7 dBFS |
+| `Audio/Music/title_theme.ogg` | music-title Seed 1 | 58.18 s, 2 Kanal/Kanäle, -20.0 LUFS, Spitze -6.1 dBFS |
+| `Audio/Music/shore_theme.ogg` | music-shore Seed 1 | 68.57 s, 2 Kanal/Kanäle, -23.0 LUFS, Spitze -8.0 dBFS |
+| `Audio/Music/hub_theme.ogg` | music-hub Seed 1 | 64.00 s, 2 Kanal/Kanäle, -22.0 LUFS, Spitze -9.7 dBFS |
+| `Audio/Music/causeway_theme.ogg` | music-causeway Seed 4 | 53.33 s, 2 Kanal/Kanäle, -20.0 LUFS, Spitze -4.9 dBFS |
+| `Audio/Music/crossing_theme.ogg` | music-crossing Seed 3 | 55.38 s, 2 Kanal/Kanäle, -18.0 LUFS, Spitze -3.0 dBFS |
+| `Audio/Music/threshold_theme.ogg` | music-threshold Seed 1 | 49.66 s, 2 Kanal/Kanäle, -22.0 LUFS, Spitze -7.2 dBFS |
+| `Audio/Sfx/footstep_stone_1.wav` | footstep-stone Seed 1 | 0.30 s, 1 Kanal/Kanäle, -26.0 LUFS, Spitze -6.8 dBFS |
+| `Audio/Sfx/footstep_stone_2.wav` | footstep-stone Seed 2 | 0.30 s, 1 Kanal/Kanäle, -26.0 LUFS, Spitze -7.3 dBFS |
+| `Audio/Sfx/footstep_stone_3.wav` | footstep-stone Seed 3 | 0.30 s, 1 Kanal/Kanäle, -28.2 LUFS, Spitze -6.0 dBFS |
+| `Audio/Sfx/footstep_stone_4.wav` | footstep-stone Seed 4 | 0.30 s, 1 Kanal/Kanäle, -26.0 LUFS, Spitze -7.9 dBFS |
+| `Audio/Sfx/footstep_wood_1.wav` | footstep-wood Seed 1 | 0.34 s, 1 Kanal/Kanäle, -26.2 LUFS, Spitze -6.0 dBFS |
+| `Audio/Sfx/footstep_wood_2.wav` | footstep-wood Seed 2 | 0.34 s, 1 Kanal/Kanäle, -26.0 LUFS, Spitze -7.4 dBFS |
+| `Audio/Sfx/footstep_wood_3.wav` | footstep-wood Seed 3 | 0.34 s, 1 Kanal/Kanäle, -26.0 LUFS, Spitze -7.2 dBFS |
+| `Audio/Sfx/footstep_wood_4.wav` | footstep-wood Seed 4 | 0.34 s, 1 Kanal/Kanäle, -26.0 LUFS, Spitze -6.1 dBFS |
+| `Audio/Sfx/ui_move.wav` | ui-move Seed 1 | 0.18 s, 1 Kanal/Kanäle, -30.0 LUFS, Spitze -17.3 dBFS |
+| `Audio/Sfx/ui_back.wav` | ui-back Seed 1 | 0.20 s, 1 Kanal/Kanäle, -31.0 LUFS, Spitze -17.0 dBFS |
+| `Audio/Sfx/ui_open.wav` | ui-open Seed 1 | 0.45 s, 1 Kanal/Kanäle, -30.0 LUFS, Spitze -17.0 dBFS |
+| `Audio/Sfx/ui_close.wav` | ui-close Seed 1 | 0.32 s, 1 Kanal/Kanäle, -29.7 LUFS, Spitze -17.0 dBFS |
+| `Audio/Sfx/chest_open.wav` | chest-open Seed 1 | 0.90 s, 1 Kanal/Kanäle, -22.4 LUFS, Spitze -3.0 dBFS |
+| `Audio/Sfx/currency_gain.wav` | currency-gain Seed 1 | 0.50 s, 1 Kanal/Kanäle, -27.0 LUFS, Spitze -14.5 dBFS |
+| `Audio/Sfx/ability_heal.wav` | ability-heal Seed 1 | 1.10 s, 1 Kanal/Kanäle, -20.0 LUFS, Spitze -7.5 dBFS |
+| `Audio/Sfx/ability_pierce.wav` | ability-pierce Seed 1 | 0.60 s, 1 Kanal/Kanäle, -17.0 LUFS, Spitze -5.6 dBFS |
+| `Audio/Sfx/ability_leap.wav` | ability-leap Seed 1 | 0.55 s, 1 Kanal/Kanäle, -17.0 LUFS, Spitze -5.6 dBFS |
+| `Audio/Sfx/ability_vortex.wav` | ability-vortex Seed 1 | 1.20 s, 1 Kanal/Kanäle, -18.0 LUFS, Spitze -4.5 dBFS |
+| `Audio/Sfx/ability_guard.wav` | ability-guard Seed 1 | 1.00 s, 1 Kanal/Kanäle, -18.0 LUFS, Spitze -2.7 dBFS |
+| `Audio/Sfx/ability_mark.wav` | ability-mark Seed 1 | 0.50 s, 1 Kanal/Kanäle, -20.0 LUFS, Spitze -3.4 dBFS |
+| `Audio/Sfx/door_awaken.wav` | door-awaken Seed 1 | 1.80 s, 1 Kanal/Kanäle, -18.0 LUFS, Spitze -2.2 dBFS |

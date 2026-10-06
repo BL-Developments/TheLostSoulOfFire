@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using TheLostSoulOfFire.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using TheLostSoulOfFire.Entities;
@@ -133,6 +134,8 @@ public sealed partial class GameWorld
             {
                 if (chest.TryOpen())
                 {
+                    _audio.Play(AudioCue.ChestOpen, 0.7f);
+                    _audio.Play(AudioCue.CurrencyGain, 0.5f);
                     _wallet.Credit(Currency.Geld, GameBalance.ChestGeld);
                     _geldPulse = CurrencyPulseDuration;
                     _particles.EmitBurst(chest.Position, -Vector2.UnitY, 18, GameBalance.Geld, 180f, 5f);

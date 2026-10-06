@@ -43,6 +43,31 @@ SFX_DURATIONS = {
     "ending_reveal.wav": 1.6,
 }
 
+#: Cues authored locally with tools/audio (recipes and seeds in Content/Audio/SOURCES.md).
+AUTHORED_SFX_DURATIONS = {
+    **{f"footstep_stone_{index}.wav": 0.30 for index in range(1, 5)},
+    **{f"footstep_wood_{index}.wav": 0.34 for index in range(1, 5)},
+    "ui_move.wav": 0.18,
+    "ui_back.wav": 0.20,
+    "ui_open.wav": 0.45,
+    "ui_close.wav": 0.32,
+    "chest_open.wav": 0.9,
+    "currency_gain.wav": 0.5,
+    "ability_heal.wav": 1.1,
+    "ability_pierce.wav": 0.6,
+    "ability_leap.wav": 0.55,
+    "ability_vortex.wav": 1.2,
+    "ability_guard.wav": 1.0,
+    "ability_mark.wav": 0.5,
+    "door_awaken.wav": 1.8,
+}
+
+#: Ambience beds and music per zone (AudioDirector.AmbienceAssets / MusicAssets).
+ZONE_AMBIENCES = ["shore_ambience.wav", "hub_ambience.wav", "harbour_ambience.wav", "causeway_ambience.wav",
+                  "crossing_ambience.wav", "threshold_ambience.wav"]
+ZONE_MUSIC = ["title_theme.ogg", "shore_theme.ogg", "hub_theme.ogg", "causeway_theme.ogg", "crossing_theme.ogg",
+              "threshold_theme.ogg"]
+
 GAMEPLAY_CUES = {
     "ScytheSwing1", "ScytheSwing2", "SoulCleave", "ScytheHit", "Dash",
     "CannonCharge", "CannonFull", "CannonFire", "BurningCharge",
@@ -138,6 +163,10 @@ def main() -> int:
             (args.content_root / "Audio" / "Music" / "arena_loop.ogg", "SongProcessor", None),
         )
     )
+    expected_paths.extend((sfx_root / filename, "SoundEffectProcessor", duration) for filename, duration in AUTHORED_SFX_DURATIONS.items())
+    expected_paths.extend((args.content_root / "Audio" / "Ambience" / name, "SoundEffectProcessor", None) for name in ZONE_AMBIENCES)
+    expected_paths.extend((args.content_root / "Audio" / "Music" / name, "SongProcessor", None) for name in ZONE_MUSIC)
+    loops = {"arena_ambience.wav", "arena_loop.ogg", *ZONE_AMBIENCES, *ZONE_MUSIC}
 
     manifest_path = args.content_root / "Content.mgcb"
     sources_path = args.content_root / "Audio" / "SOURCES.md"
@@ -172,7 +201,7 @@ def main() -> int:
             failures.append(f"{relative}: expected 16-bit PCM after decode")
         if path.parent == sfx_root and metrics["channels"] != 1:
             failures.append(f"{relative}: effects must be mono")
-        if path.name in {"arena_ambience.wav", "arena_loop.ogg"} and metrics["channels"] != 2:
+        if path.name in loops and metrics["channels"] != 2:
             failures.append(f"{relative}: loop must be stereo")
         if metrics["peak_db"] >= -1.0:
             failures.append(f"{relative}: peak {metrics['peak_db']:.2f} dBFS is not below -1 dBFS")
@@ -184,7 +213,11 @@ def main() -> int:
             failures.append(f"{relative}: ambience duration must be 20–30s")
         if path.name == "arena_loop.ogg" and not 90.0 <= metrics["duration"] <= 150.0:
             failures.append(f"{relative}: music duration must be 90–150s")
-        if path.name in {"arena_ambience.wav", "arena_loop.ogg"} and metrics["seam_db"] > -45.0:
+        if path.name in ZONE_AMBIENCES and not 20.0 <= metrics["duration"] <= 45.0:
+            failures.append(f"{relative}: ambience duration must be 20–45s")
+        if path.name in ZONE_MUSIC and not 45.0 <= metrics["duration"] <= 150.0:
+            failures.append(f"{relative}: music duration must be 45–150s")
+        if path.name in loops and metrics["seam_db"] > -45.0:
             failures.append(f"{relative}: endpoint discontinuity is {metrics['seam_db']:.1f} dBFS")
 
         block = expected_manifest_block(relative, processor)
@@ -203,7 +236,7 @@ def main() -> int:
         if f"AudioCue.{cue}" not in game_world:
             failures.append(f"gameplay has no event wiring for AudioCue.{cue}")
 
-    expected_sfx = set(SFX_DURATIONS)
+    expected_sfx = set(SFX_DURATIONS) | set(AUTHORED_SFX_DURATIONS)
     actual_sfx = {path.name for path in sfx_root.glob("*.wav")}
     for filename in sorted(actual_sfx - expected_sfx):
         failures.append(f"unexpected shipped SFX candidate: Audio/Sfx/{filename}")

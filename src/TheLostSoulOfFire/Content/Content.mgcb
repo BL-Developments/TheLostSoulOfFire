@@ -8196,3 +8196,168 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/Enemies/Devourer/Rendered/death_normal/nw.png
+
+#begin Audio/Ambience/shore_ambience.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Ambience/shore_ambience.wav
+
+#begin Audio/Ambience/hub_ambience.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Ambience/hub_ambience.wav
+
+#begin Audio/Ambience/harbour_ambience.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Ambience/harbour_ambience.wav
+
+#begin Audio/Ambience/causeway_ambience.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Ambience/causeway_ambience.wav
+
+#begin Audio/Ambience/crossing_ambience.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Ambience/crossing_ambience.wav
+
+#begin Audio/Ambience/threshold_ambience.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Ambience/threshold_ambience.wav
+
+#begin Audio/Music/title_theme.ogg
+/importer:OggImporter
+/processor:SongProcessor
+/build:Audio/Music/title_theme.ogg
+
+#begin Audio/Music/shore_theme.ogg
+/importer:OggImporter
+/processor:SongProcessor
+/build:Audio/Music/shore_theme.ogg
+
+#begin Audio/Music/hub_theme.ogg
+/importer:OggImporter
+/processor:SongProcessor
+/build:Audio/Music/hub_theme.ogg
+
+#begin Audio/Music/causeway_theme.ogg
+/importer:OggImporter
+/processor:SongProcessor
+/build:Audio/Music/causeway_theme.ogg
+
+#begin Audio/Music/crossing_theme.ogg
+/importer:OggImporter
+/processor:SongProcessor
+/build:Audio/Music/crossing_theme.ogg
+
+#begin Audio/Music/threshold_theme.ogg
+/importer:OggImporter
+/processor:SongProcessor
+/build:Audio/Music/threshold_theme.ogg
+
+#begin Audio/Sfx/footstep_stone_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/footstep_stone_1.wav
+
+#begin Audio/Sfx/footstep_stone_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/footstep_stone_2.wav
+
+#begin Audio/Sfx/footstep_stone_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/footstep_stone_3.wav
+
+#begin Audio/Sfx/footstep_stone_4.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/footstep_stone_4.wav
+
+#begin Audio/Sfx/footstep_wood_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/footstep_wood_1.wav
+
+#begin Audio/Sfx/footstep_wood_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/footstep_wood_2.wav
+
+#begin Audio/Sfx/footstep_wood_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/footstep_wood_3.wav
+
+#begin Audio/Sfx/footstep_wood_4.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/footstep_wood_4.wav
+
+#begin Audio/Sfx/ui_move.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/ui_move.wav
+
+#begin Audio/Sfx/ui_back.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/ui_back.wav
+
+#begin Audio/Sfx/ui_open.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/ui_open.wav
+
+#begin Audio/Sfx/ui_close.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/ui_close.wav
+
+#begin Audio/Sfx/chest_open.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/chest_open.wav
+
+#begin Audio/Sfx/currency_gain.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/currency_gain.wav
+
+#begin Audio/Sfx/ability_heal.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/ability_heal.wav
+
+#begin Audio/Sfx/ability_pierce.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/ability_pierce.wav
+
+#begin Audio/Sfx/ability_leap.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/ability_leap.wav
+
+#begin Audio/Sfx/ability_vortex.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/ability_vortex.wav
+
+#begin Audio/Sfx/ability_guard.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/ability_guard.wav
+
+#begin Audio/Sfx/ability_mark.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/ability_mark.wav
+
+#begin Audio/Sfx/door_awaken.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/door_awaken.wav

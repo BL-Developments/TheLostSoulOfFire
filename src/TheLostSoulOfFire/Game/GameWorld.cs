@@ -222,6 +222,7 @@ public sealed partial class GameWorld : IDisposable
         {
             _pauseMenu.Open(MenuPages.Pause);
             _audio.SetPaused(true);
+            _audio.Play(AudioCue.UiOpen, 0.6f);
             return;
         }
 
@@ -229,6 +230,7 @@ public sealed partial class GameWorld : IDisposable
         {
             _characterMenu.Open();
             _audio.SetPaused(true);
+            _audio.Play(AudioCue.UiOpen, 0.6f);
             return;
         }
 
@@ -455,6 +457,7 @@ public sealed partial class GameWorld : IDisposable
         }
 
         _player.Update(deltaTime, input, _lastMouseWorld, ActiveCombatBounds, _particles, _screenEffects, _forceSoulSense);
+        UpdateFootsteps();
         _soulSensePresentation.Update(deltaTime, _player.SoulSenseActive);
         if (_audioTestFatalDamageRequested)
         {
@@ -496,7 +499,8 @@ public sealed partial class GameWorld : IDisposable
             enemy.Update(deltaTime, _player, _souls, ActiveCombatBounds, _particles, _screenEffects);
             if (enemy is Hollow hollowAfter && previousHollowState != HollowState.Swipe && hollowAfter.State == HollowState.Swipe)
             {
-                _audio.Play(AudioCue.HollowSwipe, 0.48f);
+                // The grab is a danger signal: clearly above the room, below a hit.
+                _audio.Play(AudioCue.HollowSwipe, 0.64f);
             }
             if (enemy is Burning burningAfter && previousBurningState != BurningState.Telegraph && burningAfter.State == BurningState.Telegraph)
             {
@@ -561,7 +565,8 @@ public sealed partial class GameWorld : IDisposable
                 _audio.SetSoulSense(false);
                 _presentation.BeginDeath();
             }
-            _audio.Play(_player.IsDead ? AudioCue.PlayerDeath : AudioCue.PlayerHit, _player.IsDead ? 0.78f : 0.6f);
+            // Taking damage must never hide under the player's own swings (mix review 06.10.2026).
+            _audio.Play(_player.IsDead ? AudioCue.PlayerDeath : AudioCue.PlayerHit, _player.IsDead ? 0.82f : 0.95f);
         }
         if (!wasResonanceReady && _player.IsResonanceReady)
         {
@@ -616,6 +621,7 @@ public sealed partial class GameWorld : IDisposable
             case MenuActionResult.Resume:
                 _pauseMenu.Close();
                 _audio.SetPaused(false);
+                _audio.Play(AudioCue.UiClose, 0.55f);
                 break;
             case MenuActionResult.QuitToMainMenu:
                 _pauseMenu.Close();
@@ -638,11 +644,17 @@ public sealed partial class GameWorld : IDisposable
         {
             _characterMenu.Close();
             _audio.SetPaused(false);
+            _audio.Play(AudioCue.UiClose, 0.55f);
             return;
         }
 
+        CharacterMenuTab tabBefore = _characterMenu.SelectedTab;
         if (input.WasKeyPressed(Keys.Left) || input.WasKeyPressed(Keys.A)) _characterMenu.SelectPrevious();
         else if (input.WasKeyPressed(Keys.Right) || input.WasKeyPressed(Keys.D)) _characterMenu.SelectNext();
+        if (_characterMenu.SelectedTab != tabBefore)
+        {
+            _audio.Play(AudioCue.UiMove, 0.55f);
+        }
 
         if (input.WasLeftMousePressed)
         {
@@ -674,7 +686,25 @@ public sealed partial class GameWorld : IDisposable
     /// Shared mouse/keyboard handling for the title and pause menus. Navigation and value
     /// changes are applied here; results that leave the menu are returned to the caller.
     /// </summary>
+    /// <summary>Menu input plus its sounds: a tick when the selection or a value moves, a softer one back.</summary>
     private MenuActionResult UpdateMenuInput(MenuController menu, float deltaTime, InputState input, Viewport viewport)
+    {
+        MenuPage? pageBefore = menu.IsOpen ? menu.CurrentPage : null;
+        int indexBefore = menu.SelectedIndex;
+        MenuActionResult result = UpdateMenuInputCore(menu, deltaTime, input, viewport);
+        MenuPage? pageAfter = menu.IsOpen ? menu.CurrentPage : null;
+        if (pageAfter != pageBefore && pageBefore is not null)
+        {
+            _audio.Play(input.WasKeyPressed(Keys.Escape) ? AudioCue.UiBack : AudioCue.UiMove, 0.6f);
+        }
+        else if (pageAfter is not null && menu.SelectedIndex != indexBefore)
+        {
+            _audio.Play(AudioCue.UiMove, 0.5f);
+        }
+        return result;
+    }
+
+    private MenuActionResult UpdateMenuInputCore(MenuController menu, float deltaTime, InputState input, Viewport viewport)
     {
         menu.Tick(deltaTime);
         if (input.WasKeyPressed(Keys.Escape))
@@ -718,7 +748,11 @@ public sealed partial class GameWorld : IDisposable
         bool valueChanged = false;
         if (input.WasKeyPressed(Keys.Left) || input.WasKeyPressed(Keys.A)) valueChanged = menu.AdjustSelectedValue(-1);
         else if (input.WasKeyPressed(Keys.Right) || input.WasKeyPressed(Keys.D)) valueChanged = menu.AdjustSelectedValue(1);
-        if (valueChanged) ApplySettingsChanges();
+        if (valueChanged)
+        {
+            ApplySettingsChanges();
+            _audio.Play(AudioCue.UiMove, 0.45f, 0.1f);
+        }
 
         bool confirmedByKeyboard = input.WasKeyPressed(Keys.Enter);
         bool confirmedByMouse = false;
@@ -1372,7 +1406,8 @@ public sealed partial class GameWorld : IDisposable
         }
 
         _combatPresentation.PresentScytheImpact(strike.Step, strike.Direction);
-        _audio.Play(AudioCue.ScytheHit, strike.Step == 3 ? 0.72f : 0.48f, strike.Step == 2 ? 0.08f : 0f);
+        // A landed hit sits above the swing that carried it.
+        _audio.Play(AudioCue.ScytheHit, strike.Step == 3 ? 0.85f : 0.68f, strike.Step == 2 ? 0.08f : 0f);
     }
 
     private void SpawnWave(int waveNumber)
@@ -1527,6 +1562,7 @@ public sealed partial class GameWorld : IDisposable
             _screenEffects,
             _forceSoulSense,
             combatEnabled: false);
+        UpdateFootsteps();
 
         _soulSensePresentation.Update(deltaTime, _player.SoulSenseActive);
         _particles.Update(deltaTime);
@@ -1562,6 +1598,34 @@ public sealed partial class GameWorld : IDisposable
         }
     }
 
+    /// <summary>World units per step: half the run cycle of the rendered figure (move clip, 180 per cycle).</summary>
+    private const float FootstepStride = 90f;
+    private Vector2 _footstepFrom;
+    private float _footstepDistance;
+
+    /// <summary>
+    /// Footsteps from the distance the player actually covers (never during a dash or while dead);
+    /// on the skiff's deck the planks answer.
+    /// </summary>
+    private void UpdateFootsteps()
+    {
+        Vector2 position = _player.Position;
+        float moved = Vector2.Distance(position, _footstepFrom);
+        _footstepFrom = position;
+        if (_player.IsDead || _player.IsDashing || moved > 60f || _player.Velocity.LengthSquared() < 120f)
+        {
+            _footstepDistance = MathF.Min(_footstepDistance, FootstepStride * 0.6f);
+            return;
+        }
+        _footstepDistance += moved;
+        if (_footstepDistance >= FootstepStride)
+        {
+            _footstepDistance -= FootstepStride;
+            bool wood = _phase == GamePhase.Prologue && _prologue.IsVehicleRide;
+            _audio.Play(wood ? AudioCue.FootstepWood : AudioCue.Footstep, 0.42f);
+        }
+    }
+
     private const float HubCameraZoom = 0.88f;
     private const float HubCameraHeight = 470f;
 
@@ -1574,7 +1638,7 @@ public sealed partial class GameWorld : IDisposable
         _audio.SetSoulSense(false);
         _audio.SetCalm(false);
         _audio.SetArenaActive(true);
-        _audio.Play(AudioCue.TitleConfirm, 0.48f, -0.14f);
+        _audio.Play(AudioCue.DoorAwaken, 0.85f);
     }
 
     private void UpdateDoorTransition(float deltaTime, Viewport viewport)
@@ -2148,7 +2212,7 @@ public sealed partial class GameWorld : IDisposable
                 3 => AudioCue.SoulCleave,
                 _ => AudioCue.ScytheSwing1
             };
-            _audio.Play(cue, _player.Scythe.ActiveStep == 3 ? 0.78f : 0.5f);
+            _audio.Play(cue, _player.Scythe.ActiveStep == 3 ? 0.72f : 0.42f);
         }
 
         if (!wasDashing && _player.IsDashing)

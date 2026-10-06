@@ -34,7 +34,22 @@ public enum AudioCue
     CannonImpact,
     TitleConfirm,
     WaveClear,
-    EndingReveal
+    EndingReveal,
+    Footstep,
+    FootstepWood,
+    UiMove,
+    UiBack,
+    UiOpen,
+    UiClose,
+    ChestOpen,
+    CurrencyGain,
+    AbilityHeal,
+    AbilityPierce,
+    AbilityLeap,
+    AbilityVortex,
+    AbilityGuard,
+    AbilityMark,
+    DoorAwaken
 }
 
 /// <summary>Where the player is, for the ambience bed and the music (presentation only).</summary>
@@ -101,8 +116,26 @@ public sealed class AudioDirector : IDisposable
         [AudioCue.CannonImpact] = new(0.035f, 3, 0.025f),
         [AudioCue.TitleConfirm] = new(0.5f, 1),
         [AudioCue.WaveClear] = new(0.45f, 1),
-        [AudioCue.EndingReveal] = new(1f, 1)
+        [AudioCue.EndingReveal] = new(1f, 1),
+        [AudioCue.Footstep] = new(0.12f, 2, 0.05f),
+        [AudioCue.FootstepWood] = new(0.12f, 2, 0.05f),
+        [AudioCue.UiMove] = new(0.03f, 2, 0.03f),
+        [AudioCue.UiBack] = new(0.05f, 1, 0.02f),
+        [AudioCue.UiOpen] = new(0.15f, 1),
+        [AudioCue.UiClose] = new(0.15f, 1),
+        [AudioCue.ChestOpen] = new(0.3f, 1),
+        [AudioCue.CurrencyGain] = new(0.08f, 2, 0.04f),
+        [AudioCue.AbilityHeal] = new(0.2f, 1),
+        [AudioCue.AbilityPierce] = new(0.1f, 2, 0.02f),
+        [AudioCue.AbilityLeap] = new(0.15f, 1, 0.02f),
+        [AudioCue.AbilityVortex] = new(0.2f, 1),
+        [AudioCue.AbilityGuard] = new(0.2f, 1, 0.02f),
+        [AudioCue.AbilityMark] = new(0.15f, 1, 0.03f),
+        [AudioCue.DoorAwaken] = new(1f, 1)
     };
+
+    /// <summary>Extra takes of a cue (e.g. footsteps); Play picks one at random so repeats never match exactly.</summary>
+    private readonly Dictionary<AudioCue, List<SoundEffect>> _variants = [];
 
     private readonly Dictionary<AudioCue, SoundEffect> _sounds = [];
     private readonly Dictionary<AudioCue, List<SoundEffectInstance>> _activeInstances = [];
@@ -116,7 +149,7 @@ public sealed class AudioDirector : IDisposable
     /// <summary>Ambience bed and music per zone; a zone without its own asset keeps silence or the arena bed.</summary>
     private static readonly Dictionary<AudioZone, string> AmbienceAssets = new()
     {
-        [AudioZone.Title] = "Audio/Ambience/hub_ambience",
+        [AudioZone.Title] = "Audio/Ambience/shore_ambience",
         [AudioZone.Shore] = "Audio/Ambience/shore_ambience",
         [AudioZone.Harbour] = "Audio/Ambience/harbour_ambience",
         [AudioZone.Causeway] = "Audio/Ambience/causeway_ambience",
@@ -204,6 +237,21 @@ public sealed class AudioDirector : IDisposable
             Add(content, AudioCue.TitleConfirm, "Audio/Sfx/title_confirm", 440f, 0.26f, 0.3f, 0.015f);
             Add(content, AudioCue.WaveClear, "Audio/Sfx/wave_clear", 294f, 0.52f, 0.32f, 0.01f, rising: true);
             Add(content, AudioCue.EndingReveal, "Audio/Sfx/ending_reveal", 147f, 0.9f, 0.3f, 0.015f, rising: true);
+            AddVariants(content, AudioCue.Footstep, "Audio/Sfx/footstep_stone", 4, 90f, 0.08f, 0.2f, 0.6f);
+            AddVariants(content, AudioCue.FootstepWood, "Audio/Sfx/footstep_wood", 4, 120f, 0.09f, 0.2f, 0.5f);
+            Add(content, AudioCue.UiMove, "Audio/Sfx/ui_move", 1568f, 0.05f, 0.15f, 0.02f);
+            Add(content, AudioCue.UiBack, "Audio/Sfx/ui_back", 1046f, 0.06f, 0.15f, 0.02f);
+            Add(content, AudioCue.UiOpen, "Audio/Sfx/ui_open", 600f, 0.2f, 0.15f, 0.2f, rising: true);
+            Add(content, AudioCue.UiClose, "Audio/Sfx/ui_close", 600f, 0.15f, 0.15f, 0.2f);
+            Add(content, AudioCue.ChestOpen, "Audio/Sfx/chest_open", 300f, 0.5f, 0.4f, 0.3f);
+            Add(content, AudioCue.CurrencyGain, "Audio/Sfx/currency_gain", 3200f, 0.2f, 0.2f, 0.1f);
+            Add(content, AudioCue.AbilityHeal, "Audio/Sfx/ability_heal", 392f, 0.8f, 0.3f, 0.1f, rising: true);
+            Add(content, AudioCue.AbilityPierce, "Audio/Sfx/ability_pierce", 880f, 0.3f, 0.4f, 0.4f);
+            Add(content, AudioCue.AbilityLeap, "Audio/Sfx/ability_leap", 80f, 0.3f, 0.5f, 0.5f);
+            Add(content, AudioCue.AbilityVortex, "Audio/Sfx/ability_vortex", 200f, 0.8f, 0.4f, 0.4f, rising: true);
+            Add(content, AudioCue.AbilityGuard, "Audio/Sfx/ability_guard", 330f, 0.5f, 0.4f, 0.1f);
+            Add(content, AudioCue.AbilityMark, "Audio/Sfx/ability_mark", 1661f, 0.3f, 0.3f, 0.3f);
+            Add(content, AudioCue.DoorAwaken, "Audio/Sfx/door_awaken", 104f, 1.2f, 0.5f, 0.3f);
 
             _ambienceSound = LoadOrCreateFallback(content, "Audio/Ambience/arena_ambience", 43f, 2.4f, 0.2f, 0.16f, false);
             _beds[AmbienceAssets[AudioZone.Arena]] = _ambienceSound;
@@ -385,6 +433,11 @@ public sealed class AudioDirector : IDisposable
             return;
         }
 
+        if (_variants.TryGetValue(cue, out List<SoundEffect>? takes) && takes.Count > 1)
+        {
+            sound = takes[(int)((NextSignedFloat() * 0.5f + 0.5f) * takes.Count) % takes.Count];
+        }
+
         SoundEffectInstance instance = null;
         try
         {
@@ -479,6 +532,31 @@ public sealed class AudioDirector : IDisposable
     private void Add(ContentManager content, AudioCue cue, string assetName, float frequency, float duration, float volume, float noise, bool rising = false)
     {
         _sounds[cue] = LoadOrCreateFallback(content, assetName, frequency, duration, volume, noise, rising);
+        _activeInstances[cue] = [];
+    }
+
+    /// <summary>Loads <paramref name="assetBase"/>_1 … _<paramref name="count"/>; the first is the cue's main take.</summary>
+    private void AddVariants(ContentManager content, AudioCue cue, string assetBase, int count, float frequency, float duration, float volume, float noise)
+    {
+        List<SoundEffect> takes = [];
+        for (int index = 1; index <= count; index++)
+        {
+            try
+            {
+                takes.Add(content.Load<SoundEffect>($"{assetBase}_{index}"));
+            }
+            catch (ContentLoadException)
+            {
+            }
+        }
+        if (takes.Count == 0)
+        {
+            SoundEffect fallback = CreateTone(frequency, duration, volume, noise, false);
+            _ownedFallbackSounds.Add(fallback);
+            takes.Add(fallback);
+        }
+        _sounds[cue] = takes[0];
+        _variants[cue] = takes;
         _activeInstances[cue] = [];
     }
 

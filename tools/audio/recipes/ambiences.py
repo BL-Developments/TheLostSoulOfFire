@@ -1,6 +1,8 @@
 """Ambience loops per area (stereo, seamless). The arena keeps its approved Ludo bed."""
 from __future__ import annotations
 
+import math
+
 import numpy as np
 
 import dsp
@@ -137,3 +139,118 @@ def shore(rng) -> np.ndarray:
     mix = sea + wind + laps + flaps + buoy
     mix = dsp.reverb(mix, space, wet=0.22, loop=True)
     return dsp.normalise_loudness(mix, -29.0, peak_ceiling_db=-8.0)
+
+
+def _drip(rng) -> np.ndarray:
+    n = dsp.seconds(0.25)
+    t = dsp.time_axis(n)
+    f = rng.uniform(900, 1800)
+    return np.sin(2 * np.pi * f * (1 + 1.5 * t) * t) * np.exp(-t / 0.04) * 0.5
+
+
+def _creak(rng) -> np.ndarray:
+    """A mooring rope or timber creaking: a slowed train of friction pulses through wood resonances."""
+    duration = rng.uniform(0.4, 0.9)
+    n = dsp.seconds(duration)
+    rate = rng.uniform(25, 60)
+    pulses = np.zeros(n)
+    t = 0.0
+    while t < duration:
+        i = dsp.seconds(t)
+        if i < n:
+            pulses[i] = rng.uniform(0.5, 1.0)
+        t += 1.0 / (rate * (1 + 0.4 * math.sin(t * 9)))
+    body = sum(dsp.resonator(pulses, f, 12) * g for f, g in ((340, 1.0), (720, 0.5), (1350, 0.25)))
+    return body * dsp.envelope(n, 0.08, duration * 0.5, 1.2) * 0.25
+
+
+def _slap(rng) -> np.ndarray:
+    return _lap(rng) * 0.8
+
+
+@recipe("ambience-harbour", "Suchgang: Wind durch das versunkene Hafenviertel, Tropfen, knarzende Taue, Wasser am Kai", loop=True)
+def harbour(rng) -> np.ndarray:
+    n = dsp.seconds(36.0)
+    space = dsp.impulse_response(2.8, rng, damping_hz=4200, predelay=0.04)
+    wind = np.zeros((n, 2))
+    for _ in range(2):
+        source = dsp.pink(n, rng)
+        centre = 380 + 700 * dsp.smooth_loop(n, 0.07, rng)
+        gust = dsp.circular(lambda x: dsp.swept_bandpass(x, np.concatenate([centre, centre]), q=1.4), source)
+        level = (0.3 + 0.7 * dsp.smooth_loop(n, 0.05, rng)) * 0.02
+        wind += dsp.pan(gust / (np.std(gust) + 1e-9) * level, rng.uniform(-0.6, 0.6))
+    bed = _bed(n, rng, "brown", 40, 300, 0.05, movement=0.3, rate=0.06)
+    laps = _grains(n, rng, 14, _slap, spread=0.9, gain_range=(0.025, 0.05))
+    drips = _grains(n, rng, 30, _drip, spread=0.9, gain_range=(0.004, 0.012))
+    creaks = _grains(n, rng, 6, _creak, spread=0.8, gain_range=(0.02, 0.04))
+    mix = dsp.reverb(bed + wind + laps + drips + creaks, space, wet=0.3, loop=True)
+    return dsp.normalise_loudness(mix, -29.0, peak_ceiling_db=-8.0)
+
+
+@recipe("ambience-causeway", "Damm: offenes Wasser an den Steinkanten, stärkerer Wind, ferne Brandung", loop=True)
+def causeway(rng) -> np.ndarray:
+    n = dsp.seconds(36.0)
+    space = dsp.impulse_response(1.6, rng, damping_hz=5000, predelay=0.02)
+    sea = _bed(n, rng, "pink", 70, 1200, 0.12, movement=0.45, rate=0.11)
+    wind = np.zeros((n, 2))
+    for _ in range(3):
+        source = dsp.pink(n, rng)
+        centre = 500 + 1200 * dsp.smooth_loop(n, 0.09, rng)
+        gust = dsp.circular(lambda x: dsp.swept_bandpass(x, np.concatenate([centre, centre]), q=1.8), source)
+        level = (0.25 + 0.75 * dsp.smooth_loop(n, 0.07, rng)) * 0.024
+        wind += dsp.pan(gust / (np.std(gust) + 1e-9) * level, rng.uniform(-0.8, 0.8))
+    laps = _grains(n, rng, 26, _lap, spread=0.95, gain_range=(0.04, 0.09))
+    mix = dsp.reverb(sea + wind + laps, space, wet=0.18, loop=True)
+    return dsp.normalise_loudness(mix, -27.0, peak_ceiling_db=-7.0)
+
+
+@recipe("ambience-crossing", "Überfahrt: Wellen am Rumpf, Gischt, knarzende Planken, der Warden-Antrieb als tiefes Pochen", loop=True)
+def crossing(rng) -> np.ndarray:
+    n = dsp.seconds(24.0)
+    space = dsp.impulse_response(1.2, rng, damping_hz=5000, predelay=0.015)
+    # Waves running along the hull: swells of filtered noise every few seconds, left to right.
+    waves = np.zeros((n, 2))
+    t = 0.0
+    while t < 24.0 - 0.01:
+        length = rng.uniform(1.6, 2.6)
+        m = dsp.seconds(length)
+        swell = dsp.bandpass(rng.standard_normal(m), 180, 1400) * np.sin(np.pi * np.linspace(0, 1, m)) ** 2
+        pan = np.linspace(-0.7, 0.7, m)
+        dsp.place(waves, dsp.pan(swell, pan), dsp.seconds(t), 0.06)
+        t += rng.uniform(1.1, 1.9)
+    hull = _bed(n, rng, "brown", 35, 140, 0.1, movement=0.3, rate=0.2)
+    wind = _bed(n, rng, "pink", 400, 1600, 0.018, movement=0.5, rate=0.12)
+    engine = np.zeros((n, 2))
+    period = 0.75
+    t = 0.0
+    while t < 24.0 - 0.01:
+        thump = dsp.lowpass(np.sin(2 * np.pi * 46 * dsp.time_axis(dsp.seconds(0.4))) * np.exp(-dsp.time_axis(dsp.seconds(0.4)) / 0.09), 200)
+        dsp.place(engine, dsp.pan(thump, -0.4), dsp.seconds(t), 0.07)
+        t += period
+    spray = _grains(n, rng, 26, _lap, spread=0.95, gain_range=(0.04, 0.08))
+    creaks = _grains(n, rng, 7, _creak, spread=0.7, gain_range=(0.03, 0.05))
+    mix = dsp.reverb(waves + hull + wind + engine + spray + creaks, space, wet=0.15, loop=True)
+    return dsp.normalise_loudness(mix, -26.0, peak_ceiling_db=-6.0)
+
+
+@recipe("ambience-threshold", "Schwelle: tiefe Stille, ferner Grundton der Warden-Stadt, leise Böen, eine ferne Glocke, atmende Flammen", loop=True)
+def threshold(rng) -> np.ndarray:
+    n = dsp.seconds(32.0)
+    space = dsp.impulse_response(4.5, rng, damping_hz=3200, predelay=0.05)
+    tone = dsp.drone(61.7, 32.0, rng, movement=0.25) * 0.1  # B1: the city's low note
+    tone += dsp.drone(123.5, 32.0, rng, movement=0.35) * 0.03
+    tone = np.stack([tone, tone], axis=-1)
+    # A faint glassy shimmer on B, the Warden city's note, breathing slowly instead of noise.
+    shimmer = np.zeros(n)
+    for harmonic, gain in ((4, 0.012), (6, 0.008), (8, 0.005)):
+        shimmer += dsp.sine(61.7 * harmonic, n, rng.uniform(0, 6.28)) * gain * (0.4 + 0.6 * dsp.smooth_loop(n, 0.08, rng))
+    gusts = np.stack([shimmer, np.roll(shimmer, dsp.seconds(0.013))], axis=-1)
+    flames = np.zeros((n, 2))
+    for position in (-0.25, 0.25):
+        breath = dsp.circular(lambda x: dsp.bandpass(x, 500, 2000), dsp.pink(n, rng))
+        breath *= (0.5 + 0.5 * dsp.smooth_loop(n, 0.3, rng)) ** 2
+        flames += dsp.pan(breath / (np.std(breath) + 1e-9) * 0.0012, position)
+    bell = np.zeros((n, 2))
+    dsp.place(bell, dsp.pan(dsp.lowpass(dsp.bell(123.5, 10.0, rng, brightness=0.5), 1600) * 0.05, 0.2), dsp.seconds(9.0))
+    mix = dsp.reverb(tone + gusts + flames + bell, space, wet=0.5, loop=True)
+    return dsp.normalise_loudness(mix, -34.0, peak_ceiling_db=-10.0)
