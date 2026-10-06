@@ -906,7 +906,7 @@ public sealed partial class GameWorld : IDisposable
                 BlendState.Additive,
                 SamplerState.LinearClamp,
                 transformMatrix: RenderResolution.ToOutput(_camera.GetTransform(viewport, _screenEffects.ShakeOffset)));
-            _antechamber.DrawSoulSense(batch, pixel, _presentationTime, _soulSensePresentation.SoulEmergence);
+            _antechamber.DrawSoulSense(batch, pixel, _presentationTime, _soulSensePresentation.SoulEmergence, _art.SoftSpot);
             batch.End();
         }
         renderer.DrawVignette(batch, viewport, _soulSensePresentation.WorldSuppression, _player.ResonanceActive);

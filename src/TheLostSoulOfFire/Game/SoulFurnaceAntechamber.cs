@@ -244,10 +244,25 @@ public sealed class SoulFurnaceAntechamber
         }
     }
 
-    public void DrawSoulSense(SpriteBatch batch, Texture2D pixel, float time, float amount)
+    public void DrawSoulSense(SpriteBatch batch, Texture2D pixel, float time, float amount, Texture2D? softSpot = null)
     {
         if (amount <= 0.001f)
         {
+            return;
+        }
+
+        if (softSpot is not null)
+        {
+            // The echo of the last one through door I: residue drifting toward the door, a soft
+            // glow where the person paused, no lines or circles.
+            Vector2[] trail = [.. SoulTraces, new Vector2(EntryDoor.Center.X, EntryDoor.Bounds.Bottom - 40f)];
+            Rendering.SoulSensePresentation.DrawResidueTrail(batch, softSpot, trail, time, amount, GameBalance.SoulSenseTrace, 7, additiveBatch: true);
+            Vector2 origin = new(softSpot.Width * 0.5f, softSpot.Height * 0.5f);
+            for (int i = 0; i < SoulTraces.Length; i += 2)
+            {
+                float pulse = 0.72f + MathF.Sin(time * 4.2f + i * 0.83f) * 0.18f;
+                batch.Draw(softSpot, SoulTraces[i], null, GameBalance.SoulWhite * (0.4f * amount * pulse), 0f, origin, 22f / softSpot.Width, SpriteEffects.None, 0f);
+            }
             return;
         }
 

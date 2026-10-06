@@ -80,41 +80,80 @@ public sealed class SoulSensePresentation
         batch.End();
     }
 
+    /// <summary>
+    /// A trail of soul residue along <paramref name="path"/> as soft light, not a line: small motes
+    /// every few units, each flickering on its own and drifting slowly along the way the person
+    /// went, so the echo reads as something left behind. Shared by every Soul Sense trace.
+    /// </summary>
+    /// <remarks>
+    /// <paramref name="additiveBatch"/>: true when the batch already blends additively by source
+    /// alpha (BlendState.Additive); otherwise light is added through premultiplied colours with
+    /// alpha 0 in an alpha-blended batch.
+    /// </remarks>
+    public static void DrawResidueTrail(SpriteBatch batch, Texture2D softSpot, IReadOnlyList<Vector2> path, float time, float amount,
+        Color color, int seed = 0, float spacing = 18f, bool additiveBatch = false)
+    {
+        if (path.Count < 2 || amount <= 0.001f)
+        {
+            return;
+        }
+
+        Vector2 origin = new(softSpot.Width * 0.5f, softSpot.Height * 0.5f);
+        float drift = time * 9f;
+        int index = 0;
+        for (int segment = 0; segment < path.Count - 1; segment++)
+        {
+            Vector2 start = path[segment];
+            Vector2 delta = path[segment + 1] - start;
+            float length = delta.Length();
+            if (length < 1f)
+            {
+                continue;
+            }
+            Vector2 along = delta / length;
+            Vector2 side = new(-along.Y, along.X);
+            for (float d = (drift + segment * 7f) % spacing; d < length; d += spacing, index++)
+            {
+                float hash = MathF.Sin((index + seed * 31) * 12.9898f) * 43758.5453f;
+                hash -= MathF.Floor(hash);
+                float flicker = 0.55f + 0.45f * MathF.Sin(time * (2.4f + hash * 2f) + hash * 6.3f);
+                // Fade in where a mote enters a segment and out where it leaves it, so the drift
+                // never pops.
+                float edge = MathHelper.Clamp(MathF.Min(d, length - d) / 10f, 0f, 1f);
+                Vector2 at = start + along * d + side * ((hash - 0.5f) * 7f);
+                float size = 4.5f + hash * 3f;
+                Color glow = color * (0.55f * flicker * edge * amount);
+                if (!additiveBatch) glow.A = 0;
+                batch.Draw(softSpot, at, null, glow, 0f, origin, size * 2.6f / softSpot.Width, SpriteEffects.None, 0f);
+                Color core = GameBalance.SoulWhite * (0.35f * flicker * edge * amount);
+                if (!additiveBatch) core.A = 0;
+                batch.Draw(softSpot, at, null, core, 0f, origin, size * 0.9f / softSpot.Width, SpriteEffects.None, 0f);
+            }
+        }
+    }
+
     private static void DrawTraces(SpriteBatch batch, Texture2D pixel, float time, float amount, ArtAssets? art)
     {
         float breathe = 0.82f + MathF.Sin(time * 2.1f) * 0.18f;
         for (int pathIndex = 0; pathIndex < TracePaths.Length; pathIndex++)
         {
             Vector2[] path = TracePaths[pathIndex];
-            for (int segment = 0; segment < path.Length - 1; segment++)
+            if (art is not null)
             {
-                Vector2 start = path[segment];
-                Vector2 end = path[segment + 1];
-                Vector2 delta = end - start;
-                int pieces = Math.Max(2, (int)MathF.Ceiling(delta.Length() / 22f));
-
-                for (int piece = 0; piece < pieces; piece++)
+                DrawResidueTrail(batch, art.SoftSpot, path, time, amount * breathe, GameBalance.SoulSenseTrace, pathIndex);
+            }
+            else
+            {
+                for (int segment = 0; segment < path.Length - 1; segment++)
                 {
-                    // Uneven two-on/one-off cadence reads as residue instead of navigation markup.
-                    if ((piece + segment * 2 + pathIndex) % 3 == 2)
-                    {
-                        continue;
-                    }
-
-                    float from = (piece + 0.12f) / pieces;
-                    float to = MathF.Min(1f, (piece + 0.78f) / pieces);
-                    Vector2 a = Vector2.Lerp(start, end, from);
-                    Vector2 b = Vector2.Lerp(start, end, to);
-                    // Each fragment flickers on its own, like residue still settling.
-                    float flicker = 0.65f + 0.35f * MathF.Sin(time * 3.1f + piece * 1.7f + segment * 2.3f + pathIndex);
-                    WorldMarks.Beam(batch, pixel, a, b, 12f, GameBalance.SoulSenseTrace * (0.42f * breathe * flicker * amount));
+                    WorldMarks.Beam(batch, pixel, path[segment], path[segment + 1], 12f, GameBalance.SoulSenseTrace * (0.42f * breathe * amount));
                 }
             }
 
             for (int node = 1; node < path.Length - 1; node += 2)
             {
                 float nodePulse = 0.7f + 0.3f * MathF.Sin(time * 2.7f + pathIndex * 1.9f + node);
-                WorldMarks.Ring(batch, pixel, path[node], 5f + nodePulse * 2f, GameBalance.SoulSenseTrace * (0.4f * amount), false, 1.5f);
+                art?.DrawSoftSpot(batch, path[node], new Vector2(9f + nodePulse * 3f), GameBalance.SoulSenseTrace * (0.35f * amount));
                 art?.DrawSoftSpot(batch, path[node], new Vector2(4f), GameBalance.SoulWhite * (0.5f * amount));
             }
 

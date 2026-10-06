@@ -388,6 +388,9 @@ Rahmen wie oben (nur Darstellung und Ton).
   (Aura), Resonanz bereit (pulsierender Kern), Wellenstart (weiche Lichtfläche; der Hinweis
   erscheint beim Betreten). Bleiben als Zonen: Erscheinen von Gegnern, Warnungen der Gegner,
   Fähigkeitsbereiche (sie tragen Ort oder Reichweite eines Angriffs).
+- Seelensinn ohne Striche: Spuren der Echos (Prolog, Arena) und der Weg durch Tür I in der
+  Vorhalle als Lichtreste, die einzeln flackern und langsam in Gehrichtung treiben
+  (`SoulSensePresentation.DrawResidueTrail`); Knoten als weiches Licht statt Kreise.
 - Eigener Treffer: weicher Lichtstoß aus dem Körper statt hellem Ring; Dash: weiche Flammenspur
   statt zweier gerader Strahlen.
 
