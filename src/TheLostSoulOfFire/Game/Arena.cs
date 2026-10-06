@@ -22,6 +22,12 @@ public sealed class Arena
     public static readonly Vector2 FloorTopLeft = new(0f, 90f);
 
     /// <summary>
+    /// Floor of the cold furnace's mouth in the painted north wall (about 55 units wide, 40 high),
+    /// where the Life Flame kindles after the last wave.
+    /// </summary>
+    public static readonly Vector2 FurnaceHearth = new(467f, 47f);
+
+    /// <summary>
     /// Props of the casting hall (docs/current/regions/industrial-cathedral.md, "Gold-Standard-Raum"):
     /// cast-iron columns in the side aisles, the workers' things against the north wall, slag and
     /// chains near the edges, the works gate in the south. The central casting floor stays clear.

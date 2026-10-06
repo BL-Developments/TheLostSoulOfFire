@@ -68,7 +68,7 @@ public static class SoulfireLighting
         DrawEnemyEnergy(batch, renderer, enemies, soulSenseAmount, breathe, renderedEnemy);
         DrawChargeEnergy(batch, renderer, player, renderedPlayer);
         DrawPlayerEnergy(batch, renderer, player, presentationTime, soulSenseAmount, breathe, renderedPlayer);
-        DrawEndingLight(batch, renderer, endingComplete, lifeFlamePosition, lifeFlameAlpha, breathe);
+        DrawEndingLight(batch, renderer, endingComplete, lifeFlamePosition, lifeFlameAlpha);
 
         batch.End();
     }
@@ -255,14 +255,17 @@ public static class SoulfireLighting
         SoulfireRenderer renderer,
         bool endingComplete,
         Vector2 lifeFlamePosition,
-        float lifeFlameAlpha,
-        float breathe)
+        float lifeFlameAlpha)
     {
         if (!endingComplete || lifeFlameAlpha <= 0f)
         {
             return;
         }
 
-        renderer.DrawGlow(batch, lifeFlamePosition, 86f * breathe, new Color(255, 154, 72), 0.3f * lifeFlameAlpha);
+        // The only warm light of the game: it fills the furnace mouth, warms the bricks around it
+        // and spills across the floor toward the figure (whose lit sprite picks it up as well).
+        renderer.DrawGlow(batch, lifeFlamePosition, 64f, new Color(255, 214, 150), 0.5f * lifeFlameAlpha);
+        renderer.DrawGlow(batch, lifeFlamePosition + new Vector2(0f, 26f), 200f, new Color(255, 146, 58), 0.42f * lifeFlameAlpha);
+        renderer.DrawGlow(batch, lifeFlamePosition + new Vector2(0f, 110f), 460f, new Color(255, 112, 36), 0.24f * lifeFlameAlpha);
     }
 }

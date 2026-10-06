@@ -109,6 +109,19 @@ public sealed class Player
         Health = MaxHealth;
     }
 
+    /// <summary>
+    /// Turns the figure toward <paramref name="point"/> after the last wave, when nothing is
+    /// steered any more (presentation only; a restart resets the facing).
+    /// </summary>
+    public void LookToward(Vector2 point)
+    {
+        Vector2 toward = point - Position;
+        if (toward.LengthSquared() > 1f)
+        {
+            FacingDirection = Vector2.Normalize(toward);
+        }
+    }
+
     public void SettleForCompletion()
     {
         Velocity = Vector2.Zero;

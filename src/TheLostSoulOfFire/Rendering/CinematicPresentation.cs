@@ -119,9 +119,15 @@ public sealed class CinematicPresentation
         }
         else if (loopState == ArenaLoopState.Complete)
         {
-            target = Vector2.Lerp(playerPosition, GetLifeFlamePosition(combatBounds), 0.2f) + new Vector2(70f, -72f);
-            targetZoom = 0.92f;
-            followSpeed = 2.8f;
+            // The view turns to the furnace: its hearth a fifth of the way down the picture, above
+            // the title, and the view widens with the figure's distance so it stays in the frame.
+            Vector2 hearth = Arena.FurnaceHearth;
+            float zoom = MathHelper.Clamp(viewport.Height * 0.68f / MathF.Max(1f, playerPosition.Y - hearth.Y), 0.6f, 0.9f);
+            Vector2 framed = new(MathHelper.Lerp(hearth.X, playerPosition.X, 0.55f), hearth.Y + viewport.Height * 0.28f / zoom);
+            float settle = Ease((_stateTime - 0.6f) / 2.2f);
+            target = Vector2.Lerp(playerPosition, framed, settle);
+            targetZoom = MathHelper.Lerp(0.92f, zoom, settle);
+            followSpeed = 2.2f;
         }
 
         float zoomSmoothing = 1f - MathF.Exp(-deltaTime * followSpeed);
@@ -196,7 +202,7 @@ public sealed class CinematicPresentation
 
         if (loopState == ArenaLoopState.Complete)
         {
-            DrawLifeFlame(batch, pixel, art, combatBounds);
+            DrawLifeFlame(batch, art);
         }
     }
 
@@ -236,14 +242,16 @@ public sealed class CinematicPresentation
         }
     }
 
-    public Vector2 GetLifeFlamePosition(Rectangle combatBounds)
-    {
-        Vector2 origin = new(combatBounds.Right - 246f, combatBounds.Top + 178f);
-        float rise = Ease((_stateTime - 1.15f) / 4.6f) * 38f;
-        return origin - Vector2.UnitY * rise;
-    }
+    /// <summary>Middle of the Life Flame's body, where its light comes from; it burns in the cold furnace.</summary>
+    public Vector2 GetLifeFlamePosition() => Arena.FurnaceHearth - new Vector2(0f, 30f * GetLifeFlameKindle());
 
     public float GetLifeFlameAlpha() => Ease((_stateTime - 1.05f) / 1.15f);
+
+    /// <summary>How far the flame has grown: from a first low tongue to its full height.</summary>
+    public float GetLifeFlameKindle() => MathHelper.Lerp(0.35f, 1f, Ease((_stateTime - LifeFlameRevealTime) / 1.7f));
+
+    /// <summary>The flame's slow breath with a small, quicker flicker on top.</summary>
+    public float GetLifeFlameBreath() => 0.96f + MathF.Sin(_stateTime * 1.7f) * 0.035f + MathF.Sin(_stateTime * 7.3f + 0.6f) * 0.015f;
 
     /// <summary>Set by the game: the painted title key art and soft light spots come from here.</summary>
     public ArtAssets? Art { get; set; }
@@ -708,7 +716,12 @@ public sealed class CinematicPresentation
         DrawKeyPrompt(batch, pixel, viewport.Width * 0.5f, viewport.Height * 0.82f, "R", "TO RESTART", GameBalance.SoulWhite * (promptReveal * promptBreathe));
     }
 
-    private void DrawLifeFlame(SpriteBatch batch, Texture2D pixel, ArtAssets art, Rectangle combatBounds)
+    /// <summary>
+    /// The Life Flame in the mouth of the cold furnace (art/specs/ending.life-flame.md): an ember
+    /// bed first darkens the mouth's old violet, the flame grows from a low tongue and licks out
+    /// over the arch, and a few sparks rise from it.
+    /// </summary>
+    private void DrawLifeFlame(SpriteBatch batch, ArtAssets art)
     {
         float alpha = GetLifeFlameAlpha();
         if (alpha <= 0f)
@@ -716,10 +729,25 @@ public sealed class CinematicPresentation
             return;
         }
 
-        Vector2 position = GetLifeFlamePosition(combatBounds);
-        float breathe = 0.96f + MathF.Sin(_stateTime * 1.7f) * 0.035f;
-        art.DrawLifeFlame(batch, position, alpha, 0.88f * breathe);
-        art.DrawSoftSpot(batch, position + new Vector2(0f, 50f), new Vector2(34f, 9f), new Color(255, 192, 116) * (0.3f * alpha));
+        Vector2 hearth = Arena.FurnaceHearth;
+        float kindle = GetLifeFlameKindle();
+        float breath = GetLifeFlameBreath();
+        art.DrawSoftSpot(batch, hearth + new Vector2(0f, -15f), new Vector2(31f, 20f), new Color(20, 9, 6) * (0.82f * alpha));
+        // Additive (alpha 0 in the premultiplied blend): the glowing bed under the flame.
+        art.DrawSoftSpot(batch, hearth + new Vector2(0f, -3f), new Vector2(30f * kindle, 7f), new Color(255, 150, 70, 0) * (0.55f * alpha));
+
+        // The sprite's flame stands on 37 units below its centre at scale 1.
+        float scale = kindle * breath;
+        art.DrawLifeFlame(batch, hearth - new Vector2(0f, 37f * scale), alpha, scale);
+
+        for (int index = 0; index < 7; index++)
+        {
+            float life = (_stateTime * 0.42f + index * 0.381f) % 1f;
+            float sway = MathF.Sin(index * 2.3f + _stateTime * (1.1f + index * 0.13f)) * (5f + life * 12f);
+            Vector2 spark = hearth + new Vector2((index - 3) * 4.5f + sway, -18f - life * 120f * (0.7f + index % 3 * 0.15f));
+            float glow = alpha * kindle * MathF.Sin(life * MathF.PI) * (0.55f + 0.45f * MathF.Sin(_stateTime * 9f + index));
+            art.DrawSoftSpot(batch, spark, new Vector2(2.6f), new Color(255, 196, 120, 0) * glow);
+        }
     }
 
     private static void DrawLetterbox(SpriteBatch batch, Texture2D pixel, Viewport viewport, int height, float alpha)

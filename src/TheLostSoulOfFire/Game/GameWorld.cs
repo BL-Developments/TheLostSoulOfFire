@@ -413,10 +413,18 @@ public sealed partial class GameWorld : IDisposable
                     return;
                 }
             }
-            else if (!_endingRevealPlayed && _presentation.StateTime >= CinematicPresentation.LifeFlameRevealTime)
+            else
             {
-                _endingRevealPlayed = true;
-                _audio.Play(AudioCue.EndingReveal, 0.72f);
+                if (!_endingRevealPlayed && _presentation.StateTime >= CinematicPresentation.LifeFlameRevealTime)
+                {
+                    _endingRevealPlayed = true;
+                    _audio.Play(AudioCue.EndingReveal, 0.72f);
+                }
+                // A beat after it kindles, the figure turns to the Life Flame.
+                if (_presentation.StateTime >= CinematicPresentation.LifeFlameRevealTime + 0.35f)
+                {
+                    _player.LookToward(_presentation.GetLifeFlamePosition());
+                }
             }
             UpdateLoop(deltaTime);
             _soulSensePresentation.Update(deltaTime, false);
@@ -1429,8 +1437,8 @@ public sealed partial class GameWorld : IDisposable
             _presentationTime,
             _soulSensePresentation.SoulEmergence,
             _phase == GamePhase.Arena && _loopState == ArenaLoopState.Complete,
-            _presentation.GetLifeFlamePosition(_arena.CombatBounds),
-            _presentation.GetLifeFlameAlpha(),
+            _presentation.GetLifeFlamePosition(),
+            _presentation.GetLifeFlameAlpha() * _presentation.GetLifeFlameKindle() * _presentation.GetLifeFlameBreath(),
             drawArenaFurnaces: _phase != GamePhase.Prologue,
             renderedPlayer: _art.HasClip(VisualIds.Player, VisualClips.Aim),
             renderedEnemy: enemy => _art.IsRendered(enemy.VisualId));
