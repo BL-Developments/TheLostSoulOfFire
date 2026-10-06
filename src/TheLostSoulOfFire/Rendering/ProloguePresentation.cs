@@ -12,15 +12,22 @@ public static class ProloguePresentation
         Viewport viewport,
         PrologueDirector prologue,
         bool playerDead,
-        bool optionalHints = true)
+        bool optionalHints = true,
+        float deathTime = 10f)
     {
         float centerX = viewport.Width * 0.5f;
         if (playerDead)
         {
-            batch.FillRectangle(pixel, viewport.Bounds, Color.Black * 0.5f);
-            UiKit.Divider(batch, pixel, centerX, viewport.Height * 0.42f - 18f, 460f, GameBalance.DeathFlameBright * 0.55f);
-            PixelText.DrawCentered(batch, pixel, "YOUR FLAME GUTTERS", centerX, viewport.Height * 0.42f, 4, GameBalance.DeathFlameBright);
-            UiKit.KeyLine(batch, pixel, centerX, viewport.Height * 0.54f, "R", "TO RESTART THIS SECTOR", GameBalance.SoulWhite);
+            // As in the arena: the fall stays visible first, then the dark closes in and the
+            // line settles above the body rather than on it.
+            float collapse = Smooth((deathTime - 0.55f) / 1.1f);
+            float reveal = Smooth((deathTime - 1.0f) / 0.6f);
+            batch.FillRectangle(pixel, viewport.Bounds, Color.Black * MathHelper.Lerp(0.08f, 0.62f, collapse));
+            float lineY = viewport.Height * 0.3f;
+            UiKit.Divider(batch, pixel, centerX, lineY - 18f, 460f, GameBalance.DeathFlameBright * (0.55f * reveal));
+            PixelText.DrawCentered(batch, pixel, "YOUR FLAME GUTTERS", centerX, lineY, 4, GameBalance.DeathFlameBright * reveal);
+            float prompt = Smooth((deathTime - 1.3f) / 0.5f);
+            UiKit.KeyLine(batch, pixel, centerX, viewport.Height * 0.66f, "R", "TO RESTART THIS SECTOR", GameBalance.SoulWhite * prompt);
             return;
         }
 
@@ -79,5 +86,11 @@ public static class ProloguePresentation
         UiKit.FillDiamond(batch, pixel, new Vector2(left + 3f, y + 5f), 4, GameBalance.DeathFlame * 0.7f);
         UiKit.FillDiamond(batch, pixel, new Vector2(left + 3f, y + 5f), 2, GameBalance.DeathFlameBright);
         PixelText.DrawFace(batch, pixel, objective, new Vector2(left + 16f, y), TextFace.Body, 10f, color, 0.8f);
+    }
+
+    private static float Smooth(float amount)
+    {
+        float value = MathHelper.Clamp(amount, 0f, 1f);
+        return value * value * (3f - 2f * value);
     }
 }

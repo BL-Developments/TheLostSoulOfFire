@@ -1327,7 +1327,7 @@ public sealed partial class GameWorld : IDisposable
 
             if (!IsGamePaused)
             {
-                ProloguePresentation.DrawOverlay(batch, pixel, viewport, _prologue, _player.IsDead, _settings.OptionalHints);
+                ProloguePresentation.DrawOverlay(batch, pixel, viewport, _prologue, _player.IsDead, _settings.OptionalHints, _presentation.StateTime);
             }
         }
         else

@@ -349,6 +349,9 @@ internal sealed class TourVisualTest
             () => _world.AutomatedEnemies.OfType<Burning>().Any(enemy => enemy.IsAlive), 6f, 1.2f);
         Do("clear_burning", () => _world.DefeatAutomatedEnemies(), 2.4f);
         Shot("leave", minWait: 0.3f);
+        // A rare state: the flame gutters in the prologue (its own overlay and restart line).
+        Do("fall", () => _world.RequestAudioTestFatalDamage());
+        Series("dying", 6, 20);
     }
 
     private void BuildEscape()
