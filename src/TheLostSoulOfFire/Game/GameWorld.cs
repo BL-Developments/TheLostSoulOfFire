@@ -503,17 +503,17 @@ public sealed partial class GameWorld : IDisposable
             if (enemy is Hollow hollowAfter && previousHollowState != HollowState.Swipe && hollowAfter.State == HollowState.Swipe)
             {
                 // The grab is a danger signal: clearly above the room, below a hit.
-                _audio.Play(AudioCue.HollowSwipe, 0.7f);
+                _audio.Play(AudioCue.HollowSwipe, 0.7f, 0f, PanOf(enemy.Position));
             }
             if (enemy is Burning burningAfter && previousBurningState != BurningState.Telegraph && burningAfter.State == BurningState.Telegraph)
             {
-                _audio.Play(AudioCue.BurningCharge, 0.85f);
+                _audio.Play(AudioCue.BurningCharge, 0.85f, 0f, PanOf(enemy.Position));
             }
             if (enemy is Devourer devourerAfter)
             {
                 if (previousDevourerState != DevourerState.Slam && devourerAfter.State == DevourerState.Slam)
                 {
-                    _audio.Play(AudioCue.DevourerSlam, 0.76f);
+                    _audio.Play(AudioCue.DevourerSlam, 0.76f, 0f, PanOf(devourerAfter.Position) * 0.6f);
                     // Stone chips jump from the floor all around the impact.
                     for (int chip = 0; chip < 6; chip++)
                     {
@@ -524,7 +524,7 @@ public sealed partial class GameWorld : IDisposable
                 }
                 if (previousDevourerState != DevourerState.Devour && devourerAfter.State == DevourerState.Devour)
                 {
-                    _audio.Play(AudioCue.DevourerDevour, 0.6f);
+                    _audio.Play(AudioCue.DevourerDevour, 0.6f, 0f, PanOf(devourerAfter.Position));
                 }
             }
             if (enemy.TryConsumeSoulSpawn(out Vector2 soulPosition))
@@ -557,7 +557,7 @@ public sealed partial class GameWorld : IDisposable
             if (previousSoulState != SoulState.Releasing && soul.State == SoulState.Releasing)
             {
                 _spriteVfx.Spawn(VisualIds.SoulRelease, soul.Position, 0f, 0.62f);
-                _audio.Play(AudioCue.SoulRelease, 0.62f);
+                _audio.Play(AudioCue.SoulRelease, 0.62f, 0f, PanOf(soul.Position) * 0.6f);
             }
         }
 
@@ -1566,7 +1566,7 @@ public sealed partial class GameWorld : IDisposable
             _enemies.Add(CreateArenaEnemy(spawn.Kind, spawn.Position, ref seed));
             _particles.EmitDeathFlame(spawn.Position, 10, 0.7f);
             // Death Flame gathers and lets a figure go: heard where it stands.
-            _audio.Play(AudioCue.EnemyEmerge, 0.6f, 0f, MathHelper.Clamp((spawn.Position.X - _player.Position.X) / 700f, -0.8f, 0.8f));
+            _audio.Play(AudioCue.EnemyEmerge, 0.6f, 0f, PanOf(spawn.Position));
         }
     }
 
@@ -1712,6 +1712,9 @@ public sealed partial class GameWorld : IDisposable
         }
     }
 
+    /// <summary>Stereo position of a sound source left or right of the player (presentation only).</summary>
+    private float PanOf(Vector2 source) => MathHelper.Clamp((source.X - _player.Position.X) / 700f, -0.8f, 0.8f);
+
     private readonly Dictionary<Enemy, (Vector2 From, float Distance)> _enemySteps = new();
     private readonly List<Enemy> _goneStepEnemies = [];
 
@@ -1756,7 +1759,7 @@ public sealed partial class GameWorld : IDisposable
                 float near = MathHelper.Clamp(1f - offset.Length() / 900f, 0f, 1f);
                 if (near > 0.05f)
                 {
-                    _audio.Play(cue, loudness * near * near, 0f, MathHelper.Clamp(offset.X / 700f, -0.8f, 0.8f));
+                    _audio.Play(cue, loudness * near * near, 0f, PanOf(enemy.Position));
                 }
             }
             _enemySteps[enemy] = (enemy.Position, distance);
@@ -2261,7 +2264,7 @@ public sealed partial class GameWorld : IDisposable
                 }
                 else
                 {
-                    _audio.Play(AudioCue.CannonImpact, shot.IsFullCharge ? 0.72f : 0.48f);
+                    _audio.Play(AudioCue.CannonImpact, shot.IsFullCharge ? 0.72f : 0.48f, 0f, PanOf(shot.Position) * 0.7f);
                 }
 
                 shot.MarkHit();
@@ -2317,7 +2320,7 @@ public sealed partial class GameWorld : IDisposable
     {
         _combatPresentation.PresentBurningDetonation(position);
         _arenaAtmosphere.ReactToForce(position, 560f, 190f);
-        _audio.Play(AudioCue.BurningDetonation, 0.9f);
+        _audio.Play(AudioCue.BurningDetonation, 0.9f, 0f, PanOf(position) * 0.6f);
 
         foreach (Enemy enemy in _enemies.Where(enemy => enemy != source && enemy.IsAlive))
         {
@@ -2420,7 +2423,7 @@ public sealed partial class GameWorld : IDisposable
             }
             CreditDefeatedEnemy(enemy);
             float volume = enemy is Devourer ? 0.72f : 0.52f;
-            _audio.Play(AudioCue.EnemyDeath, volume);
+            _audio.Play(AudioCue.EnemyDeath, volume, 0f, PanOf(enemy.Position) * 0.7f);
         }
     }
 }
