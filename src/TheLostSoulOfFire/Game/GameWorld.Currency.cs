@@ -208,9 +208,12 @@ public sealed partial class GameWorld
                 }
                 else
                 {
+                    // The unopened chest glows gold on the floor around it, breathing: no ring.
                     float glow = 0.35f + MathF.Sin(_presentationTime * 3f) * 0.12f;
+                    Color gold = GameBalance.Geld * (glow * 1.5f);
+                    gold.A = 0;
+                    _art.DrawSoftSpot(batch, chest.Position + new Vector2(0f, 6f), new Vector2(62f, 36f), gold);
                     _art.DrawSoftSpot(batch, chest.Position, new Vector2(46f, 30f), GameBalance.Geld * (glow * 0.3f));
-                    WorldMarks.Ring(batch, pixel, chest.Position, 40f, GameBalance.Geld * glow);
                     _art.DrawPropFrame(batch, VisualIds.ArenaChest, VisualClips.Default, foot, 0f, Color.White);
                 }
                 continue;

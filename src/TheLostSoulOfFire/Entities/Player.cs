@@ -324,7 +324,9 @@ public sealed class Player
             {
                 // Resonating, the figure burns: Death Flame climbs its body and rings its core.
                 art.DrawLoopingEffect(batch, this, VisualIds.DeathFlameLoop, Position - new Vector2(0f, FigureHeights.Core * 0.62f), 0f, 1.05f + flare * 0.06f, Color.White * 0.55f);
-                WorldMarks.Ring(batch, pixel, body, 34f + flare * 6f, GameBalance.DeathFlame * 0.72f, true, 8f);
+                Color aura = GameBalance.DeathFlame * (0.35f + flare * 0.1f);
+                aura.A = 0;
+                art.DrawSoftSpot(batch, body, new Vector2(40f + flare * 6f), aura);
             }
             else
             {
@@ -412,7 +414,10 @@ public sealed class Player
         }
         if (coreReady)
         {
-            WorldMarks.Ring(batch, pixel, core, 14f + pulse * 5f, GameBalance.DeathFlameBright * 0.78f, false, 3f);
+            // Resonance ready: the core beats with light (no ring), visible from behind as well.
+            Color beat = GameBalance.DeathFlameBright * (0.4f + pulse * 0.3f);
+            beat.A = 0;
+            art.DrawSoftSpot(batch, core, new Vector2(16f + pulse * 6f), beat);
         }
 
         float sense = MathHelper.Clamp(soulSenseAmount, 0f, 1f);

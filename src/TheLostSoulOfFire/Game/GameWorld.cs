@@ -2347,9 +2347,11 @@ public sealed partial class GameWorld : IDisposable
         {
             float pulse = 0.5f + 0.5f * MathF.Sin(_presentationTime * 3f);
             Vector2 center = _arena.CombatBounds.Center.ToVector2();
-            // One quiet, breathing zone (its edge is the trigger radius); the zone texture fills
-            // toward the edge, so a second ring inside only doubled the line.
-            WorldMarks.Ring(batch, pixel, center, GameBalance.WaveTriggerRadius, GameBalance.DeathFlameBright * (0.18f + pulse * 0.14f));
+            // A breathing pool of Death Flame light where the next wave is called (the prompt
+            // appears inside it); no edge line.
+            Color pool = GameBalance.DeathFlame * (0.16f + pulse * 0.08f);
+            pool.A = 0;
+            _art.DrawSoftSpot(batch, center, new Vector2(GameBalance.WaveTriggerRadius * 1.15f), pool);
             _art.DrawSoftSpot(batch, center, new Vector2(GameBalance.WaveTriggerRadius * 0.5f), GameBalance.DeathFlame * (0.05f + pulse * 0.04f));
         }
 

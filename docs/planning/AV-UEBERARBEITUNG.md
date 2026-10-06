@@ -384,6 +384,10 @@ Rahmen wie oben (nur Darstellung und Ton).
   (0,85 s, wie die Darstellung); `Player.SinceDeath` als Darstellungszeit.
 - Arena-Intro, Wellenwechsel und Tod: die Ringe um Figur und Hallenmitte durch weiches,
   atmendes Licht ersetzt (die Flamme sammelt sich, statt als Kreislinie zu erscheinen).
+- Weitere Ringe durch Licht ersetzt: ungeöffnete Truhe (Goldschimmer am Boden), Resonanz aktiv
+  (Aura), Resonanz bereit (pulsierender Kern), Wellenstart (weiche Lichtfläche; der Hinweis
+  erscheint beim Betreten). Bleiben als Zonen: Erscheinen von Gegnern, Warnungen der Gegner,
+  Fähigkeitsbereiche (sie tragen Ort oder Reichweite eines Angriffs).
 - Eigener Treffer: weicher Lichtstoß aus dem Körper statt hellem Ring; Dash: weiche Flammenspur
   statt zweier gerader Strahlen.
 
