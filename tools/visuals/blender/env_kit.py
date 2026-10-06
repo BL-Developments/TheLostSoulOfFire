@@ -386,13 +386,22 @@ def roof(name: str, centre: Vector, length: float, width: float, rise: float, ma
 
 def stone(name: str, image: str, size: float, tint=(1.0, 1.0, 1.0), spread: float = 0.25,
           ash_image: str | None = None, ash_amount: float = 0.0, ash_tint=(0.55, 0.53, 0.56),
-          roughness: float = 0.85, bump: float = 0.35, axes: str = "XY") -> bpy.types.Material:
+          roughness: float = 0.85, bump: float = 0.35, axes: str = "XY", random_attribute: str | None = None,
+          wet: float = 0.0) -> bpy.types.Material:
     """Material for single stones (paving, ashlar): each object samples its own part of a
     jointless painted surface (Object Info > Random) and gets its own value, so hundreds of
-    stones never repeat; ash settles across them in world space."""
+    stones never repeat; ash settles across them in world space. With `random_attribute` the
+    value comes from that point attribute instead (many stones in one mesh, see `setts`);
+    `wet` adds dark, nearly mirror-smooth puddles in world space as in `textured`."""
     material, nodes, links, bsdf = _principled(name)
     coords = nodes.new("ShaderNodeTexCoord")
-    info = nodes.new("ShaderNodeObjectInfo")
+    if random_attribute:
+        info = nodes.new("ShaderNodeAttribute")
+        info.attribute_name = random_attribute
+        random_out = info.outputs["Fac"]
+    else:
+        info = nodes.new("ShaderNodeObjectInfo")
+        random_out = info.outputs["Random"]
     separate = nodes.new("ShaderNodeSeparateXYZ")
     links.new(coords.outputs["Object"], separate.inputs["Vector"])
 
@@ -410,9 +419,9 @@ def stone(name: str, image: str, size: float, tint=(1.0, 1.0, 1.0), spread: floa
                 links.new(b, node.inputs[1])
         return node.outputs[0]
 
-    random_u = math_node("FRACT", math_node("MULTIPLY", info.outputs["Random"], 1.0))
-    random_v = math_node("FRACT", math_node("MULTIPLY", info.outputs["Random"], 7.31))
-    random_w = math_node("FRACT", math_node("MULTIPLY", info.outputs["Random"], 13.7))
+    random_u = math_node("FRACT", math_node("MULTIPLY", random_out, 1.0))
+    random_v = math_node("FRACT", math_node("MULTIPLY", random_out, 7.31))
+    random_w = math_node("FRACT", math_node("MULTIPLY", random_out, 13.7))
     u = math_node("ADD", math_node("MULTIPLY", separate.outputs[axes[0]], 1.0 / size), math_node("ADD", math_node("MULTIPLY", random_u, 0.5), 0.25))
     v = math_node("ADD", math_node("MULTIPLY", separate.outputs[axes[1]], 1.0 / size), math_node("ADD", math_node("MULTIPLY", random_v, 0.5), 0.25))
     combine = nodes.new("ShaderNodeCombineXYZ")
@@ -487,14 +496,98 @@ def stone(name: str, image: str, size: float, tint=(1.0, 1.0, 1.0), spread: floa
         links.new(colour_out, mix.inputs["A"])
         links.new(ash_colour.outputs["Result"], mix.inputs["B"])
         colour_out = mix.outputs["Result"]
-    links.new(colour_out, bsdf.inputs["Base Color"])
     bsdf.inputs["Roughness"].default_value = roughness
+    if wet > 0:
+        colour_out = _puddles(nodes, links, bsdf, colour_out, roughness, wet)
+    links.new(colour_out, bsdf.inputs["Base Color"])
     if bump > 0:
         bump_node = nodes.new("ShaderNodeBump")
         bump_node.inputs["Strength"].default_value = bump
         links.new(texture.outputs["Color"], bump_node.inputs["Height"])
         links.new(bump_node.outputs["Normal"], bsdf.inputs["Normal"])
     return material
+
+
+def _puddles(nodes, links, bsdf, colour_out, roughness: float, wet: float):
+    """Puddles: soft world-space patches that are darker and nearly mirror-smooth."""
+    geometry = nodes.new("ShaderNodeNewGeometry")
+    puddle = nodes.new("ShaderNodeTexNoise")
+    puddle.inputs["Scale"].default_value = 0.45
+    puddle.inputs["Detail"].default_value = 4.0
+    puddle.inputs["Roughness"].default_value = 0.55
+    links.new(geometry.outputs["Position"], puddle.inputs["Vector"])
+    mask = _ramp(nodes, [(0.66 - wet * 0.12, (0, 0, 0)), (0.7 - wet * 0.1, (1, 1, 1))])
+    links.new(puddle.outputs["Fac"], mask.inputs["Fac"])
+    darker = nodes.new("ShaderNodeMix")
+    darker.data_type = "RGBA"
+    darker.blend_type = "MULTIPLY"
+    links.new(mask.outputs["Color"], darker.inputs["Factor"])
+    links.new(colour_out, darker.inputs["A"])
+    darker.inputs["B"].default_value = (0.45, 0.48, 0.55, 1.0)
+    rough = nodes.new("ShaderNodeMix")
+    rough.data_type = "FLOAT"
+    links.new(mask.outputs["Color"], rough.inputs["Factor"])
+    rough.inputs["A"].default_value = roughness
+    rough.inputs["B"].default_value = 0.05
+    links.new(rough.outputs["Result"], bsdf.inputs["Roughness"])
+    return darker.outputs["Result"]
+
+
+def setts(prefix: str, x0: float, x1: float, y0: float, y1: float, material: bpy.types.Material, seed: int = 1,
+          row: float = 0.2, lengths=(0.24, 0.38), gap: float = 0.026, height: float = 0.1, jitter: float = 0.012,
+          tilt: float = 0.06, bevel: float = 0.018, sunken: float = 0.04, missing: float = 0.012,
+          skip=None) -> bpy.types.Object:
+    """Small stones (setts) in running rows between Blender x0..x1 and y0..y1 (metres), built as
+    ONE mesh: thousands of objects would be slow. Each stone is a box, slightly turned and with
+    a slightly sloping top, and carries its own random value in the point attribute
+    `stone_random`, which `stone(..., random_attribute="stone_random")` reads. A share of the
+    stones has sunk (`sunken`, they hold water) and a few are gone (`missing`)."""
+    import random
+
+    import bmesh
+    rng = random.Random(seed)
+    mesh_builder = bmesh.new()
+    layer = mesh_builder.verts.layers.float.new("stone_random")
+    corners = [(-1, -1, 0), (1, -1, 0), (1, 1, 0), (-1, 1, 0), (-1, -1, 1), (1, -1, 1), (1, 1, 1), (-1, 1, 1)]
+    sides = [(0, 3, 2, 1), (4, 5, 6, 7), (0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7)]
+    y = y0
+    while y < y1:
+        x = x0 - rng.uniform(0, lengths[1])
+        while x < x1:
+            length = rng.uniform(*lengths)
+            # Stones at the ends of a row are cut to the edge, so the paving ends straight.
+            left, right = max(x, x0), min(x + length, x1)
+            depth = min(row, y1 - y)
+            cx, cy = (left + right) / 2, y + depth / 2
+            if (skip is None or not skip(cx, cy)) and rng.random() >= missing and right - left > 0.08 and depth > 0.08:
+                hx, hy = (right - left - gap) / 2, (depth - gap) / 2
+                top = rng.uniform(-jitter, jitter) - (rng.uniform(0.015, 0.03) if rng.random() < sunken else 0.0)
+                yaw = rng.uniform(-0.03, 0.03)
+                tx, ty = rng.uniform(-tilt, tilt), rng.uniform(-tilt, tilt)
+                value = rng.random()
+                c, s = math.cos(yaw), math.sin(yaw)
+                verts = []
+                for sx, sy, sz in corners:
+                    lx, ly = sx * hx, sy * hy
+                    vert = mesh_builder.verts.new((cx + lx * c - ly * s, cy + lx * s + ly * c,
+                                                   (top + lx * tx + ly * ty) if sz else top - height))
+                    vert[layer] = value
+                    verts.append(vert)
+                for side in sides:
+                    mesh_builder.faces.new([verts[index] for index in side])
+            x += length
+        y += row
+    bmesh.ops.recalc_face_normals(mesh_builder, faces=mesh_builder.faces)
+    mesh = bpy.data.meshes.new(prefix)
+    mesh_builder.to_mesh(mesh)
+    mesh_builder.free()
+    obj = bpy.data.objects.new(prefix, mesh)
+    bpy.context.collection.objects.link(obj)
+    obj.data.materials.append(material)
+    modifier = obj.modifiers.new("Bevel", "BEVEL")
+    modifier.width = bevel
+    modifier.segments = 2
+    return obj
 
 
 def paving(prefix: str, x0: float, x1: float, y0: float, y1: float, material: bpy.types.Material, seed: int = 1,

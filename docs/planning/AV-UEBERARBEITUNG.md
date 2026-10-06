@@ -237,17 +237,27 @@ Rahmen wie oben (nur Darstellung und Ton).
   `TOUR_AUDIO song=threshold_theme life_flame=0.44`; Gameplay-Audiotest (10 Wellen, Ende,
   Neustart) und `validate_audio.py` (125 Assets) bestehen.
 
-**Befunde, offen (nach Wirkung):**
-1. Vorhalle: Aschehaufen am Wandfuß rendern als helle, flache Ovale; Feuerschalen und
-   Warden-Flammen werfen kaum Licht auf den Boden, der Raum wirkt gleichmäßig grau.
-2. Prolog II: Bodentextur des Suchgangs wiederholt sich sichtbar (dunkle Flecken im Raster).
-3. Prolog I: große, leere Steinplatten, wenig Material.
-4. Arena im Spielausschnitt: Boden gleichmäßig hell, wenig Lichtgefälle.
-5. Sprache: Erzähltexte englisch, HUD deutsch (Inhaltsfrage, nicht ohne Owner ändern).
+- Vorhalle: Die Aschehaufen am Wandfuß waren gestauchte Kugeln mit sehr hellem Material
+  (wirkten wie weiße Kiesel); jetzt flache, unregelmäßige, dunklere Verwehungen (Plate neu,
+  sonst pixelgleich). Feuerschalen mit größerer, flackernder Lichtinsel; die sechs
+  Pilasterflammen leuchten erstmals ihren Stein an.
+- Prolog II und III: Das Pflaster war eine gespiegelte, gekachelte Textur (Kaleidoskop-Muster).
+  Jetzt einzelne Steine als ein Mesh (`kit.setts`, je Stein ein Zufallswert als Attribut,
+  `kit.stone(..., random_attribute=, wet=)`), mit gekippten, abgesackten und wenigen fehlenden
+  Steinen, Pfützen und echten Fugen; mittlere Helligkeit wie vorher. Gleise im Hafen auf
+  nassem Schotterstreifen (sonst verschwanden die Schwellen zwischen den Steinen); das
+  Schotterbett des Damms als gebrochener Stein (Voronoi) statt glatter heller Fläche.
 
-6. Arena: Die Nordwand wirkt im Endbild hinter einem leichten Dunstschleier (Luftperspektive
+**Befunde, offen (nach Wirkung):**
+1. Prolog I: große, leere Steinplatten, wenig Material.
+2. Arena im Spielausschnitt: Boden gleichmäßig hell, wenig Lichtgefälle.
+3. Sprache: Erzähltexte englisch, HUD deutsch (Inhaltsfrage, nicht ohne Owner ändern).
+
+4. Arena: Die Nordwand wirkt im Endbild hinter einem leichten Dunstschleier (Luftperspektive
    nach Bildhöhe trifft die Wand); prüfen, ob die Wand davon ausgenommen werden sollte.
 
 **Verworfen:**
+- Pflaster aus Granit mit der Tönung der Kantsteine (0,56): sechs- bis achtmal zu hell, die
+  Streuung je Stein ging in der Tonkurve unter.
 - Feuerknistern mit kräftigem Brausen und Atemband: CLAP hörte „Wind“ (0,5–0,8); das Brausen
   ist jetzt leise und tief, das Knistern trägt.

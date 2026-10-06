@@ -67,7 +67,9 @@ def materials() -> dict[str, bpy.types.Material]:
         "brick": kit.stone("brick", brick, 3.0, tint=(0.33, 0.24, 0.23), spread=0.3, axes="XZ"),
         "basalt": kit.stone("basalt", stone, 3.0, tint=(0.62, 0.61, 0.68), spread=0.3, axes="XZ"),
         "basalt_floor": kit.stone("basalt_floor", stone, 4.0, tint=(0.55, 0.54, 0.6), spread=0.3),
-        "ballast": kit.painted("ballast", (0.035, 0.035, 0.042), (0.10, 0.098, 0.108), scale=6.0, bump=0.6),
+        # Track ballast: broken stone about 6 cm across, dark gaps between the pieces.
+        "ballast": kit.flagstones("ballast", (0.05, 0.05, 0.056), (0.17, 0.165, 0.175), (0.012, 0.012, 0.015), size=0.09),
+        "ballast_wet": kit.flagstones("ballast_wet", (0.028, 0.03, 0.038), (0.095, 0.1, 0.12), (0.008, 0.008, 0.01), size=0.09),
         "water": water_material(water),
         "iron": kit.painted("iron", (0.045, 0.045, 0.052), (0.11, 0.105, 0.115), scale=3.0, roughness=0.5, bump=0.4),
         "rust": kit.painted("rust", (0.06, 0.035, 0.03), (0.16, 0.085, 0.06), scale=4.0, roughness=0.8, bump=0.5),
@@ -80,6 +82,9 @@ def materials() -> dict[str, bpy.types.Material]:
         "dark": kit.painted("dark", (0.004, 0.004, 0.006), (0.012, 0.010, 0.016), bump=0.0),
         "ember": kit.emissive("ember", (0.55, 0.22, 1.0), 3.0),
         "setts": kit.textured("setts", setts, 2.2, tint=(0.70, 0.72, 0.78), roughness=0.55, bump=0.35, variation=0.3, wet=0.5),
+        # Single granite setts: each samples its own patch and value, so the quay never repeats.
+        "sett": kit.stone("sett", granite, 3.0, tint=(0.08, 0.088, 0.118), spread=0.9, random_attribute="stone_random",
+                          roughness=0.5, bump=0.3, wet=0.5),
         "hull": kit.painted("hull", (0.035, 0.035, 0.042), (0.09, 0.085, 0.095), scale=2.0, roughness=0.6, bump=0.5),
         "bone": kit.painted("bone", (0.32, 0.30, 0.26), (0.48, 0.46, 0.40), scale=4.0, roughness=0.6),
         "backing": kit.painted("backing", (0.012, 0.011, 0.015), (0.03, 0.028, 0.034), bump=0.0),
@@ -394,8 +399,18 @@ def build_shore(m, scene) -> dict[str, list]:
 
 # ---- II Searchway ---------------------------------------------------------------------------
 
-def setts_floor(m, x0: float, y0: float, x1: float, y1: float, z: float = 0.0) -> bpy.types.Object:
-    return kit.plane("setts", ground(x0, y0, z), ground(x1, y1, z), m["setts"])
+def setts_floor(m, x0: float, y0: float, x1: float, y1: float, z: float = 0.0, seed: int = 1,
+                tracks: tuple[float, ...] = ()) -> bpy.types.Object:
+    """Wet granite setts laid as single stones over dark joints: real joints catch the light and
+    no painted pattern repeats across the quay. Along `tracks` (world y) the setts stop and the
+    sleepers lie in a strip of ballast, so the line still reads."""
+    kit.plane("setts_joints", ground(x0, y0, z - 0.03), ground(x1, y1, z - 0.03), m["grout_dark"])
+    a, b = ground(x0, y0), ground(x1, y1)
+    beds = [ground(0, y).y for y in tracks]
+    for index, yy in enumerate(beds):
+        kit.box(f"track_bed_{index}", Vector(((a.x + b.x) / 2, yy, -0.02)), (b.x - a.x, 2.75, 0.04), m["ballast_wet"])
+    return kit.setts("setts", a.x, b.x, b.y, a.y, m["sett"], seed=seed,
+                     skip=lambda x, y: any(abs(y - yy) < 1.45 for yy in beds))
 
 
 def track(m, y: float, x0: float, x1: float, seed: int) -> list[bpy.types.Object]:
@@ -437,7 +452,7 @@ def build_search(m, scene) -> dict[str, list]:
     pieces: dict[str, list] = {}
     water(m)
     quay(m, 40, 1760, 112, 925, seed=21, kerb_north=True, slabs=False)
-    setts_floor(m, 40, 118, 1760, 914, 0.002)
+    setts_floor(m, 40, 118, 1760, 914, 0.002, seed=23, tracks=(300, 790))
     for index, y in enumerate((300, 790)):
         track(m, y, 40, 1760, seed=31 + index)
     drowned_roofs(m, 41)
@@ -640,8 +655,11 @@ def build_causeway(m, scene) -> dict[str, list]:
     # The embankment: a granite-faced body, paved shoulders, a ballast bed for the tracks.
     a, b = ground(40, 130), ground(1400, 880)
     kit.box("dam_body", Vector(((a.x + b.x) / 2, (a.y + b.y) / 2, -1.75)), (b.x - a.x, a.y - b.y, 3.2), m["kerb_face"])
-    kit.plane("dam_shoulders", ground(40, 130, 0.002), ground(1400, 880, 0.002), m["setts"])
     bed_a, bed_b = ground(40, 430), ground(1400, 740)
+    # Paved shoulders of single setts; none under the ballast bed.
+    kit.plane("dam_joints", ground(40, 130, -0.03), ground(1400, 880, -0.03), m["grout_dark"])
+    kit.setts("dam_shoulders", a.x, b.x, b.y, a.y, m["sett"], seed=29,
+              skip=lambda x, y: bed_b.y - 0.1 < y < bed_a.y + 0.1)
     kit.box("ballast_bed", Vector(((bed_a.x + bed_b.x) / 2, (bed_a.y + bed_b.y) / 2, 0.06)), (bed_b.x - bed_a.x, bed_a.y - bed_b.y, 0.14),
             m["ballast"], bevel=0.05)
     for y in (510, 660):
