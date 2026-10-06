@@ -575,6 +575,12 @@ public sealed class CinematicPresentation
                 DrawSelection(batch, pixel, centerX, y, width, 17, reveal);
             }
             DrawEntryLabel(batch, pixel, menu.GetLabel(entries[i]), centerX, y, color * (reveal * breathe), reveal);
+            if (menu.VolumeOf(entries[i]) is { } volume)
+            {
+                // A volume shows as a short iron bar under its value.
+                Rectangle track = new((int)(centerX - 70f), (int)y + 21, 140, 3);
+                UiKit.Bar(batch, pixel, track, volume / 100f, (selected ? GameBalance.DeathFlameBright : GameBalance.SoulWhite * 0.6f) * reveal, reveal);
+            }
         }
     }
 

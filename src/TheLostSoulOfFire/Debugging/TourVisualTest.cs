@@ -550,6 +550,16 @@ internal sealed class TourVisualTest
         Do("pause_down", () => _input.InjectKeyPress(Keys.Down), 0.15f);
         Do("pause_confirm", () => _input.InjectKeyPress(Keys.Enter), 0.3f);
         Shot("pause_settings");
+        Do("graphics", () => _input.InjectKeyPress(Keys.Down), 0.15f);
+        Do("graphics_open", () => _input.InjectKeyPress(Keys.Enter), 0.3f);
+        Shot("settings_graphics");
+        Do("graphics_back", () => _input.InjectKeyPress(Keys.Escape), 0.2f);
+        // Going back puts the selection on the first entry again: two down to AUDIO.
+        Do("audio_down1", () => _input.InjectKeyPress(Keys.Down), 0.15f);
+        Do("audio", () => _input.InjectKeyPress(Keys.Down), 0.15f);
+        Do("audio_open", () => _input.InjectKeyPress(Keys.Enter), 0.3f);
+        Shot("settings_audio");
+        Do("audio_back", () => _input.InjectKeyPress(Keys.Escape), 0.2f);
         Do("pause_back", () => _input.InjectKeyPress(Keys.Escape), 0.2f);
         Do("pause_close", () => _input.InjectKeyPress(Keys.Escape), 0.4f);
         Do("character", () => _input.InjectKeyPress(Keys.Tab), 0.4f);
