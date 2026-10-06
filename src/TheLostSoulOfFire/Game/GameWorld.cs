@@ -1565,6 +1565,8 @@ public sealed partial class GameWorld : IDisposable
             int seed = _waveNumber * 100 + _reinforcementSeed++;
             _enemies.Add(CreateArenaEnemy(spawn.Kind, spawn.Position, ref seed));
             _particles.EmitDeathFlame(spawn.Position, 10, 0.7f);
+            // Death Flame gathers and lets a figure go: heard where it stands.
+            _audio.Play(AudioCue.EnemyEmerge, 0.6f, 0f, MathHelper.Clamp((spawn.Position.X - _player.Position.X) / 700f, -0.8f, 0.8f));
         }
     }
 

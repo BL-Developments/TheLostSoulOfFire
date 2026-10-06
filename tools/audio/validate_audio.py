@@ -63,6 +63,7 @@ AUTHORED_SFX_DURATIONS = {
     "ability_guard.wav": 1.0,
     "ability_mark.wav": 0.5,
     "door_awaken.wav": 1.8,
+    "enemy_emerge.wav": 0.9,
 }
 
 #: Ambience beds and music per zone (AudioDirector.AmbienceAssets / MusicAssets).

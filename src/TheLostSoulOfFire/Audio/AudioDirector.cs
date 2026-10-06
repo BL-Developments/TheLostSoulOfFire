@@ -40,6 +40,7 @@ public enum AudioCue
     HollowStep,
     BurningStep,
     DevourerStep,
+    EnemyEmerge,
     UiMove,
     UiBack,
     UiOpen,
@@ -125,6 +126,7 @@ public sealed class AudioDirector : IDisposable
         [AudioCue.HollowStep] = new(0.06f, 3, 0.06f),
         [AudioCue.BurningStep] = new(0.05f, 3, 0.07f),
         [AudioCue.DevourerStep] = new(0.12f, 2, 0.04f),
+        [AudioCue.EnemyEmerge] = new(0.08f, 3, 0.05f, CueGroup.Enemy),
         [AudioCue.UiMove] = new(0.03f, 2, 0.03f),
         [AudioCue.UiBack] = new(0.05f, 1, 0.02f),
         [AudioCue.UiOpen] = new(0.15f, 1),
@@ -248,6 +250,7 @@ public sealed class AudioDirector : IDisposable
             AddVariants(content, AudioCue.HollowStep, "Audio/Sfx/step_hollow", 4, 70f, 0.12f, 0.15f, 0.7f);
             AddVariants(content, AudioCue.BurningStep, "Audio/Sfx/step_burning", 4, 180f, 0.06f, 0.15f, 0.8f);
             AddVariants(content, AudioCue.DevourerStep, "Audio/Sfx/step_devourer", 4, 45f, 0.2f, 0.25f, 0.5f);
+            Add(content, AudioCue.EnemyEmerge, "Audio/Sfx/enemy_emerge", 60f, 0.5f, 0.4f, 0.4f, rising: true);
             Add(content, AudioCue.UiMove, "Audio/Sfx/ui_move", 1568f, 0.05f, 0.15f, 0.02f);
             Add(content, AudioCue.UiBack, "Audio/Sfx/ui_back", 1046f, 0.06f, 0.15f, 0.02f);
             Add(content, AudioCue.UiOpen, "Audio/Sfx/ui_open", 600f, 0.2f, 0.15f, 0.2f, rising: true);

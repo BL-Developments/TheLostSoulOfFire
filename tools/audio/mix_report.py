@@ -56,6 +56,7 @@ CLASS = {
     "ScytheHit": "hit", "CoreHit": "hit", "CannonImpact": "hit", "EnemyDeath": "hit",
     "ScytheSwing1": "action", "ScytheSwing2": "action", "SoulCleave": "action", "Dash": "action",
     "CannonCharge": "action", "CannonFull": "action", "CannonFire": "action", "SoulRelease": "action",
+    "EnemyEmerge": "event",
     "Footstep": "step", "FootstepWood": "step", "HollowStep": "step", "BurningStep": "step", "DevourerStep": "step",
     "UiMove": "ui", "UiBack": "ui", "UiOpen": "ui", "UiClose": "ui", "CurrencyGain": "ui",
     "SoulSenseOn": "sense", "SoulSenseOff": "sense",
@@ -65,7 +66,7 @@ CLASS = {
 PAUSED_BED_DB = 20 * np.log10(0.4)
 
 #: Cues that never sound in a zone (no chests or waves in the prologue, no combat in the hub).
-ARENA_ONLY = {"ChestOpen", "CurrencyGain", "WaveStart", "WaveClear", "EndingReveal", "TitleConfirm", "DoorAwaken"}
+ARENA_ONLY = {"EnemyEmerge", "ChestOpen", "CurrencyGain", "WaveStart", "WaveClear", "EndingReveal", "TitleConfirm", "DoorAwaken"}
 ZONE_CUES = {
     "arena": lambda cue, kind: cue not in {"DoorAwaken", "TitleConfirm"},
     "hub": lambda cue, kind: (kind in ("ui", "sense") and cue != "CurrencyGain") or cue in ("Footstep", "DoorAwaken"),

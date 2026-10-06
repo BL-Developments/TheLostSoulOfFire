@@ -8673,3 +8673,8 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/Props/Sandbox/dummy.png
+
+#begin Audio/Sfx/enemy_emerge.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/enemy_emerge.wav

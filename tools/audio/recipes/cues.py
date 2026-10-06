@@ -259,3 +259,15 @@ def door_awaken(rng) -> np.ndarray:
     return _finish(x, -18.0, -2.0)
 
 
+@recipe("enemy-emerge", "Gegner erscheint: Death Flame saugt sich zusammen und gibt eine Gestalt frei, tiefer Stoß mit violettem Schimmer")
+def enemy_emerge(rng) -> np.ndarray:
+    n = dsp.seconds(0.9)
+    t = dsp.time_axis(n)
+    # A reversed swell: air drawn in, rising in pitch, cut off by a low push.
+    draw = dsp.bandpass(rng.standard_normal(n), 300, 2400) * np.clip(t / 0.42, 0, 1) ** 2.2 * (t < 0.44)
+    sweep = np.sin(2 * np.pi * np.cumsum(np.interp(t, [0, 0.44], [140, 420])) / dsp.RATE) * np.clip(t / 0.44, 0, 1) ** 3 * (t < 0.44) * 0.25
+    push = dsp.lowpass(_impact(rng, n, dsp.seconds(0.44), 30, 220, 0.09, 1.3), 180)
+    shimmer = sum(np.sin(2 * np.pi * f * t) * g for f, g in ((622.3, 0.5), (932.3, 0.3), (1244.5, 0.15)))
+    shimmer = shimmer * np.exp(-np.clip(t - 0.44, 0, None) / 0.22) * (t >= 0.44) * 0.18
+    x = _room(draw * 0.5 + sweep + push + shimmer, rng, 0.9, 0.25, damping=3500)
+    return _finish(x, -21.0, -4.0)

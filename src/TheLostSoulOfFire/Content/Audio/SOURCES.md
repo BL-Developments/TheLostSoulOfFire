@@ -156,3 +156,4 @@ Ergebnisse sind eigene Arbeit des Projekts.
 | `Audio/Sfx/step_devourer_2.wav` | step-devourer Seed 2 | 0.70 s, 1 Kanal/Kanäle, -25.0 LUFS, Spitze -4.0 dBFS |
 | `Audio/Sfx/step_devourer_3.wav` | step-devourer Seed 3 | 0.70 s, 1 Kanal/Kanäle, -24.9 LUFS, Spitze -4.0 dBFS |
 | `Audio/Sfx/step_devourer_4.wav` | step-devourer Seed 4 | 0.70 s, 1 Kanal/Kanäle, -24.0 LUFS, Spitze -4.6 dBFS |
+| `Audio/Sfx/enemy_emerge.wav` | enemy-emerge Seed 1 | 0.90 s, 1 Kanal/Kanäle, -21.0 LUFS, Spitze -4.0 dBFS |
