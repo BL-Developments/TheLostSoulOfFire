@@ -10614,3 +10614,18 @@
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /build:Audio/Sfx/footstep_stone_1_hall_foundry.wav
+
+#begin Audio/Sfx/presence_burning.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/presence_burning.wav
+
+#begin Audio/Sfx/presence_hollow.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/presence_hollow.wav
+
+#begin Audio/Sfx/presence_devourer.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/presence_devourer.wav

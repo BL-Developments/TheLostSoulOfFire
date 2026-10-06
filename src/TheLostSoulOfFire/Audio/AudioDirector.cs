@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
@@ -73,6 +74,14 @@ public enum AudioCue
     /// <summary>The heavy Soul Cannon swung from the back into the hands, and laid back again.</summary>
     CannonDraw,
     CannonStow
+}
+
+/// <summary>The enemy kinds that are heard where they stand, between their steps and attacks.</summary>
+public enum EnemyPresence
+{
+    Hollow,
+    Burning,
+    Devourer
 }
 
 /// <summary>Where the player is, for the ambience bed and the music (presentation only).</summary>
@@ -260,6 +269,21 @@ public sealed class AudioDirector : IDisposable
     private AudioZone _zone = AudioZone.Arena;
     private AudioZone _fadingZone = AudioZone.Arena;
     private SoundEffectInstance? _fadingAmbience;
+    /// <summary>
+    /// Presence loops (16_AUDIO_DIRECTION): a Burning crackles, a Hollow breathes and whispers,
+    /// trapped souls murmur in a Devourer. One quiet loop per kind, placed toward the nearest
+    /// of its kind; danger signals push them back like the swings and steps.
+    /// </summary>
+    private static readonly Dictionary<EnemyPresence, (string Asset, float Volume)> PresenceAssets = new()
+    {
+        [EnemyPresence.Hollow] = ("Audio/Sfx/presence_hollow", 0.3f),
+        [EnemyPresence.Burning] = ("Audio/Sfx/presence_burning", 0.34f),
+        [EnemyPresence.Devourer] = ("Audio/Sfx/presence_devourer", 0.42f)
+    };
+
+    private readonly Dictionary<EnemyPresence, SoundEffect?> _presenceSounds = [];
+    private readonly Dictionary<EnemyPresence, SoundEffectInstance> _presence = [];
+    private readonly Dictionary<EnemyPresence, float> _presenceLevel = [];
     private SoundEffect? _lifeFlameSound;
     private SoundEffectInstance? _lifeFlame;
     private const float LifeFlameVolume = 0.44f;
@@ -289,6 +313,10 @@ public sealed class AudioDirector : IDisposable
 
     public int FallbackSoundCount => _ownedFallbackSounds.Count;
     public bool MusicPlaying => _musicPlaying && MediaPlayer.State == MediaState.Playing;
+
+    /// <summary>Diagnostics for the tour: the volume and pan of each presence loop that plays.</summary>
+    public string DescribePresence() => string.Join(" ", _presence.Select(pair => string.Create(
+        System.Globalization.CultureInfo.InvariantCulture, $"{pair.Key}={pair.Value.Volume:0.00}@{pair.Value.Pan:+0.00;-0.00}")));
 
     /// <summary>Diagnostics for the tour: what plays now (song asset, Life Flame loop level).</summary>
     public string DescribeEnding() => string.Create(System.Globalization.CultureInfo.InvariantCulture,
@@ -684,7 +712,7 @@ public sealed class AudioDirector : IDisposable
                     else if (!paused && instance.State == SoundState.Paused) instance.Resume();
                 }
             }
-            foreach (SoundEffectInstance tail in _hallInstances)
+            foreach (SoundEffectInstance tail in _hallInstances.Concat(_presence.Values))
             {
                 if (paused && tail.State == SoundState.Playing) tail.Pause();
                 else if (!paused && tail.State == SoundState.Paused) tail.Resume();
@@ -737,9 +765,70 @@ public sealed class AudioDirector : IDisposable
         }
     }
 
+    /// <summary>
+    /// The presence of an enemy kind this frame: <paramref name="level"/> 0..1 (nearness, already
+    /// shaped), <paramref name="pan"/> toward the nearest one. Levels glide, so enemies appearing,
+    /// dying or walking past fade in and out; at 0 the loop stops.
+    /// </summary>
+    public void SetPresence(EnemyPresence kind, float level, float pan, float deltaTime)
+    {
+        if (!_available)
+        {
+            return;
+        }
+
+        float current = _presenceLevel.GetValueOrDefault(kind);
+        float step = deltaTime / (level > current ? 0.35f : 0.8f);
+        current = level > current ? MathF.Min(level, current + step) : MathF.Max(level, current - step);
+        _presenceLevel[kind] = current;
+        try
+        {
+            if (current <= 0.001f)
+            {
+                if (_presence.Remove(kind, out SoundEffectInstance? gone))
+                {
+                    gone.Stop();
+                    gone.Dispose();
+                }
+                return;
+            }
+            if (!_presence.TryGetValue(kind, out SoundEffectInstance? loop))
+            {
+                if (!_presenceSounds.TryGetValue(kind, out SoundEffect? sound))
+                {
+                    try { sound = _content.Load<SoundEffect>(PresenceAssets[kind].Asset); }
+                    catch (ContentLoadException) { sound = null; }
+                    _presenceSounds[kind] = sound;
+                }
+                if (sound is null)
+                {
+                    return;
+                }
+                loop = sound.CreateInstance();
+                loop.IsLooped = true;
+                loop.Volume = 0f;
+                loop.Play();
+                if (_paused) loop.Pause();
+                _presence[kind] = loop;
+            }
+            loop.Volume = Math.Clamp(PresenceAssets[kind].Volume * current * (1f - 0.5f * _focus), 0f, 1f);
+            loop.Pan = Math.Clamp(pan, -1f, 1f);
+        }
+        catch
+        {
+            _available = false;
+        }
+    }
+
     /// <summary>Discards every running or paused effect, e.g. when a run is abandoned.</summary>
     public void StopEffects()
     {
+        foreach (SoundEffectInstance loop in _presence.Values)
+        {
+            try { loop.Stop(); loop.Dispose(); } catch { }
+        }
+        _presence.Clear();
+        _presenceLevel.Clear();
         SetLifeFlame(0f, 0f);
         foreach (SoundEffectInstance tail in _hallInstances)
         {

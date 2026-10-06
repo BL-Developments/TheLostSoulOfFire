@@ -280,3 +280,13 @@ Rezepte `cannon-draw` und `cannon-stow` in `tools/audio/recipes/cues.py`: Riemen
 | `Audio/Sfx/cannon_draw.wav` | cannon-draw Seed 1 | 0.42 s, 1 Kanal/Kanäle, -24.5 LUFS, Spitze -3.0 dBFS |
 | `Audio/Sfx/cannon_stow.wav` | cannon-stow Seed 2 | 0.36 s, 1 Kanal/Kanäle, -23.0 LUFS, Spitze -8.5 dBFS |
 | `Audio/Sfx/footstep_stone_1_hall_foundry.wav` | Hallfahne von footstep_stone_1.wav (Gießhalle, RT60 2.4 s) | 2.46 s, 1 Kanal, -34.0 LUFS, Spitze -15.3 dBFS |
+
+## Präsenz der Gegner (Durchgang 3, 06.10.2026)
+
+Rezepte `presence-burning`, `presence-hollow`, `presence-devourer` in `tools/audio/recipes/ambiences.py`, nach 16_AUDIO_DIRECTION (Burning: Knistern, instabiles Flammengrollen; Hollow: leises Atmen, verzerrtes Flüstern; Devourer: verzerrte Seelenstimmen aus dem Rumpf). Nahtlose Mono-Schleifen; das Spiel setzt je Art eine Schleife in Richtung des nächsten Gegners und blendet sie nach Abstand. CLAP: Burning „fire crackling and roaring“ 0,66; Hollow „choir of ghostly voices“ 0,68; Devourer „deep monster growl“ 0,38 + „ghostly voices“ 0,27 (die rauschhafte erste Fassung hörte CLAP als Wind, verworfen).
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/presence_burning.wav` | presence-burning Seed 1 | 5.00 s, 1 Kanal/Kanäle, -24.0 LUFS, Spitze -4.8 dBFS |
+| `Audio/Sfx/presence_hollow.wav` | presence-hollow Seed 1 | 6.00 s, 1 Kanal/Kanäle, -26.0 LUFS, Spitze -8.5 dBFS |
+| `Audio/Sfx/presence_devourer.wav` | presence-devourer Seed 1 | 7.00 s, 1 Kanal/Kanäle, -25.0 LUFS, Spitze -8.0 dBFS |

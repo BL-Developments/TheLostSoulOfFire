@@ -299,3 +299,105 @@ def life_flame(rng) -> np.ndarray:
     quiet = np.abs(mix) + np.abs(np.roll(mix, 1))
     mix = np.roll(mix, -int(np.argmin(quiet)))
     return dsp.normalise_loudness(mix, -24.0, peak_ceiling_db=-4.0)
+
+
+def _seamless(mix: np.ndarray) -> np.ndarray:
+    """Start a loop where two neighbouring samples are nearly silent, so its ends meet cleanly."""
+    quiet = np.abs(mix) + np.abs(np.roll(mix, 1))
+    return np.roll(mix, -int(np.argmin(quiet)))
+
+
+@recipe("presence-burning", "Burning in der Nähe: instabiles Grollen der Death Flame, flatternd, Knistern aus den Rissen; Punktquelle (mono), nahtlos", loop=True)
+def presence_burning(rng) -> np.ndarray:
+    seconds = 5.0
+    n = dsp.seconds(seconds)
+    # Unstable flame: a low roar whose level jumps irregularly several times a second.
+    roar = dsp.circular(lambda x: dsp.bandpass(x, 60, 520), dsp.brown(n, rng))
+    flutter = 0.45 + 0.35 * dsp.smooth_loop(n, 5.5, rng) + 0.2 * dsp.smooth_loop(n, 1.3, rng)
+    roar = roar / (np.std(roar) + 1e-9) * flutter
+    # A hiss over it, the flame tongues licking out of the cracks.
+    tongue = dsp.circular(lambda x: dsp.bandpass(x, 900, 3800), dsp.pink(n, rng))
+    tongue = tongue / (np.std(tongue) + 1e-9) * np.clip(dsp.smooth_loop(n, 3.0, rng), 0, None) ** 2
+    crackle = np.zeros(n)
+    for _ in range(int(seconds * 9)):
+        dsp.place(crackle, _pop(rng, rng.random() < 0.25), int(rng.integers(0, n)), min(1.0, 0.05 * rng.pareto(1.8) + 0.03))
+    mix = roar * 0.22 + tongue * 0.05 + crackle * 0.8
+    mix = dsp.circular(lambda x: dsp.highpass(x, 45), mix)
+    return dsp.normalise_loudness(_seamless(mix), -24.0, peak_ceiling_db=-4.0)
+
+
+@recipe("presence-hollow", "Hollow in der Nähe: leises Atmen durch die Porzellanmaske, verzerrtes Flüstern, Stoff knarzt; Punktquelle (mono), nahtlos", loop=True)
+def presence_hollow(rng) -> np.ndarray:
+    seconds = 6.0
+    n = dsp.seconds(seconds)
+    t = dsp.time_axis(n)
+    # Two slow breaths per loop, hollow and resonant behind the mask.
+    breath_env = np.zeros(n)
+    for start, length, gain in ((0.3, 1.1, 0.9), (1.5, 1.3, 0.6), (3.3, 1.1, 1.0), (4.5, 1.2, 0.55)):
+        a, m = dsp.seconds(start), dsp.seconds(length)
+        breath_env[a:a + m] += np.sin(np.pi * np.linspace(0, 1, m)) ** 1.5 * gain
+    air = dsp.circular(lambda x: dsp.bandpass(x, 300, 2600), dsp.pink(n, rng))
+    air = air / (np.std(air) + 1e-9)
+    breath = sum(dsp.resonator(air, f, 6) * g for f, g in ((520, 1.0), (1150, 0.6), (2300, 0.25))) * breath_env
+    breath = breath / (np.std(breath) + 1e-9)
+    # Whispering: noise shaped into syllables, formants sliding, pitched oddly low.
+    whisper = np.zeros(n)
+    for _ in range(9):
+        at = int(rng.integers(0, n))
+        m = dsp.seconds(rng.uniform(0.12, 0.35))
+        grain = dsp.bandpass(rng.standard_normal(m), 600, 4500)
+        centre = np.linspace(rng.uniform(700, 1400), rng.uniform(1600, 2800), m)
+        grain = dsp.swept_bandpass(grain, centre, q=4.0) * np.hanning(m)
+        dsp.place(whisper, grain, at, rng.uniform(0.3, 1.0))
+    whisper = whisper / (np.std(whisper) + 1e-9)
+    creak = np.zeros(n)
+    for _ in range(3):
+        pulses = np.zeros(dsp.seconds(0.25))
+        tt = 0.0
+        while tt < 0.25:
+            pulses[dsp.seconds(tt)] = rng.uniform(0.4, 1.0)
+            tt += 1.0 / rng.uniform(60, 110)
+        dsp.place(creak, dsp.resonator(pulses, rng.uniform(400, 800), 9) * np.hanning(len(pulses)), int(rng.integers(0, n)), 0.5)
+    mix = breath * 0.5 + whisper * 0.12 + creak * 0.25
+    room = dsp.impulse_response(0.6, rng, damping_hz=4500, predelay=0.006)
+    mix = dsp.reverb(mix, room, wet=0.12, loop=True).mean(axis=1)
+    mix = dsp.circular(lambda x: dsp.highpass(x, 80), mix)
+    return dsp.normalise_loudness(_seamless(mix), -26.0, peak_ceiling_db=-6.0)
+
+
+@recipe("presence-devourer", "Devourer in der Nähe: tiefes Grollen aus dem Rumpf, ein verzerrter Chor gefangener Seelen, nasses Atmen; Punktquelle (mono), nahtlos", loop=True)
+def presence_devourer(rng) -> np.ndarray:
+    seconds = 7.0
+    n = dsp.seconds(seconds)
+    t = dsp.time_axis(n)
+    # The prison: a low, slowly beating drone (two close pitches) under a rumble.
+    drone = (np.sin(2 * np.pi * 55.0 * t) + 0.7 * np.sin(2 * np.pi * 57.3 * t + 1.0) + 0.3 * np.sin(2 * np.pi * 110.4 * t)) * 0.25
+    rumble = dsp.circular(lambda x: dsp.bandpass(x, 35, 180), dsp.brown(n, rng))
+    rumble = rumble / (np.std(rumble) + 1e-9) * (0.6 + 0.4 * dsp.smooth_loop(n, 0.4, rng))
+    # Trapped souls: a few breathy vowel tones drifting in pitch, very quiet and detuned.
+    choir = np.zeros(n)
+    for base in (196.0, 233.1, 277.2):
+        drift = 1.0 + 0.012 * dsp.smooth_loop(n, 0.2, rng)
+        phase = np.cumsum(base * drift) / dsp.RATE * 2 * np.pi
+        tone = np.sin(phase) + 0.4 * np.sin(2 * phase) + 0.2 * np.sin(3 * phase)
+        breathy = dsp.circular(lambda x: dsp.bandpass(x, base * 0.9, base * 4), dsp.pink(n, rng))
+        voice = (tone * 0.85 + breathy / (np.std(breathy) + 1e-9) * 0.12) * np.clip(dsp.smooth_loop(n, 0.25, rng), 0, None) ** 2
+        choir += voice
+    choir = dsp.circular(lambda x: dsp.bandpass(x, 300, 1600), choir)
+    choir = choir / (np.std(choir) + 1e-9)
+    # A throat: a slow pulse train (the glottis, ~40 Hz) through two low formants, swelling with
+    # each breath, so it reads as a creature, not as weather.
+    breath_cycle = 0.5 - 0.5 * np.cos(2 * np.pi * t / (seconds / 2))
+    rate = 38.0 + 6.0 * dsp.smooth_loop(n, 0.3, rng)
+    pulse_phase = np.cumsum(rate) / dsp.RATE
+    # Each glottal pulse a short decaying click (a rattle, not hiss): jitter in level per pulse.
+    glottis = (np.diff(np.floor(pulse_phase), prepend=0) > 0).astype(float)
+    glottis *= rng.uniform(0.6, 1.0, n)
+    glottis = np.convolve(glottis, np.exp(-np.arange(dsp.seconds(0.004)) / dsp.seconds(0.001)), mode="same")
+    throat = sum(dsp.resonator(glottis, f, q) * g for f, q, g in ((280, 5, 1.0), (640, 6, 0.6), (1300, 8, 0.2)))
+    throat = throat / (np.std(throat) + 1e-9) * breath_cycle ** 1.5
+    mix = drone * 0.35 + rumble * 0.12 + throat * 0.32 + choir * 0.2
+    room = dsp.impulse_response(1.0, rng, damping_hz=3000, predelay=0.01)
+    mix = dsp.reverb(mix, room, wet=0.18, loop=True).mean(axis=1)
+    mix = dsp.circular(lambda x: dsp.highpass(x, 30), mix)
+    return dsp.normalise_loudness(_seamless(mix), -25.0, peak_ceiling_db=-5.0)

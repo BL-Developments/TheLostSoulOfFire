@@ -327,6 +327,13 @@ Rahmen wie oben (nur Darstellung und Ton).
   helles Herz, großflächige Helligkeitsstreuung 10,5 → 13,5 (Gauß 90 px), Figuren als dunkle
   Silhouetten darin gut lesbar.
 
+- Präsenz der Gegner (16_AUDIO_DIRECTION verlangt sie, sie fehlte): je Art eine leise nahtlose
+  Schleife in Richtung des nächsten Gegners, nach Abstand (bis 850), etwas voller bei mehreren,
+  Burning im Anlauf lauter, tritt bei Gefahrensignalen zurück, aus bei Tod und außerhalb des
+  Kampfs. Burning: Knistern und instabiles Grollen; Hollow: Atmen, Flüstern, Stoff; Devourer:
+  Kehle, Drone, Seelenchor. Pegel unter dem Bett (etwa −9 bis −2 LU, wie die Schritte).
+  Rundgang protokolliert `presence Hollow=0.10@+0.36 Burning=0.28@-0.09 Devourer=0.08@+0.56`.
+
 **Befunde, offen (nach Wirkung):**
 1. Sprache: Erzähltexte englisch, HUD deutsch (Inhaltsfrage, nicht ohne Owner ändern).
 
@@ -339,6 +346,8 @@ Luftperspektive auf die Wand begrenzt: Kontrast unverändert, Änderung zurückg
 Taumeln und -Tod, Burning-Tod, Burning-Angriff, HUD, Seelensinn der Vorhalle.
 
 **Verworfen:**
+- Devourer-Präsenz aus Rauschgrollen und gehauchtem Chor: CLAP hörte „wind“ (0,7–0,9); jetzt
+  tonale Kehle (Pulsfolge durch Formanten) und tonaler Chor.
 - Ziehende Rauchschatten über dem Arenaboden (gegen das gleichmäßige Licht): dunkelten vor allem
   die hellen Stellen ab; großflächige Helligkeitsstreuung sank von 10,5 auf 8,0 (Gauß 90 px),
   das Bild wurde nur dunkler. Besser über gezielte Lichtinseln lösen, nicht über Schatten.

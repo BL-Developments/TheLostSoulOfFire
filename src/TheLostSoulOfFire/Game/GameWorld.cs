@@ -199,6 +199,7 @@ public sealed partial class GameWorld : IDisposable
         _audio.SetEnding(ending);
         _audio.SetLifeFlame(ending ? _presentation.GetLifeFlameAlpha() * _presentation.GetLifeFlameKindle() : 0f,
             PanOf(_presentation.GetLifeFlamePosition()) * 0.7f);
+        UpdateEnemyPresence(deltaTime);
         if (_devMenu.IsOpen)
         {
             _audio.Update(deltaTime);
@@ -1970,6 +1971,60 @@ public sealed partial class GameWorld : IDisposable
 
     /// <summary>Stereo position of a sound source left or right of the player (presentation only).</summary>
     private float PanOf(Vector2 source) => MathHelper.Clamp((source.X - _player.Position.X) / 700f, -0.8f, 0.8f);
+
+    /// <summary>
+    /// Each enemy kind is heard where the nearest of its kind stands (presentation only): louder
+    /// the closer it is, a little fuller with more of them, a Burning flaring up as it winds up and
+    /// runs. Nothing while the player is dead or outside a fight.
+    /// </summary>
+    private void UpdateEnemyPresence(float deltaTime)
+    {
+        bool heard = IsCombatPhase && !_player.IsDead;
+        foreach (EnemyPresence kind in PresenceKinds)
+        {
+            Enemy? nearest = null;
+            float best = float.MaxValue;
+            int count = 0;
+            if (heard)
+            {
+                foreach (Enemy enemy in _enemies)
+                {
+                    if (!enemy.IsAlive || PresenceOf(enemy) != kind)
+                    {
+                        continue;
+                    }
+                    count++;
+                    float distance = Vector2.DistanceSquared(enemy.Position, _player.Position);
+                    if (distance < best)
+                    {
+                        best = distance;
+                        nearest = enemy;
+                    }
+                }
+            }
+            float level = 0f;
+            if (nearest is not null)
+            {
+                float nearness = MathHelper.Clamp(1f - MathF.Sqrt(best) / 850f, 0f, 1f);
+                level = nearness * nearness * MathF.Min(1.3f, 1f + 0.1f * (count - 1));
+                if (nearest is Burning { IsAggressionCommitted: true })
+                {
+                    level *= 1.5f;
+                }
+            }
+            _audio.SetPresence(kind, MathHelper.Clamp(level, 0f, 1.5f), nearest is null ? 0f : PanOf(nearest.Position), deltaTime);
+        }
+    }
+
+    private static readonly EnemyPresence[] PresenceKinds = [EnemyPresence.Hollow, EnemyPresence.Burning, EnemyPresence.Devourer];
+
+    private static EnemyPresence? PresenceOf(Enemy enemy) => enemy switch
+    {
+        Hollow => EnemyPresence.Hollow,
+        Burning => EnemyPresence.Burning,
+        Devourer => EnemyPresence.Devourer,
+        _ => null
+    };
 
     private readonly Dictionary<Enemy, (Vector2 From, float Distance)> _enemySteps = new();
     private readonly List<Enemy> _goneStepEnemies = [];
