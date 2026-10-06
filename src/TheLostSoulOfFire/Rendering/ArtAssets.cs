@@ -851,6 +851,12 @@ public sealed class ArtAssets
     public void DrawShade(SpriteBatch batch, Rectangle area, Color top) =>
         batch.Draw(_shade, area, top);
 
+    /// <summary>The vertical shade (opaque at the top, clear at the bottom), for flipped uses.</summary>
+    public Texture2D ShadeTexture => _shade;
+
+    /// <summary>The transform of the running lit scene pass, for callers that restart the batch.</summary>
+    public Matrix SceneTransform => _sceneTransform;
+
     private static Texture2D CreateShadeTexture(GraphicsDevice device, int height)
     {
         Color[] data = new Color[height];

@@ -953,6 +953,7 @@ public sealed partial class GameWorld : IDisposable
                 _arenaAtmosphere.DrawBackground(batch, pixel, _soulSensePresentation.WorldSuppression, _art.HasArt(VisualIds.ArenaFloor) ? _art : null);
             }
             DrawSceneProps(batch, layer => layer < SceneLayer.Actor);
+            DrawFloorDepth(batch, viewport);
             if (IsCombatPhase && _phase == GamePhase.Arena)
             {
                 DrawArenaLoop(batch, pixel);
@@ -1021,6 +1022,10 @@ public sealed partial class GameWorld : IDisposable
         _art.BeginLitScene(sceneTransform, lights);
 
         DrawSceneProps(batch, layer => layer == SceneLayer.Atmosphere);
+        if (MotesLook is { } motes)
+        {
+            ForegroundMotes.Draw(batch, _art, _camera, viewport, _presentationTime, motes, 53 + (int)_phase);
+        }
         _presentation.DrawWorldAccents(batch, pixel, _art, _phase, _loopState, _player.IsDead, _player, ActiveCombatBounds);
 
         if (IsCombatPhase && _presentation.ShouldDrawAim(_loopState, _player.IsDead))
@@ -1076,6 +1081,78 @@ public sealed partial class GameWorld : IDisposable
             _art.DrawSoftSpot(batch, at, size, shade * 0.14f);
         }
     }
+
+    /// <summary>
+    /// Depth on the floor, under every figure (presentation only). Aerial perspective: the part
+    /// of the floor farther from the camera (the top of the view) sits in a faint haze, the near
+    /// edge sinks into shadow. In the foundry, the rose window throws a pale pool of light onto
+    /// the middle of the hall, where the fights happen, with dust turning slowly in it.
+    /// </summary>
+    private void DrawFloorDepth(SpriteBatch batch, Viewport viewport)
+    {
+        bool arena = _phase == GamePhase.Arena && _art.HasArt(VisualIds.ArenaFloor);
+        bool prologue = _phase == GamePhase.Prologue && PrologueEnvironment.PlateOf(_prologue) is { } plate && _art.HasArt(plate);
+        if (!arena && !prologue)
+        {
+            return;
+        }
+
+        // The visible floor in world units.
+        float zoom = MathF.Max(0.1f, _camera.Zoom);
+        Vector2 half = new(viewport.Width * 0.5f / zoom, viewport.Height * 0.5f / zoom);
+        Rectangle view = new((int)(_camera.Position.X - half.X) - 40, (int)(_camera.Position.Y - half.Y) - 40,
+            (int)(half.X * 2f) + 80, (int)(half.Y * 2f) + 80);
+        Color haze = arena ? new Color(150, 140, 178) : new Color(120, 136, 170);
+        _art.DrawShade(batch, new Rectangle(view.X, view.Y, view.Width, (int)(view.Height * 0.42f)), haze * 0.07f);
+        Rectangle near = new(view.X, view.Y + (int)(view.Height * 0.62f), view.Width, (int)(view.Height * 0.38f) + 2);
+        DrawShadeUp(batch, near, new Color(4, 3, 9) * 0.16f);
+
+        if (!arena)
+        {
+            return;
+        }
+
+        batch.End();
+        batch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.LinearClamp, transformMatrix: _art.SceneTransform);
+        float breathe = 1f + 0.04f * MathF.Sin(_presentationTime * 0.21f);
+        Color window = new(205, 196, 236);
+        _art.DrawSoftSpot(batch, RoseWindowPool, new Vector2(470f, 230f) * breathe, window * 0.07f);
+        _art.DrawSoftSpot(batch, RoseWindowPool + new Vector2(-20f, -30f), new Vector2(260f, 120f) * breathe, window * 0.06f);
+        // Dust turning slowly in the light: only where the pool is, fading in and out.
+        for (int index = 0; index < 16; index++)
+        {
+            float seed = index * 12.9898f;
+            float life = (_presentationTime * 0.05f + Fraction(MathF.Sin(seed) * 43758.5453f)) % 1f;
+            Vector2 at = RoseWindowPool + new Vector2(
+                (Fraction(MathF.Sin(seed * 1.7f) * 24634.6345f) - 0.5f) * 760f + MathF.Sin(_presentationTime * 0.13f + seed) * 30f,
+                (Fraction(MathF.Sin(seed * 2.3f) * 15731.743f) - 0.5f) * 340f - life * 60f);
+            Vector2 offset = (at - RoseWindowPool) / new Vector2(470f, 230f);
+            float inside = MathHelper.Clamp(1f - offset.Length(), 0f, 1f);
+            float fade = MathF.Sin(life * MathF.PI);
+            _art.DrawSoftSpot(batch, at - new Vector2(0f, 40f + 30f * Fraction(seed)), new Vector2(2.2f), window * (0.5f * inside * fade));
+        }
+        batch.End();
+        batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, transformMatrix: _art.SceneTransform);
+    }
+
+    /// <summary>What floats between camera and room: ash in the foundry and the antechamber, sea mist over the prologue.</summary>
+    private ForegroundMotes.Look? MotesLook => _phase switch
+    {
+        GamePhase.Arena when !_sandboxActive => new ForegroundMotes.Look(new Color(236, 226, 255), 0.34f, new Vector2(5f, 9f), 12),
+        GamePhase.Antechamber or GamePhase.EnteringArena => new ForegroundMotes.Look(new Color(226, 214, 250), 0.28f, new Vector2(3f, 7f), 9),
+        GamePhase.Prologue when _prologue.IsVehicleRide => new ForegroundMotes.Look(new Color(206, 222, 250), 0.26f, new Vector2(-46f, 4f), 10),
+        GamePhase.Prologue => new ForegroundMotes.Look(new Color(206, 222, 250), 0.24f, new Vector2(-9f, 3f), 10),
+        _ => null
+    };
+
+    /// <summary>Where the rose window's light falls on the foundry floor.</summary>
+    private static readonly Vector2 RoseWindowPool = new(930f, 420f);
+
+    private static float Fraction(float value) => value - MathF.Floor(value);
+
+    /// <summary>Like <see cref="ArtAssets.DrawShade"/>, but darkest at the bottom edge.</summary>
+    private void DrawShadeUp(SpriteBatch batch, Rectangle area, Color bottom) =>
+        batch.Draw(_art.ShadeTexture, area, null, bottom, 0f, Vector2.Zero, SpriteEffects.FlipVertically, 0f);
 
     private static readonly (Vector2 At, Vector2 Size)[] ArenaBlotches =
     [
