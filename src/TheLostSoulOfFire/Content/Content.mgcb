@@ -10609,3 +10609,8 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/Player/Animations/wake_normal/nw.png
+
+#begin Audio/Sfx/footstep_stone_1_hall_foundry.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/footstep_stone_1_hall_foundry.wav

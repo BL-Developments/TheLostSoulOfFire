@@ -275,7 +275,8 @@ Rahmen wie oben (nur Darstellung und Ton).
   ihrer Halle mit dem Ton spielen (`AudioDirector.HallSends`, Anteil 0,3–0,4, höchstens sechs
   gleichzeitig): Treffer, Kanone, Detonation, Schlag, Tode, Seelenspaltung, Spielertreffer,
   Wellenstart in der Arena; Schritte in der Vorhalle. Prolog im Freien bleibt trocken.
-  Rundgang zählt `TOUR_AUDIO hall_tails=Hub:2,Arena:12` (Prolog 0). CLAP: mit Fahne „large
+  Rundgang zählt `TOUR_AUDIO hall_tails=Hub:2,Arena:12` (Prolog 0). Nachgezogen: Schritte auch in
+  der Gießhalle (eigene Fahne, Anteil 0,2; eine Fahne je Ton und Halle). CLAP: mit Fahne „large
   reverberant stone hall“ 0,90–0,94, Trefferfolge nicht „washy“; Audiotests grün.
 
 - Titel: Die Figur stand flach und grau vor der Flamme (das Toon-Material macht Licht farblos).

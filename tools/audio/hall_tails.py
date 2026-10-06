@@ -52,6 +52,8 @@ TAILS = {
     "player_hit": FOUNDRY,
     "wave_start": FOUNDRY,
     "footstep_stone_1": ANTECHAMBER,
+    # The same step in the foundry, its own file (a cue can have a tail per hall).
+    "footstep_stone_1@foundry": FOUNDRY,
 }
 
 
@@ -78,7 +80,8 @@ def main(argv: list[str]) -> int:
     for name, hall in TAILS.items():
         if args.only and name not in args.only:
             continue
-        x, rate = sf.read(str(SFX / f"{name}.wav"))
+        source, _, suffix = name.partition("@")
+        x, rate = sf.read(str(SFX / f"{source}.wav"))
         if rate != dsp.RATE:
             raise SystemExit(f"{name}: {rate} Hz")
         if x.ndim > 1:
@@ -88,10 +91,10 @@ def main(argv: list[str]) -> int:
         peak = np.max(np.abs(wet))
         if peak > 10 ** (-1.5 / 20):
             raise SystemExit(f"{name}: tail peak {20 * np.log10(peak):.1f} dBFS, would clip")
-        target = SFX / f"{name}_hall.wav"
+        target = SFX / (f"{source}_hall_{suffix}.wav" if suffix else f"{source}_hall.wav")
         sf.write(str(target), wet, rate, subtype="PCM_16")
         hall_name = "Gießhalle" if hall is FOUNDRY else "Vorhalle"
-        print(f"| `Audio/Sfx/{target.name}` | Hallfahne von {name}.wav ({hall_name}, RT60 {hall[0]:.1f} s) | "
+        print(f"| `Audio/Sfx/{target.name}` | Hallfahne von {source}.wav ({hall_name}, RT60 {hall[0]:.1f} s) | "
               f"{len(wet) / rate:.2f} s, 1 Kanal, {dsp.loudness(wet):.1f} LUFS, Spitze {20 * np.log10(peak):.1f} dBFS |")
     return 0
 

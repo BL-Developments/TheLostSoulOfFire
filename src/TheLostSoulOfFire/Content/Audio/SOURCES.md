@@ -279,3 +279,4 @@ Rezepte `cannon-draw` und `cannon-stow` in `tools/audio/recipes/cues.py`: Riemen
 | --- | --- | --- |
 | `Audio/Sfx/cannon_draw.wav` | cannon-draw Seed 1 | 0.42 s, 1 Kanal/Kanäle, -24.5 LUFS, Spitze -3.0 dBFS |
 | `Audio/Sfx/cannon_stow.wav` | cannon-stow Seed 2 | 0.36 s, 1 Kanal/Kanäle, -23.0 LUFS, Spitze -8.5 dBFS |
+| `Audio/Sfx/footstep_stone_1_hall_foundry.wav` | Hallfahne von footstep_stone_1.wav (Gießhalle, RT60 2.4 s) | 2.46 s, 1 Kanal, -34.0 LUFS, Spitze -15.3 dBFS |

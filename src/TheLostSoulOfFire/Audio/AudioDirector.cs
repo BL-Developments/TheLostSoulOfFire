@@ -205,11 +205,12 @@ public sealed class AudioDirector : IDisposable
         (AudioCue.SoulCleave, "Audio/Sfx/soul_cleave_hall", AudioZone.Arena, 0.36f),
         (AudioCue.PlayerHit, "Audio/Sfx/player_hit_hall", AudioZone.Arena, 0.3f),
         (AudioCue.WaveStart, "Audio/Sfx/wave_start_hall", AudioZone.Arena, 0.4f),
-        (AudioCue.Footstep, "Audio/Sfx/footstep_stone_1_hall", AudioZone.Hub, 0.3f)
+        (AudioCue.Footstep, "Audio/Sfx/footstep_stone_1_hall", AudioZone.Hub, 0.3f),
+        (AudioCue.Footstep, "Audio/Sfx/footstep_stone_1_hall_foundry", AudioZone.Arena, 0.2f)
     ];
 
     private const int MaximumHallTails = 6;
-    private readonly Dictionary<AudioCue, (SoundEffect Tail, AudioZone Hall, float Send)> _hallTails = [];
+    private readonly Dictionary<(AudioCue Cue, AudioZone Hall), (SoundEffect Tail, float Send)> _hallTails = [];
     private readonly List<SoundEffectInstance> _hallInstances = [];
 
     /// <summary>Extra takes of a cue (e.g. footsteps); Play picks one at random so repeats never match exactly.</summary>
@@ -378,7 +379,7 @@ public sealed class AudioDirector : IDisposable
             {
                 try
                 {
-                    _hallTails[cue] = (content.Load<SoundEffect>(asset), hall, send);
+                    _hallTails[(cue, hall)] = (content.Load<SoundEffect>(asset), send);
                 }
                 catch (ContentLoadException)
                 {
@@ -631,7 +632,7 @@ public sealed class AudioDirector : IDisposable
     /// </summary>
     private void PlayHallTail(AudioCue cue, float volume, float pitch, float pan)
     {
-        if (!_hallTails.TryGetValue(cue, out (SoundEffect Tail, AudioZone Hall, float Send) hall) || hall.Hall != _zone)
+        if (!_hallTails.TryGetValue((cue, _zone), out (SoundEffect Tail, float Send) hall))
         {
             return;
         }
