@@ -917,6 +917,7 @@ public sealed partial class GameWorld : IDisposable
             {
                 _art.DrawEnvironment(batch, VisualIds.ArenaWall, Arena.WallFoot);
                 _art.DrawEnvironment(batch, VisualIds.ArenaFloor, Arena.FloorTopLeft);
+                DrawArenaShading(batch);
                 _arenaAtmosphere.DrawBackground(batch, pixel, _soulSensePresentation.WorldSuppression);
             }
             DrawSceneProps(batch, layer => layer < SceneLayer.Actor);
@@ -1003,6 +1004,40 @@ public sealed partial class GameWorld : IDisposable
         _art.EndLitScene();
         batch.End();
     }
+
+    /// <summary>
+    /// Painted shade over the evenly lit foundry floor (presentation only): the foot of the north
+    /// wall lies in its shadow, the sides and the south fall off into the dark, a few broad
+    /// blotches break the floor's even value; the middle, where the fights are, stays lit.
+    /// </summary>
+    private void DrawArenaShading(SpriteBatch batch)
+    {
+        if (!_art.HasArt(VisualIds.ArenaFloor))
+        {
+            return;
+        }
+
+        Color shade = new(4, 3, 9);
+        _art.DrawShade(batch, new Rectangle(0, (int)Arena.WallFoot.Y, 1800, 150), shade * 0.5f);
+        _art.DrawSoftSpot(batch, new Vector2(-40f, 520f), new Vector2(420f, 760f), shade * 0.55f);
+        _art.DrawSoftSpot(batch, new Vector2(1840f, 520f), new Vector2(420f, 760f), shade * 0.55f);
+        _art.DrawSoftSpot(batch, new Vector2(900f, 1080f), new Vector2(1150f, 300f), shade * 0.5f);
+        _art.DrawSoftSpot(batch, new Vector2(60f, 1000f), new Vector2(380f, 300f), shade * 0.4f);
+        _art.DrawSoftSpot(batch, new Vector2(1740f, 1000f), new Vector2(380f, 300f), shade * 0.4f);
+        foreach ((Vector2 at, Vector2 size) in ArenaBlotches)
+        {
+            _art.DrawSoftSpot(batch, at, size, shade * 0.14f);
+        }
+    }
+
+    private static readonly (Vector2 At, Vector2 Size)[] ArenaBlotches =
+    [
+        (new Vector2(420f, 330f), new Vector2(260f, 150f)),
+        (new Vector2(1310f, 300f), new Vector2(300f, 140f)),
+        (new Vector2(760f, 760f), new Vector2(340f, 170f)),
+        (new Vector2(1420f, 690f), new Vector2(240f, 160f)),
+        (new Vector2(300f, 760f), new Vector2(220f, 150f))
+    ];
 
     /// <summary>Props of the room being shown plus props staged by automated tests.</summary>
     private IEnumerable<SceneProp> ActiveSceneProps => _phase switch
