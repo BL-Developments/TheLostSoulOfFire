@@ -36,6 +36,14 @@ public static class VisualIds
     public const string SearchLuggage = "prop.search-luggage";
     public const string SearchMast = "prop.search-mast";
     public const string WardenMarker = "prop.warden-marker";
+    public const string CausewayFloor = "environment.causeway";
+    public const string DeckFloor = "environment.deck";
+    public const string DeckSea = "environment.sea";
+    public const string PassingFar = "environment.passing-far";
+    public const string PassingNear = "environment.passing-near";
+    public const string DeckRail = "prop.deck-rail";
+    public const string ThresholdFloor = "environment.threshold";
+    public const string ThresholdGate = "prop.threshold-gate";
     public const string HubFloor = "environment.hub";
     public const string HubBrazier = "prop.hub-brazier";
     public const string HubLeaves = "environment.hub-leaves";

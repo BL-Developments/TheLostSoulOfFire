@@ -261,6 +261,24 @@ public sealed class ArtAssets
         batch.Draw(clip.Texture, bounds, clip.GetSourceRectangle(0f), Color.White);
     }
 
+    /// <summary>
+    /// Draws an environment piece repeated sideways from x = 0 to <paramref name="coverWidth"/>,
+    /// shifted left by <paramref name="scroll"/> world units (wrapping), its top at <paramref name="top"/>.
+    /// </summary>
+    public void DrawEnvironmentScrolled(SpriteBatch batch, string id, float top, float scroll, float coverWidth)
+    {
+        float width = WorldSizeOf(id, new Vector2(1800f, 1000f)).X;
+        if (width <= 1f)
+        {
+            return;
+        }
+        float start = -(scroll % width);
+        for (float x = start; x < coverWidth; x += width)
+        {
+            DrawEnvironment(batch, id, new Vector2(MathF.Round(x), top));
+        }
+    }
+
     private void DrawTiled(SpriteBatch batch, VisualEntry entry, VisualClipDefinition clip, Vector2 position)
     {
         Vector2 topLeft = position - entry.Origin * entry.WorldSize;

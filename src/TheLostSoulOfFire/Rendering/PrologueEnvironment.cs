@@ -29,8 +29,22 @@ public static class PrologueEnvironment
     {
         PrologueSector.Emergence => VisualIds.ShoreFloor,
         PrologueSector.Search => VisualIds.SearchFloor,
+        PrologueSector.Escape => prologue.IsVehicleRide ? VisualIds.DeckFloor : VisualIds.CausewayFloor,
+        PrologueSector.Threshold => VisualIds.ThresholdFloor,
         _ => null
     };
+
+    /// <summary>
+    /// The crossing: the sea and the drowned town slide past the skiff (far gables slowly, near
+    /// mast stumps fast) while the deck stays still, so motion reads without moving the floor.
+    /// </summary>
+    public static void DrawCrossing(SpriteBatch batch, ArtAssets art, float time)
+    {
+        art.DrawEnvironmentScrolled(batch, VisualIds.DeckSea, 0f, time * 110f, 1800f);
+        art.DrawEnvironmentScrolled(batch, VisualIds.PassingFar, 0f, time * 34f, 1800f);
+        art.DrawEnvironment(batch, VisualIds.DeckFloor, Vector2.Zero);
+        art.DrawEnvironmentScrolled(batch, VisualIds.PassingNear, 746f, time * 190f, 1800f);
+    }
 
     public static void DrawGround(
         SpriteBatch batch,

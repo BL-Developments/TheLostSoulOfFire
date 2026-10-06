@@ -1074,6 +1074,145 @@
           "loop": true
         }
       }
+    },
+    {
+      "id": "environment.causeway",
+      "kind": "environment",
+      "palette": "world",
+      "worldSize": [1800, 1000],
+      "origin": [0.0, 0.0],
+      "layer": "ground",
+      "clips": {
+        "default": {
+          "path": "Textures/Environment/Causeway/plate_{tile}",
+          "frameSize": [1350, 1500],
+          "frames": 1,
+          "fps": 1,
+          "loop": true,
+          "tiles": [2, 1]
+        }
+      }
+    },
+    {
+      "id": "environment.deck",
+      "kind": "environment",
+      "palette": "world",
+      "worldSize": [1800, 1000],
+      "origin": [0.0, 0.0],
+      "layer": "ground",
+      "clips": {
+        "default": {
+          "path": "Textures/Environment/Deck/plate_{tile}",
+          "frameSize": [1350, 1500],
+          "frames": 1,
+          "fps": 1,
+          "loop": true,
+          "tiles": [2, 1]
+        }
+      }
+    },
+    {
+      "id": "environment.sea",
+      "kind": "environment",
+      "palette": "world",
+      "worldSize": [1200, 1000],
+      "origin": [0.0, 0.0],
+      "layer": "ground",
+      "clips": {
+        "default": {
+          "path": "Textures/Environment/Deck/sea",
+          "frameSize": [1800, 1500],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "environment.passing-far",
+      "kind": "environment",
+      "palette": "world",
+      "worldSize": [1200, 306],
+      "origin": [0.0, 0.0],
+      "layer": "background",
+      "clips": {
+        "default": {
+          "path": "Textures/Environment/Deck/passing_far",
+          "frameSize": [1800, 459],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "environment.passing-near",
+      "kind": "environment",
+      "palette": "world",
+      "worldSize": [1200, 254],
+      "origin": [0.0, 0.0],
+      "layer": "ground",
+      "clips": {
+        "default": {
+          "path": "Textures/Environment/Deck/passing_near",
+          "frameSize": [1800, 381],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "environment.threshold",
+      "kind": "environment",
+      "palette": "world",
+      "worldSize": [1800, 1000],
+      "origin": [0.0, 0.0],
+      "layer": "ground",
+      "clips": {
+        "default": {
+          "path": "Textures/Environment/Threshold/plate_{tile}",
+          "frameSize": [1350, 1500],
+          "frames": 1,
+          "fps": 1,
+          "loop": true,
+          "tiles": [2, 1]
+        }
+      }
+    },
+    {
+      "id": "prop.deck-rail",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [993.33, 65.33],
+      "origin": [0.5, 0.8929],
+      "layer": "foreground",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Deck/rail",
+          "frameSize": [1490, 98],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "prop.threshold-gate",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [292.0, 707.33],
+      "origin": [0.5, 0.9793],
+      "layer": "high-prop",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Threshold/gate",
+          "frameSize": [438, 1061],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
     }
   ]
 }

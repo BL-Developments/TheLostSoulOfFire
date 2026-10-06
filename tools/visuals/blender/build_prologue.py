@@ -46,7 +46,7 @@ def texture(name: str, folder: Path = TEXTURES) -> str:
 
 def parse(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(prog="build_prologue.py")
-    parser.add_argument("--sector", required=True, choices=["search", "causeway", "deck", "threshold"])
+    parser.add_argument("--sector", required=True, choices=["search", "causeway", "deck", "threshold", "sea", "passing"])
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--samples", type=int, default=48)
     return parser.parse_args(argv[argv.index("--") + 1:] if "--" in argv else [])
@@ -64,7 +64,7 @@ def materials() -> dict[str, bpy.types.Material]:
         "plank": kit.stone("plank", wood, 3.5, tint=(0.62, 0.58, 0.56), spread=0.35),
         "plank_face": kit.stone("plank_face", wood, 3.5, tint=(0.5, 0.47, 0.46), spread=0.35, axes="XZ"),
         "brick": kit.stone("brick", brick, 3.0, tint=(0.33, 0.24, 0.23), spread=0.3, axes="XZ"),
-        "basalt": kit.stone("basalt", stone, 3.0, tint=(0.46, 0.45, 0.5), spread=0.3, axes="XZ"),
+        "basalt": kit.stone("basalt", stone, 3.0, tint=(0.62, 0.61, 0.68), spread=0.3, axes="XZ"),
         "basalt_floor": kit.stone("basalt_floor", stone, 4.0, tint=(0.55, 0.54, 0.6), spread=0.3),
         "ballast": kit.painted("ballast", (0.05, 0.05, 0.058), (0.13, 0.125, 0.135), scale=6.0, bump=0.6),
         "water": water_material(water),
@@ -79,6 +79,10 @@ def materials() -> dict[str, bpy.types.Material]:
         "dark": kit.painted("dark", (0.004, 0.004, 0.006), (0.012, 0.010, 0.016), bump=0.0),
         "ember": kit.emissive("ember", (0.55, 0.22, 1.0), 3.0),
         "setts": kit.textured("setts", setts, 2.2, tint=(0.70, 0.72, 0.78), roughness=0.55, bump=0.35, variation=0.3, wet=0.5),
+        "hull": kit.painted("hull", (0.035, 0.035, 0.042), (0.09, 0.085, 0.095), scale=2.0, roughness=0.6, bump=0.5),
+        "bone": kit.painted("bone", (0.32, 0.30, 0.26), (0.48, 0.46, 0.40), scale=4.0, roughness=0.6),
+        "backing": kit.painted("backing", (0.012, 0.011, 0.015), (0.03, 0.028, 0.034), bump=0.0),
+        "grout_dark": kit.painted("grout_dark", (0.02, 0.02, 0.024), (0.05, 0.05, 0.055), scale=2.0, roughness=1.0, bump=0.0),
         "slate": kit.painted("slate", (0.016, 0.018, 0.024), (0.045, 0.05, 0.06), scale=4.0, roughness=0.7, bump=0.3),
     }
 
@@ -323,9 +327,306 @@ def signal_mast(m, foot: Vector) -> list[bpy.types.Object]:
     return parts
 
 
+# ---- III Causeway --------------------------------------------------------------------------
+
+def skiff(m, bow: Vector, length: float = 11.0, beam: float = 4.2, deck: float = 0.0, cannons: bool = True,
+          name: str = "skiff") -> dict[str, list]:
+    """The Warden skiff, bow toward +x: a riveted iron hull with a timber deck, a low railing, an
+    iron cage over its Death-Flame engine at the stern and two mounted Soul Cannon housings.
+    Hand-made, no electrics (VISUAL-ART-DIRECTION E8). Returns its parts by group."""
+    groups: dict[str, list] = {"hull": [], "rail_front": [], "rail_back": []}
+    stern_x = bow.x - length
+    centre = Vector(((bow.x + stern_x) / 2 - 0.4, bow.y, deck))
+    hull = kit.box(f"{name}_hull", centre + Vector((0, 0, -0.9)), (length - 1.2, beam, 1.8), m["hull"], bevel=0.25)
+    groups["hull"].append(hull)
+    # Pointed bow: a wedge from the full beam to the stem.
+    import bmesh
+    mesh = bpy.data.meshes.new(f"{name}_bow")
+    bm = bmesh.new()
+    x0, x1 = bow.x - 1.8, bow.x + 0.2
+    top, bottom = deck + 0.05, deck - 1.7
+    verts = [bm.verts.new(v) for v in ((x0, bow.y - beam / 2, top), (x0, bow.y + beam / 2, top), (x1, bow.y, top + 0.25),
+                                       (x0, bow.y - beam / 2, bottom), (x0, bow.y + beam / 2, bottom), (x1 - 0.6, bow.y, bottom))]
+    for face in ((0, 2, 1), (3, 4, 5), (0, 3, 5, 2), (1, 2, 5, 4), (0, 1, 4, 3)):
+        bm.faces.new([verts[i] for i in face])
+    bm.to_mesh(mesh)
+    bm.free()
+    bow_obj = bpy.data.objects.new(f"{name}_bow", mesh)
+    bpy.context.collection.objects.link(bow_obj)
+    mesh.materials.append(m["hull"])
+    groups["hull"].append(bow_obj)
+    groups["hull"].append(kit.box(f"{name}_bowdeck", Vector((bow.x - 1.2, bow.y, deck + 0.04)), (1.6, beam * 0.55, 0.06), m["plank"]))
+    groups["hull"].append(kit.box(f"{name}_wale", centre + Vector((0, 0, -0.05)), (length - 1.0, beam + 0.12, 0.12), m["iron"]))
+    # Deck planks running fore and aft.
+    rng = random.Random(7)
+    y = bow.y - beam / 2 + 0.15
+    while y < bow.y + beam / 2 - 0.15:
+        width = rng.uniform(0.2, 0.26)
+        groups["hull"].append(kit.box(f"{name}_deck_{y:.2f}", Vector((centre.x, y + width / 2, deck + 0.02)), (length - 1.6, width - 0.02, 0.05),
+                                      m["plank"], bevel=0.008))
+        y += width
+    # Engine cage at the stern: forged bars around a basalt hearth (its flame is the game's).
+    engine = Vector((stern_x + 1.6, bow.y, deck))
+    groups["hull"].append(kit.cylinder(f"{name}_hearth", engine + Vector((0, 0, 0.3)), 0.9, 0.6, m["basalt_floor"], vertices=24))
+    for angle in range(0, 360, 24):
+        groups["hull"].append(kit.box(f"{name}_cagebar_{angle}", engine + Vector((math.cos(math.radians(angle)) * 0.95, math.sin(math.radians(angle)) * 0.95, 0.85)),
+                                      (0.05, 0.05, 1.1), m["iron"]))
+    bpy.ops.mesh.primitive_torus_add(major_radius=0.95, minor_radius=0.04, location=engine + Vector((0, 0, 1.4)))
+    ring = bpy.context.active_object
+    ring.data.materials.append(m["iron"])
+    groups["hull"].append(ring)
+    kit.point_light(f"{name}_engine_light", engine + Vector((0, -0.5, 1.6)), 500.0, WARDEN_LIGHT, radius=0.4)
+    # Deck furniture: a hatch, coiled lines, lashed crates, the tiller at the stern and two Warden
+    # lamps on short iron posts.
+    groups["hull"].append(kit.box(f"{name}_hatch", Vector((centre.x + 0.6, bow.y + beam * 0.2, deck + 0.1)), (1.3, 1.0, 0.16), m["plank_face"], bevel=0.03))
+    for k, (dx, dy) in enumerate(((-1.4, 0.32), (2.9, 0.3))):
+        groups["hull"].append(kit.cylinder(f"{name}_coil_{k}", Vector((centre.x + dx, bow.y + beam * dy, deck + 0.06)), 0.32, 0.1, m["rope"], vertices=20))
+    for k, dx in enumerate((-2.6, -2.0)):
+        groups["hull"].append(kit.box(f"{name}_crate_{k}", Vector((centre.x + dx, bow.y + beam * 0.3, deck + 0.3)), (0.55, 0.55, 0.55), m["plank_face"], bevel=0.02,
+                                      rotation=(0, 0, 0.1 * k)))
+    groups["hull"].append(kit.box(f"{name}_tiller", Vector((stern_x + 0.2, bow.y, deck + 0.55)), (1.2, 0.08, 0.08), m["plank_face"], rotation=(0, -0.25, 0)))
+    for k, dx in enumerate((-0.2, 0.25)):
+        post = Vector((centre.x + dx * length, bow.y + beam * 0.38, deck))
+        groups["hull"].append(kit.box(f"{name}_lamppost_{k}", post + Vector((0, 0, 0.7)), (0.07, 0.07, 1.4), m["iron"]))
+        groups["hull"].append(kit.cylinder(f"{name}_lampcup_{k}", post + Vector((0, 0, 1.45)), 0.11, 0.1, m["iron"], vertices=10))
+        kit.point_light(f"{name}_lamp_{k}", post + Vector((0, -0.2, 1.7)), 120.0, WARDEN_LIGHT, radius=0.15)
+    if cannons:
+        for side, offset in (("aft", -2.2), ("fore", 2.2)):
+            base = Vector((centre.x + offset, bow.y - beam * 0.18, deck))
+            groups["hull"].append(kit.cylinder(f"{name}_mount_{side}", base + Vector((0, 0, 0.25)), 0.5, 0.5, m["iron"], vertices=20))
+            groups["hull"].append(kit.box(f"{name}_gun_{side}", base + Vector((0, -0.55, 0.65)), (0.42, 1.4, 0.42), m["iron"], bevel=0.04,
+                                          rotation=(0.12, 0, 0)))
+            groups["hull"].append(kit.box(f"{name}_gunband_{side}", base + Vector((0, -0.9, 0.7)), (0.5, 0.12, 0.5), m["bone"], bevel=0.02,
+                                          rotation=(0.12, 0, 0)))
+    # Low railing: posts and a top rail along both sides; the near (south) side is its own group.
+    for side, group in ((-1, "rail_front"), (1, "rail_back")):
+        yy = bow.y + side * (beam / 2 - 0.08)
+        x = stern_x + 0.8
+        while x < bow.x - 1.6:
+            groups[group].append(kit.box(f"{name}_post_{side}_{x:.1f}", Vector((x, yy, deck + 0.45)), (0.06, 0.06, 0.9), m["iron"]))
+            x += 1.1
+        groups[group].append(kit.box(f"{name}_toprail_{side}", Vector(((stern_x + bow.x) / 2 - 0.4, yy, deck + 0.9)), (length - 2.4, 0.07, 0.07), m["iron"]))
+    return groups
+
+
+def build_causeway(m, scene) -> dict[str, list]:
+    """III, the causeway: the railway dam out to the ferry landing, broken at its edges. Two
+    tracks on ballast down the middle, paved shoulders, a fallen signal gantry, rubble, and at the
+    eastern end the timber landing where the Warden skiff is moored."""
+    pieces: dict[str, list] = {}
+    water(m)
+    rng = random.Random(13)
+    # The embankment: a granite-faced body, paved shoulders, a ballast bed for the tracks.
+    a, b = ground(40, 130), ground(1400, 880)
+    kit.box("dam_body", Vector(((a.x + b.x) / 2, (a.y + b.y) / 2, -1.75)), (b.x - a.x, a.y - b.y, 3.2), m["kerb_face"])
+    kit.plane("dam_shoulders", ground(40, 130, 0.002), ground(1400, 880, 0.002), m["setts"])
+    bed_a, bed_b = ground(40, 430), ground(1400, 740)
+    kit.box("ballast_bed", Vector(((bed_a.x + bed_b.x) / 2, (bed_a.y + bed_b.y) / 2, 0.06)), (bed_b.x - bed_a.x, bed_a.y - bed_b.y, 0.14),
+            m["ballast"], bevel=0.05)
+    for y in (510, 660):
+        yy = ground(0, y).y
+        x = metres(40)
+        while x < metres(1360):
+            kit.box(f"tie_{y}_{x:.1f}", Vector((x, yy, 0.14)), (0.24, 2.5, 0.08), m["plank"], rotation=(0, 0, rng.uniform(-0.03, 0.03)))
+            x += rng.uniform(0.6, 0.72)
+        rails(m, yy, metres(40), metres(1340), 0.19)
+    # Buffer stops where the tracks end before the landing.
+    for y in (510, 660):
+        kit.box(f"buffer_{y}", ground(1350, y, 0.5), (0.4, 2.6, 0.8), m["rust"], bevel=0.04)
+    # Broken edges: kerb only in pieces, chunks fallen toward the water.
+    for edge_y, kerb_y in ((130, 128), (880, 882)):
+        x = 40
+        while x < 1400:
+            length = rng.uniform(50, 110)
+            if rng.random() < 0.72:
+                kit.box(f"edge_{edge_y}_{x}", ground(x + length / 2, kerb_y, -0.12), (metres(length) - 0.05, 0.5, 0.36), m["kerb"], bevel=0.03,
+                        rotation=(0, 0, rng.uniform(-0.03, 0.03)))
+            else:
+                for k in range(3):
+                    kit.box(f"fallen_{edge_y}_{x}_{k}", ground(x + rng.uniform(0, length), kerb_y + (rng.uniform(15, 40) if edge_y > 500 else -rng.uniform(15, 40)),
+                                                             -0.7 + rng.uniform(-0.2, 0.2)), (0.7, 0.5, 0.4), m["kerb"], bevel=0.04,
+                            rotation=(rng.uniform(-0.6, 0.6), rng.uniform(-0.6, 0.6), rng.uniform(0, 3)))
+            x += length
+    # The fallen signal gantry on the north shoulder: a riveted lattice beam lying askew.
+    gantry = ground(610, 280, 0.25)
+    for k in range(2):
+        kit.box(f"gantry_chord_{k}", gantry + Vector((0, k * 0.7, 0)), (9.0, 0.12, 0.18), m["rust"], rotation=(0, 0, 0.12))
+    for k in range(13):
+        kit.box(f"gantry_web_{k}", gantry + Vector((-4.2 + k * 0.7, 0.35, 0.02)), (0.08, 0.8, 0.08), m["rust"],
+                rotation=(0, 0, 0.12 + (0.6 if k % 2 else -0.6)))
+    kit.box("gantry_signal", gantry + Vector((4.6, 0.9, 0.2)), (0.5, 0.3, 0.9), m["iron"], bevel=0.03, rotation=(1.3, 0, 0.12))
+    # Rubble near the south-east.
+    for k in range(9):
+        kit.box(f"rubble_{k}", ground(1285 + rng.uniform(-70, 70), 770 + rng.uniform(-25, 25), 0.15), (rng.uniform(0.3, 0.7), rng.uniform(0.3, 0.6), 0.3),
+                m["kerb"], bevel=0.04, rotation=(rng.uniform(-0.4, 0.4), rng.uniform(-0.4, 0.4), rng.uniform(0, 3)))
+    # The landing: a timber pier on piles, east of the dam.
+    pier_a, pier_b = ground(1395, 300), ground(1780, 560)
+    x = pier_a.x
+    while x < pier_b.x:
+        kit.box(f"pier_plank_{x:.2f}", Vector((x + 0.13, (pier_a.y + pier_b.y) / 2, -0.05 + rng.uniform(-0.01, 0.01))), (0.24, pier_a.y - pier_b.y, 0.08),
+                m["plank"], bevel=0.008)
+        x += 0.27
+    for px in (1410, 1560, 1720):
+        for py in (310, 550):
+            kit.cylinder(f"pier_pile_{px}_{py}", ground(px, py, -0.6), 0.16, 1.4, m["plank_face"], vertices=10)
+    # The moored skiff along the south side of the landing, bow east.
+    boat = skiff(m, ground(1790, 642), length=8.6, beam=3.4, deck=-0.25, cannons=False, name="moored")
+    for x in (1460, 1640):
+        bollard(m, ground(x, 548), f"pier_bollard_{x}")
+    # A gangplank from the pier onto the skiff's deck.
+    kit.box("gangplank", ground(1560, 572, -0.1), (1.0, 1.1, 0.06), m["plank"], rotation=(0.1, 0, 0))
+    marks = [warden_marker(m, ground(1395, 505), "dock_mark")]
+    for group in marks:
+        kit.camera_only_hidden(group)
+    common_lights(scene)
+    return pieces
+
+
+# ---- Crossing (deck) ------------------------------------------------------------------------
+
+def build_deck(m, scene) -> dict[str, list]:
+    """The Warden skiff under way: the deck fills the middle of the frame (walkable deck
+    475..1325 x 330..720), dark sea all round. The passing drowned town is the game's parallax;
+    the near railing is a foreground piece so figures stand behind it."""
+    pieces: dict[str, list] = {}
+    sea = water(m, level=-1.4)
+    sea.hide_render = True  # the game scrolls the sea under the skiff
+    deck_y = (330 + 720) / 2
+    boat = skiff(m, ground(1520, deck_y), length=metres(1520 - 380), beam=kit.depth(470), deck=0.0, name="skiff")
+    pieces["rail"] = boat["rail_front"]
+    kit.camera_only_hidden(boat["rail_front"])
+    common_lights(scene, key=1.5, fill=450.0, centre=(900, 525))
+    scene["transparent_plate"] = True
+    return pieces
+
+
+def build_sea(m, scene) -> dict[str, list]:
+    """A 1200-unit wide stretch of sea that repeats seamlessly sideways (the water texture
+    mirrors every 9 m), scrolled by the game under the skiff during the crossing."""
+    water(m, level=-1.4)
+    common_lights(scene, key=1.5, fill=450.0, centre=(600, 500))
+    scene["plate_size"] = (1200, 1000)
+    return {}
+
+
+def build_passing(m, scene) -> dict[str, list]:
+    """What the skiff passes: gables, chimneys and mast stumps of the drowned town standing in
+    the sea, rendered alone on transparency in two bands (far above the deck, near below it) and
+    laid out to wrap around 1800 units, so the game can scroll them at different speeds."""
+    rng = random.Random(29)
+    far, near = [], []
+    for k in range(6):
+        x = k * 200 + rng.uniform(-30, 30)
+        base = ground(x, rng.uniform(150, 290), -2.2)
+        roof = kit.roof(f"far_roof_{k}", base, rng.uniform(3.5, 6.0), rng.uniform(2.8, 3.8), rng.uniform(1.6, 2.4), m["slate"], yaw=rng.uniform(-0.1, 0.1))
+        far.append(roof)
+        if rng.random() < 0.7:
+            far.append(kit.box(f"far_chimney_{k}", base + Vector((rng.uniform(-1.2, 1.2), 0.2, 2.2)), (0.45, 0.45, 1.2), m["brick"], bevel=0.02))
+    for k in range(4):
+        x = k * 300 + rng.uniform(-40, 40)
+        base = ground(x, rng.uniform(850, 960), -1.4)
+        height = rng.uniform(2.5, 4.5)
+        near.append(kit.cylinder(f"near_mast_{k}", base + Vector((0, 0, height / 2)), 0.12, height, m["plank_face"], vertices=10,
+                                 rotation=(rng.uniform(-0.25, 0.25), rng.uniform(-0.25, 0.25), 0)))
+        if rng.random() < 0.6:
+            near.append(kit.box(f"near_yard_{k}", base + Vector((0, 0, height * 0.8)), (1.8, 0.08, 0.08), m["plank_face"], rotation=(0, rng.uniform(-0.3, 0.3), 0)))
+    # Wrap: copies one strip-width to the left so the right edge continues into the left.
+    for group in (far, near):
+        for obj in list(group):
+            copy = obj.copy()
+            copy.data = obj.data
+            bpy.context.collection.objects.link(copy)
+            copy.location.x -= metres(1200)
+            group.append(copy)
+    common_lights(scene, key=1.5, fill=450.0, centre=(900, 500))
+    scene["transparent_plate"] = True
+    scene["plate_size"] = (1200, 1000)
+    scene["full_width_pieces"] = True
+    return {"far": far, "near": near}
+
+
+# ---- Threshold ------------------------------------------------------------------------------
+
+def build_threshold(m, scene) -> dict[str, list]:
+    """The Warden threshold: a broad approach of dressed basalt (walkable 110..1690 x 545..875)
+    before the long wall of the Warden city; in the middle the gatehouse stands forward with a
+    door made for shoulders and hands, a slit above it holding the Warden flame. The gatehouse is
+    its own piece, so whoever walks through the door disappears into it."""
+    pieces: dict[str, list] = {}
+    rng = random.Random(17)
+    a, b = ground(0, 520), ground(1800, 1000)
+    kit.plane("approach_bed", ground(-100, 500, -0.02), ground(1900, 1100, -0.02), m["grout_dark"])
+    kit.paving("approach", a.x - 1.0, b.x + 1.0, b.y - 1.0, a.y, m["basalt_floor"], seed=19, row=1.1, lengths=(1.2, 2.4), gap=0.05, height=0.12)
+    # Three broad steps up to the gate in the middle.
+    for k in range(3):
+        y = 760 - k * 30
+        kit.box(f"step_{k}", ground(900, y, 0.08 + k * 0.16), (metres(520 - k * 70), kit.depth(30), 0.16 + k * 0.16), m["basalt"], bevel=0.02)
+    # The city wall: dressed basalt in courses with buttresses, foot at y = 540.
+    wall_front = ground(0, 540).y
+    kit.box("city_wall_core", Vector((metres(900), wall_front + 0.8, 7.0)), (metres(1800) + 4, 1.4, 14.0), m["backing"])
+    kit.ashlar("city_wall", -2.0, metres(1800) + 2.0, 0.0, 14.0, wall_front, m["basalt"], seed=23, course=0.6, lengths=(1.0, 1.9), depth=0.14,
+               openings=[(metres(760), metres(1040), 14.0)])
+    for x in (120, 380, 620, 1180, 1420, 1680):
+        kit.box(f"buttress_{x}", ground(x, 540, 6.0) + Vector((0, -0.45, 0)), (1.1, 0.9, 12.0), m["basalt"], bevel=0.05)
+        kit.box(f"buttress_cap_{x}", ground(x, 540, 0.5) + Vector((0, -0.75, 0)), (1.4, 1.5, 1.0), m["basalt"], bevel=0.05)
+    marks = [warden_marker(m, ground(754, 660), "gate_mark_l"), warden_marker(m, ground(1046, 660), "gate_mark_r")]
+    for group in marks:
+        kit.camera_only_hidden(group)
+    # The passage behind the door: dark floor running north.
+    kit.plane("passage", ground(840, 400, 0.01), ground(960, 700, 0.01), m["dark"])
+    gate = gatehouse(m, ground(900, 690))
+    pieces["gate"] = gate
+    kit.camera_only_hidden(gate)
+    for x in (300, 1500):
+        kit.point_light(f"wall_glow_{x}", ground(x, 560, 3.0) + Vector((0, -1.0, 0)), 400.0, WARDEN_LIGHT, radius=0.5)
+    common_lights(scene, key=2.2, fill=700.0, centre=(900, 650))
+    return pieces
+
+
+def gatehouse(m, foot: Vector) -> list[bpy.types.Object]:
+    """The gatehouse standing forward of the wall: a massive basalt block with a human-sized
+    doorway (open, dark) and above it a narrow vertical slit framed in iron for the Warden flame."""
+    width, depth, height = metres(280), 4.6, 13.0
+    centre = foot + Vector((0, depth / 2, height / 2))
+    block = kit.box("gate_block", centre, (width, depth, height), m["basalt"], bevel=0.06)
+    door_w, door_h = 1.15, 2.35
+    cutter = kit.box("gate_door_cut", foot + Vector((0, depth / 2, door_h / 2 - 0.01)), (door_w, depth + 1.0, door_h + 0.02), m["dark"])
+    modifier = block.modifiers.new("door", "BOOLEAN")
+    modifier.object, modifier.operation = cutter, "DIFFERENCE"
+    cutter.hide_render = cutter.hide_viewport = True
+    slit = kit.box("gate_slit_cut", foot + Vector((0, 0.2, 5.6)), (0.32, 1.0, 2.0), m["dark"])
+    modifier = block.modifiers.new("slit", "BOOLEAN")
+    modifier.object, modifier.operation = slit, "DIFFERENCE"
+    slit.hide_render = slit.hide_viewport = True
+    parts = [block]
+    for side in (-1, 1):
+        parts.append(kit.box(f"gate_jamb_{side}", foot + Vector((side * (door_w / 2 + 0.12), -0.08, door_h / 2)), (0.24, 0.3, door_h), m["iron"]))
+        parts.append(kit.box(f"gate_slitframe_{side}", foot + Vector((side * 0.2, -0.06, 5.6)), (0.08, 0.2, 2.1), m["iron"]))
+    parts.append(kit.box("gate_lintel", foot + Vector((0, -0.1, door_h + 0.15)), (door_w + 0.7, 0.34, 0.3), m["iron"], bevel=0.02))
+    parts.append(kit.box("gate_slit_sill", foot + Vector((0, -0.1, 4.55)), (0.6, 0.3, 0.12), m["iron"]))
+    # The open ring of the Keeper: once, carved, unfilled, high on the gatehouse.
+    bpy.ops.mesh.primitive_torus_add(major_radius=0.7, minor_radius=0.07, major_segments=48, minor_segments=8,
+                                     location=foot + Vector((0, -0.05, 8.6)), rotation=(math.radians(90), 0, 0))
+    ring = bpy.context.active_object
+    ring.name = "keeper_ring"
+    import bmesh
+    bm = bmesh.new()
+    bm.from_mesh(ring.data)
+    gap = [v for v in bm.verts if v.co.y > 0.52 and abs(v.co.x) < 0.26]
+    bmesh.ops.delete(bm, geom=gap, context="VERTS")
+    bm.to_mesh(ring.data)
+    bm.free()
+    ring.data.materials.append(m["iron"])
+    parts.append(ring)
+    kit.point_light("gate_slit_light", foot + Vector((0, -0.6, 5.6)), 260.0, WARDEN_LIGHT, radius=0.2)
+    kit.point_light("gate_door_light", foot + Vector((0, 1.2, 1.2)), 120.0, WARDEN_LIGHT, radius=0.3)
+    return parts
+
+
 # ---- main -----------------------------------------------------------------------------------
 
-BUILDERS = {"search": build_search}
+BUILDERS = {"search": build_search, "causeway": build_causeway, "deck": build_deck, "threshold": build_threshold,
+            "sea": build_sea, "passing": build_passing}
 
 
 def pixel_box(objects, scene):
@@ -354,8 +655,13 @@ def main() -> None:
     kit.plate_camera(scene, *WORLD)
     m = materials()
     pieces = BUILDERS[args.sector](m, scene)
+    if "plate_size" in scene:
+        width, height = scene["plate_size"]
+        bpy.data.objects.remove(scene.camera)
+        kit.plate_camera(scene, width, height)
     kit.painterly(scene, size=4, sharpness=0.5)
-    kit.render(scene, out / "plate.png")
+    if args.sector != "passing":
+        kit.render(scene, out / "plate.png", transparent=bool(scene.get("transparent_plate", False)))
     records = {}
     for name, objects in pieces.items():
         if objects and isinstance(objects[0], list):
@@ -370,7 +676,10 @@ def main() -> None:
         for light, energy in dimmed:
             light.data.energy = energy
         restore()
-        records[name] = {"box": pixel_box(objects, scene)}
+        box = pixel_box(objects, scene)
+        if scene.get("full_width_pieces"):
+            box = (0, box[1], scene.render.resolution_x, box[3])
+        records[name] = {"box": box}
     (out / "pieces.json").write_text(json.dumps(records, indent=2) + "\n")
     bpy.ops.wm.save_as_mainfile(filepath=str(out / f"{args.sector}.blend"))
     print("BUILD_PROLOGUE_DONE " + json.dumps(records))

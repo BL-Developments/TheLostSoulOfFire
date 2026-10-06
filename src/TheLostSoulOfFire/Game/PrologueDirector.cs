@@ -88,6 +88,37 @@ public sealed class PrologueDirector
         new(VisualIds.SearchMast, new Vector2(330f, 968f), new Vector2(110f, 520f), SceneLayer.Occluder)
     ];
 
+    /// <summary>The Warden mark on the landing of the causeway.</summary>
+    public static IReadOnlyList<PropPlacement> CausewayProps { get; } =
+    [
+        new(VisualIds.WardenMarker, new Vector2(1395f, 505f), new Vector2(30f, 90f), SceneLayer.HighProp)
+    ];
+
+    /// <summary>The skiff's near railing, drawn in front of everyone on deck.</summary>
+    public static IReadOnlyList<PropPlacement> DeckProps { get; } =
+    [
+        new(VisualIds.DeckRail, new Vector2(922f, 757f), new Vector2(990f, 60f), SceneLayer.Foreground)
+    ];
+
+    /// <summary>
+    /// The gatehouse of the threshold (whoever walks through its door disappears into it) and the
+    /// two Warden marks flanking the steps.
+    /// </summary>
+    public static IReadOnlyList<PropPlacement> ThresholdProps { get; } =
+    [
+        new(VisualIds.ThresholdGate, new Vector2(900f, 690f), new Vector2(290f, 700f), SceneLayer.HighProp),
+        new(VisualIds.WardenMarker, new Vector2(754f, 660f), new Vector2(30f, 90f), SceneLayer.HighProp),
+        new(VisualIds.WardenMarker, new Vector2(1046f, 660f), new Vector2(30f, 90f), SceneLayer.HighProp)
+    ];
+
+    public static IReadOnlyList<PropPlacement> SectorProps(PrologueSector sector, bool ride) => sector switch
+    {
+        PrologueSector.Search => SearchProps,
+        PrologueSector.Escape => ride ? DeckProps : CausewayProps,
+        PrologueSector.Threshold => ThresholdProps,
+        _ => ShoreProps
+    };
+
     /// <summary>Warden flames standing in the fittings of a sector's props: base point and height.</summary>
     public static IReadOnlyList<(Vector2 Base, float Height)> WardenFlames(PrologueSector sector, bool ride) => sector switch
     {
@@ -95,6 +126,18 @@ public sealed class PrologueDirector
         [
             (new Vector2(548f, 353f), 24f), (new Vector2(1038f, 573f), 24f), (new Vector2(1416f, 454f), 24f),
             (new Vector2(330f, 500f), 46f)
+        ],
+        PrologueSector.Escape when ride =>
+        [
+            (new Vector2(695f, 261f), 22f), (new Vector2(1208f, 261f), 22f), (new Vector2(487f, 492f), 52f)
+        ],
+        PrologueSector.Escape =>
+        [
+            (new Vector2(1395f, 426f), 24f), (new Vector2(1362f, 522f), 20f), (new Vector2(1620f, 522f), 20f), (new Vector2(1323f, 623f), 40f)
+        ],
+        PrologueSector.Threshold =>
+        [
+            (new Vector2(900f, 432f), 70f), (new Vector2(754f, 581f), 24f), (new Vector2(1046f, 581f), 24f)
         ],
         _ => []
     };

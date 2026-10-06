@@ -99,7 +99,8 @@ def main(argv: list[str]) -> int:
     with common.record_step(step) as recorded:
         for row in range(rows):
             for column in range(columns):
-                target = CONTENT / f"{args.texture}_c{column}r{row}.png"
+                suffix = f"_c{column}r{row}" if columns * rows > 1 else ""
+                target = CONTENT / f"{args.texture}{suffix}.png"
                 target.parent.mkdir(parents=True, exist_ok=True)
                 plate.crop((column * tile_w, row * tile_h, (column + 1) * tile_w, (row + 1) * tile_h)).save(target)
                 outputs.append(target)

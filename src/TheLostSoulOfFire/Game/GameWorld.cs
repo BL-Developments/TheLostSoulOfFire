@@ -61,6 +61,19 @@ public sealed partial class GameWorld : IDisposable
     private readonly List<SceneProp> _searchProps = PrologueDirector.SearchProps
         .Select(placement => new SceneProp(placement.VisualId, placement.Foot, placement.FallbackSize, placement.FallbackLayer))
         .ToList();
+    private readonly Dictionary<IReadOnlyList<PropPlacement>, List<SceneProp>> _placedProps = [];
+
+    /// <summary>Scene props for a placement list, created once and kept (they carry their occluder fade).</summary>
+    private List<SceneProp> PropsOf(IReadOnlyList<PropPlacement> placements)
+    {
+        if (!_placedProps.TryGetValue(placements, out List<SceneProp>? props))
+        {
+            props = placements.Select(placement => new SceneProp(placement.VisualId, placement.Foot, placement.FallbackSize, placement.FallbackLayer)).ToList();
+            _placedProps[placements] = props;
+        }
+        return props;
+    }
+
     private readonly List<SceneProp> _shoreProps = PrologueDirector.ShoreProps
         .Select(placement => new SceneProp(placement.VisualId, placement.Foot, placement.FallbackSize, placement.FallbackLayer))
         .ToList();
@@ -853,7 +866,11 @@ public sealed partial class GameWorld : IDisposable
                 string? plate = PrologueEnvironment.PlateOf(_prologue);
                 bool painted = plate is not null && _art.HasArt(plate);
                 PrologueEnvironment.DrawGround(batch, pixel, _prologue, _presentationTime, _soulSensePresentation.WorldSuppression, painted);
-                if (painted)
+                if (painted && _prologue.IsVehicleRide)
+                {
+                    PrologueEnvironment.DrawCrossing(batch, _art, _prologue.StateTime);
+                }
+                else if (painted)
                 {
                     _art.DrawEnvironment(batch, plate!, Vector2.Zero);
                 }
@@ -959,6 +976,8 @@ public sealed partial class GameWorld : IDisposable
         GamePhase.Arena => _arenaProps.Concat(_sceneProps),
         GamePhase.Prologue when _prologue.Sector == PrologueSector.Emergence => _shoreProps.Concat(_sceneProps),
         GamePhase.Prologue when _prologue.Sector == PrologueSector.Search && _art.HasArt(VisualIds.SearchFloor) => _searchProps.Concat(_sceneProps),
+        GamePhase.Prologue when PrologueEnvironment.PlateOf(_prologue) is { } plate && _art.HasArt(plate) =>
+            PropsOf(PrologueDirector.SectorProps(_prologue.Sector, _prologue.IsVehicleRide)).Concat(_sceneProps),
         _ => _sceneProps
     };
 
