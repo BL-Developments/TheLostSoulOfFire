@@ -283,10 +283,27 @@ Rahmen wie oben (nur Darstellung und Ton).
   Exponent 4): Kopf, Schultern und Mantel lösen sich vom Nebel. Verworfen: Stärke 1,1/Exponent
   2,4 (Figur wirkte wie ein Geist).
 
+- Seelenkanone (Owner-Wunsch: „wirkt wie eine Spielzeugpistole, sollte eine dicke Kanone sein,
+  idealerweise größer beim Aufladen“): neues Modell nach 07_SOUL_CANNON und Figurenblatt, etwa
+  1,2 m statt 46 cm: Reliquienkammer aus geschwärztem Eisen mit Gittern über der Death Flame,
+  Schaft, dickes Rohr mit Silberbändern und zwei Leitungen, weite gerippte Mündung; Knochenweiß
+  nur an Kolbenplatte und Runen (die weißen Längsstreben ließen die alte wie ein Spielzeug
+  wirken). Auf dem Rücken vom linken Hüftbereich bis über die rechte Schulter; im Kampf an der
+  rechten Hüfte angeschlagen, Lauf 11° nach innen, Oberkörper gegen das Gewicht zurückgelehnt.
+  Sie wächst beim Laden um bis zu 30 % (Stand: stufenlos, Clip `aim` nach Ladung; Gehen:
+  `aim_move`, `_2`, `_3` je Ladestufe, gleicher Zyklus, die Beine springen beim Wechsel nicht)
+  und entlädt sich nach dem Schuss auf Ruhegröße. Ladeleuchten und Mündungsfeuer an der
+  gezeichneten Mündung (`FigureHeights.MuzzleOf(..., charge)`); Schuss, Schaden und Timing
+  unverändert. `build_player.py --recannon` ersetzt die Kanone in der bestehenden Figur. Alle
+  18 Spielerclips neu gerendert; Titelbild mit der neuen Kanone (Kantenterm nur auf Körper und
+  Kleidung). Geprüft: Vorschauen in vier Richtungen, Rundgang (Ziehen, Laden, Schuss, Gehen mit
+  Kanone), Slice- und Fähigkeitentest, 258 Unit-Tests.
+
 **Befunde, offen (nach Wirkung):**
 1. Arena im Spielausschnitt: Boden gleichmäßig hell, wenig Lichtgefälle.
 2. Sprache: Erzähltexte englisch, HUD deutsch (Inhaltsfrage, nicht ohne Owner ändern).
 
+4. Truhe: springt in einem Bild auf, keine sichtbare Deckelbewegung.
 3. Arena: Die Nordwand wirkt im Endbild hinter einem leichten Dunstschleier (Luftperspektive
    nach Bildhöhe trifft die Wand); prüfen, ob die Wand davon ausgenommen werden sollte.
 

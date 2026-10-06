@@ -168,7 +168,7 @@ public static class SoulfireLighting
 
         float charge = player.Cannon.ChargeProgress;
         Vector2 muzzle = renderedPlayer
-            ? FigureHeights.MuzzleOf(player.Position, player.FacingDirection)
+            ? FigureHeights.MuzzleOf(player.Position, player.FacingDirection, charge)
             : player.Position + player.FacingDirection * 74f;
         float chargeRadius = SoulfireRenderSettings.CannonGlowRadius * MathHelper.Lerp(0.68f, 1.55f, charge);
         Color chargeColor = player.Cannon.IsFullCharge ? GameBalance.SoulWhite : GameBalance.DeathFlameBright;

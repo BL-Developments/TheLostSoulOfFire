@@ -412,15 +412,18 @@ public sealed class ArtAssets
         };
         if (cannonClip == VisualClips.Aim && moving && HasClip(VisualIds.Player, VisualClips.AimMove))
         {
-            // Charging on the move: the cannon stays on target while the legs walk under it.
-            DrawCharacter(batch, player, VisualIds.Player, VisualClips.AimMove, player.FacingDirection, player.Position, 1f, Color.White,
-                walkAxis: player.FacingDirection);
+            // Charging on the move: the cannon stays on target while the legs walk under it, at
+            // the size of the charge stage it has reached.
+            string walk = VisualClips.AimMoveStage(player.Cannon.ChargeStage);
+            DrawCharacter(batch, player, VisualIds.Player, HasClip(VisualIds.Player, walk) ? walk : VisualClips.AimMove,
+                player.FacingDirection, player.Position, 1f, Color.White, walkAxis: player.FacingDirection);
             return;
         }
 
         if (cannonClip is not null && HasClip(VisualIds.Player, cannonClip))
         {
-            float? progress = cannonClip == VisualClips.Aim ? null : player.Cannon.StateProgress;
+            // Standing, the braced cannon is drawn at its charge: it grows as the Death Flame fills it.
+            float? progress = cannonClip == VisualClips.Aim ? player.Cannon.ChargeProgress : player.Cannon.StateProgress;
             DrawCharacter(batch, player, VisualIds.Player, cannonClip, player.FacingDirection, player.Position, 1f, Color.White, progress: progress);
             return;
         }
@@ -789,7 +792,7 @@ public sealed class ArtAssets
         public float PlayClip(string name, VisualClipDefinition clip, float deltaTime, float distance)
         {
             SettleRemaining = MathF.Max(0f, SettleRemaining - deltaTime);
-            if (!string.Equals(_clipName, name, StringComparison.Ordinal))
+            if (!string.Equals(_clipName, name, StringComparison.Ordinal) && !SameCycle(_clipName, name))
             {
                 // Actions start at once (their first frame is the feedback); only the way back
                 // into standing or running blends, so a figure settles instead of snapping.
@@ -809,12 +812,17 @@ public sealed class ArtAssets
                 return _elapsed;
             }
 
+            _clipName = name;
             _elapsed = ClipClock.Advance(_elapsed, clip, deltaTime, distance);
             _cycleLength = clip.Duration;
             return _elapsed;
         }
 
         private float _cycleLength;
+
+        /// <summary>Clips that are one cycle drawn in variants (the charged walk): switching keeps the phase.</summary>
+        private static bool SameCycle(string a, string b) =>
+            a.StartsWith(VisualClips.AimMove, StringComparison.Ordinal) && b.StartsWith(VisualClips.AimMove, StringComparison.Ordinal);
 
         /// <summary>Where in its cycle the clip <paramref name="name"/> is (0–1), or null if another clip plays.</summary>
         public float? CyclePhase(string name) =>

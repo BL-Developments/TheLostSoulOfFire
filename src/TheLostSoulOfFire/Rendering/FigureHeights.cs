@@ -19,11 +19,21 @@ public static class FigureHeights
     /// <summary>The eyes, about 1.66 m up.</summary>
     public const float Eyes = 91f;
 
-    /// <summary>The raised Soul Cannon's muzzle, about 1.37 m up ...</summary>
-    public const float Muzzle = 75f;
+    /// <summary>The braced Soul Cannon's muzzle, about 1.2 m up ...</summary>
+    public const float Muzzle = 66f;
 
-    /// <summary>... and 0.85 m ahead of the feet (level distance, before squashing).</summary>
-    public const float MuzzleReach = 57f;
+    /// <summary>
+    /// ... and ahead of the feet: the grip 0.14 m ahead, the cannon 0.95 m long along the aim,
+    /// growing by <see cref="CannonGrowth"/> at full charge (tools/visuals/blender/build_player.py,
+    /// cannon_aimed and CANNON_GROWTH). Level distances, before squashing.
+    /// </summary>
+    public const float MuzzleGrip = 9f;
+    public const float MuzzleLength = 63.5f;
+    public const float CannonGrowth = 0.3f;
+
+    /// <summary>How far ahead of the feet the muzzle is at this charge (0–1).</summary>
+    public static float MuzzleReach(float charge) =>
+        MuzzleGrip + MuzzleLength * (1f + CannonGrowth * MathHelper.Clamp(charge, 0f, 1f));
 
     /// <summary>
     /// Shots, sparks and slashes are drawn this far above their gameplay position, so they fly
@@ -44,7 +54,10 @@ public static class FigureHeights
     public static Vector2 FallenChestOf(Vector2 foot, Vector2 facing) =>
         foot + new Vector2(facing.X * 50f, facing.Y * 50f * LevelSquash - 8f);
 
-    /// <summary>Screen position of the raised cannon's muzzle for a figure on <paramref name="foot"/> aiming along <paramref name="facing"/>.</summary>
-    public static Vector2 MuzzleOf(Vector2 foot, Vector2 facing) =>
-        foot + new Vector2(facing.X * MuzzleReach, facing.Y * MuzzleReach * LevelSquash - Muzzle);
+    /// <summary>Screen position of the braced cannon's muzzle for a figure on <paramref name="foot"/> aiming along <paramref name="facing"/>.</summary>
+    public static Vector2 MuzzleOf(Vector2 foot, Vector2 facing, float charge = 0f)
+    {
+        float reach = MuzzleReach(charge);
+        return foot + new Vector2(facing.X * reach, facing.Y * reach * LevelSquash - Muzzle);
+    }
 }

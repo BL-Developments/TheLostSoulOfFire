@@ -1337,10 +1337,10 @@ public sealed partial class GameWorld : IDisposable
         _player.Draw(batch, pixel, _art, _debugVisible, _soulSensePresentation.SoulEmergence);
         if (IsCombatPhase && _player.Cannon.State == SoulCannonState.Charging)
         {
-            Vector2 muzzle = rendered
-                ? FigureHeights.MuzzleOf(_player.Position, _player.FacingDirection)
-                : _player.Position + _player.FacingDirection * 74f;
             float charge = _player.Cannon.ChargeProgress;
+            Vector2 muzzle = rendered
+                ? FigureHeights.MuzzleOf(_player.Position, _player.FacingDirection, charge)
+                : _player.Position + _player.FacingDirection * 74f;
             Color chargeColor = _player.Cannon.IsFullCharge
                 ? Color.White
                 : _player.Cannon.ChargeStage >= 3
@@ -2482,7 +2482,12 @@ public sealed partial class GameWorld : IDisposable
 
         Vector2 origin = _player.Position + request.Direction * 74f;
         _cannonShots.Add(new CannonShot(origin, request));
-        _combatPresentation.PresentCannonFire(origin, request);
+        // The flash bursts from the drawn muzzle, which has grown with the charge (presentation
+        // only; the shot itself starts at its gameplay origin, inside the flash).
+        Vector2 flash = _art.HasClip(VisualIds.Player, VisualClips.Aim)
+            ? _player.Position + request.Direction * FigureHeights.MuzzleReach(request.Charge)
+            : origin;
+        _combatPresentation.PresentCannonFire(flash, request);
         if (request.IsFullCharge)
         {
             _arenaAtmosphere.ReactToForce(origin, 460f, 135f);

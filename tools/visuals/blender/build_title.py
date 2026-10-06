@@ -36,7 +36,8 @@ def flame_rim(figure: bpy.types.Object, strength: float = 0.7, power: float = 4.
     materials = {slot.material for child in figure.children_recursive if child.type == "MESH"
                  for slot in child.material_slots if slot.material is not None}
     for material in materials:
-        if not material.use_nodes or "outline" in material.name:
+        # Body, clothes and hair only: on the weapons' metal the term would read as a glow.
+        if not material.use_nodes or material.name not in ("coat", "shirt", "trousers", "boots", "skin", "hair", "leather"):
             continue
         nodes, links = material.node_tree.nodes, material.node_tree.links
         emission = next((node for node in nodes if node.type == "EMISSION"), None)

@@ -111,6 +111,17 @@ public static class VisualClips
 
     /// <summary>Player: walking while the Soul Cannon charges (distance clip, played backward when backing away).</summary>
     public const string AimMove = "aim_move";
+
+    /// <summary>
+    /// The walk while charging at the cannon's size for a charge stage (SoulCannon.ChargeStage);
+    /// all three share one cycle, so changing stage mid-stride keeps the legs where they are.
+    /// </summary>
+    public static string AimMoveStage(int stage) => stage switch
+    {
+        >= 3 => "aim_move_3",
+        2 => "aim_move_2",
+        _ => AimMove
+    };
     public const string CannonDraw = "cannon_draw";
     public const string CannonFire = "cannon_fire";
     public const string Dash = "dash";
