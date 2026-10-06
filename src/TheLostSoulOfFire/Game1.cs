@@ -226,8 +226,11 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         _resolution.Update(GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight);
     }
 
+    private readonly System.Diagnostics.Stopwatch _frameWatch = new();
+
     protected override void Update(GameTime gameTime)
     {
+        _frameWatch.Restart();
         _input.Update(_resolution);
         if (_tourTest is not null)
         {
@@ -343,6 +346,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
                 : $"Screenshot failed — {path}";
         }
 
+        _tourTest?.RecordFrameTime(_frameWatch.Elapsed.TotalMilliseconds);
         if (_tourTest?.PendingCapture is not null)
         {
             _tourTest.Capture(_virtualTarget);

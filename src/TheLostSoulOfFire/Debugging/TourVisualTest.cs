@@ -22,7 +22,44 @@ namespace TheLostSoulOfFire.Debugging;
 /// </summary>
 internal sealed class TourVisualTest
 {
-    private sealed record Step(string Name, Action? Enter, Func<bool> Ready, bool Capture, float Timeout, float MinWait = 0f, Action? EveryFrame = null);
+    private sealed record Step(string Name, Action? Enter, Func<bool> Ready, bool Capture, float Timeout, float MinWait = 0f, Action? EveryFrame = null)
+    {
+        public string Station { get; init; } = "";
+    }
+
+    private readonly Dictionary<string, List<double>> _frameTimes = new();
+
+    /// <summary>CPU time of one frame (update and draw, without saving a capture), filed under the running station.</summary>
+    public void RecordFrameTime(double milliseconds)
+    {
+        if (Finished || _index < 0 || _index >= _steps.Count)
+        {
+            return;
+        }
+
+        string station = _steps[_index].Station;
+        if (!_frameTimes.TryGetValue(station, out List<double>? times))
+        {
+            _frameTimes[station] = times = [];
+        }
+        times.Add(milliseconds);
+    }
+
+    private void ReportFrameTimes()
+    {
+        foreach ((string station, List<double> times) in _frameTimes)
+        {
+            if (times.Count == 0)
+            {
+                continue;
+            }
+            times.Sort();
+            double average = times.Average();
+            double p95 = times[Math.Min(times.Count - 1, (int)(times.Count * 0.95))];
+            Console.WriteLine(string.Create(System.Globalization.CultureInfo.InvariantCulture,
+                $"TOUR_PERF station={station} frames={times.Count} avg_ms={average:0.00} p95_ms={p95:0.00} max_ms={times[^1]:0.00}"));
+        }
+    }
 
     private static readonly Vector2 ArenaCentre = new(900f, 560f);
 
@@ -144,6 +181,7 @@ internal sealed class TourVisualTest
         _stepTime = 0f;
         if (_index >= _steps.Count)
         {
+            ReportFrameTimes();
             Console.WriteLine($"TOUR_VISUAL_TEST_PASS captures={_captured} dir={_directory}");
             Finished = true;
             ExitCode = 0;
@@ -177,20 +215,20 @@ internal sealed class TourVisualTest
     private string Named(string name) => $"{_station}_{name}";
 
     private void Do(string name, Action enter, float wait = 0.02f) =>
-        _steps.Add(new Step(Named(name), enter, () => true, false, wait + 1f, wait));
+        _steps.Add(new Step(Named(name), enter, () => true, false, wait + 1f, wait) { Station = _station });
 
     private void Shot(string name, Action? enter = null, Func<bool>? ready = null, float timeout = 10f, float minWait = 0f, Action? everyFrame = null) =>
-        _steps.Add(new Step(Named(name), enter, ready ?? (() => true), true, timeout, minWait, everyFrame));
+        _steps.Add(new Step(Named(name), enter, ready ?? (() => true), true, timeout, minWait, everyFrame) { Station = _station });
 
     private void Wait(string name, Func<bool> ready, float timeout, Action? enter = null, Action? everyFrame = null) =>
-        _steps.Add(new Step(Named(name), enter, ready, false, timeout, 0f, everyFrame));
+        _steps.Add(new Step(Named(name), enter, ready, false, timeout, 0f, everyFrame) { Station = _station });
 
     /// <summary>A series of <paramref name="frames"/> captures, one every <paramref name="every"/> frames.</summary>
     private void Series(string name, int frames, int every = 1, Action? everyFrame = null)
     {
         for (int index = 0; index < frames; index++)
         {
-            _steps.Add(new Step(Named($"{name}_{index:00}"), null, () => true, true, 2f, (every - 1) / 60f + 0.0001f, everyFrame));
+            _steps.Add(new Step(Named($"{name}_{index:00}"), null, () => true, true, 2f, (every - 1) / 60f + 0.0001f, everyFrame) { Station = _station });
         }
     }
 
