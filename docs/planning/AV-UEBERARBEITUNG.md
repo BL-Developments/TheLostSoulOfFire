@@ -278,6 +278,11 @@ Rahmen wie oben (nur Darstellung und Ton).
   Rundgang zählt `TOUR_AUDIO hall_tails=Hub:2,Arena:12` (Prolog 0). CLAP: mit Fahne „large
   reverberant stone hall“ 0,90–0,94, Trefferfolge nicht „washy“; Audiotests grün.
 
+- Titel: Die Figur stand flach und grau vor der Flamme (das Toon-Material macht Licht farblos).
+  Nur im Schlüsselbild ein violetter Kantenterm in ihren Materialien (`flame_rim`, Stärke 0,7,
+  Exponent 4): Kopf, Schultern und Mantel lösen sich vom Nebel. Verworfen: Stärke 1,1/Exponent
+  2,4 (Figur wirkte wie ein Geist).
+
 **Befunde, offen (nach Wirkung):**
 1. Arena im Spielausschnitt: Boden gleichmäßig hell, wenig Lichtgefälle.
 2. Sprache: Erzähltexte englisch, HUD deutsch (Inhaltsfrage, nicht ohne Owner ändern).

@@ -29,6 +29,37 @@ PROLOGUE = ROOT / "art" / "production" / "candidates" / "environment.prologue"
 WARDEN = (0.55, 0.22, 1.0)
 
 
+def flame_rim(figure: bpy.types.Object, strength: float = 0.7, power: float = 4.0) -> None:
+    """The Warden flame ahead lines his silhouette: every toon material of the figure gets an
+    added violet term from the facing ratio, so the edges glow toward the gate while the inner
+    shapes keep their painted values. Only in this render (the game's sprites are unchanged)."""
+    materials = {slot.material for child in figure.children_recursive if child.type == "MESH"
+                 for slot in child.material_slots if slot.material is not None}
+    for material in materials:
+        if not material.use_nodes or "outline" in material.name:
+            continue
+        nodes, links = material.node_tree.nodes, material.node_tree.links
+        emission = next((node for node in nodes if node.type == "EMISSION"), None)
+        if emission is None or not emission.inputs["Color"].is_linked:
+            continue
+        source = emission.inputs["Color"].links[0].from_socket
+        weight = nodes.new("ShaderNodeLayerWeight")
+        weight.inputs["Blend"].default_value = 0.5
+        curve = nodes.new("ShaderNodeMath")
+        curve.operation = "POWER"
+        curve.inputs[1].default_value = power
+        links.new(weight.outputs["Facing"], curve.inputs[0])
+        rim = nodes.new("ShaderNodeVectorMath")
+        rim.operation = "SCALE"
+        rim.inputs[0].default_value = tuple(c * strength for c in (0.62, 0.36, 1.0))
+        links.new(curve.outputs[0], rim.inputs["Scale"])
+        add = nodes.new("ShaderNodeVectorMath")
+        add.operation = "ADD"
+        links.new(source, add.inputs[0])
+        links.new(rim.outputs["Vector"], add.inputs[1])
+        links.new(add.outputs["Vector"], emission.inputs["Color"])
+
+
 def parse(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(prog="build_title.py")
     parser.add_argument("--out", type=Path, required=True)
@@ -135,6 +166,7 @@ def build(args) -> None:
     scene.frame_set(1)
     figure.location = (0.0, 0.0, 0.0)
     figure.rotation_euler = (0, 0, math.radians(14))  # he faces -Y, out to sea, a little toward the gate (screen left)
+    flame_rim(figure)
 
     m = {
         "slab": kit.stone("slab", tex("concrete"), 6.0, tint=(0.42, 0.45, 0.5), spread=0.3),
