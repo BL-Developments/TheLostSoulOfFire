@@ -81,6 +81,19 @@ AUTHORED_SFX_DURATIONS = {
     "scythe_swing_1_v3.wav": 0.19,
     "scythe_swing_2_v2.wav": 0.23,
     "scythe_swing_2_v3.wav": 0.25,
+    # Combat layers (tools/audio/recipes/combat.py): material, wind-ups, deaths.
+    **{f"hit_hollow_{index}.wav": 0.32 for index in range(1, 4)},
+    **{f"hit_burning_{index}.wav": 0.42 for index in range(1, 4)},
+    **{f"hit_devourer_{index}.wav": 0.55 for index in range(1, 4)},
+    **{f"hit_dummy_{index}.wav": 0.36 for index in range(1, 4)},
+    **{f"hit_heavy_{index}.wav": 0.4 for index in range(1, 4)},
+    **{f"body_hit_{index}.wav": 0.24 for index in range(1, 4)},
+    **{f"hollow_windup_{index}.wav": 0.44 for index in range(1, 3)},
+    **{f"devourer_windup_{index}.wav": 0.86 for index in range(1, 3)},
+    **{f"burning_rush_{index}.wav": 0.62 for index in range(1, 3)},
+    **{f"death_hollow_{index}.wav": 0.9 for index in range(1, 3)},
+    **{f"death_burning_{index}.wav": 0.9 for index in range(1, 3)},
+    **{f"death_devourer_{index}.wav": 1.4 for index in range(1, 3)},
 }
 
 #: Ambience beds and music per zone (AudioDirector.AmbienceAssets / MusicAssets).

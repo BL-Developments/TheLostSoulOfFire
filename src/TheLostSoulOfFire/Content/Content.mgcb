@@ -9334,3 +9334,153 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/Player/Animations/swing3_return_normal/nw.png
+
+#begin Audio/Sfx/hit_hollow_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/hit_hollow_1.wav
+
+#begin Audio/Sfx/hit_hollow_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/hit_hollow_2.wav
+
+#begin Audio/Sfx/hit_hollow_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/hit_hollow_3.wav
+
+#begin Audio/Sfx/hit_burning_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/hit_burning_1.wav
+
+#begin Audio/Sfx/hit_burning_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/hit_burning_2.wav
+
+#begin Audio/Sfx/hit_burning_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/hit_burning_3.wav
+
+#begin Audio/Sfx/hit_devourer_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/hit_devourer_1.wav
+
+#begin Audio/Sfx/hit_devourer_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/hit_devourer_2.wav
+
+#begin Audio/Sfx/hit_devourer_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/hit_devourer_3.wav
+
+#begin Audio/Sfx/hit_dummy_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/hit_dummy_1.wav
+
+#begin Audio/Sfx/hit_dummy_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/hit_dummy_2.wav
+
+#begin Audio/Sfx/hit_dummy_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/hit_dummy_3.wav
+
+#begin Audio/Sfx/hit_heavy_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/hit_heavy_1.wav
+
+#begin Audio/Sfx/hit_heavy_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/hit_heavy_2.wav
+
+#begin Audio/Sfx/hit_heavy_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/hit_heavy_3.wav
+
+#begin Audio/Sfx/body_hit_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/body_hit_1.wav
+
+#begin Audio/Sfx/body_hit_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/body_hit_2.wav
+
+#begin Audio/Sfx/body_hit_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/body_hit_3.wav
+
+#begin Audio/Sfx/hollow_windup_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/hollow_windup_1.wav
+
+#begin Audio/Sfx/hollow_windup_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/hollow_windup_2.wav
+
+#begin Audio/Sfx/devourer_windup_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/devourer_windup_1.wav
+
+#begin Audio/Sfx/devourer_windup_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/devourer_windup_2.wav
+
+#begin Audio/Sfx/burning_rush_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/burning_rush_1.wav
+
+#begin Audio/Sfx/burning_rush_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/burning_rush_2.wav
+
+#begin Audio/Sfx/death_hollow_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/death_hollow_1.wav
+
+#begin Audio/Sfx/death_hollow_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/death_hollow_2.wav
+
+#begin Audio/Sfx/death_burning_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/death_burning_1.wav
+
+#begin Audio/Sfx/death_burning_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/death_burning_2.wav
+
+#begin Audio/Sfx/death_devourer_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/death_devourer_1.wav
+
+#begin Audio/Sfx/death_devourer_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/death_devourer_2.wav

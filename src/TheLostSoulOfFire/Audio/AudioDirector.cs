@@ -53,7 +53,23 @@ public enum AudioCue
     AbilityVortex,
     AbilityGuard,
     AbilityMark,
-    DoorAwaken
+    DoorAwaken,
+    /// <summary>Contact layers under a landed blow: the target's material (and its weight).</summary>
+    HitHollow,
+    HitBurning,
+    HitDevourer,
+    HitDummy,
+    HitHeavy,
+    /// <summary>The blow landing on the player's body, at once, under the Ludo hurt sound.</summary>
+    BodyHit,
+    /// <summary>Wind-ups the enemies had no sound for, and the Burning's run.</summary>
+    HollowWindup,
+    DevourerWindup,
+    BurningRush,
+    /// <summary>How each enemy dies, layered with the shared death sound.</summary>
+    DeathHollow,
+    DeathBurning,
+    DeathDevourer
 }
 
 /// <summary>Where the player is, for the ambience bed and the music (presentation only).</summary>
@@ -90,7 +106,8 @@ public sealed class AudioDirector : IDisposable
         float Cooldown,
         int Polyphony,
         float PitchVariation = 0f,
-        CueGroup Group = CueGroup.General);
+        CueGroup Group = CueGroup.General,
+        bool Danger = false);
 
     private static readonly Dictionary<AudioCue, CuePolicy> Policies = new()
     {
@@ -102,19 +119,19 @@ public sealed class AudioDirector : IDisposable
         [AudioCue.CannonCharge] = new(0.16f, 1),
         [AudioCue.CannonFull] = new(0.2f, 1),
         [AudioCue.CannonFire] = new(0.1f, 2, 0.012f),
-        [AudioCue.BurningCharge] = new(0.12f, 2, 0.02f, CueGroup.Enemy),
+        [AudioCue.BurningCharge] = new(0.12f, 2, 0.02f, CueGroup.Enemy, Danger: true),
         [AudioCue.BurningDetonation] = new(0.12f, 2, 0.015f, CueGroup.Enemy),
         [AudioCue.CoreHit] = new(0.035f, 3, 0.02f),
         [AudioCue.SoulRelease] = new(0.08f, 2, 0.012f),
         [AudioCue.ResonanceReady] = new(0.35f, 1),
         [AudioCue.ResonanceActivate] = new(0.5f, 1),
-        [AudioCue.PlayerHit] = new(0.08f, 2, 0.02f),
+        [AudioCue.PlayerHit] = new(0.08f, 2, 0.02f, Danger: true),
         [AudioCue.PlayerDeath] = new(0.5f, 1),
         [AudioCue.SoulSenseOn] = new(0.2f, 1),
         [AudioCue.SoulSenseOff] = new(0.2f, 1),
         [AudioCue.WaveStart] = new(0.45f, 1),
-        [AudioCue.HollowSwipe] = new(0.075f, 3, 0.028f, CueGroup.Enemy),
-        [AudioCue.DevourerSlam] = new(0.18f, 1, 0.012f, CueGroup.Enemy),
+        [AudioCue.HollowSwipe] = new(0.075f, 3, 0.028f, CueGroup.Enemy, Danger: true),
+        [AudioCue.DevourerSlam] = new(0.18f, 1, 0.012f, CueGroup.Enemy, Danger: true),
         [AudioCue.DevourerDevour] = new(0.35f, 1, 0.01f, CueGroup.Enemy),
         [AudioCue.EnemyDeath] = new(0.045f, 3, 0.03f, CueGroup.Enemy),
         [AudioCue.CannonImpact] = new(0.035f, 3, 0.025f),
@@ -139,8 +156,31 @@ public sealed class AudioDirector : IDisposable
         [AudioCue.AbilityVortex] = new(0.2f, 1),
         [AudioCue.AbilityGuard] = new(0.2f, 1, 0.02f),
         [AudioCue.AbilityMark] = new(0.15f, 1, 0.03f),
-        [AudioCue.DoorAwaken] = new(1f, 1)
+        [AudioCue.DoorAwaken] = new(1f, 1),
+        [AudioCue.HitHollow] = new(0.03f, 3, 0.04f),
+        [AudioCue.HitBurning] = new(0.03f, 3, 0.04f),
+        [AudioCue.HitDevourer] = new(0.04f, 2, 0.03f),
+        [AudioCue.HitDummy] = new(0.03f, 2, 0.05f),
+        [AudioCue.HitHeavy] = new(0.08f, 1, 0.02f),
+        [AudioCue.BodyHit] = new(0.08f, 2, 0.03f),
+        [AudioCue.HollowWindup] = new(0.1f, 3, 0.04f, CueGroup.Enemy, Danger: true),
+        [AudioCue.DevourerWindup] = new(0.3f, 1, 0.02f, CueGroup.Enemy, Danger: true),
+        [AudioCue.BurningRush] = new(0.12f, 2, 0.03f, CueGroup.Enemy, Danger: true),
+        [AudioCue.DeathHollow] = new(0.05f, 3, 0.03f, CueGroup.Enemy),
+        [AudioCue.DeathBurning] = new(0.05f, 3, 0.03f, CueGroup.Enemy),
+        [AudioCue.DeathDevourer] = new(0.2f, 1, 0.02f, CueGroup.Enemy)
     };
+
+    /// <summary>
+    /// Sounds that make way for a danger signal: started while one is fresh, they come in
+    /// quieter (swings, steps, the cannon's charge), so the warning cuts through a busy fight.
+    /// </summary>
+    private static readonly HashSet<AudioCue> Yielding =
+    [
+        AudioCue.ScytheSwing1, AudioCue.ScytheSwing2, AudioCue.SoulCleave, AudioCue.Dash, AudioCue.CannonCharge,
+        AudioCue.Footstep, AudioCue.FootstepWood, AudioCue.HollowStep, AudioCue.BurningStep, AudioCue.DevourerStep,
+        AudioCue.EnemyEmerge, AudioCue.SoulRelease
+    ];
 
     /// <summary>Extra takes of a cue (e.g. footsteps); Play picks one at random so repeats never match exactly.</summary>
     private readonly Dictionary<AudioCue, List<SoundEffect>> _variants = [];
@@ -200,6 +240,9 @@ public sealed class AudioDirector : IDisposable
     private float _targetArenaMix = 1f;
     private float _duckTimer;
     private float _duckAmount;
+
+    /// <summary>Freshness of the last danger signal (1 at its start, fading over about 0.4 s).</summary>
+    private float _focus;
     private uint _random = 0xA17D3C5Bu;
     private bool _available = true;
     private float _masterVolume = 1f;
@@ -274,6 +317,18 @@ public sealed class AudioDirector : IDisposable
             Add(content, AudioCue.AbilityGuard, "Audio/Sfx/ability_guard", 330f, 0.5f, 0.4f, 0.1f);
             Add(content, AudioCue.AbilityMark, "Audio/Sfx/ability_mark", 1661f, 0.3f, 0.3f, 0.3f);
             Add(content, AudioCue.DoorAwaken, "Audio/Sfx/door_awaken", 104f, 1.2f, 0.5f, 0.3f);
+            AddVariants(content, AudioCue.HitHollow, "Audio/Sfx/hit_hollow", 3, 180f, 0.1f, 0.3f, 0.7f);
+            AddVariants(content, AudioCue.HitBurning, "Audio/Sfx/hit_burning", 3, 240f, 0.12f, 0.3f, 0.8f);
+            AddVariants(content, AudioCue.HitDevourer, "Audio/Sfx/hit_devourer", 3, 70f, 0.2f, 0.35f, 0.5f);
+            AddVariants(content, AudioCue.HitDummy, "Audio/Sfx/hit_dummy", 3, 600f, 0.08f, 0.25f, 0.4f);
+            AddVariants(content, AudioCue.HitHeavy, "Audio/Sfx/hit_heavy", 3, 50f, 0.2f, 0.35f, 0.4f);
+            AddVariants(content, AudioCue.BodyHit, "Audio/Sfx/body_hit", 3, 110f, 0.1f, 0.3f, 0.6f);
+            AddVariants(content, AudioCue.HollowWindup, "Audio/Sfx/hollow_windup", 2, 500f, 0.4f, 0.2f, 0.6f);
+            AddVariants(content, AudioCue.DevourerWindup, "Audio/Sfx/devourer_windup", 2, 55f, 0.8f, 0.3f, 0.3f);
+            AddVariants(content, AudioCue.BurningRush, "Audio/Sfx/burning_rush", 2, 140f, 0.6f, 0.3f, 0.8f);
+            AddVariants(content, AudioCue.DeathHollow, "Audio/Sfx/death_hollow", 2, 2200f, 0.6f, 0.2f, 0.4f);
+            AddVariants(content, AudioCue.DeathBurning, "Audio/Sfx/death_burning", 2, 120f, 0.7f, 0.2f, 0.7f);
+            AddVariants(content, AudioCue.DeathDevourer, "Audio/Sfx/death_devourer", 2, 60f, 1.2f, 0.3f, 0.4f);
 
             _ambienceSound = LoadOrCreateFallback(content, "Audio/Ambience/arena_ambience", 43f, 2.4f, 0.2f, 0.16f, false);
             _beds[AmbienceAssets[AudioZone.Arena]] = _ambienceSound;
@@ -315,6 +370,7 @@ public sealed class AudioDirector : IDisposable
             CleanupInstances(cue);
         }
 
+        _focus = MathF.Max(0f, _focus - deltaTime / 0.4f);
         _duckTimer = MathF.Max(0f, _duckTimer - deltaTime);
         if (_duckTimer <= 0f)
         {
@@ -473,6 +529,21 @@ public sealed class AudioDirector : IDisposable
             sound = takes[(int)((NextSignedFloat() * 0.5f + 0.5f) * takes.Count) % takes.Count];
         }
 
+        if (Yielding.Contains(cue))
+        {
+            volume *= 1f - 0.4f * _focus;
+        }
+        if (!policy.Danger)
+        {
+            // Many sounds at once: each new one comes in a little quieter, so a crowded fight
+            // stays full without stacking into one loud, tiring wall.
+            int busy = CountActiveVoices();
+            if (busy > 6)
+            {
+                volume *= 1f / MathF.Sqrt(1f + (busy - 6) * 0.12f);
+            }
+        }
+
         SoundEffectInstance instance = null;
         try
         {
@@ -484,6 +555,10 @@ public sealed class AudioDirector : IDisposable
             CuePlayed?.Invoke(cue);
             instances.Add(instance);
             _cooldowns[cue] = policy.Cooldown;
+            if (policy.Danger)
+            {
+                _focus = 1f;
+            }
             ApplyCueDuck(cue);
         }
         catch
@@ -683,6 +758,9 @@ public sealed class AudioDirector : IDisposable
             case AudioCue.EndingReveal:
                 BeginDuck(1.3f, 0.52f);
                 break;
+            case AudioCue.DevourerWindup:
+                BeginDuck(0.8f, 0.22f);
+                break;
         }
     }
 
@@ -748,6 +826,16 @@ public sealed class AudioDirector : IDisposable
 
     private static float Lerp(float from, float to, float amount) =>
         from + (to - from) * Math.Clamp(amount, 0f, 1f);
+
+    private int CountActiveVoices()
+    {
+        int count = 0;
+        foreach (List<SoundEffectInstance> instances in _activeInstances.Values)
+        {
+            count += instances.Count;
+        }
+        return count;
+    }
 
     private int CountActiveEnemyVoices()
     {

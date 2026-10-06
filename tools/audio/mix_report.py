@@ -48,6 +48,9 @@ BANDS = {
     "ui": (-12.0, 4.0),
     "sense": (-12.0, 6.0),
     "event": (2.0, 18.0),
+    # Layers under another cue (material under a hit, a body blow under the hurt sound): they
+    # colour and time the blow, the cue on top carries it.
+    "layer": (-6.0, 12.0),
 }
 
 CLASS = {
@@ -60,6 +63,9 @@ CLASS = {
     "Footstep": "step", "FootstepWood": "step", "HollowStep": "step", "BurningStep": "step", "DevourerStep": "step",
     "UiMove": "ui", "UiBack": "ui", "UiOpen": "ui", "UiClose": "ui", "CurrencyGain": "ui",
     "SoulSenseOn": "sense", "SoulSenseOff": "sense",
+    "HitHollow": "layer", "HitBurning": "layer", "HitDevourer": "layer", "HitDummy": "layer", "HitHeavy": "layer",
+    "BodyHit": "layer", "DeathHollow": "layer", "DeathBurning": "layer", "DeathDevourer": "layer",
+    "HollowWindup": "danger", "DevourerWindup": "danger", "BurningRush": "danger",
 }
 
 #: Menu sounds play over the paused beds (AudioDirector.PausedBedVolume).
@@ -124,6 +130,8 @@ INDIRECT = {
     "HollowStep": 0.4, "BurningStep": 0.4, "DevourerStep": 0.5,
     "AbilityHeal": 0.72, "AbilityPierce": 0.72, "AbilityLeap": 0.72, "AbilityVortex": 0.72,
     "AbilityGuard": 0.72, "AbilityMark": 0.72,
+    "HitHollow": 0.78, "HitBurning": 0.78, "HitDevourer": 0.78, "HitDummy": 0.78,
+    "DeathHollow": 0.66, "DeathBurning": 0.66, "DeathDevourer": 0.64,
 }
 
 

@@ -501,6 +501,19 @@ public sealed partial class GameWorld : IDisposable
             BurningState? previousBurningState = enemy is Burning burningBefore ? burningBefore.State : null;
             DevourerState? previousDevourerState = enemy is Devourer devourerBefore ? devourerBefore.State : null;
             enemy.Update(deltaTime, _player, _souls, ActiveCombatBounds, _particles, _screenEffects);
+            if (enemy is Hollow windingHollow && previousHollowState != HollowState.Telegraph && windingHollow.State == HollowState.Telegraph)
+            {
+                // The mask creaks and it draws breath as the arm goes back: the swipe is coming.
+                _audio.Play(AudioCue.HollowWindup, 0.8f, 0f, PanOf(enemy.Position));
+            }
+            if (enemy is Burning rushingBurning && previousBurningState != BurningState.Charge && rushingBurning.State == BurningState.Charge)
+            {
+                _audio.Play(AudioCue.BurningRush, 0.86f, 0f, PanOf(enemy.Position));
+            }
+            if (enemy is Devourer liftingDevourer && previousDevourerState != DevourerState.SlamTelegraph && liftingDevourer.State == DevourerState.SlamTelegraph)
+            {
+                _audio.Play(AudioCue.DevourerWindup, 0.72f, 0f, PanOf(enemy.Position) * 0.6f);
+            }
             if (enemy is Hollow hollowAfter && previousHollowState != HollowState.Swipe && hollowAfter.State == HollowState.Swipe)
             {
                 // The grab is a danger signal: clearly above the room, below a hit.
@@ -578,6 +591,8 @@ public sealed partial class GameWorld : IDisposable
             }
             // Taking damage must never hide under the player's own swings (mix review 06.10.2026).
             _audio.Play(_player.IsDead ? AudioCue.PlayerDeath : AudioCue.PlayerHit, _player.IsDead ? 0.82f : 0.95f);
+            // The blow itself lands at once; the Ludo hurt sound swells in just after it.
+            _audio.Play(AudioCue.BodyHit, _player.IsDead ? 0.85f : 0.72f);
         }
         if (!wasResonanceReady && _player.IsResonanceReady)
         {
@@ -1523,6 +1538,7 @@ public sealed partial class GameWorld : IDisposable
             {
                 firstContact = contactPosition;
             }
+            PlayMaterialHit(enemy, strike.Step switch { 1 => 0.5f, 2 => 0.62f, _ => 0.78f }, strike.Step == 3 ? -0.06f : 0f);
             if (coreHit)
             {
                 _automatedCoreHits++;
@@ -1541,6 +1557,10 @@ public sealed partial class GameWorld : IDisposable
         }
 
         _combatPresentation.PresentScytheImpact(strike.Step, strike.Direction, firstContact);
+        if (strike.Step == 3)
+        {
+            _audio.Play(AudioCue.HitHeavy, 0.55f, 0f, PanOf(firstContact) * 0.5f);
+        }
         // A landed hit sits above the swing that carried it.
         _audio.Play(AudioCue.ScytheHit, strike.Step == 3 ? 0.85f : 0.68f, strike.Step == 2 ? 0.08f : 0f);
     }
@@ -2383,6 +2403,11 @@ public sealed partial class GameWorld : IDisposable
                     shot.IsFullCharge));
 
                 Vector2 impactPosition = coreHit ? weakPoint : enemy.Position;
+                PlayMaterialHit(enemy, shot.IsFullCharge ? 0.75f : 0.5f, shot.IsFullCharge ? -0.05f : 0.03f);
+                if (shot.IsFullCharge)
+                {
+                    _audio.Play(AudioCue.HitHeavy, 0.6f, -0.04f, PanOf(impactPosition) * 0.5f);
+                }
                 _combatPresentation.PresentCannonImpact(
                     impactPosition,
                     shot.Direction,
@@ -2471,6 +2496,23 @@ public sealed partial class GameWorld : IDisposable
         }
     }
 
+    /// <summary>The target's material under a landed blow: cloth and porcelain, ember crust, flesh, wood.</summary>
+    private void PlayMaterialHit(Enemy enemy, float volume, float pitch)
+    {
+        AudioCue? cue = enemy switch
+        {
+            Hollow => AudioCue.HitHollow,
+            Burning => AudioCue.HitBurning,
+            Devourer => AudioCue.HitDevourer,
+            TrainingDummy => AudioCue.HitDummy,
+            _ => null
+        };
+        if (cue is { } material)
+        {
+            _audio.Play(material, volume, pitch, PanOf(enemy.Position) * 0.7f);
+        }
+    }
+
     private static float DistanceSquaredToSegment(Vector2 point, Vector2 start, Vector2 end)
     {
         Vector2 segment = end - start;
@@ -2553,8 +2595,19 @@ public sealed partial class GameWorld : IDisposable
                 _particles.EmitDebris(head, enemy.Position.Y + FigureHeights.Air + 6f, 9, new Color(214, 208, 198), 170f, 4.5f);
             }
             CreditDefeatedEnemy(enemy);
-            float volume = enemy is Devourer ? 0.72f : 0.52f;
+            float volume = enemy is Devourer ? 0.62f : 0.42f;
             _audio.Play(AudioCue.EnemyDeath, volume, 0f, PanOf(enemy.Position) * 0.7f);
+            AudioCue? death = enemy switch
+            {
+                Hollow => AudioCue.DeathHollow,
+                Burning => AudioCue.DeathBurning,
+                Devourer => AudioCue.DeathDevourer,
+                _ => null
+            };
+            if (death is { } layer)
+            {
+                _audio.Play(layer, enemy is Devourer ? 0.64f : 0.66f, 0f, PanOf(enemy.Position) * 0.7f);
+            }
         }
     }
 }

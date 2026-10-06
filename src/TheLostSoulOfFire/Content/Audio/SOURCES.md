@@ -173,3 +173,43 @@ Ergebnisse sind eigene Arbeit des Projekts.
 | `Audio/Sfx/hollow_swipe_v3.wav` | Ableitung von hollow_swipe.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.34 s, 1 Kanal, -16.3 LUFS, Spitze -4.3 dBFS |
 | `Audio/Sfx/enemy_death_v2.wav` | Ableitung von enemy_death.wav (Tonhöhe ×1.025, Klangneigung +0.8/-0.6 dB) | 0.54 s, 1 Kanal, -14.3 LUFS, Spitze -4.4 dBFS |
 | `Audio/Sfx/enemy_death_v3.wav` | Ableitung von enemy_death.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.58 s, 1 Kanal, -14.3 LUFS, Spitze -3.9 dBFS |
+
+## Kampfschichten (Polish-Durchgang, 06.10.2026)
+
+Rezepte in `tools/audio/recipes/combat.py`. Sie ersetzen nichts aus der Ludo-Bank, sondern liegen
+darunter: ein Kontakt-Transient auf Sample 0 (der Ludo-Treffer setzt erst nach 40–55 ms ein), das
+Material des Ziels, Warnungen für die bisher stummen Ausholbewegungen von Hollow und Devourer, der
+Anlauf des Burning und ein eigener Tod je Gegner. Takes einer Gruppe auf ±0,5 LU angeglichen.
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/hit_hollow_1.wav` | hit-hollow Seed 1 | 0.32 s, 1 Kanal, -20.8 LUFS, Spitze -3.0 dBFS (Takes angeglichen) |
+| `Audio/Sfx/hit_hollow_2.wav` | hit-hollow Seed 2 | 0.32 s, 1 Kanal, -21.3 LUFS, Spitze -2.5 dBFS (Takes angeglichen) |
+| `Audio/Sfx/hit_hollow_3.wav` | hit-hollow Seed 3 | 0.32 s, 1 Kanal, -20.8 LUFS, Spitze -2.5 dBFS (Takes angeglichen) |
+| `Audio/Sfx/hit_burning_1.wav` | hit-burning Seed 1 | 0.42 s, 1 Kanal, -22.1 LUFS, Spitze -5.2 dBFS (Takes angeglichen) |
+| `Audio/Sfx/hit_burning_2.wav` | hit-burning Seed 2 | 0.42 s, 1 Kanal, -22.6 LUFS, Spitze -2.5 dBFS (Takes angeglichen) |
+| `Audio/Sfx/hit_burning_3.wav` | hit-burning Seed 3 | 0.42 s, 1 Kanal, -22.1 LUFS, Spitze -5.9 dBFS (Takes angeglichen) |
+| `Audio/Sfx/hit_devourer_1.wav` | hit-devourer Seed 1 | 0.55 s, 1 Kanal, -22.1 LUFS, Spitze -3.2 dBFS (Takes angeglichen) |
+| `Audio/Sfx/hit_devourer_2.wav` | hit-devourer Seed 2 | 0.55 s, 1 Kanal, -22.6 LUFS, Spitze -2.0 dBFS (Takes angeglichen) |
+| `Audio/Sfx/hit_devourer_3.wav` | hit-devourer Seed 3 | 0.55 s, 1 Kanal, -22.1 LUFS, Spitze -3.4 dBFS (Takes angeglichen) |
+| `Audio/Sfx/hit_dummy_1.wav` | hit-dummy Seed 1 | 0.36 s, 1 Kanal, -22.2 LUFS, Spitze -3.0 dBFS (Takes angeglichen) |
+| `Audio/Sfx/hit_dummy_2.wav` | hit-dummy Seed 2 | 0.36 s, 1 Kanal, -22.7 LUFS, Spitze -3.0 dBFS (Takes angeglichen) |
+| `Audio/Sfx/hit_dummy_3.wav` | hit-dummy Seed 3 | 0.36 s, 1 Kanal, -22.2 LUFS, Spitze -4.4 dBFS (Takes angeglichen) |
+| `Audio/Sfx/hit_heavy_1.wav` | hit-heavy Seed 1 | 0.40 s, 1 Kanal, -22.0 LUFS, Spitze -2.0 dBFS (Takes angeglichen) |
+| `Audio/Sfx/hit_heavy_2.wav` | hit-heavy Seed 2 | 0.40 s, 1 Kanal, -21.6 LUFS, Spitze -2.0 dBFS (Takes angeglichen) |
+| `Audio/Sfx/hit_heavy_3.wav` | hit-heavy Seed 3 | 0.40 s, 1 Kanal, -21.5 LUFS, Spitze -2.4 dBFS (Takes angeglichen) |
+| `Audio/Sfx/body_hit_1.wav` | body-hit Seed 1 | 0.24 s, 1 Kanal, -19.1 LUFS, Spitze -3.5 dBFS (Takes angeglichen) |
+| `Audio/Sfx/body_hit_2.wav` | body-hit Seed 2 | 0.24 s, 1 Kanal, -19.2 LUFS, Spitze -2.5 dBFS (Takes angeglichen) |
+| `Audio/Sfx/body_hit_3.wav` | body-hit Seed 3 | 0.24 s, 1 Kanal, -19.6 LUFS, Spitze -2.5 dBFS (Takes angeglichen) |
+| `Audio/Sfx/hollow_windup_1.wav` | hollow-windup Seed 1 | 0.44 s, 1 Kanal, -18.5 LUFS, Spitze -2.9 dBFS (Takes angeglichen, +3,5 dB nach Mixprüfung) |
+| `Audio/Sfx/hollow_windup_2.wav` | hollow-windup Seed 2 | 0.44 s, 1 Kanal, -18.5 LUFS, Spitze -2.8 dBFS (Takes angeglichen, +3,5 dB nach Mixprüfung) |
+| `Audio/Sfx/devourer_windup_1.wav` | devourer-windup Seed 1 | 0.86 s, 1 Kanal, -21.0 LUFS, Spitze -5.2 dBFS (Takes angeglichen) |
+| `Audio/Sfx/devourer_windup_2.wav` | devourer-windup Seed 2 | 0.86 s, 1 Kanal, -21.0 LUFS, Spitze -5.8 dBFS (Takes angeglichen) |
+| `Audio/Sfx/burning_rush_1.wav` | burning-rush Seed 1 | 0.62 s, 1 Kanal, -22.1 LUFS, Spitze -3.7 dBFS (Takes angeglichen) |
+| `Audio/Sfx/burning_rush_2.wav` | burning-rush Seed 2 | 0.62 s, 1 Kanal, -22.6 LUFS, Spitze -3.0 dBFS (Takes angeglichen) |
+| `Audio/Sfx/death_hollow_1.wav` | death-hollow Seed 1 | 0.90 s, 1 Kanal, -20.2 LUFS, Spitze -2.5 dBFS (Takes angeglichen) |
+| `Audio/Sfx/death_hollow_2.wav` | death-hollow Seed 2 | 0.90 s, 1 Kanal, -20.5 LUFS, Spitze -2.5 dBFS (Takes angeglichen) |
+| `Audio/Sfx/death_burning_1.wav` | death-burning Seed 1 | 0.90 s, 1 Kanal, -25.2 LUFS, Spitze -3.0 dBFS (Takes angeglichen) |
+| `Audio/Sfx/death_burning_2.wav` | death-burning Seed 2 | 0.90 s, 1 Kanal, -24.7 LUFS, Spitze -6.0 dBFS (Takes angeglichen) |
+| `Audio/Sfx/death_devourer_1.wav` | death-devourer Seed 1 | 1.40 s, 1 Kanal, -20.0 LUFS, Spitze -2.3 dBFS (Takes angeglichen) |
+| `Audio/Sfx/death_devourer_2.wav` | death-devourer Seed 2 | 1.40 s, 1 Kanal, -20.5 LUFS, Spitze -2.0 dBFS (Takes angeglichen) |
