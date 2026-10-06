@@ -113,8 +113,16 @@ mit jedem Meilenstein aktualisiert.
   Menü-, Truhen-, Währungs-, Fähigkeiten-, Tür- und Erscheinungstöne, Mix gegen das Bett jeder
   Zone geprüft und nachgezogen.
 
-**Geprüft:** 257 Unit-Tests; Rundgang über 17 Stationen (434 Aufnahmen, Bild für Bild
-gesichtet, CPU-Zeit je Frame im Mittel 0,3–0,6 ms, 95. Perzentil unter 1 ms); Slice-,
+- Nachgezogen im zweiten Zyklus: Figuren setzen sich nach Aktionen weich (0,1 s), Nachbilder
+  zeigen die echte Pose, Arena-Dunst und -Rauch weich statt Pixelformen, Gegner- und
+  Treffertöne aus ihrer Richtung, nahtlose Atmosphäre der Überfahrt, Tod im Prolog wie in der
+  Arena inszeniert.
+
+**Geprüft:** 257 Unit-Tests; Rundgang über 17 Stationen (rund 440 Aufnahmen, Schlüsselbilder und
+Bildserien gesichtet; er schlägt fehl, sobald irgendwo ein Platzhalter gezeichnet wird – keiner
+gefunden). Leistung auf dem M1 Pro: CPU-Zeit je Frame im Mittel 0,3–0,6 ms; Wandzeit ohne
+Bildsynchronisation (CPU und GPU) im Mittel rund 1 ms, 95. Perzentil höchstens rund 2 ms,
+Ausreißer nur beim Laden; Slice-,
 Fähigkeiten-, Vorhallen- und Währungstest; Audio-Laufzeit-, Gameplay- und Tod-Neustart-Test;
 `validate_audio.py` (75 Assets); `mix_report.py` (alle Zonen im Band); CLAP als Hörprobe für
 neue Klänge.
@@ -125,6 +133,6 @@ neue Klänge.
 - Stable Audio Open ist auf Hugging Face zugangsbeschränkt (Lizenzzustimmung des Owners
   fehlt); ACE-Step läuft auf diesem Rechner nicht (Arbeitsspeicher bei laufendem Docker).
   Musik und Klänge sind deshalb lokal synthetisiert.
-- Die Leistungswerte messen die CPU-Seite von Update und Draw auf dem Mac (M1 Pro); die
-  GPU-Zeit und schwächere Rechner sind nicht gemessen.
+- Die Leistungswerte stammen von einem Mac (M1 Pro); schwächere Rechner und andere
+  Grafiktreiber sind nicht gemessen.
 - Kein Push und kein PR ohne Freigabe des Owners.
