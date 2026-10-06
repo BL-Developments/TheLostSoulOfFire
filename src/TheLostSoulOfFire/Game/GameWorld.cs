@@ -929,6 +929,7 @@ public sealed partial class GameWorld : IDisposable
             }
         }
 
+        DrawGroundMist(batch);
         _player.DrawAfterimages(batch, pixel);
         if (IsCombatPhase)
         {
@@ -1039,6 +1040,60 @@ public sealed partial class GameWorld : IDisposable
         (new Vector2(1420f, 690f), new Vector2(240f, 160f)),
         (new Vector2(300f, 760f), new Vector2(220f, 150f))
     ];
+
+    private static readonly Color SeaMist = new(150, 164, 200);
+    private static readonly Color AshHaze = new(138, 128, 160);
+
+    /// <summary>
+    /// Mist and haze drifting low over each room (presentation only): sea mist over the water of
+    /// the prologue, moving with the sea during the crossing; haze at the foot of the Warden wall;
+    /// ash in the antechamber; smoke under the foundry's north wall.
+    /// </summary>
+    private void DrawGroundMist(SpriteBatch batch)
+    {
+        float t = _presentationTime;
+        if (_phase is GamePhase.Antechamber or GamePhase.EnteringArena)
+        {
+            Atmosphere.Draw(batch, _art, -200f, 1700f, t, 31,
+                new Atmosphere.Band(330f, 430f, 7, 6f, AshHaze, 0.09f, 380f, 50f),
+                new Atmosphere.Band(450f, 860f, 6, 4f, AshHaze, 0.035f, 420f, 70f));
+            return;
+        }
+
+        if (_phase == GamePhase.Arena && !_sandboxActive)
+        {
+            Atmosphere.Draw(batch, _art, -200f, 2000f, t, 37,
+                new Atmosphere.Band(95f, 230f, 9, 7f, AshHaze, 0.13f, 400f, 60f),
+                new Atmosphere.Band(260f, 980f, 6, 5f, AshHaze, 0.04f, 480f, 80f));
+            return;
+        }
+
+        if (_phase != GamePhase.Prologue || PrologueEnvironment.PlateOf(_prologue) is not { } plate || !_art.HasArt(plate))
+        {
+            return;
+        }
+
+        switch (_prologue.Sector)
+        {
+            case PrologueSector.Escape when _prologue.IsVehicleRide:
+                // The mist moves with the sea, so the crossing reads as speed.
+                Atmosphere.Draw(batch, _art, -400f, 2200f, _prologue.StateTime, 41,
+                    new Atmosphere.Band(120f, 320f, 10, -120f, SeaMist, 0.18f, 380f, 55f),
+                    new Atmosphere.Band(730f, 1000f, 10, -150f, SeaMist, 0.2f, 380f, 55f));
+                break;
+            case PrologueSector.Threshold:
+                Atmosphere.Draw(batch, _art, -200f, 2000f, t, 43,
+                    new Atmosphere.Band(520f, 620f, 9, 5f, SeaMist, 0.16f, 400f, 55f),
+                    new Atmosphere.Band(640f, 960f, 6, 4f, SeaMist, 0.05f, 480f, 75f));
+                break;
+            default:
+                Atmosphere.Draw(batch, _art, -200f, 2000f, t, 47 + (int)_prologue.Sector,
+                    new Atmosphere.Band(0f, 125f, 10, 9f, SeaMist, 0.22f, 380f, 55f),
+                    new Atmosphere.Band(905f, 1010f, 10, 11f, SeaMist, 0.24f, 380f, 55f),
+                    new Atmosphere.Band(160f, 860f, 7, 6f, SeaMist, 0.05f, 480f, 75f));
+                break;
+        }
+    }
 
     /// <summary>Props of the room being shown plus props staged by automated tests.</summary>
     private IEnumerable<SceneProp> ActiveSceneProps => _phase switch
