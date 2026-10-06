@@ -2,8 +2,8 @@
 
 Art: sprite
 Status: im-spiel
-Stil: ludo
-Weltgröße: 45 × 45
+Stil: hausstil
+Weltgröße: 72 × 72 (Frame; das Licht selbst etwa 30 Einheiten)
 Akzentfarbe: Seelenweiß mit violettem Saum
 Lore: [Symbolsatz: Death Flame](../../docs/current/VISUAL-ART-DIRECTION.md#11-symbolsatz--working-canon)
 
@@ -15,7 +15,11 @@ Lore: [Symbolsatz: Death Flame](../../docs/current/VISUAL-ART-DIRECTION.md#11-sy
 Kleine runde Lichtform, nicht mit Effekten verwechselbar.
 
 ## Animationen
-- `default`: Standbild, zur Laufzeit pulsierend.
+- `default`: Schleife, 12 Frames bei 12 fps: atmender Saum, kreisende Funken; zur Laufzeit zusätzlich pulsierend.
 
 ## Effekte
 - `fx.soul-release`: Release der Seele, 1,25 s
+
+
+## Herstellung
+Erzeugt von `tools/visuals/vfx_kit.py --only lost_soul` (vorgemultipliert, Import mit `PremultiplyAlpha=False`).

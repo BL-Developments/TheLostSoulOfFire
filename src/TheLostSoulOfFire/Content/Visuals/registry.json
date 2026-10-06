@@ -406,15 +406,15 @@
     {
       "id": "pickup.lost-soul",
       "kind": "sprite",
-      "palette": "world",
-      "worldSize": [44.8, 44.8],
+      "palette": "death-flame",
+      "worldSize": [72, 72],
       "origin": [0.5, 0.5],
       "clips": {
         "default": {
-          "path": "Textures/Pickups/lost_soul_64",
-          "frameSize": [64, 64],
-          "frames": 1,
-          "fps": 1,
+          "path": "Textures/Pickups/lost_soul",
+          "frameSize": [128, 128],
+          "frames": 12,
+          "fps": 12,
           "loop": true
         }
       }

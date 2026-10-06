@@ -403,6 +403,31 @@ def death_flame(i: int, n: int, size: int) -> np.ndarray:
     return f.image(glow=1.15)
 
 
+def lost_soul(i: int, n: int, size: int) -> np.ndarray:
+    """A Lost Soul (art/specs/pickup.lost-soul.md): a small round light, almost white, with a
+    softly flickering violet rim and a few motes circling it; no face, no flame shape, so it is
+    never mistaken for an effect (seamless loop)."""
+    f = Frame(size)
+    noise = Noise(97, period=4)
+    t = i / n
+    bob = math.sin(t * math.tau) * size * 0.012
+    x, y = f.x, (f.y - bob) * 0.92
+    r = np.sqrt(x * x + y * y)
+    angle = np.arctan2(y, x)
+    # The rim breathes: radius modulated by looping noise around the circle.
+    wobble = noise.fbm(np.cos(angle) * 1.2 + 2.0, np.sin(angle) * 1.2 + t * 4, 3) - 0.5
+    radius = size * (0.13 + 0.025 * math.sin(t * math.tau * 2)) * (1 + wobble * 0.35)
+    body = np.clip(1 - r / radius, 0, 1) ** 0.6
+    f.add(body, np.clip(0.5 + 0.75 * (1 - r / radius), 0.2, 1.2))
+    f.add(gauss(x * x + y * y, size * 0.05), 1.2)
+    for k in range(4):
+        local = (t + k / 4) % 1.0
+        a = k * math.tau / 4 + t * math.tau
+        mx, my = math.cos(a) * size * 0.2, math.sin(a) * size * 0.07 + bob - size * 0.02
+        f.add(gauss((f.x - mx) ** 2 + (f.y - my) ** 2, 1.2) * (0.5 + 0.5 * math.sin(local * math.tau)) * 0.8, 0.8)
+    return f.image(glow=1.05, halo=0.6)
+
+
 #: effect -> (file stem, frame size, frames, builder)
 EFFECTS = {
     "core_hit": ("fx_core_hit", 128, 9, core_hit),
@@ -414,6 +439,7 @@ EFFECTS = {
     "resonance_activate": ("fx_resonance_activate", 256, 16, resonance_activate),
     "dash_ignition": ("fx_dash_ignition", 128, 9, dash_ignition),
     "death_flame": ("fx_death_flame_loop", 128, 16, death_flame),
+    "lost_soul": ("../Pickups/lost_soul", 128, 12, lost_soul),
 }
 
 
@@ -528,7 +554,7 @@ def main() -> int:
         image.save(args.out / f"{stem}.png")
         if args.preview:
             args.preview.mkdir(parents=True, exist_ok=True)
-            preview(frames, args.preview / f"{stem}.png")
+            preview(frames, args.preview / f"{Path(stem).name}.png")
         print(f"{stem}.png {image.size[0]}x{image.size[1]} frames={count}")
     return 0
 

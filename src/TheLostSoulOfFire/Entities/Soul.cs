@@ -124,8 +124,12 @@ public sealed class Soul
 
         if (State == SoulState.Residue)
         {
-            batch.DrawLine(pixel, Position - new Vector2(7f, 0f), Position + new Vector2(7f, 0f), GameBalance.DeathFlameBright * 0.8f, 3f);
-            batch.FillCircle(pixel, Position, 4f, GameBalance.SoulWhite);
+            // Rendered figures carry their core at the sternum: the residue rises to it as it arrives.
+            Vector2 target = player.Position + player.FacingDirection * 2f;
+            float arriving = useSpriteArt ? MathHelper.Clamp(1f - Vector2.Distance(Position, target) / 160f, 0f, 1f) : 0f;
+            Vector2 drawn = Position - new Vector2(0f, FigureHeights.Core * arriving);
+            WorldMarks.Beam(batch, pixel, drawn - new Vector2(9f, 0f), drawn + new Vector2(9f, 0f), 12f, GameBalance.DeathFlameBright * 0.8f);
+            WorldMarks.Ring(batch, pixel, drawn, 6f, GameBalance.SoulWhite, true, 3f);
             return;
         }
 
@@ -145,15 +149,15 @@ public sealed class Soul
 
         if (State == SoulState.BeingDevoured)
         {
-            batch.DrawCircle(pixel, Position, 25f + pulse * 5f, GameBalance.DeathFlameBright * 0.85f, 4f, 22);
+            WorldMarks.Ring(batch, pixel, Position, 25f + pulse * 5f, GameBalance.DeathFlameBright * 0.85f, true, 4f);
         }
 
         if (State == SoulState.Releasing)
         {
-            Vector2 playerCore = player.Position + player.FacingDirection * 2f;
-            batch.DrawLine(pixel, playerCore, Position, GameBalance.DeepViolet * (0.42f + releaseProgress * 0.3f), 5f);
-            batch.DrawLine(pixel, playerCore, Position, GameBalance.DeathFlameBright * (0.45f + releaseProgress * 0.4f), 1.5f);
-            batch.DrawCircle(pixel, Position, 22f + releaseProgress * 18f, glow * (1f - releaseProgress) * 0.7f, 3f, 24);
+            Vector2 playerCore = player.Position + player.FacingDirection * 2f - (useSpriteArt ? new Vector2(0f, FigureHeights.Core) : Vector2.Zero);
+            WorldMarks.Beam(batch, pixel, playerCore, Position, 18f, GameBalance.DeathFlame * (0.42f + releaseProgress * 0.3f));
+            WorldMarks.Beam(batch, pixel, playerCore, Position, 7f, GameBalance.DeathFlameBright * (0.45f + releaseProgress * 0.4f));
+            WorldMarks.Ring(batch, pixel, Position, 22f + releaseProgress * 18f, glow * (1f - releaseProgress) * 0.7f, false, 3f);
         }
     }
 

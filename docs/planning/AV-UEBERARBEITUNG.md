@@ -46,26 +46,31 @@ Bodennebel und Normal-Map-Licht der Death Flame.
 | B2 | Hollow | idle, move, swipe gerendert | zusätzlich Treffer, Taumeln, Erholen, Tod mit fallender Maske | ☑ |
 | B3 | Burning | Ludo-Sprite | gerenderte Figur: Ruhe, Pirschen, Aufflammen, Anlauf, Erholung, Treffer, Tod | ☑ |
 | B4 | Devourer | Ludo-Sprite | gerenderte Figur mit Rumpföffnung: Ruhe, Gang, Schlag, Erholung, Verschlingen, Taumeln, Treffer, Tod | ☑ |
-| B5 | Seelen und Pickups | Formen und Glühen | gemalte Seelenflamme, Release | ☐ |
+| B5 | Seelen und Pickups | Formen und Glühen | gemalte Seelenflamme, Release | ◐ (Release-Flipbook neu) |
+| B7 | Arena-Truhe | Rechtecke | gerendertes Reliquiar mit Öffnen-Clip | ☑ |
 | B6 | Trainingspuppe (Sandbox) | Platzhalter | gerendertes Prop | ☐ |
 
 ## C Effekte (VFX)
 
-Sense-Schläge 1–3 und Seelenhieb, Mündung, Projektil und Ladung der Soul Cannon,
-Core-Treffer, Seelen-Release, Dash-Zündung, Resonanz, Burning-Detonation,
-Devourer-Schlag, Gegner-Erscheinen, Death-Flame-Spur, Kisten-Öffnen. Status: ☐ (alte
-Ludo-Sprites, teils Pixelformen).
+| # | Effekt | Status |
+| --- | --- | --- |
+| C1 | Sensenhiebe 1–3: Death-Flame-Band entlang der Klingenbahn (Trail-Shader) | ☑ |
+| C2 | Flipbooks aus `tools/visuals/vfx_kit.py`: Core-Treffer, Mündung, Projektil, Ladung, Burning-Detonation, Seelenfreigabe, Resonanz, Dash-Zündung, Death Flame | ☑ |
+| C3 | Warnzeichen als Licht (Ausholbogen, Anlaufring und -bahn, Detonations- und Schlagring, Seelenstrahlen), Bodenmarken (Wellenstart, Erscheinen) | ☑ |
+| C4 | Partikel als Lichtpunkte und Funkenschlieren | ☑ |
+| C5 | Fähigkeiten im Feld (Durchschlag, Sog, Marke, Schutz), Glutfunken, Resonanz-Aura | ☑ |
+| C6 | Maskensplitter beim Hollow-Tod, Devourer-Schlag als Bodenriss | ☐ |
 
 ## D Oberfläche und Typografie
 
 | # | Element | Status |
 | --- | --- | --- |
 | D1 | Schrift: Pixel-Schrift durch gesetzte Schriften ersetzen (Cinzel, Alegreya Sans; OFL) | ☑ |
-| D2 | HUD: Leben, Dash, Resonanz, Fähigkeitenkarten, Wellenanzeige, Währungen | ☐ |
-| D3 | Titel- und Pausenmenü, Einstellungen | ☐ |
-| D4 | Charaktermenü (Charakter, Karte, Skills, Fähigkeiten) | ☐ |
-| D5 | Erzählzeilen, Abschnittstitel, Hinweise, Todesbildschirm | ☐ |
-| D6 | Dev-Menü (nur Sandbox) | ☐ |
+| D2 | HUD in Warden-Eisen (`UiKit`): Medaillon und Lebensleiste mit Schadensspur, Dash, Währungen mit Symbolen, Wellenplakette, Resonanzplatte, Fähigkeitenkarten; Kanonenladung am Fadenkreuz | ☑ |
+| D3 | Titel- und Pausenmenü, Einstellungen (Seitentitel, Werte hervorgehoben, Auswahl mit Glut und Rauten) | ☑ |
+| D4 | Charaktermenü (Eisenplatte, Reiter mit Ornament, Fähigkeitenkatalog) | ☑ |
+| D5 | Erzählband, Abschnittstitel, Ziele, Hinweise mit Tastenkappen, Todes- und Abschlusszeilen | ☑ |
+| D6 | Dev-Menü und Sandbox-Banner | ☑ |
 
 ## E Ton
 
