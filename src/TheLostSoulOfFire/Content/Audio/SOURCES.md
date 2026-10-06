@@ -115,7 +115,7 @@ Ergebnisse sind eigene Arbeit des Projekts.
 | `Audio/Ambience/hub_ambience.wav` | ambience-hub Seed 2 | 32.00 s, 2 Kanal/Kanäle, -30.0 LUFS, Spitze -12.0 dBFS |
 | `Audio/Ambience/harbour_ambience.wav` | ambience-harbour Seed 1 | 36.00 s, 2 Kanal/Kanäle, -29.0 LUFS, Spitze -15.0 dBFS |
 | `Audio/Ambience/causeway_ambience.wav` | ambience-causeway Seed 1 | 36.00 s, 2 Kanal/Kanäle, -27.0 LUFS, Spitze -14.4 dBFS |
-| `Audio/Ambience/crossing_ambience.wav` | ambience-crossing Seed 2 | 24.00 s, 2 Kanal/Kanäle, -26.0 LUFS, Spitze -11.8 dBFS |
+| `Audio/Ambience/crossing_ambience.wav` | ambience-crossing Seed 1, Naht 1,5 s überblendet | 22.50 s, 2 Kanal/Kanäle, -26.0 LUFS, Spitze -13.1 dBFS |
 | `Audio/Ambience/threshold_ambience.wav` | ambience-threshold Seed 5 | 32.00 s, 2 Kanal/Kanäle, -34.0 LUFS, Spitze -25.7 dBFS |
 | `Audio/Music/title_theme.ogg` | music-title Seed 1 | 58.18 s, 2 Kanal/Kanäle, -20.0 LUFS, Spitze -6.1 dBFS |
 | `Audio/Music/shore_theme.ogg` | music-shore Seed 1 | 68.57 s, 2 Kanal/Kanäle, -23.0 LUFS, Spitze -8.0 dBFS |

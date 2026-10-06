@@ -3,9 +3,11 @@
 
     tools/audio/.venv/bin/python tools/audio/install.py CANDIDATE.wav Audio/Sfx/ui_move.wav
     tools/audio/.venv/bin/python tools/audio/install.py CANDIDATE.wav Audio/Music/title_theme.ogg
+    tools/audio/.venv/bin/python tools/audio/install.py CANDIDATE.wav Audio/Ambience/x.wav --crossfade 1.5
 
 WAV targets are copied as 16-bit PCM (effects mono, ambience stereo, 48 kHz); OGG targets are
-encoded with oggenc at quality 5 (48 kHz stereo), like the approved arena loop. The mgcb block
+encoded with oggenc at quality 5 (48 kHz stereo), like the approved arena loop. Loops get 8 ms
+edge fades, or with --crossfade an equal-power crossfade of tail into head (seamless texture). The mgcb block
 matches what tools/audio/validate_audio.py expects. Prints the ledger line for SOURCES.md
 (recipe, seed, LUFS, peak) from the candidate's JSON report next to it.
 """
@@ -32,7 +34,24 @@ def block(relative: str) -> str:
     return f"#begin {relative}\n/importer:{importer}\n/processor:{processor}\n/build:{relative}\n"
 
 
+def crossfade_loop(data: np.ndarray, rate: int, seconds: float) -> np.ndarray:
+    """Seamless loop: the last `seconds` fade (equal power) into the first ones, and the loop
+    becomes that much shorter, so the seam carries no step in level or texture."""
+    n = int(seconds * rate)
+    t = np.linspace(0.0, 1.0, n)[:, None]
+    head = data[:n] * np.sin(t * np.pi / 2)
+    tail = data[-n:] * np.cos(t * np.pi / 2)
+    out = data[:-n].copy()
+    out[:n] = head + tail
+    return out
+
+
 def main(argv: list[str]) -> int:
+    crossfade = 0.0
+    if "--crossfade" in argv:
+        index = argv.index("--crossfade")
+        crossfade = float(argv[index + 1])
+        argv = argv[:index] + argv[index + 2:]
     source, relative = Path(argv[0]), argv[1]
     target = CONTENT / relative
     target.parent.mkdir(parents=True, exist_ok=True)
@@ -41,7 +60,9 @@ def main(argv: list[str]) -> int:
         raise SystemExit(f"{source}: {rate} Hz, erwartet 48000")
     if relative.startswith("Audio/Sfx/") and data.shape[1] != 1:
         data = data.mean(axis=1, keepdims=True)
-    if relative.startswith(("Audio/Ambience/", "Audio/Music/")):
+    if crossfade > 0 and relative.startswith(("Audio/Ambience/", "Audio/Music/")):
+        data = crossfade_loop(data, rate, crossfade)
+    elif relative.startswith(("Audio/Ambience/", "Audio/Music/")):
         # Loops: an 8 ms fade at both edges keeps the seam free of a sample jump (a downbeat
         # that starts on sample 0 would otherwise click once per loop).
         edge = int(0.008 * rate)
