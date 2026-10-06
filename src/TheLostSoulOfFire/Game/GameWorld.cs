@@ -459,6 +459,7 @@ public sealed partial class GameWorld : IDisposable
 
         _player.Update(deltaTime, input, _lastMouseWorld, ActiveCombatBounds, _particles, _screenEffects, _forceSoulSense);
         UpdateFootsteps();
+        UpdateEnemyFootsteps();
         _soulSensePresentation.Update(deltaTime, _player.SoulSenseActive);
         if (_audioTestFatalDamageRequested)
         {
@@ -1643,6 +1644,70 @@ public sealed partial class GameWorld : IDisposable
             _footstepDistance -= FootstepStride;
             bool wood = _phase == GamePhase.Prologue && _prologue.IsVehicleRide;
             _audio.Play(wood ? AudioCue.FootstepWood : AudioCue.Footstep, 0.42f);
+        }
+    }
+
+    private readonly Dictionary<Enemy, (Vector2 From, float Distance)> _enemySteps = new();
+    private readonly List<Enemy> _goneStepEnemies = [];
+
+    /// <summary>
+    /// Enemies are heard walking (presentation only): each kind has its own step every stride of
+    /// ground covered, quieter with distance from the player and placed left or right of them.
+    /// </summary>
+    private void UpdateEnemyFootsteps()
+    {
+        if (!IsCombatPhase)
+        {
+            _enemySteps.Clear();
+            return;
+        }
+
+        foreach (Enemy enemy in _enemies)
+        {
+            (AudioCue cue, float stride, float loudness) = enemy switch
+            {
+                Devourer => (AudioCue.DevourerStep, 105f, 0.62f),
+                Burning => (AudioCue.BurningStep, 70f, 0.34f),
+                Hollow => (AudioCue.HollowStep, 72f, 0.4f),
+                _ => (AudioCue.Footstep, 0f, 0f)
+            };
+            if (stride <= 0f || !enemy.IsAlive)
+            {
+                continue;
+            }
+
+            if (!_enemySteps.TryGetValue(enemy, out (Vector2 From, float Distance) step))
+            {
+                _enemySteps[enemy] = (enemy.Position, stride * 0.5f);
+                continue;
+            }
+
+            float moved = Vector2.Distance(enemy.Position, step.From);
+            float distance = moved > 40f ? stride * 0.5f : step.Distance + moved;
+            if (distance >= stride)
+            {
+                distance -= stride;
+                Vector2 offset = enemy.Position - _player.Position;
+                float near = MathHelper.Clamp(1f - offset.Length() / 900f, 0f, 1f);
+                if (near > 0.05f)
+                {
+                    _audio.Play(cue, loudness * near * near, 0f, MathHelper.Clamp(offset.X / 700f, -0.8f, 0.8f));
+                }
+            }
+            _enemySteps[enemy] = (enemy.Position, distance);
+        }
+
+        _goneStepEnemies.Clear();
+        foreach (Enemy known in _enemySteps.Keys)
+        {
+            if (!known.IsAlive || !_enemies.Contains(known))
+            {
+                _goneStepEnemies.Add(known);
+            }
+        }
+        foreach (Enemy gone in _goneStepEnemies)
+        {
+            _enemySteps.Remove(gone);
         }
     }
 

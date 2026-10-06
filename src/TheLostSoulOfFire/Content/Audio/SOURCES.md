@@ -144,3 +144,15 @@ Ergebnisse sind eigene Arbeit des Projekts.
 | `Audio/Sfx/ability_guard.wav` | ability-guard Seed 1 | 1.00 s, 1 Kanal/Kanäle, -18.0 LUFS, Spitze -2.7 dBFS |
 | `Audio/Sfx/ability_mark.wav` | ability-mark Seed 1 | 0.50 s, 1 Kanal/Kanäle, -20.0 LUFS, Spitze -3.4 dBFS |
 | `Audio/Sfx/door_awaken.wav` | door-awaken Seed 1 | 1.80 s, 1 Kanal/Kanäle, -18.0 LUFS, Spitze -2.2 dBFS |
+| `Audio/Sfx/step_hollow_1.wav` | step-hollow Seed 1 | 0.42 s, 1 Kanal/Kanäle, -29.0 LUFS, Spitze -15.2 dBFS |
+| `Audio/Sfx/step_hollow_2.wav` | step-hollow Seed 2 | 0.42 s, 1 Kanal/Kanäle, -29.0 LUFS, Spitze -15.8 dBFS |
+| `Audio/Sfx/step_hollow_3.wav` | step-hollow Seed 3 | 0.42 s, 1 Kanal/Kanäle, -29.0 LUFS, Spitze -15.7 dBFS |
+| `Audio/Sfx/step_hollow_4.wav` | step-hollow Seed 4 | 0.42 s, 1 Kanal/Kanäle, -29.0 LUFS, Spitze -15.4 dBFS |
+| `Audio/Sfx/step_burning_1.wav` | step-burning Seed 1 | 0.26 s, 1 Kanal/Kanäle, -28.0 LUFS, Spitze -11.2 dBFS |
+| `Audio/Sfx/step_burning_2.wav` | step-burning Seed 2 | 0.26 s, 1 Kanal/Kanäle, -28.0 LUFS, Spitze -13.5 dBFS |
+| `Audio/Sfx/step_burning_3.wav` | step-burning Seed 3 | 0.26 s, 1 Kanal/Kanäle, -28.0 LUFS, Spitze -11.6 dBFS |
+| `Audio/Sfx/step_burning_4.wav` | step-burning Seed 4 | 0.26 s, 1 Kanal/Kanäle, -28.0 LUFS, Spitze -12.4 dBFS |
+| `Audio/Sfx/step_devourer_1.wav` | step-devourer Seed 1 | 0.70 s, 1 Kanal/Kanäle, -25.2 LUFS, Spitze -4.0 dBFS |
+| `Audio/Sfx/step_devourer_2.wav` | step-devourer Seed 2 | 0.70 s, 1 Kanal/Kanäle, -25.0 LUFS, Spitze -4.0 dBFS |
+| `Audio/Sfx/step_devourer_3.wav` | step-devourer Seed 3 | 0.70 s, 1 Kanal/Kanäle, -24.9 LUFS, Spitze -4.0 dBFS |
+| `Audio/Sfx/step_devourer_4.wav` | step-devourer Seed 4 | 0.70 s, 1 Kanal/Kanäle, -24.0 LUFS, Spitze -4.6 dBFS |

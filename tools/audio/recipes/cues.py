@@ -68,6 +68,45 @@ def footstep_wood(rng) -> np.ndarray:
     return _finish(x, -26.0, -6.0)
 
 
+@recipe("step-hollow", "Hollow-Schritt: schleifende Sohle über Stein, schwerer Stoff, kaum Absatz")
+def step_hollow(rng) -> np.ndarray:
+    n = dsp.seconds(0.42)
+    t = dsp.time_axis(n)
+    # The foot is dragged rather than set down: a short scrape that swells and fades.
+    scrape = dsp.bandpass(rng.standard_normal(n), 400, 3200) * np.sin(np.clip(t / 0.26, 0, 1) * np.pi) ** 1.5
+    scrape *= 0.55 + 0.45 * dsp.lowpass(rng.standard_normal(n), 30) / 0.2
+    thud = dsp.lowpass(_impact(rng, n, dsp.seconds(0.05), 40, 260, 0.04, 1.0), 220)
+    cloth = dsp.bandpass(rng.standard_normal(n), 900, 5000) * np.exp(-((t - 0.12) / 0.07) ** 2) * 0.35
+    grit = _crunch(rng, n, 0.04, 0.16, rng.integers(12, 24), 1500, 6000, 0.25)
+    x = _room(scrape * 0.35 + thud * 0.8 + cloth + grit, rng, 0.4, 0.14)
+    return _finish(x, -29.0, -8.0)
+
+
+@recipe("step-burning", "Burning-Schritt: weicher Tritt unter knisternder Glut, kurzes Zischen auf dem Stein")
+def step_burning(rng) -> np.ndarray:
+    n = dsp.seconds(0.26)
+    t = dsp.time_axis(n)
+    # Mostly the embers: a soft footfall under crackle and a short sizzle where it touches stone.
+    tap = _impact(rng, n, 0, 300, 2400, 0.008, 0.35)
+    body = dsp.lowpass(_impact(rng, n, 0, 60, 400, 0.018, 0.25), 350)
+    crackle = _crunch(rng, n, 0.0, 0.16, rng.integers(30, 50), 2000, 10000, 0.9)
+    hiss = dsp.highpass(rng.standard_normal(n), 3000) * np.sin(np.clip(t / 0.18, 0, 1) * np.pi) * 0.22
+    x = _room(tap + body + crackle + hiss, rng, 0.3, 0.1)
+    return _finish(x, -28.0, -7.0)
+
+
+@recipe("step-devourer", "Devourer-Schritt: schwerer Aufschlag, dumpfes Nachbeben, knirschender Stein")
+def step_devourer(rng) -> np.ndarray:
+    n = dsp.seconds(0.7)
+    t = dsp.time_axis(n)
+    thump = dsp.lowpass(_impact(rng, n, 0, 25, 180, 0.07, 1.4), 160)
+    sub = np.sin(2 * np.pi * rng.uniform(42, 50) * t) * np.exp(-t / 0.12) * 0.6
+    stone = _crunch(rng, n, 0.01, 0.2, rng.integers(30, 50), 600, 4000, 0.35)
+    rattle = dsp.bandpass(rng.standard_normal(n), 1800, 6000) * np.exp(-((t - 0.05) / 0.04) ** 2) * 0.12
+    x = _room(thump + sub + stone + rattle, rng, 0.7, 0.2, damping=3000)
+    return _finish(x, -24.0, -4.0)
+
+
 @recipe("ui-move", "Menü: leises gläsernes Klicken mit violettem Nachklang")
 def ui_move(rng) -> np.ndarray:
     n = dsp.seconds(0.18)

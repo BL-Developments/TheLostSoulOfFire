@@ -8601,3 +8601,63 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/Ending/life_flame.png
+
+#begin Audio/Sfx/step_hollow_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/step_hollow_1.wav
+
+#begin Audio/Sfx/step_hollow_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/step_hollow_2.wav
+
+#begin Audio/Sfx/step_hollow_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/step_hollow_3.wav
+
+#begin Audio/Sfx/step_hollow_4.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/step_hollow_4.wav
+
+#begin Audio/Sfx/step_burning_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/step_burning_1.wav
+
+#begin Audio/Sfx/step_burning_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/step_burning_2.wav
+
+#begin Audio/Sfx/step_burning_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/step_burning_3.wav
+
+#begin Audio/Sfx/step_burning_4.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/step_burning_4.wav
+
+#begin Audio/Sfx/step_devourer_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/step_devourer_1.wav
+
+#begin Audio/Sfx/step_devourer_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/step_devourer_2.wav
+
+#begin Audio/Sfx/step_devourer_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/step_devourer_3.wav
+
+#begin Audio/Sfx/step_devourer_4.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/step_devourer_4.wav

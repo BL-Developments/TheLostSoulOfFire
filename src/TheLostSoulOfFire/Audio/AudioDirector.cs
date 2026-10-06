@@ -37,6 +37,9 @@ public enum AudioCue
     EndingReveal,
     Footstep,
     FootstepWood,
+    HollowStep,
+    BurningStep,
+    DevourerStep,
     UiMove,
     UiBack,
     UiOpen,
@@ -119,6 +122,9 @@ public sealed class AudioDirector : IDisposable
         [AudioCue.EndingReveal] = new(1f, 1),
         [AudioCue.Footstep] = new(0.12f, 2, 0.05f),
         [AudioCue.FootstepWood] = new(0.12f, 2, 0.05f),
+        [AudioCue.HollowStep] = new(0.06f, 3, 0.06f),
+        [AudioCue.BurningStep] = new(0.05f, 3, 0.07f),
+        [AudioCue.DevourerStep] = new(0.12f, 2, 0.04f),
         [AudioCue.UiMove] = new(0.03f, 2, 0.03f),
         [AudioCue.UiBack] = new(0.05f, 1, 0.02f),
         [AudioCue.UiOpen] = new(0.15f, 1),
@@ -239,6 +245,9 @@ public sealed class AudioDirector : IDisposable
             Add(content, AudioCue.EndingReveal, "Audio/Sfx/ending_reveal", 147f, 0.9f, 0.3f, 0.015f, rising: true);
             AddVariants(content, AudioCue.Footstep, "Audio/Sfx/footstep_stone", 4, 90f, 0.08f, 0.2f, 0.6f);
             AddVariants(content, AudioCue.FootstepWood, "Audio/Sfx/footstep_wood", 4, 120f, 0.09f, 0.2f, 0.5f);
+            AddVariants(content, AudioCue.HollowStep, "Audio/Sfx/step_hollow", 4, 70f, 0.12f, 0.15f, 0.7f);
+            AddVariants(content, AudioCue.BurningStep, "Audio/Sfx/step_burning", 4, 180f, 0.06f, 0.15f, 0.8f);
+            AddVariants(content, AudioCue.DevourerStep, "Audio/Sfx/step_devourer", 4, 45f, 0.2f, 0.25f, 0.5f);
             Add(content, AudioCue.UiMove, "Audio/Sfx/ui_move", 1568f, 0.05f, 0.15f, 0.02f);
             Add(content, AudioCue.UiBack, "Audio/Sfx/ui_back", 1046f, 0.06f, 0.15f, 0.02f);
             Add(content, AudioCue.UiOpen, "Audio/Sfx/ui_open", 600f, 0.2f, 0.15f, 0.2f, rising: true);
@@ -412,7 +421,10 @@ public sealed class AudioDirector : IDisposable
         ApplyMix();
     }
 
-    public void Play(AudioCue cue, float volume = 1f, float pitch = 0f)
+    public void Play(AudioCue cue, float volume = 1f, float pitch = 0f) => Play(cue, volume, pitch, 0f);
+
+    /// <summary>Plays a cue placed left or right of the listener (<paramref name="pan"/> −1 … 1).</summary>
+    public void Play(AudioCue cue, float volume, float pitch, float pan)
     {
         if (!_available || !_sounds.TryGetValue(cue, out SoundEffect sound))
         {
@@ -444,7 +456,7 @@ public sealed class AudioDirector : IDisposable
             instance = sound.CreateInstance();
             instance.Volume = Math.Clamp(volume, 0f, 1f);
             instance.Pitch = Math.Clamp(pitch + NextSignedFloat() * policy.PitchVariation, -1f, 1f);
-            instance.Pan = 0f;
+            instance.Pan = Math.Clamp(pan, -1f, 1f);
             instance.Play();
             instances.Add(instance);
             _cooldowns[cue] = policy.Cooldown;

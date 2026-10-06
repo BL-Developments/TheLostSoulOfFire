@@ -47,6 +47,9 @@ SFX_DURATIONS = {
 AUTHORED_SFX_DURATIONS = {
     **{f"footstep_stone_{index}.wav": 0.30 for index in range(1, 5)},
     **{f"footstep_wood_{index}.wav": 0.34 for index in range(1, 5)},
+    **{f"step_hollow_{index}.wav": 0.42 for index in range(1, 5)},
+    **{f"step_burning_{index}.wav": 0.26 for index in range(1, 5)},
+    **{f"step_devourer_{index}.wav": 0.7 for index in range(1, 5)},
     "ui_move.wav": 0.18,
     "ui_back.wav": 0.20,
     "ui_open.wav": 0.45,
