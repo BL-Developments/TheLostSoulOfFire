@@ -116,7 +116,8 @@ mit jedem Meilenstein aktualisiert.
 - Nachgezogen im zweiten Zyklus: Figuren setzen sich nach Aktionen weich (0,1 s), Nachbilder
   zeigen die echte Pose, Arena-Dunst und -Rauch weich statt Pixelformen, Gegner- und
   Treffertöne aus ihrer Richtung, nahtlose Atmosphäre der Überfahrt, Tod im Prolog wie in der
-  Arena inszeniert.
+  Arena inszeniert, Schritte von Spieler und Gegnern auf den gezeichneten Fußaufsätzen
+  (protokolliert: Phase 0,26 und 0,77 bei Aufsätzen auf 0,25 und 0,75).
 
 **Geprüft:** 257 Unit-Tests; Rundgang über 17 Stationen (rund 440 Aufnahmen, Schlüsselbilder und
 Bildserien gesichtet; er schlägt fehl, sobald irgendwo ein Platzhalter gezeichnet wird – keiner
