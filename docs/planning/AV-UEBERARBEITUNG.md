@@ -334,6 +334,11 @@ Rahmen wie oben (nur Darstellung und Ton).
   Kehle, Drone, Seelenchor. Pegel unter dem Bett (etwa −9 bis −2 LU, wie die Schritte).
   Rundgang protokolliert `presence Hollow=0.10@+0.36 Burning=0.28@-0.09 Devourer=0.08@+0.56`.
 
+- Resonanz: Während der 10 s brennt die eigene Death Flame hörbar (Rezept `resonance-rumble`:
+  tiefes Grollen mit langsamen Schüben, Herzschlag 60 bpm, weiche Funken; CLAP „deep rumbling
+  fire“ 0,78, keine Sirene), blendet in 0,6 s ein und 1,2 s aus; Rundgang aktiviert die Resonanz
+  jetzt wirklich (R) und protokolliert `resonance=0.40`.
+
 **Befunde, offen (nach Wirkung):**
 1. Sprache: Erzähltexte englisch, HUD deutsch (Inhaltsfrage, nicht ohne Owner ändern).
 

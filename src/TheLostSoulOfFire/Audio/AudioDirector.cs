@@ -284,6 +284,10 @@ public sealed class AudioDirector : IDisposable
     private readonly Dictionary<EnemyPresence, SoundEffect?> _presenceSounds = [];
     private readonly Dictionary<EnemyPresence, SoundEffectInstance> _presence = [];
     private readonly Dictionary<EnemyPresence, float> _presenceLevel = [];
+    private SoundEffect? _resonanceSound;
+    private SoundEffectInstance? _resonance;
+    private float _resonanceLevel;
+    private const float ResonanceRumbleVolume = 0.4f;
     private SoundEffect? _lifeFlameSound;
     private SoundEffectInstance? _lifeFlame;
     private const float LifeFlameVolume = 0.44f;
@@ -316,7 +320,8 @@ public sealed class AudioDirector : IDisposable
 
     /// <summary>Diagnostics for the tour: the volume and pan of each presence loop that plays.</summary>
     public string DescribePresence() => string.Join(" ", _presence.Select(pair => string.Create(
-        System.Globalization.CultureInfo.InvariantCulture, $"{pair.Key}={pair.Value.Volume:0.00}@{pair.Value.Pan:+0.00;-0.00}")));
+        System.Globalization.CultureInfo.InvariantCulture, $"{pair.Key}={pair.Value.Volume:0.00}@{pair.Value.Pan:+0.00;-0.00}"))) +
+        string.Create(System.Globalization.CultureInfo.InvariantCulture, $" resonance={_resonance?.Volume ?? 0f:0.00}");
 
     /// <summary>Diagnostics for the tour: what plays now (song asset, Life Flame loop level).</summary>
     public string DescribeEnding() => string.Create(System.Globalization.CultureInfo.InvariantCulture,
@@ -712,7 +717,7 @@ public sealed class AudioDirector : IDisposable
                     else if (!paused && instance.State == SoundState.Paused) instance.Resume();
                 }
             }
-            foreach (SoundEffectInstance tail in _hallInstances.Concat(_presence.Values))
+            foreach (SoundEffectInstance tail in _hallInstances.Concat(_presence.Values).Concat(_resonance is null ? [] : [_resonance]))
             {
                 if (paused && tail.State == SoundState.Playing) tail.Pause();
                 else if (!paused && tail.State == SoundState.Paused) tail.Resume();
@@ -820,9 +825,53 @@ public sealed class AudioDirector : IDisposable
         }
     }
 
+    /// <summary>
+    /// While Resonance burns (16_AUDIO_DIRECTION: a subtle flame rumble, never a siren), the
+    /// player's own Death Flame is heard: it swells in with the activation and dies away after.
+    /// </summary>
+    public void SetResonanceRumble(bool active, float deltaTime)
+    {
+        if (!_available || (!active && _resonance is null))
+        {
+            return;
+        }
+
+        _resonanceLevel = active
+            ? MathF.Min(1f, _resonanceLevel + deltaTime / 0.6f)
+            : MathF.Max(0f, _resonanceLevel - deltaTime / 1.2f);
+        try
+        {
+            if (_resonanceLevel <= 0.001f)
+            {
+                _resonance?.Stop();
+                _resonance?.Dispose();
+                _resonance = null;
+                return;
+            }
+            if (_resonance is null)
+            {
+                _resonanceSound ??= _content.Load<SoundEffect>("Audio/Sfx/resonance_rumble");
+                _resonance = _resonanceSound.CreateInstance();
+                _resonance.IsLooped = true;
+                _resonance.Volume = 0f;
+                _resonance.Play();
+                if (_paused) _resonance.Pause();
+            }
+            _resonance.Volume = Math.Clamp(ResonanceRumbleVolume * _resonanceLevel * (1f - 0.4f * _focus), 0f, 1f);
+        }
+        catch (ContentLoadException)
+        {
+            _resonance = null;
+        }
+    }
+
     /// <summary>Discards every running or paused effect, e.g. when a run is abandoned.</summary>
     public void StopEffects()
     {
+        _resonance?.Stop();
+        _resonance?.Dispose();
+        _resonance = null;
+        _resonanceLevel = 0f;
         foreach (SoundEffectInstance loop in _presence.Values)
         {
             try { loop.Stop(); loop.Dispose(); } catch { }

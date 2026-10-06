@@ -401,3 +401,33 @@ def presence_devourer(rng) -> np.ndarray:
     mix = dsp.reverb(mix, room, wet=0.18, loop=True).mean(axis=1)
     mix = dsp.circular(lambda x: dsp.highpass(x, 30), mix)
     return dsp.normalise_loudness(_seamless(mix), -25.0, peak_ceiling_db=-5.0)
+
+
+@recipe("resonance-rumble", "Resonanz: die eigene Death Flame brennt im Körper, tiefes ruhiges Grollen mit langsamen Schüben und einem leisen Herzschlag; Punktquelle (mono), nahtlos", loop=True)
+def resonance_rumble(rng) -> np.ndarray:
+    seconds = 4.0
+    n = dsp.seconds(seconds)
+    t = dsp.time_axis(n)
+    # A deep, steady flame: low band noise, surging slowly (two surges per loop).
+    body = dsp.circular(lambda x: dsp.bandpass(x, 40, 260), dsp.brown(n, rng))
+    surge = 0.7 + 0.3 * (0.5 - 0.5 * np.cos(2 * np.pi * t / (seconds / 2)))
+    body = body / (np.std(body) + 1e-9) * surge
+    # Its breath: a soft, high-ish shimmer of the flame tongues (violet, not fire-orange: no crackle).
+    shimmer = dsp.circular(lambda x: dsp.bandpass(x, 1800, 5200), dsp.pink(n, rng))
+    shimmer = shimmer / (np.std(shimmer) + 1e-9) * (0.4 + 0.6 * dsp.smooth_loop(n, 1.5, rng)) * 0.06
+    # The core's heartbeat under it, 60 bpm, felt more than heard.
+    beat = np.zeros(n)
+    for k in range(int(seconds)):
+        for offset, gain in ((0.0, 1.0), (0.24, 0.6)):
+            at = dsp.seconds(k + offset)
+            m = dsp.seconds(0.18)
+            bt = dsp.time_axis(m)
+            thump = np.sin(2 * np.pi * (52 - 14 * bt / 0.18) * bt) * np.exp(-bt / 0.05) * gain
+            dsp.place(beat, thump, at)
+    # A few soft sparks: it is a flame, not weather.
+    sparks = np.zeros(n)
+    for _ in range(int(seconds * 3)):
+        dsp.place(sparks, _pop(rng, False), int(rng.integers(0, n)), rng.uniform(0.04, 0.12))
+    mix = body * 0.3 + shimmer + beat * 0.6 + sparks
+    mix = dsp.circular(lambda x: dsp.highpass(x, 28), mix)
+    return dsp.normalise_loudness(_seamless(mix), -25.0, peak_ceiling_db=-4.0)

@@ -509,6 +509,9 @@ internal sealed class TourVisualTest
         });
         Do("resonance", () => _input.InjectKeyPress(Keys.F5), 0.3f);
         Shot("resonance_ready", minWait: 0.3f);
+        Do("resonance_activate", () => _input.InjectKeyPress(Keys.R), 1.4f);
+        Shot("resonance_active");
+        Do("resonance_audio", () => Console.WriteLine($"TOUR_AUDIO station=arena_player {_world.AutomatedAudio.DescribePresence()}"));
     }
 
     private void BuildBurning()

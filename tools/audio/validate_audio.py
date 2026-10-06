@@ -135,12 +135,14 @@ AUTHORED_SFX_DURATIONS = {
     "presence_burning.wav": 5.000,
     "presence_hollow.wav": 6.000,
     "presence_devourer.wav": 7.000,
+    # The player's own Death Flame burning during Resonance (recipes/ambiences.py), looped.
+    "resonance_rumble.wav": 4.000,
     # The Life Flame's fire after the last wave (tools/audio/recipes/ambiences.py), looped.
     "life_flame_loop.wav": 9.0,
 }
 
 #: Looping point sources: mono (the game pans them) and seamless like the beds.
-POINT_LOOPS = {"life_flame_loop.wav", "presence_burning.wav", "presence_hollow.wav", "presence_devourer.wav"}
+POINT_LOOPS = {"life_flame_loop.wav", "presence_burning.wav", "presence_hollow.wav", "presence_devourer.wav", "resonance_rumble.wav"}
 
 #: Ambience beds and music per zone (AudioDirector.AmbienceAssets / MusicAssets).
 ZONE_AMBIENCES = ["shore_ambience.wav", "hub_ambience.wav", "harbour_ambience.wav", "causeway_ambience.wav",

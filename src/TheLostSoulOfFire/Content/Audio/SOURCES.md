@@ -290,3 +290,11 @@ Rezepte `presence-burning`, `presence-hollow`, `presence-devourer` in `tools/aud
 | `Audio/Sfx/presence_burning.wav` | presence-burning Seed 1 | 5.00 s, 1 Kanal/Kanäle, -24.0 LUFS, Spitze -4.8 dBFS |
 | `Audio/Sfx/presence_hollow.wav` | presence-hollow Seed 1 | 6.00 s, 1 Kanal/Kanäle, -26.0 LUFS, Spitze -8.5 dBFS |
 | `Audio/Sfx/presence_devourer.wav` | presence-devourer Seed 1 | 7.00 s, 1 Kanal/Kanäle, -25.0 LUFS, Spitze -8.0 dBFS |
+
+## Resonanz (Durchgang 3, 06.10.2026)
+
+Rezept `resonance-rumble`: die eigene Death Flame während der Resonanz (16_AUDIO_DIRECTION: dezentes Flammengrollen, keine Sirene). Tiefes Grollen mit zwei langsamen Schüben, leiser Herzschlag (60 bpm), wenige weiche Funken. CLAP „deep rumbling fire“ 0,78, „alarm siren“ 0,002. Verworfen: schnelles Flackern im Pegel (CLAP: „wind“ 0,6).
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/resonance_rumble.wav` | resonance-rumble Seed 2 | 4.00 s, 1 Kanal/Kanäle, -25.0 LUFS, Spitze -9.4 dBFS |

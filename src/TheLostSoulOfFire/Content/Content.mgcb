@@ -10629,3 +10629,8 @@
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /build:Audio/Sfx/presence_devourer.wav
+
+#begin Audio/Sfx/resonance_rumble.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/resonance_rumble.wav

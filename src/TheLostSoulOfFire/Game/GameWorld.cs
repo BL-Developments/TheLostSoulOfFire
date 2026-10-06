@@ -200,6 +200,7 @@ public sealed partial class GameWorld : IDisposable
         _audio.SetLifeFlame(ending ? _presentation.GetLifeFlameAlpha() * _presentation.GetLifeFlameKindle() : 0f,
             PanOf(_presentation.GetLifeFlamePosition()) * 0.7f);
         UpdateEnemyPresence(deltaTime);
+        _audio.SetResonanceRumble(IsCombatPhase && _player.ResonanceActive && !_player.IsDead, deltaTime);
         if (_devMenu.IsOpen)
         {
             _audio.Update(deltaTime);
