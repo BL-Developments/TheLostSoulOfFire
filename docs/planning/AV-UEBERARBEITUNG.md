@@ -28,13 +28,13 @@ Bodennebel und Normal-Map-Licht der Death Flame.
 
 | # | Bereich | Ist (Rundgang 06.10.) | Ziel | Status |
 | --- | --- | --- | --- | --- |
-| A1 | Titel | Arena-Boden als Hintergrund, Pixel-Schrift | eigenes Titelbild mit Landmarke, Logo-Typografie, ruhige Bewegung | ☐ |
+| A1 | Titel | Arena-Boden als Hintergrund, Pixel-Schrift | 3D-Schlüsselbild mit der Spielfigur am Ufer, Cinzel-Titel, driftendes Bild, atmende Flamme, Nebel; Menü rechts | ☑ |
 | A2 | Prolog I Ufer | gemalt (Stil B), wenig Tiefe am Wasser | Wasserkante, Gischt, Dammreste, Tiefe | ◐ |
-| A3 | Prolog II Suchgang | flache Platzhalter-Formen | Hafenviertel: Lagerhausmauern, Viaduktbögen, Kofferzone, Signalmast mit Suchfeuer | ☐ |
-| A4 | Prolog III Damm | flache Platzhalter-Formen | gebrochener Damm mit Schienen, Anleger mit Skiff | ☐ |
-| A5 | Prolog Überfahrt (Deck) | flache Platzhalter-Formen | Skiff-Deck mit Reling; versunkene Giebel und Masten ziehen vorbei | ☐ |
-| A6 | Schwelle | flache Platzhalter-Formen | Warden-Architektur, monumentale Schwelle, Tür in Menschengröße, Stadtsilhouette | ☐ |
-| A7 | Hub „Ashen Antechamber“ | flache Platzhalter-Formen | Vorhalle des Seelenofens: sieben Türen, Sockel, Asche, Warden-Material | ☐ |
+| A3 | Prolog II Suchgang | flache Platzhalter-Formen | 3D-Hafenkai: nasses Pflaster, Gleise, Warden-Bohlen, Stege, versunkene Dächer, Koffer, Warden-Marken, Signalmast mit Suchfeuer | ☑ |
+| A4 | Prolog III Damm | flache Platzhalter-Formen | 3D-Gleisdamm mit Bruchkanten, Signalträger, Anleger und vertäutem Skiff | ☑ |
+| A5 | Prolog Überfahrt (Deck) | flache Platzhalter-Formen | stehendes Deck, scrollendes Meer, zwei Parallax-Bänder der versunkenen Stadt, Reling als Vordergrund | ☑ |
+| A6 | Schwelle | flache Platzhalter-Formen | Basaltvorplatz, Warden-Mauer mit Strebepfeilern, Torhaus als Prop (man geht wirklich hindurch), Spalt mit Warden-Flamme, offener Ring | ☑ |
+| A7 | Hub „Ashen Antechamber“ | flache Platzhalter-Formen | 3D-Vorhalle aus Einzelsteinen, sieben Türen (gleitende Flügel, Siegel), Pilaster mit Warden-Flammen, offener Ring, Feuerschalen | ☑ |
 | A8 | Arena (Gießhalle) | gemalt (Stil B) | Tiefe am Nordrand, Rosette und Ofen, Vordergrundträger | ◐ |
 | A9 | Türübergang, Abschluss, Ende (Life Flame) | einfache Überblendung | gestaltete Übergänge | ☐ |
 
@@ -42,10 +42,10 @@ Bodennebel und Normal-Map-Licht der Death Flame.
 
 | # | Figur | Ist | Ziel | Status |
 | --- | --- | --- | --- | --- |
-| B1 | Spieler | idle, move, swing1–3, aim gerendert | zusätzlich cannon_draw, cannon_fire (Rückstoß), dash, hit, death | ◐ |
-| B2 | Hollow | idle, move, swipe gerendert | zusätzlich Treffer, Taumeln, Erholen, Tod mit Maskenbruch | ☐ |
-| B3 | Burning | Ludo-Sprite | gerenderte Figur, alle Zustände (Anlauf, Ankündigung, Sturm, Erholung, Detonation) | ☐ |
-| B4 | Devourer | Ludo-Sprite | gerenderte Figur, alle Zustände (Gang, Schlag, Verschlingen, Taumeln, Tod) | ☐ |
+| B1 | Spieler | idle, move, swing1–3, aim gerendert | zusätzlich cannon_draw, cannon_fire (Rückstoß), dash, hit, death | ☑ |
+| B2 | Hollow | idle, move, swipe gerendert | zusätzlich Treffer, Taumeln, Erholen, Tod mit fallender Maske | ☑ |
+| B3 | Burning | Ludo-Sprite | gerenderte Figur: Ruhe, Pirschen, Aufflammen, Anlauf, Erholung, Treffer, Tod | ☑ |
+| B4 | Devourer | Ludo-Sprite | gerenderte Figur mit Rumpföffnung: Ruhe, Gang, Schlag, Erholung, Verschlingen, Taumeln, Treffer, Tod | ☑ |
 | B5 | Seelen und Pickups | Formen und Glühen | gemalte Seelenflamme, Release | ☐ |
 | B6 | Trainingspuppe (Sandbox) | Platzhalter | gerendertes Prop | ☐ |
 
@@ -60,7 +60,7 @@ Ludo-Sprites, teils Pixelformen).
 
 | # | Element | Status |
 | --- | --- | --- |
-| D1 | Schrift: Pixel-Schrift durch gesetzte Schriften ersetzen (Titel und Fließtext, OFL) | ☐ |
+| D1 | Schrift: Pixel-Schrift durch gesetzte Schriften ersetzen (Cinzel, Alegreya Sans; OFL) | ☑ |
 | D2 | HUD: Leben, Dash, Resonanz, Fähigkeitenkarten, Wellenanzeige, Währungen | ☐ |
 | D3 | Titel- und Pausenmenü, Einstellungen | ☐ |
 | D4 | Charaktermenü (Charakter, Karte, Skills, Fähigkeiten) | ☐ |
@@ -74,12 +74,12 @@ Außerhalb der Arena läuft nur die Arena-Atmosphäre leise; Musik gibt es nur i
 
 | # | Thema | Status |
 | --- | --- | --- |
-| E1 | Musik: Titel, Ufer und Prolog, Überfahrt, Hub, Ende; Übergänge zwischen den Bereichen | ☐ |
-| E2 | Atmosphären je Bereich: Ufer (Wasser, Wind, Fallblätter), Hafen, Damm, Deck, Schwelle, Hub | ☐ |
-| E3 | Schritte und Kleidung (Spieler, Hollow, Devourer) | ☐ |
-| E4 | UI-Töne: Navigation, Bestätigen, Zurück, Menü öffnen und schließen, Reiter, Ausrüsten | ☐ |
-| E5 | Fehlende Spielsignale: Kiste, Währung, Fähigkeiten (6), Türen, Hollow-Treffer, Taumeln, Erscheinen | ☐ |
-| E6 | Mix: Lautheit, Frequenzverteilung, Ducking, Stille | ☐ |
+| E1 | Musik: Titel, Ufer/Hafen, Damm, Überfahrt, Schwelle, Hub; Überblendung zwischen Zonen | ☑ (Hörabnahme durch Owner offen) |
+| E2 | Atmosphären je Bereich: Ufer, Hafen, Damm, Deck, Schwelle, Hub | ☑ (Hörabnahme durch Owner offen) |
+| E3 | Schritte des Spielers (Stein, Planken; Varianten); Gegner-Schritte offen | ◐ |
+| E4 | UI-Töne: Navigation, Zurück, Menü öffnen und schließen, Reiter, Werte | ☑ |
+| E5 | Fehlende Spielsignale: Kiste, Währung, Fähigkeiten (6), Hub-Tür | ☑ |
+| E6 | Mix: Treffer über Schwüngen, Schaden und Gefahrensignale angehoben, Zonenpegel | ◐ |
 
 Werkzeuge: Ludo-Bank (Ableitungen erlaubt), lokale Synthese (numpy/scipy), ACE-Step v1
 (Apache-2.0) für Musik, CLAP (Apache-2.0) und Spektralanalyse als Hörprobe.
