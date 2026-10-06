@@ -252,3 +252,21 @@ Abgeleitet mit `tools/audio/derive_variants.py` (Tonhöhe ±4,5 %, Klangneigung,
 | `Audio/Sfx/player_hit_v3.wav` | Ableitung von player_hit.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.21 s, 1 Kanal, -19.5 LUFS, Spitze -3.0 dBFS |
 | `Audio/Sfx/currency_gain_v2.wav` | Ableitung von currency_gain.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.48 s, 1 Kanal, -27.0 LUFS, Spitze -14.4 dBFS |
 | `Audio/Sfx/currency_gain_v3.wav` | Ableitung von currency_gain.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.52 s, 1 Kanal, -27.0 LUFS, Spitze -15.4 dBFS |
+
+## Hallfahnen (Durchgang 3, 06.10.2026)
+
+Mit `tools/audio/hall_tails.py`: der trockene Take gefaltet mit der Impulsantwort seiner Halle, nur der Hall, auf −8 LU unter dem Take gesetzt. Das Spiel spielt ihn nur in dieser Halle mit dem Ton zusammen (Anteil 0,3–0,4, `AudioDirector.HallSends`). CLAP: Trocken + Fahne bei 0,35 wird als „hit in a large reverberant stone hall“ eingeordnet (0,90–0,94, trocken 0,1–0,6), eine Folge von fünf Treffern im Abstand von 0,25 s nicht als „washy reverb“ (0,05).
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/scythe_hit_hall.wav` | Hallfahne von scythe_hit.wav (Gießhalle, RT60 2.4 s) | 2.51 s, 1 Kanal, -24.9 LUFS, Spitze -9.1 dBFS |
+| `Audio/Sfx/core_hit_hall.wav` | Hallfahne von core_hit.wav (Gießhalle, RT60 2.4 s) | 2.44 s, 1 Kanal, -20.9 LUFS, Spitze -4.4 dBFS |
+| `Audio/Sfx/cannon_fire_hall.wav` | Hallfahne von cannon_fire.wav (Gießhalle, RT60 2.4 s) | 2.71 s, 1 Kanal, -23.3 LUFS, Spitze -5.0 dBFS |
+| `Audio/Sfx/cannon_impact_hall.wav` | Hallfahne von cannon_impact.wav (Gießhalle, RT60 2.4 s) | 2.62 s, 1 Kanal, -22.0 LUFS, Spitze -3.7 dBFS |
+| `Audio/Sfx/burning_detonation_hall.wav` | Hallfahne von burning_detonation.wav (Gießhalle, RT60 2.4 s) | 2.89 s, 1 Kanal, -24.1 LUFS, Spitze -7.0 dBFS |
+| `Audio/Sfx/devourer_slam_hall.wav` | Hallfahne von devourer_slam.wav (Gießhalle, RT60 2.4 s) | 2.71 s, 1 Kanal, -21.0 LUFS, Spitze -3.5 dBFS |
+| `Audio/Sfx/enemy_death_hall.wav` | Hallfahne von enemy_death.wav (Gießhalle, RT60 2.4 s) | 2.88 s, 1 Kanal, -22.3 LUFS, Spitze -4.6 dBFS |
+| `Audio/Sfx/soul_cleave_hall.wav` | Hallfahne von soul_cleave.wav (Gießhalle, RT60 2.4 s) | 2.64 s, 1 Kanal, -26.2 LUFS, Spitze -6.1 dBFS |
+| `Audio/Sfx/player_hit_hall.wav` | Hallfahne von player_hit.wav (Gießhalle, RT60 2.4 s) | 2.51 s, 1 Kanal, -27.5 LUFS, Spitze -11.8 dBFS |
+| `Audio/Sfx/wave_start_hall.wav` | Hallfahne von wave_start.wav (Gießhalle, RT60 2.4 s) | 2.96 s, 1 Kanal, -28.3 LUFS, Spitze -14.6 dBFS |
+| `Audio/Sfx/footstep_stone_1_hall.wav` | Hallfahne von footstep_stone_1.wav (Vorhalle, RT60 3.2 s) | 3.26 s, 1 Kanal, -34.0 LUFS, Spitze -15.6 dBFS |

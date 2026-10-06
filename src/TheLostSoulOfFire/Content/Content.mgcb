@@ -9968,3 +9968,58 @@
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /build:Audio/Sfx/currency_gain_v3.wav
+
+#begin Audio/Sfx/scythe_hit_hall.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/scythe_hit_hall.wav
+
+#begin Audio/Sfx/core_hit_hall.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/core_hit_hall.wav
+
+#begin Audio/Sfx/cannon_fire_hall.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/cannon_fire_hall.wav
+
+#begin Audio/Sfx/cannon_impact_hall.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/cannon_impact_hall.wav
+
+#begin Audio/Sfx/burning_detonation_hall.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/burning_detonation_hall.wav
+
+#begin Audio/Sfx/devourer_slam_hall.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/devourer_slam_hall.wav
+
+#begin Audio/Sfx/enemy_death_hall.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/enemy_death_hall.wav
+
+#begin Audio/Sfx/soul_cleave_hall.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/soul_cleave_hall.wav
+
+#begin Audio/Sfx/player_hit_hall.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/player_hit_hall.wav
+
+#begin Audio/Sfx/wave_start_hall.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/wave_start_hall.wav
+
+#begin Audio/Sfx/footstep_stone_1_hall.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/footstep_stone_1_hall.wav

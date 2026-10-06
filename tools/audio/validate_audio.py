@@ -115,6 +115,18 @@ AUTHORED_SFX_DURATIONS = {
     "player_hit_v3.wav": 0.209,
     "currency_gain_v2.wav": 0.478,
     "currency_gain_v3.wav": 0.524,
+    # Hall tails (tools/audio/hall_tails.py): wet-only reverberation of the foundry and the antechamber.
+    "scythe_hit_hall.wav": 2.507,
+    "core_hit_hall.wav": 2.443,
+    "cannon_fire_hall.wav": 2.711,
+    "cannon_impact_hall.wav": 2.618,
+    "burning_detonation_hall.wav": 2.888,
+    "devourer_slam_hall.wav": 2.706,
+    "enemy_death_hall.wav": 2.878,
+    "soul_cleave_hall.wav": 2.635,
+    "player_hit_hall.wav": 2.511,
+    "wave_start_hall.wav": 2.959,
+    "footstep_stone_1_hall.wav": 3.260,
     # The Life Flame's fire after the last wave (tools/audio/recipes/ambiences.py), looped.
     "life_flame_loop.wav": 9.0,
 }

@@ -182,6 +182,31 @@ public sealed class AudioDirector : IDisposable
         AudioCue.EnemyEmerge, AudioCue.SoulRelease
     ];
 
+    /// <summary>
+    /// Hall tails (tools/audio/hall_tails.py): the reverberation of the hall a cue sounds in,
+    /// rendered offline, played with the cue only in that hall at the given send. The foundry of
+    /// the arena gives its blows and deaths their space; in the stone antechamber the player's
+    /// steps carry. Everywhere else (the open-air prologue) the cues stay dry.
+    /// </summary>
+    private static readonly (AudioCue Cue, string Asset, AudioZone Hall, float Send)[] HallSends =
+    [
+        (AudioCue.ScytheHit, "Audio/Sfx/scythe_hit_hall", AudioZone.Arena, 0.34f),
+        (AudioCue.CoreHit, "Audio/Sfx/core_hit_hall", AudioZone.Arena, 0.3f),
+        (AudioCue.CannonFire, "Audio/Sfx/cannon_fire_hall", AudioZone.Arena, 0.36f),
+        (AudioCue.CannonImpact, "Audio/Sfx/cannon_impact_hall", AudioZone.Arena, 0.34f),
+        (AudioCue.BurningDetonation, "Audio/Sfx/burning_detonation_hall", AudioZone.Arena, 0.4f),
+        (AudioCue.DevourerSlam, "Audio/Sfx/devourer_slam_hall", AudioZone.Arena, 0.4f),
+        (AudioCue.EnemyDeath, "Audio/Sfx/enemy_death_hall", AudioZone.Arena, 0.34f),
+        (AudioCue.SoulCleave, "Audio/Sfx/soul_cleave_hall", AudioZone.Arena, 0.36f),
+        (AudioCue.PlayerHit, "Audio/Sfx/player_hit_hall", AudioZone.Arena, 0.3f),
+        (AudioCue.WaveStart, "Audio/Sfx/wave_start_hall", AudioZone.Arena, 0.4f),
+        (AudioCue.Footstep, "Audio/Sfx/footstep_stone_1_hall", AudioZone.Hub, 0.3f)
+    ];
+
+    private const int MaximumHallTails = 6;
+    private readonly Dictionary<AudioCue, (SoundEffect Tail, AudioZone Hall, float Send)> _hallTails = [];
+    private readonly List<SoundEffectInstance> _hallInstances = [];
+
     /// <summary>Extra takes of a cue (e.g. footsteps); Play picks one at random so repeats never match exactly.</summary>
     private readonly Dictionary<AudioCue, List<SoundEffect>> _variants = [];
 
@@ -342,6 +367,16 @@ public sealed class AudioDirector : IDisposable
             AddVariants(content, AudioCue.DeathHollow, "Audio/Sfx/death_hollow", 2, 2200f, 0.6f, 0.2f, 0.4f);
             AddVariants(content, AudioCue.DeathBurning, "Audio/Sfx/death_burning", 2, 120f, 0.7f, 0.2f, 0.7f);
             AddVariants(content, AudioCue.DeathDevourer, "Audio/Sfx/death_devourer", 2, 60f, 1.2f, 0.3f, 0.4f);
+            foreach ((AudioCue cue, string asset, AudioZone hall, float send) in HallSends)
+            {
+                try
+                {
+                    _hallTails[cue] = (content.Load<SoundEffect>(asset), hall, send);
+                }
+                catch (ContentLoadException)
+                {
+                }
+            }
 
             _ambienceSound = LoadOrCreateFallback(content, "Audio/Ambience/arena_ambience", 43f, 2.4f, 0.2f, 0.16f, false);
             _beds[AmbienceAssets[AudioZone.Arena]] = _ambienceSound;
@@ -567,6 +602,7 @@ public sealed class AudioDirector : IDisposable
             instance.Play();
             CuePlayed?.Invoke(cue);
             instances.Add(instance);
+            PlayHallTail(cue, instance.Volume, instance.Pitch, pan);
             _cooldowns[cue] = policy.Cooldown;
             if (policy.Danger)
             {
@@ -580,6 +616,43 @@ public sealed class AudioDirector : IDisposable
             _available = false;
         }
     }
+
+    /// <summary>
+    /// The hall answers a cue: its tail, at the cue's level times the send, at the same pitch and
+    /// less to one side (a hall's reverberation comes from all around). In a crowded moment the
+    /// tails already sounding carry the room, and a new one is left out.
+    /// </summary>
+    private void PlayHallTail(AudioCue cue, float volume, float pitch, float pan)
+    {
+        if (!_hallTails.TryGetValue(cue, out (SoundEffect Tail, AudioZone Hall, float Send) hall) || hall.Hall != _zone)
+        {
+            return;
+        }
+
+        for (int index = _hallInstances.Count - 1; index >= 0; index--)
+        {
+            if (_hallInstances[index].State == SoundState.Stopped)
+            {
+                _hallInstances[index].Dispose();
+                _hallInstances.RemoveAt(index);
+            }
+        }
+        if (_hallInstances.Count >= MaximumHallTails)
+        {
+            return;
+        }
+
+        SoundEffectInstance tail = hall.Tail.CreateInstance();
+        tail.Volume = Math.Clamp(volume * hall.Send, 0f, 1f);
+        tail.Pitch = pitch;
+        tail.Pan = Math.Clamp(pan * 0.4f, -1f, 1f);
+        tail.Play();
+        _hallInstances.Add(tail);
+        HallTailsPlayed[_zone] = HallTailsPlayed.GetValueOrDefault(_zone) + 1;
+    }
+
+    /// <summary>Diagnostics for the tour: how many hall tails each zone has played.</summary>
+    public Dictionary<AudioZone, int> HallTailsPlayed { get; } = [];
 
     /// <summary>
     /// Pause menu mix: running effects are paused (and resumed later), music and
@@ -602,6 +675,11 @@ public sealed class AudioDirector : IDisposable
                     if (paused && instance.State == SoundState.Playing) instance.Pause();
                     else if (!paused && instance.State == SoundState.Paused) instance.Resume();
                 }
+            }
+            foreach (SoundEffectInstance tail in _hallInstances)
+            {
+                if (paused && tail.State == SoundState.Playing) tail.Pause();
+                else if (!paused && tail.State == SoundState.Paused) tail.Resume();
             }
             if (paused && _lifeFlame?.State == SoundState.Playing) _lifeFlame.Pause();
             else if (!paused && _lifeFlame?.State == SoundState.Paused) _lifeFlame.Resume();
@@ -655,6 +733,11 @@ public sealed class AudioDirector : IDisposable
     public void StopEffects()
     {
         SetLifeFlame(0f, 0f);
+        foreach (SoundEffectInstance tail in _hallInstances)
+        {
+            try { tail.Stop(); tail.Dispose(); } catch { }
+        }
+        _hallInstances.Clear();
         foreach (List<SoundEffectInstance> instances in _activeInstances.Values)
         {
             foreach (SoundEffectInstance instance in instances)

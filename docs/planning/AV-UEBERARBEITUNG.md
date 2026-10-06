@@ -270,6 +270,14 @@ Rahmen wie oben (nur Darstellung und Ton).
   behält bewusst `extension="EXTEND"` (ein ruhiger Ton je Stein); gespiegelt oder mit einer
   Farbe je Stein aus der Fläche wurde es zu unruhig und dunkler (verworfen).
 
+- Raumklang: Alle Effekte klangen in der Gießhalle so trocken wie draußen. Jetzt vorgerechnete
+  Hallfahnen (`tools/audio/hall_tails.py`, Gießhalle RT60 2,4 s, Vorhalle 3,2 s), die nur in
+  ihrer Halle mit dem Ton spielen (`AudioDirector.HallSends`, Anteil 0,3–0,4, höchstens sechs
+  gleichzeitig): Treffer, Kanone, Detonation, Schlag, Tode, Seelenspaltung, Spielertreffer,
+  Wellenstart in der Arena; Schritte in der Vorhalle. Prolog im Freien bleibt trocken.
+  Rundgang zählt `TOUR_AUDIO hall_tails=Hub:2,Arena:12` (Prolog 0). CLAP: mit Fahne „large
+  reverberant stone hall“ 0,90–0,94, Trefferfolge nicht „washy“; Audiotests grün.
+
 **Befunde, offen (nach Wirkung):**
 1. Arena im Spielausschnitt: Boden gleichmäßig hell, wenig Lichtgefälle.
 2. Sprache: Erzähltexte englisch, HUD deutsch (Inhaltsfrage, nicht ohne Owner ändern).

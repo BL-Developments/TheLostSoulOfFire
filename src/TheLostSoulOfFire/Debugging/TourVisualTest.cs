@@ -230,6 +230,8 @@ internal sealed class TourVisualTest
                 ExitCode = 1;
                 return;
             }
+            Console.WriteLine("TOUR_AUDIO hall_tails=" + string.Join(",",
+                _world.AutomatedAudio.HallTailsPlayed.Select(pair => $"{pair.Key}:{pair.Value}")));
             Console.WriteLine($"TOUR_VISUAL_TEST_PASS captures={_captured} dir={_directory}");
             Finished = true;
             ExitCode = 0;
