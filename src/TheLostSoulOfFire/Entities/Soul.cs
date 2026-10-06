@@ -115,7 +115,8 @@ public sealed class Soul
         Texture2D pixel,
         Player player,
         bool soulSenseActive,
-        bool useSpriteArt)
+        bool useSpriteArt,
+        Texture2D? softSpot = null)
     {
         if (State is SoulState.Released or SoulState.Consumed)
         {
@@ -155,9 +156,52 @@ public sealed class Soul
         if (State == SoulState.Releasing)
         {
             Vector2 playerCore = player.Position + player.FacingDirection * 2f - (useSpriteArt ? new Vector2(0f, FigureHeights.Core) : Vector2.Zero);
-            WorldMarks.Beam(batch, pixel, playerCore, Position, 18f, GameBalance.DeathFlame * (0.42f + releaseProgress * 0.3f));
-            WorldMarks.Beam(batch, pixel, playerCore, Position, 7f, GameBalance.DeathFlameBright * (0.45f + releaseProgress * 0.4f));
+            if (softSpot is not null)
+            {
+                DrawReleaseStream(batch, softSpot, playerCore, releaseProgress);
+            }
+            else
+            {
+                WorldMarks.Beam(batch, pixel, playerCore, Position, 18f, GameBalance.DeathFlame * (0.42f + releaseProgress * 0.3f));
+                WorldMarks.Beam(batch, pixel, playerCore, Position, 7f, GameBalance.DeathFlameBright * (0.45f + releaseProgress * 0.4f));
+            }
             WorldMarks.Ring(batch, pixel, Position, 22f + releaseProgress * 18f, glow * (1f - releaseProgress) * 0.7f, false, 3f);
+        }
+    }
+
+    /// <summary>
+    /// The soul's Death Flame drawn to the player's core as a stream of light, not a line: soft
+    /// motes travelling along a gently bowed path, thickest near the soul and thinning toward the
+    /// core, each with a short fading tail. Presentation only.
+    /// </summary>
+    private void DrawReleaseStream(SpriteBatch batch, Texture2D softSpot, Vector2 core, float progress)
+    {
+        Vector2 from = Position;
+        Vector2 delta = core - from;
+        float length = delta.Length();
+        if (length < 4f)
+        {
+            return;
+        }
+
+        Vector2 side = new Vector2(-delta.Y, delta.X) / length;
+        float bow = MathF.Min(36f, length * 0.18f) * (_origin.X % 2f < 1f ? 1f : -1f);
+        Vector2 origin = new(softSpot.Width * 0.5f, softSpot.Height * 0.5f);
+        float strength = MathHelper.Clamp(progress * 3f, 0f, 1f) * (1f - MathHelper.Clamp((progress - 0.85f) / 0.15f, 0f, 1f));
+        const int motes = 9;
+        for (int index = 0; index < motes; index++)
+        {
+            float t = (_visualTime * 0.9f + index / (float)motes) % 1f;
+            for (int trail = 0; trail < 3; trail++)
+            {
+                float at = MathF.Max(0f, t - trail * 0.035f);
+                Vector2 point = from + delta * at + side * (MathF.Sin(at * MathF.PI) * bow + MathF.Sin(_visualTime * 6f + index) * 2.5f);
+                float size = MathHelper.Lerp(7f, 3f, at) * (1f - trail * 0.25f);
+                float alpha = strength * MathF.Sin(MathF.Max(0.05f, at) * MathF.PI * 0.9f + 0.3f) * (1f - trail * 0.35f);
+                Color color = Color.Lerp(GameBalance.DeathFlame, GameBalance.DeathFlameBright, at) * (0.55f * alpha);
+                color.A = 0; // additive light in the premultiplied blend
+                batch.Draw(softSpot, point, null, color, 0f, origin, size * 2f / softSpot.Width, SpriteEffects.None, 0f);
+            }
         }
     }
 

@@ -374,6 +374,10 @@ Rahmen wie oben (nur Darstellung und Ton).
   leiser (bis 0,3), und nur die erste einer Folge duckt die Musik (vorher pumpte sie bei jeder).
   Gleiches Abklingen für die Währungstöne.
 
+- Seelen einsammeln ohne Linien (Owner): statt gerader Strahlen von jeder Seele zum Kern ein
+  gebogener Strom aus weichen Lichtpunkten mit kurzen Schweifen, an der Seele dichter, zum Kern
+  dünner; blendet mit der Freigabe ein und aus.
+
 **Befunde, offen (nach Wirkung):**
 1. Sprache: Erzähltexte englisch, HUD deutsch (Inhaltsfrage, nicht ohne Owner ändern).
 
