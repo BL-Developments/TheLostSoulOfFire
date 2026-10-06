@@ -427,10 +427,10 @@
       "origin": [0.5, 0.5],
       "clips": {
         "default": {
-          "path": "Textures/Ending/life_flame_128",
+          "path": "Textures/Ending/life_flame",
           "frameSize": [128, 128],
-          "frames": 1,
-          "fps": 1,
+          "frames": 16,
+          "fps": 16,
           "loop": true
         }
       }

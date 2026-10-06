@@ -41,11 +41,22 @@ STOPS = [
 
 # ----------------------------------------------------------------------------- fields
 
-def ramp(heat: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+# The Life Flame (art/specs/ending.life-flame.md): ember red, warm orange, gold, a yellow-white core.
+LIFE_STOPS = [
+    (0.0, (90, 24, 10), 0.0),
+    (0.3, (150, 46, 14), 0.55),
+    (0.6, (255, 128, 40), 0.9),
+    (0.85, (255, 200, 110), 1.0),
+    (1.0, (255, 246, 214), 1.0),
+]
+
+
+def ramp(heat: np.ndarray, stops=None) -> tuple[np.ndarray, np.ndarray]:
+    stops = stops or STOPS
     h = np.clip(heat, 0.0, 1.0)
-    at = [s[0] for s in STOPS]
-    colour = np.stack([np.interp(h, at, [s[1][c] / 255 for s in STOPS]) for c in range(3)], axis=-1)
-    opacity = np.interp(h, at, [s[2] for s in STOPS])
+    at = [s[0] for s in stops]
+    colour = np.stack([np.interp(h, at, [s[1][c] / 255 for s in stops]) for c in range(3)], axis=-1)
+    opacity = np.interp(h, at, [s[2] for s in stops])
     return colour, opacity
 
 
@@ -97,12 +108,12 @@ class Frame:
         self.heat = np.where(density * heat > self.density * self.heat * 0.999, np.maximum(self.heat, heat * np.clip(density * 1.5, 0, 1)), self.heat)
         self.density = 1 - (1 - np.clip(self.density, 0, 1)) * (1 - np.clip(density, 0, 1))
 
-    def image(self, glow: float = 1.0, cover: float = 0.55, halo: float = 0.35) -> np.ndarray:
+    def image(self, glow: float = 1.0, cover: float = 0.55, halo: float = 0.35, stops=None) -> np.ndarray:
         if halo > 0:
             # A soft halo of low heat around everything bright: light spilling into the air.
             spill = blur(self.density * np.clip(self.heat, 0, 1), self.size * SS * 0.03)
             self.add(spill * halo * 1.6, np.full(spill.shape, 0.42))
-        colour, opacity = ramp(self.heat)
+        colour, opacity = ramp(self.heat, stops)
         light = np.clip(self.density * (0.35 + 0.85 * self.heat) * glow, 0, 1)
         rgb = colour * light[..., None]
         alpha = np.clip(self.density * opacity * cover, 0, 1)
@@ -428,6 +439,27 @@ def lost_soul(i: int, n: int, size: int) -> np.ndarray:
     return f.image(glow=1.05, halo=0.6)
 
 
+def life_flame(i: int, n: int, size: int) -> np.ndarray:
+    """The Life Flame at the end of the arena: soft, round, rising; warm where the Death Flame is
+    cold, calmer in its motion (seamless loop)."""
+    f = Frame(size)
+    noise = Noise(109, period=4)
+    phase = i / n * 4
+    base, tip = size * 0.22, -size * 0.36
+    length = base - tip
+    along = base - f.y
+    sway = (noise.fbm(f.y * 0.02 + 7.0, i / n * 4, 2) - 0.5) * size * 0.05 * np.clip(along / length, 0, 1) ** 1.4
+    flame, core = tongues(along, f.x + sway, length, size * 0.21, noise, phase, scale=0.06, bite=0.45, taper=0.5)
+    f.add(flame, np.clip(0.38 + 0.9 * core, 0.05, 1.2))
+    f.add(gauss(f.x ** 2 + ((f.y - base * 0.3) * 1.2) ** 2, size * 0.08) * 0.9, 1.2)
+    for k in range(5):
+        local = (i / n + k / 5) % 1.0
+        ex = math.sin(k * 1.7 + local * 3) * size * 0.12
+        ey = base * 0.1 - local * size * 0.7
+        f.add(gauss((f.x - ex) ** 2 + (f.y - ey) ** 2, 1.2) * math.sin(local * math.pi) * 0.9, 0.85)
+    return f.image(glow=1.15, halo=0.55, stops=LIFE_STOPS)
+
+
 #: effect -> (file stem, frame size, frames, builder)
 EFFECTS = {
     "core_hit": ("fx_core_hit", 128, 9, core_hit),
@@ -440,6 +472,7 @@ EFFECTS = {
     "dash_ignition": ("fx_dash_ignition", 128, 9, dash_ignition),
     "death_flame": ("fx_death_flame_loop", 128, 16, death_flame),
     "lost_soul": ("../Pickups/lost_soul", 128, 12, lost_soul),
+    "life_flame": ("../Ending/life_flame", 128, 16, life_flame),
 }
 
 

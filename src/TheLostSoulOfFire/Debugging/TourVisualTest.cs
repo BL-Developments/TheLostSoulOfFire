@@ -463,7 +463,7 @@ internal sealed class TourVisualTest
         Wait("combat", () => _world.LoopState == ArenaLoopState.Combat, 25f);
         Do("clear", () => _world.DefeatAutomatedEnemies(), 0.2f);
         Wait("complete", () => _world.LoopState == ArenaLoopState.Complete, 20f);
-        Series("ending", 12, 15);
+        Series("ending", 16, 27);
     }
 
     private void BuildSandbox()

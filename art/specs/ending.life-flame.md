@@ -2,7 +2,7 @@
 
 Art: sprite
 Status: im-spiel
-Stil: ludo
+Stil: hausstil
 Weltgröße: 128 × 128
 Akzentfarbe: warmes Orange mit gelbweißem Kern (Life Flame)
 Lore: [Symbolsatz: Life Flame](../../docs/current/VISUAL-ART-DIRECTION.md#11-symbolsatz--working-canon)
@@ -15,4 +15,7 @@ Lore: [Symbolsatz: Life Flame](../../docs/current/VISUAL-ART-DIRECTION.md#11-sym
 Kleine aufrechte Flamme.
 
 ## Animationen
-- `default`: Standbild, zur Laufzeit atmend.
+- `default`: Schleife, 16 Frames bei 16 fps; zur Laufzeit zusätzlich atmend.
+
+## Herstellung
+Erzeugt von `tools/visuals/vfx_kit.py --only life_flame` mit der warmen Verlaufstabelle (Glutrot, Orange, Gold, gelbweißer Kern); vorgemultipliert, Import mit `PremultiplyAlpha=False`.
