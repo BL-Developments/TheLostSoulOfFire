@@ -124,6 +124,16 @@ public sealed class FigureMotionTests
     }
 
     [TestMethod]
+    public void WalkingBackward_RunsTheCycleBackward()
+    {
+        VisualClipDefinition walk = new("aim_move", "P/aim_move/{dir}", 128, 128, 12, 12f, true, null, ClipProgress.Distance, 150f);
+        float elapsed = ClipClock.Advance(0.5f, walk, Frame, -30f);
+        Assert.AreEqual(0.5f - 30f / 150f * walk.Duration, elapsed, 0.0001f, "backing away steps the cycle back");
+        float wrapped = ClipClock.Advance(0.1f, walk, Frame, -30f);
+        Assert.IsTrue(wrapped >= 0f && wrapped < walk.Duration, "a backward step below the start wraps into the cycle");
+    }
+
+    [TestMethod]
     public void TimeClip_RunsWithTheClock()
     {
         VisualClipDefinition idle = new("idle", "P/idle/{dir}", 128, 128, 9, 9f, true, null, ClipProgress.Time, 0f);

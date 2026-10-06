@@ -145,6 +145,17 @@
           "loop": false,
           "normalMap": "Textures/Player/Animations/retreat_normal/{dir}",
           "origin": [0.5, 0.8718]
+        },
+        "aim_move": {
+          "path": "Textures/Player/Animations/aim_move/{dir}",
+          "frameSize": [214, 224],
+          "frames": 12,
+          "fps": 12.0,
+          "loop": true,
+          "normalMap": "Textures/Player/Animations/aim_move_normal/{dir}",
+          "progress": "distance",
+          "cycleDistance": 150.0,
+          "origin": [0.5, 0.7902]
         }
       },
       "pixelsPerUnit": 1.5

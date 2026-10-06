@@ -410,6 +410,14 @@ public sealed class ArtAssets
             SoulCannonState.Returning => VisualClips.CannonFire,
             _ => null
         };
+        if (cannonClip == VisualClips.Aim && moving && HasClip(VisualIds.Player, VisualClips.AimMove))
+        {
+            // Charging on the move: the cannon stays on target while the legs walk under it.
+            DrawCharacter(batch, player, VisualIds.Player, VisualClips.AimMove, player.FacingDirection, player.Position, 1f, Color.White,
+                walkAxis: player.FacingDirection);
+            return;
+        }
+
         if (cannonClip is not null && HasClip(VisualIds.Player, cannonClip))
         {
             float? progress = cannonClip == VisualClips.Aim ? null : player.Cannon.StateProgress;
@@ -490,10 +498,16 @@ public sealed class ArtAssets
         Color tint,
         float fallbackSize = FallbackCharacterSize,
         float? progress = null,
-        bool snapFacing = false)
+        bool snapFacing = false,
+        Vector2? walkAxis = null)
     {
         FigureState figure = _figures.GetValue(owner, _ => new FigureState());
-        float deltaTime = figure.Advance(_time, position, out float distance);
+        float deltaTime = figure.Advance(_time, position, out float distance, out Vector2 moved);
+        if (walkAxis is { } axis && axis.LengthSquared() > 0.0001f)
+        {
+            // Walking backward plays the cycle backward, so the feet keep their grip.
+            distance = Vector2.Dot(moved, Vector2.Normalize(axis));
+        }
         switch (owner)
         {
             case Enemy enemy:
@@ -753,10 +767,11 @@ public sealed class ArtAssets
         public bool DissolveStarted { get; set; }
 
         /// <summary>Time and distance since this figure was last drawn.</summary>
-        public float Advance(float time, Vector2 position, out float distance)
+        public float Advance(float time, Vector2 position, out float distance, out Vector2 moved)
         {
             float deltaTime = _hasDrawn ? MathHelper.Clamp(time - _lastTime, 0f, 0.25f) : 0f;
             distance = _hasDrawn ? MathF.Min(Vector2.Distance(position, _lastDrawPosition), MaxDistancePerDraw) : 0f;
+            moved = _hasDrawn && distance > 0f ? Vector2.Normalize(position - _lastDrawPosition) * distance : Vector2.Zero;
             _hasDrawn = true;
             _lastTime = time;
             _lastDrawPosition = position;

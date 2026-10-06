@@ -799,6 +799,41 @@ def key_aim(poser: Poser, frames: int) -> bpy.types.Action:
     return action
 
 
+def key_aim_move(poser: Poser, frames: int) -> bpy.types.Action:
+    """Walking while the Soul Cannon charges (the game slows the player to 58 %): the upper body
+    holds the aim of key_aim, the legs take short, grounded steps under it (no flight phase), the
+    hips sway a little with each step. A distance clip; the game plays it backward when the player
+    backs away, so the feet stay on the floor whichever way he walks."""
+    action = replace_action(poser.rig, "aim_move")
+    ground = rest_ground(poser.rig)
+    for frame in range(frames + 1):
+        phase = frame / frames * math.tau
+        poser.clear()
+        for side, offset in (("l", 0.0), ("r", math.pi)):
+            leg = phase + offset
+            poser.set(f"thigh_{side}", "forward", 20 * math.sin(leg) + 4)
+            lift = max(0.0, math.cos(leg + 0.25)) ** 1.6
+            poser.set(f"calf_{side}", "back", 10 + 44 * lift)
+            poser.set(f"foot_{side}", "down", 8 * lift)
+        ground_feet(poser, ground, settle=1.0)
+        poser.turn("pelvis", 4 * math.sin(phase))
+        poser.set("spine_01", "forward", 4)
+        poser.turn("spine_02", 12 - 4 * math.sin(phase))  # the chest holds the aim against the hips
+        poser.turn("spine_03", 8)
+        poser.set("neck_01", "forward", 4)
+        right = -poser.left
+        bob = (poser.rig.pose.bones["pelvis"].head - poser.rig.data.bones["pelvis"].head_local).z
+        place_bone(poser, "cannon", Vector((right * 0.12, -0.42, 1.30 + bob * 0.6)),
+                   Vector((0.0, -1.0, 0.0)), Vector((0.0, 0.0, 1.0)))
+        place_weapon(poser, Vector((poser.left * 0.25, -0.13, 1.01 + bob)),
+                     Vector((0.06 * poser.left, 0.55, -0.83)), Vector((poser.left, 0.0, 0.0)))
+        loose_fists(poser, 75)
+        poser.key(frame + 1)
+        key_hands(poser.rig, frame + 1, cannon=1.0)
+        key_legs(poser.rig, frame + 1, 0.0)
+    return action
+
+
 # ---- Soul Cannon, dash, hit and death -------------------------------------------------------
 # These clips are sampled by the game's own timers (SoulCannon state progress, dash progress,
 # hit flash), so each pose lands on the moment the gameplay already defines.
@@ -1125,7 +1160,7 @@ def main() -> None:
 COMBAT_FRAMES = {
     "swing1": 14, "swing2": 16, "swing3": 26,
     "swing1_return": 8, "swing2_return": 8, "swing3_return": 10,
-    "dash": 8, "hit": 6, "cannon_fire": 10, "retreat": 8,
+    "dash": 8, "hit": 6, "cannon_fire": 10, "retreat": 8, "aim_move": 12,
 }
 
 
@@ -1135,7 +1170,8 @@ def combat_action(poser: Poser, name: str, paths: dict) -> bpy.types.Action:
         return key_swing_return(poser, int(name[5]), frames)
     if name.startswith("swing"):
         return key_swing(poser, int(name[5]), frames, paths)
-    return {"dash": key_dash, "hit": key_hit, "cannon_fire": key_cannon_fire, "retreat": key_retreat}[name](poser, frames)
+    return {"dash": key_dash, "hit": key_hit, "cannon_fire": key_cannon_fire, "retreat": key_retreat,
+            "aim_move": key_aim_move}[name](poser, frames)
 
 
 def write_paths(path: Path, paths: dict) -> None:

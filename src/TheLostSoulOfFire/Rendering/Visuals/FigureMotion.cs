@@ -85,8 +85,19 @@ public sealed class FacingTracker
 /// </summary>
 public static class ClipClock
 {
-    public static float Advance(float elapsed, VisualClipDefinition clip, float deltaTime, float distance) =>
-        clip.Progress == ClipProgress.Distance
-            ? elapsed + MathF.Max(0f, distance) / clip.CycleDistance * clip.Duration
-            : elapsed + MathF.Max(0f, deltaTime);
+    public static float Advance(float elapsed, VisualClipDefinition clip, float deltaTime, float distance)
+    {
+        if (clip.Progress != ClipProgress.Distance)
+        {
+            return elapsed + MathF.Max(0f, deltaTime);
+        }
+
+        // A negative distance (walking backward) runs a looping cycle backward, wrapping below zero.
+        float next = elapsed + distance / clip.CycleDistance * clip.Duration;
+        if (next >= 0f)
+        {
+            return next;
+        }
+        return clip.Loop && clip.Duration > 0f ? (next % clip.Duration + clip.Duration) % clip.Duration : 0f;
+    }
 }

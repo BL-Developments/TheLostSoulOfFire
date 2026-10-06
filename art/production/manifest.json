@@ -12545,6 +12545,117 @@
         "status": "angenommen",
         "reason": "Polish-Durchgang: Rückstoßsprung als Sprung statt Gleiten, an den Fähigkeitszeitgeber gekoppelt"
       }
+    },
+    {
+      "id": "96519fa97f874609a1f70323b0042366",
+      "timestamp": "2026-10-06T15:30:44+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "aim_move",
+        "frames": 12,
+        "fps": 12.0,
+        "frame_size": [
+          214,
+          224
+        ],
+        "origin": [
+          0.5,
+          0.7902
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.0,
+        "render_seconds": 33.2
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/aim_move.render.json",
+          "sha256": "b2e5f2055a78704027372e87618f0e61869b2b05507238559bd68c3d1286c525"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move/n.png",
+          "sha256": "33b6169c8d6050286ad96de381ee1e0a12c8d1ab9385ee82e161c0d2054dca6a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_normal/n.png",
+          "sha256": "10d43a83516187b60fece131883812c24b28d8860fa7741c9e5a0c1e7f9498f6"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move/ne.png",
+          "sha256": "c8896980fc7467ccf352bcfbcb5449f1184668b262cb58ae743643898c68c465"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_normal/ne.png",
+          "sha256": "17d4f1c0d3786b7d6cd805db2efd432307aa4cbb3b38437f3f1f1ac20cfcce9d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move/e.png",
+          "sha256": "fa590925b30e9ba633399b50a656f8e945810d9aaece882f86d134e937b701ae"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_normal/e.png",
+          "sha256": "b1f3ada9ca9f7bf75a0c83c0ce5cb7c43b908bc2e38a9199c25c7709bc95cecb"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move/se.png",
+          "sha256": "bb2267a644bd76b55e7816b000f8e2ff588a178119f1b07176cc021e414a6b2b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_normal/se.png",
+          "sha256": "ffd3b95fa7ba87d8a01a4121588afcca4b25862d9830b5b5a8d2fe617a870278"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move/s.png",
+          "sha256": "9d251b6f61a89801d4e75c2429f47905111deadddaffd3a63a56f94339faf7cb"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_normal/s.png",
+          "sha256": "e6f01e42b9c76f03ebfc2a21266e039a8b56cadf0c2379234412e5029b89dd2f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move/sw.png",
+          "sha256": "87ce057fec401e98c63e919274b28f85c8c74542e85dc3f0c79a20b44eabaee1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_normal/sw.png",
+          "sha256": "ac1d0684115e17cf1656a2f7869545469d076ef73e074ff16351feba0feab4b3"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move/w.png",
+          "sha256": "f48701614289cb604fa43ae9c7c404ef4aa98b0be02f84c3246db555359041d6"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_normal/w.png",
+          "sha256": "4fbcc0022c1e216598808b9cbae1074b9cab9ae17c95201455dbc9e6a9c6517f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move/nw.png",
+          "sha256": "fbe5685eb22c6d6e8be4f019bd45923aa8fedb19776ed2182239d1f150afda1a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_normal/nw.png",
+          "sha256": "e9ece66f3e7c1c2668bb8c03999f620dcff94babf5a3743277b024cb1730894c"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.39,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Polish-Durchgang: Gehen mit erhobener Kanone, nach Strecke und Richtung, statt Gleiten in der Zielpose"
+      }
     }
   ]
 }

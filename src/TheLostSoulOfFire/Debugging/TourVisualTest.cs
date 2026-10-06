@@ -476,6 +476,14 @@ internal sealed class TourVisualTest
         Do("rest", () => { }, 0.6f);
         Series("cannon_draw_charge", 30, 2, () => _input.InjectMousePresses(left: false, right: true));
         Series("cannon_fire", 30, 1);
+        // Charging on the move: aiming right while backing away to the left walks the legs backward.
+        Do("place_cannon_walk", () => { _world.PlaceAutomatedPlayer(ArenaCentre + new Vector2(200f, 0f)); _world.SetAutomatedAim(Vector2.UnitX); }, 0.6f);
+        Series("cannon_walk_back", 16, 3, () =>
+        {
+            _input.InjectKeyDown(Keys.A);
+            _input.InjectMousePresses(left: false, right: true);
+        });
+        Do("cannon_walk_release", () => { }, 1.6f);
         Do("place_dash", () => { _world.PlaceAutomatedPlayer(ArenaCentre - new Vector2(200f, 0f)); _world.SetAutomatedAim(Vector2.UnitX); }, 0.6f);
         Series("dash", 16, 1, () =>
         {
