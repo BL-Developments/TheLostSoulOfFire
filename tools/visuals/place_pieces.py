@@ -30,6 +30,7 @@ CONTENT = common.REPO_ROOT / "src" / "TheLostSoulOfFire" / "Content"
 REGISTRY = CONTENT / "Visuals" / "registry.json"
 MGCB = CONTENT / "Content.mgcb"
 PPU = 1.5
+MARGIN = 4
 
 
 def compact_json(value: object) -> str:
@@ -86,6 +87,12 @@ def main(argv: list[str]) -> int:
     )
     with common.record_step(step):
         image = Image.open(source).convert("RGBA").crop((left, top, right, bottom))
+        # A transparent margin all round (the asset checks require it; a piece cut by the
+        # plate's frame would otherwise touch its own edge).
+        padded = Image.new("RGBA", (image.width + 2 * MARGIN, image.height + 2 * MARGIN), (0, 0, 0, 0))
+        padded.paste(image, (MARGIN, MARGIN))
+        image = padded
+        left, top = left - MARGIN, top - MARGIN
         image.save(target)
         width, height = image.size
         if args.anchor:

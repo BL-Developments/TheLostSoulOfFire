@@ -925,13 +925,13 @@
       "id": "prop.hub-brazier",
       "kind": "prop",
       "palette": "world",
-      "worldSize": [54.0, 100.67],
-      "origin": [0.5062, 0.8874],
+      "worldSize": [59.33, 106.0],
+      "origin": [0.5056, 0.8679],
       "layer": "high-prop",
       "clips": {
         "default": {
           "path": "Textures/Props/Hub/brazier",
-          "frameSize": [81, 151],
+          "frameSize": [89, 159],
           "frames": 1,
           "fps": 1,
           "loop": true
@@ -942,13 +942,13 @@
       "id": "environment.hub-leaves",
       "kind": "environment",
       "palette": "world",
-      "worldSize": [124.67, 209.33],
-      "origin": [0.5027, 1.0],
+      "worldSize": [130.0, 215.33],
+      "origin": [0.5026, 0.9845],
       "layer": "ground",
       "clips": {
         "default": {
           "path": "Textures/Environment/Hub/leaves",
-          "frameSize": [187, 314],
+          "frameSize": [195, 323],
           "frames": 1,
           "fps": 1,
           "loop": true
@@ -959,13 +959,13 @@
       "id": "environment.hub-leaves-final",
       "kind": "environment",
       "palette": "world",
-      "worldSize": [224.0, 299.33],
-      "origin": [0.5, 1.0],
+      "worldSize": [229.33, 305.33],
+      "origin": [0.5, 0.9891],
       "layer": "ground",
       "clips": {
         "default": {
           "path": "Textures/Environment/Hub/leaves_final",
-          "frameSize": [336, 449],
+          "frameSize": [344, 458],
           "frames": 1,
           "fps": 1,
           "loop": true
@@ -976,13 +976,13 @@
       "id": "environment.hub-seal",
       "kind": "environment",
       "palette": "world",
-      "worldSize": [160.0, 132.67],
-      "origin": [0.5, 0.995],
+      "worldSize": [165.33, 138.0],
+      "origin": [0.5, 0.9758],
       "layer": "ground",
       "clips": {
         "default": {
           "path": "Textures/Environment/Hub/seal",
-          "frameSize": [240, 199],
+          "frameSize": [248, 207],
           "frames": 1,
           "fps": 1,
           "loop": true
@@ -993,13 +993,13 @@
       "id": "environment.hub-seal-final",
       "kind": "environment",
       "palette": "world",
-      "worldSize": [258.67, 196.0],
-      "origin": [0.5, 0.9966],
+      "worldSize": [264.0, 201.33],
+      "origin": [0.5, 0.9834],
       "layer": "ground",
       "clips": {
         "default": {
           "path": "Textures/Environment/Hub/seal_final",
-          "frameSize": [388, 294],
+          "frameSize": [396, 302],
           "frames": 1,
           "fps": 1,
           "loop": true
@@ -1028,13 +1028,13 @@
       "id": "prop.search-luggage",
       "kind": "prop",
       "palette": "world",
-      "worldSize": [113.33, 80.0],
-      "origin": [0.5147, 0.7708],
+      "worldSize": [118.67, 85.33],
+      "origin": [0.514, 0.7539],
       "layer": "high-prop",
       "clips": {
         "default": {
           "path": "Textures/Props/Search/luggage",
-          "frameSize": [170, 120],
+          "frameSize": [178, 128],
           "frames": 1,
           "fps": 1,
           "loop": true
@@ -1045,13 +1045,13 @@
       "id": "prop.warden-marker",
       "kind": "prop",
       "palette": "world",
-      "worldSize": [39.33, 107.33],
-      "origin": [0.4915, 0.882],
+      "worldSize": [44.67, 112.67],
+      "origin": [0.4925, 0.8639],
       "layer": "high-prop",
       "clips": {
         "default": {
           "path": "Textures/Props/Warden/marker",
-          "frameSize": [59, 161],
+          "frameSize": [67, 169],
           "frames": 1,
           "fps": 1,
           "loop": true
@@ -1062,13 +1062,13 @@
       "id": "prop.search-mast",
       "kind": "prop",
       "palette": "world",
-      "worldSize": [113.33, 533.33],
-      "origin": [0.5, 0.94],
+      "worldSize": [118.67, 538.67],
+      "origin": [0.5, 0.9356],
       "layer": "occluder",
       "clips": {
         "default": {
           "path": "Textures/Props/Search/mast",
-          "frameSize": [170, 800],
+          "frameSize": [178, 808],
           "frames": 1,
           "fps": 1,
           "loop": true

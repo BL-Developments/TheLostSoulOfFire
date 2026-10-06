@@ -6816,6 +6816,366 @@
         "status": "angenommen",
         "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
       }
+    },
+    {
+      "id": "b3687a67c29242ae9186debb511fcdd5",
+      "timestamp": "2026-10-06T00:08:09+00:00",
+      "visual_id": "prop.search-luggage",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "luggage",
+        "box": [
+          1165,
+          1010,
+          1335,
+          1130
+        ],
+        "layer": "high-prop"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/search/luggage_full.png",
+          "sha256": "797da1a6294f70e02f9a14af3c9e75396d2e9e7d50265eb8b5548f2760b8da3f"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Search/luggage.png",
+          "sha256": "7d36c8bab376fe46967bd524d8052d343577f863527c49ca421a43dae4f57b4d"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.04,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "b64bb5ce86944986be8d35edca0029c5",
+      "timestamp": "2026-10-06T00:08:09+00:00",
+      "visual_id": "prop.warden-marker",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "marker",
+        "box": [
+          793,
+          506,
+          852,
+          667
+        ],
+        "layer": "high-prop"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/search/marker_full.png",
+          "sha256": "0e04bcb7d672d08f4da94b4cec7702c67a714c042ecf894ee49c9db90847e004"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Warden/marker.png",
+          "sha256": "b59ee819a151162577467e6ec364c5b5747ea7a22888372d594ce5497af1fc6a"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.03,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "5b8c25031c944a6e8ec19fb4dd4d4828",
+      "timestamp": "2026-10-06T00:08:09+00:00",
+      "visual_id": "prop.search-mast",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "mast",
+        "box": [
+          410,
+          700,
+          580,
+          1500
+        ],
+        "layer": "occluder"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/search/mast_full.png",
+          "sha256": "fc9b5a533b57dafc48c8f627ca2beff3fa84761bdfb63d8ed83bccd97c889f44"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Search/mast.png",
+          "sha256": "33a411d6b2693e47671402d7ee668a6f012da89ca3e91d59e3cac79232a93812"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.05,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "8eeb7003b87a4b7991390bcaae571a55",
+      "timestamp": "2026-10-06T00:08:09+00:00",
+      "visual_id": "prop.hub-brazier",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "brazier",
+        "box": [
+          799,
+          889,
+          880,
+          1040
+        ],
+        "layer": "high-prop"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.hub/brazier_full.png",
+          "sha256": "7496f49dbd94fbf93336016ad193012a953b1daac14853718eaba609a0025021"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Hub/brazier.png",
+          "sha256": "7de119553501bacdea0d5c885052ef646d9458ee3b54523d517df06eba0a6f06"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.02,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "5b7a7a40846247eaa4a288c1d26069e6",
+      "timestamp": "2026-10-06T00:08:10+00:00",
+      "visual_id": "environment.hub-leaves",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "leaf_biome",
+        "box": [
+          461,
+          196,
+          648,
+          510
+        ],
+        "layer": "ground"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.hub/leaf_biome_full.png",
+          "sha256": "4a950549f293f31be2ac6e8b96343c07115578301fbe72877fb546ca8fb6a33b"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Hub/leaves.png",
+          "sha256": "e3a0179507f1c12786325f207638818549118c0cb71e109a4ed07a0c632db4f3"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.03,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "239c1698d81044a3a1e9fddf4e3cb68c",
+      "timestamp": "2026-10-06T00:08:10+00:00",
+      "visual_id": "environment.hub-leaves-final",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "leaf_final",
+        "box": [
+          957,
+          61,
+          1293,
+          510
+        ],
+        "layer": "ground"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.hub/leaf_final_full.png",
+          "sha256": "7d5672d3223ab4cd4fb14e46abcd094ad6910c1308808883e9acccf479a1da22"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Hub/leaves_final.png",
+          "sha256": "b69d8bc9d75abffcfbe0ab2c636b9ed8eea355021ae4b7df673b39a21f5e8a6f"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.04,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "a9a7e394b12e4313a908703fa395dfa1",
+      "timestamp": "2026-10-06T00:08:10+00:00",
+      "visual_id": "environment.hub-seal",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "seal_biome",
+        "box": [
+          435,
+          312,
+          675,
+          373
+        ],
+        "layer": "ground"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.hub/seal_biome_full.png",
+          "sha256": "4cdfecd28415afa3daaeb44ca394ddd19d02175e9f861c3d5472312b182d0989"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Hub/seal.png",
+          "sha256": "2cbb2b4f64b83d091f5ff8e1cb7a6bc7ff7f9892a32730b42b4bb1b3169d9e59"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.02,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "aee494fe84d84b82944967f90b98f948",
+      "timestamp": "2026-10-06T00:08:10+00:00",
+      "visual_id": "environment.hub-seal-final",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "seal_final",
+        "box": [
+          931,
+          217,
+          1319,
+          311
+        ],
+        "layer": "ground"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.hub/seal_final_full.png",
+          "sha256": "339e7995ea6253fc7e3b7043cb3b8317b4db9ce43a4d0f659d1696185f43518d"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Hub/seal_final.png",
+          "sha256": "7b6f367ca766c7fb03f0ece2b037a95718789fe8de17f69d3919aa9cab74b99b"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.03,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
     }
   ]
 }
