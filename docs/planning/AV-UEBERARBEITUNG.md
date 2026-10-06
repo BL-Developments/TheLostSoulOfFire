@@ -165,7 +165,8 @@ Steuerung sind unverändert.
 - Flammenband: folgt dem gerenderten Death-Flame-Kern im Sensenkragen in Richtung, Höhe und Zeit
   (`ScytheBladePaths.cs`, erzeugt von `tools/visuals/blade_paths.py`), zeichnet den Teil hinter
   der Figur vor ihr und erscheint erst mit dem schnellen Hieb, nicht im Ausholen. Die
-  Zündfunken kommen aus dem Kragen statt vor der Figur.
+  Zündfunken kommen aus dem Kragen statt vor der Figur; die Flamme leuchtet beim Durchziehen
+  Boden und nahe Figuren an.
 - Gegner: Hollow-Griff (Bemerken, Ausholen mit wachsender Spannung statt starrem Halten,
   Schritt, Überstrecken; 20 Frames), Erholung aus der Endpose, Treffer. Devourer-Schlag
   (Einatmen, Arme mit Stützschritt über den Kopf, Halten, Hammerschlag; 24 Frames), Erholung,

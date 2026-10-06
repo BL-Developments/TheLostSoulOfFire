@@ -309,6 +309,36 @@ public sealed class ScytheCombat
         return true;
     }
 
+    /// <summary>
+    /// Light of the swing (presentation only): where the Death Flame core in the collar is while
+    /// the stroke is fast, and how bright it burns. It lights the floor and nearby figures; there
+    /// is none during the wind-up or after the swing has settled.
+    /// </summary>
+    public bool TryGetFlameLight(Vector2 feet, out Vector2 position, out float intensity)
+    {
+        position = default;
+        intensity = 0f;
+        if (ActiveStep == 0)
+        {
+            return false;
+        }
+
+        float progress = NormalizedProgress;
+        float start = StrokeStart(ActiveStep);
+        float rise = MathHelper.Clamp((progress - start) / 0.08f, 0f, 1f);
+        float fall = 1f - MathHelper.Clamp((progress - 0.5f) / 0.4f, 0f, 1f);
+        intensity = rise * fall * ActiveStep switch { 1 => 0.32f, 2 => 0.4f, _ => 0.55f } * (_resonanceActive ? 1.2f : 1f);
+        if (intensity <= 0.01f)
+        {
+            return false;
+        }
+
+        ScytheBladePaths.Sample core = ScytheBladePaths.At(ActiveStep, progress);
+        float angle = MathF.Atan2(_attackDirection.Y, _attackDirection.X) + MathHelper.ToRadians(core.Heading);
+        position = feet + ScytheBladePaths.Project(angle, core.Distance * ScytheBladePaths.UnitsPerMetre, core.Height);
+        return true;
+    }
+
     private static ScytheStrike BuildStrike(int step, Vector2 direction, bool resonanceActive, PlayerAttributes attributes)
     {
         ScytheStrike strike = step switch

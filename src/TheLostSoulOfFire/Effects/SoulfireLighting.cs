@@ -212,6 +212,13 @@ public static class SoulfireLighting
             GameBalance.DeathFlameBright,
             SoulfireRenderSettings.PlayerCoreGlowIntensity);
 
+        // The swing's Death Flame lights what it passes: the floor and anyone close to the blade.
+        if (renderedPlayer && player.Scythe.TryGetFlameLight(player.Position, out Vector2 blade, out float flame))
+        {
+            renderer.DrawGlow(batch, blade, 96f, GameBalance.DeathFlame, flame);
+            renderer.DrawGlow(batch, blade, 40f, GameBalance.DeathFlameBright, flame * 0.6f);
+        }
+
         if (soulSenseAmount > 0.001f)
         {
             Vector2 eye = renderedPlayer
