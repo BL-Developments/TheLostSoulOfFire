@@ -1342,6 +1342,23 @@
           "loop": false
         }
       }
+    },
+    {
+      "id": "prop.training-dummy",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [78.67, 130.67],
+      "origin": [0.5, 0.8673],
+      "layer": "high-prop",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Sandbox/dummy",
+          "frameSize": [118, 196],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
     }
   ]
 }

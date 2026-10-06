@@ -508,6 +508,20 @@ internal sealed class TourVisualTest
     {
         Do("enter", () => _world.ApplyDeveloperStart(new DeveloperStartOptions(DeveloperStartArea.Sandbox, 1), _viewport));
         Shot("arrive", minWait: 1f);
+        Do("spawn_dummy", () => _world.SpawnAutomatedSandboxEnemy(SandboxEnemyKind.TrainingDummy), 0.6f);
+        Do("approach", () =>
+        {
+            if (_world.AutomatedEnemies.OfType<TrainingDummy>().FirstOrDefault() is { } dummy)
+            {
+                _world.PlaceAutomatedPlayer(dummy.Position + new Vector2(-70f, 10f));
+                AimAt(dummy.Position);
+            }
+        }, 0.3f);
+        Series("dummy_hits", 12, 4, () =>
+        {
+            if (_world.AutomatedEnemies.OfType<TrainingDummy>().FirstOrDefault() is { } dummy) AimAt(dummy.Position);
+            _input.InjectMousePresses(left: true, right: false);
+        });
         Do("dev_menu", () => _input.InjectKeyPress(Keys.F), 0.4f);
         Shot("dev_menu");
         Do("dev_menu_close", () => _input.InjectKeyPress(Keys.F), 0.3f);

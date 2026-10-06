@@ -193,6 +193,29 @@ public sealed class ArtAssets
         return true;
     }
 
+    /// <summary>
+    /// The rendered training post, standing on its iron foot 36 units below the dummy's position.
+    /// A hit rocks it on its foot for a moment (presentation only; the dummy never moves).
+    /// </summary>
+    private void DrawTrainingDummy(SpriteBatch batch, TrainingDummy dummy)
+    {
+        SpriteClip? clip = GetEffect(VisualIds.TrainingDummy);
+        dummy.DrawnAsFigure = clip is not null;
+        if (clip is null || !Registry.TryGet(VisualIds.TrainingDummy, out VisualEntry entry))
+        {
+            return;
+        }
+
+        Vector2 foot = dummy.Position + new Vector2(0f, 36f);
+        float hit = MathHelper.Clamp(dummy.HitFlashRemaining / 0.14f, 0f, 1f);
+        float rock = MathF.Sin((1f - hit) * MathF.PI * 3f) * hit * 0.07f;
+        DrawSoftSpot(batch, foot + new Vector2(6f, 0f), new Vector2(34f, 11f), new Color(3, 3, 7) * 0.65f);
+        Vector2 scale = entry.WorldSize / new Vector2(clip.FrameWidth, clip.FrameHeight);
+        Vector2 origin = entry.Origin * new Vector2(clip.FrameWidth, clip.FrameHeight);
+        Color tint = hit > 0f ? Color.Lerp(Color.White, new Color(255, 235, 255), hit) : Color.White;
+        batch.Draw(clip.Texture, foot, clip.GetSourceRectangle(0f), tint, rock, origin, scale, SpriteEffects.None, 0f);
+    }
+
     /// <summary>A Death Flame slash along <paramref name="path"/> (tail first); false without the shader.</summary>
     public bool DrawDeathFlameSlash(SpriteBatch batch, IReadOnlyList<Vector2> path, float headWidth, float opacity, float heat)
     {
@@ -410,6 +433,12 @@ public sealed class ArtAssets
 
     public void DrawEnemy(SpriteBatch batch, Enemy enemy)
     {
+        if (enemy is TrainingDummy dummy)
+        {
+            DrawTrainingDummy(batch, dummy);
+            return;
+        }
+
         if (enemy.VisualId is not { } id)
         {
             return;

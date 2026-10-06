@@ -90,33 +90,39 @@ public sealed class TrainingDummy : Enemy
         Color straw = flash ? GameBalance.SoulWhite : new Color(128, 106, 72);
         Color rope = new(48, 36, 28);
 
-        batch.FillEllipse(pixel, Position + new Vector2(0f, 34f), 34f, 9f, new Color(3, 3, 7) * 0.6f);
-        batch.DrawLine(pixel, Position + new Vector2(0f, 36f), Position + new Vector2(0f, -58f), wood, 8f);
-        batch.DrawLine(pixel, Position + new Vector2(-34f, -30f), Position + new Vector2(34f, -30f), wood, 7f);
-        batch.FillEllipse(pixel, Position + new Vector2(0f, -8f), 20f, 28f, straw);
-        batch.DrawLine(pixel, Position + new Vector2(-18f, -14f), Position + new Vector2(18f, -14f), rope, 3f);
-        batch.DrawLine(pixel, Position + new Vector2(-17f, 6f), Position + new Vector2(17f, 6f), rope, 3f);
-        batch.FillCircle(pixel, Position + new Vector2(0f, -50f), 13f, straw);
-        batch.DrawCircle(pixel, Position + new Vector2(0f, -8f), 10f, GameBalance.DeathFlame * 0.8f, 2f, 16);
+        if (!DrawnAsFigure)
+        {
+            batch.FillEllipse(pixel, Position + new Vector2(0f, 34f), 34f, 9f, new Color(3, 3, 7) * 0.6f);
+            batch.DrawLine(pixel, Position + new Vector2(0f, 36f), Position + new Vector2(0f, -58f), wood, 8f);
+            batch.DrawLine(pixel, Position + new Vector2(-34f, -30f), Position + new Vector2(34f, -30f), wood, 7f);
+            batch.FillEllipse(pixel, Position + new Vector2(0f, -8f), 20f, 28f, straw);
+            batch.DrawLine(pixel, Position + new Vector2(-18f, -14f), Position + new Vector2(18f, -14f), rope, 3f);
+            batch.DrawLine(pixel, Position + new Vector2(-17f, 6f), Position + new Vector2(17f, 6f), rope, 3f);
+            batch.FillCircle(pixel, Position + new Vector2(0f, -50f), 13f, straw);
+            batch.DrawCircle(pixel, Position + new Vector2(0f, -8f), 10f, GameBalance.DeathFlame * 0.8f, 2f, 16);
+        }
 
-        Rectangle track = new((int)Position.X - 36, (int)Position.Y - 82, 72, 6);
-        batch.FillRectangle(pixel, track, new Color(20, 18, 26) * 0.9f);
-        int fill = (int)MathF.Round(track.Width * Health / (float)MaxHealth);
-        batch.FillRectangle(pixel, new Rectangle(track.X, track.Y, fill, track.Height), GameBalance.DeathFlameBright);
-        batch.DrawRectangle(pixel, track, GameBalance.SoulWhite * 0.45f, 1f);
+        // The rendered post stands taller; its bar and numbers sit above its hood.
+        float lift = DrawnAsFigure ? 52f : 0f;
+        Rectangle track = new((int)Position.X - 36, (int)(Position.Y - 82 - lift), 72, 6);
+        UiKit.Bar(batch, pixel, track, Health / (float)MaxHealth, GameBalance.DeathFlameBright);
 
         if (DamageSinceRefill > 0)
         {
-            PixelText.DrawCentered(batch, pixel, $"SUMME {DamageSinceRefill}", Position.X, track.Y - 16f, 1, GameBalance.SoulWhite * 0.85f);
+            PixelText.DrawFace(batch, pixel, $"SUMME {DamageSinceRefill}", new Vector2(Position.X - PixelText.MeasureFace($"SUMME {DamageSinceRefill}", TextFace.Body, 9.5f, 1f) * 0.5f, track.Y - 18f),
+                TextFace.Body, 9.5f, GameBalance.SoulWhite * 0.9f, 1f);
         }
 
         foreach (DamageNumber number in _numbers)
         {
             float progress = number.Age / GameBalance.TrainingDummyNumberLifetime;
             float alpha = 1f - progress * progress;
-            Vector2 at = Position + new Vector2((number.Lane - 1) * 22f, -112f - progress * 42f);
+            Vector2 at = Position + new Vector2((number.Lane - 1) * 22f, -112f - lift - progress * 42f);
             Color color = number.IsCoreHit ? GameBalance.DeathFlameBright : GameBalance.SoulWhite;
-            PixelText.DrawCentered(batch, pixel, number.Damage.ToString(), at.X, at.Y, 2, color * alpha);
+            string text = number.Damage.ToString();
+            float pop = 1f + MathF.Max(0f, 0.25f - progress) * 1.6f;
+            float cap = (number.IsCoreHit ? 17f : 14f) * pop;
+            PixelText.DrawFace(batch, pixel, text, new Vector2(at.X - PixelText.MeasureFace(text, TextFace.Display, cap) * 0.5f, at.Y), TextFace.Display, cap, color * alpha);
         }
     }
 

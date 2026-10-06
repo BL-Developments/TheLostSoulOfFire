@@ -147,6 +147,9 @@ public sealed partial class GameWorld
         }
     }
 
+    /// <summary>Tour hook: spawns a sandbox enemy as the dev menu would.</summary>
+    internal void SpawnAutomatedSandboxEnemy(SandboxEnemyKind kind) => SpawnSandboxEnemy(kind);
+
     private void SpawnSandboxEnemy(SandboxEnemyKind kind)
     {
         Vector2 position = SandboxSpawner.ChoosePosition(_arena.CombatBounds, _player.Position, _sandboxSpawnCount, SandboxSpawner.Radius(kind));

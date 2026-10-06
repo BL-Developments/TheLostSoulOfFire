@@ -10280,6 +10280,51 @@
         "status": "angenommen",
         "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
       }
+    },
+    {
+      "id": "9aabd102dce24e5385ff0623a018e610",
+      "timestamp": "2026-10-06T02:52:12+00:00",
+      "visual_id": "prop.training-dummy",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "dummy",
+        "box": [
+          35,
+          74,
+          145,
+          262
+        ],
+        "layer": "high-prop"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/prop.training-dummy/dummy_full.png",
+          "sha256": "00041a4ea11911fa990fa599258e8fd7662802061f5eb0940c8834d9c7d701a1"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Sandbox/dummy.png",
+          "sha256": "ba935fcb914e336521aada5c1756609a2c25801befdbff4842c8ff04cac833b5"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.02,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
     }
   ]
 }
