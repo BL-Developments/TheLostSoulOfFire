@@ -533,6 +533,110 @@ public sealed class ArtAssets
         figure.RememberPose(clip, clip.GetSourceRectangle(elapsed), position, scale, tint);
     }
 
+    /// <summary>A figure that casts a shadow: who it is (its last drawn pose is used), where its feet are, how dark.</summary>
+    public readonly record struct ShadowCaster(object Owner, Vector2 Foot, float Strength);
+
+    /// <summary>
+    /// Shadows of rendered figures on the floor, drawn before any figure: the figure's own pose
+    /// laid down along the room's key light (<paramref name="keyShadow"/>: where a point one unit
+    /// up lands, in world units on the floor), plus a second, fainter one thrown away from the
+    /// strongest nearby light (braziers, furnaces, a burning foe). Several layers of growing
+    /// length make it dark at the feet and soft toward the tip. Presentation only.
+    /// </summary>
+    public void DrawCastShadows(SpriteBatch batch, IReadOnlyList<ShadowCaster> casters, IReadOnlyList<SceneLight> lights, Vector2 keyShadow, float keyStrength)
+    {
+        if (casters.Count == 0)
+        {
+            return;
+        }
+
+        batch.End();
+        foreach (ShadowCaster caster in casters)
+        {
+            if (!_figures.TryGetValue(caster.Owner, out FigureState? figure) || figure.LastClip is not { } clip)
+            {
+                continue;
+            }
+
+            DrawShadow(batch, clip, figure.LastSource, figure.LastScale, caster.Foot, keyShadow, keyStrength * caster.Strength);
+            if (StrongestLight(lights, caster.Foot) is { } light)
+            {
+                Vector2 away = caster.Foot - light.Position;
+                float distance = away.Length();
+                float reach = light.Radius * SpriteLighting.LightRadiusScale;
+                float falloff = 1f - distance / reach;
+                // Close to a light the shadow is long and dark; far from it, short and faint.
+                Vector2 direction = away / distance * MathHelper.Clamp(70f / distance, 0.35f, 1.1f);
+                direction.Y *= FigureHeights.LevelSquash;
+                DrawShadow(batch, clip, figure.LastSource, figure.LastScale, caster.Foot, direction,
+                    0.32f * caster.Strength * MathHelper.Clamp(light.Intensity * 1.6f, 0f, 1f) * falloff * falloff);
+            }
+        }
+        batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, transformMatrix: _sceneTransform);
+    }
+
+    private static SceneLight? StrongestLight(IReadOnlyList<SceneLight> lights, Vector2 foot)
+    {
+        SceneLight? best = null;
+        float bestWeight = 0.05f;
+        foreach (SceneLight light in lights)
+        {
+            // Small glows (sparks, cores, souls) light a figure but do not throw a shadow worth drawing.
+            if (light.Radius < 70f || light.Intensity < 0.2f)
+            {
+                continue;
+            }
+            float distance = Vector2.Distance(light.Position, foot);
+            float reach = light.Radius * SpriteLighting.LightRadiusScale;
+            if (distance < 36f || distance >= reach)
+            {
+                continue;
+            }
+            float falloff = 1f - distance / reach;
+            float weight = light.Intensity * falloff * falloff;
+            if (weight > bestWeight)
+            {
+                bestWeight = weight;
+                best = light;
+            }
+        }
+        return best;
+    }
+
+    private void DrawShadow(SpriteBatch batch, SpriteClip clip, Rectangle source, float scale, Vector2 foot, Vector2 direction, float alpha)
+    {
+        if (alpha <= 0.01f || direction.LengthSquared() < 0.0001f)
+        {
+            return;
+        }
+
+        // The figure's width lies across the shadow, its height along it.
+        Vector2 across = Vector2.Normalize(new Vector2(-direction.Y, direction.X));
+        if (across.X < 0f)
+        {
+            across = -across;
+        }
+        across = Vector2.Lerp(Vector2.UnitX, across, 0.6f);
+        const int layers = 4;
+        for (int layer = 0; layer < layers; layer++)
+        {
+            float length = 0.55f + 0.15f * layer;
+            Vector2 along = direction * length;
+            Matrix shear = new(
+                across.X, across.Y, 0f, 0f,
+                -along.X, -along.Y, 0f, 0f,
+                0f, 0f, 1f, 0f,
+                0f, 0f, 0f, 1f);
+            Matrix transform = Matrix.CreateTranslation(-foot.X, -foot.Y, 0f) * shear * Matrix.CreateTranslation(foot.X, foot.Y, 0f) * _sceneTransform;
+            // A shadow thrown toward the camera mirrors the sprite; without culling it still draws.
+            batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, null, RasterizerState.CullNone, null, transform);
+            batch.Draw(clip.Texture, foot, source, ShadowColor * (alpha / layers), 0f, clip.PixelOrigin, scale, SpriteEffects.None, 0f);
+            batch.End();
+        }
+    }
+
+    private static readonly Color ShadowColor = new(4, 3, 9);
+
     /// <summary>
     /// Where a figure's clip <paramref name="clipName"/> stands in its cycle (0–1) as last drawn,
     /// or null when the figure shows another clip: footsteps land on the drawn footfalls.

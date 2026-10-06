@@ -961,6 +961,7 @@ public sealed partial class GameWorld : IDisposable
         }
 
         DrawGroundMist(batch);
+        DrawFigureShadows(batch, lights, shouldDrawPlayer && (inAntechamber || IsCombatPhase));
         _player.DrawAfterimages(batch, pixel, _art);
         if (IsCombatPhase)
         {
@@ -1149,6 +1150,42 @@ public sealed partial class GameWorld : IDisposable
         GamePhase.Prologue when PrologueEnvironment.PlateOf(_prologue) is { } plate && _art.HasArt(plate) =>
             PropsOf(PrologueDirector.SectorProps(_prologue.Sector, _prologue.IsVehicleRide)).Concat(_sceneProps),
         _ => _sceneProps
+    };
+
+    private readonly List<ArtAssets.ShadowCaster> _shadowCasters = [];
+
+    /// <summary>Cast shadows of the player and the enemies on the floor, under every figure.</summary>
+    private void DrawFigureShadows(SpriteBatch batch, IReadOnlyList<SceneLight> lights, bool drawPlayer)
+    {
+        _shadowCasters.Clear();
+        if (drawPlayer && _art.IsRendered(VisualIds.Player) && !_player.IsDead)
+        {
+            _shadowCasters.Add(new ArtAssets.ShadowCaster(_player, _player.Position, 1f));
+        }
+        if (IsCombatPhase)
+        {
+            foreach (Enemy enemy in _enemies)
+            {
+                if (enemy.DrawnAsFigure && enemy.VisualClip is not null && enemy is not TrainingDummy)
+                {
+                    // A dying figure's shadow fades with it.
+                    _shadowCasters.Add(new ArtAssets.ShadowCaster(enemy, enemy.Position, enemy.IsAlive ? 1f : 0.6f));
+                }
+            }
+        }
+        (Vector2 direction, float strength) = KeyShadow;
+        _art.DrawCastShadows(batch, _shadowCasters, lights, direction, strength);
+    }
+
+    /// <summary>
+    /// The key light's shadow per area: where a point one unit above the floor lands (toward
+    /// the lower right, like the shadows baked into the props) and how dark it is.
+    /// </summary>
+    private (Vector2 Direction, float Strength) KeyShadow => _phase switch
+    {
+        GamePhase.Antechamber or GamePhase.EnteringArena => (new Vector2(0.5f, 0.28f), 0.5f),
+        GamePhase.Prologue => (new Vector2(0.62f, 0.32f), 0.55f),
+        _ => (new Vector2(0.58f, 0.3f), 0.55f)
     };
 
     /// <summary>Enemies, the player and high props, drawn back to front by foot point.</summary>
