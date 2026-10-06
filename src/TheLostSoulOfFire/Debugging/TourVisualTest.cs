@@ -324,6 +324,13 @@ internal sealed class TourVisualTest
         Do("settings_open", () => _input.InjectKeyPress(Keys.Enter), 0.3f);
         Shot("settings", minWait: 0.2f);
         Do("settings_back", () => _input.InjectKeyPress(Keys.Escape), 0.3f);
+        Do("singleplayer_open", () => _input.InjectKeyPress(Keys.Enter), 0.3f);
+        Shot("singleplayer", minWait: 0.2f);
+        Do("singleplayer_back", () => _input.InjectKeyPress(Keys.Escape), 0.3f);
+        Do("quit_up", () => _input.InjectKeyPress(Keys.Up), 0.15f);
+        Do("quit_open", () => _input.InjectKeyPress(Keys.Enter), 0.3f);
+        Shot("quit_confirm", minWait: 0.2f);
+        Do("quit_cancel", () => _input.InjectKeyPress(Keys.Escape), 0.3f);
     }
 
     private void BuildWaking()

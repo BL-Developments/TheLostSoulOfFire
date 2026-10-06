@@ -558,9 +558,9 @@ public sealed class CinematicPresentation
                 pixel,
                 prompt,
                 centerX,
-                viewport.Height * MenuStartYFraction - MenuPromptOffset,
-                2,
-                GameBalance.DeathFlameBright * (0.8f * reveal));
+                viewport.Height * MenuStartYFraction - MenuPromptOffset - 8f,
+                3,
+                GameBalance.DeathFlameBright * (0.85f * reveal));
         }
         for (int i = 0; i < entries.Count; i++)
         {
