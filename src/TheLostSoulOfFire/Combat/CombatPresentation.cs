@@ -50,8 +50,19 @@ public sealed class CombatPresentation
         }
     }
 
+    /// <summary>
+    /// Set when the scythe draws its own Death Flame ribbon along the blade; the flat slash
+    /// sprites are then left out.
+    /// </summary>
+    public bool SlashRibbons { get; set; }
+
     public void PresentScytheSwing(int step, Vector2 playerPosition, Vector2 direction)
     {
+        if (SlashRibbons)
+        {
+            return;
+        }
+
         string effect = step switch
         {
             2 => VisualIds.ScytheSlash2,

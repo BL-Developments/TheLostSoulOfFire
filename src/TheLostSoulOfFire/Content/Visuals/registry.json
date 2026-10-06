@@ -621,8 +621,8 @@
         "default": {
           "path": "Textures/Effects/fx_death_flame_loop",
           "frameSize": [128, 128],
-          "frames": 9,
-          "fps": 12,
+          "frames": 16,
+          "fps": 16,
           "loop": true
         }
       }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TheLostSoulOfFire.Effects;
@@ -139,7 +140,8 @@ public sealed class ScytheCombat
         Vector2 playerPosition,
         Vector2 facingDirection,
         bool debugVisible,
-        bool figureCarriesScythe = false)
+        bool figureCarriesScythe = false,
+        ArtAssets? art = null)
     {
         if (ActiveStep == 0)
         {
@@ -150,7 +152,7 @@ public sealed class ScytheCombat
             return;
         }
 
-        DrawAttackingScythe(batch, pixel, physicalScythe, playerPosition, debugVisible, figureCarriesScythe);
+        DrawAttackingScythe(batch, pixel, physicalScythe, playerPosition, debugVisible, figureCarriesScythe, art);
     }
 
     private void StartAttack(Vector2 facingDirection, Vector2 playerPosition, ParticleSystem particles)
@@ -178,6 +180,53 @@ public sealed class ScytheCombat
             flame,
             ActiveStep == 3 ? 115f : 60f,
             ActiveStep == 3 ? 6f : 3f);
+    }
+
+    private readonly List<Vector2> _slashPath = new(40);
+
+    /// <summary>
+    /// The swing as a Death Flame ribbon on the blade's level circle: it trails the blade by up
+    /// to a third of a turn, then burns out from the tail as the swing settles. Presentation
+    /// only; the strike itself is resolved elsewhere.
+    /// </summary>
+    private bool DrawFlameSlash(SpriteBatch batch, ArtAssets art, Vector2 centre, float radius, float squash,
+        float start, float totalArc, float eased, float alpha)
+    {
+        if (!art.CanDrawDeathFlame || alpha <= 0.01f)
+        {
+            return art.CanDrawDeathFlame;
+        }
+
+        float headWidth = ActiveStep switch { 1 => 24f, 2 => 32f, _ => 50f };
+        float heat = ActiveStep switch { 1 => 1.0f, 2 => 1.15f, _ => 1.35f };
+        if (_resonanceActive)
+        {
+            headWidth *= 1.22f;
+            heat *= 1.15f;
+        }
+
+        float reach = MathF.Abs(totalArc) * (ActiveStep == 3 ? 0.6f : 0.5f);
+        float head = start + totalArc * MathF.Max(eased, 0.04f);
+        float sweep = MathF.Min(MathF.Abs(totalArc * MathF.Max(eased, 0.04f)), reach) * MathF.Sign(totalArc);
+        // As the swing ends the tail catches up with the blade.
+        float settle = MathHelper.Clamp((NormalizedProgress - 0.55f) / 0.45f, 0f, 1f);
+        sweep *= 1f - settle * 0.7f;
+        float tail = head - sweep;
+
+        _slashPath.Clear();
+        const int points = 32;
+        for (int index = 0; index < points; index++)
+        {
+            float angle = MathHelper.Lerp(tail, head, index / (points - 1f));
+            // The edge flares out a little toward the blade, like cloth of flame thrown off it.
+            float r = radius * (0.94f + 0.06f * index / (points - 1f));
+            _slashPath.Add(centre + new Vector2(MathF.Cos(angle) * r, MathF.Sin(angle) * r * squash));
+        }
+
+        // A wide, dim veil of flame under a narrower, hotter edge.
+        art.DrawDeathFlameSlash(batch, _slashPath, headWidth * 1.8f, alpha * 0.8f, heat * 0.75f);
+        art.DrawDeathFlameSlash(batch, _slashPath, headWidth, alpha, heat);
+        return true;
     }
 
     private static ScytheStrike BuildStrike(int step, Vector2 direction, bool resonanceActive, PlayerAttributes attributes)
@@ -221,7 +270,8 @@ public sealed class ScytheCombat
         Texture2D? physicalScythe,
         Vector2 playerPosition,
         bool debugVisible,
-        bool figureCarriesScythe)
+        bool figureCarriesScythe,
+        ArtAssets? art)
     {
         // A rendered figure swings the scythe itself; the Death Flame trail then follows its
         // blade: a level circle at hand height, seen from the camera's angle.
@@ -258,12 +308,15 @@ public sealed class ScytheCombat
         float fadeStart = ActiveStep == 3 ? 0.7f : 0.62f;
         float trailAlpha = 1f - MathHelper.Clamp((attackProgress - fadeStart) / (1f - fadeStart), 0f, 1f);
         float visibleSweep = totalArc * MathHelper.Clamp(eased, 0.08f, 1f);
-        float outerThickness = thickness + (ActiveStep switch { 1 => 3f, 2 => 6f, _ => 10f });
-        batch.DrawArc(pixel, trailCentre, radius, start, visibleSweep, GameBalance.DeepViolet * (0.62f * trailAlpha), outerThickness, ActiveStep == 3 ? 34 : 24, squash);
-        batch.DrawArc(pixel, trailCentre, radius, start, visibleSweep, trail * trailAlpha, thickness, ActiveStep == 3 ? 34 : 24, squash);
-        if (ActiveStep == 3)
+        if (!(figureCarriesScythe && art is not null && DrawFlameSlash(batch, art, trailCentre, radius, squash, start, totalArc, eased, trailAlpha)))
         {
-            batch.DrawArc(pixel, trailCentre, radius + 3f, start, visibleSweep, GameBalance.SoulWhite * (0.82f * trailAlpha), 4.5f, 34, squash);
+            float outerThickness = thickness + (ActiveStep switch { 1 => 3f, 2 => 6f, _ => 10f });
+            batch.DrawArc(pixel, trailCentre, radius, start, visibleSweep, GameBalance.DeepViolet * (0.62f * trailAlpha), outerThickness, ActiveStep == 3 ? 34 : 24, squash);
+            batch.DrawArc(pixel, trailCentre, radius, start, visibleSweep, trail * trailAlpha, thickness, ActiveStep == 3 ? 34 : 24, squash);
+            if (ActiveStep == 3)
+            {
+                batch.DrawArc(pixel, trailCentre, radius + 3f, start, visibleSweep, GameBalance.SoulWhite * (0.82f * trailAlpha), 4.5f, 34, squash);
+            }
         }
 
         if (!figureCarriesScythe)

@@ -146,8 +146,19 @@ public sealed class ParticleSystem
         }
     }
 
-    public void Draw(SpriteBatch batch, Texture2D pixel)
+    /// <summary>
+    /// Draws the particles. With <paramref name="softDot"/> (a soft round light) embers glow as
+    /// points of light with a hot centre and shards streak along their direction; without it they
+    /// fall back to flat shapes.
+    /// </summary>
+    public void Draw(SpriteBatch batch, Texture2D pixel, Texture2D? softDot = null)
     {
+        if (softDot is not null)
+        {
+            DrawSoft(batch, softDot);
+            return;
+        }
+
         foreach (Particle particle in _particles)
         {
             float normalized = particle.Remaining / particle.Lifetime;
@@ -160,6 +171,35 @@ public sealed class ParticleSystem
             else
             {
                 batch.FillCircle(pixel, particle.Position, size, particle.Color * normalized);
+            }
+        }
+    }
+
+    private void DrawSoft(SpriteBatch batch, Texture2D dot)
+    {
+        Vector2 origin = new(dot.Width * 0.5f, dot.Height * 0.5f);
+        float unit = 1f / dot.Width;
+        foreach (Particle particle in _particles)
+        {
+            float normalized = particle.Remaining / particle.Lifetime;
+            float size = MathHelper.Lerp(particle.EndSize, particle.StartSize, normalized);
+            float fade = normalized * normalized * (3f - 2f * normalized);
+            // Light, not paint: the halo adds light (no coverage), the centre burns whiter.
+            Color halo = particle.Color * (0.75f * fade);
+            halo.A = 0;
+            Color centre = Color.Lerp(particle.Color, Color.White, 0.55f) * fade;
+            if (particle.Shape == ParticleShape.Shard)
+            {
+                Vector2 velocity = particle.Velocity.LengthSquared() > 1f ? particle.Velocity : new Vector2(MathF.Cos(particle.Rotation), MathF.Sin(particle.Rotation));
+                float angle = MathF.Atan2(velocity.Y, velocity.X);
+                float stretch = 2.2f + MathHelper.Clamp(velocity.Length() / 120f, 0f, 3f);
+                batch.Draw(dot, particle.Position, null, halo, angle, origin, new Vector2(size * stretch * 2.4f, size * 1.6f) * unit, SpriteEffects.None, 0f);
+                batch.Draw(dot, particle.Position, null, centre, angle, origin, new Vector2(size * stretch * 1.3f, size * 0.7f) * unit, SpriteEffects.None, 0f);
+            }
+            else
+            {
+                batch.Draw(dot, particle.Position, null, halo, 0f, origin, size * 3.2f * unit, SpriteEffects.None, 0f);
+                batch.Draw(dot, particle.Position, null, centre, 0f, origin, size * 1.3f * unit, SpriteEffects.None, 0f);
             }
         }
     }

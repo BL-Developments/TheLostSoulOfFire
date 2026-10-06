@@ -197,6 +197,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         _art = new ArtAssets(Content);
         PixelText.LoadFonts(Content);
         UiKit.Load(Content);
+        WorldMarks.Load(Content);
         _virtualTarget = new RenderTarget2D(
             GraphicsDevice,
             RenderResolution.OutputWidth,

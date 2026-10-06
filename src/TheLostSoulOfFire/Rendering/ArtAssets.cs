@@ -193,6 +193,21 @@ public sealed class ArtAssets
         return true;
     }
 
+    /// <summary>A Death Flame slash along <paramref name="path"/> (tail first); false without the shader.</summary>
+    public bool DrawDeathFlameSlash(SpriteBatch batch, IReadOnlyList<Vector2> path, float headWidth, float opacity, float heat)
+    {
+        if (_deathFlame is null || !_litSceneActive)
+        {
+            return false;
+        }
+
+        _deathFlame.DrawSlash(batch, _sceneTransform, path, headWidth, opacity, heat, _time);
+        return true;
+    }
+
+    /// <summary>True when Death Flame ribbons can be drawn (the shader loaded).</summary>
+    public bool CanDrawDeathFlame => _deathFlame is not null;
+
     /// <summary>Drops dissolves and other presentation-only leftovers, for example when a run restarts.</summary>
     public void ClearTransient() => _dissolves.Clear();
 
@@ -549,6 +564,9 @@ public sealed class ArtAssets
         texture.SetData(data);
         return texture;
     }
+
+    /// <summary>The soft round light used for spots and particles (premultiplied white).</summary>
+    public Texture2D SoftSpot => _softSpot;
 
     /// <summary>Premultiplied white with a smooth falloff to the edge.</summary>
     private static Texture2D CreateSoftSpotTexture(GraphicsDevice device, int size)

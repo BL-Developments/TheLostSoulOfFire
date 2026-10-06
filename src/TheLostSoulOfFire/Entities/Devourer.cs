@@ -274,7 +274,7 @@ public sealed class Devourer : Enemy
             {
                 float angle = i * MathHelper.TwoPi / 7f + 0.3f;
                 Vector2 crack = new(MathF.Cos(angle), MathF.Sin(angle) * 0.8f);
-                batch.DrawLine(pixel, DrawnTorso, DrawnTorso + crack * (10f + burst * 40f), GameBalance.DeathFlameBright * (0.8f * (1f - burst)), 3f);
+                WorldMarks.Beam(batch, pixel, DrawnTorso, DrawnTorso + crack * (10f + burst * 40f), 12f, GameBalance.DeathFlameBright * (0.8f * (1f - burst)));
             }
             return;
         }
@@ -287,7 +287,7 @@ public sealed class Devourer : Enemy
             {
                 float angle = i * MathHelper.TwoPi / 7f;
                 Vector2 crack = new(MathF.Cos(angle), MathF.Sin(angle));
-                batch.DrawLine(pixel, TorsoPosition, TorsoPosition + crack * (22f + progress * 45f), GameBalance.DeathFlameBright * (1f - progress), 4f);
+                WorldMarks.Beam(batch, pixel, TorsoPosition, TorsoPosition + crack * (22f + progress * 45f), 14f, GameBalance.DeathFlameBright * (1f - progress));
             }
             return;
         }
@@ -311,19 +311,19 @@ public sealed class Devourer : Enemy
 
         if (State == DevourerState.ApproachSoul && _targetSoul is not null)
         {
-            batch.DrawLine(pixel, DrawnTorso, _targetSoul.Position, GameBalance.DeathFlame * 0.48f, 4f);
-            batch.DrawCircle(pixel, _targetSoul.Position, 31f + pulse * 8f, GameBalance.DeathFlameBright * 0.72f, 4f, 24);
+            WorldMarks.Beam(batch, pixel, DrawnTorso, _targetSoul.Position, 12f, GameBalance.DeathFlame * 0.48f);
+            WorldMarks.Ring(batch, pixel, _targetSoul.Position, 31f + pulse * 8f, GameBalance.DeathFlameBright * 0.72f);
         }
         else if (State == DevourerState.Devour && _targetSoul is not null)
         {
-            batch.DrawLine(pixel, DrawnTorso, _targetSoul.Position, GameBalance.DeepViolet * 0.9f, 15f);
-            batch.DrawLine(pixel, DrawnTorso, _targetSoul.Position, GameBalance.DeathFlameBright * 0.8f, 4f);
+            WorldMarks.Beam(batch, pixel, DrawnTorso, _targetSoul.Position, 30f, GameBalance.DeathFlame * 0.8f);
+            WorldMarks.Beam(batch, pixel, DrawnTorso, _targetSoul.Position, 12f, GameBalance.DeathFlameBright * 0.8f);
         }
 
         if (State == DevourerState.SlamTelegraph)
         {
             float progress = 1f - _stateTimer / GameBalance.DevourerSlamTelegraph;
-            batch.DrawCircle(pixel, Position, GameBalance.DevourerSlamRange * progress, GameBalance.DeathFlame * (0.25f + progress * 0.5f), 6f, 32);
+            WorldMarks.Ring(batch, pixel, Position, GameBalance.DevourerSlamRange * progress, GameBalance.DeathFlame * (0.25f + progress * 0.5f), progress > 0.7f, 6f);
             if (!DrawnAsFigure)
             {
                 batch.DrawLine(pixel, Position - right * 38f, Position - right * 46f - Vector2.UnitY * (45f + progress * 30f), body, 26f);
@@ -332,7 +332,8 @@ public sealed class Devourer : Enemy
         }
         else if (State == DevourerState.Slam)
         {
-            batch.DrawCircle(pixel, Position, GameBalance.DevourerSlamRange, GameBalance.SoulWhite * 0.78f, 12f, 36);
+            WorldMarks.Ring(batch, pixel, Position, GameBalance.DevourerSlamRange, GameBalance.DeathFlame * 0.85f, true, 12f);
+            WorldMarks.Ring(batch, pixel, Position, GameBalance.DevourerSlamRange, GameBalance.SoulWhite * 0.78f, false, 12f);
         }
 
         if (soulSenseActive)

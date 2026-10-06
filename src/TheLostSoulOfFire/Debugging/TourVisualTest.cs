@@ -378,7 +378,16 @@ internal sealed class TourVisualTest
             () => _world.LoopState == ArenaLoopState.Combat && _world.AutomatedEnemies.OfType<Burning>().Any(enemy => enemy.IsAlive), 20f, 0.6f);
         Shot("charge", ready: () => _world.AutomatedEnemies.OfType<Burning>().Any(burning => burning.State == BurningState.Telegraph && burning.IsAlive), timeout: 15f,
             everyFrame: () => { if (Nearest<Burning>() is { } burning) AimAt(burning.Position); });
-        Series("detonation", 24, 3);
+        Series("telegraph", 8, 3, () => { if (Nearest<Burning>() is { } burning) AimAt(burning.Position); });
+        // A cannon shot into a charging Burning sets off its detonation.
+        Wait("charging", () => _world.AutomatedEnemies.OfType<Burning>().Any(burning => burning.IsCharging && burning.IsAlive), 10f,
+            everyFrame: () => { if (Nearest<Burning>() is { } burning) AimAt(burning.Position); });
+        Series("shoot", 4, 1, () =>
+        {
+            if (Nearest<Burning>() is { } burning) AimAt(burning.Position);
+            _input.InjectMousePresses(left: false, right: true);
+        });
+        Series("detonation", 24, 2);
         Overview("overview");
     }
 

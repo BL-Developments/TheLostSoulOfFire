@@ -279,16 +279,25 @@ public sealed class Player
         if (ResonanceActive)
         {
             float flare = 0.5f + 0.5f * MathF.Sin(_visualTime * 11f);
-            batch.DrawCircle(pixel, body, 34f + flare * 6f, GameBalance.DeathFlame * 0.72f, 8f, 28);
-            batch.DrawLine(pixel, body - right * 20f, body - right * 32f - Vector2.UnitY * (30f + flare * 15f), GameBalance.DeathFlame * 0.62f, 8f);
-            batch.DrawLine(pixel, body + right * 18f, body + right * 29f - Vector2.UnitY * (37f + flare * 11f), GameBalance.DeathFlameBright * 0.7f, 6f);
+            if (rendered)
+            {
+                // Resonating, the figure burns: Death Flame climbs its body and rings its core.
+                art.DrawLoopingEffect(batch, this, VisualIds.DeathFlameLoop, Position - new Vector2(0f, FigureHeights.Core * 0.62f), 0f, 1.05f + flare * 0.06f, Color.White * 0.55f);
+                WorldMarks.Ring(batch, pixel, body, 34f + flare * 6f, GameBalance.DeathFlame * 0.72f, true, 8f);
+            }
+            else
+            {
+                batch.DrawCircle(pixel, body, 34f + flare * 6f, GameBalance.DeathFlame * 0.72f, 8f, 28);
+                batch.DrawLine(pixel, body - right * 20f, body - right * 32f - Vector2.UnitY * (30f + flare * 15f), GameBalance.DeathFlame * 0.62f, 8f);
+                batch.DrawLine(pixel, body + right * 18f, body + right * 29f - Vector2.UnitY * (37f + flare * 11f), GameBalance.DeathFlameBright * 0.7f, 6f);
+            }
         }
 
         if (!rendered)
         {
             Cannon.DrawBack(batch, pixel, art.GetSpriteTexture(VisualIds.SoulCannon), Position, FacingDirection);
         }
-        Scythe.Draw(batch, pixel, art.GetSpriteTexture(VisualIds.Scythe), Position, FacingDirection, debugVisible, rendered);
+        Scythe.Draw(batch, pixel, art.GetSpriteTexture(VisualIds.Scythe), Position, FacingDirection, debugVisible, rendered, art);
 
         if (rendered)
         {
@@ -303,7 +312,7 @@ public sealed class Player
         if (HitFlashRemaining > 0f)
         {
             float flash = MathHelper.Clamp(HitFlashRemaining / 0.14f, 0f, 1f);
-            batch.DrawCircle(pixel, body, 29f, GameBalance.SoulWhite * (0.72f * flash), 4f, 24);
+            WorldMarks.Ring(batch, pixel, body, 29f + (1f - flash) * 8f, GameBalance.SoulWhite * (0.72f * flash), false, 4f);
             batch.FillCircle(pixel, body + FacingDirection * 2f, 7f, GameBalance.SoulWhite * (0.88f * flash));
         }
 
@@ -340,7 +349,7 @@ public sealed class Player
         }
         if (coreReady)
         {
-            batch.DrawCircle(pixel, core, 14f + pulse * 5f, GameBalance.DeathFlameBright * 0.78f, 3f, 20);
+            WorldMarks.Ring(batch, pixel, core, 14f + pulse * 5f, GameBalance.DeathFlameBright * 0.78f, false, 3f);
         }
 
         float sense = MathHelper.Clamp(soulSenseAmount, 0f, 1f);

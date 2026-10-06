@@ -250,18 +250,19 @@ public sealed class Burning : Enemy
                 float instability = 0.5f + 0.5f * MathF.Sin(_visualTime * 42f);
                 float outerRadius = MathHelper.Lerp(62f, 18f, compression);
                 batch.FillCircle(pixel, DrawnCore, outerRadius, GameBalance.DeepViolet * (0.18f + compression * 0.35f));
-                batch.DrawCircle(pixel, DrawnCore, outerRadius + instability * 5f, GameBalance.DeathFlameBright * (0.58f + compression * 0.36f), 4f + compression * 5f, 30);
+                WorldMarks.Ring(batch, pixel, DrawnCore, outerRadius + instability * 5f, GameBalance.DeathFlameBright * (0.58f + compression * 0.36f), compression > 0.5f, 4f + compression * 5f);
                 batch.FillCircle(pixel, DrawnCore, 6f + compression * 8f, GameBalance.SoulWhite * (0.62f + compression * 0.38f));
                 foreach (Vector2 fracture in GetFracturePositions())
                 {
-                    batch.DrawLine(pixel, DrawnFracture(fracture), Vector2.Lerp(DrawnFracture(fracture), DrawnCore, compression), GameBalance.DeathFlameBright * 0.82f, 3f + compression * 2f);
+                    WorldMarks.Beam(batch, pixel, DrawnFracture(fracture), Vector2.Lerp(DrawnFracture(fracture), DrawnCore, compression), 10f + compression * 6f, GameBalance.DeathFlameBright * 0.82f);
                 }
                 return;
             }
 
             float progress = 1f - MathHelper.Clamp(_stateTimer / releaseRemaining, 0f, 1f);
-            batch.FillCircle(pixel, DrawnCore, 28f + progress * 118f, GameBalance.DeepViolet * (0.62f * (1f - progress)));
-            batch.DrawCircle(pixel, DrawnCore, 40f + progress * 132f, GameBalance.DeathFlameBright * (1f - progress), 8f, 30);
+            // The blast's reach races out as a ring of light; the flipbook carries the fireball.
+            WorldMarks.Ring(batch, pixel, DrawnCore, 40f + progress * 132f, GameBalance.DeathFlame * (0.9f * (1f - progress)), true, 8f);
+            WorldMarks.Ring(batch, pixel, DrawnCore, 40f + progress * 132f, GameBalance.DeathFlameBright * (0.7f * (1f - progress) * (1f - progress)), false, 8f);
             return;
         }
 
@@ -285,13 +286,13 @@ public sealed class Burning : Enemy
 
         if (State == BurningState.Telegraph)
         {
-            batch.DrawCircle(pixel, Position, 42f + telegraph * 30f, GameBalance.DeathFlame * (0.35f + telegraph * 0.55f), 5f + telegraph * 5f, 26);
-            batch.DrawLine(pixel, Position, Position + _chargeDirection * (90f + telegraph * 80f), GameBalance.DeathFlameBright * (0.3f + telegraph * 0.5f), 4f);
+            WorldMarks.Ring(batch, pixel, Position, 42f + telegraph * 30f, GameBalance.DeathFlame * (0.35f + telegraph * 0.55f), telegraph > 0.6f, 5f + telegraph * 5f);
+            WorldMarks.Lane(batch, pixel, Position, _chargeDirection, 90f + telegraph * 80f, 30f, GameBalance.DeathFlameBright * (0.3f + telegraph * 0.5f));
         }
         else if (State == BurningState.Charge)
         {
-            batch.DrawLine(pixel, Position - _chargeDirection * 78f, Position, GameBalance.DeepViolet * 0.82f, 28f);
-            batch.DrawLine(pixel, Position - _chargeDirection * 58f, Position, GameBalance.DeathFlameBright * 0.72f, 8f);
+            WorldMarks.Beam(batch, pixel, Position - _chargeDirection * 78f, Position, 40f, GameBalance.DeathFlame * 0.7f);
+            WorldMarks.Beam(batch, pixel, Position - _chargeDirection * 58f, Position, 16f, GameBalance.DeathFlameBright * 0.72f);
         }
 
         if (soulSenseActive)

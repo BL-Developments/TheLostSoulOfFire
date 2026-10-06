@@ -17,3 +17,8 @@ Klar als Effekt dieser Quelle lesbar, verdeckt keine Figur und keinen Telegraph.
 
 ## Animationen
 - `default`: 0,42 s, Treffer bei 0,155 s.
+
+## Einsatz
+Nur noch Rückfall: Mit gerenderter Spielfigur und geladenem Death-Flame-Shader zieht die Sense
+ihren Hieb als Flammenband entlang der Klinge (`ScytheCombat.DrawFlameSlash`), dieses Sheet
+bleibt dann aus.

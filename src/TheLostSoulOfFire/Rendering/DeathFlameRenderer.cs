@@ -130,6 +130,67 @@ public sealed class DeathFlameRenderer
         batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, transformMatrix: sceneTransform);
     }
 
+    /// <summary>
+    /// A scythe slash along <paramref name="path"/> (tail first): thin and dim at the tail, widest
+    /// just behind the blade, rounded at the head. <paramref name="heat"/> lifts the intensity, so a
+    /// heavier stroke burns toward white. Ends and restarts the running deferred scene batch.
+    /// </summary>
+    public void DrawSlash(SpriteBatch batch, Matrix sceneTransform, IReadOnlyList<Vector2> path, float headWidth, float opacity, float heat, float time)
+    {
+        if (path.Count < 2)
+        {
+            return;
+        }
+
+        int vertexCount = path.Count * 2;
+        if (_vertices.Length < vertexCount)
+        {
+            _vertices = new VertexPositionColorTexture[vertexCount];
+        }
+
+        for (int index = 0; index < path.Count; index++)
+        {
+            Vector2 previous = path[Math.Max(index - 1, 0)];
+            Vector2 next = path[Math.Min(index + 1, path.Count - 1)];
+            Vector2 tangent = next - previous;
+            tangent = tangent.LengthSquared() > 0.0001f ? Vector2.Normalize(tangent) : Vector2.UnitX;
+            Vector2 normal = new(-tangent.Y, tangent.X);
+            float along = index / (path.Count - 1f);
+            float body = MathF.Pow(along, 0.8f);
+            float head = along > 0.86f ? MathF.Sqrt(MathF.Max(0f, 1f - MathF.Pow((along - 0.86f) / 0.14f, 2f))) : 1f;
+            float halfWidth = headWidth * 0.5f * MathF.Max(0.06f, body * head);
+            float intensity = MathHelper.Clamp(opacity * (0.25f + 0.75f * along) * heat, 0f, 1f);
+            Color color = new(1f, 1f, 1f, intensity);
+            _vertices[index * 2] = new VertexPositionColorTexture(new Vector3(path[index] + normal * halfWidth, 0f), color, new Vector2(along, 0f));
+            _vertices[index * 2 + 1] = new VertexPositionColorTexture(new Vector3(path[index] - normal * halfWidth, 0f), color, new Vector2(along, 1f));
+        }
+
+        DrawStrip(batch, sceneTransform, vertexCount, time, 3.2f, 2.4f);
+    }
+
+    private void DrawStrip(SpriteBatch batch, Matrix sceneTransform, int vertexCount, float time, float flowScale, float flowSpeed)
+    {
+        batch.End();
+        Viewport viewport = _device.Viewport;
+        Matrix projection = Matrix.CreateOrthographicOffCenter(0f, viewport.Width, viewport.Height, 0f, 0f, -1f);
+        _effect.CurrentTechnique = _effect.Techniques["Trail"];
+        _effect.Parameters["MatrixTransform"].SetValue(sceneTransform * projection);
+        _effect.Parameters["Time"].SetValue(time);
+        _effect.Parameters["FlowScale"].SetValue(flowScale);
+        _effect.Parameters["FlowSpeed"].SetValue(flowSpeed);
+        _effect.Parameters["Ramp"].SetValue(_ramp);
+        _effect.Parameters["Flow"].SetValue(_flow);
+        _device.BlendState = BlendState.AlphaBlend;
+        _device.DepthStencilState = DepthStencilState.None;
+        _device.RasterizerState = RasterizerState.CullNone;
+        foreach (EffectPass pass in _effect.CurrentTechnique.Passes)
+        {
+            pass.Apply();
+            _device.DrawUserPrimitives(PrimitiveType.TriangleStrip, _vertices, 0, vertexCount - 2);
+        }
+        batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, transformMatrix: sceneTransform);
+    }
+
     /// <summary>Draws a greyscale flipbook frame coloured by the ramp. Ends and restarts the scene batch.</summary>
     public void DrawFlipbook(SpriteBatch batch, Matrix sceneTransform, SpriteClip clip, float elapsed, Vector2 position, float rotation, float scale, float opacity)
     {

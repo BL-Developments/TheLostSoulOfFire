@@ -467,6 +467,7 @@ public sealed partial class GameWorld : IDisposable
         }
         if (_player.Scythe.StartedThisFrame)
         {
+            _combatPresentation.SlashRibbons = _art.CanDrawDeathFlame && _art.HasClip(VisualIds.Player, VisualClips.Aim);
             _combatPresentation.PresentScytheSwing(
                 _player.Scythe.ActiveStep,
                 _player.Position,
@@ -977,7 +978,7 @@ public sealed partial class GameWorld : IDisposable
                 _art.DrawCannonProjectile(batch, shot);
             }
         }
-        _particles.Draw(batch, pixel);
+        _particles.Draw(batch, pixel, _art.SoftSpot);
         _spriteVfx.Draw(batch);
         batch.End();
         batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, transformMatrix: sceneTransform);
@@ -1837,8 +1838,9 @@ public sealed partial class GameWorld : IDisposable
         {
             float pulse = 0.5f + 0.5f * MathF.Sin(_presentationTime * 3f);
             Vector2 center = _arena.CombatBounds.Center.ToVector2();
-            batch.DrawCircle(pixel, center, GameBalance.WaveTriggerRadius, GameBalance.DeathFlameBright * (0.22f + pulse * 0.22f), 4f, 48);
-            batch.DrawCircle(pixel, center, GameBalance.WaveTriggerRadius * 0.55f, GameBalance.DeathFlame * (0.14f + pulse * 0.14f), 3f, 36);
+            WorldMarks.Ring(batch, pixel, center, GameBalance.WaveTriggerRadius, GameBalance.DeathFlameBright * (0.3f + pulse * 0.25f));
+            WorldMarks.Ring(batch, pixel, center, GameBalance.WaveTriggerRadius * 0.55f, GameBalance.DeathFlame * (0.2f + pulse * 0.2f));
+            _art.DrawSoftSpot(batch, center, new Vector2(GameBalance.WaveTriggerRadius * 0.5f), GameBalance.DeathFlame * (0.06f + pulse * 0.05f));
         }
 
         foreach (PendingArenaSpawn spawn in _pendingSpawns)
@@ -1847,14 +1849,15 @@ public sealed partial class GameWorld : IDisposable
             float progress = 1f - spawn.Remaining / GameBalance.ArenaSpawnTelegraphDuration;
             float pulse = 0.5f + 0.5f * MathF.Sin(_presentationTime * 14f);
             float radius = MathHelper.Lerp(62f, 26f, progress);
-            batch.DrawCircle(pixel, spawn.Position, radius, GameBalance.DeathFlameBright * (0.25f + progress * 0.45f), 4f, 32);
-            batch.DrawCircle(pixel, spawn.Position, radius * 0.55f + pulse * 4f, GameBalance.DeathFlame * (0.2f + progress * 0.4f), 3f, 24);
+            WorldMarks.Ring(batch, pixel, spawn.Position, radius, GameBalance.DeathFlameBright * (0.25f + progress * 0.45f), progress > 0.7f);
+            WorldMarks.Ring(batch, pixel, spawn.Position, radius * 0.55f + pulse * 4f, GameBalance.DeathFlame * (0.2f + progress * 0.4f));
+            _art.DrawSoftSpot(batch, spawn.Position, new Vector2(radius * 0.8f), GameBalance.DeathFlame * (0.1f + progress * 0.2f));
         }
 
         if (_loopState is ArenaLoopState.Intro or ArenaLoopState.Transition)
         {
             float pulse = 0.5f + 0.5f * MathF.Sin(_presentation.StateTime * 8f);
-            batch.DrawCircle(pixel, _arena.CombatBounds.Center.ToVector2(), 118f + pulse * 14f, GameBalance.DeathFlame * (0.18f + pulse * 0.18f), 5f, 40);
+            WorldMarks.Ring(batch, pixel, _arena.CombatBounds.Center.ToVector2(), 118f + pulse * 14f, GameBalance.DeathFlame * (0.24f + pulse * 0.2f));
         }
     }
 

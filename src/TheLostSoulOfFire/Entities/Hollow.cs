@@ -224,11 +224,13 @@ public sealed class Hollow : Enemy
         if (State == HollowState.Telegraph)
         {
             float radius = 48f + telegraph * 20f;
-            batch.DrawArc(pixel, Position, radius, MathF.Atan2(_facing.Y, _facing.X) - 0.8f, 1.6f, GameBalance.DeathFlame * (0.28f + telegraph * 0.5f), 4f, 18);
+            WorldMarks.Arc(batch, pixel, Position, radius, MathF.Atan2(_facing.Y, _facing.X), 1.6f, GameBalance.DeathFlame * (0.28f + telegraph * 0.5f));
         }
         else if (State == HollowState.Swipe)
         {
-            batch.DrawArc(pixel, Position, GameBalance.HollowSwipeRange, MathF.Atan2(_facing.Y, _facing.X) - 0.75f, 1.5f, GameBalance.SoulWhite * 0.72f, 9f, 20);
+            float facing = MathF.Atan2(_facing.Y, _facing.X);
+            WorldMarks.Arc(batch, pixel, Position, GameBalance.HollowSwipeRange, facing, 1.5f, GameBalance.DeathFlame * 0.7f, 9f);
+            WorldMarks.Arc(batch, pixel, Position, GameBalance.HollowSwipeRange, facing, 1.5f, GameBalance.SoulWhite * 0.72f, 9f);
         }
 
         if (soulSenseActive)
