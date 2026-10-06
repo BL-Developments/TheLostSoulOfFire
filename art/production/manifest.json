@@ -17052,6 +17052,2172 @@
         "status": "angenommen",
         "reason": "Tod: Aufbäumen, auf die Knie, Sturz nach vorn"
       }
+    },
+    {
+      "id": "be989a6276e5459b9cade46ed00ab9e2",
+      "timestamp": "2026-10-06T19:59:49+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "idle",
+        "frames": 24,
+        "fps": 16.0,
+        "frame_size": [
+          382,
+          279
+        ],
+        "origin": [
+          0.5,
+          0.7634
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 67.7
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/idle.render.json",
+          "sha256": "5650ce538e64f83915c58a39803e244bd2a798e12de9b82f537255a8e5df7a1f"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle/n.png",
+          "sha256": "e47551cb9aa7b00226bf0d9e8f1c006cddd0c5ff0f5951c43b822184028700d8"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle_normal/n.png",
+          "sha256": "a6f54e001234ce5210a85e43994ccadffdf039d76587e6103f2497398a08088b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle/ne.png",
+          "sha256": "fea5827bdaad8eb8bceaeb50f718079db87d9175b4947f9efa29527433be5f2b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle_normal/ne.png",
+          "sha256": "e2742012c82010d4c843ba978035c5a3d3fd72a5124225702574c886ee81d57f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle/e.png",
+          "sha256": "b6d43247b03e961e037555f0f62f65f422b9a21ff6d64aece8973d49a873f919"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle_normal/e.png",
+          "sha256": "2d5c2639b7e76825cf6c13134679678dff8825081af4b44ffc577514864ca082"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle/se.png",
+          "sha256": "4f3fae05641cf172d7a72dfc9a6e9c5a6650b8db2d971584d406dd4f7c40b756"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle_normal/se.png",
+          "sha256": "7510e66445470a9d98d5cfd2f2f5ab4640356a23c817a9940ad93b71078e30f7"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle/s.png",
+          "sha256": "df67a661aac5a3ff012709019291ef8f90a931820491d9e54be276228183d97e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle_normal/s.png",
+          "sha256": "7fc403bc9ee7b48ac33ffda6289d4ead1039c04262d2b80765967d5c266cb65d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle/sw.png",
+          "sha256": "03f05c50db77b5264ff2b723f343ac5f5b9de90a378488581ea8154c86844106"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle_normal/sw.png",
+          "sha256": "34540547d78456bb8c97893b887d12f5a78718032e90c66fbe486ce74e8ea3b5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle/w.png",
+          "sha256": "1a04465539656c367d159c0005a1bd1a8d8f0d93a6a9d0f989e334af70a53df3"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle_normal/w.png",
+          "sha256": "1dbcc6dc894eab2542cacaef90b824902019af9f10c011b27da2c51e900512d2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle/nw.png",
+          "sha256": "dc876034160b5fdffc42192f051aa23ccf732fefe4bc94193fd1b6c2c00e8725"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle_normal/nw.png",
+          "sha256": "ba2536aa9e5f7a1f6488b663972634b4c4f2103ecd7bb9534181c51cebb237dc"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 1.41,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Neue Sense (2 m, schwer wie die Kanone) in seitlicher Haltung"
+      }
+    },
+    {
+      "id": "32da9b1aa01f401691e6c45fcd5ba778",
+      "timestamp": "2026-10-06T19:59:52+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "move",
+        "frames": 24,
+        "fps": 24.0,
+        "frame_size": [
+          374,
+          278
+        ],
+        "origin": [
+          0.5,
+          0.7518
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 67.3
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/move.render.json",
+          "sha256": "e186e91c8fdebf99a497b38004ab2c9347c8c588e4c2b813b65da7427a32bb4d"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move/n.png",
+          "sha256": "5d1e62e11d81dedb524aab21ebaf8aaa44460167304a7c3fbf7e7d311b6e3f69"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move_normal/n.png",
+          "sha256": "0c7ed5b6f823a7aba8978d9f7b3c48a8846203d05442aa6b3dcadabb3c478d2a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move/ne.png",
+          "sha256": "b64adde5f1a31e5920e560a47b2092dcb6ad0140f7fc45aec74c334e60232cf3"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move_normal/ne.png",
+          "sha256": "b99408b226562489c7b1487a3098473526ddd2350ac895c1d87183b5cae0ee3c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move/e.png",
+          "sha256": "032d2e80a3fab40497ab1f9ba0c7181dd19ee3bc261f5fbb2c8088271d01b526"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move_normal/e.png",
+          "sha256": "7662ca36155f682051d3bb6eb4e5086da6d140d15baf85cd0ba7a1662b998a12"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move/se.png",
+          "sha256": "a2ea4015b61d212000df371564d7b6d3839febc0faaee6bebcd12c6dfff669dc"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move_normal/se.png",
+          "sha256": "98bc7fbfe1816140dda90f61a22fddba0082f0d2680ca7a8b5364138ee8b7fb8"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move/s.png",
+          "sha256": "bbdb06684ded5ca1457a0b137fd2747d2beaf47503ee3ac33616c11447f40934"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move_normal/s.png",
+          "sha256": "a6451a9097b8e6cfb2a669dc62987551fbe95f395588a80014dd50e277b01747"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move/sw.png",
+          "sha256": "0816c60a84b04e2022b4db6f6bdfd01beba74c2fbd0838d95fde184408f1aa76"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move_normal/sw.png",
+          "sha256": "4f78c302e655c4c4548548b99a3bce8d09c0879951465781ec4d1bd9e796ee06"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move/w.png",
+          "sha256": "cf4caa31397ca2b0dc5090c2cf03c1f8394666f2055edd746a00d04585d44050"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move_normal/w.png",
+          "sha256": "6c40143c06fe923c1ffac079a9cfee426a2c484a190524fc71affc974bd0df54"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move/nw.png",
+          "sha256": "99e0c84d4bbafc98c1d770719b0d6c91287af663c7f3f9c4bcc015593319360e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move_normal/nw.png",
+          "sha256": "edf7169c5f65b6711cde2b6a751c29e8300f554f0aa0cba8cd2aed0b92060be6"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 1.45,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Neue Sense (2 m, schwer wie die Kanone) in seitlicher Haltung"
+      }
+    },
+    {
+      "id": "98876f94aef64359b5a86c56ec869e29",
+      "timestamp": "2026-10-06T19:59:53+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "swing1",
+        "frames": 14,
+        "fps": 24.0,
+        "frame_size": [
+          396,
+          286
+        ],
+        "origin": [
+          0.5,
+          0.7832
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 39.5
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/swing1.render.json",
+          "sha256": "df6557256ff8295a402b58aea18bd4f8a620fe93c2ff4ca481a19fca9c3a858a"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/n.png",
+          "sha256": "547ed5947aaf7b454bfe829afbc0ee502fe2e669863dcefae8623151975c4b82"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/n.png",
+          "sha256": "d41ebc8be09e5c091f63d03cb23c1c7505ebc8e5c762b39428b2e7ac7eabe25e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/ne.png",
+          "sha256": "6e7c4261ce6565256eae876d5908d628df3e4cf79ee912b08567df948b68fbe3"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/ne.png",
+          "sha256": "05d68ba8cf400079c207c75a6172339d89ed51297961928c15ce8afd7f0da966"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/e.png",
+          "sha256": "f5804281baee0e41842c0ac5d10d6a039f8b95c3b55f7eff9a42cd4670097bfa"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/e.png",
+          "sha256": "34d9197734748a5d78a9178f5c80c15246c1e216557301939fca8dec8ca61ab7"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/se.png",
+          "sha256": "80d1bceae9385434c954c96a5964b3c19b4a87322910bee2852b83a1e41588b5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/se.png",
+          "sha256": "7be716d3c8e69aa2303c2cd033aee809c4c50b2767359867ac857a6daec3b6dd"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/s.png",
+          "sha256": "ea81b9aaf8d0be0e214dc70ed555db1b58a75faf7a531160344adf2eb8032e85"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/s.png",
+          "sha256": "296bf3635d5ec4fe0abd296ac114b09e5675606df3aa940ee4b14384e7083f2a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/sw.png",
+          "sha256": "9d4e10e26340864b214cd9021236b25944ed72f5726b11a8bd2766b65de5d416"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/sw.png",
+          "sha256": "d46a9ab6709548a9a9e60e7b7ac92716e0c17b088aa33bddbc251148a4155b17"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/w.png",
+          "sha256": "76383c75b86add804a74ec7dfd513429e2391072f4da74225a49b18695c4ce18"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/w.png",
+          "sha256": "430fab5bed6ef211d497983000730b7566dc62974f891cbda2de6a78a39a0a31"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/nw.png",
+          "sha256": "378ee16d171405935a0d1560d4a63512d0b826b5f17b8101e5fd360695cb9450"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/nw.png",
+          "sha256": "7cb816960f364a2745d931e18c45301b9db2a61bd35898c37cb6d931bf766c6e"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.96,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Neue Sense (2 m, schwer wie die Kanone) in seitlicher Haltung"
+      }
+    },
+    {
+      "id": "c2d52de6579440a7a49e75ff6b2822ec",
+      "timestamp": "2026-10-06T19:59:55+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "swing2",
+        "frames": 16,
+        "fps": 24.0,
+        "frame_size": [
+          398,
+          356
+        ],
+        "origin": [
+          0.5,
+          0.7612
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 45.9
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/swing2.render.json",
+          "sha256": "cfe85de9862c5087b5e83319d7d4fe64838d4cd5d862b86662fb22db2923f780"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/n.png",
+          "sha256": "35be788d2890a173f88bc4cb773554c855c38464889f07377aaa81850da50d2f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/n.png",
+          "sha256": "4ac49969ae9e08bbf8c5e1bdedbb350396377cc4b3dd8ac02a3d1f68930dcf9a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/ne.png",
+          "sha256": "ce155a459c282015806b5eec42bd84cfe3d19d77d1642c0c6196e89586c91037"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/ne.png",
+          "sha256": "b3fe3599fd452d29e1d2a5621445e6233752da651a941537813ede1872a66399"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/e.png",
+          "sha256": "b7927af83eec4f9ed66213794677b6292cff911a68583aa9a9728181eb832696"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/e.png",
+          "sha256": "afa1d37973efd6672b51bf77bce0f9617095cff1936eb5af1038412c2a702d9d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/se.png",
+          "sha256": "764716e1ef48031aea2baa2ba0256b2e487afe13a8b51002d4403249bbf05830"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/se.png",
+          "sha256": "85b3b5772335638e754cb149c3c98970ccdfb0db93e7ecfe270c83ffb9ae442e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/s.png",
+          "sha256": "92c2badea96f0cb5ffc8a98ea72691cd0cee42781aea17fa65ed04c0348151b0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/s.png",
+          "sha256": "db056ce368c3e91fe799900978bea647fd94193878b95a9e1f564a014030518d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/sw.png",
+          "sha256": "cb7a997980f1262036d5a2674a526a86dc79248870d214d90556fb14110b9bc9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/sw.png",
+          "sha256": "a437b39ee5c950fefe9bb527d168e773fd496a2b3ecaa6c173595c917468cc3b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/w.png",
+          "sha256": "df29d83ec8e1ee80695f3169959bdb551952ab330dd7b5a29d8be6c9118c8f8f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/w.png",
+          "sha256": "90092ee286168b16635b45ab07c8276290d7349c1486e1f87f6fdc73033bada6"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/nw.png",
+          "sha256": "14311abdf820fa43928e39040bed25c469b81ca97832aa47dbf10cbf141ea6e8"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/nw.png",
+          "sha256": "06519191567d7ab96c9983289d27f07c797c669bb1cc21d2bdee26774ddc14f6"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 1.23,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Neue Sense (2 m, schwer wie die Kanone) in seitlicher Haltung"
+      }
+    },
+    {
+      "id": "a042fac5e6cd44a88b8cac0b0391731d",
+      "timestamp": "2026-10-06T19:59:59+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "swing3",
+        "frames": 26,
+        "fps": 24.0,
+        "frame_size": [
+          392,
+          398
+        ],
+        "origin": [
+          0.5,
+          0.7513
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 73.2
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/swing3.render.json",
+          "sha256": "34c0be76e0abfc8a8ae73b727f37f5f709ce4f0ee8914122c2daeb08cbd0a75c"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/n.png",
+          "sha256": "1b2ab337be840205683950051214587b4f8bf8842c8e09c80355436a14ffda15"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/n.png",
+          "sha256": "cb3f6cd12e934a11ed5dc7cd04edced8f2bd9a0c9efbab91f4eb9a550dc9c0c4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/ne.png",
+          "sha256": "bc14fe4e2eb46bcde44c936ac3323a7dc5071eac47d57fe8444d9df8c54e055b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/ne.png",
+          "sha256": "0387cbbb0185e4b6d34a6f453183943d584489c26e9b73c90c4a425cfccadea0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/e.png",
+          "sha256": "8d9f1138b4cd87a1a6bf65530ef138b9888f83504bcae45fe4c62bda5920bfeb"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/e.png",
+          "sha256": "1e14082d1aba3406f1edc98cc12655740e10661ca3d49eb4ce6d5126a2dba6dd"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/se.png",
+          "sha256": "34a93376768d504d4ef839a1b7cbbe25abc1b35c0b74447e47fa93c627587e8c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/se.png",
+          "sha256": "26010d469a031a9a96bb2417923f73e9f9fb7721653c7c8e2485fe6a96078994"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/s.png",
+          "sha256": "3bbb04a1ef494abf7e4230e3ff8a16c97f9ed8fb7e1b212e68879e453859a7ca"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/s.png",
+          "sha256": "73f2409c671c5d5dc755e0ae66c92b913155d292dbe3703e7ef6a3d9e06f4c8b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/sw.png",
+          "sha256": "f8a8c5f71fc0d08be411a925334c9bc60de0f70a9ac70174ab108a67d985ea63"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/sw.png",
+          "sha256": "7f50dc80ff4599aa8d2184b63bc2f41c3b4a688cc5a6967782477c59c90bcfe7"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/w.png",
+          "sha256": "6e9e2eb8f7e9d354bbd0b2343b7bb0c4010775a7938a66dfc4c24b8bc5adc81e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/w.png",
+          "sha256": "a0837eff2665fcdb3a38e74ee9a7130656f84ec48bce42d67b7c5378c21838dc"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/nw.png",
+          "sha256": "fc63f695f274bd80a792025e564534d5dc3e9ba9e1509239ef6b04db8a546a1a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/nw.png",
+          "sha256": "5d450e0481b8a454d6a4938f558ee797954d17e2f26613f8679a5ac99ff76f46"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 2.17,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Neue Sense (2 m, schwer wie die Kanone) in seitlicher Haltung"
+      }
+    },
+    {
+      "id": "e5ce7f0923fd460f9a520ec79c818826",
+      "timestamp": "2026-10-06T20:00:00+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "aim",
+        "frames": 9,
+        "fps": 6.0,
+        "frame_size": [
+          296,
+          269
+        ],
+        "origin": [
+          0.5,
+          0.768
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 25.4
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/aim.render.json",
+          "sha256": "de7bccdba49ce2c88abf9fa73356b38b260c12ef01d04ce1026b7255e5ea7c7b"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim/n.png",
+          "sha256": "6d4c52fcc1b2de47cc9a433fb3816dea584a426aa34661adff7d3e559798223a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_normal/n.png",
+          "sha256": "b0a15f8035db69f15045bcbe67132443836301dd24b72f2b981c71a2746d8390"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim/ne.png",
+          "sha256": "ea6e7044950a39cf832057a567b6c713a909f8ac148c8435adc6d46803326c80"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_normal/ne.png",
+          "sha256": "b063cfca2accc0a44521179f2b530a3974f61303285a35ebae0a06c0d17ad23e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim/e.png",
+          "sha256": "2770944971711b1d10de4616dfb16339576bd05835f269fba2a92b618143444f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_normal/e.png",
+          "sha256": "418d0d7b1865a7f37d28d3854c20a9d01a570d5e158e0260f701be524954aa10"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim/se.png",
+          "sha256": "5360228a2de189d40c7b6c0d47468b63719ca22a15f22c1a2282582b57ffa876"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_normal/se.png",
+          "sha256": "a0f68cecc863533faa54ee5afcd748cc4decc273a9081e163b9142bce41878e4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim/s.png",
+          "sha256": "fd445b4535a06c030c69dcdd3465d705e51061b036d16d52fba199ca6300624f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_normal/s.png",
+          "sha256": "1484924c038e114df3aa06c4d406008a0267f2b744b5e43cfad49cb986cea249"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim/sw.png",
+          "sha256": "de75f10c930b16be9717c7b636efb02ad7d9808814d65cd66536dd36c899a9f1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_normal/sw.png",
+          "sha256": "be973d0d0c0ad3c3cee8e61d28d23a840829937f75531ca2910096107caecbeb"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim/w.png",
+          "sha256": "830b078fb915e520f73976977a7d681c2a0a06a58c258f25652b371851558ddb"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_normal/w.png",
+          "sha256": "2a3aa600952d67e59a5f7e7b0389d9de795845f32ba3090f8873bc40edee1cb7"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim/nw.png",
+          "sha256": "f55f4b2aab2e2ec054ea9dc1ef08a99814114cb41438a650ebfa2121162081ab"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_normal/nw.png",
+          "sha256": "8ef5f7a8c5ed122fc3e684f6fe6bc04096e5cb08be65d29974262b16ba2b64a1"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.42,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Neue Sense (2 m, schwer wie die Kanone) in seitlicher Haltung"
+      }
+    },
+    {
+      "id": "4649fd1de6aa424492e5626fdb3b406e",
+      "timestamp": "2026-10-06T20:00:00+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "cannon_draw",
+        "frames": 5,
+        "fps": 12.0,
+        "frame_size": [
+          382,
+          288
+        ],
+        "origin": [
+          0.5,
+          0.7729
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 14.6
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/cannon_draw.render.json",
+          "sha256": "29caf75811a71df81c306ae66372ea67b52737708a1b08af1c644912d21ecfcf"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw/n.png",
+          "sha256": "85f6e036e008805d2b196898a6386bb8a0bde363bea988a80f14aee19338a9b6"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw_normal/n.png",
+          "sha256": "ffa5178fad59f65b024bdfbfe516a66a8b62bd19ae73268198d4952353584f2c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw/ne.png",
+          "sha256": "bc4945b625442b74b126e0d1a9e95a56e5205b9381ac9146a70afaffa6a01118"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw_normal/ne.png",
+          "sha256": "6621f1b03e0ffb2570075093df4104625acac776acf09e4b03aff2ec01bf2ef1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw/e.png",
+          "sha256": "49234d8c13f3f89fcf02baf4dbb3ce853174e8e88d98fd048034ee4ab0c6aa22"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw_normal/e.png",
+          "sha256": "8456ce707ba7ffeeb4e547b75156307d1d4354b973c5f05a543029025df7b4e0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw/se.png",
+          "sha256": "950cc90a09dcbdf9fd71fc5eedabcf4a1a92599a041c3947bafd428881081c6c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw_normal/se.png",
+          "sha256": "c0944958e985931e04a9e5ab8021f4cef8a08672d97149e2de68b6c4d02a8ba5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw/s.png",
+          "sha256": "4471b0bd2bf72ea387ff915044e6058e1cbbe3c8a22620ef6ec61bd929c038c0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw_normal/s.png",
+          "sha256": "39a944387db326901ea26d7c56320076a081b2ab01727113bf18752862261df6"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw/sw.png",
+          "sha256": "4847d932507c282f651c26af9bfc457e5434d9697fc8b1ab99ef7b7dd7258b69"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw_normal/sw.png",
+          "sha256": "3b09efd2aecce245ff7fdb7b51831089dbcde299b0f85930e1587ebee5dc6252"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw/w.png",
+          "sha256": "b4470417ca5bace89deb19d293c081207f37747675c4d41847dcfe9e2dba3c1d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw_normal/w.png",
+          "sha256": "078580dd1ed38cc43edeecab86fda98e3d23e9347405915f6065482bccc2e160"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw/nw.png",
+          "sha256": "67511a782bc33ccb624c61ef267edbefa0ff4c440de1dfeb303999d20f6a6a47"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw_normal/nw.png",
+          "sha256": "b713257d680e86b97885a08e34f971f8e47b2a64d8d64bd35bbead8450ec22ac"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.35,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Neue Sense (2 m, schwer wie die Kanone) in seitlicher Haltung"
+      }
+    },
+    {
+      "id": "a2df333f52eb4490a61d6f5a0a4ee995",
+      "timestamp": "2026-10-06T20:00:01+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "cannon_fire",
+        "frames": 10,
+        "fps": 24.0,
+        "frame_size": [
+          382,
+          289
+        ],
+        "origin": [
+          0.5,
+          0.7737
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 28.8
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/cannon_fire.render.json",
+          "sha256": "5baf848e2ef1e9062633735474b64afffe25c9317627bc6bc5a59f15bb67f197"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/n.png",
+          "sha256": "bce7eb960369259575e1de22ce0d6af55fd20c91cff72b1a0fc9593b15e665cc"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/n.png",
+          "sha256": "2d5991ad8aebafa4f006b05fb56ab2f51ad453a1f0ee58e2fe61172decf10a31"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/ne.png",
+          "sha256": "baebbcb99cc30ab5b0cb07a480892666433e2b0f6fba1847e87a2d9162ecfbfb"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/ne.png",
+          "sha256": "a8c3890af0f616396ccb491a9de90b9f8fb212fa0aa681bf2251bd740579d2ee"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/e.png",
+          "sha256": "d656da8cfb8ed0ec07ffd33731b9adc9462969fc8cfc8387ba8ec0c797546711"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/e.png",
+          "sha256": "0dc5ea2453a7ad338cad4eb679c63b21f667f9d0e52db8aeb367cef13780957c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/se.png",
+          "sha256": "26123c8bad4fdc1268b95944fdb4ae7443f0844804d39705c590e1fabafdef0f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/se.png",
+          "sha256": "5646445f9120b43c0dc19b68f9e76e263e78c168220643254d5e440d47a628de"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/s.png",
+          "sha256": "0cf6ca1865177855ce26235865f2930a5757af124c2b3e7f555f3960f620bf9f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/s.png",
+          "sha256": "09a43147753b121e98c5cd96ae91176e10f1ee08f40cbd2d20b16474ebbf3cad"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/sw.png",
+          "sha256": "b1544febbaa1b754194395557f21f6a1356bd020217d55b1b7b11eaf7e399f86"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/sw.png",
+          "sha256": "e94778eb092b0c290ebb38687643c9c6880467576152495d4fb09240dee839a5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/w.png",
+          "sha256": "f5dc54d4485406b426aed3612b28affc19a8d4062f73195cd469e971b6648a21"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/w.png",
+          "sha256": "6a44d858794709faaa044c9408418702bf73f1dca54a0155a1e8bc48c73b8765"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/nw.png",
+          "sha256": "22790f9228e1d24fd3b6c908572787d95600f09fdd1748204e9520427178327a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/nw.png",
+          "sha256": "944ead877d27a263cff51ac2185a4a72110ace33e3b0d7216ce9a6bc016a957c"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.7,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Neue Sense (2 m, schwer wie die Kanone) in seitlicher Haltung"
+      }
+    },
+    {
+      "id": "6184d10583df4b82b864ce70deabd3be",
+      "timestamp": "2026-10-06T20:00:02+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "dash",
+        "frames": 8,
+        "fps": 24.0,
+        "frame_size": [
+          342,
+          265
+        ],
+        "origin": [
+          0.5,
+          0.7358
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 22.8
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/dash.render.json",
+          "sha256": "62316082852a173d254c44f1db3f819106f985df429638607ee164dc03557423"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/n.png",
+          "sha256": "34d493f2d67dd89c5b4f66d703fe4ed6037d672c31d5c9b2212f13dcc28c15fa"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/n.png",
+          "sha256": "9ed97aa0e05acdc72c6873497f569a635639c185b342524b6fd2302a5a061e22"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/ne.png",
+          "sha256": "55730d9fb1416b4d150e13ed1a270e495031a9227267f893759f92582714bc9c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/ne.png",
+          "sha256": "c81b09bd1d465d2a434e392dd258ad52ffb0ec1055d88ef16c92f0bee8e907ef"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/e.png",
+          "sha256": "c034388cc3240e35b56db3acf8f60e5bd11611a3eecb5614de1c3847f998e06d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/e.png",
+          "sha256": "9f0f0dacb7c08282b9905a2e76e9f1a4b353606884515bb9ccf31fbd91556894"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/se.png",
+          "sha256": "fc447e3097ede334dbc184bf5416d1e6f655bf0ea803eb678634968246e9bef9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/se.png",
+          "sha256": "8d65f57a13e4ee9548ef089ebb9c73b2030a9505df4d73749b79ffe0ee502100"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/s.png",
+          "sha256": "ced700229701b110788edc051d5f47fd98ebf4d0d46a0ade6937fb2bc8b9c5d6"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/s.png",
+          "sha256": "d984a9a3601d212f7a3bc8e53250c79b75c790a6162a9f49729df1c679763e26"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/sw.png",
+          "sha256": "840e16289746c8c359c6b131dd4260a61c44ebb45b117ee49488e372140e0d52"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/sw.png",
+          "sha256": "e7f544726aff4a5d749a2a64032b9677ef42039cf8377b0de108c12cf2be0d33"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/w.png",
+          "sha256": "2e3d3249dc66122d2be81cfe0708e1d2af397c29d7e934ced3ab9bf468afa6c5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/w.png",
+          "sha256": "f8523a6ca616cdf3cdca0a082899200acff9b89713201a6210716dfbbaece96d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/nw.png",
+          "sha256": "a2363bb1e2223e784eff53bae5a59a8ee3e36eb4257ec156d1956b7ce90008ad"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/nw.png",
+          "sha256": "b21bb0d67cef59fd7d8d67894453c31c25399fa1cbd412df444021071363b65f"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.49,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Neue Sense (2 m, schwer wie die Kanone) in seitlicher Haltung"
+      }
+    },
+    {
+      "id": "c00824029eb147d594245780d9980963",
+      "timestamp": "2026-10-06T20:00:03+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "hit",
+        "frames": 6,
+        "fps": 24.0,
+        "frame_size": [
+          382,
+          298
+        ],
+        "origin": [
+          0.5,
+          0.7819
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 17.2
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/hit.render.json",
+          "sha256": "4735cb8cdf50041490b07b6431a8ac6211cf81170d6438b3a1f323ecd0eab146"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/n.png",
+          "sha256": "ef0285bcc3963e891e0365e6fed0b5b0834c50592564270478bc10ad1ea28d80"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/n.png",
+          "sha256": "c7d4ae4dea19f418d27139221355724df37374c77925511a01c7591ae1025ef4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/ne.png",
+          "sha256": "e5109cedbd08c2c3b618fe8a4da2508886a27cefc23d3a7967b9e742a3317110"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/ne.png",
+          "sha256": "753d669319b64655ee8ec08d9147f104901275ed185940f22c29d56e493240d4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/e.png",
+          "sha256": "137da415fa2ec910255b6675d35825de8884d79bb2abf77e782fe78041b9a762"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/e.png",
+          "sha256": "3e2bd19cd21c2db258d769708788331a3b7ca8d4605a9dbf0a78028c88133ad2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/se.png",
+          "sha256": "cf33554eb011e71b610060be1f761ebf8ac88a125d92afe853caf69c4c28129f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/se.png",
+          "sha256": "76ddcebac4e35bbd800c82ccf2df2cf31d2b48345dfc99dc62f7a4bfe3d183a9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/s.png",
+          "sha256": "ede5f7b83ed8bf5f4d3b0fdfb847f1afe8fee0c5feedba8315a4200b5bf2370a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/s.png",
+          "sha256": "47b9e57fe758ca2c0f02c101961763deab304c4470fc08ef96cbede0b7a0de17"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/sw.png",
+          "sha256": "e5a19c00009502724e2eef7414b9d7bf04e363b15db77ffc9e6221672dcd2576"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/sw.png",
+          "sha256": "7e4506c8a0b3bc9b8213b428c2770865186eeff9e48118e8aa118b7ea21f369f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/w.png",
+          "sha256": "b425f0ed96533db1fb9e21972d566a53c6544e93ae351f5c57bd9678feb01e80"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/w.png",
+          "sha256": "11b76ec3cc123d889e35c77ab4de6ac055979641d23c91b8d1e9e6950db12981"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/nw.png",
+          "sha256": "6519ab26bc78504da9f873fc7334ffd616d6374619a251549ceaab859dbf746d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/nw.png",
+          "sha256": "986b48debe4bce8e74a08f376831bb50bce5458b7af33cabc419d51bd5ccb085"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.4,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Neue Sense (2 m, schwer wie die Kanone) in seitlicher Haltung"
+      }
+    },
+    {
+      "id": "0c9c16f7c10b40d4800a3f4fab38cb2f",
+      "timestamp": "2026-10-06T20:00:05+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "death",
+        "frames": 16,
+        "fps": 12.0,
+        "frame_size": [
+          434,
+          338
+        ],
+        "origin": [
+          0.5,
+          0.629
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 46.8
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/death.render.json",
+          "sha256": "348811708d605c1d6d6bf79bc5af946b8c28536018162c2999227f4823f3c96b"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death/n.png",
+          "sha256": "b2accb1b72f6774da4b39b3c2f3aa849f6916a94a3a395d1858f8966e7471d23"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death_normal/n.png",
+          "sha256": "9d160cc775bee7313d2a1cab13c71b574e1bea7ff9d547e32d9f1ab36f5e2d5a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death/ne.png",
+          "sha256": "d08bcfe4e0a9e62ad9297da6555b34dc385a5ca1a163c32dabee7b187f8ea88d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death_normal/ne.png",
+          "sha256": "904b628f435086ea99279008d5340a3f2dd0ebbf9098ebf6012f272df1c5308d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death/e.png",
+          "sha256": "4aa0ae3ec1141a0773e92eb855fcf828d038cebf8157576490fcd6a10a21fe4c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death_normal/e.png",
+          "sha256": "60167dde002ab3ee3a673e94dbd9a46eaed9201b2476e57a6d6a9a50de323be8"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death/se.png",
+          "sha256": "a6c607b3a50f1b75a7c4acdb542efaa5dbad827cef609b8817dc19808b196c49"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death_normal/se.png",
+          "sha256": "99a69fa177c8b85b2b5f66f4a1a3bbc4018d6a478436239b3ace1da35ac931f4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death/s.png",
+          "sha256": "64e6ba237d1f108707ddd2d1a36a90fdd3c5396cd1adc5a0087022fc7fbc6704"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death_normal/s.png",
+          "sha256": "cb79f6343bc4d33669cd55c1a94843500a681bc7f3cb5853263f7d5da13afa28"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death/sw.png",
+          "sha256": "cd5191c6d8eda2c4222600088f52f8d8f1a8c438386c0d91d0ad1e24c845fdf4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death_normal/sw.png",
+          "sha256": "2e183a761df4f163e493f3e45384ea1f25b03a79ca3d91ae76f68466c49adf82"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death/w.png",
+          "sha256": "af56825b49e5a311c73a7c07b1ccd0fe9bd2bb9cd536a95df6ae9045e3a9d5a2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death_normal/w.png",
+          "sha256": "33ef7be4cc865140f71ef4bbbf78eb81fee513e8393d6ad716d839b3f71855bc"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death/nw.png",
+          "sha256": "d716dfe735220c5ea08ef8ab9393e9328110f34c64934e56b3daa129e76863ad"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death_normal/nw.png",
+          "sha256": "d8657a4416adab5c247a4a0232799102d3781d58ecd9e4f10d496f175a01bf57"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 1.24,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Neue Sense (2 m, schwer wie die Kanone) in seitlicher Haltung"
+      }
+    },
+    {
+      "id": "29d90c88d1bd4c949728ce51d71fd51f",
+      "timestamp": "2026-10-06T20:00:06+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "swing1_return",
+        "frames": 8,
+        "fps": 24.0,
+        "frame_size": [
+          382,
+          287
+        ],
+        "origin": [
+          0.5,
+          0.7387
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 23.0
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/swing1_return.render.json",
+          "sha256": "06c6b84822dda40c968e6994c679bf430ffef244128523509fdaa998c2d2430d"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return/n.png",
+          "sha256": "59d97f2c09a1c6255bfb5e44b7e48930f78a5cd2030e9f6bab1fbcdde891b02e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return_normal/n.png",
+          "sha256": "3c6000a10b059df01d3cc3c01b87d2b83fa98fc6cb5869d528947266803c62d7"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return/ne.png",
+          "sha256": "47c6568e7307676daee3f4c88f728931a996e697f8464aafa57059a386c7e0b4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return_normal/ne.png",
+          "sha256": "4080267a8c26407c9ece1f54c31d535552605d1f91aa9517a06c1603cc25d862"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return/e.png",
+          "sha256": "737fd96e170ec3bf9f31528091404efd7fe90f9bee368777b322949a2d465b4b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return_normal/e.png",
+          "sha256": "67ec3c85deac82ab8733fa668c00973e5ae542058cd0658893de0b42902f4694"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return/se.png",
+          "sha256": "de903513a1750452670b1d17d3571d77b737bd9fbac2977704a102f6b90808eb"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return_normal/se.png",
+          "sha256": "6fab24c9287a40f93ed49e487a2d53946949fe0d2c9b6afa5c314b8f285b200d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return/s.png",
+          "sha256": "d8d024b9bfb56773bbddb5a1f873bb5bdbc0e0d8c437f609d9e4b6c8154ead5e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return_normal/s.png",
+          "sha256": "56c6b38c1e1f5a40080fc09fb597ba93476190161d9aa9a122aa7fd9bf5359ba"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return/sw.png",
+          "sha256": "6254577ff7ee29edb9554ad0a292aa2206e6fcbfff65e42b982e06e56b289e4d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return_normal/sw.png",
+          "sha256": "95ecc8648bafcc965a0977afd38562fae56ba071aa041c5eda92a09dcb4dced5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return/w.png",
+          "sha256": "7ff6d5baa8520cdbd1670abb59f458a43732aa7ba74ec7d22795d2fde9d60824"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return_normal/w.png",
+          "sha256": "d69ca40553162ec17955cea728bf59726f211a3216f4f663f607c718db57c229"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return/nw.png",
+          "sha256": "0a212ec89ad825805b601f970e67351ff75d5fdc9e0cbc64d0ce77570cd25937"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return_normal/nw.png",
+          "sha256": "ff43c63a5f571593a31aa926436754168c31cff764269a8c06c700bec5f2c4b5"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.55,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Neue Sense (2 m, schwer wie die Kanone) in seitlicher Haltung"
+      }
+    },
+    {
+      "id": "0a263afe00cc4bef95fa368c57a1b497",
+      "timestamp": "2026-10-06T20:00:07+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "swing2_return",
+        "frames": 8,
+        "fps": 24.0,
+        "frame_size": [
+          382,
+          317
+        ],
+        "origin": [
+          0.5,
+          0.795
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 22.7
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/swing2_return.render.json",
+          "sha256": "8a4aa85faeb1558d58c9614cc451f16a0622d4617ec197000e6b4ef4a94bafcc"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return/n.png",
+          "sha256": "75bff1a13e99b255cc405771c0d1ea056890be626cc44e6822fea964b177cc13"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return_normal/n.png",
+          "sha256": "39dbec277d3dd89a4fc9adbb967c9a33506b20d28ad2dd389ca70972bb8b4107"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return/ne.png",
+          "sha256": "f321274dc39e418c0993798ad0548ebcbabf961fd2e5a6ac4ab6eded6d639b29"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return_normal/ne.png",
+          "sha256": "2300966e0e758e3c3b3a777d9d2708a7fb892b1df0cffdf3d80fc4dee0a9d603"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return/e.png",
+          "sha256": "44927e638df3351724f738100ddee35b01fdfd93ed9a33903e0dafd3fa99e117"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return_normal/e.png",
+          "sha256": "05c0245efbe96a072273dc91416042d61eec69c0ac97118c78b9ca9ee9ff23a0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return/se.png",
+          "sha256": "a6abb31d772544f102d409cc5ed62787123dca148a5edf4d5cb039a34baad031"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return_normal/se.png",
+          "sha256": "1ec35f469a480099e9a96a4a79bdd071b0e545ced358ce018fbeccc756670982"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return/s.png",
+          "sha256": "ba85206d9163921698b99e5e131eff0f2fd8ad1117daedc28a1c0ee606eb48ec"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return_normal/s.png",
+          "sha256": "08ec6664fc8c08763ed8a490896311ea55c076147e5b41e7a65821545f1692d1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return/sw.png",
+          "sha256": "ce0756e4c12995ec4494c8747160eb9a9e78118ca0c844c35701763567a69b56"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return_normal/sw.png",
+          "sha256": "b040da851719e92c91f49a239a0e6ebc8dbfe80ad8c4c149bb4c8f0d3beaa75c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return/w.png",
+          "sha256": "78c513c0d21972073a5f0f638e60afcbebd648952a9b351c8505e7df9357c323"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return_normal/w.png",
+          "sha256": "2e09822dac97e4d6ba9c33b795a5f02db805ff576550119fd9ce8fdd7f25f9bc"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return/nw.png",
+          "sha256": "c8a834c8a1033524e358070b20b598276f1b6efd2bfb12fa3f53f458f4005dd2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return_normal/nw.png",
+          "sha256": "7b87fa7c477cb14377aa25dd8a9844fae91d5990070de6b4c87fe7b31b6f77e0"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.6,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Neue Sense (2 m, schwer wie die Kanone) in seitlicher Haltung"
+      }
+    },
+    {
+      "id": "b6735095b20c4ae19db393c9cebb5b83",
+      "timestamp": "2026-10-06T20:00:08+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "swing3_return",
+        "frames": 10,
+        "fps": 24.0,
+        "frame_size": [
+          382,
+          302
+        ],
+        "origin": [
+          0.5,
+          0.702
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 27.5
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/swing3_return.render.json",
+          "sha256": "038eda4a458da257cd92f645b8bc1cdc2fc5022ddff59fd43e0831c5115d600f"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return/n.png",
+          "sha256": "65559a2acf085678513ebe3045b914ea8cf51fe3cf7768d33bb8c57b48952432"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return_normal/n.png",
+          "sha256": "e5b19806f2f349d330b5fd48ff26c5de1690ea83f9e40ac3a91e7a5bf10c3d14"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return/ne.png",
+          "sha256": "e7a2beb721b8cee1b7a2d93c423e1fc0191fdfacd892881e5bf42828cc594112"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return_normal/ne.png",
+          "sha256": "34e2d12e03316db037c4112b1c0e1ae3318b82b6b76d86b01d5137126c7fca6a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return/e.png",
+          "sha256": "c5deeffc4cf8736c8ff43836d5f04e393497f528dc94259d32af365ae5dd6954"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return_normal/e.png",
+          "sha256": "86e24a7534b7ff49d9ebc90018fc625ed199245b1ca05eefce3ae14b918b1c5f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return/se.png",
+          "sha256": "7e755c62a62cf48b5e9f83eb7f03a27a666b10453b53df479595ab74004ee42d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return_normal/se.png",
+          "sha256": "0b1f53d569a9974455ca8871552d3e793de1b24c2ec112e4a6d885196a73272b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return/s.png",
+          "sha256": "37b41a7b0d721d1243f9817e6d0a5ed0427f8b2d04498bf063fd317e399c2dd9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return_normal/s.png",
+          "sha256": "0341c8f76a5ac10ef2a600d7e227999a4f1a1ce2fd700d2119f2d7a183c9d44a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return/sw.png",
+          "sha256": "8e60d564bce8e9089d6ca9bc94ae8efad5e103d2a6f7fbc3b925e2a517506ec4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return_normal/sw.png",
+          "sha256": "06f0319dbc7ee1fe5525bc871cbcad6e0907a5e213888e556acdef1da95e19ad"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return/w.png",
+          "sha256": "ff2b0450e8b1628ec83d6d226f1eee6a72b882456fdaabd3c907b4cf9b02e02c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return_normal/w.png",
+          "sha256": "e7cf9c1813e1767f0fbf64a1ec4ff65fe232cfdf3888e7b1d285b82610055e26"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return/nw.png",
+          "sha256": "8bde2cce33a2278455ba28bfd4ca4c8d40a561e06cb5cd63ec63ad0bd1827a03"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return_normal/nw.png",
+          "sha256": "7de1600aae482c9a8c0a743f7fc7a4905dbff4c981d277105149aaf2a5b0c549"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.72,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Neue Sense (2 m, schwer wie die Kanone) in seitlicher Haltung"
+      }
+    },
+    {
+      "id": "6d0392ac23584a9f9bd330ca9b8c7418",
+      "timestamp": "2026-10-06T20:00:09+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "retreat",
+        "frames": 8,
+        "fps": 24.0,
+        "frame_size": [
+          382,
+          313
+        ],
+        "origin": [
+          0.5,
+          0.7923
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 22.5
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/retreat.render.json",
+          "sha256": "9791248f6c305de3350cec1803a6ed66a082e8a77eed64e46201554c3b459ac4"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat/n.png",
+          "sha256": "bb9afeff00bff27df965de79470839e47afa919c93ec3cd0366167b3ca1f3c75"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat_normal/n.png",
+          "sha256": "f53b5888ad0d072d41d776a23b44a6281119c05615f06543790a087f85fb0742"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat/ne.png",
+          "sha256": "c0f1f056540c6ea2708b10fdb176589c57b8925c0176156507b12ca8b60b0b09"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat_normal/ne.png",
+          "sha256": "d563b86355c5a2881da5b8a94e474fae526b12c347ae0709539853ccc90c3ec4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat/e.png",
+          "sha256": "d636915473fc7a077d001d6362d98a1efc8693036e11188bac373bd09b655d17"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat_normal/e.png",
+          "sha256": "bf09559a4a674e41c91c6e4ffccecb7b488a97e54fead2b9ef5c9230fa572b6e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat/se.png",
+          "sha256": "e6da95f29d4708678d81dd5ee18de4f5b208ffdbe1b42fde873f97ca3e8dad91"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat_normal/se.png",
+          "sha256": "1600cbab29e92ce0012c58b73b12d017a6176d58d2ce83390aa087fc6afc0977"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat/s.png",
+          "sha256": "228379437b901db959d4845e0caace794cfad0369297a87d9e8e0a3400e4db35"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat_normal/s.png",
+          "sha256": "71f5c1d9ff69a5a1e803ce60259839b423e885ef58d2e4fb9ccb616178ab4f19"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat/sw.png",
+          "sha256": "3561cfa0251fb92155cc28d787b1260d8353c6ff50735c808c1fd0a8fbfa43e0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat_normal/sw.png",
+          "sha256": "bd3774609fe5aa9db51e8e54e645d42cd12aba2be1453c570e46870e4173a62b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat/w.png",
+          "sha256": "02b18559934fba59b1ffd71c57982b916c124d9078ee3112551f3e14c6a5cd24"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat_normal/w.png",
+          "sha256": "93786a23411f9bdc871d6c58a77748c5ff313e95df442395c86f2b2e782e5bf4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat/nw.png",
+          "sha256": "aab8e1c4849fc7d692d9bec3b4ec62cd9078b25eaf52edf290c0aaa74517173c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat_normal/nw.png",
+          "sha256": "0e1a4e165ce75261177da411be86a428baaa224343b0b4ebd71501859a4471df"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.6,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Neue Sense (2 m, schwer wie die Kanone) in seitlicher Haltung"
+      }
+    },
+    {
+      "id": "860cc4afa4e144c7bfc8f8628b7132c7",
+      "timestamp": "2026-10-06T20:00:11+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "aim_move",
+        "frames": 12,
+        "fps": 12.0,
+        "frame_size": [
+          282,
+          253
+        ],
+        "origin": [
+          0.5,
+          0.7375
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 33.1
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/aim_move.render.json",
+          "sha256": "17ebb79900f0bb0a5cfcf71d4614e97269097f232b2d20633c2083ff6ee908f6"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move/n.png",
+          "sha256": "d4db94eddeac17c0124dbbc9f5776e4d65ab0fa58dfeb7961f7a8f7232fb2075"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_normal/n.png",
+          "sha256": "7ade28869daf58a2e719f06533e5de41414fbf320526799e75bc5d467affa8dd"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move/ne.png",
+          "sha256": "67a5e513ce7a3c54ef92bc3d8a5a7a554eeba1a6e3e265532f658b3ce4290169"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_normal/ne.png",
+          "sha256": "f7ecc65f49d6bd5ce2c5793791493cff3bfeef837cd7e9ca55764d9a35187e33"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move/e.png",
+          "sha256": "09f3abf0f27eecdf1235e53477df609cf1055eaa5c28ff896d9f151dec6dc524"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_normal/e.png",
+          "sha256": "e773cbc2ddb67f465d5c0fb0571672104505c5efa2bb28b4e7ee40df8b67e972"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move/se.png",
+          "sha256": "f0b0ba2fe525f47a713589b1a85e4c0a29a00c6086554d285d067c879ec38b1a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_normal/se.png",
+          "sha256": "79b0bf5565685f16fabc7943e9465d2311a90589a49af6aabc0e64def6ccfe0b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move/s.png",
+          "sha256": "dfed1c0d7273a14d8e02e7eef5286ecbf4ee37dd2b0c6639568813400be534ac"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_normal/s.png",
+          "sha256": "e946b9c8fd4e36bd05b0e0434b54f91847d1a25baf9320184bf8729d166a2974"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move/sw.png",
+          "sha256": "eaaac853486e89899529aa5b892eabe41cf9fc0bd41d826fc0f812beff5ee357"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_normal/sw.png",
+          "sha256": "b6b456fc93441665a4d22322a2ce561dbf9dccb4d40461de6e84706a9d5e6604"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move/w.png",
+          "sha256": "d59c6b4fabdeb0c52198f7c20db90142356803b52e143d9f1523485b480715e9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_normal/w.png",
+          "sha256": "2f8774e8e732fe1ee99e0050236026ca78665183af300350a0ab9b76283bb844"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move/nw.png",
+          "sha256": "2620327846f8287ec1e14282e6e7fc8e028ef0f914c10bd07789d03a75d8fa51"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_normal/nw.png",
+          "sha256": "e1e854bb940f9fa613e0d8031d4296e51a4df4b53772e4ef893fb64f306fab8f"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.55,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Neue Sense (2 m, schwer wie die Kanone) in seitlicher Haltung"
+      }
+    },
+    {
+      "id": "286940f40e8d49f8878c137d37bf73c6",
+      "timestamp": "2026-10-06T20:00:12+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "aim_move_2",
+        "frames": 12,
+        "fps": 12.0,
+        "frame_size": [
+          282,
+          262
+        ],
+        "origin": [
+          0.5,
+          0.7466
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 32.7
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/aim_move_2.render.json",
+          "sha256": "cef40299c693ad4f6b5086e8ae97ce612786fd3da7bf0e00e0207ee6d617e3db"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2/n.png",
+          "sha256": "fe1eecc4aee17869229a41b4d10a95196f92d4e572326e54ff88b2a98228fafa"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2_normal/n.png",
+          "sha256": "fb0dba1ce3fec910e5c0bba8db9df2f7ec3161a95d979c98ef31b6aa3ac5549c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2/ne.png",
+          "sha256": "dc1169234eb74a87c299ace72a0e2b4748e018b78e83804d51da01017623ec31"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2_normal/ne.png",
+          "sha256": "7fd4584da0642285621d9c1b8d39e64a8f07d167d817c194b6898250ebd3eb7d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2/e.png",
+          "sha256": "57add782b35bedd1c97332e4b37fe0b59a4c33836a40035a8fbf50629a0fef8f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2_normal/e.png",
+          "sha256": "518ac3e5eeede157cdc09a2b6aa1dc3c4080af43a1e33425753de3b061a67a2f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2/se.png",
+          "sha256": "59f167c26734f0da3b396159f121ab695d64198a67ad1a8ddff9dc6409c3afdb"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2_normal/se.png",
+          "sha256": "67619eca69cba15d5b5147b262cea948d1f86e9d97b62e12fef5961b727d25cb"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2/s.png",
+          "sha256": "81c4411792327c99f2c9724a82b95c939a4e87f391e92178130138db9fdfe727"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2_normal/s.png",
+          "sha256": "76ec50e5dc4c34df0e253bedff391f0e5fe3cde7a27861ff466cbf7d1b4e72ab"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2/sw.png",
+          "sha256": "1cbf18ec00e98a40ece8812dfa2d54636f844daf3e36dff4460ff9e833a8e0b1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2_normal/sw.png",
+          "sha256": "634ea07c88a605abacfeab61d884a479e177d7c253e0afe7adf544c4b74aa410"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2/w.png",
+          "sha256": "6bf4a6a8ca460d2a47f9bb2c1f469c3832296c5d12412cd62bef76da04e129c5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2_normal/w.png",
+          "sha256": "14c329cc36f57f2d0170063e71adb984dfbcce19d5ef92fc9cdbaa5d9acbc98b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2/nw.png",
+          "sha256": "9389ede6d544db6d74b5dd4822e2759cce314e504dfb7f75c8aa40ff57be4f76"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2_normal/nw.png",
+          "sha256": "9f12c56d4f8f5f6504d3f7f1e673e15cc4e26b164d9f1abeddb5d8d38d75105d"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.57,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Neue Sense (2 m, schwer wie die Kanone) in seitlicher Haltung"
+      }
+    },
+    {
+      "id": "aeabde32d40c47ee9f584b9082bb6b9a",
+      "timestamp": "2026-10-06T20:00:13+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "aim_move_3",
+        "frames": 12,
+        "fps": 12.0,
+        "frame_size": [
+          288,
+          271
+        ],
+        "origin": [
+          0.5,
+          0.755
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 32.7
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/aim_move_3.render.json",
+          "sha256": "6cc77f6d0f350af6b8ad7ac8c4aad91a62ba3c5cf0431e08037fca410e73e2bf"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3/n.png",
+          "sha256": "21014636c1133f6780350b35e164046946868eea028f4b50f413b31aa1aa9afb"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3_normal/n.png",
+          "sha256": "cc751380bb794ebd02aee5155c484c217b865e42f3928827b50e10105eb1608f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3/ne.png",
+          "sha256": "d08843c5d5b4f710285cc4ae48a3588258a73c1a4c72679afb74f72b41c32b27"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3_normal/ne.png",
+          "sha256": "918632a1aa452c0aa62ccf3baafd3c00326e61b235e0bd656ff736b3a91e3c51"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3/e.png",
+          "sha256": "5f64c4babbaf49e6516e0e77a47429143195344ab105323f1872d6e26f25752d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3_normal/e.png",
+          "sha256": "eef4d7d72b231af713a40011e274c38ac14de4b8e76e97da7f19af1b02b5369e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3/se.png",
+          "sha256": "36dd0f23d9af7bcd5095d48e10001c89f35561ec1a1e4eb5c60765e3fc2b02f1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3_normal/se.png",
+          "sha256": "d22c4285a9e3f74a38cb24dd8b8c862a70c3cd0a63a00179831903ef98795033"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3/s.png",
+          "sha256": "6c9f5c4b3cfdf175a703f025a635a71f3ad2ae1958b85264d53b7540fde6cc83"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3_normal/s.png",
+          "sha256": "d5625d58bcd9b29c12065cb6b4f8d2e0892f90e3d7ceb8852a0353f96936e8cd"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3/sw.png",
+          "sha256": "2b5049fa791e72ec5f78d45e82d6991e430f86ad4035bf0c44009a8e59d6b9e5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3_normal/sw.png",
+          "sha256": "3a032f7cec5f3eee689645328fd4e5934031bf02db4a015ed2766dff8d1301fb"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3/w.png",
+          "sha256": "39204ec1f4ac04f88de4f07a9881e3a2c282429263bf0ec1b69a03446d556323"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3_normal/w.png",
+          "sha256": "650124a859a003da51fe44c903d104a7d5a79a520c589cd19dc072ec87ced411"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3/nw.png",
+          "sha256": "7e45f8572a8281f4b0e81b3bea3b4a3c4882677242e457aa645032446cad98d8"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3_normal/nw.png",
+          "sha256": "3e33a6274408006ea8ad372d4698dfc8cf24b6916ba90e9ca515c6b5802ac5a8"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.6,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Neue Sense (2 m, schwer wie die Kanone) in seitlicher Haltung"
+      }
+    },
+    {
+      "id": "8d692681054e4b51b089c060bea445b3",
+      "timestamp": "2026-10-06T20:00:16+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "wake",
+        "frames": 30,
+        "fps": 8.0,
+        "frame_size": [
+          412,
+          331
+        ],
+        "origin": [
+          0.5,
+          0.6423
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 90.4
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/wake.render.json",
+          "sha256": "cee206b9faa8007426f6b0bed00abe78880515affd31f02b05c8fe862a6d80e9"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake/n.png",
+          "sha256": "4a5cefde4d65a9127a7487aa6a76b3bba81d217cec9ee83d6fe13503f31b9821"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake_normal/n.png",
+          "sha256": "f4c0cb0399909f3c81b66b192b0c402b7ce534431eff7b5316cf20efa81c28cc"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake/ne.png",
+          "sha256": "7dd39d6b0f0c4a4320fd59b4c2b526c3e887fdb74c2d3eb2a474eec552ea9354"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake_normal/ne.png",
+          "sha256": "82adaa280dc54dc1733a17f420c6011a6fc313c5dfb1993e19c15a4b5d234330"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake/e.png",
+          "sha256": "4314846feed6dffa590258413efdff779bbabda71adadecb58657967d7636f54"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake_normal/e.png",
+          "sha256": "6be724288cd44817052fc6f561de61ec760cc72a35b37124a7bb6dd64e90ebcb"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake/se.png",
+          "sha256": "bcb2b3a752992a157de8cbd56186f06e11a46e2326d544a8499b282674411c23"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake_normal/se.png",
+          "sha256": "e68402afa5c5915ecc232a43f7d56f8a1e5c604b6503cac0cc643680206d53e3"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake/s.png",
+          "sha256": "768c09ec78aabc0fdcb3a01fdd618f8a41266102753c526f17e5ea1599b827b6"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake_normal/s.png",
+          "sha256": "774a5a13647b3c5016923af7b5f27b0c86a1fe77811498bd8c7bb270c55060b0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake/sw.png",
+          "sha256": "42d64ad90551b3f3c39c6f86c933badc723bbd39eb946c72d71538f56929ad7a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake_normal/sw.png",
+          "sha256": "3fd07e3c47453ce3108a1d2fc5f017ac69c871a62b548c483144d1ca54aff051"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake/w.png",
+          "sha256": "9a2c92c6cc12a6f96a64edd85c91c3c8746cda7b0428480e85f699fd51e180e4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake_normal/w.png",
+          "sha256": "ccec5f21cb70bfcf6a84accb58778e82e837cde30bedac25b7f567e00c1a1e2f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake/nw.png",
+          "sha256": "9ef01e58f439fe6fce80efd11affa4d785cae676afce143fde0b39f9dbca9d3e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake_normal/nw.png",
+          "sha256": "de8737ca0aef99278139e6b2669618fe56a79094d75a9960f5d2ff1899a1ca0e"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 2.18,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Neue Sense (2 m, schwer wie die Kanone) in seitlicher Haltung"
+      }
+    },
+    {
+      "id": "69776e123273406085f6596e2adf6d8f",
+      "timestamp": "2026-10-06T20:18:58+00:00",
+      "visual_id": "environment.title",
+      "step": "place-environment",
+      "tool": {
+        "name": "place_environment.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "world": [
+          1280,
+          720
+        ],
+        "output": [
+          1920,
+          1080
+        ],
+        "tiles": [
+          1,
+          1
+        ],
+        "layer": "background",
+        "origin": [
+          0.0,
+          0.0
+        ],
+        "crop": null,
+        "mute_reds": null,
+        "target_median": null
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/title/v2/backdrop.png",
+          "sha256": "4f121ede0257b4b0b41bec87c458c2798d62f864d080596d8c8d7d11df631552"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Title/backdrop.png",
+          "sha256": "92f5b45ab8ba91c576b87d3b291a0aced9f8842dcd0300b9ecb34ddfa8cd8ad6"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.22,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Bodenplatte für das Spiel aufbereitet"
+      }
     }
   ]
 }

@@ -226,6 +226,7 @@ public sealed class ScytheCombat
     }
 
     private readonly List<Vector2> _slashPath = new(40);
+    private readonly List<Vector2> _slashTips = new(40);
     private readonly List<float> _slashMask = new(40);
 
     /// <summary>
@@ -256,9 +257,9 @@ public sealed class ScytheCombat
         // the oldest flame is flung out beyond the blade.
         (float trail, float flung) = ActiveStep switch
         {
-            1 => (0.17f, 1.04f),
-            2 => (0.17f, 1.12f),
-            _ => (0.22f, 1.37f)
+            1 => (0.26f, 1.03f),
+            2 => (0.28f, 1.08f),
+            _ => (0.34f, 1.2f)
         };
         float activeFrom = StrokeStart(ActiveStep);
         float settle = MathHelper.Clamp((progress - 0.55f) / 0.45f, 0f, 1f);
@@ -272,18 +273,27 @@ public sealed class ScytheCombat
         float aim = MathF.Atan2(_attackDirection.Y, _attackDirection.X);
         float reach = _resonanceActive ? GameBalance.ResonanceScytheRangeMultiplier : 1f;
         _slashPath.Clear();
+        _slashTips.Clear();
         _slashMask.Clear();
         bool any = false;
         const int points = 28;
         for (int index = 0; index < points; index++)
         {
             float along = index / (points - 1f);
-            ScytheBladePaths.Sample sample = ScytheBladePaths.At(ActiveStep, MathHelper.Lerp(tail, head, along));
-            float angle = aim + MathHelper.ToRadians(sample.Heading);
-            float distance = sample.Distance * ScytheBladePaths.UnitsPerMetre * reach * MathHelper.Lerp(flung, 1f, along);
-            _slashPath.Add(feet + ScytheBladePaths.Project(angle, distance, sample.Height));
-            // Level depth of the point relative to the body: negative is farther from the camera.
-            float depth = MathF.Sin(angle) * distance;
+            float at = MathHelper.Lerp(tail, head, along);
+            // The sweep spans the blade from its root at the collar to a little beyond its tip;
+            // older parts are flung outward, so the stroke shows the strike's reach.
+            ScytheBladePaths.Sample root = ScytheBladePaths.At(ActiveStep, at);
+            ScytheBladePaths.Sample tip = ScytheBladePaths.TipAt(ActiveStep, at);
+            float fling = MathHelper.Lerp(flung, 1f, along);
+            float rootAngle = aim + MathHelper.ToRadians(root.Heading);
+            float tipAngle = aim + MathHelper.ToRadians(tip.Heading);
+            float rootDistance = root.Distance * ScytheBladePaths.UnitsPerMetre * reach;
+            float tipDistance = tip.Distance * ScytheBladePaths.UnitsPerMetre * reach * 1.06f * fling;
+            _slashPath.Add(feet + ScytheBladePaths.Project(rootAngle, rootDistance, root.Height));
+            _slashTips.Add(feet + ScytheBladePaths.Project(tipAngle, tipDistance, tip.Height));
+            // Level depth of the sweep's middle relative to the body: negative is farther from the camera.
+            float depth = (MathF.Sin(rootAngle) * rootDistance + MathF.Sin(tipAngle) * tipDistance) * 0.5f;
             float front = MathHelper.SmoothStep(0f, 1f, MathHelper.Clamp((depth + 10f) / 20f, 0f, 1f));
             float share = behind ? 1f - front : front;
             _slashMask.Add(share);
@@ -295,17 +305,14 @@ public sealed class ScytheCombat
             return true;
         }
 
-        float headWidth = ActiveStep switch { 1 => 24f, 2 => 32f, _ => 50f };
-        float heat = ActiveStep switch { 1 => 1.0f, 2 => 1.15f, _ => 1.35f };
+        float heat = ActiveStep switch { 1 => 0.85f, 2 => 1.0f, _ => 1.2f };
         if (_resonanceActive)
         {
-            headWidth *= 1.22f;
             heat *= 1.15f;
         }
 
-        // A wide, dim veil of flame under a narrower, hotter edge.
-        art.DrawDeathFlameSlash(batch, _slashPath, headWidth * 1.8f, alpha * 0.8f, heat * 0.75f, _slashMask);
-        art.DrawDeathFlameSlash(batch, _slashPath, headWidth, alpha, heat, _slashMask);
+        // One broad, soft stroke over the surface the blade swept (no ribbon line).
+        art.DrawDeathFlameSmear(batch, _slashPath, _slashTips, alpha * heat, _slashMask);
         return true;
     }
 

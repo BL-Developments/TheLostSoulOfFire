@@ -177,12 +177,47 @@ public sealed class DeathFlameRenderer
         DrawStrip(batch, sceneTransform, vertexCount, time, 3.2f, 2.4f);
     }
 
-    private void DrawStrip(SpriteBatch batch, Matrix sceneTransform, int vertexCount, float time, float flowScale, float flowSpeed)
+    /// <summary>
+    /// The scythe's sweep as a surface: for each moment of the trail the blade's root
+    /// (<paramref name="inner"/>) and its tip (<paramref name="outer"/>), oldest first; the strip
+    /// between them is drawn soft, brightest at the outer edge and the newest end, so the swing
+    /// reads as one broad stroke instead of a line. <paramref name="mask"/> as in DrawSlash.
+    /// Ends and restarts the running deferred scene batch.
+    /// </summary>
+    public void DrawSmear(SpriteBatch batch, Matrix sceneTransform, IReadOnlyList<Vector2> inner, IReadOnlyList<Vector2> outer,
+        float opacity, float time, IReadOnlyList<float>? mask = null)
+    {
+        int count = Math.Min(inner.Count, outer.Count);
+        if (count < 2)
+        {
+            return;
+        }
+
+        int vertexCount = count * 2;
+        if (_vertices.Length < vertexCount)
+        {
+            _vertices = new VertexPositionColorTexture[vertexCount];
+        }
+
+        for (int index = 0; index < count; index++)
+        {
+            float along = index / (count - 1f);
+            float intensity = MathHelper.Clamp(opacity * (mask is null ? 1f : mask[index]), 0f, 1f);
+            Color color = new(1f, 1f, 1f, intensity);
+            _vertices[index * 2] = new VertexPositionColorTexture(new Vector3(inner[index], 0f), color, new Vector2(along, 0f));
+            _vertices[index * 2 + 1] = new VertexPositionColorTexture(new Vector3(outer[index], 0f), color, new Vector2(along, 1f));
+        }
+
+        DrawStrip(batch, sceneTransform, vertexCount, time, 1.4f, 1.1f, "Smear");
+    }
+
+    private void DrawStrip(SpriteBatch batch, Matrix sceneTransform, int vertexCount, float time, float flowScale, float flowSpeed,
+        string technique = "Trail")
     {
         batch.End();
         Viewport viewport = _device.Viewport;
         Matrix projection = Matrix.CreateOrthographicOffCenter(0f, viewport.Width, viewport.Height, 0f, 0f, -1f);
-        _effect.CurrentTechnique = _effect.Techniques["Trail"];
+        _effect.CurrentTechnique = _effect.Techniques[technique];
         _effect.Parameters["MatrixTransform"].SetValue(sceneTransform * projection);
         _effect.Parameters["Time"].SetValue(time);
         _effect.Parameters["FlowScale"].SetValue(flowScale);

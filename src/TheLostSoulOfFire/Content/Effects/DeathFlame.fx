@@ -1,6 +1,8 @@
 // Death Flame colouring shared by every Death Flame effect: an intensity is mapped through
 // the Death Flame ramp (dark violet → violet → near white). Two techniques:
-//   Trail    — runtime ribbons (scythe arcs) with a scrolling flow texture;
+//   Trail    — runtime ribbons with a scrolling flow texture;
+//   Smear    — the scythe's sweep: the whole surface the blade passed, brightest at its outer
+//              edge and newest end, soft everywhere (no hard line);
 //   Flipbook — greyscale flipbook frames drawn through SpriteBatch.
 // The ramp texture is built from the colours in DeathFlameRamp.cs, so every source yields
 // the same flame colour.
@@ -64,6 +66,21 @@ float4 TrailPS(SpriteVertexOutput input) : COLOR
     return float4(ramp.rgb * ramp.a, ramp.a);
 }
 
+// x runs along the sweep (0 at the oldest edge, 1 at the blade), y from the blade's root (0) to
+// beyond its tip (1). Brightest a little inside the outer edge, fading softly to both edges, to
+// the root and to the old end; the flow breaks it into faint streaks along the motion.
+float4 SmearPS(SpriteVertexOutput input) : COLOR
+{
+    float2 uv = input.TextureCoordinates;
+    float outer = smoothstep(-0.15, 0.78, uv.y) * (1.0 - smoothstep(0.86, 1.0, uv.y));
+    float age = pow(saturate(uv.x), 0.85) * (1.0 - smoothstep(0.95, 1.0, uv.x) * 0.4);
+    float flow = tex2D(FlowSampler, float2(uv.x * FlowScale - Time * FlowSpeed, uv.y * 2.4)).r;
+    float intensity = saturate(outer * age * (0.72 + 0.28 * flow) * input.Color.a * 1.5);
+    float4 ramp = tex2D(RampSampler, float2(intensity, 0.5));
+    float alpha = ramp.a * saturate(intensity * 1.6);
+    return float4(ramp.rgb * alpha, alpha);
+}
+
 float4 FlipbookPS(SpriteVertexOutput input) : COLOR
 {
     float4 frame = tex2D(SpriteSampler, input.TextureCoordinates);
@@ -79,6 +96,15 @@ technique Trail
     {
         VertexShader = compile VS_SHADERMODEL TrailVS();
         PixelShader = compile PS_SHADERMODEL TrailPS();
+    }
+};
+
+technique Smear
+{
+    pass P0
+    {
+        VertexShader = compile VS_SHADERMODEL TrailVS();
+        PixelShader = compile PS_SHADERMODEL SmearPS();
     }
 };
 

@@ -27,9 +27,9 @@ using System;
 namespace TheLostSoulOfFire.Rendering;
 
 /// <summary>
-/// Where the Death Flame core in the scythe's collar is during each swing of the rendered
-/// figure: progress, heading in degrees from the aim (positive clockwise on screen), level
-/// distance from the feet and height above the floor in metres. Presentation only.
+/// Where the Death Flame core in the scythe's collar and the blade's tip are during each swing of
+/// the rendered figure: progress, heading in degrees from the aim (positive clockwise on screen),
+/// level distance from the feet and height above the floor in metres. Presentation only.
 /// </summary>
 public static partial class ScytheBladePaths
 {
@@ -44,19 +44,23 @@ def main() -> None:
     data = json.loads(args.paths.read_text())
     lines = [HEADER]
     names = []
-    for step in (1, 2, 3):
-        samples = data[f"swing{step}"]
-        rows = []
-        for sample in samples:
-            forward, left, up = sample["core"]
-            heading = math.degrees(math.atan2(-left, forward))
-            distance = math.hypot(forward, left)
-            rows.append(f"        new({sample['p']:.4f}f, {heading:.2f}f, {distance:.4f}f, {up:.4f}f),")
-        name = f"Swing{step}"
-        names.append(name)
-        lines.append(f"    private static readonly Sample[] {name} =\n    [\n" + "\n".join(rows) + "\n    ];\n")
+    for point, prefix in (("core", "Swing"), ("tip", "Tip")):
+        for step in (1, 2, 3):
+            samples = data[f"swing{step}"]
+            rows = []
+            for sample in samples:
+                forward, left, up = sample[point]
+                heading = math.degrees(math.atan2(-left, forward))
+                distance = math.hypot(forward, left)
+                rows.append(f"        new({sample['p']:.4f}f, {heading:.2f}f, {distance:.4f}f, {up:.4f}f),")
+            name = f"{prefix}{step}"
+            names.append(name)
+            lines.append(f"    private static readonly Sample[] {name} =\n    [\n" + "\n".join(rows) + "\n    ];\n")
     lines.append("    private static ReadOnlySpan<Sample> Of(int step) => step switch\n    {\n"
-                 "        1 => Swing1,\n        2 => Swing2,\n        _ => Swing3\n    };\n}\n")
+                 "        1 => Swing1,\n        2 => Swing2,\n        _ => Swing3\n    };\n")
+    lines.append("    /// <summary>The blade's tip during each swing, in the same terms as the core.</summary>\n"
+                 "    private static ReadOnlySpan<Sample> OfTip(int step) => step switch\n    {\n"
+                 "        1 => Tip1,\n        2 => Tip2,\n        _ => Tip3\n    };\n}\n")
     args.out.write_text("\n".join(lines))
     print(f"BLADE_PATHS_DONE {args.out}")
 

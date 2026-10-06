@@ -217,6 +217,19 @@ public sealed class ArtAssets
     }
 
     /// <summary>A Death Flame slash along <paramref name="path"/> (tail first); false without the shader.</summary>
+    /// <summary>The scythe's sweep as a soft surface between blade root and tip (DeathFlameRenderer.DrawSmear).</summary>
+    public bool DrawDeathFlameSmear(SpriteBatch batch, IReadOnlyList<Vector2> inner, IReadOnlyList<Vector2> outer, float opacity,
+        IReadOnlyList<float>? mask = null)
+    {
+        if (_deathFlame is null || !_litSceneActive)
+        {
+            return false;
+        }
+
+        _deathFlame.DrawSmear(batch, _sceneTransform, inner, outer, opacity, _time, mask);
+        return true;
+    }
+
     public bool DrawDeathFlameSlash(SpriteBatch batch, IReadOnlyList<Vector2> path, float headWidth, float opacity, float heat,
         IReadOnlyList<float>? mask = null)
     {

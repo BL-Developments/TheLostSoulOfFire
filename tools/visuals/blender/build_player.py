@@ -49,7 +49,9 @@ BONE_WHITE = (0.50, 0.47, 0.40)
 
 #: Scythe in weapon space: the shaft runs along +Y from the butt to the blade, the origin is the
 #: point between the hands; the blade stands out along +Z from the top.
-SHAFT_BOTTOM, SHAFT_TOP = -0.55, 1.05
+SHAFT_BOTTOM, SHAFT_TOP = -0.62, 1.38
+#: The blade: how far its tip curls back toward the butt and how far it stands out (metres).
+BLADE_BACK, BLADE_HEIGHT = 0.46, 0.98
 GRIPS = {"r": -0.16, "l": 0.16}
 LEATHER = (0.11, 0.065, 0.040)
 BRASS = (0.42, 0.30, 0.12)
@@ -62,6 +64,7 @@ def parse(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--rekey", help="comma-separated actions to key again on the opened .blend (no rebuild)")
     parser.add_argument("--paths", type=Path, help="JSON file for the blade paths of the swings")
     parser.add_argument("--recannon", action="store_true", help="replace the Soul Cannon on the opened figure and key its actions again")
+    parser.add_argument("--rescythe", action="store_true", help="replace the scythe on the opened figure and key every action again")
     return parser.parse_args(argv[argv.index("--") + 1:] if "--" in argv else [])
 
 
@@ -305,75 +308,111 @@ def build_face(body: bpy.types.Object, rig: bpy.types.Object, ink: bpy.types.Mat
 # ---- Scythe -------------------------------------------------------------------------------
 
 def build_scythe(materials: dict[str, bpy.types.Material], outline: bpy.types.Material) -> bpy.types.Object:
-    """Protagonist sheet: S-curved wooden shaft, deeply curved blade with a back spur, iron collar
-    holding a Death Flame core, counterweight spike at the butt. Built in weapon space."""
+    """Protagonist sheet, at the weight of the Soul Cannon: a two-metre S-curved shaft of dark wood
+    with leather wraps at the grips and iron ferrules, a broad crescent blade (about a metre)
+    with a dark iron back and a bright edge, a back spur, a heavy iron collar holding the Death
+    Flame core on both sides, and a long counterweight spike. Built in weapon space: origin
+    between the hands, shaft along +Y toward the blade, the blade standing out along +Z."""
     parts = []
-    # Shaft: a gentle S in the X-Y plane.
+
+    def cylinder(name: str, radius: float, length: float, y: float, material: str, vertices: int = 14) -> bpy.types.Object:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=vertices, radius=radius, depth=length, location=(0, y, 0), rotation=(math.radians(90), 0, 0))
+        obj = bpy.context.active_object
+        obj.name = name
+        obj.data.materials.append(materials[material])
+        parts.append(obj)
+        return obj
+
+    # Shaft: a gentle S in the X-Y plane, thicker than a field scythe's.
     curve = bpy.data.curves.new("scythe_shaft", "CURVE")
     curve.dimensions = "3D"
-    curve.bevel_depth = 0.016
+    curve.bevel_depth = 0.023
     curve.bevel_resolution = 2
     spline = curve.splines.new("POLY")
-    steps = 16
+    steps = 20
     spline.points.add(steps)
     for index, point in enumerate(spline.points):
         t = index / steps
         y = SHAFT_BOTTOM + (SHAFT_TOP - SHAFT_BOTTOM) * t
-        point.co = (0.03 * math.sin(t * math.tau), y, 0.0, 1)
+        point.co = (0.04 * math.sin(t * math.tau), y, 0.0, 1)
     shaft = bpy.data.objects.new("scythe_shaft", curve)
     bpy.context.collection.objects.link(shaft)
     curve.materials.append(materials["wood"])
     parts.append(shaft)
+    # Leather wraps where the hands hold it, iron ferrules along it.
+    for side, y in GRIPS.items():
+        cylinder(f"scythe_wrap_{side}", 0.029, 0.14, y, "leather")
+    for index, y in enumerate((0.62, SHAFT_TOP - 0.16, SHAFT_BOTTOM + 0.1)):
+        cylinder(f"scythe_ferrule_{index}", 0.03, 0.035, y, "iron")
 
-    # Blade: a crescent along a spine curving back toward the butt, edge on the inner side.
-    bm = bmesh.new()
-    samples = 14
-    outer, inner = [], []
-    for index in range(samples + 1):
-        u = index / samples
-        spine = Vector((0.0, SHAFT_TOP + 0.02 - 0.30 * u * u, 0.03 + 0.70 * u))
-        tangent = Vector((0.0, -0.60 * u, 0.70)).normalized()
-        inward = Vector((0.0, -tangent.z, tangent.y))  # toward the butt side of the curve
-        width = 0.12 * (1.0 - u) ** 0.75 + 0.004
-        outer.append(bm.verts.new(spine - inward * width * 0.15))
-        inner.append(bm.verts.new(spine + inward * width * 0.85))
-    for index in range(samples):
-        bm.faces.new((outer[index], outer[index + 1], inner[index + 1], inner[index]))
+    def crescent(name: str, back: float, height: float, root_width: float, outer_share: float, inner_share: float,
+                 material: str, thickness: float) -> bpy.types.Object:
+        """A band along the blade's spine (curving back toward the butt), from outer_share to
+        inner_share of the local width (0 = back edge, 1 = cutting edge)."""
+        bm = bmesh.new()
+        samples = 18
+        outer, inner = [], []
+        for index in range(samples + 1):
+            u = index / samples
+            spine = Vector((0.0, SHAFT_TOP + 0.03 - back * u * u, 0.04 + height * u))
+            tangent = Vector((0.0, -2.0 * back * u, height)).normalized()
+            inward = Vector((0.0, -tangent.z, tangent.y))  # toward the butt side of the curve
+            width = root_width * (1.0 - u) ** 0.7 + 0.005
+            outer.append(bm.verts.new(spine + inward * width * (outer_share - 0.15)))
+            inner.append(bm.verts.new(spine + inward * width * (inner_share - 0.15)))
+        for index in range(samples):
+            bm.faces.new((outer[index], outer[index + 1], inner[index + 1], inner[index]))
+        mesh = bpy.data.meshes.new(name)
+        bm.to_mesh(mesh)
+        bm.free()
+        obj = bpy.data.objects.new(name, mesh)
+        bpy.context.collection.objects.link(obj)
+        mesh.materials.append(materials[material])
+        obj.modifiers.new("Thickness", "SOLIDIFY").thickness = thickness
+        parts.append(obj)
+        return obj
+
+    # Blade: bright steel with a dark, thicker iron back along its outer curve.
+    blade = crescent("scythe_blade", BLADE_BACK, BLADE_HEIGHT, 0.21, 0.0, 1.0, "steel", 0.012)
+    spine_band = crescent("scythe_spine", BLADE_BACK, BLADE_HEIGHT, 0.21, -0.02, 0.22, "iron", 0.02)
     # Back spur on the outer side near the root.
-    spur_base = Vector((0.0, SHAFT_TOP + 0.04, 0.06))
-    a = bm.verts.new(spur_base + Vector((0, 0, -0.03)))
-    b = bm.verts.new(spur_base + Vector((0, 0.13, 0.05)))
-    c = bm.verts.new(spur_base + Vector((0, 0, 0.05)))
+    bm = bmesh.new()
+    spur_base = Vector((0.0, SHAFT_TOP + 0.06, 0.08))
+    a = bm.verts.new(spur_base + Vector((0, 0, -0.05)))
+    b = bm.verts.new(spur_base + Vector((0, 0.22, 0.09)))
+    c = bm.verts.new(spur_base + Vector((0, 0, 0.08)))
     bm.faces.new((a, b, c))
-    mesh = bpy.data.meshes.new("scythe_blade")
+    mesh = bpy.data.meshes.new("scythe_spur")
     bm.to_mesh(mesh)
     bm.free()
-    blade = bpy.data.objects.new("scythe_blade", mesh)
-    bpy.context.collection.objects.link(blade)
-    mesh.materials.append(materials["steel"])
-    blade.modifiers.new("Thickness", "SOLIDIFY").thickness = 0.008
-    parts.append(blade)
+    spur = bpy.data.objects.new("scythe_spur", mesh)
+    bpy.context.collection.objects.link(spur)
+    mesh.materials.append(materials["iron"])
+    spur.modifiers.new("Thickness", "SOLIDIFY").thickness = 0.018
+    parts.append(spur)
 
-    # Iron collar with the Death Flame core, and the counterweight spike.
-    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.028, depth=0.09, location=(0, SHAFT_TOP - 0.03, 0), rotation=(math.radians(90), 0, 0))
-    collar = bpy.context.active_object
-    collar.name = "scythe_collar"
-    collar.data.materials.append(materials["iron"])
-    parts.append(collar)
-    bpy.ops.mesh.primitive_uv_sphere_add(segments=12, ring_count=8, radius=0.017, location=(0.024, SHAFT_TOP - 0.03, 0.0))
-    core = bpy.context.active_object
-    core.name = "scythe_core"
-    core.data.materials.append(materials["death_flame"])
-    parts.append(core)
-    bpy.ops.mesh.primitive_cone_add(vertices=10, radius1=0.022, depth=0.12, location=(0, SHAFT_BOTTOM - 0.05, 0), rotation=(math.radians(90), 0, 0))
+    # Heavy iron collar holding the Death Flame core, visible from both sides.
+    collar = cylinder("scythe_collar", 0.044, 0.17, SHAFT_TOP - 0.04, "iron", vertices=16)
+    for index, y in enumerate((SHAFT_TOP - 0.12, SHAFT_TOP + 0.04)):
+        cylinder(f"scythe_collar_ring_{index}", 0.05, 0.02, y, "steel", vertices=16)
+    for side in (1, -1):
+        bpy.ops.mesh.primitive_uv_sphere_add(segments=14, ring_count=10, radius=0.028, location=(side * BLADE_CORE.x, SHAFT_TOP - 0.04, 0.0))
+        core = bpy.context.active_object
+        core.name = f"scythe_core_{side}"
+        core.data.materials.append(materials["death_flame"])
+        parts.append(core)
+    # The counterweight spike at the butt.
+    bpy.ops.mesh.primitive_cone_add(vertices=12, radius1=0.032, depth=0.2, location=(0, SHAFT_BOTTOM - 0.09, 0), rotation=(math.radians(90), 0, 0))
     spike = bpy.context.active_object
     spike.name = "scythe_spike"
     spike.data.materials.append(materials["iron"])
     parts.append(spike)
 
-    for part in (shaft, blade, collar, spike):
-        if part.type == "MESH":
-            add_outline(part, outline, thickness=0.005)
+    for part in parts:
+        if part.type == "MESH" and part.data.materials[0] != materials["death_flame"]:
+            add_outline(part, outline, thickness=0.006)
+        elif part.type == "CURVE":
+            pass
     root = bpy.data.objects.new("scythe", None)
     bpy.context.collection.objects.link(root)
     for part in parts:
@@ -591,9 +630,9 @@ def key_idle(poser: Poser, frames: int) -> bpy.types.Action:
         poser.set("spine_02", "forward", 2.0 + math.sin(phase) * 1.2)
         poser.set("spine_03", "forward", math.sin(phase + 0.6) * 1.0)
         poser.set("neck_01", "forward", 3.0 + math.sin(phase + 1.2) * 1.0)
-        # Combat stance from the sheet: the scythe lies level across the body, blade up on the left.
-        place_weapon(poser, Vector((0.0, -0.30, 1.0 + 0.008 * math.sin(phase + 0.4))),
-                     Vector((poser.left, 0.0, 0.04)), Vector((0.0, 0.0, 1.0)))
+        # Combat stance: the guard of weapon_idle, breathing with the chest.
+        centre, shaft, blade = weapon_idle(poser.left)
+        place_weapon(poser, centre + Vector((0.0, 0.0, 0.008 * math.sin(phase + 0.4))), shaft, blade)
         loose_fists(poser, 70)
         poser.key(frame + 1)
         key_hands(poser.rig, frame + 1)
@@ -622,10 +661,10 @@ def key_run(poser: Poser, frames: int) -> bpy.types.Action:
             poser.set(f"calf_{side}", "back", 16 + 66 * lift)
             poser.set(f"foot_{side}", "down", 12 * lift)
         ground_feet(poser, ground, settle=0.45)
-        # Scythe carried diagonally across the chest, blade behind the left shoulder.
+        # The scythe carried in the guard, bobbing with the body, the blade out to the side.
         bob = (poser.rig.pose.bones["pelvis"].head - poser.rig.data.bones["pelvis"].head_local).z
-        place_weapon(poser, Vector((-0.02 * poser.left, -0.27, 1.12 + bob)),
-                     Vector((0.8 * poser.left, 0.0, 0.62)), Vector((0.0, 1.0, 0.0)))
+        centre, shaft, blade = weapon_carry(poser.left)
+        place_weapon(poser, centre + Vector((0.0, 0.0, bob)), shaft, blade)
         loose_fists(poser, 70)
         poser.key(frame + 1)
         key_hands(poser.rig, frame + 1)
@@ -738,10 +777,10 @@ def scythe_placement(poser: Poser, chest: Vector, blade: float, reach: float, he
 
 
 #: Blade points in the scythe's own frame (build_scythe): tip, middle of the crescent and root.
-BLADE_TIP = Vector((0.0, SHAFT_TOP + 0.02 - 0.30, 0.73))
-BLADE_MID = Vector((0.0, SHAFT_TOP + 0.02 - 0.075, 0.38))
+BLADE_TIP = Vector((0.0, SHAFT_TOP + 0.03 - BLADE_BACK, 0.04 + BLADE_HEIGHT))
+BLADE_MID = Vector((0.0, SHAFT_TOP + 0.03 - BLADE_BACK * 0.25, 0.04 + BLADE_HEIGHT * 0.5))
 #: The Death Flame core in the iron collar below the blade: the game's flame ribbon streams from it.
-BLADE_CORE = Vector((0.024, SHAFT_TOP - 0.03, 0.0))
+BLADE_CORE = Vector((0.036, SHAFT_TOP - 0.04, 0.0))
 
 
 def pose_body(poser: Poser, keys: Keys, p: float, drift: float, feet: dict, lean_bone_share: float = 1.0) -> None:
@@ -911,12 +950,22 @@ def key_aim_move(poser: Poser, frames: int, name: str = "aim_move") -> bpy.types
 # hit flash), so each pose lands on the moment the gameplay already defines.
 
 def weapon_idle(left: float) -> tuple[Vector, Vector, Vector]:
-    return Vector((0.0, -0.30, 1.0)), Vector((left, 0.0, 0.04)), Vector((0.0, 0.0, 1.0))
+    """The guard: the shaft held low across the body, pointing forward and to the left, rising a
+    little; the blade hangs straight down from its end, out to the side (never standing up). In
+    this camera a shaft pointing to the figure's left would read as upright from the east, so it
+    points forward-left and reads as a diagonal from almost every direction."""
+    return Vector((0.0, -0.3, 0.98)), Vector((left * 0.62, -0.58, 0.22)), Vector((0.0, 0.0, -1.0))
+
+
+def weapon_carry(left: float) -> tuple[Vector, Vector, Vector]:
+    """Running: the guard drawn in a little closer and lower, the blade still out to the side."""
+    return Vector((0.0, -0.26, 0.96)), Vector((left * 0.64, -0.48, 0.2)), Vector((0.0, 0.12, -1.0))
 
 
 def weapon_trailing(left: float) -> tuple[Vector, Vector, Vector]:
-    """The scythe in the left hand alone, blade down behind, while the right hand holds the cannon."""
-    return Vector((left * 0.25, -0.13, 1.01)), Vector((0.06 * left, 0.55, -0.83)), Vector((left, 0.0, 0.0))
+    """The scythe in the left hand alone, the shaft trailing back low, the blade out to the side,
+    while the right hand holds the cannon."""
+    return Vector((left * 0.25, -0.13, 1.01)), Vector((0.12 * left, 0.85, -0.42)), Vector((left, 0.0, -0.4))
 
 
 def cannon_aimed(left: float) -> tuple[Vector, Vector, Vector]:
@@ -1032,8 +1081,9 @@ def key_dash(poser: Poser, frames: int) -> bpy.types.Action:
         # In the air the body floats a little; on the catch it settles fully onto the floor.
         ground_feet(poser, ground, settle=0.55 + 0.45 * window(p, 0.75, 1.0))
         bob = (poser.rig.pose.bones["pelvis"].head - poser.rig.data.bones["pelvis"].head_local).z
-        carry = (Vector((-0.02 * left, -0.27, 1.12)), Vector((0.8 * left, 0.0, 0.62)), Vector((0.0, 1.0, 0.0)))
-        low = (Vector((0.04 * left, -0.16, 0.94)), Vector((0.7 * left, 0.62, 0.05)), Vector((0.0, 0.3, 1.0)))
+        carry = weapon_carry(left)
+        # Pulled in low: the shaft trailing back along the flight, the blade out and down.
+        low = (Vector((0.04 * left, -0.16, 0.94)), Vector((0.7 * left, 0.62, 0.05)), Vector((left * 0.3, 0.2, -1.0)))
         centre, axis, up = blend_placement(carry, low, keys("carry", p))
         place_weapon(poser, centre + Vector((0.0, 0.0, bob)), axis, up)
         loose_fists(poser, 80)
@@ -1120,15 +1170,14 @@ def key_retreat(poser: Poser, frames: int) -> bpy.types.Action:
 def key_death(poser: Poser, frames: int) -> bpy.types.Action:
     """Death: the blow throws him back, the knees buckle, the scythe slips from his hands and
     he falls forward onto the floor. Played once from the moment Health reaches zero."""
-    action = bpy.data.actions.new("death")
-    poser.rig.animation_data.action = action
+    action = replace_action(poser.rig, "death")
     left = poser.left
     ground = rest_ground(poser.rig)
     contact = [("foot_l", "head"), ("foot_r", "head"), ("ball_l", "tail"), ("ball_r", "tail"),
                ("calf_l", "head"), ("calf_r", "head"), ("head", "tail"), ("spine_03", "tail"),
                ("hand_l", "tail"), ("hand_r", "tail"), ("pelvis", "head")]
     drop_start = weapon_idle(left)
-    drop_end = (Vector((left * 0.38, -0.55, 0.035)), Vector((left * 0.92, -0.38, 0.0)), Vector((0.0, 0.0, 1.0)))
+    drop_end = (Vector((left * 0.38, -0.55, 0.035)), Vector((left * 0.92, -0.38, 0.0)), Vector((0.38, 0.92 * left, 0.0)))
     for index in range(frames):
         p = index / (frames - 1)
         recoil = max(0.0, 1.0 - p / 0.22) ** 1.2
@@ -1179,7 +1228,7 @@ def key_wake(poser: Poser, frames: int) -> bpy.types.Action:
     contact = [("foot_l", "head"), ("foot_r", "head"), ("ball_l", "tail"), ("ball_r", "tail"),
                ("calf_l", "head"), ("calf_r", "head"), ("head", "tail"), ("spine_03", "tail"),
                ("hand_l", "tail"), ("hand_r", "tail"), ("pelvis", "head")]
-    on_floor = (Vector((left * 0.34, -0.42, 0.035)), Vector((left * 0.92, -0.38, 0.0)), Vector((0.0, 0.0, 1.0)))
+    on_floor = (Vector((left * 0.34, -0.42, 0.035)), Vector((left * 0.92, -0.38, 0.0)), Vector((0.38, 0.92 * left, 0.0)))
     for index in range(frames):
         p = index / (frames - 1)
         # Lying until 0.3, the push up to the knee by 0.62, rising from 0.68 to 0.92.
@@ -1273,7 +1322,7 @@ def main() -> None:
     poser.measure_rest([f"{bone}_{side}" for bone in FINGERS + THUMB for side in ("l", "r")], "down")
     add_leg_ik(rig)
     paths: dict = {}
-    actions = [key_idle(poser, LOOP_FRAMES["idle"]), key_run(poser, LOOP_FRAMES["run"]), key_death(poser, 16)]
+    actions = [key_idle(poser, LOOP_FRAMES["idle"]), key_run(poser, LOOP_FRAMES["run"])]
     actions += [combat_action(poser, name, paths) for name in COMBAT_FRAMES]
     for action in actions:
         action.use_fake_user = True
@@ -1300,7 +1349,7 @@ COMBAT_FRAMES = {
     "swing1": 14, "swing2": 16, "swing3": 26,
     "swing1_return": 8, "swing2_return": 8, "swing3_return": 10,
     "dash": 8, "hit": 6, "cannon_fire": 10, "retreat": 8, "aim_move": 12, "aim_move_2": 12, "aim_move_3": 12,
-    "aim": 9, "cannon_draw": 5, "wake": 30,
+    "aim": 9, "cannon_draw": 5, "wake": 30, "death": 16,
 }
 
 #: The actions that carry the Soul Cannon in the hands (re-keyed by --recannon).
@@ -1316,7 +1365,7 @@ def combat_action(poser: Poser, name: str, paths: dict) -> bpy.types.Action:
     if name.startswith("aim_move"):
         return key_aim_move(poser, frames, name)
     return {"dash": key_dash, "hit": key_hit, "cannon_fire": key_cannon_fire, "retreat": key_retreat,
-            "aim": key_aim, "cannon_draw": key_cannon_draw, "wake": key_wake}[name](poser, frames)
+            "aim": key_aim, "cannon_draw": key_cannon_draw, "wake": key_wake, "death": key_death}[name](poser, frames)
 
 
 def write_paths(path: Path, paths: dict) -> None:
@@ -1355,6 +1404,29 @@ def rekey(args: argparse.Namespace) -> None:
     print(f"REKEY_PLAYER_DONE {args.out} actions={','.join(names)}")
 
 
+def rescythe(args: argparse.Namespace) -> None:
+    """Replace the scythe of the opened figure with the current build_scythe and key every action
+    again (the scythe is in all of them); the blade paths of the swings are written to --paths."""
+    rig = bpy.data.objects["figure"]
+    old = bpy.data.objects.get("scythe")
+    if old is not None:
+        for obj in [old, *old.children_recursive]:
+            bpy.data.objects.remove(obj, do_unlink=True)
+    materials = {name: bpy.data.materials[name] for name in ("wood", "steel", "iron", "death_flame", "leather")}
+    outline = bpy.data.materials["outline"]
+    rig.animation_data.action = None
+    for pose in rig.pose.bones:
+        pose.rotation_euler = (0, 0, 0)
+        pose.location = (0, 0, 0)
+        pose.scale = (1, 1, 1)
+    bpy.context.view_layer.update()
+    scythe = build_scythe(materials, outline)
+    scythe.matrix_world = rig.matrix_world @ rig.data.bones["weapon"].matrix_local
+    attach(scythe, rig, "weapon")
+    args.rekey = ",".join(["idle", "run", *COMBAT_FRAMES])
+    rekey(args)
+
+
 def recannon(args: argparse.Namespace) -> None:
     """Replace the Soul Cannon of the opened figure: the old model goes, the new one is built,
     the `cannon` bone gets its new place on the back and the actions that hold the cannon are keyed
@@ -1389,7 +1461,9 @@ def recannon(args: argparse.Namespace) -> None:
 
 if __name__ == "__main__":
     arguments = parse(sys.argv)
-    if arguments.recannon:
+    if arguments.rescythe:
+        rescythe(arguments)
+    elif arguments.recannon:
         recannon(arguments)
     elif arguments.rekey:
         rekey(arguments)

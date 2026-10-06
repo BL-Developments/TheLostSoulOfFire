@@ -14,9 +14,13 @@ public static partial class ScytheBladePaths
     /// The core's place at <paramref name="progress"/> of swing <paramref name="step"/>, smoothly
     /// in between the recorded frames (Catmull-Rom through the samples).
     /// </summary>
-    public static Sample At(int step, float progress)
+    public static Sample At(int step, float progress) => Interpolate(Of(step), progress);
+
+    /// <summary>The blade tip's place at <paramref name="progress"/> of swing <paramref name="step"/>.</summary>
+    public static Sample TipAt(int step, float progress) => Interpolate(OfTip(step), progress);
+
+    private static Sample Interpolate(ReadOnlySpan<Sample> samples, float progress)
     {
-        ReadOnlySpan<Sample> samples = Of(step);
         float p = MathHelper.Clamp(progress, 0f, 1f);
         int index = 0;
         while (index < samples.Length - 2 && samples[index + 1].Progress < p)

@@ -507,6 +507,43 @@ def mark_ring(width: float, glow: float) -> np.ndarray:
     return image.reshape(256, SS, 256, SS, 4).mean(axis=(1, 3))
 
 
+def mark_zone(rim_width: float, fill: float, rim: float = 0.8) -> np.ndarray:
+    """A zone of light on the floor instead of a line: the area inside fills faintly, rising
+    toward the edge, and the edge itself is a soft band at exactly MARK_RING_RADIUS, so the
+    radius still reads precisely without a hairline."""
+    n = 256 * SS
+    ys, xs = np.mgrid[0:n, 0:n].astype(float)
+    x, y = (xs + 0.5) / SS - 128, (ys + 0.5) / SS - 128
+    r = np.sqrt(x * x + y * y)
+    d = r - MARK_RING_RADIUS
+    fade = canvas_fade(x, y)
+    edge = np.exp(-(d / rim_width) ** 2)
+    inside = np.clip(r / MARK_RING_RADIUS, 0, 1) ** 2.6 * np.exp(-(np.clip(d, 0, None) / (rim_width * 0.8)) ** 2)
+    core = edge * rim * fade
+    glow = (fill * inside + 0.3 * np.exp(-(d / (rim_width * 3.0)) ** 2)) * fade
+    image = light_image(core, glow)
+    return image.reshape(256, SS, 256, SS, 4).mean(axis=(1, 3))
+
+
+def mark_sector(span: float = 1.6) -> np.ndarray:
+    """The swipe's reach as a filled sector: faint near the body, brighter toward the soft edge at
+    MARK_RING_RADIUS, the sides fading out; a zone, not a line."""
+    n = 256 * SS
+    ys, xs = np.mgrid[0:n, 0:n].astype(float)
+    x, y = (xs + 0.5) / SS - 128, (ys + 0.5) / SS - 128
+    r = np.sqrt(x * x + y * y)
+    d = r - MARK_RING_RADIUS
+    angle = np.abs(np.arctan2(y, x))
+    ends = np.clip((span / 2 - angle) / 0.3, 0, 1) ** 1.3
+    fade = canvas_fade(x, y)
+    edge = np.exp(-(d / 6.5) ** 2)
+    inside = np.clip((r - MARK_RING_RADIUS * 0.3) / (MARK_RING_RADIUS * 0.7), 0, 1) ** 1.8 * np.exp(-(np.clip(d, 0, None) / 5.0) ** 2)
+    core = edge * 0.75 * ends * fade
+    glow = (0.32 * inside + 0.3 * np.exp(-(d / 18) ** 2)) * ends * fade
+    image = light_image(core, glow)
+    return image.reshape(256, SS, 256, SS, 4).mean(axis=(1, 3))
+
+
 def mark_arc(span: float = 1.6) -> np.ndarray:
     n = 256 * SS
     ys, xs = np.mgrid[0:n, 0:n].astype(float)
@@ -547,9 +584,10 @@ def mark_beam() -> np.ndarray:
 
 
 MARKS = {
-    "mark_ring_thin": lambda: mark_ring(2.4, 9.0),
-    "mark_ring_bold": lambda: mark_ring(5.5, 15.0),
-    "mark_arc": mark_arc,
+    # Zones of light, not lines (Durchgang 3): same radius, filled toward a soft edge.
+    "mark_ring_thin": lambda: mark_zone(6.0, 0.16, 0.7),
+    "mark_ring_bold": lambda: mark_zone(9.0, 0.3, 1.0),
+    "mark_arc": mark_sector,
     "mark_lane": mark_lane,
     "mark_beam": mark_beam,
 }

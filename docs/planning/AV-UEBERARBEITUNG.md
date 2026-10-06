@@ -344,6 +344,25 @@ Rahmen wie oben (nur Darstellung und Ton).
   hält beim vollen Laden vibrierend, nach dem Schuss sofort weg; passt zur wachsenden Kanone.
   Rundgang: `hum=0.25@-0.07` beim Laden, `0.00` danach.
 
+- Sense (Owner: „hält sie mit der Spitze nach oben statt seitlich“, „nicht so mächtig wie die
+  Kanone“): neues Modell (Schaft 2 m, dicker, Lederwicklungen und Eisenringe, Klinge etwa 1 m mit
+  dunklem Eisenrücken und hellem Schliff, schwerer Kragen mit Death-Flame-Kern auf beiden Seiten,
+  langer Gegengewichtsdorn); reicht jetzt etwa 1,9 m weit, passend zur Trefferweite 1,7–2,1 m.
+  Grundhaltung: Schaft schräg nach vorn-links, Klinge hängt seitlich herab (aus sechs von acht
+  Richtungen diagonal, nie Spitze nach oben; in dieser Kamera erscheint „links der Figur“ von
+  Osten als „oben“, daher nach vorn-links). Laufen, Dash, Halten mit Kanone, Tod und Erwachen
+  angepasst. `build_player.py --rescythe` ersetzt die Sense und keyt alle Aktionen neu; alle 19
+  Clips und das Titelbild neu gerendert; `key_idle` nutzt jetzt `weapon_idle`.
+  Verworfen: Varianten A (Klinge waagrecht nach vorn: von vorn ein Haken), C (Schaft aufrecht:
+  verdeckt den Körper), Schaft nach links ansteigend (von Osten senkrecht, Spitze oben).
+- Hiebe ohne Linien (Owner): statt des dünnen Flammenbands eine breite, weiche Wischspur über die
+  ganze überstrichene Klingenfläche (Shader-Pass `Smear`, Kragen bis knapp hinter die Spitze,
+  zur Spitze und zum neuen Ende heller, weich auslaufend); Spitzenbahnen der Klinge aus den
+  Keys im Spiel (`ScytheBladePaths.TipAt`). Der dritte Hieb zeigt eine helle Sichel.
+- Warnzeichen ohne Linien: Ringe und Wurfbogen als weiche Zonen (innen schwach gefüllt, zum
+  Rand heller, weicher Rand exakt auf dem Radius) statt Haarlinien; gilt überall (Wellenstart,
+  Erscheinen, Detonation, Schlag, Truhe, Fähigkeiten, Hollow-Griff).
+
 **Befunde, offen (nach Wirkung):**
 1. Sprache: Erzähltexte englisch, HUD deutsch (Inhaltsfrage, nicht ohne Owner ändern).
 
