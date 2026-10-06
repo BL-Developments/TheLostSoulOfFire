@@ -19218,6 +19218,117 @@
         "status": "kandidat",
         "reason": "Bodenplatte für das Spiel aufbereitet"
       }
+    },
+    {
+      "id": "f6443c5d17fb4248be5a9384f79e01a2",
+      "timestamp": "2026-10-06T20:40:58+00:00",
+      "visual_id": "enemy.hollow",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "stagger",
+        "frames": 16,
+        "fps": 14.0,
+        "frame_size": [
+          204,
+          233
+        ],
+        "origin": [
+          0.5,
+          0.8893
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.4,
+        "render_seconds": 42.3
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/enemy.hollow/render/stagger.render.json",
+          "sha256": "c1b781007b8267cf977a4dc3c4530fcf11c4bb5d04770afbf9186ebbe932ea02"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger/n.png",
+          "sha256": "800e696235f4ecf97ec3308e832a4334902c51a31685d31f9bc3258324c11453"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger_normal/n.png",
+          "sha256": "5c76cd6da352b1840b49f30a8dd09bb2188aadef345b82d68eb07ac9fe6eb03f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger/ne.png",
+          "sha256": "8b8122e09becd05206085f20dceef989ed5615f91423d523988c5f806f534e18"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger_normal/ne.png",
+          "sha256": "5271240daa99d49f483f39582af50ab47fa80f47f3d580d16145c444497b50ae"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger/e.png",
+          "sha256": "9df6c5b1d9068f1e4f342a58a06d70dd8f2d255d5d2d6d4bacb8908e66dcd93d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger_normal/e.png",
+          "sha256": "19c649ebe8d713d66da177249fcf651e56e1c8cf1821596f99fc78cb23bc2ea3"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger/se.png",
+          "sha256": "24f179f1d23da1c3dac0df4b7a93192255a8e41eed05ddba715c98f61cecfe30"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger_normal/se.png",
+          "sha256": "5f2492165838d3b5d1b46be40b1abeb1da674bcdcb11ea60d9c0767d929f68cc"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger/s.png",
+          "sha256": "59496d611dea4c275655be9bdcc47da02b32d225c9ea84f2b1e0181ac2e12e52"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger_normal/s.png",
+          "sha256": "20db227964c178583485b0d924837b8c7c1d4315876119f64dffec622ea52e2f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger/sw.png",
+          "sha256": "643d43ea852c74c8882aa20abf5b729d40222724986d976f8d9b2f4b777e8ed2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger_normal/sw.png",
+          "sha256": "a3b004eab507c93c8194d5d1c2b96c47fb7d6a872ed5dd2fef6d2e7b6e9223e7"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger/w.png",
+          "sha256": "fd9d41d937403fcb92f048f84ab6fb37bec74025dab778ed6dda6d528575e1ed"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger_normal/w.png",
+          "sha256": "62b05689918a2882c0df75f56e0205b885c49beeafebe5a6979fb4575c71becd"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger/nw.png",
+          "sha256": "2de636fa7992af3fe364ad3185f7be27b33eb872bf1fc4a505af88ce0dc71190"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger_normal/nw.png",
+          "sha256": "276e73d581672fe7e7f2a480b54587c3628f62bf728aca395bb55e4b4ec31080"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.52,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Taumeln: Rückwurf, zwei Stolperschritte zurück, benommenes Wanken, Sammeln"
+      }
     }
   ]
 }

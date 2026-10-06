@@ -248,12 +248,12 @@
         },
         "stagger": {
           "path": "Textures/Enemies/Hollow/Animations/stagger/{dir}",
-          "frameSize": [188, 240],
-          "frames": 12,
-          "fps": 10.0,
-          "loop": false,
+          "frameSize": [204, 233],
+          "frames": 16,
+          "fps": 14.0,
+          "loop": true,
           "normalMap": "Textures/Enemies/Hollow/Animations/stagger_normal/{dir}",
-          "origin": [0.5, 0.8833]
+          "origin": [0.5, 0.8893]
         },
         "death": {
           "path": "Textures/Enemies/Hollow/Animations/death/{dir}",

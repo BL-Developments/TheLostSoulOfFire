@@ -425,34 +425,40 @@ def key_recover(poser: Poser, frames: int) -> bpy.types.Action:
 
 
 def key_stagger(poser: Poser, frames: int) -> bpy.types.Action:
-    """Full cannon on the core (1.15 s): thrown back with arms flung, then a dazed sway with the
-    mask lolling, then the stoop returns."""
-    action = bpy.data.actions.new("stagger")
-    poser.rig.animation_data.action = action
-    ground = rest_ground(poser.rig)
+    """Full cannon on the core (1.15 s, sampled by the stagger timer): the blast throws it back,
+    arms flung, the mask snapping up, and drives it two stumbling steps backward (right, then
+    left); it sways dazed with the mask lolling, then shuffles forward into its stoop again."""
+    action = replace_action(poser.rig, "stagger")
+    w = 0.12
+    rest = {"l": Vector((w, -0.12, 0)), "r": Vector((-w, -0.12, 0))}
     for frame in range(frames):
         p = frame / (frames - 1)
-        throw = ease(min(1.0, p / 0.12)) * (1.0 - ease(max(0.0, (p - 0.12) / 0.3)))
-        daze = ease(min(1.0, max(0.0, (p - 0.1) / 0.2))) * (1.0 - ease(max(0.0, (p - 0.8) / 0.2)))
-        sway = math.sin(p * math.tau * 1.5)
+        throw = smooth(min(1.0, p / 0.1)) * (1.0 - smooth(max(0.0, (p - 0.14) / 0.36)))
+        daze = smooth(min(1.0, max(0.0, (p - 0.12) / 0.2))) * (1.0 - smooth(max(0.0, (p - 0.78) / 0.22)))
+        sway = math.sin(p * math.tau * 1.6)
+        planter = Feet(poser)
+        r1, lr1 = step_arc(p, 0.04, 0.2, rest["r"], Vector((-w - 0.03, 0.12, 0)), 0.06)
+        l1, ll1 = step_arc(p, 0.16, 0.34, rest["l"], Vector((w + 0.02, 0.2, 0)), 0.05)
+        r2, lr2 = step_arc(p, 0.66, 0.86, r1, rest["r"], 0.04) if p > 0.66 else (r1, 0.0)
+        l2, ll2 = step_arc(p, 0.74, 0.95, l1, rest["l"], 0.04) if p > 0.74 else (l1, 0.0)
         poser.clear()
-        stoop(poser, lean=-30 * throw + 6 * daze)
-        poser.set("head", "back", 28 * throw)
+        planter.plant("r", Vector((r2.x * poser.left, r2.y, 0.0)), yaw=10 * throw, heel=8 * throw, lift=lr1 + lr2)
+        planter.plant("l", Vector((l2.x * poser.left, l2.y, 0.0)), yaw=-6 * throw, heel=10 * daze, lift=ll1 + ll2)
+        move_pelvis(poser, Vector((0.03 * sway * daze * poser.left, 0.08 * throw, -0.03 * throw - 0.02 * daze)))
+        stoop(poser, lean=-34 * throw + 6 * daze)
+        poser.set("head", "back", 32 * throw)
         poser.set("neck_01", "left", 18 * daze * sway)
         poser.set("head", "forward", 8 * daze)
         poser.set("spine_02", "left", 10 * daze * sway)
         poser.set("spine_01", "left", -5 * daze * sway)
-        poser.set("thigh_r" if poser.left > 0 else "thigh_l", "forward", -16 * throw)
-        poser.set("thigh_l" if poser.left > 0 else "thigh_r", "forward", 10 * throw)
-        for side in ("l", "r"):
-            poser.set(f"calf_{side}", "back", 10 * daze + 8 * throw)
-        ground_feet(poser, ground)
+        fit_pelvis(poser, reach=0.97)
+        planter.settle()
         for side, phase in (("l", 0.0), ("r", math.pi)):
-            limp = dict(ARM_HANG)
-            limp = {k: (v[0] + 0.12 * daze * math.sin(p * math.tau * 1.5 + phase), v[1], v[2]) for k, v in limp.items()}
+            limp = {k: (v[0] + 0.14 * daze * math.sin(p * math.tau * 1.6 + phase), v[1], v[2]) for k, v in ARM_HANG.items()}
             pose_arm(poser, side, limp, ARM_FLUNG, throw)
         claws(poser, 20 + 30 * throw)
         poser.key(frame + 1)
+        key_legs(poser.rig, frame + 1, 1.0)
     return action
 
 
@@ -535,7 +541,7 @@ def main() -> None:
     poser = Poser(rig, Vector((0, toe.y, 0)).normalized())
     poser.measure_rest([f"{bone}_{side}" for bone in FINGERS + THUMB for side in ("l", "r")], "down")
     add_leg_ik(rig)
-    actions = [key_idle(poser, LOOP_FRAMES["idle"]), key_move(poser, LOOP_FRAMES["move"]), key_stagger(poser, 12), key_death(poser, 9)]
+    actions = [key_idle(poser, LOOP_FRAMES["idle"]), key_move(poser, LOOP_FRAMES["move"]), key_death(poser, 9)]
     actions += [combat_action(poser, name) for name in COMBAT_FRAMES]
     for action in actions:
         action.use_fake_user = True
@@ -554,12 +560,12 @@ def main() -> None:
 LOOP_FRAMES = {"idle": 24, "move": 24}
 
 #: Frames of the combat actions; render and pack take the same counts.
-COMBAT_FRAMES = {"swipe": SWIPE_FRAMES, "hit": 6, "recover": 10}
+COMBAT_FRAMES = {"swipe": SWIPE_FRAMES, "hit": 6, "recover": 10, "stagger": 16}
 
 
 def combat_action(poser: Poser, name: str) -> bpy.types.Action:
     frames = COMBAT_FRAMES[name]
-    return {"swipe": key_swipe, "hit": key_hit, "recover": key_recover}[name](poser, frames)
+    return {"swipe": key_swipe, "hit": key_hit, "recover": key_recover, "stagger": key_stagger}[name](poser, frames)
 
 
 def rekey(args: argparse.Namespace) -> None:

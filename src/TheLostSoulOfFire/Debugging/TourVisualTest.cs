@@ -469,6 +469,9 @@ internal sealed class TourVisualTest
             }
         });
         Series("hollow_hit_reaction", 10, 2);
+        // A full cannon throws the Hollows back (1.15 s).
+        Do("stagger", () => _world.StaggerAutomatedEnemies<Hollow>());
+        Series("hollow_stagger", 10, 7);
         Do("defeat", () => _world.DefeatAutomatedEnemies());
         Series("hollow_death", 12, 3);
         Series("soul_release", 10, 6);

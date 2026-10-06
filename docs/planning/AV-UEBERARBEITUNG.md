@@ -378,6 +378,10 @@ Rahmen wie oben (nur Darstellung und Ton).
   gebogener Strom aus weichen Lichtpunkten mit kurzen Schweifen, an der Seele dichter, zum Kern
   dünner; blendet mit der Freigabe ein und aus.
 
+- Hollow-Taumeln (16 Bilder, Zeitgeber unverändert): Rückwurf mit hochgerissenen Armen und Maske,
+  zwei Stolperschritte zurück, benommenes Wanken, Zurückschlurfen in die Haltung; im Rundgang
+  (`arena_wave1_hollow_stagger`) zu sehen.
+
 **Geprüft (Stand 06.10.2026, 22:40):** voller Rundgang über 18 Stationen (497 Aufnahmen, kein
 Platzhalter), CPU je Frame 0,24–0,52 ms, Wandzeit im Mittel 0,9–1,6 ms (95. Perzentil höchstens
 5,7 ms); 258 Unit-Tests; Slice-, Fähigkeiten-, Vorhallen- und Währungstest; Audio-Laufzeit-,
@@ -389,8 +393,7 @@ Gameplay- (10 Wellen) und Tod-Neustart-Test; `validate_audio.py` (169 Assets);
    Gegner, Hallfahnen, Ladebrummen, Resonanzgrollen, Feuer der Life Flame, Ende-Musik.
 2. Sichtabnahme der neuen Sense und der Wischspur im Spiel (eigene Hand an Maus und Tastatur:
    die Rundgänge sehen nur feste Zielrichtungen).
-3. Hollow-Taumeln ist eher schwach (gleicher Ansatz wie beim Devourer möglich).
-4. Lampenscheibe am Ufer meldet `clean_prop_halo.py --check` (echt, kein Fehler).
+3. Lampenscheibe am Ufer meldet `clean_prop_halo.py --check` (echt, kein Fehler).
 
 **Befunde, offen (nach Wirkung):**
 1. Sprache: Erzähltexte englisch, HUD deutsch (Inhaltsfrage, nicht ohne Owner ändern).
