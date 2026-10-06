@@ -9676,3 +9676,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/Player/Animations/retreat_normal/nw.png
+
+#begin Audio/Sfx/scythe_swing_1_lead.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/scythe_swing_1_lead.wav
+
+#begin Audio/Sfx/scythe_swing_1_lead_v2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/scythe_swing_1_lead_v2.wav
+
+#begin Audio/Sfx/scythe_swing_1_lead_v3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/scythe_swing_1_lead_v3.wav

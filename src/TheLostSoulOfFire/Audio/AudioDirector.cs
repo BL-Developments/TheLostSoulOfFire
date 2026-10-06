@@ -261,7 +261,7 @@ public sealed class AudioDirector : IDisposable
         _content = content;
         try
         {
-            Add(content, AudioCue.ScytheSwing1, "Audio/Sfx/scythe_swing_1", 250f, 0.09f, 0.32f, 0.22f);
+            Add(content, AudioCue.ScytheSwing1, "Audio/Sfx/scythe_swing_1_lead", 250f, 0.09f, 0.32f, 0.22f);
             Add(content, AudioCue.ScytheSwing2, "Audio/Sfx/scythe_swing_2", 205f, 0.12f, 0.4f, 0.3f);
             Add(content, AudioCue.SoulCleave, "Audio/Sfx/soul_cleave", 82f, 0.22f, 0.7f, 0.48f);
             Add(content, AudioCue.ScytheHit, "Audio/Sfx/scythe_hit", 118f, 0.08f, 0.48f, 0.72f);
@@ -290,7 +290,7 @@ public sealed class AudioDirector : IDisposable
             Add(content, AudioCue.EndingReveal, "Audio/Sfx/ending_reveal", 147f, 0.9f, 0.3f, 0.015f, rising: true);
             foreach ((AudioCue cue, string asset) in new[]
             {
-                (AudioCue.ScytheSwing1, "Audio/Sfx/scythe_swing_1"), (AudioCue.ScytheSwing2, "Audio/Sfx/scythe_swing_2"),
+                (AudioCue.ScytheSwing1, "Audio/Sfx/scythe_swing_1_lead"), (AudioCue.ScytheSwing2, "Audio/Sfx/scythe_swing_2"),
                 (AudioCue.ScytheHit, "Audio/Sfx/scythe_hit"), (AudioCue.CoreHit, "Audio/Sfx/core_hit"),
                 (AudioCue.CannonImpact, "Audio/Sfx/cannon_impact"), (AudioCue.EnemyDeath, "Audio/Sfx/enemy_death"),
                 (AudioCue.Dash, "Audio/Sfx/dash"), (AudioCue.HollowSwipe, "Audio/Sfx/hollow_swipe")

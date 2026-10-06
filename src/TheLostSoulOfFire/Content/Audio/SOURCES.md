@@ -213,3 +213,6 @@ Anlauf des Burning und ein eigener Tod je Gegner. Takes einer Gruppe auf ±0,5 L
 | `Audio/Sfx/death_burning_2.wav` | death-burning Seed 2 | 0.90 s, 1 Kanal, -24.7 LUFS, Spitze -6.0 dBFS (Takes angeglichen) |
 | `Audio/Sfx/death_devourer_1.wav` | death-devourer Seed 1 | 1.40 s, 1 Kanal, -20.0 LUFS, Spitze -2.3 dBFS (Takes angeglichen) |
 | `Audio/Sfx/death_devourer_2.wav` | death-devourer Seed 2 | 1.40 s, 1 Kanal, -20.5 LUFS, Spitze -2.0 dBFS (Takes angeglichen) |
+| `Audio/Sfx/scythe_swing_1_lead.wav` | scythe_swing_1.wav, erste 30 ms gekürzt (Körper früher, Animation) | 0.15 s, 1 Kanal, -12.8 LUFS, Spitze -3.0 dBFS |
+| `Audio/Sfx/scythe_swing_1_lead_v2.wav` | scythe_swing_1_v2.wav, erste 30 ms gekürzt (Körper früher, Animation) | 0.14 s, 1 Kanal, -12.8 LUFS, Spitze -2.8 dBFS |
+| `Audio/Sfx/scythe_swing_1_lead_v3.wav` | scythe_swing_1_v3.wav, erste 30 ms gekürzt (Körper früher, Animation) | 0.16 s, 1 Kanal, -12.9 LUFS, Spitze -3.0 dBFS |

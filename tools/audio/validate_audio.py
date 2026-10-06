@@ -81,6 +81,10 @@ AUTHORED_SFX_DURATIONS = {
     "scythe_swing_1_v3.wav": 0.19,
     "scythe_swing_2_v2.wav": 0.23,
     "scythe_swing_2_v3.wav": 0.25,
+    # The light swing with its slow start trimmed (tools/audio/retime.py), so it is full at contact.
+    "scythe_swing_1_lead.wav": 0.15,
+    "scythe_swing_1_lead_v2.wav": 0.14,
+    "scythe_swing_1_lead_v3.wav": 0.16,
     # Combat layers (tools/audio/recipes/combat.py): material, wind-ups, deaths.
     **{f"hit_hollow_{index}.wav": 0.32 for index in range(1, 4)},
     **{f"hit_burning_{index}.wav": 0.42 for index in range(1, 4)},
