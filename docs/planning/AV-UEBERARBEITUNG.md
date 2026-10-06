@@ -330,11 +330,13 @@ Rahmen wie oben (nur Darstellung und Ton).
 **Befunde, offen (nach Wirkung):**
 1. Sprache: Erzähltexte englisch, HUD deutsch (Inhaltsfrage, nicht ohne Owner ändern).
 
-2. Arena: Die Nordwand wirkt im Endbild hinter einem leichten Dunstschleier (Luftperspektive
-   nach Bildhöhe trifft die Wand); prüfen, ob die Wand davon ausgenommen werden sollte.
 
 **Hinweis:** Nach `place_environment.py` immer `dotnet build` vor dem Rundgang, sonst zeigt
 das Spiel noch die alten Kacheln (Content-Pipeline).
+
+**Geprüft, kein Mangel:** Nordwand im Endbild (der vermutete Dunstschleier ist nicht messbar;
+Luftperspektive auf die Wand begrenzt: Kontrast unverändert, Änderung zurückgenommen). Hollow-
+Taumeln und -Tod, Burning-Tod, Burning-Angriff, HUD, Seelensinn der Vorhalle.
 
 **Verworfen:**
 - Ziehende Rauchschatten über dem Arenaboden (gegen das gleichmäßige Licht): dunkelten vor allem
