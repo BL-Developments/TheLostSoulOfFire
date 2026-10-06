@@ -331,6 +331,9 @@ Rahmen wie oben (nur Darstellung und Ton).
 das Spiel noch die alten Kacheln (Content-Pipeline).
 
 **Verworfen:**
+- Ziehende Rauchschatten über dem Arenaboden (gegen das gleichmäßige Licht): dunkelten vor allem
+  die hellen Stellen ab; großflächige Helligkeitsstreuung sank von 10,5 auf 8,0 (Gauß 90 px),
+  das Bild wurde nur dunkler. Besser über gezielte Lichtinseln lösen, nicht über Schatten.
 - Pflaster aus Granit mit der Tönung der Kantsteine (0,56): sechs- bis achtmal zu hell, die
   Streuung je Stein ging in der Tonkurve unter.
 - Feuerknistern mit kräftigem Brausen und Atemband: CLAP hörte „Wind“ (0,5–0,8); das Brausen
