@@ -119,9 +119,11 @@ mit jedem Meilenstein aktualisiert.
   Arena inszeniert, Schritte von Spieler und Gegnern auf den gezeichneten Fußaufsätzen
   (protokolliert: Phase 0,26 und 0,77 bei Aufsätzen auf 0,25 und 0,75); die acht häufigsten
   Kampftöne mit je zwei abgeleiteten Varianten (CLAP-Ähnlichkeit zum Original 0,94–0,98,
-  zu anderen Tönen höchstens 0,88), zufällig gewählt.
+  zu anderen Tönen höchstens 0,88), zufällig gewählt; Lautstärken in den Einstellungen als
+  Leisten, Bildbewegung mit deutschen Werten, Beenden-Abfrage lesbar.
 
-**Geprüft:** 257 Unit-Tests; Rundgang über 17 Stationen (rund 440 Aufnahmen, Schlüsselbilder und
+**Geprüft:** 257 Unit-Tests; Rundgang über 17 Stationen (450 Aufnahmen, auch Menü-Unterseiten,
+Beenden-Abfrage, Tod im Prolog und Wellenwechsel; Schlüsselbilder und
 Bildserien gesichtet; er schlägt fehl, sobald irgendwo ein Platzhalter gezeichnet wird – keiner
 gefunden). Leistung auf dem M1 Pro: CPU-Zeit je Frame im Mittel 0,3–0,6 ms; Wandzeit ohne
 Bildsynchronisation (CPU und GPU) im Mittel rund 1 ms, 95. Perzentil höchstens rund 2 ms;
