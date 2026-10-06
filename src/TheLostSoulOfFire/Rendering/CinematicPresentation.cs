@@ -176,13 +176,7 @@ public sealed class CinematicPresentation
             float scale = MathHelper.Lerp(0.68f, 0.34f, collapse);
             float alpha = MathHelper.Lerp(1f, 0.34f, collapse) * Ease((_stateTime - delay) / 0.25f);
             art.DrawLoopingEffect(batch, player, VisualIds.DeathFlameLoop, body, 0f, scale, Color.White * alpha);
-            batch.DrawCircle(
-                pixel,
-                body,
-                MathHelper.Lerp(52f, 17f, collapse),
-                GameBalance.DeathFlameBright * (0.42f * (1f - collapse)),
-                3f,
-                26);
+            WorldMarks.Ring(batch, pixel, body, MathHelper.Lerp(52f, 17f, collapse), GameBalance.DeathFlameBright * (0.55f * (1f - collapse)), false, 3f);
             return;
         }
 
@@ -191,7 +185,7 @@ public sealed class CinematicPresentation
             float reveal = 1f - MathF.Abs(_stateTime - 0.82f) / 0.38f;
             reveal = MathHelper.Clamp(reveal, 0f, 1f);
             art.DrawLoopingEffect(batch, this, VisualIds.DeathFlameLoop, player.Position, 0f, 0.46f, Color.White * (0.58f * reveal));
-            batch.DrawCircle(pixel, player.Position, 24f + reveal * 31f, GameBalance.DeathFlameBright * (0.3f * reveal), 3f, 28);
+            WorldMarks.Ring(batch, pixel, player.Position, 24f + reveal * 31f, GameBalance.DeathFlameBright * (0.45f * reveal), false, 3f);
         }
 
         if (loopState == ArenaLoopState.Complete)
@@ -522,7 +516,7 @@ public sealed class CinematicPresentation
         float currencyY = CharacterRowsY + CharacterRowSpacing * 4f + 26f;
         PixelText.Draw(batch, pixel, "WÄHRUNGEN", new Vector2(centerX + CharacterLabelOffsetX, currencyY), 2, effect);
         float ruleY = currencyY + 7 * 2 + 8f;
-        batch.DrawLine(pixel, new Vector2(centerX + CharacterLabelOffsetX, ruleY), new Vector2(centerX - CharacterLabelOffsetX, ruleY), GameBalance.DeathFlame * (0.32f * reveal), 1f);
+        UiKit.Divider(batch, pixel, centerX, ruleY, -CharacterLabelOffsetX * 2f, GameBalance.DeathFlameBright * (0.45f * reveal));
         DrawCurrencyRow(batch, pixel, centerX, ruleY + 20f, "GELD", sheet.GeldRunText, sheet.GeldSecuredText, GameBalance.Geld * reveal, value);
         DrawCurrencyRow(batch, pixel, centerX, ruleY + 20f + CharacterRowSpacing, "GLUT", sheet.GlutRunText, sheet.GlutSecuredText, GameBalance.Glut * reveal, value);
     }
@@ -708,7 +702,7 @@ public sealed class CinematicPresentation
         Vector2 position = GetLifeFlamePosition(combatBounds);
         float breathe = 0.96f + MathF.Sin(_stateTime * 1.7f) * 0.035f;
         art.DrawLifeFlame(batch, position, alpha, 0.88f * breathe);
-        batch.DrawLine(pixel, position + new Vector2(-22f, 50f), position + new Vector2(22f, 50f), new Color(255, 192, 116) * (0.22f * alpha), 2f);
+        art.DrawSoftSpot(batch, position + new Vector2(0f, 50f), new Vector2(34f, 9f), new Color(255, 192, 116) * (0.3f * alpha));
     }
 
     private static void DrawLetterbox(SpriteBatch batch, Texture2D pixel, Viewport viewport, int height, float alpha)

@@ -926,7 +926,7 @@ public sealed partial class GameWorld : IDisposable
                 _art.DrawEnvironment(batch, VisualIds.ArenaWall, Arena.WallFoot);
                 _art.DrawEnvironment(batch, VisualIds.ArenaFloor, Arena.FloorTopLeft);
                 DrawArenaShading(batch);
-                _arenaAtmosphere.DrawBackground(batch, pixel, _soulSensePresentation.WorldSuppression);
+                _arenaAtmosphere.DrawBackground(batch, pixel, _soulSensePresentation.WorldSuppression, _art.HasArt(VisualIds.ArenaFloor) ? _art : null);
             }
             DrawSceneProps(batch, layer => layer < SceneLayer.Actor);
             if (IsCombatPhase && _phase == GamePhase.Arena)

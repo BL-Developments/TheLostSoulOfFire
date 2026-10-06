@@ -103,6 +103,7 @@ public sealed class ArenaAtmosphere
 
     private readonly AmbientParticle[] _particles = new AmbientParticle[ParticleCapacity];
     private readonly Random _random = new(4129);
+    private ArtAssets? _art;
     private float _time;
     private float _activity = 1f;
     private float _ashSpawnTimer;
@@ -251,16 +252,26 @@ public sealed class ArenaAtmosphere
         _forcePressure = MathF.Max(_forcePressure, MathHelper.Clamp(strength / 190f, 0f, 1f));
     }
 
+    /// <summary>
+    /// Haze, furnace mouths and ambient particles. With <paramref name="art"/> (the painted foundry)
+    /// the haze and smoke are soft light, embers glow as points, and the furnace mouths are left to
+    /// the painting, which has its own.
+    /// </summary>
     public void DrawBackground(
         SpriteBatch batch,
         Texture2D pixel,
-        float soulSenseAmount)
+        float soulSenseAmount,
+        ArtAssets? art = null)
     {
         float sense = MathHelper.Clamp(soulSenseAmount, 0f, 1f);
         float physicalVisibility = MathHelper.Lerp(1f, 0.32f, sense);
+        _art = art;
 
         DrawHaze(batch, pixel, physicalVisibility);
-        DrawFurnaceFaces(batch, pixel, physicalVisibility);
+        if (art is null)
+        {
+            DrawFurnaceFaces(batch, pixel, physicalVisibility);
+        }
 
         for (int i = 0; i < _particles.Length; i++)
         {
@@ -400,6 +411,20 @@ public sealed class ArenaAtmosphere
                 physicalVisibility *
                 calmOpacity *
                 breathe;
+            if (_art is not null)
+            {
+                // A bank of soft puffs along the band instead of a hard-edged strip.
+                for (int puff = 0; puff < 5; puff++)
+                {
+                    float along = (puff + 0.5f) / 5f;
+                    Vector2 at = Vector2.Lerp(band.Start, band.End, along) + drift;
+                    float swell = 0.8f + 0.2f * MathF.Sin(_time * 0.3f + band.Phase + puff * 1.3f);
+                    Vector2 radii = new(Vector2.Distance(band.Start, band.End) * 0.28f, band.Width * 0.75f * pressure * swell);
+                    _art.DrawSoftSpot(batch, at, radii, outer * (opacity * 0.7f));
+                    _art.DrawSoftSpot(batch, at, radii * 0.5f, inner * (opacity * 0.4f));
+                }
+                continue;
+            }
             batch.DrawLine(pixel, band.Start + drift, band.End + drift, outer * (opacity * 0.55f), band.Width * pressure);
             batch.DrawLine(pixel, band.Start + drift, band.End + drift, inner * (opacity * 0.35f), band.Width * 0.42f * pressure);
         }
@@ -458,6 +483,21 @@ public sealed class ArenaAtmosphere
                     particle.Position + direction * size,
                     new Color(139, 134, 145) * (commonAlpha * physicalVisibility),
                     MathF.Max(1f, particle.Depth * 1.35f));
+                break;
+
+            case AmbientParticleKind.Smoke when _art is not null:
+                _art.DrawSoftSpot(batch, particle.Position, new Vector2(size * 1.3f), new Color(62, 59, 69) * (commonAlpha * physicalVisibility * 0.5f));
+                break;
+
+            case AmbientParticleKind.Ember when _art is not null:
+                _art.DrawSoftSpot(batch, particle.Position, new Vector2(MathF.Max(2f, size * 2.2f)), new Color(194, 80, 34) * (commonAlpha * physicalVisibility * 0.6f));
+                _art.DrawSoftSpot(batch, particle.Position, new Vector2(MathF.Max(1f, size * 0.8f)), new Color(255, 170, 90) * (commonAlpha * physicalVisibility));
+                break;
+
+            case AmbientParticleKind.SoulMote when _art is not null:
+                float moteVisibility = MathHelper.Lerp(0.32f, 0.82f, soulSenseAmount);
+                _art.DrawSoftSpot(batch, particle.Position, new Vector2(MathF.Max(3f, size * 2.6f)), GameBalance.DeathFlame * (commonAlpha * moteVisibility * 0.7f));
+                _art.DrawSoftSpot(batch, particle.Position, new Vector2(MathF.Max(1.2f, size * 0.9f)), GameBalance.DeathFlameBright * (commonAlpha * moteVisibility));
                 break;
 
             case AmbientParticleKind.Smoke:
