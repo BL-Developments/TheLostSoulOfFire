@@ -87,6 +87,7 @@ public sealed class ArtAssets
     private readonly DeathFlameRenderer? _deathFlame;
     private readonly Texture2D _dissolveNoise;
     private readonly Texture2D _softSpot;
+    private readonly Texture2D _shade;
     private readonly ConditionalWeakTable<object, FigureState> _figures = new();
     private readonly List<DissolveInstance> _dissolves = [];
     private Matrix _sceneTransform = Matrix.Identity;
@@ -116,6 +117,7 @@ public sealed class ArtAssets
         _deathFlame = deathFlame is null ? null : new DeathFlameRenderer(device, deathFlame);
         _dissolveNoise = CreateNoiseTexture(device, 64, seed: 1709);
         _softSpot = CreateSoftSpotTexture(device, 64);
+        _shade = CreateShadeTexture(device, 256);
 
         foreach (VisualEntry entry in registry.Entries)
         {
@@ -259,6 +261,15 @@ public sealed class ArtAssets
         }
 
         batch.Draw(clip.Texture, bounds, clip.GetSourceRectangle(0f), Color.White);
+    }
+
+    /// <summary>Draws a single-image environment stretched over a screen rectangle (title key art).</summary>
+    public void DrawEnvironmentStretched(SpriteBatch batch, string id, Rectangle destination)
+    {
+        if (GetEffect(id) is { } clip)
+        {
+            batch.Draw(clip.Texture, destination, clip.GetSourceRectangle(0f), Color.White);
+        }
     }
 
     /// <summary>
@@ -516,6 +527,27 @@ public sealed class ArtAssets
     public void DrawSoftSpot(SpriteBatch batch, Vector2 center, Vector2 radii, Color color) =>
         batch.Draw(_softSpot, center, null, color, 0f, new Vector2(_softSpot.Width, _softSpot.Height) * 0.5f,
             radii * 2f / _softSpot.Width, SpriteEffects.None, 0f);
+
+    /// <summary>
+    /// A smooth vertical shade over a rectangle: <paramref name="top"/> at its top edge fading to
+    /// nothing at its bottom (premultiplied), without the banding of stacked rectangles.
+    /// </summary>
+    public void DrawShade(SpriteBatch batch, Rectangle area, Color top) =>
+        batch.Draw(_shade, area, top);
+
+    private static Texture2D CreateShadeTexture(GraphicsDevice device, int height)
+    {
+        Color[] data = new Color[height];
+        for (int y = 0; y < height; y++)
+        {
+            float share = 1f - y / (height - 1f);
+            float alpha = share * share * (3f - 2f * share);
+            data[y] = Color.White * alpha;
+        }
+        Texture2D texture = new(device, 1, height);
+        texture.SetData(data);
+        return texture;
+    }
 
     /// <summary>Premultiplied white with a smooth falloff to the edge.</summary>
     private static Texture2D CreateSoftSpotTexture(GraphicsDevice device, int size)

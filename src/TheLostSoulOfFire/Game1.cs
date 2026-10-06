@@ -195,6 +195,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         _pixel = new Texture2D(GraphicsDevice, 1, 1);
         _pixel.SetData([Color.White]);
         _art = new ArtAssets(Content);
+        PixelText.LoadFonts(Content);
         _virtualTarget = new RenderTarget2D(
             GraphicsDevice,
             RenderResolution.OutputWidth,

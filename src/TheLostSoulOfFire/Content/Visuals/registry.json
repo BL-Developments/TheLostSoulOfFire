@@ -1213,6 +1213,23 @@
           "loop": true
         }
       }
+    },
+    {
+      "id": "environment.title",
+      "kind": "environment",
+      "palette": "world",
+      "worldSize": [1280, 720],
+      "origin": [0.0, 0.0],
+      "layer": "background",
+      "clips": {
+        "default": {
+          "path": "Textures/Title/backdrop",
+          "frameSize": [1920, 1080],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
     }
   ]
 }

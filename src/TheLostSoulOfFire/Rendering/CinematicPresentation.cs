@@ -135,6 +135,11 @@ public sealed class CinematicPresentation
     {
         Vector2 center = combatBounds.Center.ToVector2();
 
+        if (gamePhase == GamePhase.Title && art.HasArt(VisualIds.TitleBackdrop))
+        {
+            return;
+        }
+
         if (gamePhase == GamePhase.Title)
         {
             float reveal = Ease((_titleTime - 0.15f) / 1.1f);
@@ -240,8 +245,75 @@ public sealed class CinematicPresentation
 
     public float GetLifeFlameAlpha() => Ease((_stateTime - 1.05f) / 1.15f);
 
+    /// <summary>Set by the game: the painted title key art and soft light spots come from here.</summary>
+    public ArtAssets? Art { get; set; }
+
+    /// <summary>
+    /// The title over its key art (tools/visuals/blender/build_title.py): the painting drifts
+    /// very slowly, the far Warden flame breathes, mist moves over the water; the title sits in
+    /// the dark sky, the menu to the right of the figure.
+    /// </summary>
+    private void DrawTitleArt(SpriteBatch batch, Texture2D pixel, Viewport viewport, MenuController menu, ArtAssets art)
+    {
+        float reveal = Ease((_titleTime - 0.1f) / 1.4f);
+        float drift = 0.5f - 0.5f * MathF.Cos(_titleTime * MathHelper.TwoPi / 48f);
+        float zoom = 1.02f + 0.03f * drift;
+        Vector2 focus = new(viewport.Width * 0.52f, viewport.Height * 0.46f);
+        Vector2 size = new Vector2(viewport.Width, viewport.Height) * zoom;
+        Vector2 topLeft = focus - new Vector2(viewport.Width * 0.52f, viewport.Height * 0.46f) * zoom + new Vector2(-6f + 12f * drift, 0f);
+        art.DrawEnvironmentStretched(batch, VisualIds.TitleBackdrop, new Rectangle((int)topLeft.X, (int)topLeft.Y, (int)size.X, (int)size.Y));
+        Vector2 Map(float u, float v) => topLeft + new Vector2(u * size.X, v * size.Y);
+
+        // The Warden flame in the far gate and its light on the water.
+        float breathe = 0.85f + 0.1f * MathF.Sin(_titleTime * 2.3f) + 0.05f * MathF.Sin(_titleTime * 5.1f);
+        art.DrawSoftSpot(batch, Map(0.571f, 0.36f), new Vector2(26f, 54f) * breathe, GameBalance.DeathFlame * 0.35f);
+        art.DrawSoftSpot(batch, Map(0.571f, 0.36f), new Vector2(7f, 22f) * breathe, GameBalance.SoulWhite * 0.35f);
+        art.DrawSoftSpot(batch, Map(0.571f, 0.79f), new Vector2(18f, 46f) * breathe, GameBalance.DeathFlame * 0.22f);
+        // Mist drifting over the sea.
+        for (int i = 0; i < 7; i++)
+        {
+            float speed = 9f + i * 3.1f;
+            float x = ((i * 233f + _titleTime * speed) % (viewport.Width + 600f)) - 300f;
+            float y = viewport.Height * (0.62f + 0.035f * (i % 4)) + MathF.Sin(_titleTime * 0.2f + i) * 6f;
+            art.DrawSoftSpot(batch, new Vector2(x, y), new Vector2(240f + i * 25f, 26f + (i % 3) * 8f), new Color(150, 160, 190) * 0.05f);
+        }
+
+        // Darkness: fades in from black, keeps a dark band in the sky for the title, vignette.
+        batch.FillRectangle(pixel, viewport.Bounds, Color.Black * MathHelper.Lerp(1f, 0.08f, Ease(_titleTime / 1.8f)));
+        art.DrawShade(batch, new Rectangle(0, 0, viewport.Width, (int)(viewport.Height * 0.46f)), Color.Black * 0.62f);
+        art.DrawSoftSpot(batch, new Vector2(0f, viewport.Height), new Vector2(420f, 300f), Color.Black * 0.6f);
+        art.DrawSoftSpot(batch, new Vector2(viewport.Width, viewport.Height), new Vector2(420f, 300f), Color.Black * 0.5f);
+        DrawLetterbox(batch, pixel, viewport, 44, 0.94f);
+
+        float centerX = viewport.Width * 0.5f;
+        float titleY = viewport.Height * 0.15f;
+        DrawTitleRules(batch, pixel, viewport, titleY - 30f, reveal);
+        PixelText.DrawCentered(batch, pixel, "THE LOST", centerX, titleY - 8f, 3, new Color(190, 182, 204) * (0.85f * reveal));
+        PixelText.DrawCentered(batch, pixel, "SOUL OF FIRE", centerX, titleY + 22f, 7, GameBalance.SoulWhite * reveal);
+        PixelText.DrawCentered(batch, pixel, "DEATH IS NOT THE END", centerX, titleY + 84f, 3, GameBalance.DeathFlameBright * (0.62f * reveal));
+
+        if (menu.IsOpen)
+        {
+            float menuReveal = Ease(menu.OpenTimer / MenuController.RevealDuration);
+            DrawMenuList(batch, pixel, viewport, menu, menuReveal, _titleTime);
+            return;
+        }
+
+        float promptReveal = Ease((_titleTime - 1.6f) / 0.9f);
+        float promptBreathe = 0.62f + MathF.Sin(_titleTime * 2.4f) * 0.14f;
+        float promptX = viewport.Width * menu.AnchorX;
+        PixelText.DrawCentered(batch, pixel, "PRESS ANY KEY OR CLICK", promptX, viewport.Height * 0.66f, 2, GameBalance.SoulWhite * (promptReveal * promptBreathe));
+        DrawPromptMark(batch, pixel, new Vector2(promptX, viewport.Height * 0.66f - 20f), promptReveal * promptBreathe);
+    }
+
     private void DrawTitle(SpriteBatch batch, Texture2D pixel, Viewport viewport, MenuController menu)
     {
+        if (Art is { } art && art.HasArt(VisualIds.TitleBackdrop))
+        {
+            DrawTitleArt(batch, pixel, viewport, menu, art);
+            return;
+        }
+
         float reveal = Ease((_titleTime - 0.1f) / 1.05f);
         float darkness = MathHelper.Lerp(0.96f, 0.68f, Ease(_titleTime / 1.25f));
         batch.FillRectangle(pixel, viewport.Bounds, Color.Black * darkness);
@@ -289,7 +361,7 @@ public sealed class CinematicPresentation
     public IReadOnlyList<Rectangle> GetMenuEntryBounds(Viewport viewport, MenuPage page, MenuController? menu = null)
     {
         List<Rectangle> bounds = new(page.Entries.Count);
-        float centerX = viewport.Width * 0.5f;
+        float centerX = viewport.Width * (menu?.AnchorX ?? 0.5f);
         for (int i = 0; i < page.Entries.Count; i++)
         {
             int width = PixelText.Measure(menu?.GetLabel(page.Entries[i]) ?? page.Entries[i].Label, MenuEntryScale);
@@ -454,7 +526,7 @@ public sealed class CinematicPresentation
 
     private static void DrawMenuList(SpriteBatch batch, Texture2D pixel, Viewport viewport, MenuController menu, float reveal, float time)
     {
-        float centerX = viewport.Width * 0.5f;
+        float centerX = viewport.Width * menu.AnchorX;
         IReadOnlyList<MenuEntry> entries = menu.CurrentPage.Entries;
         if (menu.CurrentPage.Prompt is { } prompt)
         {

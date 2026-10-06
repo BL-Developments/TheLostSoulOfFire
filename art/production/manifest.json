@@ -7811,6 +7811,63 @@
         "status": "kandidat",
         "reason": "Bodenplatte für das Spiel aufbereitet"
       }
+    },
+    {
+      "id": "a2a2d5bef51e4ce0bd599e74219a5054",
+      "timestamp": "2026-10-06T00:23:37+00:00",
+      "visual_id": "environment.title",
+      "step": "place-environment",
+      "tool": {
+        "name": "place_environment.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "world": [
+          1280,
+          720
+        ],
+        "output": [
+          1920,
+          1080
+        ],
+        "tiles": [
+          1,
+          1
+        ],
+        "layer": "background",
+        "origin": [
+          0.0,
+          0.0
+        ],
+        "crop": null,
+        "mute_reds": null,
+        "target_median": null
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/title/backdrop.png",
+          "sha256": "113752e896f082792c9f6ac9e533f400a69c7379daaf14412df91f562a9aa3eb"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Title/backdrop.png",
+          "sha256": "16c48845169e7a164fee03be0424d2cd616ac643579666a49905b5ba01b32fc0"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.23,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Bodenplatte für das Spiel aufbereitet"
+      }
     }
   ]
 }

@@ -44,6 +44,7 @@ public static class VisualIds
     public const string DeckRail = "prop.deck-rail";
     public const string ThresholdFloor = "environment.threshold";
     public const string ThresholdGate = "prop.threshold-gate";
+    public const string TitleBackdrop = "environment.title";
     public const string HubFloor = "environment.hub";
     public const string HubBrazier = "prop.hub-brazier";
     public const string HubLeaves = "environment.hub-leaves";

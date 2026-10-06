@@ -171,12 +171,13 @@ public sealed partial class GameWorld : IDisposable
         _skipMainMenu = skipMainMenu;
         _skipPrologue = skipPrologue;
         _settings = settings ?? new GameSettings();
-        _menu = new MenuController(_settings);
+        _menu = new MenuController(_settings) { AnchorX = art.HasArt(VisualIds.TitleBackdrop) ? 0.74f : 0.5f };
         _pauseMenu = new MenuController(_settings);
         _settingsChanged = settingsChanged;
         _profileStore = profileStore ?? new PlayerProfileStore();
         _wallet.LoadSecured(_profileStore.Load());
         _art = art;
+        _presentation.Art = art;
         _audio = new AudioDirector(content);
         ApplyAudioSettings();
         _spriteVfx = new SpriteVfxSystem(art);

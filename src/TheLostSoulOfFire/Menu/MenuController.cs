@@ -42,6 +42,9 @@ public sealed class MenuController
 
     public MenuController(GameSettings? settings = null) => Settings = settings ?? new GameSettings();
 
+    /// <summary>Horizontal centre of the entry list as a share of the screen width (presentation).</summary>
+    public float AnchorX { get; set; } = 0.5f;
+
     public bool IsOpen => _pages.Count > 0;
     public MenuPage CurrentPage => _pages.Peek();
     public int SelectedIndex => _selectedIndex;
