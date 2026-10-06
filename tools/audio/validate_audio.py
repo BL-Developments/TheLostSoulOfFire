@@ -64,6 +64,23 @@ AUTHORED_SFX_DURATIONS = {
     "ability_mark.wav": 0.5,
     "door_awaken.wav": 1.8,
     "enemy_emerge.wav": 0.9,
+    # Variants derived from the Ludo takes (tools/audio/derive_variants.py).
+    "cannon_impact_v2.wav": 0.31,
+    "cannon_impact_v3.wav": 0.34,
+    "core_hit_v2.wav": 0.17,
+    "core_hit_v3.wav": 0.19,
+    "dash_v2.wav": 0.24,
+    "dash_v3.wav": 0.26,
+    "enemy_death_v2.wav": 0.54,
+    "enemy_death_v3.wav": 0.58,
+    "hollow_swipe_v2.wav": 0.31,
+    "hollow_swipe_v3.wav": 0.34,
+    "scythe_hit_v2.wav": 0.14,
+    "scythe_hit_v3.wav": 0.16,
+    "scythe_swing_1_v2.wav": 0.17,
+    "scythe_swing_1_v3.wav": 0.19,
+    "scythe_swing_2_v2.wav": 0.23,
+    "scythe_swing_2_v3.wav": 0.25,
 }
 
 #: Ambience beds and music per zone (AudioDirector.AmbienceAssets / MusicAssets).

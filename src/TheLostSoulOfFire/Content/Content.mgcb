@@ -8678,3 +8678,83 @@
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /build:Audio/Sfx/enemy_emerge.wav
+
+#begin Audio/Sfx/scythe_swing_1_v2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/scythe_swing_1_v2.wav
+
+#begin Audio/Sfx/scythe_swing_1_v3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/scythe_swing_1_v3.wav
+
+#begin Audio/Sfx/scythe_swing_2_v2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/scythe_swing_2_v2.wav
+
+#begin Audio/Sfx/scythe_swing_2_v3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/scythe_swing_2_v3.wav
+
+#begin Audio/Sfx/scythe_hit_v2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/scythe_hit_v2.wav
+
+#begin Audio/Sfx/scythe_hit_v3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/scythe_hit_v3.wav
+
+#begin Audio/Sfx/core_hit_v2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/core_hit_v2.wav
+
+#begin Audio/Sfx/core_hit_v3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/core_hit_v3.wav
+
+#begin Audio/Sfx/cannon_impact_v2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/cannon_impact_v2.wav
+
+#begin Audio/Sfx/cannon_impact_v3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/cannon_impact_v3.wav
+
+#begin Audio/Sfx/dash_v2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/dash_v2.wav
+
+#begin Audio/Sfx/dash_v3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/dash_v3.wav
+
+#begin Audio/Sfx/hollow_swipe_v2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/hollow_swipe_v2.wav
+
+#begin Audio/Sfx/hollow_swipe_v3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/hollow_swipe_v3.wav
+
+#begin Audio/Sfx/enemy_death_v2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/enemy_death_v2.wav
+
+#begin Audio/Sfx/enemy_death_v3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/enemy_death_v3.wav

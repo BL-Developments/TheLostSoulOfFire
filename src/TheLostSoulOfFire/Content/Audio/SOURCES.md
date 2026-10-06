@@ -157,3 +157,19 @@ Ergebnisse sind eigene Arbeit des Projekts.
 | `Audio/Sfx/step_devourer_3.wav` | step-devourer Seed 3 | 0.70 s, 1 Kanal/Kanäle, -24.9 LUFS, Spitze -4.0 dBFS |
 | `Audio/Sfx/step_devourer_4.wav` | step-devourer Seed 4 | 0.70 s, 1 Kanal/Kanäle, -24.0 LUFS, Spitze -4.6 dBFS |
 | `Audio/Sfx/enemy_emerge.wav` | enemy-emerge Seed 1 | 0.90 s, 1 Kanal/Kanäle, -21.0 LUFS, Spitze -4.0 dBFS |
+| `Audio/Sfx/scythe_swing_1_v2.wav` | Ableitung von scythe_swing_1.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.17 s, 1 Kanal, -13.7 LUFS, Spitze -2.8 dBFS |
+| `Audio/Sfx/scythe_swing_1_v3.wav` | Ableitung von scythe_swing_1.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.19 s, 1 Kanal, -13.7 LUFS, Spitze -3.0 dBFS |
+| `Audio/Sfx/scythe_swing_2_v2.wav` | Ableitung von scythe_swing_2.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.23 s, 1 Kanal, -14.5 LUFS, Spitze -3.7 dBFS |
+| `Audio/Sfx/scythe_swing_2_v3.wav` | Ableitung von scythe_swing_2.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.25 s, 1 Kanal, -14.5 LUFS, Spitze -2.9 dBFS |
+| `Audio/Sfx/scythe_hit_v2.wav` | Ableitung von scythe_hit.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.14 s, 1 Kanal, -16.9 LUFS, Spitze -3.0 dBFS |
+| `Audio/Sfx/scythe_hit_v3.wav` | Ableitung von scythe_hit.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.16 s, 1 Kanal, -16.9 LUFS, Spitze -2.5 dBFS |
+| `Audio/Sfx/core_hit_v2.wav` | Ableitung von core_hit.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.17 s, 1 Kanal, -12.9 LUFS, Spitze -3.1 dBFS |
+| `Audio/Sfx/core_hit_v3.wav` | Ableitung von core_hit.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.19 s, 1 Kanal, -12.9 LUFS, Spitze -2.0 dBFS |
+| `Audio/Sfx/cannon_impact_v2.wav` | Ableitung von cannon_impact.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.31 s, 1 Kanal, -14.0 LUFS, Spitze -3.1 dBFS |
+| `Audio/Sfx/cannon_impact_v3.wav` | Ableitung von cannon_impact.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.34 s, 1 Kanal, -14.0 LUFS, Spitze -2.8 dBFS |
+| `Audio/Sfx/dash_v2.wav` | Ableitung von dash.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.24 s, 1 Kanal, -17.2 LUFS, Spitze -3.4 dBFS |
+| `Audio/Sfx/dash_v3.wav` | Ableitung von dash.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.26 s, 1 Kanal, -17.2 LUFS, Spitze -2.5 dBFS |
+| `Audio/Sfx/hollow_swipe_v2.wav` | Ableitung von hollow_swipe.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.31 s, 1 Kanal, -16.3 LUFS, Spitze -4.1 dBFS |
+| `Audio/Sfx/hollow_swipe_v3.wav` | Ableitung von hollow_swipe.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.34 s, 1 Kanal, -16.3 LUFS, Spitze -4.3 dBFS |
+| `Audio/Sfx/enemy_death_v2.wav` | Ableitung von enemy_death.wav (Tonhöhe ×1.025, Klangneigung +0.8/-0.6 dB) | 0.54 s, 1 Kanal, -14.3 LUFS, Spitze -4.4 dBFS |
+| `Audio/Sfx/enemy_death_v3.wav` | Ableitung von enemy_death.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.58 s, 1 Kanal, -14.3 LUFS, Spitze -3.9 dBFS |

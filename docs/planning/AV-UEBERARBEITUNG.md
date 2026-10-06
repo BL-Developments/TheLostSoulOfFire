@@ -117,7 +117,9 @@ mit jedem Meilenstein aktualisiert.
   zeigen die echte Pose, Arena-Dunst und -Rauch weich statt Pixelformen, Gegner- und
   Treffertöne aus ihrer Richtung, nahtlose Atmosphäre der Überfahrt, Tod im Prolog wie in der
   Arena inszeniert, Schritte von Spieler und Gegnern auf den gezeichneten Fußaufsätzen
-  (protokolliert: Phase 0,26 und 0,77 bei Aufsätzen auf 0,25 und 0,75).
+  (protokolliert: Phase 0,26 und 0,77 bei Aufsätzen auf 0,25 und 0,75); die acht häufigsten
+  Kampftöne mit je zwei abgeleiteten Varianten (CLAP-Ähnlichkeit zum Original 0,94–0,98,
+  zu anderen Tönen höchstens 0,88), zufällig gewählt.
 
 **Geprüft:** 257 Unit-Tests; Rundgang über 17 Stationen (rund 440 Aufnahmen, Schlüsselbilder und
 Bildserien gesichtet; er schlägt fehl, sobald irgendwo ein Platzhalter gezeichnet wird – keiner

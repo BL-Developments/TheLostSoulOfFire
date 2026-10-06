@@ -245,6 +245,16 @@ public sealed class AudioDirector : IDisposable
             Add(content, AudioCue.TitleConfirm, "Audio/Sfx/title_confirm", 440f, 0.26f, 0.3f, 0.015f);
             Add(content, AudioCue.WaveClear, "Audio/Sfx/wave_clear", 294f, 0.52f, 0.32f, 0.01f, rising: true);
             Add(content, AudioCue.EndingReveal, "Audio/Sfx/ending_reveal", 147f, 0.9f, 0.3f, 0.015f, rising: true);
+            foreach ((AudioCue cue, string asset) in new[]
+            {
+                (AudioCue.ScytheSwing1, "Audio/Sfx/scythe_swing_1"), (AudioCue.ScytheSwing2, "Audio/Sfx/scythe_swing_2"),
+                (AudioCue.ScytheHit, "Audio/Sfx/scythe_hit"), (AudioCue.CoreHit, "Audio/Sfx/core_hit"),
+                (AudioCue.CannonImpact, "Audio/Sfx/cannon_impact"), (AudioCue.EnemyDeath, "Audio/Sfx/enemy_death"),
+                (AudioCue.Dash, "Audio/Sfx/dash"), (AudioCue.HollowSwipe, "Audio/Sfx/hollow_swipe")
+            })
+            {
+                AddDerived(content, cue, asset, 2);
+            }
             AddVariants(content, AudioCue.Footstep, "Audio/Sfx/footstep_stone", 4, 90f, 0.08f, 0.2f, 0.6f);
             AddVariants(content, AudioCue.FootstepWood, "Audio/Sfx/footstep_wood", 4, 120f, 0.09f, 0.2f, 0.5f);
             AddVariants(content, AudioCue.HollowStep, "Audio/Sfx/step_hollow", 4, 70f, 0.12f, 0.15f, 0.7f);
@@ -559,6 +569,26 @@ public sealed class AudioDirector : IDisposable
     {
         _sounds[cue] = LoadOrCreateFallback(content, assetName, frequency, duration, volume, noise, rising);
         _activeInstances[cue] = [];
+    }
+
+    /// <summary>
+    /// Adds the derived takes <paramref name="assetName"/>_v2, _v3 … (tools/audio/derive_variants.py)
+    /// beside the cue's main take, so frequent hits and swings never repeat exactly.
+    /// </summary>
+    private void AddDerived(ContentManager content, AudioCue cue, string assetName, int count)
+    {
+        List<SoundEffect> takes = [_sounds[cue]];
+        for (int index = 2; index <= count + 1; index++)
+        {
+            try
+            {
+                takes.Add(content.Load<SoundEffect>($"{assetName}_v{index}"));
+            }
+            catch (ContentLoadException)
+            {
+            }
+        }
+        _variants[cue] = takes;
     }
 
     /// <summary>Loads <paramref name="assetBase"/>_1 … _<paramref name="count"/>; the first is the cue's main take.</summary>
