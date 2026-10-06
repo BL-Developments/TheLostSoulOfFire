@@ -463,7 +463,8 @@ kein Ersatzklang), Gameplay- und Tod-Neustart-Test.
 
 **Nächste Schritte (nach Wirkung):**
 1. Hörabnahme durch den Owner: Wuchtschichten der Hiebe, sanfte Seelenglocke, Präsenz der
-   Gegner, Hallfahnen, Ladebrummen, Resonanzgrollen, Feuer der Life Flame, Ende-Musik.
+   Gegner, Hallfahnen, Ladebrummen, Resonanzgrollen, Feuer der Life Flame, Ende-Musik, Pochen
+   bei wenig Leben, Warden-Flammen in Vorhalle und Prolog, Ofen der Gießhalle.
 2. Sichtabnahme der neuen Sense und der Wischspur mit eigener Steuerung. Automatisch geprüft
    (Station `arena_swings`, Serie `sweep`, kreisende Maus während der Combo): Figur und Spur
    behalten die Richtung, mit der der Hieb begann, der nächste Schlag dreht zur neuen Mausrichtung,
@@ -472,8 +473,10 @@ kein Ersatzklang), Gameplay- und Tod-Neustart-Test.
 
 **Befunde, offen (nach Wirkung):**
 1. Sprache: Erzähltexte englisch, HUD deutsch (Inhaltsfrage, nicht ohne Owner ändern).
-
-
+2. Warnzonen (Ausholbogen des Hollow, Anlaufring und -bahn des Burning, Schlagzone des
+   Devourer) sind bewusst geblieben: weiche Zonen, aber mit hellerem Rand. Sie zeigen den
+   Wirkbereich eines Angriffs; ob sie noch weicher werden sollen, entscheidet der Owner nach
+   dem Spielen (Lesbarkeit geht vor).
 
 **Hinweis:** Nach `place_environment.py` immer `dotnet build` vor dem Rundgang, sonst zeigt
 das Spiel noch die alten Kacheln (Content-Pipeline).
@@ -483,6 +486,11 @@ Luftperspektive auf die Wand begrenzt: Kontrast unverändert, Änderung zurückg
 Taumeln und -Tod, Burning-Tod, Burning-Angriff, HUD, Seelensinn der Vorhalle.
 
 **Verworfen:**
+- Wellen an der Ufer-Kante als eigene Klangquelle: synthetische Wellen hörte CLAP als „wind“
+  (über 0,9) oder, mit dichten Blasen, als „bubbles“/„toilet flushing“ – nie als Wellen am Ufer.
+  Das Ufer-Bett trägt die Wellen weiter; Rezepte entfernt.
+- Eigenes Ofen-Rezept (`furnace-breath`): „wind“/„thunder“; ersetzt durch die tiefer gestimmte
+  Warden-Flamme.
 - Alten Freigabeton nur in den Höhen absenken: Grundton selbst zu hoch, blieb ein Piepen.
 - Devourer-Präsenz aus Rauschgrollen und gehauchtem Chor: CLAP hörte „wind“ (0,7–0,9); jetzt
   tonale Kehle (Pulsfolge durch Formanten) und tonaler Chor.

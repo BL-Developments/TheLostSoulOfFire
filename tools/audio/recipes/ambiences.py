@@ -459,31 +459,3 @@ def warden_flame(rng) -> np.ndarray:
     mix = roar * 0.07 + air * 0.012 + hum * 0.03 + ticks
     mix = dsp.circular(lambda x: dsp.highpass(x, 38), mix)
     return dsp.normalise_loudness(_seamless(mix), -26.0, peak_ceiling_db=-6.0)
-
-
-@recipe("furnace-breath", "Seelenofen der Gießhalle in der Nordwand: tiefes, langsam atmendes Brausen der Death Flame im Schlund, flackernd, selten ein dumpfes Aufwallen, leise Glut; Punktquelle (mono), nahtlos", loop=True)
-def furnace_breath(rng) -> np.ndarray:
-    seconds = 8.0
-    n = dsp.seconds(seconds)
-    t = dsp.time_axis(n)
-    # The furnace mouth: a broad, low flame roar, flickering fast like a big fire and breathing
-    # slowly as the draught pulls.
-    roar = dsp.circular(lambda x: dsp.bandpass(x, 80, 700), dsp.brown(n, rng) + dsp.pink(n, rng) * 0.25)
-    roar = roar / (np.std(roar) + 1e-9)
-    flicker = np.clip(0.4 + 0.5 * dsp.smooth_loop(n, 11.0, rng) + 0.15 * dsp.smooth_loop(n, 1.8, rng), 0.05, None)
-    breath = 0.65 + 0.35 * dsp.smooth_loop(n, 0.22, rng)
-    roar *= flicker * breath
-    air = dsp.circular(lambda x: dsp.bandpass(x, 700, 2200), dsp.pink(n, rng))
-    air = air / (np.std(air) + 1e-9) * flicker ** 2 * breath
-    # A soft swell once a loop as the fire draws in, felt rather than heard.
-    swell = dsp.circular(lambda x: dsp.lowpass(x, 120), dsp.brown(n, rng))
-    swell = swell / (np.std(swell) + 1e-9) * np.exp(-((t - rng.uniform(1.5, 6.5)) / 0.5) ** 2)
-    # The Death Flame's voice deep inside: a faint hum on G-sharp.
-    hum = (np.sin(2 * np.pi * 51.9 * t) + 0.4 * np.sin(2 * np.pi * 77.8 * t + 1.1)) * (0.8 + 0.2 * dsp.smooth_loop(n, 0.2, rng))
-    ticks = np.zeros(n)
-    for _ in range(int(seconds * 2.0)):
-        dsp.place(ticks, _pop(rng, rng.random() < 0.3), int(rng.integers(0, n)), rng.uniform(0.02, 0.07))
-    ticks = dsp.circular(lambda x: dsp.lowpass(x, 3000), ticks)
-    mix = roar * 0.08 + air * 0.012 + swell * 0.03 + hum * 0.02 + ticks
-    mix = dsp.circular(lambda x: dsp.highpass(x, 30), mix)
-    return dsp.normalise_loudness(_seamless(mix), -25.0, peak_ceiling_db=-6.0)
