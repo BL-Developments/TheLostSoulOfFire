@@ -475,7 +475,7 @@ internal sealed class TourVisualTest
         Series("hollow_stagger", 10, 7);
         Do("defeat", () => _world.DefeatAutomatedEnemies());
         Series("hollow_death", 12, 3);
-        Series("soul_release", 10, 6);
+        Series("soul_release", 14, 9);
     }
 
     /// <summary>

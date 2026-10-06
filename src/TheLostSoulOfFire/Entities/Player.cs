@@ -349,8 +349,12 @@ public sealed class Player
 
         if (HitFlashRemaining > 0f)
         {
+            // The blow as light bursting from the body (the sprite itself flashes in SpriteLit),
+            // widening as it fades: no ring.
             float flash = MathHelper.Clamp(HitFlashRemaining / 0.14f, 0f, 1f);
-            WorldMarks.Ring(batch, pixel, body, 29f + (1f - flash) * 8f, GameBalance.SoulWhite * (0.72f * flash), false, 4f);
+            Color burst = GameBalance.SoulWhite * (0.45f * flash);
+            burst.A = 0;
+            art.DrawSoftSpot(batch, body, new Vector2(22f + (1f - flash) * 26f), burst);
             art.DrawSoftSpot(batch, body, new Vector2(12f), GameBalance.SoulWhite * (0.88f * flash));
         }
 
@@ -358,10 +362,18 @@ public sealed class Player
         {
             if (rendered)
             {
-                // Two streaks of Death Flame trail the body (the ignition flipbook marks the start).
-                Vector2 trail = body - _dashDirection * 18f;
-                WorldMarks.Beam(batch, pixel, trail - right * 10f, trail - _dashDirection * 46f - right * 14f, 14f, GameBalance.DeathFlame * 0.7f);
-                WorldMarks.Beam(batch, pixel, trail + right * 10f, trail - _dashDirection * 52f + right * 15f, 10f, GameBalance.DeathFlameBright * 0.6f);
+                // Death Flame streams off the body as soft light along the dash, thinning behind it
+                // (the ignition flipbook marks the start, afterimages carry the shape): no streaks.
+                for (int index = 0; index < 7; index++)
+                {
+                    float back = 14f + index * 9f;
+                    float fade = 1f - index / 7f;
+                    float sway = MathF.Sin(_visualTime * 18f + index * 1.7f) * 4f * (index / 7f);
+                    Vector2 at = body - _dashDirection * back + right * sway;
+                    Color flame = Color.Lerp(GameBalance.DeathFlameBright, GameBalance.DeathFlame, index / 7f) * (0.5f * fade);
+                    flame.A = 0;
+                    art.DrawSoftSpot(batch, at, new Vector2(16f - index * 1.4f, 13f - index * 1.2f), flame);
+                }
             }
             else
             {

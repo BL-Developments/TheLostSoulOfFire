@@ -374,9 +374,13 @@ Rahmen wie oben (nur Darstellung und Ton).
   leiser (bis 0,3), und nur die erste einer Folge duckt die Musik (vorher pumpte sie bei jeder).
   Gleiches Abklingen für die Währungstöne.
 
-- Seelen einsammeln ohne Linien (Owner): statt gerader Strahlen von jeder Seele zum Kern ein
-  gebogener Strom aus weichen Lichtpunkten mit kurzen Schweifen, an der Seele dichter, zum Kern
-  dünner; blendet mit der Freigabe ein und aus.
+- Seelen einsammeln ohne Linien (Owner: „muss nicht mal Licht haben, reicht, wenn die
+  Seelen-Inkremente nach der Erlösung zum nächsten Ziel fliegen“): während der Erlösung kein
+  Strahl und kein Ring mehr; danach fliegt jedes Seelenteil als kleine Seele mit kurzem Schweif
+  zur Figur und steigt dabei zum Kern auf (Flugzeit und Resonanzgewinn unverändert).
+  Verworfen: Lichtstrom aus Punkten zwischen Seele und Kern (Owner wollte kein Licht, nur Flug).
+- Eigener Treffer: weicher Lichtstoß aus dem Körper statt hellem Ring; Dash: weiche Flammenspur
+  statt zweier gerader Strahlen.
 
 - Hollow-Taumeln (16 Bilder, Zeitgeber unverändert): Rückwurf mit hochgerissenen Armen und Maske,
   zwei Stolperschritte zurück, benommenes Wanken, Zurückschlurfen in die Haltung; im Rundgang

@@ -1013,7 +1013,7 @@ public sealed partial class GameWorld : IDisposable
         {
             foreach (Soul soul in _souls)
             {
-                _art.DrawLostSoul(batch, soul);
+                _art.DrawLostSoul(batch, soul, _player);
                 soul.Draw(batch, pixel, _player, false, true, _art.SoftSpot);
             }
         }

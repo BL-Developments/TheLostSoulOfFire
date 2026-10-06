@@ -1140,14 +1140,36 @@ public sealed class ArtAssets
         DrawFrame(batch, clip, _time, position, worldSize.X / clip.FrameWidth, color);
     }
 
-    public void DrawLostSoul(SpriteBatch batch, Soul soul)
+    public void DrawLostSoul(SpriteBatch batch, Soul soul, Player? player = null)
     {
-        if (soul.State is SoulState.Released or SoulState.Consumed or SoulState.Residue)
+        if (soul.State is SoulState.Released or SoulState.Consumed)
         {
             return;
         }
 
         float pulse = 0.94f + MathF.Sin(_time * 5f) * 0.07f;
+        if (soul.State == SoulState.Residue)
+        {
+            if (player is null)
+            {
+                return;
+            }
+            // What remains after the release flies to the player as a small soul and rises to the
+            // core as it arrives; a short tail of fading copies shows where it came from.
+            Vector2 target = player.Position + player.FacingDirection * 2f;
+            Vector2 toward = target - soul.Position;
+            float distance = toward.Length();
+            float arriving = MathHelper.Clamp(1f - distance / 160f, 0f, 1f);
+            Vector2 lift = new(0f, -FigureHeights.Core * arriving - 18f * (1f - arriving));
+            Vector2 back = distance > 0.5f ? -toward / distance : Vector2.Zero;
+            for (int index = 3; index >= 1; index--)
+            {
+                DrawSprite(batch, VisualIds.LostSoul, soul.Position + lift + back * (index * 9f), 0.36f - index * 0.05f, Color.White * (0.4f - index * 0.1f));
+            }
+            DrawSprite(batch, VisualIds.LostSoul, soul.Position + lift, 0.38f * pulse, Color.White);
+            return;
+        }
+
         DrawSprite(batch, VisualIds.LostSoul, soul.Position, pulse, Color.White);
     }
 
