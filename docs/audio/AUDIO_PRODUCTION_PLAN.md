@@ -134,3 +134,20 @@ Menütöne gegen das pausierte Bett). Bänder in LU über dem Bett: Gefahr +6 �
 Gefahrensignale auf dem Deck nicht untergehen; Prolog-Kampfmusik etwas voller; Warn- und
 Schritt-Cues nachgezogen). Maskierung nach Frequenz und die Dynamik eines echten Kampfs bildet
 der Bericht nicht ab; die Hörabnahme im Spiel bleibt offen.
+
+## Kampfschichten und Vorrang (06.10.2026, abends)
+
+Die Ludo-Cues bleiben der Kern jeder Aktion. Darunter liegen lokal gebaute Schichten
+(`tools/audio/recipes/combat.py`, Quellen in `Content/Audio/SOURCES.md`): ein Kontakt-Transient
+auf Sample 0 mit dem Material des Ziels (Hollow: Stoff, hohler Körper, Porzellanknack; Burning:
+Krustenbruch, Glutknistern, Zischen; Devourer: Fleisch, Nachgeben, leeres Grollen;
+Übungspuppe: Holz und Stroh), ein Druckstoß unter Seelenspaltung und voller Kanone und ein
+Körpertreffer unter dem Spieler-Schmerzlaut. Neu sind Ausholwarnungen für Hollow und Devourer, das Fauchen des Burning
+beim Losstürmen und ein eigener Tod je Gegner zusätzlich zum gemeinsamen Todeslaut. Je Gruppe 2–3
+Takes, auf ±0,5 LU angeglichen, dazu die Tonhöhenstreuung der Cue-Regeln.
+
+`AudioDirector` gibt Gefahrensignalen (Ausholen, Anlauf, Spielertreffer, Griff, Schlag) Vorrang:
+Schwünge, Schritte und Ladegeräusche, die während der folgenden 0,4 s starten, kommen bis zu 40 %
+leiser. Laufen schon mehr als sechs Effekte, kommt jeder weitere nicht gefährliche leiser hinzu,
+damit ein voller Kampf nicht zu einer gleichmäßig lauten Wand wird. `mix_report.py` kennt die
+Klasse „layer“ (−6 … +12 LU über dem Bett) für Schichten unter einem anderen Cue.

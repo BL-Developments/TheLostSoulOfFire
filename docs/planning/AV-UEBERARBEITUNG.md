@@ -143,3 +143,70 @@ neue Klänge.
 - Die Leistungswerte stammen von einem Mac (M1 Pro); schwächere Rechner und andere
   Grafiktreiber sind nicht gemessen.
 - Kein Push und kein PR ohne Freigabe des Owners.
+
+## Polish-Durchgang Kampf, Bewegung und Raum (06.10.2026, abends)
+
+Schwerpunkt nach Owner-Auftrag: Kampfanimation, Kampfton, Bewegungsqualität, Räumlichkeit.
+Weiterhin nur Darstellung und Ton; Treffererkennung, Zeitfenster, Hitstop-Dauern, Balance und
+Steuerung sind unverändert.
+
+**Geändert:**
+- Spieler: Die drei Sensenhiebe sind neu gekeyt (`tools/visuals/blender/build_player.py`,
+  Bausteine in `combat_kit.py`). Die Beine stehen auf IK, Hüfte und Brust drehen gegeneinander, und
+  jeder Hieb hat Ausholen, Kontakt und Nachschwung im bestehenden Zeitfenster, bei 14/16/26 statt 7/8/12 Frames:
+  ein schneller flacher Schnitt mit Schritt rechts, eine schwerere aufsteigende Rückhand mit Schritt
+  links, die Seelenspaltung mit hohem Ausholen über die Schulter und tiefem Drehausfall. Die
+  Spielvorwärtsbewegung im Hieb wird im Rig zurückgerechnet, damit stehende Füße stehen bleiben.
+  Im Stand sammelt sich die Figur nach jedem Hieb in die Grundhaltung zurück (`swingN_return`,
+  am Combo-Zeitgeber). Neu sind außerdem: Dash (Absprung, Gleitphase, Abfangen), Treffer (Kopf und
+  Brust schnappen zurück, Schritt zurück) und Kanonenrückstoß mit Rückschritt. Dazu ein Sprung
+  für den Rückstoßsprung (statt Gleiten) und Gehen mit geladener Kanone (Clip nach Strecke,
+  rückwärts beim Zurückweichen).
+- Flammenband: folgt dem gerenderten Death-Flame-Kern im Sensenkragen in Richtung, Höhe und Zeit
+  (`ScytheBladePaths.cs`, erzeugt von `tools/visuals/blade_paths.py`), zeichnet den Teil hinter
+  der Figur vor ihr und erscheint erst mit dem schnellen Hieb, nicht im Ausholen. Die
+  Zündfunken kommen aus dem Kragen statt vor der Figur.
+- Gegner: Hollow-Griff (Bemerken, Ausholen mit wachsender Spannung statt starrem Halten,
+  Schritt, Überstrecken; 20 Frames), Erholung aus der Endpose, Treffer. Devourer-Schlag
+  (Einatmen, Arme mit Stützschritt über den Kopf, Halten, Hammerschlag; 24 Frames), Erholung,
+  Treffer. Burning-Ankündigung (Atem und Aufflammen, Scharren, Sprinterhocke mit Zittern),
+  Anlauf mit Flugphase, Erholung (Bremsen, Keuchen, Aufrichten), Treffer.
+- Treffer: Figuren blitzen auf (Shader `SpriteLit.fx`), stauchen und kippen mit dem Schlag und
+  wippen zurück; ein Rücklicht je Raum hebt sie vom Boden ab.
+- Kamera: weiches Rauschen statt Zufallssprünge beim Schütteln, Stoß als gedämpfte Feder, kurzes
+  Heranlehnen bei schweren Treffern (nur Bild, nicht die Mauszuordnung), leichte Führung in Ziel-
+  und Laufrichtung. Blitze brechen als Licht vom Treffpunkt aus; der Aufprallmoment
+  verdunkelt zum Rand hin statt das ganze Bild zu schwärzen. Schüttelstärken leicht gesenkt.
+- Raum: Schlagschatten aller Figuren in Richtung des Raumlichts und weg vom stärksten nahen
+  Licht; Luftperspektive auf dem Boden (fern dunstig, nah dunkel); Lichtinsel der Fensterrose
+  mit treibendem Staub in der Gießhalle; wenige unscharfe Schwebeteilchen mit Parallaxe vor der
+  Szene. Warnringe ohne den eckigen Lichtrand, der schon vorher bei großen Ringen sichtbar war.
+- Ton (`tools/audio/recipes/combat.py`): Unter jedem Treffer liegen jetzt ein Kontakt-Transient
+  auf Sample 0 (der Ludo-Treffer setzt erst nach 40–55 ms ein) und das Material des Ziels
+  (Stoff/Porzellan, Glutkruste, Fleisch, Holz). Seelenspaltung und volle Kanone bekommen einen kurzen
+  Druckstoß, der Spieler einen Körpertreffer. Hollow und Devourer kündigen ihr Ausholen hörbar an,
+  der Burning faucht beim Losstürmen, jeder Gegner stirbt mit eigenem Klang. Je 2–3 angeglichene
+  Takes. Gefahrensignale lassen neu startende Schwünge und Schritte kurz zurücktreten, und viele
+  gleichzeitige Töne kommen leiser hinzu. Schwung 1 ohne den leisen Anlauf (`retime.py`), damit er
+  bei der Klingenspitze voll ist.
+
+**Geprüft:** Vorschauen jedes neuen Clips in zwei Richtungen; Rundgang (474 Aufnahmen, neu: Laden im
+Rückwärtsgehen, Rückstoßsprung) mit Bildserien von Combo, Gegnerangriffen, Treffern und
+Massenkampf, Vorher-Nachher-Vergleiche; Slice-, Fähigkeiten-, Vorhallen- und Währungstest; 258
+Unit-Tests; `validate_audio.py` (124 Assets); `mix_report.py` in allen vier Zonen ohne Ausreißer;
+Audio-Laufzeit-, Gameplay- (10 Wellen) und Tod-Neustart-Test. Leistung auf dem M1 Pro: CPU je Frame
+im Mittel 0,2–0,45 ms; Wandzeit im Mittel rund 1 ms, 95. Perzentil höchstens 3,9 ms.
+
+**Grenzen:**
+- Ich kann nicht hören. Die neuen Schichten sind nach Absicht, Spektrogramm, Lautheit und
+  Einsatzzeit gebaut; CLAP unterscheidet bei so kurzen synthetischen Treffern das Material nicht
+  verlässlich (auch der Ludo-Treffer allein gilt ihm als „Holzpfosten“). Die Hörabnahme der
+  Materialschichten, Ausholwarnungen und Tode steht beim Owner aus.
+- Figuren haben acht gerenderte Richtungen: Das Flammenband folgt dem genauen Zielwinkel, die
+  Figur dem nächsten Achtel; bis zu 22,5° Versatz bleiben.
+- Schlägt der Spieler im vollen Lauf, gleiten die Füße der Hiebe (das Spiel bewegt ihn währenddessen
+  mit voller Geschwindigkeit; Beine und Oberkörper sind ein Sprite). Stehend und beim Vorwärtsschritt
+  des Hiebs stehen sie.
+- Gegner rutschen beim Rückstoß (Spielposition) im Trefferclip; Kippen und Stauchen mildern das.
+- Die Bewegung der übrigen Gegnerclips (Gehen, Taumeln, Tod) stammt aus dem vorigen Durchgang.
+- Kein Push und kein PR ohne Freigabe des Owners.

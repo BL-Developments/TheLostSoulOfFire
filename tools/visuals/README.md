@@ -67,6 +67,8 @@ Nötige vorhanden ist und die Kostenbremse bezahlte Aufrufe verweigert.
 | `blender/build_player.py` | Spielfigur: MPFB2-Körper, Mantel, Sense und Cannon im Rig (IK an den Griffen), Aktionen idle, run, swing1–3, aim |
 | `blender/build_hollow.py` | Hollow: großer, dünner MPFB2-Körper, ausfransendes Gewand, Maske, Aktionen idle, move, swipe |
 | `blender/figure_kit.py` | gemeinsame Bausteine: Toon-Material mit Pinselrauschen, Konturhülle, Poser nach Bühnenrichtungen, Kleidung aus dem Körper, Bodenkontakt |
+| `blender/combat_kit.py` | Kampfanimation: Schlüsselposen über den Spielfortschritt mit monotonen Kubiken, Bein-IK mit gesetzten Füßen und Schrittbögen, Hüfte und Wirbelsäule, Rückrechnung der Spielvorwärtsbewegung, Neu-Keyen einzelner Aktionen (`--rekey`) |
+| `blade_paths.py` | Klingenkernbahn der Hiebe (aufgezeichnet beim Keyen) als C#-Tabelle `Rendering/ScytheBladePaths.cs` für das Flammenband |
 | `pack_sheets.py` | Frames zu Sheets packen, gemeinsamer Zuschnitt, Registry und `Content.mgcb` eintragen; mit `--pixels-per-unit` ein Zuschnitt und Ursprung je Clip bei festem Maßstab |
 | `feather_frame_edges.py` | äußere Pixel jedes Frames ausblenden (transparenter Rand) |
 | `value_distribution.py` | Wertverteilung der Düsternis-Charta (W1, W2, W4, W6) an Aufnahmen messen |
@@ -92,6 +94,22 @@ tools/visuals/.venv/bin/python tools/visuals/pack_sheets.py --render art/product
   --animation move --fps 12 --visual-id player --texture-dir Textures/Player/Animations \
   --pixels-per-unit 1.5 --progress-distance 180 --decision angenommen --reason "..." --register
 ```
+
+Kampfaktionen einer gebauten Figur neu keyen, ohne Körper und Kleidung neu zu bauen (die
+Bildzahlen stehen in `COMBAT_FRAMES` des jeweiligen Skripts), eine Vorschau in zwei Richtungen
+rendern und danach alle acht Richtungen wie oben rendern und packen:
+
+```sh
+blender -b art/production/candidates/player/player.blend -P tools/visuals/blender/build_player.py -- \
+  --out art/production/candidates/player/player.blend --rekey swing1,swing2,swing3 \
+  --paths art/production/candidates/player/swing_paths.json
+blender -b art/production/candidates/player/player.blend -P tools/visuals/blender/render_directions.py -- \
+  --out art/production/candidates/player/preview --action swing3 --animation swing3 --frames 26 \
+  --resolution 400 --ortho-scale 4.0 --foot 0.8 --directions se,e --no-normals
+tools/visuals/.venv/bin/python tools/visuals/blade_paths.py --paths art/production/candidates/player/swing_paths.json
+```
+
+`build_hollow.py`, `build_burning.py` und `build_devourer.py` kennen `--rekey` ebenso.
 
 Gerenderte Figuren stehen mit den Füßen auf ihrer Spielposition. Was fliegt
 (Schüsse, Funken, Hiebe), zeichnet das Spiel auf Körperhöhe darüber
