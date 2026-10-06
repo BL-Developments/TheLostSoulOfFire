@@ -384,8 +384,7 @@ public sealed class CinematicPresentation
     public void DrawPauseMenu(SpriteBatch batch, Texture2D pixel, Viewport viewport, MenuController menu)
     {
         float reveal = Ease(menu.OpenTimer / MenuController.RevealDuration);
-        batch.FillRectangle(pixel, viewport.Bounds, Color.Black * (PauseVeilAlpha * reveal));
-        DrawLetterbox(batch, pixel, viewport, 44, 0.94f * reveal);
+        DrawVeil(batch, pixel, viewport, reveal);
 
         float centerX = viewport.Width * 0.5f;
         float headingY = viewport.Height * 0.36f;
@@ -394,7 +393,20 @@ public sealed class CinematicPresentation
         DrawMenuList(batch, pixel, viewport, menu, reveal, menu.OpenTimer);
     }
 
-    private const float PauseVeilAlpha = 0.55f;
+    private const float PauseVeilAlpha = 0.66f;
+
+    /// <summary>The veil over the frozen world: darkened, deeper at the edges, letterboxed.</summary>
+    private void DrawVeil(SpriteBatch batch, Texture2D pixel, Viewport viewport, float reveal)
+    {
+        batch.FillRectangle(pixel, viewport.Bounds, new Color(4, 3, 8) * (PauseVeilAlpha * reveal));
+        if (Art is { } art)
+        {
+            art.DrawShade(batch, new Rectangle(0, 0, viewport.Width, viewport.Height / 3), Color.Black * (0.4f * reveal));
+            art.DrawSoftSpot(batch, new Vector2(0f, viewport.Height), new Vector2(460f, 320f), Color.Black * (0.45f * reveal));
+            art.DrawSoftSpot(batch, new Vector2(viewport.Width, viewport.Height), new Vector2(460f, 320f), Color.Black * (0.45f * reveal));
+        }
+        DrawLetterbox(batch, pixel, viewport, 44, 0.94f * reveal);
+    }
 
     private const int CharacterTabScale = 3;
     private const float CharacterTabY = 92f;
@@ -435,13 +447,17 @@ public sealed class CinematicPresentation
     public void DrawCharacterMenu(SpriteBatch batch, Texture2D pixel, Viewport viewport, CharacterMenu menu, CharacterSheet sheet, IReadOnlyList<AbilityCard> abilities, bool canChooseAbilities)
     {
         float reveal = Ease(menu.OpenTimer / MenuController.RevealDuration);
-        batch.FillRectangle(pixel, viewport.Bounds, Color.Black * (PauseVeilAlpha * reveal));
-        DrawLetterbox(batch, pixel, viewport, 44, 0.94f * reveal);
+        DrawVeil(batch, pixel, viewport, reveal);
+        batch.FillRectangle(pixel, viewport.Bounds, new Color(4, 3, 8) * (0.12f * reveal));
         DrawCharacterTabs(batch, pixel, viewport, menu, reveal);
         DrawTitleRules(batch, pixel, viewport, CharacterRuleY, reveal);
 
         if (menu.SelectedTab == CharacterMenuTab.Character)
         {
+            float centerX = viewport.Width * 0.5f;
+            Rectangle page = new((int)(centerX + CharacterLabelOffsetX - 36f), (int)CharacterRowsY - 34,
+                (int)(-CharacterLabelOffsetX * 2f + 72f), (int)(CharacterRowSpacing * 6f + 90f));
+            UiKit.Panel(batch, pixel, page, GameBalance.DeathFlame, 0.35f * reveal, 0.94f * reveal);
             DrawCharacterPage(batch, pixel, viewport, sheet, reveal);
         }
         else if (menu.SelectedTab == CharacterMenuTab.Abilities)
@@ -457,7 +473,7 @@ public sealed class CinematicPresentation
     private static float CharacterTabCenterX(Viewport viewport, int index) =>
         viewport.Width * 0.5f + (index - (CharacterMenu.Tabs.Count - 1) * 0.5f) * CharacterTabSpacing;
 
-    private static void DrawCharacterTabs(SpriteBatch batch, Texture2D pixel, Viewport viewport, CharacterMenu menu, float reveal)
+    private void DrawCharacterTabs(SpriteBatch batch, Texture2D pixel, Viewport viewport, CharacterMenu menu, float reveal)
     {
         for (int i = 0; i < CharacterMenu.Tabs.Count; i++)
         {
@@ -473,9 +489,9 @@ public sealed class CinematicPresentation
             if (selected)
             {
                 int width = PixelText.Measure(label, CharacterTabScale);
-                DrawSelectionMarker(batch, pixel, new Vector2(centerX - width * 0.5f - 16f, CharacterTabY + 10f), GameBalance.DeathFlameBright * reveal);
-                float underlineY = CharacterTabY + 7 * CharacterTabScale + 8f;
-                batch.DrawLine(pixel, new Vector2(centerX - width * 0.5f, underlineY), new Vector2(centerX + width * 0.5f, underlineY), GameBalance.DeathFlameBright * (0.7f * reveal), 2f);
+                DrawSelectionMarker(batch, pixel, new Vector2(centerX - width * 0.5f - 18f, CharacterTabY + 8.5f), GameBalance.DeathFlameBright * reveal);
+                float underlineY = CharacterTabY + 7 * CharacterTabScale + 10f;
+                UiKit.Divider(batch, pixel, centerX, underlineY, width + 60f, GameBalance.DeathFlameBright * (0.8f * reveal));
             }
         }
     }
@@ -503,6 +519,7 @@ public sealed class CinematicPresentation
     private static void DrawCharacterRow(SpriteBatch batch, Texture2D pixel, float centerX, float y, string label, string value, string? effect, Color labelColor, Color valueColor, Color effectColor)
     {
         PixelText.Draw(batch, pixel, label, new Vector2(centerX + CharacterLabelOffsetX, y), MenuEntryScale, labelColor);
+        batch.FillRectangle(pixel, new Rectangle((int)(centerX + CharacterLabelOffsetX), (int)y + 32, (int)(-CharacterLabelOffsetX * 2f), 1), effectColor * 0.2f);
         int valueWidth = PixelText.Measure(value, MenuEntryScale);
         PixelText.Draw(batch, pixel, value, new Vector2(centerX + CharacterValueRightOffsetX - valueWidth, y), MenuEntryScale, valueColor);
         if (effect is not null)
@@ -514,6 +531,7 @@ public sealed class CinematicPresentation
 
     private static void DrawCurrencyRow(SpriteBatch batch, Texture2D pixel, float centerX, float y, string label, string? runText, string securedText, Color labelColor, Color valueColor)
     {
+        UiKit.Icon(batch, pixel, label == "GELD" ? UiIcon.Geld : UiIcon.Glut, new Vector2(centerX + CharacterLabelOffsetX - 17f, y + 8.5f), 0.8f, valueColor.A / 255f);
         PixelText.Draw(batch, pixel, label, new Vector2(centerX + CharacterLabelOffsetX, y), MenuEntryScale, labelColor);
         float x = centerX + CharacterEffectOffsetX;
         if (runText is not null)
@@ -524,7 +542,7 @@ public sealed class CinematicPresentation
         PixelText.Draw(batch, pixel, securedText, new Vector2(x, y + 7f), 2, valueColor);
     }
 
-    private static void DrawMenuList(SpriteBatch batch, Texture2D pixel, Viewport viewport, MenuController menu, float reveal, float time)
+    private void DrawMenuList(SpriteBatch batch, Texture2D pixel, Viewport viewport, MenuController menu, float reveal, float time)
     {
         float centerX = viewport.Width * menu.AnchorX;
         IReadOnlyList<MenuEntry> entries = menu.CurrentPage.Entries;
@@ -546,20 +564,27 @@ public sealed class CinematicPresentation
             Color baseColor = entries[i].IsPlaceholder ? GameBalance.SoulWhite * 0.42f : GameBalance.SoulWhite * 0.72f;
             Color color = selected ? GameBalance.DeathFlameBright : baseColor;
             float breathe = selected ? 0.85f + MathF.Sin(time * 3f) * 0.15f : 1f;
-            PixelText.DrawCentered(batch, pixel, menu.GetLabel(entries[i]), centerX, y, MenuEntryScale, color * (reveal * breathe));
-
             if (selected)
             {
                 int width = PixelText.Measure(menu.GetLabel(entries[i]), MenuEntryScale);
-                DrawSelectionMarker(batch, pixel, new Vector2(centerX - width * 0.5f - 16f, y + 10f), GameBalance.DeathFlameBright * reveal);
+                DrawSelection(batch, pixel, centerX, y, width, 17, reveal);
             }
+            PixelText.DrawCentered(batch, pixel, menu.GetLabel(entries[i]), centerX, y, MenuEntryScale, color * (reveal * breathe));
         }
     }
 
     private static void DrawSelectionMarker(SpriteBatch batch, Texture2D pixel, Vector2 center, Color color)
     {
-        batch.DrawLine(pixel, center + new Vector2(-5f, -5f), center + new Vector2(3f, 0f), color, 2f);
-        batch.DrawLine(pixel, center + new Vector2(3f, 0f), center + new Vector2(-5f, 5f), color, 2f);
+        UiKit.FillDiamond(batch, pixel, center, 5, color * 0.45f);
+        UiKit.FillDiamond(batch, pixel, center, 3, color);
+    }
+
+    /// <summary>A soft glow behind the selected entry, flanked by two flame diamonds.</summary>
+    private void DrawSelection(SpriteBatch batch, Texture2D pixel, float centerX, float y, int width, int height, float alpha)
+    {
+        Art?.DrawSoftSpot(batch, new Vector2(centerX, y + height * 0.5f), new Vector2(width * 0.5f + 70f, height + 6f), GameBalance.DeathFlame * (0.16f * alpha));
+        DrawSelectionMarker(batch, pixel, new Vector2(centerX - width * 0.5f - 20f, y + height * 0.5f), GameBalance.DeathFlameBright * alpha);
+        DrawSelectionMarker(batch, pixel, new Vector2(centerX + width * 0.5f + 20f, y + height * 0.5f), GameBalance.DeathFlameBright * alpha);
     }
 
     private void DrawIntro(SpriteBatch batch, Texture2D pixel, Viewport viewport)
@@ -578,11 +603,12 @@ public sealed class CinematicPresentation
         float placeIn = Ease((_stateTime - 0.3f) / 0.34f);
         float placeOut = 1f - Ease((_stateTime - 1.12f) / 0.32f);
         float placeAlpha = placeIn * placeOut;
-        PixelText.DrawCentered(batch, pixel, "ABANDONED SOUL FURNACE", viewport.Width * 0.5f, viewport.Height * 0.18f, 2, GameBalance.SoulWhite * (0.68f * placeAlpha));
+        DrawTitleRules(batch, pixel, viewport, viewport.Height * 0.18f - 18f, placeAlpha * 0.8f);
+        PixelText.DrawCentered(batch, pixel, "ABANDONED SOUL FURNACE", viewport.Width * 0.5f, viewport.Height * 0.18f, 4, GameBalance.SoulWhite * (0.82f * placeAlpha));
 
         float warning = Ease((_stateTime - 0.88f) / 0.26f) * (1f - Ease((_stateTime - 1.38f) / 0.14f));
         DrawTitleRules(batch, pixel, viewport, viewport.Height * 0.78f - 16f, warning * 0.58f);
-        PixelText.DrawCentered(batch, pixel, "THE FURNACE WAKES", viewport.Width * 0.5f, viewport.Height * 0.78f, 2, GameBalance.DeathFlameBright * (0.76f * warning));
+        PixelText.DrawCentered(batch, pixel, "THE FURNACE WAKES", viewport.Width * 0.5f, viewport.Height * 0.78f, 3, GameBalance.DeathFlameBright * (0.82f * warning));
     }
 
     private void DrawWaveTransition(SpriteBatch batch, Texture2D pixel, Viewport viewport, int nextWave)
@@ -609,13 +635,14 @@ public sealed class CinematicPresentation
         float titleReveal = Ease((_stateTime - 1.05f) / 0.6f);
         float centerX = viewport.Width * 0.5f;
         float titleY = viewport.Height * 0.42f;
-        DrawTitleRules(batch, pixel, viewport, titleY - 29f, titleReveal * 0.72f);
-        PixelText.DrawCentered(batch, pixel, "THE FLAME", centerX, titleY - 11f, 2, new Color(172, 158, 186) * (0.72f * titleReveal));
-        PixelText.DrawCentered(batch, pixel, "IS EXTINGUISHED", centerX, titleY + 23f, 4, GameBalance.DeathFlameBright * titleReveal);
+        DrawTitleRules(batch, pixel, viewport, titleY - 38f, titleReveal * 0.72f);
+        PixelText.DrawCentered(batch, pixel, "THE FLAME", centerX, titleY - 16f, 3, new Color(172, 158, 186) * (0.72f * titleReveal));
+        PixelText.DrawCentered(batch, pixel, "IS EXTINGUISHED", centerX, titleY + 18f, 5, GameBalance.DeathFlameBright * titleReveal);
+        DrawTitleRules(batch, pixel, viewport, titleY + 66f, titleReveal * 0.4f);
 
         float promptReveal = Ease((_stateTime - 1.0f) / 0.45f);
         float promptBreathe = 0.58f + MathF.Sin(_stateTime * 2.2f) * 0.1f;
-        PixelText.DrawCentered(batch, pixel, "R TO RETRY", centerX, viewport.Height * 0.66f, 2, GameBalance.SoulWhite * (promptReveal * promptBreathe));
+        DrawKeyPrompt(batch, pixel, centerX, viewport.Height * 0.66f, "R", "TO RETRY", GameBalance.SoulWhite * (promptReveal * promptBreathe));
     }
 
     private void DrawCompletion(SpriteBatch batch, Texture2D pixel, Viewport viewport)
@@ -637,7 +664,7 @@ public sealed class CinematicPresentation
 
         float promptReveal = Ease((_stateTime - 5.2f) / 0.65f);
         float promptBreathe = 0.56f + MathF.Sin(_stateTime * 2f) * 0.1f;
-        PixelText.DrawCentered(batch, pixel, "R TO RESTART", viewport.Width * 0.5f, viewport.Height * 0.82f, 2, GameBalance.SoulWhite * (promptReveal * promptBreathe));
+        DrawKeyPrompt(batch, pixel, viewport.Width * 0.5f, viewport.Height * 0.82f, "R", "TO RESTART", GameBalance.SoulWhite * (promptReveal * promptBreathe));
     }
 
     private void DrawLifeFlame(SpriteBatch batch, Texture2D pixel, ArtAssets art, Rectangle combatBounds)
@@ -672,13 +699,11 @@ public sealed class CinematicPresentation
             return;
         }
 
-        float centerX = viewport.Width * 0.5f;
-        Color rule = GameBalance.DeathFlame * (0.42f * alpha);
-        batch.DrawLine(pixel, new Vector2(centerX - 244f, y), new Vector2(centerX - 72f, y), rule, 2f);
-        batch.DrawLine(pixel, new Vector2(centerX + 72f, y), new Vector2(centerX + 244f, y), rule, 2f);
-        batch.DrawLine(pixel, new Vector2(centerX - 6f, y), new Vector2(centerX, y - 6f), GameBalance.DeathFlameBright * (0.62f * alpha), 2f);
-        batch.DrawLine(pixel, new Vector2(centerX, y - 6f), new Vector2(centerX + 6f, y), GameBalance.DeathFlameBright * (0.62f * alpha), 2f);
+        UiKit.Divider(batch, pixel, viewport.Width * 0.5f, y, 500f, GameBalance.DeathFlameBright * (0.62f * alpha));
     }
+
+    private static void DrawKeyPrompt(SpriteBatch batch, Texture2D pixel, float centerX, float y, string key, string action, Color color) =>
+        UiKit.KeyLine(batch, pixel, centerX, y, key, action, color);
 
     private static void DrawPromptMark(SpriteBatch batch, Texture2D pixel, Vector2 center, float alpha)
     {

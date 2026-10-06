@@ -156,13 +156,22 @@ public sealed partial class GameWorld
         if (_phase == GamePhase.Arena && _loopState == ArenaLoopState.Complete) return;
         var cards = CurrentAbilityCards();
         for (int slot = 0; slot < 2; slot++)
-            AbilityPresentation.DrawHud(batch, pixel, viewport, cards[(int)_abilities.Slots[slot]]);
-        PixelText.Draw(batch, pixel, "TAB  FÄHIGKEITEN UND CHARAKTER", new Vector2(24, viewport.Height - 57), 1, GameBalance.SoulWhite * 0.55f);
+            AbilityPresentation.DrawHud(batch, pixel, viewport, cards[(int)_abilities.Slots[slot]], _presentationTime);
+        float hintX = DrawKeyHint(batch, pixel, new Vector2(24, viewport.Height - 62), "TAB", "FÄHIGKEITEN UND CHARAKTER", GameBalance.SoulWhite * 0.72f);
         if (CanChooseAbilities)
-            PixelText.Draw(batch, pixel, "C  FAEHIGKEITEN WAEHLEN", new Vector2(380, viewport.Height - 57), 1, GameBalance.DeathFlameBright);
+            DrawKeyHint(batch, pixel, new Vector2(hintX + 28, viewport.Height - 62), "C", "FÄHIGKEITEN WÄHLEN", GameBalance.DeathFlameBright);
         if (_abilities.FeedbackRemaining > 0)
             PixelText.DrawCentered(batch, pixel, _abilities.Feedback, viewport.Width * 0.5f, 85, 1, GameBalance.GlutBright);
         if (_player.AbilityEffects.SetupRemaining > 0 || _player.AbilityEffects.RevengeRemaining > 0)
-            PixelText.DrawCentered(batch, pixel, "NAECHSTER TREFFER VERSTAERKT", viewport.Width * 0.5f, 102, 1, GameBalance.DeathFlameBright);
+            PixelText.DrawCentered(batch, pixel, "NÄCHSTER TREFFER VERSTÄRKT", viewport.Width * 0.5f, 102, 1, GameBalance.DeathFlameBright);
+    }
+
+    /// <summary>A keycap followed by its label; returns the right edge.</summary>
+    private static float DrawKeyHint(SpriteBatch batch, Texture2D pixel, Vector2 position, string key, string label, Color color)
+    {
+        UiKit.Key(batch, pixel, position, key, color, 1f, 1, 17);
+        float labelX = position.X + UiKit.KeyWidth(key, 1) + 8;
+        PixelText.DrawFace(batch, pixel, label, new Vector2(labelX, position.Y + 4f), TextFace.Body, 9.5f, color, 0.5f);
+        return labelX + PixelText.MeasureFace(label, TextFace.Body, 9.5f, 0.5f);
     }
 }

@@ -206,21 +206,13 @@ public sealed partial class GameWorld
         }
     }
 
-    private void DrawSecuredSummary(SpriteBatch batch, Texture2D pixel, Viewport viewport, string prefix, int geld, int glut, float alpha)
-    {
-        string text = $"{prefix} · GELD {geld} · GLUT {glut}";
-        PixelText.DrawCentered(batch, pixel, text, viewport.Width * 0.5f, viewport.Height - 30f, 1, GameBalance.Geld * (0.8f * alpha));
-    }
+    private void DrawSecuredSummary(SpriteBatch batch, Texture2D pixel, Viewport viewport, string prefix, int geld, int glut, float alpha) =>
+        UiKit.Balances(batch, pixel, viewport.Width * 0.5f, viewport.Height - 30f, prefix, geld, glut, alpha);
 
     private void DrawCenteredPrompt(SpriteBatch batch, Texture2D pixel, Viewport viewport, string prompt, Color accent)
     {
-        float pulse = 0.68f + MathF.Sin(_presentationTime * 4f) * 0.14f;
-        int textScale = PixelText.Measure(prompt, 2) + 48 <= viewport.Width ? 2 : 1;
-        int promptWidth = PixelText.Measure(prompt, textScale) + 48;
-        Rectangle panel = new((viewport.Width - promptWidth) / 2, viewport.Height - 150, promptWidth, 48);
-        batch.FillRectangle(pixel, panel, Color.Black * 0.72f);
-        batch.DrawRectangle(pixel, panel, accent * (0.52f * pulse), 2f);
-        PixelText.DrawCentered(batch, pixel, prompt, viewport.Width * 0.5f, panel.Y + 24f - textScale * 3.5f, textScale, GameBalance.SoulWhite * pulse);
+        float pulse = 0.5f + MathF.Sin(_presentationTime * 4f) * 0.5f;
+        UiKit.Prompt(batch, pixel, viewport.Width * 0.5f, viewport.Height - 206, prompt, accent, pulse);
     }
 
     /// <summary>Purely visual: the Glut is already credited when the spark starts.</summary>

@@ -65,6 +65,8 @@ internal sealed class TourVisualTest
         Station("sandbox", BuildSandbox);
     }
 
+    private bool _advancePending;
+
     public string? PendingCapture { get; private set; }
     public bool Finished { get; private set; }
     public int ExitCode { get; private set; }
@@ -76,8 +78,11 @@ internal sealed class TourVisualTest
             return;
         }
 
-        if (_index < 0)
+        if (_index < 0 || _advancePending)
         {
+            // A step after a capture starts here, not in Capture(): input injected at the end
+            // of a frame would be cleared before the world reads it.
+            _advancePending = false;
             Advance();
             if (Finished)
             {
@@ -122,7 +127,7 @@ internal sealed class TourVisualTest
             ExitCode = 1;
             return;
         }
-        Advance();
+        _advancePending = true;
     }
 
     private void Advance()
@@ -424,8 +429,7 @@ internal sealed class TourVisualTest
         Do("pause_confirm", () => _input.InjectKeyPress(Keys.Enter), 0.3f);
         Shot("pause_settings");
         Do("pause_back", () => _input.InjectKeyPress(Keys.Escape), 0.2f);
-        Do("pause_top", () => _input.InjectKeyPress(Keys.Up), 0.2f);
-        Do("pause_close", () => _input.InjectKeyPress(Keys.Enter), 0.4f);
+        Do("pause_close", () => _input.InjectKeyPress(Keys.Escape), 0.4f);
         Do("character", () => _input.InjectKeyPress(Keys.Tab), 0.4f);
         for (int tab = 0; tab < 4; tab++)
         {

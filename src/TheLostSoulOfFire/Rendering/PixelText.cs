@@ -7,6 +7,14 @@ using TheLostSoulOfFire.Core;
 
 namespace TheLostSoulOfFire.Rendering;
 
+public enum TextFace
+{
+    /// <summary>Alegreya Sans: reading text, labels.</summary>
+    Body,
+    /// <summary>Cinzel: names, headings, values that carry weight.</summary>
+    Display
+}
+
 /// <summary>
 /// All text of the game. With the typeset fonts loaded (<see cref="LoadFonts"/>) the sizes 1–2
 /// are set in Alegreya Sans and the sizes from 3 up in Cinzel, sized by cap height so layouts
@@ -201,6 +209,68 @@ public static class PixelText
             }
         }
         return text;
+    }
+
+    /// <summary>
+    /// Text in a chosen face at any cap height (logical pixels), with optional letter spacing:
+    /// Cinzel for names and numbers that carry weight, Alegreya Sans for reading text. Without
+    /// the typeset fonts it falls back to the nearest pixel-font size.
+    /// </summary>
+    public static void DrawFace(SpriteBatch batch, Texture2D pixel, string text, Vector2 position, TextFace face, float capHeight, Color color, float tracking = 0f)
+    {
+        if (!UsesFonts)
+        {
+            Draw(batch, pixel, text, position, NearestStep(capHeight), color);
+            return;
+        }
+
+        (Face chosen, float k) = PickFace(face, capHeight);
+        float spacing = chosen.Font.Spacing;
+        chosen.Font.Spacing = spacing + tracking / k;
+        string safe = Sanitise(text, chosen.Font);
+        Vector2 at = new(RenderResolution.SnapToOutputPixel(position.X), RenderResolution.SnapToOutputPixel(position.Y - chosen.CapTop * k));
+        float shadowOffset = 1f / RenderResolution.Scale * (capHeight >= 15f ? 2f : 1f);
+        batch.DrawString(chosen.Font, safe, at + new Vector2(shadowOffset), Color.Black * (color.A / 255f * 0.55f), 0f, Vector2.Zero, k, SpriteEffects.None, 0f);
+        batch.DrawString(chosen.Font, safe, at, color, 0f, Vector2.Zero, k, SpriteEffects.None, 0f);
+        chosen.Font.Spacing = spacing;
+    }
+
+    public static int MeasureFace(string text, TextFace face, float capHeight, float tracking = 0f)
+    {
+        if (!UsesFonts)
+        {
+            return Measure(text, NearestStep(capHeight));
+        }
+
+        (Face chosen, float k) = PickFace(face, capHeight);
+        float spacing = chosen.Font.Spacing;
+        chosen.Font.Spacing = spacing + tracking / k;
+        float width = chosen.Font.MeasureString(Sanitise(text, chosen.Font)).X * k;
+        chosen.Font.Spacing = spacing;
+        return (int)MathF.Ceiling(width);
+    }
+
+    private static (Face Face, float Scale) PickFace(TextFace face, float capHeight)
+    {
+        Face chosen = face switch
+        {
+            TextFace.Display => capHeight <= 20f ? _display! : _displayLarge!,
+            _ => capHeight <= 9f ? _uiSmall! : _ui!
+        };
+        return (chosen, capHeight / chosen.CapHeight);
+    }
+
+    private static int NearestStep(float capHeight)
+    {
+        int best = 1;
+        for (int step = 1; step < CapHeights.Length; step++)
+        {
+            if (MathF.Abs(CapHeights[step] - capHeight) < MathF.Abs(CapHeights[best] - capHeight))
+            {
+                best = step;
+            }
+        }
+        return best;
     }
 
     public static int Measure(string text, int scale)

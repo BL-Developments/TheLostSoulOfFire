@@ -250,6 +250,7 @@ public sealed partial class GameWorld : IDisposable
         };
         _phaseTime += deltaTime;
         _presentation.Update(deltaTime, _phase);
+        _hud.Update(deltaTime, _player);
         _audio.Update(deltaTime);
         bool wasDashing = _player.IsDashing;
         bool wasResonanceActive = _player.ResonanceActive;
@@ -987,9 +988,7 @@ public sealed partial class GameWorld : IDisposable
 
         if (IsCombatPhase && _presentation.ShouldDrawAim(_loopState, _player.IsDead))
         {
-            batch.DrawCircle(pixel, _lastMouseWorld, 9f, GameBalance.DeathFlameBright * 0.75f, 2f, 16);
-            batch.DrawLine(pixel, _lastMouseWorld - Vector2.UnitX * 13f, _lastMouseWorld + Vector2.UnitX * 13f, GameBalance.DeathFlame * 0.6f, 1f);
-            batch.DrawLine(pixel, _lastMouseWorld - Vector2.UnitY * 13f, _lastMouseWorld + Vector2.UnitY * 13f, GameBalance.DeathFlame * 0.6f, 1f);
+            HudRenderer.DrawReticle(batch, pixel, _lastMouseWorld, _player.Cannon, _presentationTime);
         }
 
         if (_debugVisible && IsCombatPhase)
@@ -1297,14 +1296,11 @@ public sealed partial class GameWorld : IDisposable
         float placeIn = Ease(_phaseTime / 0.45f);
         float placeOut = 1f - Ease((_phaseTime - 2.2f) / 0.55f);
         float placeAlpha = _phase == GamePhase.Antechamber ? placeIn * placeOut : 0f;
-        PixelText.DrawCentered(
-            batch,
-            pixel,
-            "ASHEN ANTECHAMBER",
-            centerX,
-            viewport.Height * 0.14f,
-            2,
-            GameBalance.SoulWhite * (0.7f * placeAlpha));
+        if (placeAlpha > 0f)
+        {
+            UiKit.Divider(batch, pixel, centerX, viewport.Height * 0.14f - 18f, 420f, GameBalance.DeathFlameBright * (0.55f * placeAlpha));
+            PixelText.DrawCentered(batch, pixel, "ASHEN ANTECHAMBER", centerX, viewport.Height * 0.14f, 4, GameBalance.SoulWhite * (0.85f * placeAlpha));
+        }
 
         if (_phase == GamePhase.Antechamber)
         {
@@ -1314,22 +1310,9 @@ public sealed partial class GameWorld : IDisposable
         HubDoor? nearbyDoor = _phase == GamePhase.Antechamber ? _antechamber.DoorAt(_player.Position) : null;
         if (nearbyDoor is not null)
         {
-            float pulse = 0.68f + MathF.Sin(_presentationTime * 4f) * 0.14f;
-            string prompt = nearbyDoor.Prompt;
-            int textScale = PixelText.Measure(prompt, 2) + 48 <= viewport.Width ? 2 : 1;
-            int promptWidth = PixelText.Measure(prompt, textScale) + 48;
-            Rectangle panel = new((viewport.Width - promptWidth) / 2, viewport.Height - 104, promptWidth, 48);
+            float pulse = nearbyDoor.IsSealed ? 0f : 0.5f + MathF.Sin(_presentationTime * 4f) * 0.5f;
             Color accent = nearbyDoor.IsSealed ? GameBalance.DeepViolet : GameBalance.DeathFlame;
-            batch.FillRectangle(pixel, panel, Color.Black * 0.72f);
-            batch.DrawRectangle(pixel, panel, accent * (0.52f * pulse), 2f);
-            PixelText.DrawCentered(
-                batch,
-                pixel,
-                prompt,
-                centerX,
-                panel.Y + 24f - textScale * 3.5f,
-                textScale,
-                GameBalance.SoulWhite * (nearbyDoor.IsSealed ? 0.72f : pulse));
+            UiKit.Prompt(batch, pixel, centerX, viewport.Height - 206, nearbyDoor.Prompt, accent, pulse, nearbyDoor.IsSealed ? 0.72f : 1f);
         }
 
         if (_phase != GamePhase.EnteringArena)
@@ -1342,7 +1325,8 @@ public sealed partial class GameWorld : IDisposable
         batch.FillRectangle(pixel, new Rectangle(0, 0, viewport.Width, barHeight), Color.Black * 0.9f);
         batch.FillRectangle(pixel, new Rectangle(0, viewport.Height - barHeight, viewport.Width, barHeight), Color.Black * 0.9f);
         float labelAlpha = Ease(progress / 0.35f) * (1f - Ease((progress - 0.68f) / 0.25f));
-        PixelText.DrawCentered(batch, pixel, "THE DOOR AWAKENS", centerX, viewport.Height * 0.78f, 2, GameBalance.DeathFlameBright * labelAlpha);
+        UiKit.Divider(batch, pixel, centerX, viewport.Height * 0.78f - 16f, 380f, GameBalance.DeathFlameBright * (0.5f * labelAlpha));
+        PixelText.DrawCentered(batch, pixel, "THE DOOR AWAKENS", centerX, viewport.Height * 0.78f, 3, GameBalance.DeathFlameBright * labelAlpha);
         float fade = Ease((progress - 0.72f) / 0.28f);
         batch.FillRectangle(pixel, viewport.Bounds, Color.Black * fade);
     }

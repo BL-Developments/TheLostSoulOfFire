@@ -18,10 +18,10 @@ public sealed class RunAbilities
     [
         new("ZWEITER ATEM", "HEILT 25 LEBEN", 3, 3f),
         new("DURCHSCHLAG", "GESCHOSS TRIFFT MEHRERE GEGNER", 3, 1f),
-        new("RUECKSTOSSSPRUNG", "SPRUNG ZURUECK + GEGNER WEGSTOSSEN", 2, 2f),
+        new("RÜCKSTOSSSPRUNG", "SPRUNG ZURÜCK + GEGNER WEGSTOSSEN", 2, 2f),
         new("SOG", "ZIEHT GEGNER ZUM ZIELPUNKT", 4, 4f),
-        new("VERGELTUNG", "TREFFER ABFANGEN + NAECHSTEN TREFFER STAERKEN", 3, 4f),
-        new("VORLAGE", "TREFFER MARKIERT; FOLGETREFFER ERHAELT BONUS", 2, 2f)
+        new("VERGELTUNG", "TREFFER ABFANGEN + NÄCHSTEN TREFFER STÄRKEN", 3, 4f),
+        new("VORLAGE", "TREFFER MARKIERT; FOLGETREFFER ERHÄLT BONUS", 2, 2f)
     ];
     private readonly float[] _cooldowns = new float[6];
     private readonly List<AbilityProjectile> _projectiles = [];
@@ -47,7 +47,7 @@ public sealed class RunAbilities
         Rectangle bounds, IReadOnlyList<Enemy> enemies, ParticleSystem particles, bool chargeCost = true)
     {
         AbilityDefinition definition = Definitions[(int)ability];
-        if (player.IsDead) return Reject("NICHT HANDLUNGSFAEHIG");
+        if (player.IsDead) return Reject("NICHT HANDLUNGSFÄHIG");
         if (Cooldown(ability) > 0) return Reject("NOCH NICHT BEREIT");
         if (ability == RunAbility.SecondWind && player.Health >= player.MaxHealth)
             return Reject("LEBEN BEREITS VOLL");
