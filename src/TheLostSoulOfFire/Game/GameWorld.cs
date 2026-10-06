@@ -1693,11 +1693,66 @@ public sealed partial class GameWorld : IDisposable
     /// Footsteps from the distance the player actually covers (never during a dash or while dead);
     /// on the skiff's deck the planks answer.
     /// </summary>
+    private float? _playerStepPhase;
+    private readonly Dictionary<Enemy, float> _enemyStepPhases = new();
+    private static readonly float[] Footfalls = [0.25f, 0.75f];
+    private static readonly float[] BurningFootfalls = [0.2f, 0.7f];
+
+    /// <summary>
+    /// True when a walk or run cycle passed one of its footfalls since the last check: the
+    /// rendered clips set a heel down at a quarter and three quarters of their cycle
+    /// (key_run/key_move in tools/visuals/blender/build_*.py; the Burning slightly earlier).
+    /// </summary>
+    private static bool CrossedFootfall(float? previous, float current, float[] footfalls)
+    {
+        if (previous is not { } before)
+        {
+            return false;
+        }
+
+        float travelled = current - before;
+        if (travelled < 0f)
+        {
+            travelled += 1f;
+        }
+        if (travelled <= 0f || travelled > 0.5f)
+        {
+            return false;
+        }
+
+        foreach (float contact in footfalls)
+        {
+            float ahead = contact - before;
+            if (ahead <= 0f)
+            {
+                ahead += 1f;
+            }
+            if (ahead <= travelled)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void UpdateFootsteps()
     {
         Vector2 position = _player.Position;
         float moved = Vector2.Distance(position, _footstepFrom);
         _footstepFrom = position;
+        bool wood = _phase == GamePhase.Prologue && _prologue.IsVehicleRide;
+        if (!_player.IsDead && !_player.IsDashing && _art.CyclePhase(_player, VisualClips.Move) is { } phase)
+        {
+            // The rendered run: a step on every drawn footfall.
+            if (CrossedFootfall(_playerStepPhase, phase, Footfalls))
+            {
+                _audio.Play(wood ? AudioCue.FootstepWood : AudioCue.Footstep, 0.42f);
+            }
+            _playerStepPhase = phase;
+            return;
+        }
+
+        _playerStepPhase = null;
         if (_player.IsDead || _player.IsDashing || moved > 60f || _player.Velocity.LengthSquared() < 120f)
         {
             _footstepDistance = MathF.Min(_footstepDistance, FootstepStride * 0.6f);
@@ -1707,7 +1762,6 @@ public sealed partial class GameWorld : IDisposable
         if (_footstepDistance >= FootstepStride)
         {
             _footstepDistance -= FootstepStride;
-            bool wood = _phase == GamePhase.Prologue && _prologue.IsVehicleRide;
             _audio.Play(wood ? AudioCue.FootstepWood : AudioCue.Footstep, 0.42f);
         }
     }
@@ -1727,6 +1781,7 @@ public sealed partial class GameWorld : IDisposable
         if (!IsCombatPhase)
         {
             _enemySteps.Clear();
+            _enemyStepPhases.Clear();
             return;
         }
 
@@ -1743,6 +1798,23 @@ public sealed partial class GameWorld : IDisposable
             {
                 continue;
             }
+
+            if (enemy.DrawnAsFigure && _art.CyclePhase(enemy, VisualClips.Move) is { } enemyPhase)
+            {
+                // A rendered walk: the step lands on the drawn footfall.
+                float? lastPhase = _enemyStepPhases.TryGetValue(enemy, out float last) ? last : null;
+                _enemyStepPhases[enemy] = enemyPhase;
+                if (CrossedFootfall(lastPhase, enemyPhase, enemy is Burning ? BurningFootfalls : Footfalls))
+                {
+                    float nearness = MathHelper.Clamp(1f - Vector2.Distance(enemy.Position, _player.Position) / 900f, 0f, 1f);
+                    if (nearness > 0.05f)
+                    {
+                        _audio.Play(cue, loudness * nearness * nearness, 0f, PanOf(enemy.Position));
+                    }
+                }
+                continue;
+            }
+            _enemyStepPhases.Remove(enemy);
 
             if (!_enemySteps.TryGetValue(enemy, out (Vector2 From, float Distance) step))
             {
@@ -1773,9 +1845,17 @@ public sealed partial class GameWorld : IDisposable
                 _goneStepEnemies.Add(known);
             }
         }
+        foreach (Enemy known in _enemyStepPhases.Keys)
+        {
+            if (!known.IsAlive || !_enemies.Contains(known))
+            {
+                _goneStepEnemies.Add(known);
+            }
+        }
         foreach (Enemy gone in _goneStepEnemies)
         {
             _enemySteps.Remove(gone);
+            _enemyStepPhases.Remove(gone);
         }
     }
 

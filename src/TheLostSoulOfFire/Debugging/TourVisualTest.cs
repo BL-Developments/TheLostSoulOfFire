@@ -5,6 +5,7 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using TheLostSoulOfFire.Audio;
 using TheLostSoulOfFire.Combat;
 using TheLostSoulOfFire.Entities;
 using TheLostSoulOfFire.Game;
@@ -174,6 +175,7 @@ internal sealed class TourVisualTest
 
         Step step = _steps[_index];
         _stepTime += deltaTime;
+        _frame++;
         // Held input continues on the frame of a capture, so a series never drops it.
         step.EveryFrame?.Invoke();
         if (_stepTime >= step.MinWait && step.Ready())
@@ -259,6 +261,18 @@ internal sealed class TourVisualTest
     }
 
     private string Named(string name) => $"{_station}_{name}";
+
+    private int _frame;
+
+    /// <summary>Footsteps while the tour runs: each with the run phase drawn at that moment.</summary>
+    private void LogStep(AudioCue cue)
+    {
+        if (cue is AudioCue.Footstep or AudioCue.FootstepWood)
+        {
+            Console.WriteLine(string.Create(System.Globalization.CultureInfo.InvariantCulture,
+                $"TOUR_STEP frame={_frame} phase={_world.AutomatedRunPhase ?? -1f:0.00}"));
+        }
+    }
 
     private void Do(string name, Action enter, float wait = 0.02f) =>
         _steps.Add(new Step(Named(name), enter, () => true, false, wait + 1f, wait) { Station = _station });
@@ -447,7 +461,9 @@ internal sealed class TourVisualTest
         Wait("combat", () => _world.LoopState == ArenaLoopState.Combat, 20f);
         Do("clear", () => _world.DefeatAutomatedEnemies(), 2.5f);
         Do("place_run", () => { _world.PlaceAutomatedPlayer(ArenaCentre - new Vector2(320f, 0f)); _world.SetAutomatedAim(Vector2.UnitX); }, 0.3f);
+        Do("listen_steps", () => _world.AutomatedAudio.CuePlayed += LogStep);
         Series("run", 16, 2, () => _input.InjectKeyDown(Keys.D));
+        Do("stop_listening", () => _world.AutomatedAudio.CuePlayed -= LogStep);
         Do("place_combo", () => { _world.PlaceAutomatedPlayer(ArenaCentre); _world.SetAutomatedAim(new Vector2(1f, 0.35f)); }, 0.6f);
         Series("combo", 48, 1, () => _input.InjectMousePresses(left: true, right: false));
         Do("rest", () => { }, 0.6f);

@@ -507,6 +507,13 @@ public sealed class ArtAssets
     }
 
     /// <summary>
+    /// Where a figure's clip <paramref name="clipName"/> stands in its cycle (0–1) as last drawn,
+    /// or null when the figure shows another clip: footsteps land on the drawn footfalls.
+    /// </summary>
+    public float? CyclePhase(object owner, string clipName) =>
+        _figures.TryGetValue(owner, out FigureState? figure) ? figure.CyclePhase(clipName) : null;
+
+    /// <summary>
     /// An afterimage of a rendered figure: the pose it showed <paramref name="age"/> seconds ago,
     /// drawn at <paramref name="position"/> in <paramref name="color"/>. False when no pose is known.
     /// </summary>
@@ -604,12 +611,20 @@ public sealed class ArtAssets
                 }
                 _clipName = name;
                 _elapsed = 0f;
+                _cycleLength = clip.Duration;
                 return _elapsed;
             }
 
             _elapsed = ClipClock.Advance(_elapsed, clip, deltaTime, distance);
+            _cycleLength = clip.Duration;
             return _elapsed;
         }
+
+        private float _cycleLength;
+
+        /// <summary>Where in its cycle the clip <paramref name="name"/> is (0–1), or null if another clip plays.</summary>
+        public float? CyclePhase(string name) =>
+            string.Equals(_clipName, name, StringComparison.Ordinal) && _cycleLength > 0f ? _elapsed / _cycleLength % 1f : null;
 
         public void RememberPose(SpriteClip clip, Rectangle source, Vector2 position, float scale, Color tint)
         {

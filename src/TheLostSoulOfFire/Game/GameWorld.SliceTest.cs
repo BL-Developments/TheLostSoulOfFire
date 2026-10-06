@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using TheLostSoulOfFire.Audio;
 using TheLostSoulOfFire.Combat;
 using TheLostSoulOfFire.Core;
 using TheLostSoulOfFire.Entities;
@@ -39,6 +40,11 @@ public sealed partial class GameWorld
         _automatedAim = direction is { } value && value.LengthSquared() > 0.0001f ? Vector2.Normalize(value) : null;
 
     internal void SetAutomatedHudHidden(bool hidden) => _automatedHideHud = hidden;
+
+    internal AudioDirector AutomatedAudio => _audio;
+
+    /// <summary>The drawn run phase of the player (0–1), or null when the figure is not running.</summary>
+    internal float? AutomatedRunPhase => _art.CyclePhase(_player, VisualClips.Move);
 
     /// <summary>Zooms the camera out to the whole world for overview shots.</summary>
     internal void SetAutomatedOverview(bool overview) => _automatedOverview = overview;

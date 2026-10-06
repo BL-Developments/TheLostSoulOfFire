@@ -431,6 +431,9 @@ public sealed class AudioDirector : IDisposable
         ApplyMix();
     }
 
+    /// <summary>Raised for every cue that actually starts (diagnostics: the tour logs footsteps).</summary>
+    public event Action<AudioCue>? CuePlayed;
+
     public void Play(AudioCue cue, float volume = 1f, float pitch = 0f) => Play(cue, volume, pitch, 0f);
 
     /// <summary>Plays a cue placed left or right of the listener (<paramref name="pan"/> −1 … 1).</summary>
@@ -468,6 +471,7 @@ public sealed class AudioDirector : IDisposable
             instance.Pitch = Math.Clamp(pitch + NextSignedFloat() * policy.PitchVariation, -1f, 1f);
             instance.Pan = Math.Clamp(pan, -1f, 1f);
             instance.Play();
+            CuePlayed?.Invoke(cue);
             instances.Add(instance);
             _cooldowns[cue] = policy.Cooldown;
             ApplyCueDuck(cue);
