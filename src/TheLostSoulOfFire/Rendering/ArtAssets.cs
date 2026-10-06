@@ -496,8 +496,40 @@ public sealed class ArtAssets
         float scale = Registry.TryGet(id, out VisualEntry entry) && entry.PixelsPerUnit is { } pixelsPerUnit
             ? sizeScale / pixelsPerUnit
             : worldSize.X / clip.FrameWidth;
-        figure.RememberPose(clip, clip.GetSourceRectangle(elapsed), position, scale, tint);
         DrawFrame(batch, clip, elapsed, position, scale, tint);
+        if (figure.SettleRemaining > 0f && figure.Settling is { } previous)
+        {
+            // The pose being left lies over the new one and fades out, moving with the figure.
+            float fade = figure.SettleRemaining / FigureState.SettleDuration;
+            DrawSource(batch, previous.Clip, previous.Source, position, previous.Scale, previous.Tint * (fade * fade * 0.9f));
+        }
+        figure.RememberPose(clip, clip.GetSourceRectangle(elapsed), position, scale, tint);
+    }
+
+    /// <summary>
+    /// An afterimage of a rendered figure: the pose it showed <paramref name="age"/> seconds ago,
+    /// drawn at <paramref name="position"/> in <paramref name="color"/>. False when no pose is known.
+    /// </summary>
+    public bool DrawGhost(SpriteBatch batch, object owner, Vector2 position, float age, Color color)
+    {
+        if (!_figures.TryGetValue(owner, out FigureState? figure) || figure.PoseAt(_time - age) is not { } pose)
+        {
+            return false;
+        }
+
+        batch.Draw(pose.Clip.Texture, position, pose.Source, color, 0f, pose.Clip.PixelOrigin, pose.Scale, SpriteEffects.None, 0f);
+        return true;
+    }
+
+    private void DrawSource(SpriteBatch batch, SpriteClip clip, Rectangle source, Vector2 position, float scale, Color color)
+    {
+        if (_litSceneActive && clip.NormalMap is not null)
+        {
+            _lighting!.Draw(batch, clip, source, position, scale, color);
+            return;
+        }
+
+        batch.Draw(clip.Texture, position, source, color, 0f, clip.PixelOrigin, scale, SpriteEffects.None, 0f);
     }
 
     private void StartDissolve(object owner, string id)
@@ -545,11 +577,31 @@ public sealed class ArtAssets
             return deltaTime;
         }
 
+        /// <summary>How long a figure settles from an action back into standing or running.</summary>
+        public const float SettleDuration = 0.1f;
+
+        /// <summary>The pose the figure left when it switched into a rest clip, fading out over it.</summary>
+        public (SpriteClip Clip, Rectangle Source, float Scale, Color Tint)? Settling { get; private set; }
+        public float SettleRemaining { get; private set; }
+
         /// <summary>Elapsed playback of <paramref name="name"/>; switching clips restarts, turning does not.</summary>
         public float PlayClip(string name, VisualClipDefinition clip, float deltaTime, float distance)
         {
+            SettleRemaining = MathF.Max(0f, SettleRemaining - deltaTime);
             if (!string.Equals(_clipName, name, StringComparison.Ordinal))
             {
+                // Actions start at once (their first frame is the feedback); only the way back
+                // into standing or running blends, so a figure settles instead of snapping.
+                bool intoRest = name is VisualClips.Idle or VisualClips.Move;
+                if (intoRest && LastClip is not null && _clipName.Length > 0)
+                {
+                    Settling = (LastClip, LastSource, LastScale, LastTint);
+                    SettleRemaining = SettleDuration;
+                }
+                else
+                {
+                    SettleRemaining = 0f;
+                }
                 _clipName = name;
                 _elapsed = 0f;
                 return _elapsed;
@@ -566,6 +618,32 @@ public sealed class ArtAssets
             LastPosition = position;
             LastScale = scale;
             LastTint = tint;
+            _history[_historyNext] = (_lastTime, clip, source, scale);
+            _historyNext = (_historyNext + 1) % _history.Length;
+        }
+
+        private readonly (float Time, SpriteClip? Clip, Rectangle Source, float Scale)[] _history = new (float, SpriteClip?, Rectangle, float)[32];
+        private int _historyNext;
+
+        /// <summary>The pose drawn closest to <paramref name="time"/> within the last half second.</summary>
+        public (SpriteClip Clip, Rectangle Source, float Scale)? PoseAt(float time)
+        {
+            (float Time, SpriteClip? Clip, Rectangle Source, float Scale) best = default;
+            float bestGap = float.MaxValue;
+            foreach (var pose in _history)
+            {
+                if (pose.Clip is null)
+                {
+                    continue;
+                }
+                float gap = MathF.Abs(pose.Time - time);
+                if (gap < bestGap)
+                {
+                    bestGap = gap;
+                    best = pose;
+                }
+            }
+            return best.Clip is null || bestGap > 0.5f ? null : (best.Clip, best.Source, best.Scale);
         }
     }
 

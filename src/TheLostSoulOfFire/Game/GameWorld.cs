@@ -937,7 +937,7 @@ public sealed partial class GameWorld : IDisposable
         }
 
         DrawGroundMist(batch);
-        _player.DrawAfterimages(batch, pixel);
+        _player.DrawAfterimages(batch, pixel, _art);
         if (IsCombatPhase)
         {
             _art.DrawDissolves(batch);

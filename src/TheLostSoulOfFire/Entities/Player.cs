@@ -239,11 +239,19 @@ public sealed class Player
         }
     }
 
-    public void DrawAfterimages(SpriteBatch batch, Texture2D pixel)
+    public void DrawAfterimages(SpriteBatch batch, Texture2D pixel, ArtAssets? art = null)
     {
         foreach (Afterimage afterimage in _afterimages)
         {
             float alpha = afterimage.Remaining / afterimage.Lifetime;
+            // A rendered figure leaves a violet ghost of the very pose it had there.
+            Color ghost = new Color(120, 70, 210) * (alpha * alpha * 0.55f);
+            ghost.A = (byte)(ghost.A * 0.7f);
+            if (art is not null && art.DrawGhost(batch, this, afterimage.Position, afterimage.Lifetime - afterimage.Remaining, ghost))
+            {
+                continue;
+            }
+
             Vector2 right = new(-afterimage.Facing.Y, afterimage.Facing.X);
             Color silhouette = new Color(69, 28, 112) * (alpha * 0.48f);
             batch.DrawLine(pixel, afterimage.Position - afterimage.Facing * 15f, afterimage.Position + afterimage.Facing * 14f, silhouette, 28f);
@@ -313,14 +321,24 @@ public sealed class Player
         {
             float flash = MathHelper.Clamp(HitFlashRemaining / 0.14f, 0f, 1f);
             WorldMarks.Ring(batch, pixel, body, 29f + (1f - flash) * 8f, GameBalance.SoulWhite * (0.72f * flash), false, 4f);
-            batch.FillCircle(pixel, body + FacingDirection * 2f, 7f, GameBalance.SoulWhite * (0.88f * flash));
+            art.DrawSoftSpot(batch, body, new Vector2(12f), GameBalance.SoulWhite * (0.88f * flash));
         }
 
         if (IsDashing)
         {
-            Vector2 ignitionOrigin = Position - _dashDirection * 15f;
-            batch.DrawLine(pixel, ignitionOrigin - right * 8f, ignitionOrigin - _dashDirection * 23f - right * 11f, GameBalance.DeathFlame, 7f);
-            batch.DrawLine(pixel, ignitionOrigin + right * 8f, ignitionOrigin - _dashDirection * 27f + right * 12f, GameBalance.DeathFlameBright, 5f);
+            if (rendered)
+            {
+                // Two streaks of Death Flame trail the body (the ignition flipbook marks the start).
+                Vector2 trail = body - _dashDirection * 18f;
+                WorldMarks.Beam(batch, pixel, trail - right * 10f, trail - _dashDirection * 46f - right * 14f, 14f, GameBalance.DeathFlame * 0.7f);
+                WorldMarks.Beam(batch, pixel, trail + right * 10f, trail - _dashDirection * 52f + right * 15f, 10f, GameBalance.DeathFlameBright * 0.6f);
+            }
+            else
+            {
+                Vector2 ignitionOrigin = Position - _dashDirection * 15f;
+                batch.DrawLine(pixel, ignitionOrigin - right * 8f, ignitionOrigin - _dashDirection * 23f - right * 11f, GameBalance.DeathFlame, 7f);
+                batch.DrawLine(pixel, ignitionOrigin + right * 8f, ignitionOrigin - _dashDirection * 27f + right * 12f, GameBalance.DeathFlameBright, 5f);
+            }
         }
 
         if (debugVisible)
