@@ -425,10 +425,10 @@ public sealed class Player
         {
             Vector2 eyes = Position - new Vector2(0f, FigureHeights.Eyes) + new Vector2(FacingDirection.X * 6f, FacingDirection.Y * 3f);
             Vector2 across = new(MathF.Abs(FacingDirection.Y) * 3.5f + 1f, 0f);
-            art.DrawSoftSpot(batch, eyes, new Vector2(11f, 8f), GameBalance.DeathFlame * (0.5f * sense));
-            art.DrawSoftSpot(batch, eyes - across, new Vector2(2.6f), GameBalance.SoulWhite * sense);
-            art.DrawSoftSpot(batch, eyes + across, new Vector2(2.6f), GameBalance.SoulWhite * sense);
-            batch.DrawLine(pixel, core, eyes, GameBalance.DeathFlame * (0.35f * sense), 2f);
+            // The eyes glint violet (subtle, owner): no line from the core.
+            art.DrawSoftSpot(batch, eyes, new Vector2(8f, 6f), GameBalance.DeathFlame * (0.25f * sense));
+            art.DrawSoftSpot(batch, eyes - across, new Vector2(2f), GameBalance.DeathFlameBright * (0.7f * sense));
+            art.DrawSoftSpot(batch, eyes + across, new Vector2(2f), GameBalance.DeathFlameBright * (0.7f * sense));
         }
     }
 

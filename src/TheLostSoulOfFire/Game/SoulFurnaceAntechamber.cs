@@ -261,7 +261,7 @@ public sealed class SoulFurnaceAntechamber
             for (int i = 0; i < SoulTraces.Length; i += 2)
             {
                 float pulse = 0.72f + MathF.Sin(time * 4.2f + i * 0.83f) * 0.18f;
-                batch.Draw(softSpot, SoulTraces[i], null, GameBalance.SoulWhite * (0.4f * amount * pulse), 0f, origin, 22f / softSpot.Width, SpriteEffects.None, 0f);
+                batch.Draw(softSpot, SoulTraces[i], null, GameBalance.SoulSenseTrace * (0.18f * amount * pulse), 0f, origin, 18f / softSpot.Width, SpriteEffects.None, 0f);
             }
             return;
         }

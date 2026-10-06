@@ -90,7 +90,7 @@ public static class SoulfireLighting
             float radius = soul.State == SoulState.Residue
                 ? SoulfireRenderSettings.SoulGlowRadius * 0.48f
                 : SoulfireRenderSettings.SoulGlowRadius * breathe;
-            float intensity = SoulfireRenderSettings.SoulGlowIntensity * MathHelper.Lerp(1f, 1.42f, soulSenseAmount);
+            float intensity = SoulfireRenderSettings.SoulGlowIntensity * MathHelper.Lerp(1f, 1.12f, soulSenseAmount);
             renderer.DrawGlow(batch, soul.Position, radius, GameBalance.SoulWhite, intensity);
             renderer.DrawGlow(batch, soul.Position, radius * 0.48f, GameBalance.DeathFlameBright, intensity * 0.72f);
         }
@@ -108,7 +108,7 @@ public static class SoulfireLighting
         {
             if (enemy is Burning burning && burning.State != BurningState.Dead)
             {
-                float fractureIntensity = MathHelper.Lerp(0.11f, 0.27f, soulSenseAmount);
+                float fractureIntensity = MathHelper.Lerp(0.11f, 0.16f, soulSenseAmount);
                 foreach (Vector2 fracture in burning.GetFracturePositions())
                 {
                     renderer.DrawGlow(batch, burning.DrawnFracture(fracture), 30f * breathe, GameBalance.DeathFlame, fractureIntensity);
@@ -131,10 +131,11 @@ public static class SoulfireLighting
                     Vector2 core = renderedEnemy?.Invoke(hollow) == true
                         ? hollow.CorePosition - new Vector2(0f, FigureHeights.Air)
                         : hollow.CorePosition;
-                    renderer.DrawGlow(batch, core, 50f * breathe, GameBalance.SoulWhite, 0.38f * soulSenseAmount);
+                    // Soul Sense stays subtle (owner): a faint violet light, not a white bloom.
+                    renderer.DrawGlow(batch, core, 34f * breathe, GameBalance.DeathFlameBright, 0.14f * soulSenseAmount);
                     break;
                 case Devourer devourer when devourer.State != DevourerState.Dead:
-                    float torsoIntensity = 0.22f + devourer.ConsumedSoulCount * 0.07f;
+                    float torsoIntensity = 0.1f + devourer.ConsumedSoulCount * 0.035f;
                     renderer.DrawGlow(batch, devourer.DrawnTorso, 66f, GameBalance.DeathFlameBright, torsoIntensity * soulSenseAmount);
                     break;
             }
@@ -232,7 +233,7 @@ public static class SoulfireLighting
             Vector2 eye = renderedPlayer
                 ? player.Position - new Vector2(0f, FigureHeights.Eyes)
                 : player.Position + player.FacingDirection * 26f;
-            renderer.DrawGlow(batch, eye, 34f, GameBalance.SoulWhite, 0.25f * soulSenseAmount);
+            renderer.DrawGlow(batch, eye, 24f, GameBalance.DeathFlameBright, 0.12f * soulSenseAmount);
         }
 
         if (player.IsResonanceReady)

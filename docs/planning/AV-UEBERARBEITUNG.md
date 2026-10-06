@@ -391,6 +391,11 @@ Rahmen wie oben (nur Darstellung und Ton).
 - Seelensinn ohne Striche: Spuren der Echos (Prolog, Arena) und der Weg durch Tür I in der
   Vorhalle als Lichtreste, die einzeln flackern und langsam in Gehrichtung treiben
   (`SoulSensePresentation.DrawResidueTrail`); Knoten als weiches Licht statt Kreise.
+- Seelensinn subtiler (Owner: „das Licht ist viel zu krass“): Kerne der Hollows, Bruchstellen der
+  Burning und der Rumpf des Devourer als kleine violette Lichtpunkte statt flacher Scheiben mit
+  Ringen und weißer Blüte; Lichtdurchgang im Seelensinn stark gesenkt (Hollow-Kern 0,38 weiß →
+  0,14 violett, Devourer etwa halbiert, Seelen 1,42× → 1,12×), Spuren halb so hell, Augen ohne
+  Linie zum Kern. Schwachpunkte bleiben als Punkte erkennbar.
 - Eigener Treffer: weicher Lichtstoß aus dem Körper statt hellem Ring; Dash: weiche Flammenspur
   statt zweier gerader Strahlen.
 

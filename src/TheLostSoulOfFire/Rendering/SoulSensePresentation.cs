@@ -121,11 +121,11 @@ public sealed class SoulSensePresentation
                 // never pops.
                 float edge = MathHelper.Clamp(MathF.Min(d, length - d) / 10f, 0f, 1f);
                 Vector2 at = start + along * d + side * ((hash - 0.5f) * 7f);
-                float size = 4.5f + hash * 3f;
-                Color glow = color * (0.55f * flicker * edge * amount);
+                float size = 3.5f + hash * 2.5f;
+                Color glow = color * (0.28f * flicker * edge * amount);
                 if (!additiveBatch) glow.A = 0;
                 batch.Draw(softSpot, at, null, glow, 0f, origin, size * 2.6f / softSpot.Width, SpriteEffects.None, 0f);
-                Color core = GameBalance.SoulWhite * (0.35f * flicker * edge * amount);
+                Color core = GameBalance.SoulWhite * (0.12f * flicker * edge * amount);
                 if (!additiveBatch) core.A = 0;
                 batch.Draw(softSpot, at, null, core, 0f, origin, size * 0.9f / softSpot.Width, SpriteEffects.None, 0f);
             }
@@ -153,14 +153,13 @@ public sealed class SoulSensePresentation
             for (int node = 1; node < path.Length - 1; node += 2)
             {
                 float nodePulse = 0.7f + 0.3f * MathF.Sin(time * 2.7f + pathIndex * 1.9f + node);
-                art?.DrawSoftSpot(batch, path[node], new Vector2(9f + nodePulse * 3f), GameBalance.SoulSenseTrace * (0.35f * amount));
-                art?.DrawSoftSpot(batch, path[node], new Vector2(4f), GameBalance.SoulWhite * (0.5f * amount));
+                art?.DrawSoftSpot(batch, path[node], new Vector2(8f + nodePulse * 2f), Light(GameBalance.SoulSenseTrace, 0.2f * amount));
             }
 
             float travel = (time * 0.055f + pathIndex * 0.31f) % 1f;
             Vector2 mote = PointAlongPath(path, travel);
-            art?.DrawSoftSpot(batch, mote, new Vector2(16f), GameBalance.DeathFlame * (0.4f * amount));
-            art?.DrawSoftSpot(batch, mote, new Vector2(5f), GameBalance.SoulWhite * (0.8f * amount));
+            art?.DrawSoftSpot(batch, mote, new Vector2(12f), Light(GameBalance.DeathFlame, 0.25f * amount));
+            art?.DrawSoftSpot(batch, mote, new Vector2(3.5f), Light(GameBalance.SoulWhite, 0.4f * amount));
         }
     }
 
@@ -182,9 +181,12 @@ public sealed class SoulSensePresentation
 
             float scale = soul.State == SoulState.Residue ? 0.55f : 1f;
             float urgency = soul.State == SoulState.BeingDevoured ? 1.2f : 1f;
-            WorldMarks.Ring(batch, pixel, soul.Position, (20f + pulse * 4f) * scale * urgency, GameBalance.DeathFlameBright * (0.6f * amount), urgency > 1f, 2f);
-            art?.DrawSoftSpot(batch, soul.Position, new Vector2(16f * scale), GameBalance.DeathFlame * (0.5f * amount));
-            art?.DrawSoftSpot(batch, soul.Position, new Vector2(6f * scale), GameBalance.SoulWhite * amount);
+            if (art is null)
+            {
+                WorldMarks.Ring(batch, pixel, soul.Position, (20f + pulse * 4f) * scale * urgency, GameBalance.DeathFlameBright * (0.6f * amount), urgency > 1f, 2f);
+            }
+            art?.DrawSoftSpot(batch, soul.Position, new Vector2((20f + pulse * 4f) * scale * urgency), Light(GameBalance.DeathFlameBright, 0.18f * amount));
+            art?.DrawSoftSpot(batch, soul.Position, new Vector2(4f * scale), Light(GameBalance.SoulWhite, 0.4f * amount));
         }
     }
 
@@ -211,13 +213,20 @@ public sealed class SoulSensePresentation
                     Vector2 core = art?.IsRendered(hollow.VisualId) == true
                         ? hollow.CorePosition - new Vector2(0f, FigureHeights.Air)
                         : hollow.CorePosition;
-                    DrawCriticalCore(batch, pixel, core, 13f, pulse, amount);
+                    DrawCriticalCore(batch, pixel, core, 13f, pulse, amount, art);
                     break;
 
                 case Burning burning:
                     foreach (Vector2 gameplayFracture in burning.GetFracturePositions())
                     {
                         Vector2 fracture = burning.DrawnFracture(gameplayFracture);
+                        if (art is not null)
+                        {
+                            // A crack that burns from within: a hot point in a pulsing violet glow.
+                            art.DrawSoftSpot(batch, fracture, new Vector2(11f + pulse * 3f), Light(GameBalance.DeathFlameBright, 0.3f * amount));
+                            art.DrawSoftSpot(batch, fracture, new Vector2(3f), Light(GameBalance.SoulWhite, 0.5f * amount));
+                            continue;
+                        }
                         batch.FillCircle(pixel, fracture, 9f, GameBalance.DeepViolet * (0.6f * amount));
                         WorldMarks.Ring(batch, pixel, fracture, 8f + pulse * 2f, GameBalance.DeathFlameBright * (0.7f * amount), true, 2f);
                         batch.FillCircle(pixel, fracture, 4f, GameBalance.SoulWhite * (0.98f * amount));
@@ -225,7 +234,7 @@ public sealed class SoulSensePresentation
                     break;
 
                 case Devourer devourer:
-                    DrawDevourerSoul(batch, pixel, devourer, time, pulse, amount);
+                    DrawDevourerSoul(batch, pixel, devourer, time, pulse, amount, art);
                     break;
             }
         }
@@ -237,8 +246,16 @@ public sealed class SoulSensePresentation
         Vector2 position,
         float radius,
         float pulse,
-        float amount)
+        float amount,
+        ArtAssets? art = null)
     {
+        if (art is not null)
+        {
+            // The weak point as light: a pulsing violet glow around a white-hot centre.
+            art.DrawSoftSpot(batch, position, new Vector2(radius * 1.3f + pulse * 3f), Light(GameBalance.DeathFlameBright, 0.28f * amount));
+            art.DrawSoftSpot(batch, position, new Vector2(3.5f), Light(GameBalance.SoulWhite, 0.5f * amount));
+            return;
+        }
         batch.FillCircle(pixel, position, radius, GameBalance.DeepViolet * (0.72f * amount));
         WorldMarks.Ring(batch, pixel, position, radius + 3f + pulse * 2f, GameBalance.DeathFlameBright * (0.7f * amount), true, 2f);
         batch.FillCircle(pixel, position, 8f, GameBalance.DeathFlameBright * (0.9f * amount));
@@ -251,19 +268,43 @@ public sealed class SoulSensePresentation
         Devourer devourer,
         float time,
         float pulse,
-        float amount)
+        float amount,
+        ArtAssets? art = null)
     {
         Vector2 torso = devourer.DrawnTorso;
-        batch.FillCircle(pixel, torso, 22f + pulse * 2f, GameBalance.DeepViolet * (0.48f * amount));
-        batch.FillCircle(pixel, torso, 5f, GameBalance.SoulWhite * (0.94f * amount));
+        if (art is not null)
+        {
+            // The prison: a dark violet glow in the torso with the trapped souls circling in it.
+            art.DrawSoftSpot(batch, torso, new Vector2(24f + pulse * 3f), Light(GameBalance.DeathFlame, 0.25f * amount));
+            art.DrawSoftSpot(batch, torso, new Vector2(3.5f), Light(GameBalance.SoulWhite, 0.45f * amount));
+        }
+        else
+        {
+            batch.FillCircle(pixel, torso, 22f + pulse * 2f, GameBalance.DeepViolet * (0.48f * amount));
+            batch.FillCircle(pixel, torso, 5f, GameBalance.SoulWhite * (0.94f * amount));
+        }
 
         for (int index = 0; index < devourer.ConsumedSoulCount; index++)
         {
             float angle = time * (1.05f + index * 0.12f) + index * MathHelper.TwoPi / devourer.ConsumedSoulCount;
             Vector2 trapped = torso + new Vector2(MathF.Cos(angle) * 16f, MathF.Sin(angle) * 11f);
+            if (art is not null)
+            {
+                art.DrawSoftSpot(batch, trapped, new Vector2(6f), Light(GameBalance.DeathFlameBright, 0.3f * amount));
+                art.DrawSoftSpot(batch, trapped, new Vector2(2f), Light(GameBalance.SoulWhite, 0.45f * amount));
+                continue;
+            }
             batch.FillCircle(pixel, trapped, 5f, GameBalance.DeathFlameBright * (0.78f * amount));
             batch.FillCircle(pixel, trapped, 2f, GameBalance.SoulWhite * amount);
         }
+    }
+
+    /// <summary>Light added over the scene: a premultiplied colour with no coverage.</summary>
+    private static Color Light(Color color, float amount)
+    {
+        Color light = color * MathHelper.Clamp(amount, 0f, 1f);
+        light.A = 0;
+        return light;
     }
 
     private static void DrawPlayerResponse(
@@ -281,7 +322,10 @@ public sealed class SoulSensePresentation
 
         float pulse = 0.5f + 0.5f * MathF.Sin(time * 4.8f);
         Vector2 core = rendered ? player.Position - new Vector2(0f, player.DrawnCoreHeight) : player.Position + player.FacingDirection * 2f;
-        WorldMarks.Ring(batch, pixel, core, 11f + pulse * 2f, GameBalance.DeathFlameBright * (0.45f * amount), false, 1.5f);
+        if (!rendered)
+        {
+            WorldMarks.Ring(batch, pixel, core, 11f + pulse * 2f, GameBalance.DeathFlameBright * (0.45f * amount), false, 1.5f);
+        }
         if (!rendered)
         {
             // The rendered figure's eyes burn in Player.Draw.
