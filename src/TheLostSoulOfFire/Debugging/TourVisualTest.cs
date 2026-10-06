@@ -268,16 +268,23 @@ internal sealed class TourVisualTest
 
     private int _frame;
 
-    /// <summary>Footsteps while the tour runs: each with the run phase drawn at that moment.</summary>
-    /// <summary>Cannon handling cues while the tour runs, with the cannon state at that moment.</summary>
+    /// <summary>
+    /// Cannon handling cues while the tour runs, with the cannon state at that moment, and the
+    /// bound soul's throb with the player's health.
+    /// </summary>
     private void LogCannon(AudioCue cue)
     {
         if (cue is AudioCue.CannonDraw or AudioCue.CannonStow or AudioCue.CannonCharge or AudioCue.CannonFire)
         {
             Console.WriteLine($"TOUR_CUE frame={_frame} cue={cue} state={_world.AutomatedPlayer.Cannon.State}");
         }
+        else if (cue == AudioCue.SoulThrob)
+        {
+            Console.WriteLine($"TOUR_CUE frame={_frame} cue={cue} health={_world.AutomatedPlayer.Health}");
+        }
     }
 
+    /// <summary>Footsteps while the tour runs: each with the run phase drawn at that moment.</summary>
     private void LogStep(AudioCue cue)
     {
         if (cue is AudioCue.Footstep or AudioCue.FootstepWood)
@@ -635,6 +642,11 @@ internal sealed class TourVisualTest
         EnterArena(1);
         Wait("combat", () => _world.LoopState == ArenaLoopState.Combat, 20f);
         Do("place", () => _world.PlaceAutomatedPlayer(ArenaCentre), 0.3f);
+        // Low first: the bound soul throbs, the edges close in and the bar beats along.
+        Do("listen_throb", () => _world.AutomatedAudio.CuePlayed += LogCannon);
+        Do("wound", () => _world.RequestAutomatedDamage(_world.AutomatedPlayer.Health - 15), 0.2f);
+        Series("low", 18, 8);
+        Do("stop_listening_throb", () => _world.AutomatedAudio.CuePlayed -= LogCannon);
         Do("damage", () => _world.RequestAudioTestFatalDamage());
         Series("dying", 16, 4);
         Shot("dead", minWait: 1.5f);

@@ -78,7 +78,8 @@ public enum AudioCue
     /// <summary>The weight under each scythe swing: air, flame and blade, peaking at contact.</summary>
     ScytheWeight1,
     ScytheWeight2,
-    ScytheWeight3
+    ScytheWeight3,
+    SoulThrob
 }
 
 /// <summary>The enemy kinds that are heard where they stand, between their steps and attacks.</summary>
@@ -190,7 +191,8 @@ public sealed class AudioDirector : IDisposable
         [AudioCue.CannonStow] = new(0.12f, 1, 0.03f),
         [AudioCue.ScytheWeight1] = new(0.04f, 2, 0.03f),
         [AudioCue.ScytheWeight2] = new(0.05f, 2, 0.03f),
-        [AudioCue.ScytheWeight3] = new(0.12f, 1, 0.02f)
+        [AudioCue.ScytheWeight3] = new(0.12f, 1, 0.02f),
+        [AudioCue.SoulThrob] = new(0.4f, 1)
     };
 
     /// <summary>
@@ -419,6 +421,8 @@ public sealed class AudioDirector : IDisposable
             AddVariants(content, AudioCue.ScytheWeight1, "Audio/Sfx/scythe_weight_1", 2, 180f, 0.3f, 0.3f, 0.6f);
             AddVariants(content, AudioCue.ScytheWeight2, "Audio/Sfx/scythe_weight_2", 2, 160f, 0.35f, 0.3f, 0.6f);
             AddVariants(content, AudioCue.ScytheWeight3, "Audio/Sfx/scythe_weight_3", 2, 120f, 0.5f, 0.35f, 0.6f);
+            // The bound soul throbbing when health runs low, heard from within, dry.
+            AddVariants(content, AudioCue.SoulThrob, "Audio/Sfx/soul_throb", 2, 46f, 0.3f, 0.3f, 0.1f);
             Add(content, AudioCue.CannonDraw, "Audio/Sfx/cannon_draw", 140f, 0.3f, 0.3f, 0.4f);
             Add(content, AudioCue.CannonStow, "Audio/Sfx/cannon_stow", 120f, 0.3f, 0.3f, 0.4f);
             AddVariants(content, AudioCue.HitHollow, "Audio/Sfx/hit_hollow", 3, 180f, 0.1f, 0.3f, 0.7f);

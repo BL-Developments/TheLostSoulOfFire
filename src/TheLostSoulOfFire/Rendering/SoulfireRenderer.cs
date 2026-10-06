@@ -59,6 +59,7 @@ public sealed class SoulfireRenderer : IDisposable
     private Texture2D _solidTexture;
     private Texture2D _glowTexture;
     private Texture2D _vignetteTexture;
+    private Texture2D _vignetteGlowTexture;
     private int _targetWidth;
     private int _targetHeight;
 
@@ -79,6 +80,7 @@ public sealed class SoulfireRenderer : IDisposable
         _solidTexture.SetData([Color.White]);
         _glowTexture = CreateGlowTexture(graphicsDevice);
         _vignetteTexture = CreateVignetteTexture(graphicsDevice);
+        _vignetteGlowTexture = CreateVignetteTexture(graphicsDevice, glow: true);
     }
 
     /// <summary>
@@ -182,6 +184,9 @@ public sealed class SoulfireRenderer : IDisposable
     /// <summary>The soft dark frame of the vignette (premultiplied black toward the edges).</summary>
     public Texture2D VignetteTexture => _vignetteTexture;
 
+    /// <summary>Light along the picture's edges (premultiplied white), tinted when drawn.</summary>
+    public Texture2D VignetteGlowTexture => _vignetteGlowTexture;
+
     public void DrawVignette(SpriteBatch batch, Viewport viewport, float soulSenseAmount, bool resonanceActive)
     {
         float opacity = SoulfireRenderSettings.VignetteOpacity +
@@ -223,6 +228,7 @@ public sealed class SoulfireRenderer : IDisposable
         _solidTexture.Dispose();
         _glowTexture.Dispose();
         _vignetteTexture.Dispose();
+        _vignetteGlowTexture.Dispose();
         _lightBlend.Dispose();
         GC.SuppressFinalize(this);
     }
@@ -272,7 +278,7 @@ public sealed class SoulfireRenderer : IDisposable
         return texture;
     }
 
-    private static Texture2D CreateVignetteTexture(GraphicsDevice graphicsDevice)
+    private static Texture2D CreateVignetteTexture(GraphicsDevice graphicsDevice, bool glow = false)
     {
         int width = SoulfireRenderSettings.VignetteTextureWidth;
         int height = SoulfireRenderSettings.VignetteTextureHeight;
@@ -286,9 +292,10 @@ public sealed class SoulfireRenderer : IDisposable
             {
                 float normalizedX = (x + 0.5f) / width * 2f - 1f;
                 float distance = MathF.Sqrt(normalizedX * normalizedX + normalizedY * normalizedY * 0.82f);
-                float edge = SmoothStep(0.48f, 1.24f, distance);
-                byte alpha = (byte)MathF.Round(edge * 255f);
-                data[y * width + x] = new Color(0, 0, 0, (int)alpha);
+                // The glow hugs the edges more closely than the darkening.
+                float edge = glow ? SmoothStep(0.7f, 1.32f, distance) : SmoothStep(0.48f, 1.24f, distance);
+                int alpha = (int)MathF.Round(edge * 255f);
+                data[y * width + x] = glow ? new Color(alpha, alpha, alpha, alpha) : new Color(0, 0, 0, alpha);
             }
         }
 

@@ -317,6 +317,15 @@ Owner: Das Einsammeln der Seelen und die Piep-Töne werden in Kämpfen mit viele
 | `Audio/Sfx/soul_release_soft_2.wav` | soul-release-soft Seed 4 | 1.10 s, 1 Kanal/Kanäle, -22.0 LUFS, Spitze -6.9 dBFS |
 | `Audio/Sfx/soul_release_soft_3.wav` | soul-release-soft Seed 1 | 1.10 s, 1 Kanal/Kanäle, -22.0 LUFS, Spitze -7.8 dBFS |
 
+## Pochen der gebundenen Seele (Durchgang 3, 06.10.2026)
+
+Wenig Leben (30 % oder weniger) meldete nur die Lebensleiste in der Ecke. Rezept `soul-throb`: dumpfer, tiefer Doppelschlag (Gis1 fallend nach E1, weicher Einsatz, gedämpfter Stoß, Tiefpass 520 Hz), danach ein leises dunkles Glimmen. Das Spiel löst ihn je Schlag aus, schneller, je weniger Leben bleibt, und Bildrand und Lebensleiste pulsieren im selben Takt. CLAP (vier Schläge im langsamsten Takt): „slow heartbeat“ 0,68/0,65 + „muffled heartbeat“ 0,25/0,20, „bass synth note“ 0,02/0,07. Erste Fassungen mit längerem Sinuston hörte CLAP als „bass synth note“ (bis 0,62).
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/soul_throb_1.wav` | soul-throb Seed 3 | 0.62 s, 1 Kanal/Kanäle, -23.0 LUFS, Spitze -4.7 dBFS |
+| `Audio/Sfx/soul_throb_2.wav` | soul-throb Seed 4 | 0.62 s, 1 Kanal/Kanäle, -23.0 LUFS, Spitze -1.7 dBFS |
+
 ## Wucht der Sensenhiebe (Durchgang 3, 06.10.2026)
 
 Owner: Der Klang beim Schlagen muss mächtiger werden. Rezepte `scythe-weight-1/2/3` in `tools/audio/recipes/combat.py` liegen unter den Ludo-Schwüngen: schwerer Luftstoß mit aufwärts gleitendem Band, am lautesten zur Kontaktzeit (0,062/0,085/0,155 s nach Hiebbeginn, gemessen 0,067/0,088/0,167 s), Auflodern der Death Flame zu Beginn des Durchziehens, kurzer dunkler Klingenklang; beim dritten Hieb ein tiefer Druckstoß. CLAP „heavy sword swing whoosh“ 0,99.

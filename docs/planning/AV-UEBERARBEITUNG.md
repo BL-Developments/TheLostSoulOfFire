@@ -391,6 +391,13 @@ Rahmen wie oben (nur Darstellung und Ton).
 - Seelensinn ohne Striche: Spuren der Echos (Prolog, Arena) und der Weg durch Tür I in der
   Vorhalle als Lichtreste, die einzeln flackern und langsam in Gehrichtung treiben
   (`SoulSensePresentation.DrawResidueTrail`); Knoten als weiches Licht statt Kreise.
+- Wenig Leben (30 % oder weniger) meldete nur die Lebensleiste in der Ecke, obwohl der Blick im
+  Kampf auf der Figur liegt. Jetzt pocht die gebundene Seele: dumpfer Doppelschlag in Gis
+  (`soul-throb`, CLAP „slow heartbeat“ 0,65–0,68 + „muffled heartbeat“ 0,20–0,25), etwa 58 Schläge je
+  Minute an der Schwelle, 78 kurz vor dem Tod, der erste 0,45 s nach dem Treffer (nicht auf dem
+  Schmerzlaut). Im selben Takt rückt der Bildrand dunkel heran und glimmt violett, die
+  Lebensleiste schlägt mit (vorher gleichmäßiger Sinus). Nur in Kämpfen, nicht im Ende.
+  `LowHealthPresentation`, Rundgang `arena_death_low` (18 Aufnahmen, Takt im Protokoll).
 - Seelensinn subtiler (Owner: „das Licht ist viel zu krass“): Kerne der Hollows, Bruchstellen der
   Burning und der Rumpf des Devourer als kleine violette Lichtpunkte statt flacher Scheiben mit
   Ringen und weißer Blüte; Lichtdurchgang im Seelensinn stark gesenkt (Hollow-Kern 0,38 weiß →
@@ -415,7 +422,10 @@ nachgemessen liefen Truhe, Tod und Menüs wieder mit 1,0–1,1 ms und das Ende d
 1,2 ms – das System hat im Hintergrund gedrosselt, kein Spielfehler. 258 Unit-Tests; Slice-,
 Fähigkeiten-, Vorhallen- (mit Seelensinn) und Währungstest; Audio-Laufzeit-, Gameplay-
 (10 Wellen) und Tod-Neustart-Test; zuvor `validate_audio.py` (169 Assets) und `mix_report.py`
-(Arena, 55 Töne, keiner außerhalb des Bands).
+(Arena, 55 Töne, keiner außerhalb des Bands). Nachtrag 23:45 (Pochen bei wenig Leben): 263 Unit-Tests,
+`validate_audio.py` (171 Assets), `mix_report.py` in allen vier Zonen ohne Ausreißer (Pochen
+2,8–4,2 LU über dem Bett), Stationen `prologue_search` und `arena_death`, Audio-Laufzeit- (64 Töne,
+kein Ersatzklang), Gameplay- und Tod-Neustart-Test.
 
 **Nächste Schritte (nach Wirkung):**
 1. Hörabnahme durch den Owner: Wuchtschichten der Hiebe, sanfte Seelenglocke, Präsenz der

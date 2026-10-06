@@ -31,6 +31,9 @@ public sealed class HudRenderer
     private float _trailHold;
     private float _time;
 
+    /// <summary>The bound soul's throb when health runs low (0–1), so the bar beats with it.</summary>
+    public float Throb { get; set; }
+
     /// <summary>Recent damage stays visible as a pale trail that drains after a short hold.</summary>
     public void Update(float deltaTime, Player player)
     {
@@ -70,7 +73,7 @@ public sealed class HudRenderer
     {
         float health = HealthFraction(player);
         bool low = health <= 0.3f && health > 0f;
-        float lowPulse = low ? 0.5f + 0.5f * MathF.Sin(_time * 6.5f) : 0f;
+        float lowPulse = low ? Throb : 0f;
 
         Rectangle track = new(HealthTrackX, HealthTrackY, HealthTrackWidth, HealthTrackHeight);
         Color fill = low ? Color.Lerp(BoundSoul, GameBalance.DeathFlameBright, 0.35f + lowPulse * 0.25f) : BoundSoul;

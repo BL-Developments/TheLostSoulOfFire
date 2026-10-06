@@ -47,6 +47,7 @@ public sealed partial class GameWorld : IDisposable
     private readonly ParticleSystem _particles = new();
     private readonly ArenaAtmosphere _arenaAtmosphere = new();
     private readonly HudRenderer _hud = new();
+    private readonly LowHealthPresentation _lowHealth = new();
     private readonly SoulSensePresentation _soulSensePresentation = new();
     private readonly CinematicPresentation _presentation = new();
     private readonly ArtAssets _art;
@@ -109,6 +110,7 @@ public sealed partial class GameWorld : IDisposable
     private int _fpsFrames;
     private int _fps = 60;
     private bool _audioTestFatalDamageRequested;
+    private int _automatedDamageRequest;
     private bool _endingRevealPlayed;
     private bool _prologueEncounterArmed;
     private bool _prologueReleaseObserved;
@@ -262,6 +264,14 @@ public sealed partial class GameWorld : IDisposable
         _phaseTime += deltaTime;
         _presentation.Update(deltaTime, _phase);
         _hud.Update(deltaTime, _player);
+        // The bound soul throbs when it runs low, in fights only (not in the ending's calm).
+        _lowHealth.Update(deltaTime, _player.Health / (float)Math.Max(1, _player.MaxHealth),
+            IsCombatPhase && !_player.IsDead && !(_phase == GamePhase.Arena && _loopState == ArenaLoopState.Complete));
+        _hud.Throb = _lowHealth.Pulse;
+        if (_lowHealth.BeatStarted)
+        {
+            _audio.Play(AudioCue.SoulThrob, 0.6f * _lowHealth.Amount);
+        }
         _audio.Update(deltaTime);
         bool wasDashing = _player.IsDashing;
         bool wasResonanceActive = _player.ResonanceActive;
@@ -485,6 +495,11 @@ public sealed partial class GameWorld : IDisposable
         {
             _audioTestFatalDamageRequested = false;
             _player.ApplyDamage(GameBalance.PlayerMaxHealth, Vector2.Zero, _screenEffects, ignoreArmor: true);
+        }
+        if (_automatedDamageRequest > 0)
+        {
+            _player.ApplyDamage(_automatedDamageRequest, Vector2.Zero, _screenEffects, ignoreArmor: true);
+            _automatedDamageRequest = 0;
         }
         if (_player.Scythe.StartedThisFrame)
         {
@@ -910,6 +925,7 @@ public sealed partial class GameWorld : IDisposable
             batch.End();
         }
         renderer.DrawVignette(batch, viewport, _soulSensePresentation.WorldSuppression, _player.ResonanceActive);
+        DrawLowHealth(batch, renderer);
         if (_automatedHideHud)
         {
             return;
@@ -1463,6 +1479,27 @@ public sealed partial class GameWorld : IDisposable
             DrawAutomatedLights(renderer, batch);
             batch.End();
         }
+    }
+
+    /// <summary>
+    /// The bound soul running low: the world's edges close in, and on each throb they glow
+    /// faintly with the Death Flame (<see cref="LowHealthPresentation"/>).
+    /// </summary>
+    private void DrawLowHealth(SpriteBatch batch, SoulfireRenderer renderer)
+    {
+        float amount = _lowHealth.Amount;
+        if (amount <= 0.001f)
+        {
+            return;
+        }
+
+        float pulse = _lowHealth.Pulse;
+        Color glow = GameBalance.DeathFlame;
+        glow.A = 0;
+        batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp);
+        batch.Draw(renderer.VignetteTexture, RenderResolution.OutputBounds, Color.White * (amount * (0.3f + 0.16f * pulse)));
+        batch.Draw(renderer.VignetteGlowTexture, RenderResolution.OutputBounds, glow * (amount * (0.05f + 0.16f * pulse)));
+        batch.End();
     }
 
     /// <summary>

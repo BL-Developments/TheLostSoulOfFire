@@ -143,6 +143,9 @@ AUTHORED_SFX_DURATIONS = {
     "soul_release_soft_1.wav": 1.100,
     "soul_release_soft_2.wav": 1.100,
     "soul_release_soft_3.wav": 1.100,
+    # The bound soul throbbing when health runs low (recipes/cues.py), one double beat per take.
+    "soul_throb_1.wav": 0.620,
+    "soul_throb_2.wav": 0.620,
     # Weight under the scythe swings (recipes/combat.py), peaking at the strike's contact.
     "scythe_weight_1_1.wav": 0.420,
     "scythe_weight_1_2.wav": 0.420,

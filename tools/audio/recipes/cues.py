@@ -369,3 +369,29 @@ def soul_release_soft(rng) -> np.ndarray:
     x = _room(bell * 0.6 + breath + tone, rng, 1.2, 0.3, damping=3500)
     x = dsp.lowpass(x, 5000)
     return _finish(x, -22.0, -4.0)
+
+
+def _throb(t: np.ndarray, at: float, weight: float) -> np.ndarray:
+    """One beat of the bound soul: a soft, falling sub swell (G#1 to E1), no hard attack."""
+    local = np.maximum(t - at, 0.0)
+    gate = (t >= at).astype(float)
+    pitch = 41.2 + (51.9 - 41.2) * np.exp(-local / 0.04)
+    phase = 2 * np.pi * np.cumsum(pitch) / dsp.RATE
+    swell = np.clip(local / 0.014, 0, 1) ** 2
+    sub = np.sin(phase) * np.exp(-local / 0.05) * swell * 0.6
+    body = np.sin(phase * 2.0 + 0.7) * np.exp(-local / 0.03) * swell * 0.15
+    return (sub + body) * gate * weight
+
+
+@recipe("soul-throb", "Gebundene Seele pocht (wenig Leben): ein dumpfer, tiefer Doppelschlag in Gis, wie aus der Brust gehört, darunter ein leises Glimmen der Death Flame; kein Signalton")
+def soul_throb(rng) -> np.ndarray:
+    n = dsp.seconds(0.62)
+    t = dsp.time_axis(n)
+    beat = _throb(t, 0.0, 1.0) + _throb(t, 0.24, 0.72)
+    # The muffled knock of each beat, felt more than heard.
+    knock = _impact(rng, n, dsp.seconds(0.004), 40, 200, 0.032, 1.3) + _impact(rng, n, dsp.seconds(0.244), 40, 200, 0.028, 0.9)
+    # The Death Flame stirs after the beat: a dark, quiet breath, never a hiss.
+    glow = dsp.lowpass(rng.standard_normal(n), 600) * np.exp(-((t - 0.34) / 0.14) ** 2) * 0.04
+    x = dsp.lowpass(beat + dsp.lowpass(knock, 220) + glow, 520)
+    x = _room(x, rng, 0.5, 0.12, damping=1500)
+    return _finish(x, -23.0, -1.0)

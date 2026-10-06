@@ -10684,3 +10684,13 @@
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /build:Audio/Sfx/scythe_weight_3_2.wav
+
+#begin Audio/Sfx/soul_throb_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/soul_throb_1.wav
+
+#begin Audio/Sfx/soul_throb_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/soul_throb_2.wav

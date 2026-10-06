@@ -41,6 +41,9 @@ public sealed partial class GameWorld
 
     internal void SetAutomatedHudHidden(bool hidden) => _automatedHideHud = hidden;
 
+    /// <summary>Hurts the player by <paramref name="amount"/> on the next update, ignoring armour.</summary>
+    internal void RequestAutomatedDamage(int amount) => _automatedDamageRequest = Math.Max(0, amount);
+
     internal AudioDirector AutomatedAudio => _audio;
 
     /// <summary>The drawn run phase of the player (0–1), or null when the figure is not running.</summary>

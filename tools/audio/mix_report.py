@@ -64,7 +64,7 @@ CLASS = {
     "EnemyEmerge": "event",
     "Footstep": "step", "FootstepWood": "step", "HollowStep": "step", "BurningStep": "step", "DevourerStep": "step",
     "UiMove": "ui", "UiBack": "ui", "UiOpen": "ui", "UiClose": "ui", "CurrencyGain": "ui",
-    "SoulSenseOn": "sense", "SoulSenseOff": "sense",
+    "SoulSenseOn": "sense", "SoulSenseOff": "sense", "SoulThrob": "sense",
     "HitHollow": "layer", "HitBurning": "layer", "HitDevourer": "layer", "HitDummy": "layer", "HitHeavy": "layer",
     "BodyHit": "layer", "DeathHollow": "layer", "DeathBurning": "layer", "DeathDevourer": "layer",
     "HollowWindup": "danger", "DevourerWindup": "danger", "BurningRush": "danger",
@@ -77,7 +77,7 @@ PAUSED_BED_DB = 20 * np.log10(0.4)
 ARENA_ONLY = {"EnemyEmerge", "ChestOpen", "CurrencyGain", "WaveStart", "WaveClear", "EndingReveal", "TitleConfirm", "DoorAwaken"}
 ZONE_CUES = {
     "arena": lambda cue, kind: cue not in {"DoorAwaken", "TitleConfirm"},
-    "hub": lambda cue, kind: (kind in ("ui", "sense") and cue != "CurrencyGain") or cue in ("Footstep", "DoorAwaken"),
+    "hub": lambda cue, kind: (kind in ("ui", "sense") and cue not in ("CurrencyGain", "SoulThrob")) or cue in ("Footstep", "DoorAwaken"),
     "shore": lambda cue, kind: cue not in ARENA_ONLY,
     "crossing": lambda cue, kind: cue not in ARENA_ONLY,
 }
