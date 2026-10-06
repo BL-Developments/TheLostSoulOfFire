@@ -3,13 +3,12 @@
 Diese Datei ist die gemeinsame Anleitung für alle Coding-Agents (Claude, Codex,
 Copilot, Cursor). `CLAUDE.md` bindet sie nur ein; Regeln werden hier gepflegt.
 Ausführliches Wissen zu MonoGame steht in den Skills unter `.claude/skills/`
-(gespiegelt in `.agents/skills/` und `.codex/skills/`), Spielregeln und
-Entscheidungen in `docs/current/`.
+und `.agents/skills/`, Spielregeln und Entscheidungen in `docs/current/`.
 
 ## Projekt
 
-- 2D-Top-down-Roguelike in C# 13 / .NET 9 mit MonoGame 3.8 (DesktopGL) und
-  MonoGame.Extended 6.
+- 2D-Top-down-Roguelike in C# 13 / .NET 9 mit MonoGame 3.8.x (DesktopGL,
+  fester Zeitschritt mit 60 FPS) und MonoGame.Extended 6.
 - `src/TheLostSoulOfFire` ist das Spiel, `tests/TheLostSoulOfFire.Tests` die
   MSTest-Tests, `openspec/` die Spezifikationen und Changes.
 - Code, Bezeichner und Code-Kommentare sind Englisch. Dokumentation,
@@ -57,11 +56,13 @@ bestehenden Stil:
 - **Eine Aufgabe pro Methode.** Eine Methode, die man nur mit „und" beschreiben
   kann, wird geteilt. Früh zurückkehren statt tief zu verschachteln.
 - **Logik von MonoGame trennen.** Regeln, Zustände und Berechnungen kommen ohne
-  `GraphicsDevice`, `SpriteBatch` oder `Keyboard` aus, damit Tests sie direkt
-  prüfen können. `Draw` zeichnet nur, `Update` ändert Zustand.
-- **Keine Allokationen pro Frame.** In `Update` und `Draw` keine neuen Listen,
-  LINQ-Ketten, String-Verkettungen oder Lambdas mit Captures; Puffer werden
-  wiederverwendet. Inhalte werden einmal in `LoadContent` geladen.
+  `GraphicsDevice` und `SpriteBatch` aus, damit Tests sie direkt prüfen können.
+  Eingaben laufen über `Input/InputState`, nicht direkt über `Keyboard`,
+  `Mouse` oder `GamePad`. `Draw` zeichnet nur, `Update` ändert Zustand.
+- **Keine Allokationen pro Frame.** Neuer Code legt in `Update` und `Draw`
+  keine neuen Listen, LINQ-Ketten, String-Verkettungen oder Lambdas mit Captures an; Puffer werden
+  wiederverwendet. Inhalte werden einmal beim Laden über den `ContentManager`
+  geladen (siehe `Rendering/ArtAssets.cs`), nie während des Spiels.
 - **Kommentare erklären das Warum.** Was der Code tut, sagt der Code. Ein
   Kommentar begründet eine nicht offensichtliche Entscheidung oder verweist
   auf das Issue (`(#104)`). `/// <summary>` an öffentlichen Typen und Members,
