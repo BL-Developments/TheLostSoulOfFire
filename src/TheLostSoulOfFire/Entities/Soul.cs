@@ -154,7 +154,16 @@ public sealed class Soul
 
         if (State == SoulState.BeingDevoured)
         {
-            WorldMarks.Ring(batch, pixel, Position, 25f + pulse * 5f, GameBalance.DeathFlameBright * 0.85f, true, 4f);
+            if (softSpot is not null)
+            {
+                // Pulled away, the soul flickers in its own light; no ring (the Devourer draws its light pouring in).
+                float struggle = 0.5f + 0.5f * MathF.Sin(_visualTime * 17f);
+                WorldMarks.Glow(batch, softSpot, Position, 22f + struggle * 6f, GameBalance.DeathFlameBright * (0.3f + struggle * 0.2f));
+            }
+            else
+            {
+                WorldMarks.Ring(batch, pixel, Position, 25f + pulse * 5f, GameBalance.DeathFlameBright * 0.85f, true, 4f);
+            }
         }
 
         if (State == SoulState.Releasing)

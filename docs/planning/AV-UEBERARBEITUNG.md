@@ -391,6 +391,11 @@ Rahmen wie oben (nur Darstellung und Ton).
 - Seelensinn ohne Striche: Spuren der Echos (Prolog, Arena) und der Weg durch Tür I in der
   Vorhalle als Lichtreste, die einzeln flackern und langsam in Gehrichtung treiben
   (`SoulSensePresentation.DrawResidueTrail`); Knoten als weiches Licht statt Kreise.
+- Verschlingen des Devourer ohne Ring und Strahl: Die gejagte Seele steckte in einer harten weißen
+  Ringblase, ein gerader Strahl führte in den Rumpf (wie Fadenkreuz und Laser). Jetzt glimmt die
+  Zielseele beim Anpirschen und ein dünner Zug ihres Lichts neigt sich schon zur Brust; beim
+  Verschlingen fließen ihre Lichtreste beschleunigend in die Brust, die Seele flackert, die Brust
+  glimmt auf (`WorldMarks.Stream`/`Glow`). Neue Station `arena_devour` (20 Aufnahmen).
 - Wenig Leben (30 % oder weniger) meldete nur die Lebensleiste in der Ecke, obwohl der Blick im
   Kampf auf der Figur liegt. Jetzt pocht die gebundene Seele: dumpfer Doppelschlag in Gis
   (`soul-throb`, CLAP „slow heartbeat“ 0,65–0,68 + „muffled heartbeat“ 0,20–0,25), etwa 58 Schläge je

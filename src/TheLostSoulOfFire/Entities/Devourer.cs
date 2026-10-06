@@ -310,7 +310,25 @@ public sealed class Devourer : Enemy
             batch.DrawCircle(pixel, TorsoPosition, 29f + pulse * 3f, GameBalance.DeepViolet * (0.55f + ConsumedSoulCount * 0.12f), 6f, 24);
         }
 
-        if (State == DevourerState.ApproachSoul && _targetSoul is not null)
+        if (DrawnAsFigure && LightSpot is { } light && _targetSoul is not null &&
+            State is DevourerState.ApproachSoul or DevourerState.Devour)
+        {
+            // The hunger as light: while it stalks a soul, the soul glimmers and a thin drift of
+            // its light already leans toward the chest; while it devours, the soul's light pours in.
+            float time = _visualTime + Position.X * 0.01f;
+            if (State == DevourerState.ApproachSoul)
+            {
+                WorldMarks.Glow(batch, light, _targetSoul.Position, 34f + pulse * 6f, GameBalance.DeathFlame * (0.22f + pulse * 0.12f));
+                WorldMarks.Stream(batch, light, _targetSoul.Position, DrawnTorso, time, 0.35f, GameBalance.DeathFlame, 70f, 26f);
+            }
+            else
+            {
+                float devoured = 1f - _stateTimer / GameBalance.DevourerDevourDuration;
+                WorldMarks.Stream(batch, light, _targetSoul.Position, DrawnTorso, time, 0.9f, GameBalance.DeathFlameBright, 190f, 9f);
+                WorldMarks.Glow(batch, light, DrawnTorso, 22f + devoured * 10f, GameBalance.DeathFlame * (0.18f + devoured * 0.22f));
+            }
+        }
+        else if (State == DevourerState.ApproachSoul && _targetSoul is not null)
         {
             WorldMarks.Beam(batch, pixel, DrawnTorso, _targetSoul.Position, 12f, GameBalance.DeathFlame * 0.48f);
             WorldMarks.Ring(batch, pixel, _targetSoul.Position, 31f + pulse * 8f, GameBalance.DeathFlameBright * 0.72f);

@@ -495,6 +495,7 @@ public sealed class ArtAssets
         }
 
         enemy.DrawnAsFigure = IsRendered(id);
+        enemy.LightSpot = SoftSpot;
         if (enemy.VisualClip is not { } clip)
         {
             StartDissolve(enemy, id);

@@ -55,6 +55,9 @@ public abstract class Enemy
     /// </summary>
     public bool DrawnAsFigure { get; set; }
 
+    /// <summary>Presentation only: the soft light texture for overlays drawn as light, set by the art layer.</summary>
+    public Texture2D? LightSpot { get; set; }
+
     /// <summary>Visual-ID this enemy is drawn with, or <c>null</c> when it draws itself.</summary>
     public virtual string? VisualId => null;
 

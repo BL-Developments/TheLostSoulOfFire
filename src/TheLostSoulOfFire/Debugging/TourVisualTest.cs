@@ -143,6 +143,7 @@ internal sealed class TourVisualTest
         Station("arena_burning", BuildBurning);
         Station("arena_devourer", BuildDevourer);
         Station("arena_devourer_end", BuildDevourerEnd);
+        Station("arena_devour", BuildDevour);
         Station("arena_chest", BuildChest);
         Station("arena_death", BuildDeath);
         Station("menus", BuildMenus);
@@ -620,6 +621,27 @@ internal sealed class TourVisualTest
         Series("stagger", 12, 7, () => { if (Nearest<Devourer>() is { } devourer) AimAt(devourer.Position); });
         Do("defeat", () => _world.DefeatAutomatedEnemies());
         Series("death", 10, 3);
+    }
+
+    /// <summary>A Hollow falls next to the Devourer; the Devourer goes for its soul and swallows it.</summary>
+    private void BuildDevour()
+    {
+        EnterArena(3);
+        Wait("combat", () => _world.LoopState == ArenaLoopState.Combat && _world.AutomatedEnemies.OfType<Devourer>().Any(enemy => enemy.IsAlive), 20f);
+        // The others fall first and their souls go their way before the staged one is freed.
+        Do("alone", () => _world.DefeatAutomatedEnemiesExcept<Devourer>(), 2.6f);
+        Do("place", () =>
+        {
+            if (Nearest<Devourer>() is { } devourer)
+            {
+                _world.PlaceAutomatedPlayer(devourer.Position + new Vector2(-330f, 40f));
+                AimAt(devourer.Position);
+                _world.SpawnAutomatedHollow(devourer.Position + new Vector2(150f, 30f));
+            }
+        }, 0.5f);
+        Do("free", () => _world.DefeatAutomatedEnemiesExcept<Devourer>());
+        Wait("hungry", () => _world.AutomatedEnemies.OfType<Devourer>().Any(devourer => devourer.State == DevourerState.ApproachSoul), 3f);
+        Series("devour", 20, 5);
     }
 
     private void BuildChest()
