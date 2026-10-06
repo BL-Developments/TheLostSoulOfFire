@@ -84,7 +84,8 @@ public static class PrologueEnvironment
         PrologueDirector prologue,
         float time,
         float soulSense,
-        bool painted = false)
+        bool painted = false,
+        ArtAssets? art = null)
     {
         if (painted && prologue.Sector != PrologueSector.Emergence)
         {
@@ -93,7 +94,7 @@ public static class PrologueEnvironment
         switch (prologue.Sector)
         {
             case PrologueSector.Emergence:
-                DrawShoreGuides(batch, pixel, time, soulSense, painted);
+                DrawShoreGuides(batch, pixel, time, soulSense, painted, art);
                 break;
             case PrologueSector.Search:
                 DrawSearchTower(batch, pixel);
@@ -115,6 +116,28 @@ public static class PrologueEnvironment
             case PrologueSector.Threshold:
                 DrawHomebaseThreshold(batch, pixel, time);
                 break;
+        }
+    }
+
+    /// <summary>
+    /// The waiting still sit on the shore's bench as echoes under Soul Sense: wavering figures of
+    /// light without faces, drawn after the props so they sit on the bench, not behind it.
+    /// </summary>
+    public static void DrawShoreEchoes(SpriteBatch batch, ArtAssets art, PrologueDirector prologue, float time, float sense)
+    {
+        if (prologue.Sector != PrologueSector.Emergence || sense <= 0.04f)
+        {
+            return;
+        }
+
+        for (int i = 0; i < 4; i++)
+        {
+            float waver = MathF.Sin(time * 1.3f + i * 1.9f);
+            Vector2 seated = new(740f + i * 34f + waver * 1.5f, 466f - (i % 2) * 3f);
+            Color echo = GameBalance.SoulSenseTrace * (sense * (0.32f + 0.08f * waver));
+            art.DrawSoftSpot(batch, seated - new Vector2(0f, 46f), new Vector2(7f, 8f), echo);
+            art.DrawSoftSpot(batch, seated - new Vector2(0f, 24f), new Vector2(9f, 18f), echo * 0.85f);
+            art.DrawSoftSpot(batch, seated - new Vector2(-6f, 6f), new Vector2(10f, 6f), echo * 0.6f);
         }
     }
 
@@ -226,20 +249,28 @@ public static class PrologueEnvironment
     /// What the painted shore cannot show by itself: the Soul Sense trace, the waiting dead on
     /// the bench (only with Soul Sense) and the Warden mark at the eastern exit.
     /// </summary>
-    private static void DrawShoreGuides(SpriteBatch batch, Texture2D pixel, float time, float sense, bool painted)
+    private static void DrawShoreGuides(SpriteBatch batch, Texture2D pixel, float time, float sense, bool painted, ArtAssets? art)
     {
         float flicker = 0.5f + 0.5f * MathF.Sin(time * 1.7f);
-        batch.FillEllipse(pixel, PrologueDirector.SoulTrace + new Vector2(0f, 40f), 112f, 36f, GameBalance.DeepViolet * ((0.05f + flicker * 0.025f) * (1f + sense)));
-        if (sense > 0.04f)
+        if (art is not null)
         {
-            Color echo = GameBalance.DeathFlameBright * (0.13f * sense);
+            art.DrawSoftSpot(batch, PrologueDirector.SoulTrace + new Vector2(0f, 40f), new Vector2(130f, 44f), GameBalance.DeepViolet * ((0.1f + flicker * 0.05f) * (1f + sense)));
+        }
+        else
+        {
+            batch.FillEllipse(pixel, PrologueDirector.SoulTrace + new Vector2(0f, 40f), 112f, 36f, GameBalance.DeepViolet * ((0.05f + flicker * 0.025f) * (1f + sense)));
+        }
+        if (sense > 0.04f && art is null)
+        {
             for (int i = 0; i < 4; i++)
             {
-                Vector2 seated = new(714f + i * 48f, 452f - (i % 2) * 4f);
-                batch.FillCircle(pixel, seated - new Vector2(0f, 28f), 8f, echo);
-                batch.DrawLine(pixel, seated - new Vector2(0f, 18f), seated + new Vector2(0f, 16f), echo, 7f);
+                Vector2 seated = new(740f + i * 34f, 466f - (i % 2) * 3f);
+                Color echo = GameBalance.SoulSenseTrace * (sense * 0.32f);
+                batch.FillCircle(pixel, seated - new Vector2(0f, 46f), 8f, echo);
+                batch.DrawLine(pixel, seated - new Vector2(0f, 36f), seated, echo, 7f);
             }
         }
+
         if (!painted)
         {
             // The rendered shore carries the mark as a prop with its flame.

@@ -29,14 +29,14 @@ Bodennebel und Normal-Map-Licht der Death Flame.
 | # | Bereich | Ist (Rundgang 06.10.) | Ziel | Status |
 | --- | --- | --- | --- | --- |
 | A1 | Titel | Arena-Boden als Hintergrund, Pixel-Schrift | 3D-Schlüsselbild mit der Spielfigur am Ufer, Cinzel-Titel, driftendes Bild, atmende Flamme, Nebel; Menü rechts | ☑ |
-| A2 | Prolog I Ufer | gemalt (Stil B), wenig Tiefe am Wasser | Wasserkante, Gischt, Dammreste, Tiefe | ◐ |
+| A2 | Prolog I Ufer | gemalt (Stil B), wenig Tiefe am Wasser | 3D-Bahnsteig am Meer: abgesackte Kanten, geflutetes Gleisbett, Dammreste, Pfützen, Fallblattanzeige im Wasser, gerenderte Props, Seenebel | ☑ |
 | A3 | Prolog II Suchgang | flache Platzhalter-Formen | 3D-Hafenkai: nasses Pflaster, Gleise, Warden-Bohlen, Stege, versunkene Dächer, Koffer, Warden-Marken, Signalmast mit Suchfeuer | ☑ |
 | A4 | Prolog III Damm | flache Platzhalter-Formen | 3D-Gleisdamm mit Bruchkanten, Signalträger, Anleger und vertäutem Skiff | ☑ |
 | A5 | Prolog Überfahrt (Deck) | flache Platzhalter-Formen | stehendes Deck, scrollendes Meer, zwei Parallax-Bänder der versunkenen Stadt, Reling als Vordergrund | ☑ |
 | A6 | Schwelle | flache Platzhalter-Formen | Basaltvorplatz, Warden-Mauer mit Strebepfeilern, Torhaus als Prop (man geht wirklich hindurch), Spalt mit Warden-Flamme, offener Ring | ☑ |
 | A7 | Hub „Ashen Antechamber“ | flache Platzhalter-Formen | 3D-Vorhalle aus Einzelsteinen, sieben Türen (gleitende Flügel, Siegel), Pilaster mit Warden-Flammen, offener Ring, Feuerschalen | ☑ |
-| A8 | Arena (Gießhalle) | gemalt (Stil B) | Tiefe am Nordrand, Rosette und Ofen, Vordergrundträger | ◐ |
-| A9 | Türübergang, Abschluss, Ende (Life Flame) | einfache Überblendung | gestaltete Übergänge | ☐ |
+| A8 | Arena (Gießhalle) | gemalt (Stil B) | gemalte Schattierung (Wandfuß, Ränder, Flecken), Rauch unter der Nordwand; Rosette, Ofen und Träger bleiben aus dem Plate | ☑ |
+| A9 | Türübergang, Abschluss, Ende (Life Flame) | einfache Überblendung | Türlicht und Schriftzug mit Ornament, Kampf-HUD erst nach dem Intro, Life Flame als warme Flammenschleife, Abschlusszeilen in Cinzel | ☑ |
 
 ## B Figuren und Animation
 
@@ -46,9 +46,9 @@ Bodennebel und Normal-Map-Licht der Death Flame.
 | B2 | Hollow | idle, move, swipe gerendert | zusätzlich Treffer, Taumeln, Erholen, Tod mit fallender Maske | ☑ |
 | B3 | Burning | Ludo-Sprite | gerenderte Figur: Ruhe, Pirschen, Aufflammen, Anlauf, Erholung, Treffer, Tod | ☑ |
 | B4 | Devourer | Ludo-Sprite | gerenderte Figur mit Rumpföffnung: Ruhe, Gang, Schlag, Erholung, Verschlingen, Taumeln, Treffer, Tod | ☑ |
-| B5 | Seelen und Pickups | Formen und Glühen | gemalte Seelenflamme, Release | ◐ (Release-Flipbook neu) |
+| B5 | Seelen und Pickups | Formen und Glühen | atmende Lichtkugel mit Saum und Funken, Release-Flipbook, Strahlen zum Kern | ☑ |
 | B7 | Arena-Truhe | Rechtecke | gerendertes Reliquiar mit Öffnen-Clip | ☑ |
-| B6 | Trainingspuppe (Sandbox) | Platzhalter | gerendertes Prop | ☐ |
+| B6 | Trainingspuppe (Sandbox) | Platzhalter | gerendertes Prop, wankt bei Treffern | ☑ |
 
 ## C Effekte (VFX)
 
@@ -59,7 +59,8 @@ Bodennebel und Normal-Map-Licht der Death Flame.
 | C3 | Warnzeichen als Licht (Ausholbogen, Anlaufring und -bahn, Detonations- und Schlagring, Seelenstrahlen), Bodenmarken (Wellenstart, Erscheinen) | ☑ |
 | C4 | Partikel als Lichtpunkte und Funkenschlieren | ☑ |
 | C5 | Fähigkeiten im Feld (Durchschlag, Sog, Marke, Schutz), Glutfunken, Resonanz-Aura | ☑ |
-| C6 | Maskensplitter beim Hollow-Tod, Devourer-Schlag als Bodenriss | ☐ |
+| C6 | Maskensplitter beim Hollow-Tod, Steinsplitter beim Devourer-Schlag | ☑ |
+| C7 | Seelensinn: Spuren, Knoten, Kerne und die Echos auf der Bank als Licht | ☑ |
 
 ## D Oberfläche und Typografie
 

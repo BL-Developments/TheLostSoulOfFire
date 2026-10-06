@@ -919,7 +919,7 @@ public sealed partial class GameWorld : IDisposable
                 {
                     _art.DrawEnvironment(batch, plate!, Vector2.Zero);
                 }
-                PrologueEnvironment.DrawProps(batch, pixel, _prologue, _presentationTime, _soulSensePresentation.WorldSuppression, painted);
+                PrologueEnvironment.DrawProps(batch, pixel, _prologue, _presentationTime, _soulSensePresentation.WorldSuppression, painted, _art);
             }
             else
             {
@@ -960,6 +960,7 @@ public sealed partial class GameWorld : IDisposable
         }
         if (_phase == GamePhase.Prologue)
         {
+            PrologueEnvironment.DrawShoreEchoes(batch, _art, _prologue, _presentationTime, _soulSensePresentation.WorldSuppression);
             PrologueEnvironment.DrawForeground(batch, pixel, _prologue,
                 PrologueEnvironment.PlateOf(_prologue) is { } foregroundPlate && _art.HasArt(foregroundPlate));
         }

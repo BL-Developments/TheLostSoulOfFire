@@ -72,15 +72,15 @@ public sealed class SoulSensePresentation
             SamplerState.LinearClamp,
             transformMatrix: worldTransform);
 
-        DrawTraces(batch, pixel, presentationTime, amount);
-        DrawSouls(batch, pixel, souls, presentationTime, amount);
+        DrawTraces(batch, pixel, presentationTime, amount, art);
+        DrawSouls(batch, pixel, souls, presentationTime, amount, art);
         DrawEnemySouls(batch, pixel, enemies, presentationTime, amount, art);
         DrawPlayerResponse(batch, pixel, player, presentationTime, amount, art?.IsRendered(VisualIds.Player) == true);
 
         batch.End();
     }
 
-    private static void DrawTraces(SpriteBatch batch, Texture2D pixel, float time, float amount)
+    private static void DrawTraces(SpriteBatch batch, Texture2D pixel, float time, float amount, ArtAssets? art)
     {
         float breathe = 0.82f + MathF.Sin(time * 2.1f) * 0.18f;
         for (int pathIndex = 0; pathIndex < TracePaths.Length; pathIndex++)
@@ -105,22 +105,23 @@ public sealed class SoulSensePresentation
                     float to = MathF.Min(1f, (piece + 0.78f) / pieces);
                     Vector2 a = Vector2.Lerp(start, end, from);
                     Vector2 b = Vector2.Lerp(start, end, to);
-                    batch.DrawLine(pixel, a, b, GameBalance.DeepViolet * (0.25f * amount), 5f);
-                    batch.DrawLine(pixel, a, b, GameBalance.SoulSenseTrace * (0.22f * breathe * amount), 1.5f);
+                    // Each fragment flickers on its own, like residue still settling.
+                    float flicker = 0.65f + 0.35f * MathF.Sin(time * 3.1f + piece * 1.7f + segment * 2.3f + pathIndex);
+                    WorldMarks.Beam(batch, pixel, a, b, 12f, GameBalance.SoulSenseTrace * (0.42f * breathe * flicker * amount));
                 }
             }
 
             for (int node = 1; node < path.Length - 1; node += 2)
             {
                 float nodePulse = 0.7f + 0.3f * MathF.Sin(time * 2.7f + pathIndex * 1.9f + node);
-                batch.DrawCircle(pixel, path[node], 5f + nodePulse * 2f, GameBalance.SoulSenseTrace * (0.18f * amount), 1.5f, 12);
-                batch.FillCircle(pixel, path[node], 1.5f, GameBalance.SoulWhite * (0.22f * amount));
+                WorldMarks.Ring(batch, pixel, path[node], 5f + nodePulse * 2f, GameBalance.SoulSenseTrace * (0.4f * amount), false, 1.5f);
+                art?.DrawSoftSpot(batch, path[node], new Vector2(4f), GameBalance.SoulWhite * (0.5f * amount));
             }
 
             float travel = (time * 0.055f + pathIndex * 0.31f) % 1f;
             Vector2 mote = PointAlongPath(path, travel);
-            batch.DrawCircle(pixel, mote, 8f, GameBalance.DeathFlame * (0.22f * amount), 1.5f, 12);
-            batch.FillCircle(pixel, mote, 2f, GameBalance.SoulWhite * (0.58f * amount));
+            art?.DrawSoftSpot(batch, mote, new Vector2(16f), GameBalance.DeathFlame * (0.4f * amount));
+            art?.DrawSoftSpot(batch, mote, new Vector2(5f), GameBalance.SoulWhite * (0.8f * amount));
         }
     }
 
@@ -129,7 +130,8 @@ public sealed class SoulSensePresentation
         Texture2D pixel,
         IReadOnlyList<Soul> souls,
         float time,
-        float amount)
+        float amount,
+        ArtAssets? art)
     {
         float pulse = 0.5f + 0.5f * MathF.Sin(time * 4.4f);
         foreach (Soul soul in souls)
@@ -141,15 +143,9 @@ public sealed class SoulSensePresentation
 
             float scale = soul.State == SoulState.Residue ? 0.55f : 1f;
             float urgency = soul.State == SoulState.BeingDevoured ? 1.2f : 1f;
-            batch.DrawCircle(
-                pixel,
-                soul.Position,
-                (20f + pulse * 4f) * scale * urgency,
-                GameBalance.DeathFlameBright * (0.48f * amount),
-                2f,
-                20);
-            batch.FillCircle(pixel, soul.Position, 7f * scale, GameBalance.DeathFlame * (0.44f * amount));
-            batch.FillCircle(pixel, soul.Position, 3f * scale, GameBalance.SoulWhite * (0.94f * amount));
+            WorldMarks.Ring(batch, pixel, soul.Position, (20f + pulse * 4f) * scale * urgency, GameBalance.DeathFlameBright * (0.6f * amount), urgency > 1f, 2f);
+            art?.DrawSoftSpot(batch, soul.Position, new Vector2(16f * scale), GameBalance.DeathFlame * (0.5f * amount));
+            art?.DrawSoftSpot(batch, soul.Position, new Vector2(6f * scale), GameBalance.SoulWhite * amount);
         }
     }
 
@@ -184,7 +180,7 @@ public sealed class SoulSensePresentation
                     {
                         Vector2 fracture = burning.DrawnFracture(gameplayFracture);
                         batch.FillCircle(pixel, fracture, 9f, GameBalance.DeepViolet * (0.6f * amount));
-                        batch.DrawCircle(pixel, fracture, 8f + pulse * 2f, GameBalance.DeathFlameBright * (0.52f * amount), 2f, 14);
+                        WorldMarks.Ring(batch, pixel, fracture, 8f + pulse * 2f, GameBalance.DeathFlameBright * (0.7f * amount), true, 2f);
                         batch.FillCircle(pixel, fracture, 4f, GameBalance.SoulWhite * (0.98f * amount));
                     }
                     break;
@@ -205,7 +201,7 @@ public sealed class SoulSensePresentation
         float amount)
     {
         batch.FillCircle(pixel, position, radius, GameBalance.DeepViolet * (0.72f * amount));
-        batch.DrawCircle(pixel, position, radius + 3f + pulse * 2f, GameBalance.DeathFlameBright * (0.5f * amount), 2f, 18);
+        WorldMarks.Ring(batch, pixel, position, radius + 3f + pulse * 2f, GameBalance.DeathFlameBright * (0.7f * amount), true, 2f);
         batch.FillCircle(pixel, position, 8f, GameBalance.DeathFlameBright * (0.9f * amount));
         batch.FillCircle(pixel, position, 5f, GameBalance.SoulWhite * amount);
     }
@@ -246,7 +242,7 @@ public sealed class SoulSensePresentation
 
         float pulse = 0.5f + 0.5f * MathF.Sin(time * 4.8f);
         Vector2 core = rendered ? player.Position - new Vector2(0f, FigureHeights.Core) : player.Position + player.FacingDirection * 2f;
-        batch.DrawCircle(pixel, core, 11f + pulse * 2f, GameBalance.DeathFlameBright * (0.28f * amount), 1.5f, 16);
+        WorldMarks.Ring(batch, pixel, core, 11f + pulse * 2f, GameBalance.DeathFlameBright * (0.45f * amount), false, 1.5f);
         if (!rendered)
         {
             // The rendered figure's eyes burn in Player.Draw.
