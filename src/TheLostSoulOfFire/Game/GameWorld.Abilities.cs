@@ -183,6 +183,8 @@ public sealed partial class GameWorld
         if (_characterMenu.IsOpen || _pauseMenu.IsOpen || _devMenu.IsOpen || _player.IsDead) return;
         if (_phase != GamePhase.Arena && _phase != GamePhase.Antechamber) return;
         if (_phase == GamePhase.Arena && _loopState == ArenaLoopState.Complete) return;
+        // The cards arrive with the rest of the combat HUD, not over the black of the intro.
+        if (_phase == GamePhase.Arena && !_sandboxActive && !_presentation.ShouldDrawCombatHud(_loopState, _player.IsDead)) return;
         var cards = CurrentAbilityCards();
         for (int slot = 0; slot < 2; slot++)
             AbilityPresentation.DrawHud(batch, pixel, viewport, cards[(int)_abilities.Slots[slot]], _presentationTime);
