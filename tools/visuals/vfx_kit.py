@@ -153,6 +153,12 @@ def ring(f: Frame, cx: float, cy: float, rx: float, ry: float, width: float) -> 
     return np.exp(-((r - 1) * max(rx, ry) / max(width, 0.5)) ** 2)
 
 
+def wash(f: Frame, cx: float, cy: float, rx: float, ry: float) -> np.ndarray:
+    """Light washing out to an ellipse: full in the middle, falling off softly to the edge, no outline."""
+    nx, ny = (f.x - cx) / max(rx, 1e-3), (f.y - cy) / max(ry, 1e-3)
+    return np.exp(-(nx * nx + ny * ny) * 2.2)
+
+
 def star(f: Frame, cx: float, cy: float, radius: float, strength: float, spikes: int = 4, angle: float = 0.0) -> None:
     """A flash: a small hot core with thin spikes, not a disc."""
     dx, dy = f.x - cx, f.y - cy
@@ -212,7 +218,7 @@ def sparks(f: Frame, rng: np.random.Generator, count: int, t: float, reach: floa
 # ----------------------------------------------------------------------------- effects
 
 def core_hit(i: int, n: int, size: int) -> np.ndarray:
-    """Impact on a breaking point: a white star, a shock ring and embers thrown along +X."""
+    """Impact on a breaking point: a white star, a wash of light and embers thrown along +X."""
     t = i / (n - 1)
     f = Frame(size)
     rng = np.random.default_rng(11)
@@ -225,7 +231,8 @@ def core_hit(i: int, n: int, size: int) -> np.ndarray:
         reach = size * (0.18 + 0.22 * ease_out(t)) * length
         ray = np.exp(-(across / (1.2 + 2.0 * (1 - t))) ** 2) * np.clip(1 - along / reach, 0, 1) * (along > 0)
         f.add(ray * (1 - t) ** 1.2, 0.95 * (1 - t) + 0.15)
-    f.add(ring(f, 0, 0, size * (0.08 + 0.3 * ease_out(t)), size * (0.08 + 0.3 * ease_out(t)), 0.8 + 1.5 * (1 - t)) * (1 - t) ** 2 * 0.6, 0.6 * (1 - t) + 0.2)
+    shock = size * (0.08 + 0.3 * ease_out(t))
+    f.add(wash(f, 0, 0, shock, shock) * (1 - t) ** 2 * 0.3, 0.6 * (1 - t) + 0.2)
     sparks(f, rng, 16, t, size * 0.45, 0.6, bias=0.0, size=1.3, heat=1.0)
     return f.image(glow=1.15)
 
@@ -278,7 +285,7 @@ def cannon_charge(i: int, n: int, size: int) -> np.ndarray:
     pulse = 0.5 + 0.5 * math.sin(t * math.tau)
     f.add(gauss(r2, size * (0.07 + 0.015 * pulse)), 0.95 + 0.2 * pulse)
     f.add(gauss(r2, size * 0.03), 1.25)
-    f.add(ring(f, 0, 0, size * (0.16 + 0.02 * pulse), size * (0.16 + 0.02 * pulse), 1.4) * 0.35, 0.6)
+    f.add(gauss(r2, size * (0.15 + 0.02 * pulse)) * 0.18, 0.6)
     count = 12
     for k in range(count):
         local = (t + k / count) % 1.0
@@ -291,8 +298,8 @@ def cannon_charge(i: int, n: int, size: int) -> np.ndarray:
 
 
 def burning_detonation(i: int, n: int, size: int) -> np.ndarray:
-    """The Burning bursts: flash, a fireball that rises and hollows out, a ring on the floor,
-    embers, violet smoke lingering."""
+    """The Burning bursts: flash, a fireball that rises and hollows out, light washing over the
+    floor, embers, violet smoke lingering."""
     t = i / (n - 1)
     f = Frame(size)
     rng = np.random.default_rng(41)
@@ -312,9 +319,9 @@ def burning_detonation(i: int, n: int, size: int) -> np.ndarray:
     fade = (1 - t) ** 0.8
     heat = np.clip(1.3 - d * 0.75 - t * 1.0 + (erosion - 0.5) * 0.4, 0.05, 1.25)
     f.add(ball * hollow * fade, heat)
-    # Ground ring under the blast.
+    # The blast's light washes over the floor under it (no ring).
     gr = size * (0.1 + 0.42 * ease_out(t, 2.0))
-    f.add(ring(f, 0, ground, gr, gr * SQUASH, 1.5 + 4 * (1 - t)) * (1 - t) ** 1.6 * 0.7, 0.62 * (1 - t) + 0.12)
+    f.add(wash(f, 0, ground, gr, gr * SQUASH) * (1 - t) ** 1.6 * 0.6, 0.62 * (1 - t) + 0.12)
     f.add(gauss(f.x ** 2 + ((f.y - ground) / SQUASH) ** 2, gr * 0.5) * (1 - t) ** 2 * 0.4, 0.45)
     # Smoke: dim violet billows climbing late.
     if t > 0.35:
@@ -327,13 +334,13 @@ def burning_detonation(i: int, n: int, size: int) -> np.ndarray:
 
 
 def soul_release(i: int, n: int, size: int) -> np.ndarray:
-    """A soul set free: a burst ring, then a white wisp that rises and sways, motes spiralling."""
+    """A soul set free: a burst of light, then a white wisp that rises and sways, motes spiralling."""
     t = i / (n - 1)
     f = Frame(size)
     noise = Noise(53)
     if t < 0.3:
         b = t / 0.3
-        f.add(ring(f, 0, 0, size * (0.06 + 0.3 * b), size * (0.06 + 0.3 * b), 1.5) * (1 - b) ** 1.5, 0.8)
+        f.add(wash(f, 0, 0, size * (0.06 + 0.3 * b), size * (0.06 + 0.3 * b)) * (1 - b) ** 1.5 * 0.35, 0.8)
         f.add(gauss(f.x ** 2 + f.y ** 2, size * 0.08) * (1 - b), 1.1)
     rise = size * 0.38 * ease_out(t, 1.6)
     sway = math.sin(t * math.tau * 1.3) * size * 0.04
@@ -355,7 +362,7 @@ def soul_release(i: int, n: int, size: int) -> np.ndarray:
 
 
 def resonance_activate(i: int, n: int, size: int) -> np.ndarray:
-    """Resonance erupts: a ring races out over the floor, a pillar of flame climbs from the feet,
+    """Resonance erupts: light races out over the floor, a pillar of flame climbs from the feet,
     sparks rise."""
     t = i / (n - 1)
     f = Frame(size)
@@ -363,8 +370,7 @@ def resonance_activate(i: int, n: int, size: int) -> np.ndarray:
     noise = Noise(67)
     feet = AIR / 0.78  # spawned at scale 0.78 in the air pass
     gr = size * (0.06 + 0.42 * ease_out(t, 2.4))
-    f.add(ring(f, 0, feet, gr, gr * SQUASH, 1.5 + 5 * (1 - t)) * (1 - t) ** 1.2 * 0.85, 0.85 * (1 - t) + 0.15)
-    f.add(ring(f, 0, feet, gr * 0.7, gr * 0.7 * SQUASH, 1 + 2.5 * (1 - t)) * (1 - t) ** 1.6 * 0.45, 0.6)
+    f.add(wash(f, 0, feet, gr, gr * SQUASH) * (1 - t) ** 1.2 * 0.65, 0.85 * (1 - t) + 0.15)
     climb = ease_out(t / 0.4, 2.0)
     height = (feet + size * 0.48) * climb + 1
     life = (1 - t) ** 0.9

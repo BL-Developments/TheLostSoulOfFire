@@ -391,6 +391,15 @@ Rahmen wie oben (nur Darstellung und Ton).
 - Seelensinn ohne Striche: Spuren der Echos (Prolog, Arena) und der Weg durch Tür I in der
   Vorhalle als Lichtreste, die einzeln flackern und langsam in Gehrichtung treiben
   (`SoulSensePresentation.DrawResidueTrail`); Knoten als weiches Licht statt Kreise.
+- Burning ohne Blase, Strahl und Bodenring: Beim Aufladen der Detonation saß der Kern in einer
+  Seifenblase (Ring, Striche zu den Bruchstellen, harte weiße Scheibe), beim Anlauf zog ein
+  gerader Strahl hinterher, die Druckwelle war ein Ring. Jetzt sammelt sich Licht im Kern und
+  zieht sich zusammen (die Zeit bis zur Detonation bleibt lesbar), aus den Bruchstellen fließen
+  Lichtreste hinein, hinter dem Anlauf zieht ein Kielwasser aus Glut, die Druckwelle ist ein sich
+  ausbreitender Lichtschein. Die Warnzone vor dem Anlauf (Ring und Bahn) bleibt als Gefahrenzone.
+- Ringe aus den Flipbooks genommen (`vfx_kit.py`, neues `wash`): Kern-Treffer, Ladung der Kanone,
+  Bodenring der Detonation, Freigabe der Seele, Bodenringe der Resonanz sind jetzt Lichtschein ohne
+  Umriss (Vorher-nachher-Vorschau und Stationen `arena_player`, `arena_burning`).
 - Verschlingen des Devourer ohne Ring und Strahl: Die gejagte Seele steckte in einer harten weißen
   Ringblase, ein gerader Strahl führte in den Rumpf (wie Fadenkreuz und Laser). Jetzt glimmt die
   Zielseele beim Anpirschen und ein dünner Zug ihres Lichts neigt sich schon zur Brust; beim

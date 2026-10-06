@@ -249,6 +249,20 @@ public sealed class Burning : Enemy
                     1f);
                 float instability = 0.5f + 0.5f * MathF.Sin(_visualTime * 42f);
                 float outerRadius = MathHelper.Lerp(62f, 18f, compression);
+                if (DrawnAsFigure && LightSpot is { } gathering)
+                {
+                    // The Death Flame gathers into the core: its glow draws in and burns brighter,
+                    // the cracks pour their light into it and the core flickers, unstable.
+                    WorldMarks.Glow(batch, gathering, DrawnCore, outerRadius + instability * 5f, GameBalance.DeathFlame * (0.22f + compression * 0.3f));
+                    WorldMarks.Glow(batch, gathering, DrawnCore, (8f + compression * 12f) * (0.9f + instability * 0.2f), GameBalance.SoulWhite * (0.45f + compression * 0.5f));
+                    int crack = 0;
+                    foreach (Vector2 fracture in GetFracturePositions())
+                    {
+                        WorldMarks.Stream(batch, gathering, DrawnFracture(fracture), DrawnCore, _visualTime, 0.8f, GameBalance.DeathFlameBright,
+                            100f + compression * 140f, 7f, crack++);
+                    }
+                    return;
+                }
                 batch.FillCircle(pixel, DrawnCore, outerRadius, GameBalance.DeepViolet * (0.18f + compression * 0.35f));
                 WorldMarks.Ring(batch, pixel, DrawnCore, outerRadius + instability * 5f, GameBalance.DeathFlameBright * (0.58f + compression * 0.36f), compression > 0.5f, 4f + compression * 5f);
                 batch.FillCircle(pixel, DrawnCore, 6f + compression * 8f, GameBalance.SoulWhite * (0.62f + compression * 0.38f));
@@ -260,6 +274,14 @@ public sealed class Burning : Enemy
             }
 
             float progress = 1f - MathHelper.Clamp(_stateTimer / releaseRemaining, 0f, 1f);
+            if (DrawnAsFigure && LightSpot is { } flash)
+            {
+                // The blast's light washes out to its reach and fades; the flipbook carries the fireball.
+                float fade = (1f - progress) * (1f - progress);
+                WorldMarks.Glow(batch, flash, DrawnCore, 40f + progress * 132f, GameBalance.DeathFlame * (0.5f * fade));
+                WorldMarks.Glow(batch, flash, DrawnCore, (40f + progress * 132f) * 0.5f, GameBalance.DeathFlameBright * (0.4f * fade * (1f - progress)));
+                return;
+            }
             // The blast's reach races out as a ring of light; the flipbook carries the fireball.
             WorldMarks.Ring(batch, pixel, DrawnCore, 40f + progress * 132f, GameBalance.DeathFlame * (0.9f * (1f - progress)), true, 8f);
             WorldMarks.Ring(batch, pixel, DrawnCore, 40f + progress * 132f, GameBalance.DeathFlameBright * (0.7f * (1f - progress) * (1f - progress)), false, 8f);
@@ -288,6 +310,12 @@ public sealed class Burning : Enemy
         {
             WorldMarks.Ring(batch, pixel, Position, 42f + telegraph * 30f, GameBalance.DeathFlame * (0.35f + telegraph * 0.55f), telegraph > 0.6f, 5f + telegraph * 5f);
             WorldMarks.Lane(batch, pixel, Position, _chargeDirection, 90f + telegraph * 80f, 30f, GameBalance.DeathFlameBright * (0.3f + telegraph * 0.5f));
+        }
+        else if (State == BurningState.Charge && DrawnAsFigure && LightSpot is { } wake)
+        {
+            // A wake of embers shed behind the rush instead of a beam.
+            WorldMarks.Glow(batch, wake, DrawnCore - _chargeDirection * 16f, 30f, GameBalance.DeathFlame * 0.22f);
+            WorldMarks.Stream(batch, wake, DrawnCore, DrawnCore - _chargeDirection * 96f, _visualTime, 0.85f, GameBalance.DeathFlame, 260f, 9f);
         }
         else if (State == BurningState.Charge)
         {
