@@ -211,3 +211,30 @@ im Mittel 0,2–0,45 ms; Wandzeit im Mittel rund 1 ms, 95. Perzentil höchstens 
 - Gegner rutschen beim Rückstoß (Spielposition) im Trefferclip; Kippen und Stauchen mildern das.
 - Die Bewegung der übrigen Gegnerclips (Gehen, Taumeln, Tod) stammt aus dem vorigen Durchgang.
 - Kein Push und kein PR ohne Freigabe des Owners.
+
+## Arbeitsnotiz Durchgang 3 (ab 06.10.2026, abends)
+
+Lebende Notiz für die laufenden Zyklen; nach jeder Verbesserung nachgeführt. Ziel: das
+ganze Spiel auf Bastion-Niveau heben, Kampfanimationen aus Durchgang 2 bewahren.
+Rahmen wie oben (nur Darstellung und Ton).
+
+**Erledigt und im Spiel geprüft:**
+- Schutthaufen der Arena ohne den hellen Bodenfleck aus der Freistellung; weicher
+  Kontaktschatten statt dessen (`tools/visuals/clean_prop_halo.py`, `--check` prüft alle Props).
+- Gang- und Ruhezyklen doppelt so dicht abgetastet, gleiche Bewegung und Dauer: Spieler
+  (Lauf 24, Ruhe 24), Hollow (24/24), Burning (20/16), Devourer (20/20). Vorher standen die
+  Posen beim Laufen 2–3 Bilder lang. Jedes zweite neue Bild ist die alte Pose (Abweichung
+  ≤ 0,3/255); die Schritte bleiben auf den Aufsätzen (Phase 0,26/0,77). Nebenbei behoben: Das
+  erste Ruhebild des Hollow war eine aufrechte Fehlpose (er zuckte jeden Zyklus hoch).
+
+**Befunde, offen (nach Wirkung):**
+1. Ende: Die Life Flame ist klein, weit rechts oben und wirft kaum Licht; der Abschluss des
+   Spiels hat keine Wirkung (warmes Licht gegen die violette Welt fehlt).
+2. Vorhalle: Aschehaufen am Wandfuß rendern als helle, flache Ovale; Feuerschalen und
+   Warden-Flammen werfen kaum Licht auf den Boden, der Raum wirkt gleichmäßig grau.
+3. Prolog II: Bodentextur des Suchgangs wiederholt sich sichtbar (dunkle Flecken im Raster).
+4. Prolog I: große, leere Steinplatten, wenig Material.
+5. Arena im Spielausschnitt: Boden gleichmäßig hell, wenig Lichtgefälle.
+6. Sprache: Erzähltexte englisch, HUD deutsch (Inhaltsfrage, nicht ohne Owner ändern).
+
+**Verworfen:** –

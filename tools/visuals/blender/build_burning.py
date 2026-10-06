@@ -270,8 +270,7 @@ def key_glow(poser: Poser, frame: int, glow: float, flame_scale: float = 1.0) ->
 
 
 def key_idle(poser: Poser, frames: int) -> bpy.types.Action:
-    action = bpy.data.actions.new("idle")
-    poser.rig.animation_data_create().action = action
+    action = replace_action(poser.rig, "idle")
     ground = rest_ground(poser.rig)
     for frame in range(frames + 1):
         phase = frame / frames * math.tau
@@ -287,8 +286,7 @@ def key_idle(poser: Poser, frames: int) -> bpy.types.Action:
 
 def key_move(poser: Poser, frames: int) -> bpy.types.Action:
     """A low, jerky stalk: short quick strides, shoulders working, head steady and forward."""
-    action = bpy.data.actions.new("move")
-    poser.rig.animation_data.action = action
+    action = replace_action(poser.rig, "move")
     ground = rest_ground(poser.rig)
     for frame in range(frames + 1):
         phase = frame / frames * math.tau
@@ -516,17 +514,22 @@ def main() -> None:
     poser = Poser(rig, Vector((0, toe.y, 0)).normalized())
     poser.measure_rest([f"{bone}_{side}" for bone in FINGERS + THUMB for side in ("l", "r")], "down")
     add_leg_ik(rig)
-    actions = [key_idle(poser, 8), key_move(poser, 10), key_death(poser, 8)]
+    actions = [key_idle(poser, LOOP_FRAMES["idle"]), key_move(poser, LOOP_FRAMES["move"]), key_death(poser, 8)]
     actions += [combat_action(poser, name) for name in COMBAT_FRAMES]
     for action in actions:
         action.use_fake_user = True
     rig.animation_data.action = actions[0]
-    bpy.context.scene.frame_start, bpy.context.scene.frame_end = 1, 8
+    bpy.context.scene.frame_start, bpy.context.scene.frame_end = 1, LOOP_FRAMES["idle"]
     bpy.context.scene.render.fps = 12
     args.out.parent.mkdir(parents=True, exist_ok=True)
     bpy.ops.wm.save_as_mainfile(filepath=str(args.out.resolve()))
     print(f"BUILD_BURNING_DONE {args.out} height={rig.dimensions.z:.2f}")
 
+
+#: Frames of the loops, keyed per frame from a phase: the count only sets how densely the same
+#: motion is sampled. The walk advances with the distance covered, so denser frames keep it
+#: from stepping at the game's 60 Hz; the idle keeps its duration (the pack step sets the fps).
+LOOP_FRAMES = {"idle": 16, "move": 20}
 
 #: Frames of the combat actions; render and pack take the same counts.
 COMBAT_FRAMES = {"telegraph": 14, "charge": 10, "recover": 12, "hit": 6}
@@ -548,6 +551,10 @@ def rekey(args: argparse.Namespace) -> None:
                     for way in ("forward", "back", "down", "up")])
     names = [name.strip() for name in args.rekey.split(",") if name.strip()]
     for name in names:
+        if name in LOOP_FRAMES:
+            {"idle": key_idle, "move": key_move}[name](poser, LOOP_FRAMES[name])
+            print(f"REKEYED {name} frames={LOOP_FRAMES[name]}")
+            continue
         combat_action(poser, name)
         print(f"REKEYED {name} frames={COMBAT_FRAMES[name]}")
     finish_rekey(rig, "idle", args.out.resolve())

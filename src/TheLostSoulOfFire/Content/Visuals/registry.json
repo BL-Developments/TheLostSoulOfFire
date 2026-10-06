@@ -12,8 +12,8 @@
         "idle": {
           "path": "Textures/Player/Animations/idle/{dir}",
           "frameSize": [252, 213],
-          "frames": 12,
-          "fps": 8.0,
+          "frames": 24,
+          "fps": 16.0,
           "loop": true,
           "normalMap": "Textures/Player/Animations/idle_normal/{dir}",
           "origin": [0.5, 0.9014]
@@ -21,8 +21,8 @@
         "move": {
           "path": "Textures/Player/Animations/move/{dir}",
           "frameSize": [198, 248],
-          "frames": 12,
-          "fps": 12.0,
+          "frames": 24,
+          "fps": 24.0,
           "loop": true,
           "normalMap": "Textures/Player/Animations/move_normal/{dir}",
           "progress": "distance",
@@ -171,22 +171,22 @@
         "idle": {
           "path": "Textures/Enemies/Hollow/Animations/idle/{dir}",
           "frameSize": [106, 235],
-          "frames": 12,
-          "fps": 6.0,
+          "frames": 24,
+          "fps": 12.0,
           "loop": true,
           "normalMap": "Textures/Enemies/Hollow/Animations/idle_normal/{dir}",
           "origin": [0.5, 0.8936]
         },
         "move": {
           "path": "Textures/Enemies/Hollow/Animations/move/{dir}",
-          "frameSize": [162, 247],
-          "frames": 12,
-          "fps": 12.0,
+          "frameSize": [162, 248],
+          "frames": 24,
+          "fps": 24.0,
           "loop": true,
           "normalMap": "Textures/Enemies/Hollow/Animations/move_normal/{dir}",
           "progress": "distance",
           "cycleDistance": 92.0,
-          "origin": [0.5, 0.8623]
+          "origin": [0.5, 0.8589]
         },
         "swipe": {
           "path": "Textures/Enemies/Hollow/Animations/swipe/{dir}",
@@ -250,22 +250,22 @@
         "idle": {
           "path": "Textures/Enemies/Burning/Rendered/idle/{dir}",
           "frameSize": [112, 180],
-          "frames": 8,
-          "fps": 10.0,
+          "frames": 16,
+          "fps": 20.0,
           "loop": true,
           "normalMap": "Textures/Enemies/Burning/Rendered/idle_normal/{dir}",
           "origin": [0.5, 0.8611]
         },
         "move": {
           "path": "Textures/Enemies/Burning/Rendered/move/{dir}",
-          "frameSize": [137, 175],
-          "frames": 10,
-          "fps": 10.0,
+          "frameSize": [138, 175],
+          "frames": 20,
+          "fps": 20.0,
           "loop": true,
           "normalMap": "Textures/Enemies/Burning/Rendered/move_normal/{dir}",
           "progress": "distance",
           "cycleDistance": 90.0,
-          "origin": [0.5036, 0.8457]
+          "origin": [0.5, 0.8457]
         },
         "charge": {
           "path": "Textures/Enemies/Burning/Rendered/charge/{dir}",
@@ -326,22 +326,22 @@
         "idle": {
           "path": "Textures/Enemies/Devourer/Rendered/idle/{dir}",
           "frameSize": [190, 236],
-          "frames": 10,
-          "fps": 8.0,
+          "frames": 20,
+          "fps": 16.0,
           "loop": true,
           "normalMap": "Textures/Enemies/Devourer/Rendered/idle_normal/{dir}",
           "origin": [0.5, 0.8737]
         },
         "move": {
           "path": "Textures/Enemies/Devourer/Rendered/move/{dir}",
-          "frameSize": [192, 253],
-          "frames": 10,
-          "fps": 8.0,
+          "frameSize": [193, 253],
+          "frames": 20,
+          "fps": 16.0,
           "loop": true,
           "normalMap": "Textures/Enemies/Devourer/Rendered/move_normal/{dir}",
           "progress": "distance",
           "cycleDistance": 110.0,
-          "origin": [0.5, 0.8229]
+          "origin": [0.5026, 0.8229]
         },
         "slam": {
           "path": "Textures/Enemies/Devourer/Rendered/slam/{dir}",

@@ -520,8 +520,7 @@ def key_hands(rig: bpy.types.Object, frame: int, cannon: float = 0.0, holding: f
 # ---- Animation ----------------------------------------------------------------------------
 
 def key_idle(poser: Poser, frames: int) -> bpy.types.Action:
-    action = bpy.data.actions.new("idle")
-    poser.rig.animation_data_create().action = action
+    action = replace_action(poser.rig, "idle")
     for frame in range(frames + 1):
         phase = frame / frames * math.tau
         poser.clear()
@@ -540,8 +539,7 @@ def key_idle(poser: Poser, frames: int) -> bpy.types.Action:
 def key_run(poser: Poser, frames: int) -> bpy.types.Action:
     """A jog: each thigh swings sinusoidally, the knee folds most early in the swing (heel
     toward the seat) and stays nearly straight on contact; feet are kept on the ground."""
-    action = bpy.data.actions.new("run")
-    poser.rig.animation_data.action = action
+    action = replace_action(poser.rig, "run")
     ground = rest_ground(poser.rig)
     for frame in range(frames + 1):
         phase = frame / frames * math.tau
@@ -1139,7 +1137,8 @@ def main() -> None:
     poser.measure_rest([f"{bone}_{side}" for bone in FINGERS + THUMB for side in ("l", "r")], "down")
     add_leg_ik(rig)
     paths: dict = {}
-    actions = [key_idle(poser, 12), key_run(poser, 12), key_aim(poser, 4), key_cannon_draw(poser, 5), key_death(poser, 16)]
+    actions = [key_idle(poser, LOOP_FRAMES["idle"]), key_run(poser, LOOP_FRAMES["run"]), key_aim(poser, 4),
+               key_cannon_draw(poser, 5), key_death(poser, 16)]
     actions += [combat_action(poser, name, paths) for name in COMBAT_FRAMES]
     for action in actions:
         action.use_fake_user = True
@@ -1147,13 +1146,18 @@ def main() -> None:
         write_paths(args.paths, paths)
     idle = actions[0]
     rig.animation_data.action = idle
-    bpy.context.scene.frame_start, bpy.context.scene.frame_end = 1, 12
-    bpy.context.scene.render.fps = 12
+    bpy.context.scene.frame_start, bpy.context.scene.frame_end = 1, LOOP_FRAMES["idle"]
+    bpy.context.scene.render.fps = 24
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
     bpy.ops.wm.save_as_mainfile(filepath=str(args.out.resolve()))
     print(f"BUILD_PLAYER_DONE {args.out} forward={tuple(round(v, 2) for v in forward)} height={rig.dimensions.z:.2f}")
 
+
+#: Frames of the loops. Both are keyed per frame from a phase, so the count only sets how densely
+#: the same motion is sampled: 24 keeps the run smooth at the game's 60 Hz (it advances with the
+#: distance walked, one cycle per 180 units) and lets the idle breathe without visible steps.
+LOOP_FRAMES = {"idle": 24, "run": 24}
 
 #: Frames of every combat action (key poses are written over progress, so these only set the
 #: sampling); the render and pack steps take the same counts.
@@ -1196,6 +1200,10 @@ def rekey(args: argparse.Namespace) -> None:
     paths: dict = {}
     names = [name.strip() for name in args.rekey.split(",") if name.strip()]
     for name in names:
+        if name in LOOP_FRAMES:
+            {"idle": key_idle, "run": key_run}[name](poser, LOOP_FRAMES[name])
+            print(f"REKEYED {name} frames={LOOP_FRAMES[name]}")
+            continue
         combat_action(poser, name, paths)
         print(f"REKEYED {name} frames={COMBAT_FRAMES[name]}")
     if args.paths and paths:
