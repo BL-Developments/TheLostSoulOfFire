@@ -95,3 +95,36 @@ Stable Audio Open ist auf Hugging Face zugangsbeschränkt (Lizenzzustimmung des 
 
 Die Commits auf `docs/visual-vertical-slice` tragen den Fortschritt; diese Liste wird
 mit jedem Meilenstein aktualisiert.
+
+## Bericht (Stand 06.10.2026, nachts)
+
+**Geändert (nur Darstellung und Ton):**
+- Alle Bereiche als 3D-Szenen mit der Spielkamera: Titel, Ufer, Suchgang, Damm, Überfahrt
+  (Parallaxe, die in die Nacht zurücktritt), Schwelle, Vorhalle; Arena mit gemalter
+  Schattierung. Treibender Nebel und Dunst je Raum.
+- Spieler und alle Gegner als gerenderte Figuren mit vollständigen Zustandsclips; Truhe und
+  Trainingspuppe als gerenderte Props.
+- Effekte als Death-Flame-Licht: Sensenbänder entlang der Klinge, neue Flipbooks (Treffer,
+  Kanone, Detonation, Resonanz, Dash, Seelen, Death und Life Flame), Warnzeichen als
+  Lichtringe und -bahnen in unveränderter Geometrie, Partikel als Licht, Trümmer als Materie.
+- Oberfläche in Warden-Eisen mit gesetzter Schrift (Cinzel, Alegreya Sans): HUD, Menüs,
+  Charakter- und Fähigkeitenseiten, Hinweise mit Tastenkappen, Erzählband, Titelzeilen.
+- Ton: Musik und Atmosphären je Zone mit Überblendung, Schritte von Spieler und Gegnern,
+  Menü-, Truhen-, Währungs-, Fähigkeiten-, Tür- und Erscheinungstöne, Mix gegen das Bett jeder
+  Zone geprüft und nachgezogen.
+
+**Geprüft:** 257 Unit-Tests; Rundgang über 17 Stationen (434 Aufnahmen, Bild für Bild
+gesichtet, CPU-Zeit je Frame im Mittel 0,3–0,6 ms, 95. Perzentil unter 1 ms); Slice-,
+Fähigkeiten-, Vorhallen- und Währungstest; Audio-Laufzeit-, Gameplay- und Tod-Neustart-Test;
+`validate_audio.py` (75 Assets); `mix_report.py` (alle Zonen im Band); CLAP als Hörprobe für
+neue Klänge.
+
+**Grenzen und offene Punkte:**
+- Ich kann nicht hören. CLAP, Spektrogramme und Lautheitsmessung sind Ersatz; die Hörabnahme
+  im Spiel (Musik, Atmosphären, Schritte, Mix) steht beim Owner aus.
+- Stable Audio Open ist auf Hugging Face zugangsbeschränkt (Lizenzzustimmung des Owners
+  fehlt); ACE-Step läuft auf diesem Rechner nicht (Arbeitsspeicher bei laufendem Docker).
+  Musik und Klänge sind deshalb lokal synthetisiert.
+- Die Leistungswerte messen die CPU-Seite von Update und Draw auf dem Mac (M1 Pro); die
+  GPU-Zeit und schwächere Rechner sind nicht gemessen.
+- Kein Push und kein PR ohne Freigabe des Owners.
