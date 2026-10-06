@@ -379,6 +379,9 @@ Rahmen wie oben (nur Darstellung und Ton).
   Strahl und kein Ring mehr; danach fliegt jedes Seelenteil als kleine Seele mit kurzem Schweif
   zur Figur und steigt dabei zum Kern auf (Flugzeit und Resonanzgewinn unverändert).
   Verworfen: Lichtstrom aus Punkten zwischen Seele und Kern (Owner wollte kein Licht, nur Flug).
+- Tod: Das Licht der Death Flame lag ab dem ersten Bild am Boden, wo der Körper erst nach 1,3 s
+  liegt. Jetzt sinkt das Kernlicht mit dem Fall und flammt auf, wenn die Flamme den Körper nimmt
+  (0,85 s, wie die Darstellung); `Player.SinceDeath` als Darstellungszeit.
 - Eigener Treffer: weicher Lichtstoß aus dem Körper statt hellem Ring; Dash: weiche Flammenspur
   statt zweier gerader Strahlen.
 

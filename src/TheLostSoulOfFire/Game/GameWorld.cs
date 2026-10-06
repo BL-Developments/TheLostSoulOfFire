@@ -195,6 +195,7 @@ public sealed partial class GameWorld : IDisposable
         _audio.SetZone(CurrentAudioZone);
         // After the last wave the Life Flame is heard from the furnace as it kindles, and the
         // music turns to the theme in which the lost soul's motif resolves.
+        _player.SinceDeath = _player.IsDead ? _player.SinceDeath + deltaTime : 0f;
         bool ending = _phase == GamePhase.Arena && _loopState == ArenaLoopState.Complete;
         _audio.SetEnding(ending);
         _audio.SetLifeFlame(ending ? _presentation.GetLifeFlameAlpha() * _presentation.GetLifeFlameKindle() : 0f,

@@ -194,14 +194,22 @@ public static class SoulfireLighting
             : player.Position + player.FacingDirection * 2f;
         if (player.IsDead)
         {
+            // The core's light sinks with the falling body (death clip, 1.3 s) and flares when the
+            // Death Flame takes it (0.85 s after the fall begins, CinematicPresentation).
             Vector2 fallen = renderedPlayer ? FigureHeights.FallenChestOf(player.Position, player.FacingDirection) : player.Position;
+            float falling = renderedPlayer ? MathHelper.SmoothStep(0f, 1f, MathHelper.Clamp(player.SinceDeath / 1.1f, 0f, 1f)) : 1f;
+            Vector2 standing = player.Position - new Vector2(0f, FigureHeights.Core);
+            Vector2 light = Vector2.Lerp(standing, fallen, falling);
+            float taken = renderedPlayer ? MathHelper.SmoothStep(0f, 1f, MathHelper.Clamp((player.SinceDeath - 0.85f) / 0.3f, 0f, 1f)) : 1f;
+            renderer.DrawGlow(batch, light, SoulfireRenderSettings.PlayerCoreGlowRadius * breathe, GameBalance.DeathFlameBright,
+                SoulfireRenderSettings.PlayerCoreGlowIntensity * (1f - taken));
             renderer.DrawGlow(
                 batch,
-                fallen,
+                light,
                 SoulfireRenderSettings.DeathFlameGlowRadius * breathe,
                 GameBalance.DeathFlame,
-                SoulfireRenderSettings.DeathFlameGlowIntensity);
-            renderer.DrawGlow(batch, fallen, 38f, GameBalance.SoulWhite, 0.26f);
+                SoulfireRenderSettings.DeathFlameGlowIntensity * taken);
+            renderer.DrawGlow(batch, light, 38f, GameBalance.SoulWhite, 0.26f * taken);
             return;
         }
 

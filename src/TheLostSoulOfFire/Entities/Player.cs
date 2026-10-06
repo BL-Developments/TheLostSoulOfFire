@@ -51,6 +51,9 @@ public sealed class Player
     /// <summary>Presentation only: how far a backward leap (Rückstoßsprung) has run, 0..1, or null without one.</summary>
     public float? LeapProgress { get; set; }
 
+    /// <summary>Presentation only: seconds since the player fell (set by the game each frame), 0 while alive.</summary>
+    public float SinceDeath { get; set; }
+
     /// <summary>Presentation only: how far the waking at the start of the prologue has run, 0..1, or null.</summary>
     public float? WakeProgress { get; set; }
 
