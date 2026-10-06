@@ -514,6 +514,13 @@ public sealed partial class GameWorld : IDisposable
                 if (previousDevourerState != DevourerState.Slam && devourerAfter.State == DevourerState.Slam)
                 {
                     _audio.Play(AudioCue.DevourerSlam, 0.76f);
+                    // Stone chips jump from the floor all around the impact.
+                    for (int chip = 0; chip < 6; chip++)
+                    {
+                        float angle = chip * MathHelper.TwoPi / 6f + 0.4f;
+                        Vector2 at = devourerAfter.Position + new Vector2(MathF.Cos(angle) * 70f, MathF.Sin(angle) * 40f);
+                        _particles.EmitDebris(at + new Vector2(0f, FigureHeights.Air), at.Y + FigureHeights.Air, 3, new Color(70, 64, 78), 150f, 4f, 0.7f);
+                    }
                 }
                 if (previousDevourerState != DevourerState.Devour && devourerAfter.State == DevourerState.Devour)
                 {
@@ -2401,6 +2408,13 @@ public sealed partial class GameWorld : IDisposable
         enemy.ApplyDamage(damage);
         if (wasAlive && !enemy.IsAlive)
         {
+            if (enemy is Hollow && _art.IsRendered(enemy.VisualId))
+            {
+                // The porcelain mask cracks: shards break off at head height and fall around the
+                // body. Particles live in the air pass, 70 units above the floor they land on.
+                Vector2 head = enemy.Position - new Vector2(0f, 98f - FigureHeights.Air);
+                _particles.EmitDebris(head, enemy.Position.Y + FigureHeights.Air + 6f, 9, new Color(214, 208, 198), 170f, 4.5f);
+            }
             CreditDefeatedEnemy(enemy);
             float volume = enemy is Devourer ? 0.72f : 0.52f;
             _audio.Play(AudioCue.EnemyDeath, volume);

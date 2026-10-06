@@ -12,13 +12,17 @@ public sealed class ParticleSystem
     private enum ParticleShape
     {
         Orb,
-        Shard
+        Shard,
+        /// <summary>Solid debris (mask shards, stone chips): drawn as matter, not light.</summary>
+        Chip
     }
 
     private enum ParticleMotion
     {
         Free,
-        Converge
+        Converge,
+        /// <summary>Thrown up, falls under gravity to its floor line (TargetPosition.Y), bounces once and rests.</summary>
+        Fall
     }
 
     private sealed class Particle
@@ -109,6 +113,23 @@ public sealed class ParticleSystem
         }
     }
 
+    /// <summary>
+    /// Debris thrown from <paramref name="position"/> that falls to <paramref name="floorY"/>: mask
+    /// shards of a defeated Hollow, stone chips under a Devourer's slam. Presentation only.
+    /// </summary>
+    public void EmitDebris(Vector2 position, float floorY, int count, Color color, float force, float size, float spread = MathHelper.Pi)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            float angle = -MathHelper.PiOver2 + RandomRange(-spread, spread);
+            float speed = RandomRange(force * 0.4f, force);
+            Vector2 velocity = new(MathF.Cos(angle) * speed, MathF.Sin(angle) * speed * 0.8f);
+            Add(position + RandomVector(6f), velocity, RandomRange(1.1f, 1.8f), RandomRange(size * 0.5f, size), size * 0.4f,
+                Color.Lerp(color, Color.Black, RandomRange(0f, 0.35f)), ParticleShape.Chip, ParticleMotion.Fall,
+                new Vector2(0f, floorY + RandomRange(-10f, 10f)));
+        }
+    }
+
     public void EmitSoulRelease(Vector2 position)
     {
         for (int i = 0; i < 18; i++)
@@ -137,6 +158,25 @@ public sealed class ParticleSystem
                 float eased = 1f - MathF.Pow(1f - MathHelper.Clamp(progress, 0f, 1f), 2.4f);
                 particle.Position = Vector2.Lerp(particle.StartPosition, particle.TargetPosition, eased);
             }
+            else if (particle.Motion == ParticleMotion.Fall)
+            {
+                float floor = particle.TargetPosition.Y;
+                if (particle.Position.Y < floor || particle.Velocity.LengthSquared() > 1f)
+                {
+                    particle.Velocity.Y += 980f * deltaTime;
+                    particle.Position += particle.Velocity * deltaTime;
+                    if (particle.Position.Y >= floor && particle.Velocity.Y > 0f)
+                    {
+                        particle.Position.Y = floor;
+                        particle.Velocity = particle.Velocity.Y > 120f ? new Vector2(particle.Velocity.X * 0.4f, -particle.Velocity.Y * 0.28f) : Vector2.Zero;
+                        particle.AngularVelocity *= 0.3f;
+                    }
+                }
+                else
+                {
+                    particle.AngularVelocity = 0f;
+                }
+            }
             else
             {
                 particle.Position += particle.Velocity * deltaTime;
@@ -155,12 +195,18 @@ public sealed class ParticleSystem
     {
         if (softDot is not null)
         {
-            DrawSoft(batch, softDot);
+            DrawSoft(batch, softDot, pixel);
             return;
         }
 
         foreach (Particle particle in _particles)
         {
+            if (particle.Shape == ParticleShape.Chip)
+            {
+                DrawChip(batch, pixel, particle);
+                continue;
+            }
+
             float normalized = particle.Remaining / particle.Lifetime;
             float size = MathHelper.Lerp(particle.EndSize, particle.StartSize, normalized);
             if (particle.Shape == ParticleShape.Shard)
@@ -175,12 +221,28 @@ public sealed class ParticleSystem
         }
     }
 
-    private void DrawSoft(SpriteBatch batch, Texture2D dot)
+    private void DrawChip(SpriteBatch batch, Texture2D pixel, Particle particle)
+    {
+        float normalized = particle.Remaining / particle.Lifetime;
+        float fade = MathHelper.Clamp(normalized / 0.3f, 0f, 1f);
+        float size = MathHelper.Lerp(particle.EndSize, particle.StartSize, normalized);
+        // A thin flake: wide one way, narrow the other, turning as it falls.
+        batch.Draw(pixel, particle.Position, null, particle.Color * fade, particle.Rotation, new Vector2(0.5f, 0.5f),
+            new Vector2(size * 1.6f, size * 0.7f), SpriteEffects.None, 0f);
+    }
+
+    private void DrawSoft(SpriteBatch batch, Texture2D dot, Texture2D pixel)
     {
         Vector2 origin = new(dot.Width * 0.5f, dot.Height * 0.5f);
         float unit = 1f / dot.Width;
         foreach (Particle particle in _particles)
         {
+            if (particle.Shape == ParticleShape.Chip)
+            {
+                DrawChip(batch, pixel, particle);
+                continue;
+            }
+
             float normalized = particle.Remaining / particle.Lifetime;
             float size = MathHelper.Lerp(particle.EndSize, particle.StartSize, normalized);
             float fade = normalized * normalized * (3f - 2f * normalized);
@@ -208,6 +270,11 @@ public sealed class ParticleSystem
     {
         foreach (Particle particle in _particles)
         {
+            if (particle.Shape == ParticleShape.Chip)
+            {
+                continue;
+            }
+
             float normalized = particle.Remaining / particle.Lifetime;
             float size = MathHelper.Lerp(particle.EndSize, particle.StartSize, normalized);
             float radius = MathF.Max(10f, size * SoulfireRenderSettings.ParticleGlowRadiusMultiplier);
