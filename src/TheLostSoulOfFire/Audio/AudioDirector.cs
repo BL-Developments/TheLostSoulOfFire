@@ -69,7 +69,10 @@ public enum AudioCue
     /// <summary>How each enemy dies, layered with the shared death sound.</summary>
     DeathHollow,
     DeathBurning,
-    DeathDevourer
+    DeathDevourer,
+    /// <summary>The heavy Soul Cannon swung from the back into the hands, and laid back again.</summary>
+    CannonDraw,
+    CannonStow
 }
 
 /// <summary>Where the player is, for the ambience bed and the music (presentation only).</summary>
@@ -168,7 +171,9 @@ public sealed class AudioDirector : IDisposable
         [AudioCue.BurningRush] = new(0.12f, 2, 0.03f, CueGroup.Enemy, Danger: true),
         [AudioCue.DeathHollow] = new(0.05f, 3, 0.03f, CueGroup.Enemy),
         [AudioCue.DeathBurning] = new(0.05f, 3, 0.03f, CueGroup.Enemy),
-        [AudioCue.DeathDevourer] = new(0.2f, 1, 0.02f, CueGroup.Enemy)
+        [AudioCue.DeathDevourer] = new(0.2f, 1, 0.02f, CueGroup.Enemy),
+        [AudioCue.CannonDraw] = new(0.12f, 1, 0.03f),
+        [AudioCue.CannonStow] = new(0.12f, 1, 0.03f)
     };
 
     /// <summary>
@@ -179,7 +184,7 @@ public sealed class AudioDirector : IDisposable
     [
         AudioCue.ScytheSwing1, AudioCue.ScytheSwing2, AudioCue.SoulCleave, AudioCue.Dash, AudioCue.CannonCharge,
         AudioCue.Footstep, AudioCue.FootstepWood, AudioCue.HollowStep, AudioCue.BurningStep, AudioCue.DevourerStep,
-        AudioCue.EnemyEmerge, AudioCue.SoulRelease
+        AudioCue.EnemyEmerge, AudioCue.SoulRelease, AudioCue.CannonDraw, AudioCue.CannonStow
     ];
 
     /// <summary>
@@ -355,6 +360,8 @@ public sealed class AudioDirector : IDisposable
             Add(content, AudioCue.AbilityGuard, "Audio/Sfx/ability_guard", 330f, 0.5f, 0.4f, 0.1f);
             Add(content, AudioCue.AbilityMark, "Audio/Sfx/ability_mark", 1661f, 0.3f, 0.3f, 0.3f);
             Add(content, AudioCue.DoorAwaken, "Audio/Sfx/door_awaken", 104f, 1.2f, 0.5f, 0.3f);
+            Add(content, AudioCue.CannonDraw, "Audio/Sfx/cannon_draw", 140f, 0.3f, 0.3f, 0.4f);
+            Add(content, AudioCue.CannonStow, "Audio/Sfx/cannon_stow", 120f, 0.3f, 0.3f, 0.4f);
             AddVariants(content, AudioCue.HitHollow, "Audio/Sfx/hit_hollow", 3, 180f, 0.1f, 0.3f, 0.7f);
             AddVariants(content, AudioCue.HitBurning, "Audio/Sfx/hit_burning", 3, 240f, 0.12f, 0.3f, 0.8f);
             AddVariants(content, AudioCue.HitDevourer, "Audio/Sfx/hit_devourer", 3, 70f, 0.2f, 0.35f, 0.5f);

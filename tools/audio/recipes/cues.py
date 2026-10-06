@@ -271,3 +271,69 @@ def enemy_emerge(rng) -> np.ndarray:
     shimmer = shimmer * np.exp(-np.clip(t - 0.44, 0, None) / 0.22) * (t >= 0.44) * 0.18
     x = _room(draw * 0.5 + sweep + push + shimmer, rng, 0.9, 0.25, damping=3500)
     return _finish(x, -21.0, -4.0)
+
+
+def _iron_clunk(rng, n: int, at: int, weight: float = 1.0) -> np.ndarray:
+    """A heavy piece of blackened iron landing: a low body thump and a few short metallic partials."""
+    out = np.zeros(n)
+    m = min(n - at, dsp.seconds(0.4))
+    t = dsp.time_axis(m)
+    body = dsp.lowpass(rng.standard_normal(m), 260) * np.exp(-t / 0.05) * 1.4
+    base = rng.uniform(410, 470)
+    ring = sum(np.sin(2 * np.pi * base * r * t + rng.uniform(0, 6.3)) * a * np.exp(-t * d)
+               for r, a, d in ((1.0, 0.5, 26), (2.43, 0.32, 38), (3.97, 0.2, 55), (6.1, 0.1, 80)))
+    knock = dsp.bandpass(rng.standard_normal(m), 900, 5200) * np.exp(-t / 0.006) * 0.8
+    out[at:at + m] = (body + ring * 0.6 + knock) * weight
+    return out
+
+
+def _strap(rng, n: int, start: float, length: float, gain: float) -> np.ndarray:
+    """Leather under load: a quick train of creaks with a little cloth rustle."""
+    out = np.zeros(n)
+    a, m = dsp.seconds(start), dsp.seconds(length)
+    pulses = np.zeros(m)
+    tt = 0.0
+    while tt < length:
+        i = dsp.seconds(tt)
+        if i < m:
+            pulses[i] = rng.uniform(0.5, 1.0)
+        tt += 1.0 / rng.uniform(70, 120)
+    creak = sum(dsp.resonator(pulses, f, 10) * g for f, g in ((520, 1.0), (1100, 0.45), (2300, 0.15)))
+    rustle = dsp.bandpass(rng.standard_normal(m), 1800, 7000) * 0.08
+    out[a:a + m] = (creak + rustle) * np.sin(np.pi * np.linspace(0, 1, m)) * gain
+    return out
+
+
+@recipe("cannon-draw", "Seelenkanone gezogen: der Riemen knarzt, das schwere Eisen schwingt in die Hände und schlägt an, die Kammer rastet ein")
+def cannon_draw(rng) -> np.ndarray:
+    n = dsp.seconds(0.42)
+    swing = dsp.bandpass(rng.standard_normal(n), 250, 1400) * np.exp(-((dsp.time_axis(n) - 0.08) / 0.05) ** 2) * 0.25
+    latch = np.zeros(n)
+    at, m = dsp.seconds(0.165), dsp.seconds(0.05)
+    lt = dsp.time_axis(m)
+    latch[at:at + m] = (np.sin(2 * np.pi * 2300 * lt) * 0.4 + dsp.bandpass(rng.standard_normal(m), 2500, 8000)) * np.exp(-lt / 0.008)
+    x = _strap(rng, n, 0.0, 0.12, 0.5) + swing + _iron_clunk(rng, n, dsp.seconds(0.13), 1.0) + latch * 0.35
+    x = _room(x, rng, 0.45, 0.14)
+    return _finish(x, -21.0, -3.0)
+
+
+@recipe("cannon-stow", "Seelenkanone verstaut: Eisen schlägt gedämpft gegen den Rücken, der Riemen zieht nach")
+def cannon_stow(rng) -> np.ndarray:
+    n = dsp.seconds(0.36)
+    # No hard crack: the iron is laid against the coat, so it thuds softly and then rings.
+    t = dsp.time_axis(n)
+    base = rng.uniform(380, 440)
+    ring = sum(np.sin(2 * np.pi * base * r * t + rng.uniform(0, 6.3)) * a * np.exp(-t * d)
+               for r, a, d in ((1.0, 0.5, 14), (2.43, 0.3, 22), (3.97, 0.16, 32)))
+    thud = dsp.lowpass(rng.standard_normal(n), 180) * np.exp(-t / 0.035) * 0.6
+    clunk = (ring * 0.5 + thud) * np.clip(t / 0.004, 0, 1)
+    rattle = np.zeros(n)
+    for k in range(3):  # the strap's buckle and the chamber bars settling
+        at = dsp.seconds(0.05 + k * rng.uniform(0.025, 0.045))
+        m = dsp.seconds(0.06)
+        rt = dsp.time_axis(m)
+        f = rng.uniform(1700, 2900)
+        rattle[at:at + m] += (np.sin(2 * np.pi * f * rt) + 0.5 * np.sin(2 * np.pi * f * 2.7 * rt)) * np.exp(-rt / 0.012) * rng.uniform(0.15, 0.3)
+    x = clunk + rattle + _strap(rng, n, 0.03, 0.2, 0.55)
+    x = _room(x, rng, 0.4, 0.12)
+    return _finish(x, -23.0, -4.0)

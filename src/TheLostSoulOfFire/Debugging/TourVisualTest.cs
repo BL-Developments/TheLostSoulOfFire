@@ -267,6 +267,15 @@ internal sealed class TourVisualTest
     private int _frame;
 
     /// <summary>Footsteps while the tour runs: each with the run phase drawn at that moment.</summary>
+    /// <summary>Cannon handling cues while the tour runs, with the cannon state at that moment.</summary>
+    private void LogCannon(AudioCue cue)
+    {
+        if (cue is AudioCue.CannonDraw or AudioCue.CannonStow or AudioCue.CannonCharge or AudioCue.CannonFire)
+        {
+            Console.WriteLine($"TOUR_CUE frame={_frame} cue={cue} state={_world.AutomatedPlayer.Cannon.State}");
+        }
+    }
+
     private void LogStep(AudioCue cue)
     {
         if (cue is AudioCue.Footstep or AudioCue.FootstepWood)
@@ -476,8 +485,10 @@ internal sealed class TourVisualTest
         Do("place_combo", () => { _world.PlaceAutomatedPlayer(ArenaCentre); _world.SetAutomatedAim(new Vector2(1f, 0.35f)); }, 0.6f);
         Series("combo", 48, 1, () => _input.InjectMousePresses(left: true, right: false));
         Do("rest", () => { }, 0.6f);
+        Do("listen_cannon", () => _world.AutomatedAudio.CuePlayed += LogCannon);
         Series("cannon_draw_charge", 30, 2, () => _input.InjectMousePresses(left: false, right: true));
         Series("cannon_fire", 30, 1);
+        Do("stop_listening_cannon", () => _world.AutomatedAudio.CuePlayed -= LogCannon);
         // Charging on the move: aiming right while backing away to the left walks the legs backward.
         Do("place_cannon_walk", () => { _world.PlaceAutomatedPlayer(ArenaCentre + new Vector2(200f, 0f)); _world.SetAutomatedAim(Vector2.UnitX); }, 0.6f);
         Series("cannon_walk_back", 16, 3, () =>

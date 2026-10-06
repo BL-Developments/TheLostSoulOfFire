@@ -2681,6 +2681,14 @@ public sealed partial class GameWorld : IDisposable
         {
             _audio.Play(AudioCue.Dash, 0.62f);
         }
+        if (previousCannonState == SoulCannonState.Stored && _player.Cannon.State == SoulCannonState.Drawing)
+        {
+            _audio.Play(AudioCue.CannonDraw, 0.9f);
+        }
+        else if (previousCannonState == SoulCannonState.Returning && _player.Cannon.State == SoulCannonState.Stored)
+        {
+            _audio.Play(AudioCue.CannonStow, 0.78f);
+        }
         if (previousCannonState != SoulCannonState.Charging && _player.Cannon.State == SoulCannonState.Charging)
         {
             _audio.Play(AudioCue.CannonCharge, 0.42f);

@@ -10407,3 +10407,13 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/Player/Animations/aim_move_3_normal/nw.png
+
+#begin Audio/Sfx/cannon_draw.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/cannon_draw.wav
+
+#begin Audio/Sfx/cannon_stow.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/cannon_stow.wav

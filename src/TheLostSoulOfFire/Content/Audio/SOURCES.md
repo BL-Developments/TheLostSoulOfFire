@@ -270,3 +270,12 @@ Mit `tools/audio/hall_tails.py`: der trockene Take gefaltet mit der Impulsantwor
 | `Audio/Sfx/player_hit_hall.wav` | Hallfahne von player_hit.wav (Gießhalle, RT60 2.4 s) | 2.51 s, 1 Kanal, -27.5 LUFS, Spitze -11.8 dBFS |
 | `Audio/Sfx/wave_start_hall.wav` | Hallfahne von wave_start.wav (Gießhalle, RT60 2.4 s) | 2.96 s, 1 Kanal, -28.3 LUFS, Spitze -14.6 dBFS |
 | `Audio/Sfx/footstep_stone_1_hall.wav` | Hallfahne von footstep_stone_1.wav (Vorhalle, RT60 3.2 s) | 3.26 s, 1 Kanal, -34.0 LUFS, Spitze -15.6 dBFS |
+
+## Seelenkanone ziehen und verstauen (Durchgang 3, 06.10.2026)
+
+Rezepte `cannon-draw` und `cannon-stow` in `tools/audio/recipes/cues.py`: Riemen, schweres Eisen, Kammerraste; beim Verstauen ohne harten Anschlag (die erste Fassung hörte CLAP als Schuss). CLAP: Ziehen „metal clank“ 0,66 + „heavy metal weapon“ 0,26; Verstauen „leather creaking“ 0,31 + „heavy metal weapon being put away“ 0,24.
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/cannon_draw.wav` | cannon-draw Seed 1 | 0.42 s, 1 Kanal/Kanäle, -24.5 LUFS, Spitze -3.0 dBFS |
+| `Audio/Sfx/cannon_stow.wav` | cannon-stow Seed 2 | 0.36 s, 1 Kanal/Kanäle, -23.0 LUFS, Spitze -8.5 dBFS |

@@ -303,6 +303,11 @@ Rahmen wie oben (nur Darstellung und Ton).
   Samt gefüttert, vom Goldlicht getroffen, darunter ein Münzhaufen (Geld); geschlossene Truhe
   pixelgleich, Öffnen-Zeit unverändert. Verworfen: heller Samt (brannte weiß aus).
 
+- Ton der Kanone: Ziehen (Riemen, Eisen schlägt in die Hände, Kammer rastet) und Verstauen
+  (gedämpft gegen den Rücken, Riemen) an den bestehenden Zustandswechseln; Rundgang protokolliert
+  Ziehen → Laden (+0,16 s) → Schuss → Verstauen (+0,28 s). Mix „action“ +2,0/+1,6 LU über dem
+  Bett, Audiotests grün. Verworfen: Verstauen mit hartem Anschlag (CLAP: „gunshot“).
+
 **Befunde, offen (nach Wirkung):**
 1. Arena im Spielausschnitt: Boden gleichmäßig hell, wenig Lichtgefälle.
 2. Sprache: Erzähltexte englisch, HUD deutsch (Inhaltsfrage, nicht ohne Owner ändern).

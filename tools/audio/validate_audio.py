@@ -127,6 +127,9 @@ AUTHORED_SFX_DURATIONS = {
     "player_hit_hall.wav": 2.511,
     "wave_start_hall.wav": 2.959,
     "footstep_stone_1_hall.wav": 3.260,
+    # The heavy Soul Cannon drawn from the back and laid back (tools/audio/recipes/cues.py).
+    "cannon_draw.wav": 0.42,
+    "cannon_stow.wav": 0.36,
     # The Life Flame's fire after the last wave (tools/audio/recipes/ambiences.py), looped.
     "life_flame_loop.wav": 9.0,
 }
