@@ -5,7 +5,6 @@ Stand: 04.10.2026. Ein offenes Issue oder eine Empfehlung ist kein Beschluss. En
 | Frage | Zuständigkeit | Blockiert / betrifft |
 |---|---|---|
 | Endgültige Namen und Lore beider Währungen (Herkunft, Konten und Zwecke am 04.10. in #52 beschlossen) | #52 | #12, #18, #21, #22 |
-| Sicherungsquote, Rundung, Wiederholbarkeit; Geldverlust bei Niederlage | #53 | #18, Run-Wirtschaft |
 | Persönliche oder gemeinsame Konten, Profile und Freischaltungen | #58 | #12 und alle Koop-Interaktionen |
 | Zustimmung bei Start, Teilsicherung und Extraktion; gleichzeitige Eingaben | #59, #60 | #11, #18 |
 | Ultimate-Ladung, Kosten, Besitz, Dauer und Reset | #13 | #24 |
