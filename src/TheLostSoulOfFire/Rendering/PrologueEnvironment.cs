@@ -41,9 +41,11 @@ public static class PrologueEnvironment
     public static void DrawCrossing(SpriteBatch batch, ArtAssets art, float time)
     {
         art.DrawEnvironmentScrolled(batch, VisualIds.DeckSea, 0f, time * 110f, 1800f);
-        art.DrawEnvironmentScrolled(batch, VisualIds.PassingFar, 0f, time * 34f, 1800f);
+        // The drowned town sinks into the night with distance: the far gables darkest and
+        // coolest, the near masts a little less so.
+        art.DrawEnvironmentScrolled(batch, VisualIds.PassingFar, 0f, time * 34f, 1800f, new Color(118, 124, 150));
         art.DrawEnvironment(batch, VisualIds.DeckFloor, Vector2.Zero);
-        art.DrawEnvironmentScrolled(batch, VisualIds.PassingNear, 746f, time * 190f, 1800f);
+        art.DrawEnvironmentScrolled(batch, VisualIds.PassingNear, 746f, time * 190f, 1800f, new Color(170, 172, 190));
     }
 
     public static void DrawGround(

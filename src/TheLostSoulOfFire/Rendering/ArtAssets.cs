@@ -256,11 +256,14 @@ public sealed class ArtAssets
     public Vector2 WorldSizeOf(string id, Vector2 fallback) =>
         Registry.TryGet(id, out VisualEntry entry) ? entry.WorldSize : fallback;
 
-    public void DrawEnvironment(SpriteBatch batch, string id, Vector2 position)
+    public void DrawEnvironment(SpriteBatch batch, string id, Vector2 position) => DrawEnvironment(batch, id, position, Color.White);
+
+    /// <summary>Draws an environment plate tinted, e.g. distant strips sunk into the night.</summary>
+    public void DrawEnvironment(SpriteBatch batch, string id, Vector2 position, Color tint)
     {
         if (Registry.TryGet(id, out VisualEntry tiledEntry) && tiledEntry.TryGetClip(VisualClips.Default, out VisualClipDefinition tiled) && tiled.IsTiled)
         {
-            DrawTiled(batch, tiledEntry, tiled, position);
+            DrawTiled(batch, tiledEntry, tiled, position, tint);
             return;
         }
 
@@ -275,7 +278,7 @@ public sealed class ArtAssets
             return;
         }
 
-        batch.Draw(clip.Texture, bounds, clip.GetSourceRectangle(0f), Color.White);
+        batch.Draw(clip.Texture, bounds, clip.GetSourceRectangle(0f), tint);
     }
 
     /// <summary>Draws a single-image environment stretched over a screen rectangle (title key art).</summary>
@@ -291,7 +294,10 @@ public sealed class ArtAssets
     /// Draws an environment piece repeated sideways from x = 0 to <paramref name="coverWidth"/>,
     /// shifted left by <paramref name="scroll"/> world units (wrapping), its top at <paramref name="top"/>.
     /// </summary>
-    public void DrawEnvironmentScrolled(SpriteBatch batch, string id, float top, float scroll, float coverWidth)
+    public void DrawEnvironmentScrolled(SpriteBatch batch, string id, float top, float scroll, float coverWidth) =>
+        DrawEnvironmentScrolled(batch, id, top, scroll, coverWidth, Color.White);
+
+    public void DrawEnvironmentScrolled(SpriteBatch batch, string id, float top, float scroll, float coverWidth, Color tint)
     {
         float width = WorldSizeOf(id, new Vector2(1800f, 1000f)).X;
         if (width <= 1f)
@@ -301,11 +307,11 @@ public sealed class ArtAssets
         float start = -(scroll % width);
         for (float x = start; x < coverWidth; x += width)
         {
-            DrawEnvironment(batch, id, new Vector2(MathF.Round(x), top));
+            DrawEnvironment(batch, id, new Vector2(MathF.Round(x), top), tint);
         }
     }
 
-    private void DrawTiled(SpriteBatch batch, VisualEntry entry, VisualClipDefinition clip, Vector2 position)
+    private void DrawTiled(SpriteBatch batch, VisualEntry entry, VisualClipDefinition clip, Vector2 position, Color tint)
     {
         Vector2 topLeft = position - entry.Origin * entry.WorldSize;
         Vector2 tileSize = entry.WorldSize / new Vector2(clip.TileColumns, clip.TileRows);
@@ -321,7 +327,7 @@ public sealed class ArtAssets
                 Rectangle bounds = new(left, top, right - left, bottom - top);
                 if (_clips.TryGetValue(TileKey(entry.Id, clip.Name, column, row), out SpriteClip? tile) && tile is not null)
                 {
-                    batch.Draw(tile.Texture, bounds, Color.White);
+                    batch.Draw(tile.Texture, bounds, tint);
                 }
                 else
                 {
