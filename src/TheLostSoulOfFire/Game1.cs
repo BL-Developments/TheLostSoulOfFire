@@ -216,7 +216,12 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
             profileStore: CreateProfileStore());
         if (_abilityVisualTest) _world.ApplyDeveloperStart(new DeveloperStartOptions(DeveloperStartArea.Arena, 1), VirtualViewport);
         if (_sliceVisualTest) _sliceTest = new SliceVisualTest(_world, _input, VirtualViewport);
-        if (_tourVisualTest) _tourTest = new TourVisualTest(_world, _input, VirtualViewport, _art.RegistryError);
+        if (_tourVisualTest)
+        {
+            // Frames are unlocked in the tour (see the constructor), so the wall time between
+            // frames measures CPU and GPU together.
+            _tourTest = new TourVisualTest(_world, _input, VirtualViewport, _art.RegistryError, () => _art.MissingVisuals);
+        }
         if (_developerStart is not null)
         {
             Console.WriteLine(_developerStart.Describe());
@@ -227,6 +232,8 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     }
 
     private readonly System.Diagnostics.Stopwatch _frameWatch = new();
+    private readonly System.Diagnostics.Stopwatch _wallWatch = System.Diagnostics.Stopwatch.StartNew();
+    private double _lastWall;
 
     protected override void Update(GameTime gameTime)
     {
@@ -347,6 +354,12 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         }
 
         _tourTest?.RecordFrameTime(_frameWatch.Elapsed.TotalMilliseconds);
+        if (_tourTest is not null)
+        {
+            double now = _wallWatch.Elapsed.TotalMilliseconds;
+            _tourTest.RecordWallTime(now - _lastWall, _tourTest.PendingCapture is not null);
+            _lastWall = now;
+        }
         if (_tourTest?.PendingCapture is not null)
         {
             _tourTest.Capture(_virtualTarget);

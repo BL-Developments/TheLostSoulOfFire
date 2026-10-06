@@ -29,6 +29,30 @@ internal sealed class TourVisualTest
 
     private readonly Dictionary<string, List<double>> _frameTimes = new();
 
+    private readonly Dictionary<string, List<double>> _wallTimes = new();
+    private bool _lastFrameCaptured;
+
+    /// <summary>
+    /// Wall time since the previous frame with vertical sync off: CPU and GPU together. Frames
+    /// around a capture (reading back and saving the image) are left out.
+    /// </summary>
+    public void RecordWallTime(double milliseconds, bool capturedThisFrame)
+    {
+        bool skip = capturedThisFrame || _lastFrameCaptured;
+        _lastFrameCaptured = capturedThisFrame;
+        if (skip || Finished || _index < 0 || _index >= _steps.Count)
+        {
+            return;
+        }
+
+        string station = _steps[_index].Station;
+        if (!_wallTimes.TryGetValue(station, out List<double>? times))
+        {
+            _wallTimes[station] = times = [];
+        }
+        times.Add(milliseconds);
+    }
+
     /// <summary>CPU time of one frame (update and draw, without saving a capture), filed under the running station.</summary>
     public void RecordFrameTime(double milliseconds)
     {
@@ -56,8 +80,17 @@ internal sealed class TourVisualTest
             times.Sort();
             double average = times.Average();
             double p95 = times[Math.Min(times.Count - 1, (int)(times.Count * 0.95))];
+            string wall = "";
+            if (_wallTimes.TryGetValue(station, out List<double>? walls) && walls.Count > 10)
+            {
+                walls.Sort();
+                double wallAverage = walls.Average();
+                double wallP95 = walls[Math.Min(walls.Count - 1, (int)(walls.Count * 0.95))];
+                wall = string.Create(System.Globalization.CultureInfo.InvariantCulture,
+                    $" wall_avg_ms={wallAverage:0.00} wall_p95_ms={wallP95:0.00} fps_avg={1000.0 / wallAverage:0}");
+            }
             Console.WriteLine(string.Create(System.Globalization.CultureInfo.InvariantCulture,
-                $"TOUR_PERF station={station} frames={times.Count} avg_ms={average:0.00} p95_ms={p95:0.00} max_ms={times[^1]:0.00}"));
+                $"TOUR_PERF station={station} frames={times.Count} avg_ms={average:0.00} p95_ms={p95:0.00} max_ms={times[^1]:0.00}") + wall);
         }
     }
 
@@ -74,8 +107,12 @@ internal sealed class TourVisualTest
     private float _stepTime;
     private string _station = string.Empty;
 
-    public TourVisualTest(GameWorld world, InputState input, Viewport viewport, string? registryError = null)
+    private readonly Func<IReadOnlyList<string>>? _missingVisuals;
+
+    public TourVisualTest(GameWorld world, InputState input, Viewport viewport, string? registryError = null,
+        Func<IReadOnlyList<string>>? missingVisuals = null)
     {
+        _missingVisuals = missingVisuals;
         if (registryError is not null)
         {
             // An invalid registry turns every graphic into a dummy; the tour would only photograph placeholders.
@@ -182,6 +219,15 @@ internal sealed class TourVisualTest
         if (_index >= _steps.Count)
         {
             ReportFrameTimes();
+            // Any visual drawn as a dummy anywhere on the tour is a placeholder left on screen.
+            IReadOnlyList<string> missing = _missingVisuals?.Invoke() ?? [];
+            if (missing.Count > 0)
+            {
+                Console.WriteLine($"TOUR_VISUAL_TEST_FAIL step=end reason=placeholders {string.Join(",", missing)}");
+                Finished = true;
+                ExitCode = 1;
+                return;
+            }
             Console.WriteLine($"TOUR_VISUAL_TEST_PASS captures={_captured} dir={_directory}");
             Finished = true;
             ExitCode = 0;
