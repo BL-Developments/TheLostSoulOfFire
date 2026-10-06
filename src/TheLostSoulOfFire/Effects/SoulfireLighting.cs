@@ -111,12 +111,12 @@ public static class SoulfireLighting
                 float fractureIntensity = MathHelper.Lerp(0.11f, 0.27f, soulSenseAmount);
                 foreach (Vector2 fracture in burning.GetFracturePositions())
                 {
-                    renderer.DrawGlow(batch, fracture, 30f * breathe, GameBalance.DeathFlame, fractureIntensity);
+                    renderer.DrawGlow(batch, burning.DrawnFracture(fracture), 30f * breathe, GameBalance.DeathFlame, fractureIntensity);
                 }
 
-                if (burning.State is BurningState.Charge or BurningState.Detonating)
+                if (burning.State is BurningState.Charge or BurningState.Detonating or BurningState.Telegraph)
                 {
-                    renderer.DrawGlow(batch, burning.Position, 78f, GameBalance.DeathFlameBright, 0.28f);
+                    renderer.DrawGlow(batch, burning.DrawnCore, 78f, GameBalance.DeathFlameBright, burning.State == BurningState.Telegraph ? 0.16f : 0.28f);
                 }
             }
 

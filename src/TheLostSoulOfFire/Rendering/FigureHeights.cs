@@ -31,6 +31,9 @@ public static class FigureHeights
     /// </summary>
     public const float Air = 70f;
 
+    /// <summary>The Burning's chest (it is short and crouched): its breaking points are drawn here.</summary>
+    public const float BurningChest = 44f;
+
     /// <summary>How much a level circle is squashed vertically when seen from the camera (sin 35°).</summary>
     public const float LevelSquash = 0.57f;
 

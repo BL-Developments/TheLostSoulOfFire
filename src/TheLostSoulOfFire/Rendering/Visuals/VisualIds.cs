@@ -114,6 +114,7 @@ public static class VisualClips
 
     /// <summary>Enemies: the rest after an attack and the long stagger after a full cannon.</summary>
     public const string Recover = "recover";
+    public const string Telegraph = "telegraph";
     public const string Stagger = "stagger";
 
     public static string Swing(int step) => step switch

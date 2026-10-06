@@ -46,6 +46,12 @@ public abstract class Enemy
     }
     public abstract string StateLabel { get; }
 
+    /// <summary>
+    /// Presentation only: set by the art layer when this enemy is drawn as a rendered figure
+    /// standing on its position, so overlays (cores, fractures, held souls) sit on its body.
+    /// </summary>
+    public bool DrawnAsFigure { get; set; }
+
     /// <summary>Visual-ID this enemy is drawn with, or <c>null</c> when it draws itself.</summary>
     public virtual string? VisualId => null;
 

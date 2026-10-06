@@ -201,29 +201,72 @@
       "fallbackClip": "idle",
       "clips": {
         "idle": {
-          "path": "Textures/Enemies/Burning/Animations/idle/{dir}",
-          "frameSize": [128, 128],
-          "frames": 9,
-          "fps": 9,
-          "loop": true
+          "path": "Textures/Enemies/Burning/Rendered/idle/{dir}",
+          "frameSize": [112, 180],
+          "frames": 8,
+          "fps": 10.0,
+          "loop": true,
+          "normalMap": "Textures/Enemies/Burning/Rendered/idle_normal/{dir}",
+          "origin": [0.5, 0.8611]
         },
         "move": {
-          "path": "Textures/Enemies/Burning/Animations/move/{dir}",
-          "frameSize": [128, 128],
-          "frames": 9,
-          "fps": 14,
+          "path": "Textures/Enemies/Burning/Rendered/move/{dir}",
+          "frameSize": [137, 175],
+          "frames": 10,
+          "fps": 10.0,
           "loop": true,
+          "normalMap": "Textures/Enemies/Burning/Rendered/move_normal/{dir}",
           "progress": "distance",
-          "cycleDistance": 108
+          "cycleDistance": 90.0,
+          "origin": [0.5036, 0.8457]
         },
         "charge": {
-          "path": "Textures/Enemies/Burning/Animations/charge/{dir}",
-          "frameSize": [128, 128],
-          "frames": 9,
-          "fps": 15,
-          "loop": false
+          "path": "Textures/Enemies/Burning/Rendered/charge/{dir}",
+          "frameSize": [182, 183],
+          "frames": 6,
+          "fps": 18.0,
+          "loop": true,
+          "normalMap": "Textures/Enemies/Burning/Rendered/charge_normal/{dir}",
+          "origin": [0.5, 0.8579]
+        },
+        "telegraph": {
+          "path": "Textures/Enemies/Burning/Rendered/telegraph/{dir}",
+          "frameSize": [142, 197],
+          "frames": 8,
+          "fps": 12.0,
+          "loop": false,
+          "normalMap": "Textures/Enemies/Burning/Rendered/telegraph_normal/{dir}",
+          "origin": [0.5, 0.8629]
+        },
+        "recover": {
+          "path": "Textures/Enemies/Burning/Rendered/recover/{dir}",
+          "frameSize": [144, 192],
+          "frames": 8,
+          "fps": 8.0,
+          "loop": false,
+          "normalMap": "Textures/Enemies/Burning/Rendered/recover_normal/{dir}",
+          "origin": [0.5, 0.8646]
+        },
+        "hit": {
+          "path": "Textures/Enemies/Burning/Rendered/hit/{dir}",
+          "frameSize": [124, 186],
+          "frames": 4,
+          "fps": 12.0,
+          "loop": false,
+          "normalMap": "Textures/Enemies/Burning/Rendered/hit_normal/{dir}",
+          "origin": [0.5, 0.8656]
+        },
+        "death": {
+          "path": "Textures/Enemies/Burning/Rendered/death/{dir}",
+          "frameSize": [122, 179],
+          "frames": 8,
+          "fps": 12.0,
+          "loop": false,
+          "normalMap": "Textures/Enemies/Burning/Rendered/death_normal/{dir}",
+          "origin": [0.5, 0.8324]
         }
-      }
+      },
+      "pixelsPerUnit": 1.5
     },
     {
       "id": "enemy.devourer",

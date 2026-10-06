@@ -42,13 +42,43 @@ public sealed class Burning : Enemy
     public bool IsAggressionCommitted => State is BurningState.Telegraph or BurningState.Charge;
     public Vector2 FacingDirection => _facing;
     public override string VisualId => VisualIds.Burning;
+    /// <summary>The death clip ends at three quarters of the dying time; the dissolve takes the rest.</summary>
+    private const float DeathClipShare = 0.75f;
+
     public override string? VisualClip => State switch
     {
+        BurningState.Dying when DeathProgress < DeathClipShare => VisualClips.Death,
         BurningState.Dying or BurningState.Detonating or BurningState.Dead => null,
-        BurningState.Approach => VisualClips.Move,
+        BurningState.Telegraph => VisualClips.Telegraph,
         BurningState.Charge => VisualClips.Charge,
+        BurningState.Recovery => VisualClips.Recover,
+        _ when HitFlashRemaining > 0f => VisualClips.Hit,
+        BurningState.Approach => VisualClips.Move,
         _ => VisualClips.Idle
     };
+
+    public override float? VisualProgress => State switch
+    {
+        BurningState.Dying => DeathProgress / DeathClipShare,
+        BurningState.Telegraph => 1f - _stateTimer / GameBalance.BurningChargeTelegraph,
+        BurningState.Recovery => 1f - _stateTimer / GameBalance.BurningRecoveryDuration,
+        BurningState.Charge => null,
+        _ when HitFlashRemaining > 0f => HitFlashProgress,
+        _ => null
+    };
+
+    private float DeathProgress => 1f - _stateTimer / GameBalance.BurningDeathDuration;
+
+    /// <summary>
+    /// Where a breaking point is drawn: on the rendered figure's chest (closer together), or
+    /// where gameplay keeps it for the flat art. Hits always use <see cref="GetFracturePositions"/>.
+    /// </summary>
+    public Vector2 DrawnFracture(Vector2 fracture) => DrawnAsFigure
+        ? Position + (fracture - Position) * 0.7f - new Vector2(0f, FigureHeights.BurningChest)
+        : fracture;
+
+    /// <summary>Centre of the body as drawn (the detonation and its light gather here).</summary>
+    public Vector2 DrawnCore => DrawnAsFigure ? Position - new Vector2(0f, FigureHeights.BurningChest) : Position;
     public override Vector2 VisualFacing => _facing;
     public override float TelegraphRadius => State is BurningState.Telegraph or BurningState.Charge ? Radius * 4f : 0f;
 
@@ -219,19 +249,19 @@ public sealed class Burning : Enemy
                     1f);
                 float instability = 0.5f + 0.5f * MathF.Sin(_visualTime * 42f);
                 float outerRadius = MathHelper.Lerp(62f, 18f, compression);
-                batch.FillCircle(pixel, Position, outerRadius, GameBalance.DeepViolet * (0.18f + compression * 0.35f));
-                batch.DrawCircle(pixel, Position, outerRadius + instability * 5f, GameBalance.DeathFlameBright * (0.58f + compression * 0.36f), 4f + compression * 5f, 30);
-                batch.FillCircle(pixel, Position, 6f + compression * 8f, GameBalance.SoulWhite * (0.62f + compression * 0.38f));
+                batch.FillCircle(pixel, DrawnCore, outerRadius, GameBalance.DeepViolet * (0.18f + compression * 0.35f));
+                batch.DrawCircle(pixel, DrawnCore, outerRadius + instability * 5f, GameBalance.DeathFlameBright * (0.58f + compression * 0.36f), 4f + compression * 5f, 30);
+                batch.FillCircle(pixel, DrawnCore, 6f + compression * 8f, GameBalance.SoulWhite * (0.62f + compression * 0.38f));
                 foreach (Vector2 fracture in GetFracturePositions())
                 {
-                    batch.DrawLine(pixel, fracture, Vector2.Lerp(fracture, Position, compression), GameBalance.DeathFlameBright * 0.82f, 3f + compression * 2f);
+                    batch.DrawLine(pixel, DrawnFracture(fracture), Vector2.Lerp(DrawnFracture(fracture), DrawnCore, compression), GameBalance.DeathFlameBright * 0.82f, 3f + compression * 2f);
                 }
                 return;
             }
 
             float progress = 1f - MathHelper.Clamp(_stateTimer / releaseRemaining, 0f, 1f);
-            batch.FillCircle(pixel, Position, 28f + progress * 118f, GameBalance.DeepViolet * (0.62f * (1f - progress)));
-            batch.DrawCircle(pixel, Position, 40f + progress * 132f, GameBalance.DeathFlameBright * (1f - progress), 8f, 30);
+            batch.FillCircle(pixel, DrawnCore, 28f + progress * 118f, GameBalance.DeepViolet * (0.62f * (1f - progress)));
+            batch.DrawCircle(pixel, DrawnCore, 40f + progress * 132f, GameBalance.DeathFlameBright * (1f - progress), 8f, 30);
             return;
         }
 
@@ -244,9 +274,13 @@ public sealed class Burning : Enemy
             batch.FillCircle(pixel, Position + new Vector2(0f, -37f), 12f, new Color(24, 20, 27));
         }
 
-        foreach (Vector2 fracture in GetFracturePositions())
+        if (!DrawnAsFigure)
         {
-            batch.DrawLine(pixel, fracture - right * 7f, fracture + right * 7f + _facing * 5f, GameBalance.DeathFlame * (0.42f + pulse * 0.38f), 3f);
+            // The rendered figure carries its own glowing cracks.
+            foreach (Vector2 fracture in GetFracturePositions())
+            {
+                batch.DrawLine(pixel, fracture - right * 7f, fracture + right * 7f + _facing * 5f, GameBalance.DeathFlame * (0.42f + pulse * 0.38f), 3f);
+            }
         }
 
         if (State == BurningState.Telegraph)
@@ -264,8 +298,8 @@ public sealed class Burning : Enemy
         {
             foreach (Vector2 fracture in GetFracturePositions())
             {
-                batch.FillCircle(pixel, fracture, 10f, GameBalance.DeepViolet * 0.78f);
-                batch.FillCircle(pixel, fracture, 5f, GameBalance.SoulWhite);
+                batch.FillCircle(pixel, DrawnFracture(fracture), 10f, GameBalance.DeepViolet * 0.78f);
+                batch.FillCircle(pixel, DrawnFracture(fracture), 5f, GameBalance.SoulWhite);
             }
         }
 

@@ -394,6 +394,7 @@ public sealed class ArtAssets
             return;
         }
 
+        enemy.DrawnAsFigure = IsRendered(id);
         if (enemy.VisualClip is not { } clip)
         {
             StartDissolve(enemy, id);

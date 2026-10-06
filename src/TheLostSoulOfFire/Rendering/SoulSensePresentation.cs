@@ -180,9 +180,9 @@ public sealed class SoulSensePresentation
                     break;
 
                 case Burning burning:
-                    Vector2[] fractures = burning.GetFracturePositions();
-                    foreach (Vector2 fracture in fractures)
+                    foreach (Vector2 gameplayFracture in burning.GetFracturePositions())
                     {
+                        Vector2 fracture = burning.DrawnFracture(gameplayFracture);
                         batch.FillCircle(pixel, fracture, 9f, GameBalance.DeepViolet * (0.6f * amount));
                         batch.DrawCircle(pixel, fracture, 8f + pulse * 2f, GameBalance.DeathFlameBright * (0.52f * amount), 2f, 14);
                         batch.FillCircle(pixel, fracture, 4f, GameBalance.SoulWhite * (0.98f * amount));
