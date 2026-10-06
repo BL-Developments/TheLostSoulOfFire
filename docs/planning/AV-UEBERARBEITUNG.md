@@ -253,6 +253,14 @@ Rahmen wie oben (nur Darstellung und Ton).
   (`kit.paving(..., tilt=)`, Standard unverändert). Pfützen mit eigenem Zufallsstrom und nicht
   unter der Laterne (sie spiegelte sich dort als flache helle Fläche).
 
+- Arena: Ofenlicht und Glut kamen von drei Stellen eines älteren Hintergrundbilds (orange
+  Flecken mitten auf dem Boden); jetzt eine Quelle im gemalten Ofenmund, violett, mit
+  Lichtspill auf den Boden und violetten Funken; kühlt nach der letzten Welle ab.
+- Ton: Je zwei Varianten für Seelenspaltung, Seelenfreigabe, Erscheinen (oft gleichzeitig,
+  phasten sonst), Kanonenschuss, Burning-Detonation und -Ankündigung, Spielertreffer, Währung.
+  CLAP 0,86–0,99 zum Original, höchstens 0,60 zu anderen Tönen; Laufzeit- und Gameplay-
+  Audiotest, `validate_audio.py` (141 Assets), `mix_report.py` (Arena ohne Ausreißer).
+
 **Befunde, offen (nach Wirkung):**
 1. Arena im Spielausschnitt: Boden gleichmäßig hell, wenig Lichtgefälle.
 2. Sprache: Erzähltexte englisch, HUD deutsch (Inhaltsfrage, nicht ohne Owner ändern).

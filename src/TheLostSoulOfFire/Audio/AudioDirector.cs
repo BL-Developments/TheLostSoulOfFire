@@ -300,7 +300,10 @@ public sealed class AudioDirector : IDisposable
                 (AudioCue.ScytheSwing1, "Audio/Sfx/scythe_swing_1_lead"), (AudioCue.ScytheSwing2, "Audio/Sfx/scythe_swing_2"),
                 (AudioCue.ScytheHit, "Audio/Sfx/scythe_hit"), (AudioCue.CoreHit, "Audio/Sfx/core_hit"),
                 (AudioCue.CannonImpact, "Audio/Sfx/cannon_impact"), (AudioCue.EnemyDeath, "Audio/Sfx/enemy_death"),
-                (AudioCue.Dash, "Audio/Sfx/dash"), (AudioCue.HollowSwipe, "Audio/Sfx/hollow_swipe")
+                (AudioCue.Dash, "Audio/Sfx/dash"), (AudioCue.HollowSwipe, "Audio/Sfx/hollow_swipe"),
+                (AudioCue.SoulCleave, "Audio/Sfx/soul_cleave"), (AudioCue.SoulRelease, "Audio/Sfx/soul_release"),
+                (AudioCue.CannonFire, "Audio/Sfx/cannon_fire"), (AudioCue.BurningDetonation, "Audio/Sfx/burning_detonation"),
+                (AudioCue.BurningCharge, "Audio/Sfx/burning_charge"), (AudioCue.PlayerHit, "Audio/Sfx/player_hit")
             })
             {
                 AddDerived(content, cue, asset, 2);
@@ -311,12 +314,15 @@ public sealed class AudioDirector : IDisposable
             AddVariants(content, AudioCue.BurningStep, "Audio/Sfx/step_burning", 4, 180f, 0.06f, 0.15f, 0.8f);
             AddVariants(content, AudioCue.DevourerStep, "Audio/Sfx/step_devourer", 4, 45f, 0.2f, 0.25f, 0.5f);
             Add(content, AudioCue.EnemyEmerge, "Audio/Sfx/enemy_emerge", 60f, 0.5f, 0.4f, 0.4f, rising: true);
+            // Enemies often emerge together; identical takes started at once would phase.
+            AddDerived(content, AudioCue.EnemyEmerge, "Audio/Sfx/enemy_emerge", 2);
             Add(content, AudioCue.UiMove, "Audio/Sfx/ui_move", 1568f, 0.05f, 0.15f, 0.02f);
             Add(content, AudioCue.UiBack, "Audio/Sfx/ui_back", 1046f, 0.06f, 0.15f, 0.02f);
             Add(content, AudioCue.UiOpen, "Audio/Sfx/ui_open", 600f, 0.2f, 0.15f, 0.2f, rising: true);
             Add(content, AudioCue.UiClose, "Audio/Sfx/ui_close", 600f, 0.15f, 0.15f, 0.2f);
             Add(content, AudioCue.ChestOpen, "Audio/Sfx/chest_open", 300f, 0.5f, 0.4f, 0.3f);
             Add(content, AudioCue.CurrencyGain, "Audio/Sfx/currency_gain", 3200f, 0.2f, 0.2f, 0.1f);
+            AddDerived(content, AudioCue.CurrencyGain, "Audio/Sfx/currency_gain", 2);
             Add(content, AudioCue.AbilityHeal, "Audio/Sfx/ability_heal", 392f, 0.8f, 0.3f, 0.1f, rising: true);
             Add(content, AudioCue.AbilityPierce, "Audio/Sfx/ability_pierce", 880f, 0.3f, 0.4f, 0.4f);
             Add(content, AudioCue.AbilityLeap, "Audio/Sfx/ability_leap", 80f, 0.3f, 0.5f, 0.5f);

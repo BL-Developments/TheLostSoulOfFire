@@ -98,6 +98,23 @@ AUTHORED_SFX_DURATIONS = {
     **{f"death_hollow_{index}.wav": 0.9 for index in range(1, 3)},
     **{f"death_burning_{index}.wav": 0.9 for index in range(1, 3)},
     **{f"death_devourer_{index}.wav": 1.4 for index in range(1, 3)},
+    # Variants of further frequent cues (tools/audio/derive_variants.py, Durchgang 3).
+    "soul_cleave_v2.wav": 0.431,
+    "soul_cleave_v3.wav": 0.471,
+    "soul_release_v2.wav": 0.861,
+    "soul_release_v3.wav": 0.942,
+    "enemy_emerge_v2.wav": 0.861,
+    "enemy_emerge_v3.wav": 0.942,
+    "cannon_fire_v2.wav": 0.526,
+    "cannon_fire_v3.wav": 0.576,
+    "burning_detonation_v2.wav": 0.670,
+    "burning_detonation_v3.wav": 0.733,
+    "burning_charge_v2.wav": 0.526,
+    "burning_charge_v3.wav": 0.576,
+    "player_hit_v2.wav": 0.191,
+    "player_hit_v3.wav": 0.209,
+    "currency_gain_v2.wav": 0.478,
+    "currency_gain_v3.wav": 0.524,
     # The Life Flame's fire after the last wave (tools/audio/recipes/ambiences.py), looped.
     "life_flame_loop.wav": 9.0,
 }

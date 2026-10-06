@@ -229,3 +229,26 @@ erste Fassung mit stärkerem Brausen hörte es als Wind und wurde verworfen.
 | Datei | Quelle | Messung |
 | --- | --- | --- |
 | `Audio/Sfx/life_flame_loop.wav` | life-flame Seed 2 | 9.00 s, 1 Kanal, -27.7 LUFS, Spitze -4.0 dBFS, Naht -90 dBFS |
+
+## Varianten weiterer häufiger Töne (Durchgang 3, 06.10.2026)
+
+Abgeleitet mit `tools/audio/derive_variants.py` (Tonhöhe ±4,5 %, Klangneigung, Lautheit wie das Original). CLAP-Ähnlichkeit zum Original 0,86–0,99, zu anderen Tönen höchstens 0,60; zufällig gewählt wie die übrigen Varianten.
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/soul_cleave_v2.wav` | Ableitung von soul_cleave.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.43 s, 1 Kanal, -18.2 LUFS, Spitze -3.1 dBFS |
+| `Audio/Sfx/soul_cleave_v3.wav` | Ableitung von soul_cleave.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.47 s, 1 Kanal, -18.2 LUFS, Spitze -1.7 dBFS |
+| `Audio/Sfx/soul_release_v2.wav` | Ableitung von soul_release.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.86 s, 1 Kanal, -17.2 LUFS, Spitze -3.4 dBFS |
+| `Audio/Sfx/soul_release_v3.wav` | Ableitung von soul_release.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.94 s, 1 Kanal, -17.2 LUFS, Spitze -4.4 dBFS |
+| `Audio/Sfx/enemy_emerge_v2.wav` | Ableitung von enemy_emerge.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.86 s, 1 Kanal, -21.0 LUFS, Spitze -4.1 dBFS |
+| `Audio/Sfx/enemy_emerge_v3.wav` | Ableitung von enemy_emerge.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.94 s, 1 Kanal, -21.0 LUFS, Spitze -4.0 dBFS |
+| `Audio/Sfx/cannon_fire_v2.wav` | Ableitung von cannon_fire.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.53 s, 1 Kanal, -15.3 LUFS, Spitze -2.4 dBFS |
+| `Audio/Sfx/cannon_fire_v3.wav` | Ableitung von cannon_fire.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.58 s, 1 Kanal, -15.3 LUFS, Spitze -1.8 dBFS |
+| `Audio/Sfx/burning_detonation_v2.wav` | Ableitung von burning_detonation.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.67 s, 1 Kanal, -16.1 LUFS, Spitze -1.6 dBFS |
+| `Audio/Sfx/burning_detonation_v3.wav` | Ableitung von burning_detonation.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.73 s, 1 Kanal, -16.1 LUFS, Spitze -2.8 dBFS |
+| `Audio/Sfx/burning_charge_v2.wav` | Ableitung von burning_charge.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.53 s, 1 Kanal, -21.5 LUFS, Spitze -3.0 dBFS |
+| `Audio/Sfx/burning_charge_v3.wav` | Ableitung von burning_charge.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.58 s, 1 Kanal, -21.5 LUFS, Spitze -3.4 dBFS |
+| `Audio/Sfx/player_hit_v2.wav` | Ableitung von player_hit.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.19 s, 1 Kanal, -19.5 LUFS, Spitze -3.1 dBFS |
+| `Audio/Sfx/player_hit_v3.wav` | Ableitung von player_hit.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.21 s, 1 Kanal, -19.5 LUFS, Spitze -3.0 dBFS |
+| `Audio/Sfx/currency_gain_v2.wav` | Ableitung von currency_gain.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.48 s, 1 Kanal, -27.0 LUFS, Spitze -14.4 dBFS |
+| `Audio/Sfx/currency_gain_v3.wav` | Ableitung von currency_gain.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.52 s, 1 Kanal, -27.0 LUFS, Spitze -15.4 dBFS |
