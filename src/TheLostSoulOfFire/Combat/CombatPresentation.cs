@@ -2,6 +2,7 @@ using System;
 using Microsoft.Xna.Framework;
 using TheLostSoulOfFire.Effects;
 using TheLostSoulOfFire.Game;
+using TheLostSoulOfFire.Rendering;
 using TheLostSoulOfFire.Rendering.Visuals;
 
 namespace TheLostSoulOfFire.Combat;
@@ -110,7 +111,12 @@ public sealed class CombatPresentation
         }
     }
 
-    public void PresentScytheImpact(int step, Vector2 direction)
+    /// <summary>
+    /// Feedback of a landed swing at <paramref name="at"/>: hitstop (unchanged timing), a short
+    /// rock of the camera that grows with the step, a push along the blow and light bursting
+    /// from the contact; the Soul Cleave also leans the view in for a moment.
+    /// </summary>
+    public void PresentScytheImpact(int step, Vector2 direction, Vector2 at)
     {
         float hitstop = step switch
         {
@@ -123,18 +129,21 @@ public sealed class CombatPresentation
         switch (step)
         {
             case 1:
-                _screenEffects.AddShake(0.045f, 0.75f);
-                _screenEffects.Flash(0.035f, 0.055f);
+                _screenEffects.AddShake(0.05f, 0.6f);
+                _screenEffects.AddCameraKick(direction, 0.8f);
+                _screenEffects.FlashAt(InAir(at), 0.035f, 0.05f);
                 break;
             case 2:
-                _screenEffects.AddShake(0.075f, 2.2f);
-                _screenEffects.Flash(0.05f, 0.1f);
+                _screenEffects.AddShake(0.08f, 1.8f);
+                _screenEffects.AddCameraKick(direction, 1.8f);
+                _screenEffects.FlashAt(InAir(at), 0.05f, 0.09f);
                 break;
             default:
                 _screenEffects.BeginImpactFrame(0.038f);
-                _screenEffects.AddShake(0.19f, 7.5f);
+                _screenEffects.AddShake(0.2f, 5.5f);
                 _screenEffects.AddCameraKick(direction, 5.5f);
-                _screenEffects.Flash(0.085f, 0.27f);
+                _screenEffects.AddZoomPunch(0.012f);
+                _screenEffects.FlashAt(InAir(at), 0.085f, 0.24f);
                 break;
         }
     }
@@ -156,9 +165,9 @@ public sealed class CombatPresentation
             request.IsFullCharge ? 370f : 185f,
             request.IsFullCharge ? 10f : 5.5f);
         _particles.EmitDeathFlame(origin, request.IsFullCharge ? 13 : 5, request.IsFullCharge ? 1.42f : 0.8f);
-        _screenEffects.AddShake(request.IsFullCharge ? 0.24f : 0.08f, request.IsFullCharge ? 8f : 1.5f);
-        _screenEffects.AddCameraKick(-request.Direction, request.IsFullCharge ? 12f : 3f);
-        _screenEffects.Flash(request.IsFullCharge ? 0.085f : 0.045f, request.IsFullCharge ? 0.28f : 0.1f);
+        _screenEffects.AddShake(request.IsFullCharge ? 0.22f : 0.08f, request.IsFullCharge ? 6f : 1.2f);
+        _screenEffects.AddCameraKick(-request.Direction, request.IsFullCharge ? 11f : 3f);
+        _screenEffects.FlashAt(InAir(origin), request.IsFullCharge ? 0.085f : 0.045f, request.IsFullCharge ? 0.26f : 0.09f);
     }
 
     public void PresentCannonImpact(
@@ -177,12 +186,13 @@ public sealed class CombatPresentation
         _particles.EmitBurst(position, direction, fullCharge ? 30 : 14, color, fullCharge ? 390f : 215f, fullCharge ? 11f : 6f);
         _particles.EmitDeathFlame(position, fullCharge ? 12 : 5, fullCharge ? 1.3f : 0.78f);
         _screenEffects.BeginHitstop(fullCharge ? CombatFeedbackTuning.FullCannonHitstop : CombatFeedbackTuning.NormalCannonHitstop);
-        _screenEffects.AddShake(fullCharge ? 0.25f : 0.09f, fullCharge ? 10.5f : 2.5f);
-        _screenEffects.AddCameraKick(-direction, fullCharge ? 4.5f : 1.5f);
-        _screenEffects.Flash(fullCharge ? 0.095f : 0.05f, fullCharge ? 0.34f : 0.13f);
+        _screenEffects.AddShake(fullCharge ? 0.24f : 0.09f, fullCharge ? 8f : 2f);
+        _screenEffects.AddCameraKick(direction, fullCharge ? 4.5f : 1.5f);
+        _screenEffects.FlashAt(InAir(position), fullCharge ? 0.095f : 0.05f, fullCharge ? 0.32f : 0.12f);
         if (fullCharge)
         {
             _screenEffects.BeginImpactFrame(0.052f);
+            _screenEffects.AddZoomPunch(0.014f);
         }
     }
 
@@ -190,8 +200,8 @@ public sealed class CombatPresentation
     {
         _particles.EmitConvergence(position, 18, 84f, GameBalance.DeathFlameBright, 0.2f, 5f);
         _screenEffects.BeginHitstop(0.035f);
-        _screenEffects.AddCameraKick(-incomingDirection, 2.5f);
-        _screenEffects.Flash(0.045f, 0.11f);
+        _screenEffects.AddCameraKick(incomingDirection, 2.5f);
+        _screenEffects.FlashAt(InAir(position), 0.045f, 0.11f);
     }
 
     public void PresentBurningDetonation(Vector2 position)
@@ -201,8 +211,9 @@ public sealed class CombatPresentation
         _particles.EmitDeathFlame(position, 24, 1.55f);
         _screenEffects.BeginHitstop(CombatFeedbackTuning.BurningDetonationHitstop);
         _screenEffects.BeginImpactFrame(0.058f);
-        _screenEffects.AddShake(0.3f, 12.5f);
-        _screenEffects.Flash(0.11f, 0.4f);
+        _screenEffects.AddShake(0.3f, 10f);
+        _screenEffects.AddZoomPunch(0.018f);
+        _screenEffects.FlashAt(InAir(position), 0.11f, 0.36f);
     }
 
     public void BeginResonance(Vector2 position)
@@ -212,6 +223,9 @@ public sealed class CombatPresentation
         _screenEffects.BeginHitstop(CombatFeedbackTuning.ResonanceSilenceDuration);
         _screenEffects.BeginImpactFrame(0.072f);
     }
+
+    /// <summary>Effects of the air pass are drawn at body height above their position; light bursts from there.</summary>
+    private static Vector2 InAir(Vector2 position) => position - new Vector2(0f, FigureHeights.Air);
 
     public void Clear()
     {
@@ -224,8 +238,9 @@ public sealed class CombatPresentation
         _spriteVfx.Spawn(VisualIds.ResonanceActivate, _resonancePosition, 0f, 0.78f);
         _particles.EmitBurst(_resonancePosition, -Vector2.UnitY, 36, GameBalance.SoulWhite, 345f, 11f);
         _particles.EmitDeathFlame(_resonancePosition, 24, 1.7f);
-        _screenEffects.AddShake(0.34f, 14f);
+        _screenEffects.AddShake(0.34f, 11f);
         _screenEffects.AddCameraKick(Vector2.UnitY, 6f);
-        _screenEffects.Flash(0.13f, 0.48f);
+        _screenEffects.AddZoomPunch(0.022f);
+        _screenEffects.FlashAt(InAir(_resonancePosition), 0.13f, 0.44f);
     }
 }

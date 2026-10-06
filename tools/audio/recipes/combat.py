@@ -1,0 +1,248 @@
+"""Combat layers on top of the approved Ludo bank: what a blow sounds like on each material,
+the wind-ups the enemies had no sound for, and how each enemy dies.
+
+The Ludo cues stay the core of every action. These layers add what they could not carry:
+- a contact transient at sample 0, so the first thing heard lands on the frame of the hit
+  (scythe_hit and player_hit open with 40-55 ms of near silence);
+- the material of the target (porcelain and cloth, ember crust, flesh and void, wood);
+- warnings for the Hollow's and the Devourer's wind-ups, which were silent until the blow.
+
+Mono 48 kHz, peaks below -2 dBFS, short tails; variants come from the seed (author.py --seed).
+"""
+from __future__ import annotations
+
+import numpy as np
+
+import dsp
+from recipes import recipe
+
+
+def _finish(x: np.ndarray, lufs: float, peak: float = -2.0, fade_out: float = 0.03) -> np.ndarray:
+    x = dsp.highpass(x, 28)
+    x = dsp.fades(x, 0.0005, fade_out)
+    return dsp.normalise_loudness(x, lufs, peak_ceiling_db=peak)
+
+
+def _room(x: np.ndarray, rng, seconds: float = 0.5, wet: float = 0.15, damping: float = 4500) -> np.ndarray:
+    ir = dsp.impulse_response(seconds, rng, damping_hz=damping, predelay=0.008)
+    return dsp.reverb(x, ir, wet=wet).mean(axis=1)
+
+
+def _burst(rng, n: int, at: float, low: float, high: float, decay: float, gain: float = 1.0) -> np.ndarray:
+    """Band-limited noise with an instant attack and an exponential decay, placed at `at` seconds."""
+    out = np.zeros(n)
+    start = dsp.seconds(at)
+    m = min(n - start, dsp.seconds(decay * 7))
+    if m <= 0:
+        return out
+    noise = dsp.bandpass(rng.standard_normal(m), low, high)
+    out[start:start + m] = noise * np.exp(-np.arange(m) / (dsp.RATE * decay)) * gain
+    return out
+
+
+def _thump(n: int, start_hz: float, end_hz: float, decay: float, at: float = 0.0) -> np.ndarray:
+    """A pitched body blow: a sine that drops in pitch while it decays (weight without boom)."""
+    out = np.zeros(n)
+    start = dsp.seconds(at)
+    m = n - start
+    t = np.arange(m) / dsp.RATE
+    freq = end_hz + (start_hz - end_hz) * np.exp(-t / (decay * 0.6))
+    out[start:] = np.sin(2 * np.pi * np.cumsum(freq) / dsp.RATE) * np.exp(-t / decay)
+    return out
+
+
+def _grains(rng, n: int, start: float, span: float, count: int, low: float, high: float, gain: float,
+            length: tuple[float, float] = (0.002, 0.008)) -> np.ndarray:
+    """Scattered tiny noise grains (crackle, grit, splinters), thinning out over `span`."""
+    out = np.zeros(n)
+    for _ in range(count):
+        at = dsp.seconds(start + rng.exponential(span / 3))
+        m = dsp.seconds(rng.uniform(*length))
+        if at + m >= n or m < 8:
+            continue
+        grain = dsp.bandpass(rng.standard_normal(m), low, high) * np.hanning(m)
+        out[at:at + m] += grain * rng.uniform(0.25, 1.0) * gain * np.exp(-(at / dsp.RATE - start) / span)
+    return out
+
+
+def _ring(n: int, partials: list[tuple[float, float, float]], rng, at: float = 0.0) -> np.ndarray:
+    """Inharmonic ringing partials (freq, amplitude, decay seconds): ceramic, iron, glass."""
+    out = np.zeros(n)
+    start = dsp.seconds(at)
+    t = np.arange(n - start) / dsp.RATE
+    for freq, amp, decay in partials:
+        f = freq * rng.uniform(0.97, 1.03)
+        out[start:] += np.sin(2 * np.pi * f * t + rng.uniform(0, 6.28)) * amp * np.exp(-t / decay)
+    return out
+
+
+# ---- contact layers by material ---------------------------------------------------------------
+
+@recipe("hit-hollow", "Treffer auf Hollow: dumpfer Schlag in schweren Stoff, hohler Körper, Ascheknistern, ein feiner Porzellanknack")
+def hit_hollow(rng) -> np.ndarray:
+    n = dsp.seconds(0.32)
+    cloth = _burst(rng, n, 0.0, 250, 2600, 0.016, 1.0)
+    body = dsp.resonator(_burst(rng, n, 0.0, 80, 900, 0.01, 1.0), rng.uniform(170, 200), 6) * 0.9
+    body += dsp.resonator(_burst(rng, n, 0.0, 200, 1500, 0.008, 1.0), rng.uniform(380, 440), 7) * 0.5
+    thump = _thump(n, 140, 70, 0.045) * 0.7
+    ash = _grains(rng, n, 0.006, 0.09, int(rng.integers(18, 30)), 2500, 9000, 0.32)
+    porcelain = _ring(n, [(2350, 0.08, 0.025), (3720, 0.06, 0.018), (5480, 0.04, 0.012)], rng, at=rng.uniform(0.004, 0.012))
+    x = cloth + body + thump + ash + porcelain
+    return _finish(_room(x, rng, 0.4, 0.12), -18.0, -2.5)
+
+
+@recipe("hit-burning", "Treffer auf Burning: die verkohlte Kruste bricht, Glut springt knisternd heraus, kurzes Zischen")
+def hit_burning(rng) -> np.ndarray:
+    n = dsp.seconds(0.42)
+    t = dsp.time_axis(n)
+    crust = _burst(rng, n, 0.0, 700, 5200, 0.012, 1.0)
+    crack = _grains(rng, n, 0.0, 0.03, int(rng.integers(10, 16)), 1500, 7000, 0.7, (0.001, 0.004))
+    embers = _grains(rng, n, 0.02, 0.22, int(rng.integers(40, 70)), 2000, 11000, 0.35, (0.0008, 0.003))
+    hiss = dsp.highpass(rng.standard_normal(n), 3500) * np.exp(-((t - 0.07) / 0.06) ** 2) * 0.16
+    thump = _thump(n, 120, 60, 0.04) * 0.6
+    flare = dsp.lowpass(rng.standard_normal(n), 900) * dsp.envelope(n, 0.015, 0.09) * 0.35
+    x = crust + crack + embers + hiss + thump + flare
+    return _finish(_room(x, rng, 0.45, 0.12), -18.0, -2.5)
+
+
+@recipe("hit-devourer", "Treffer auf Devourer: schwerer dumpfer Schlag in Fleisch, ein nasses Nachgeben, darunter ein leeres Grollen")
+def hit_devourer(rng) -> np.ndarray:
+    n = dsp.seconds(0.55)
+    t = dsp.time_axis(n)
+    slap = _burst(rng, n, 0.0, 300, 3000, 0.01, 0.8)
+    meat = dsp.lowpass(_burst(rng, n, 0.0, 40, 700, 0.03, 1.4), 600)
+    thump = _thump(n, 95, 48, 0.09) * 1.1
+    give = dsp.bandpass(rng.standard_normal(n), 250, 1100) * np.exp(-((t - 0.035) / 0.03) ** 2) * 0.35
+    give *= 1 + 0.6 * np.sin(2 * np.pi * rng.uniform(28, 40) * t)
+    void = dsp.lowpass(dsp.brown(n, rng), 140) * dsp.envelope(n, 0.03, 0.3) * 0.5
+    x = slap + meat + thump + give + void
+    return _finish(_room(x, rng, 0.6, 0.14, 3000), -17.0, -2.0, 0.08)
+
+
+@recipe("hit-dummy", "Treffer auf die Übungspuppe: Holz klopft hohl, Stroh raschelt, der Pfahl federt nach")
+def hit_dummy(rng) -> np.ndarray:
+    n = dsp.seconds(0.36)
+    knock = sum(dsp.resonator(_burst(rng, n, 0.0, 100, 3000, 0.003, 1.0), f * rng.uniform(0.95, 1.05), q) * g
+                for f, q, g in ((210, 8, 0.8), (470, 9, 0.5), (960, 10, 0.25)))
+    straw = _grains(rng, n, 0.004, 0.12, int(rng.integers(30, 50)), 2000, 8000, 0.25)
+    sway = _thump(n, 90, 75, 0.12) * 0.25
+    x = _burst(rng, n, 0.0, 400, 4000, 0.006, 0.5) + knock + straw + sway
+    return _finish(_room(x, rng, 0.4, 0.12), -19.0, -3.0)
+
+
+@recipe("hit-heavy", "Schwere Wucht unter Seelenspaltung und voller Kanone: ein tiefer, kurzer Druckstoß ohne Dröhnen")
+def hit_heavy(rng) -> np.ndarray:
+    n = dsp.seconds(0.4)
+    punch = _thump(n, 110, 42, 0.07)
+    air = dsp.lowpass(_burst(rng, n, 0.0, 30, 400, 0.03, 1.0), 300) * 0.8
+    crack = _burst(rng, n, 0.0, 1500, 7000, 0.004, 0.35)
+    x = punch + air + crack
+    return _finish(_room(x, rng, 0.7, 0.16, 2500), -17.0, -2.0, 0.1)
+
+
+@recipe("body-hit", "Spieler getroffen: sofortiger dumpfer Stoß in den Mantel, Stoff schlägt, kurzer Ruck")
+def body_hit(rng) -> np.ndarray:
+    n = dsp.seconds(0.24)
+    coat = _burst(rng, n, 0.0, 200, 3000, 0.018, 1.0)
+    thump = _thump(n, 130, 65, 0.05) * 0.9
+    flap = _grains(rng, n, 0.01, 0.06, int(rng.integers(8, 14)), 800, 4000, 0.3, (0.004, 0.012))
+    x = coat + thump + flap
+    return _finish(_room(x, rng, 0.35, 0.1), -19.0, -2.5)
+
+
+# ---- enemy wind-ups ---------------------------------------------------------------------------
+
+@recipe("hollow-windup", "Hollow holt aus: die Maske knackt, ein rauer, hohler Atemzug durch Porzellan, Stoff spannt sich")
+def hollow_windup(rng) -> np.ndarray:
+    n = dsp.seconds(0.44)
+    t = dsp.time_axis(n)
+    creak = _ring(n, [(1850, 0.12, 0.02), (2900, 0.08, 0.015)], rng) + _burst(rng, n, 0.0, 1500, 6000, 0.004, 0.4)
+    # A rasping inhale: noise through two hollow formants that rise as the arm draws back.
+    rise = np.clip(t / 0.4, 0, 1)
+    breath = rng.standard_normal(n)
+    breath = dsp.swept_bandpass(breath, 520 + 380 * rise, q=4.0) * 0.8 + dsp.swept_bandpass(breath, 1300 + 700 * rise, q=5.0) * 0.4
+    breath *= np.sin(np.pi * np.clip(t / 0.42, 0, 1)) ** 1.3 * (0.6 + 0.4 * rise)
+    rasp = 1 + 0.5 * np.sin(2 * np.pi * (34 + 20 * rise) * t)
+    cloth = dsp.bandpass(rng.standard_normal(n), 900, 5000) * np.exp(-((t - 0.3) / 0.1) ** 2) * 0.2
+    x = creak * 0.6 + breath * rasp + cloth
+    return _finish(_room(x, rng, 0.5, 0.16), -22.0, -4.0, 0.03)
+
+
+@recipe("devourer-windup", "Devourer holt aus: ein tiefes Einsaugen, der Schlund knarrt, gefangene Seelen flüstern ansteigend")
+def devourer_windup(rng) -> np.ndarray:
+    n = dsp.seconds(0.86)
+    t = dsp.time_axis(n)
+    rise = np.clip(t / 0.8, 0, 1)
+    inhale = dsp.swept_bandpass(rng.standard_normal(n), 180 + 420 * rise ** 1.5, q=2.5) * (0.2 + 0.8 * rise) * 0.7
+    groan = np.sin(2 * np.pi * np.cumsum(46 + 20 * rise) / dsp.RATE) * (0.3 + 0.7 * rise) * 0.55
+    groan *= 1 + 0.3 * np.sin(2 * np.pi * 7 * t)
+    groan = dsp.soft_clip(groan * 1.6, 1.2) * 0.6
+    whispers = np.zeros(n)
+    for f in (880, 1170, 1480):
+        whispers += dsp.resonator(rng.standard_normal(n), f * rng.uniform(0.97, 1.03), 18) * 0.05
+    whispers *= rise ** 2
+    strain = _grains(rng, n, 0.2, 0.6, 14, 300, 1800, 0.18, (0.01, 0.03))
+    x = inhale + groan + whispers + strain
+    x *= np.clip((0.86 - t) / 0.05, 0, 1)  # cut just before the blow lands
+    return _finish(_room(x, rng, 0.8, 0.2, 3000), -21.0, -3.0, 0.02)
+
+
+@recipe("burning-rush", "Burning stürmt los: Glut faucht auf, Luft reißt, ein brüllendes Feuerrauschen, das mitläuft")
+def burning_rush(rng) -> np.ndarray:
+    n = dsp.seconds(0.62)
+    t = dsp.time_axis(n)
+    roar = dsp.lowpass(dsp.pink(n, rng), 1600) * dsp.envelope(n, 0.03, 0.45) * 0.9
+    roar *= 1 + 0.35 * dsp.lowpass(rng.standard_normal(n), 25) / 0.15
+    whoosh = dsp.swept_bandpass(rng.standard_normal(n), 2400 - 1600 * np.clip(t / 0.5, 0, 1), q=1.5) * dsp.envelope(n, 0.02, 0.3) * 0.6
+    crackle = _grains(rng, n, 0.0, 0.5, 60, 2000, 10000, 0.3, (0.0008, 0.003))
+    kick = _thump(n, 100, 55, 0.05) * 0.7
+    x = roar + whoosh + crackle + kick
+    return _finish(_room(x, rng, 0.5, 0.12), -19.0, -3.0, 0.08)
+
+
+# ---- deaths ------------------------------------------------------------------------------------
+
+@recipe("death-hollow", "Hollow stirbt: die Maske springt mit hellem Knack, der Stoff fällt in sich zusammen, die Maske klappert auf den Boden")
+def death_hollow(rng) -> np.ndarray:
+    n = dsp.seconds(0.9)
+    t = dsp.time_axis(n)
+    crack = _ring(n, [(2150, 0.3, 0.05), (3380, 0.22, 0.035), (4960, 0.15, 0.025), (7100, 0.08, 0.015)], rng)
+    crack += _burst(rng, n, 0.0, 2000, 9000, 0.005, 0.6)
+    splinters = _grains(rng, n, 0.003, 0.05, 20, 3000, 10000, 0.3, (0.001, 0.003))
+    collapse = dsp.lowpass(rng.standard_normal(n), 1800) * np.exp(-((t - 0.32) / 0.14) ** 2) * 0.45
+    collapse += _thump(n, 90, 55, 0.08, at=0.42) * 0.5
+    clatter = np.zeros(n)
+    for k, at in enumerate((0.48, 0.58, 0.64)):
+        clatter += _ring(n, [(2600, 0.12 / (k + 1), 0.02), (4100, 0.08 / (k + 1), 0.014)], rng, at=at + rng.uniform(-0.01, 0.01))
+    x = crack + splinters + collapse + clatter
+    return _finish(_room(x, rng, 0.7, 0.18), -19.0, -2.5, 0.1)
+
+
+@recipe("death-burning", "Burning erlischt: die Flammen fallen mit einem tiefen Fauchen in sich zusammen, Glut zischt aus, letzte Funken")
+def death_burning(rng) -> np.ndarray:
+    n = dsp.seconds(0.9)
+    t = dsp.time_axis(n)
+    gasp = dsp.lowpass(dsp.pink(n, rng), 1200) * dsp.envelope(n, 0.01, 0.25) * 0.8
+    out = dsp.swept_bandpass(rng.standard_normal(n), 1800 * np.exp(-t / 0.3) + 200, q=1.2) * dsp.envelope(n, 0.02, 0.4) * 0.5
+    hiss = dsp.highpass(rng.standard_normal(n), 4000) * np.exp(-t / 0.35) * 0.15
+    sparks = _grains(rng, n, 0.05, 0.6, 35, 2500, 11000, 0.25, (0.0008, 0.003))
+    settle = _thump(n, 80, 50, 0.07, at=0.35) * 0.4
+    x = gasp + out + hiss + sparks + settle
+    return _finish(_room(x, rng, 0.6, 0.15), -20.0, -3.0, 0.15)
+
+
+@recipe("death-devourer", "Devourer bricht: ein schwerer Fall, das Gefängnis reißt auf, gefangene Seelen steigen als gläserner Chor auf")
+def death_devourer(rng) -> np.ndarray:
+    n = dsp.seconds(1.4)
+    t = dsp.time_axis(n)
+    fall = _thump(n, 90, 38, 0.16) * 1.0 + dsp.lowpass(_burst(rng, n, 0.0, 30, 500, 0.06, 1.2), 400)
+    tear = dsp.swept_bandpass(rng.standard_normal(n), 300 + 1500 * np.clip((t - 0.05) / 0.4, 0, 1), q=2.0)
+    tear *= np.exp(-((t - 0.25) / 0.15) ** 2) * 0.5
+    choir = np.zeros(n)
+    for k, f in enumerate((523.25, 659.25, 783.99, 1046.5)):
+        rise = np.clip((t - 0.25 - k * 0.08) / 0.5, 0, 1)
+        voice = dsp.resonator(rng.standard_normal(n), f * rng.uniform(0.995, 1.005), 60) * 0.06
+        voice += np.sin(2 * np.pi * f * t) * 0.05
+        choir += voice * rise * np.exp(-np.maximum(t - 0.9, 0) / 0.25)
+    x = fall + tear + choir
+    return _finish(_room(x, rng, 1.2, 0.25, 3500), -18.0, -2.0, 0.25)

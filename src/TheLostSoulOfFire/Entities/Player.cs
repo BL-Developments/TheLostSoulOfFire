@@ -459,8 +459,13 @@ public sealed class Player
         }
         InvulnerabilityRemaining = 0.5f;
         screenEffects.BeginHitstop(Health == 0 ? 0.12f : 0.045f);
-        screenEffects.AddShake(Health == 0 ? 0.28f : 0.12f, Health == 0 ? 9f : 5f);
-        screenEffects.Flash(0.09f, Health == 0 ? 0.34f : 0.2f);
+        screenEffects.AddShake(Health == 0 ? 0.28f : 0.12f, Health == 0 ? 7f : 4f);
+        screenEffects.AddCameraKick(knockback, Health == 0 ? 6f : 4f);
+        if (Health == 0)
+        {
+            screenEffects.AddZoomPunch(0.02f);
+        }
+        screenEffects.FlashAt(Position - new Vector2(0f, FigureHeights.Core), 0.09f, Health == 0 ? 0.34f : 0.2f);
     }
 
     public void Heal(int amount)

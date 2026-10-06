@@ -11324,6 +11324,1116 @@
         "status": "angenommen",
         "reason": "Polish-Durchgang: Kampfanimation mit Ausholen, Gewichtsverlagerung, Schritt und Nachschwung (Beine auf IK), an den Spielzeitgeber gekoppelt"
       }
+    },
+    {
+      "id": "d9313a7e7134492e949d02753dcc91f9",
+      "timestamp": "2026-10-06T14:47:09+00:00",
+      "visual_id": "enemy.hollow",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "swipe",
+        "frames": 20,
+        "fps": 24.0,
+        "frame_size": [
+          292,
+          247
+        ],
+        "origin": [
+          0.5,
+          0.8583
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.6,
+        "render_seconds": 51.9
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/enemy.hollow/render/swipe.render.json",
+          "sha256": "ad8eacfede42b39782ef73f8c166332eb126a4ec5bc13a9cab6524cdcce1255a"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/n.png",
+          "sha256": "683269315b744ce1e7e32479dd6f5d5a38aa3f3a54174cffc426450cd068f24f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/n.png",
+          "sha256": "79624b4d3817de215545320ade1476729c6244dca849ba35162fc904863432e5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/ne.png",
+          "sha256": "69fd6082fe55c143f06f6b7fcbb90f3f32ea6a0415e68bc90412c924d6c53f07"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/ne.png",
+          "sha256": "ebedc2763055f1e636ea82141ce82a3ad9a68c0988dabb98f6a77e3950ef48e4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/e.png",
+          "sha256": "2586c0099ef73d8c3cd97f4729f8069f948dcc30ab8b8eba86ca5d1de37de49d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/e.png",
+          "sha256": "5dc8cef47223e7c269417ce12a232684e7d8aeefe8d43f112cf378893ce6eb45"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/se.png",
+          "sha256": "600df0c11d35ee03e85ee99f15b41bcfd504745a261df03caa6efb0aa6371a89"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/se.png",
+          "sha256": "55418796cb2089718353270805dacd8e442026cde55db3463ba398bfd9f16f76"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/s.png",
+          "sha256": "a5950d363e7d6d5385fd4239522d1e44b32106f73cc7d429b9236f5f6aa59306"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/s.png",
+          "sha256": "df04fecad5bc931cbe97a1b961bc46b39604b8e9a3c2ec51472be106dd46f0c1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/sw.png",
+          "sha256": "d284a77eba42000b596b5814a2ca268641e3eceab47bc2ec7c713900e6c5ba2a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/sw.png",
+          "sha256": "1aa8ce03b333daf7a4d7867f34b7a94c84fb58733dcf50269dbf1ed89a617bda"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/w.png",
+          "sha256": "333ed318971132a65c32f3520d413b268732855d0e85d3e5568f8148a0a19ef7"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/w.png",
+          "sha256": "bebc76e37c297a9181d4857c78f4624d441aaf6a8964e5b088320141c687924f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/nw.png",
+          "sha256": "b25335a149241660a0bf37e146c6b03d17dc613af7fa9626b21f9beac2370634"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/nw.png",
+          "sha256": "ed5982376dede71763ce2a152e1b16c3493ca5c86d366fb0ecef140a8527328f"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.85,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Polish-Durchgang: Hollow-Griff mit Bemerken, Ausholen mit Spannung, Schritt und Überstrecken, an Telegraph- und Griffzeitgeber gekoppelt"
+      }
+    },
+    {
+      "id": "83cabacabd7e48afb05ef13b2c4b6a13",
+      "timestamp": "2026-10-06T14:47:09+00:00",
+      "visual_id": "enemy.hollow",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "hit",
+        "frames": 6,
+        "fps": 24.0,
+        "frame_size": [
+          144,
+          239
+        ],
+        "origin": [
+          0.5,
+          0.8787
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.2,
+        "render_seconds": 15.7
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/enemy.hollow/render/hit.render.json",
+          "sha256": "320bbddd75feeffa8b6fdf58e7c906a7014767b6be23bf95723fc6c9b71a3eea"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit/n.png",
+          "sha256": "ed72d81b7f49e4d29f5a074943e8b64792f2b9e8e30f5734aff28d309ca8c4af"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit_normal/n.png",
+          "sha256": "2aa57610334d4a6c850081a4fafcf8efafb4a5db940166c409efd57f37dd3651"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit/ne.png",
+          "sha256": "1f60455bd60392d92b63467144040f9c0cd4fcf04a5c16397a61b6370952e75d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit_normal/ne.png",
+          "sha256": "238df7d8954b17b77731ecc64e9b8f24cdee46f539900efe3027b92e75ef8bc6"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit/e.png",
+          "sha256": "5a0aed66b06fdbb81c73fb7044e19d7a9f735b86f6b6a5a76ee7abbcd1522703"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit_normal/e.png",
+          "sha256": "9a1e69dc19b910594a76212923d86635104a0debf4105b3b871b7205349614c9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit/se.png",
+          "sha256": "7c51256ec53b2ab7728fce7e101a6de9448a4ab1db60bedc3b47bbac3ece3a84"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit_normal/se.png",
+          "sha256": "28f7b078663524efafb50eaa767d1c2bdd45dcf994757f07c061caac886b1812"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit/s.png",
+          "sha256": "c0eab6833374fa327cfd1cc534305155986efaf9895ac9b590c18eebaa7b6217"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit_normal/s.png",
+          "sha256": "f2395b38c2a5152ac3c1d02f0c029dd82aa38857e3421d003b29b703bab24d17"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit/sw.png",
+          "sha256": "5b236e39cd037be1fc85d582bce22ae97dbeb29fe85a9cd6bf54534bfb9c6e0f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit_normal/sw.png",
+          "sha256": "d56e4441096d974bf6bab1d1851153f2cfd0a42e0cc073053c11f52eb5843b5d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit/w.png",
+          "sha256": "3c37042dac0c774fba6f0b447ce548e2c355fc18f45e220601a7f79f32d29836"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit_normal/w.png",
+          "sha256": "e46806124e74d66b7246cf7b96224cc2752fb82d198171073d0a4174f6100995"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit/nw.png",
+          "sha256": "a1662d47b5f66e60ff3c96bb7f1003a5ebb5e03ed52168cbfb6bc2f5eaca58ca"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit_normal/nw.png",
+          "sha256": "46e0aea2164c2e2fdf63eacf24d29903856fefdc17736969c4d833e5ce1deefa"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.17,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Polish-Durchgang: Hollow-Treffer: sofortiger Rückstoß, Arme fliegen"
+      }
+    },
+    {
+      "id": "4ca1aa455c2848e09d1cf02a1e2c4000",
+      "timestamp": "2026-10-06T14:47:10+00:00",
+      "visual_id": "enemy.hollow",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "recover",
+        "frames": 10,
+        "fps": 24.0,
+        "frame_size": [
+          294,
+          248
+        ],
+        "origin": [
+          0.5,
+          0.8548
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.6,
+        "render_seconds": 25.4
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/enemy.hollow/render/recover.render.json",
+          "sha256": "03198e051759e807f51d8df4397de7c07d3387a20a81123d1cbaf214038d4dc3"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover/n.png",
+          "sha256": "5930210cf2ace4e74fd15e0ea0bc094231a9639d32ab7b5d9ad22d8013ab8e62"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover_normal/n.png",
+          "sha256": "498eb1719b5b4c88b8e82fcfd13ce8c54b800f0c5f9ecb9ea7ba7167c00578cd"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover/ne.png",
+          "sha256": "152174d3230d6db09de1bf4a41a8c07ad36974411014bf237fbfbbb26da72c9e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover_normal/ne.png",
+          "sha256": "8763f2ce83d0a1b144b83f8bb5265107357537fe38220ce342b679124b9bceb0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover/e.png",
+          "sha256": "783ac810c47de43c44a971ee282c27fd3462e0a2c028ca27b4429bf404b6cb7d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover_normal/e.png",
+          "sha256": "9f3f46546f84e3d178cdd8914c4c92acba06f2c2201f79b3c6e3ce620c9ee204"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover/se.png",
+          "sha256": "3a06d12db8e2139f584d419571df2a0538a499d7712452fcacff88fcf61e2eb0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover_normal/se.png",
+          "sha256": "c41f95a8cffcd64d7706aabd25528f124b81e49c748f89062d6412cc23fe8f95"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover/s.png",
+          "sha256": "f163aab6d86dd7588ce3c91cc6ccd023a4202c1f9e44c816bc1f2ca599d5dbff"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover_normal/s.png",
+          "sha256": "d78c67be782497c9a9511bad23aeaba57042a4a2a1010e062d12d16474a809ed"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover/sw.png",
+          "sha256": "62928f97e5938c09d88428703b6a22152a108c8f9bd9488c605b3500d8421cd0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover_normal/sw.png",
+          "sha256": "b2da1a9ba6ee170bd2f328333c66b1210a33563a92c0b30324498f1e9486047b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover/w.png",
+          "sha256": "c22ded350dbb7cb1abdeaff874b3ca42e84a83a76f9c88669eed0f708f9af502"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover_normal/w.png",
+          "sha256": "b076a63d2b07f6370690e174e9c6cf3628a01f1f5c37d87ab0d0ed1e4d1de47f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover/nw.png",
+          "sha256": "5c2c68d5cf218eb498994d0bfdc66b0beab6b9c8228277f9269e0c64398adf76"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover_normal/nw.png",
+          "sha256": "0adc0a32e7dc0dc892673031c91f29b3db1627b35152f8225fe214be5c100c79"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.49,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Polish-Durchgang: Hollow-Erholung aus der Überstreckung"
+      }
+    },
+    {
+      "id": "66a955d04615413f8d32822a762d8eb2",
+      "timestamp": "2026-10-06T14:47:12+00:00",
+      "visual_id": "enemy.devourer",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "slam",
+        "frames": 24,
+        "fps": 24.0,
+        "frame_size": [
+          266,
+          294
+        ],
+        "origin": [
+          0.5,
+          0.8878
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.6,
+        "render_seconds": 62.5
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/enemy.devourer/render/slam.render.json",
+          "sha256": "867d5c4374c09b8f5a284f3ba690b69aea88c9831db8aa6d8cf889209ac20e98"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/slam/n.png",
+          "sha256": "1386ca6189584088eff57d9745d703bf2d10e0b51269b9acef7e256205d74925"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/slam_normal/n.png",
+          "sha256": "d22922d31506fb4eb81735bfbcf5b6398b23e45d633bd883681ece3e7a7c9a7b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/slam/ne.png",
+          "sha256": "c94726cf929e29151b18bff5b42b00a53e18b111aa9207d21144975cf2f4669b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/slam_normal/ne.png",
+          "sha256": "1c8f39e9220cd7fc4b702186d21806154bae9af0784fcd7b8a4435c6a62ac03e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/slam/e.png",
+          "sha256": "999b5c3fa0d18636fc3ff7df321ea4881f6ef2723174d87fcaadec6378241d96"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/slam_normal/e.png",
+          "sha256": "6caf8eab3ab9703439829c1fea4c5ca30524d1ea0f2fd56f105dc716dc4011bc"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/slam/se.png",
+          "sha256": "f25bee5aa979aea8f69e6c104a19b41a0adea491f8c1ae9da5f56bba1ea0c6b9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/slam_normal/se.png",
+          "sha256": "65f9c6d4ac3d1d79ac239a5e855c029b3542f24fa189dc2784199e3cff14f33e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/slam/s.png",
+          "sha256": "328d267056a145e9e4589f383e957e4854c995f2104e05ec5b4fd885db4636c7"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/slam_normal/s.png",
+          "sha256": "c45a8e1eb364c9a72889d9bc1601d9832d3ce9d5c4febae56879799c39af5518"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/slam/sw.png",
+          "sha256": "a1bbf486f1838033259a914badd7255cd57cf7d64d2eaeecfb0467ffa877d4be"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/slam_normal/sw.png",
+          "sha256": "8e085aff7759013e4535bafb6d343e4849bf27ebb88420906b6a8537f2727667"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/slam/w.png",
+          "sha256": "409f5ff3abe7132609d15fdeeb34f9a74dd5845b5ef85a76dd89a1560cf6f05e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/slam_normal/w.png",
+          "sha256": "45947855a46df18d23dd2941611152a3a3b33f5019909f834c302e2155f73b43"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/slam/nw.png",
+          "sha256": "61369eb3d5b36032a519c167330824dfc43c5fd6d39d395fcfd5d3bfa1d8fa66"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/slam_normal/nw.png",
+          "sha256": "f4e1ea65cc4ae13db9d0cd58898a9fae8e002688d86806d2f1f1be9118fc2111"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 1.19,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Polish-Durchgang: Devourer-Schlag: Einatmen, Arme über den Kopf mit Stützschritt, Halten, Hammerschlag in den Boden"
+      }
+    },
+    {
+      "id": "320f85c0a2394e008ab2d47471dde8a2",
+      "timestamp": "2026-10-06T14:47:13+00:00",
+      "visual_id": "enemy.devourer",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "recover",
+        "frames": 12,
+        "fps": 24.0,
+        "frame_size": [
+          256,
+          237
+        ],
+        "origin": [
+          0.5,
+          0.8608
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.6,
+        "render_seconds": 34.7
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/enemy.devourer/render/recover.render.json",
+          "sha256": "d7cc8dca3b6875ca620bd0330279c359ab0852e92ad1b7b5d78603f36f491a26"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/recover/n.png",
+          "sha256": "73d9dbc97290d0bec64f119ab769915b69e3444a7685c35e82c65a2e7d55667e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/recover_normal/n.png",
+          "sha256": "99515f71397f10eed93f215e01b05cfec55c516df508e201f9c0a90db4438b1f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/recover/ne.png",
+          "sha256": "f11fd7a02db936dfefb26eee387c9fce87efb0231fc6b1681040cb049a5b9663"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/recover_normal/ne.png",
+          "sha256": "90960b1d8d79d6fa000b65051fa036601884edbea1dbde800109876da5cf071e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/recover/e.png",
+          "sha256": "63f557b9e2d6ed29027924a2c51296825c4b2e0fe1e78dad6d0427b1cb4eb993"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/recover_normal/e.png",
+          "sha256": "308fa11f3998cd9c00d8f3a8fe7f759a56e3b63f131d4d349538878dc5677065"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/recover/se.png",
+          "sha256": "5684492d58764999fa58fabf373d3627282feaf82ed39f1bd2a1a63f27013d3c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/recover_normal/se.png",
+          "sha256": "871eccbdd5d534128ca42ba9f9ab3a9832e62af43610ca3beb240200372545ba"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/recover/s.png",
+          "sha256": "d0f87f29cb89cb37cc26ea2ff768201a9848a60a38ed184ee746e348c272bbb9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/recover_normal/s.png",
+          "sha256": "9828cf7a93f2602195ebd4875a11d53c207d6a6c75435e521d6433df4c007fa6"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/recover/sw.png",
+          "sha256": "7d6152335a3dd5f1b23881260bdba9ddc163b3baf0ee6835aa21a7902cc7563b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/recover_normal/sw.png",
+          "sha256": "41c140ad95168b81048aa3c3a012ec912d9b8c84c3a579ad74cbd98338b6bada"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/recover/w.png",
+          "sha256": "40eae43c44931f1c24431ea991ddf847132288545a33911dea0ef4eb3ff6c235"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/recover_normal/w.png",
+          "sha256": "57b2646ea28fd3290cbfeb9f1f8ae70d6c30790865f96b4aea0c72220cef69da"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/recover/nw.png",
+          "sha256": "c9cb547f61589e1cbe7583c4da7fa6eb17f92c605244a6ea2bfec6c9ca12873c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/recover_normal/nw.png",
+          "sha256": "ed00c06e80e3405bf0906122298b8af32bc92e39508fa9d4062c3d85a15f40ab"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.47,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Polish-Durchgang: Devourer-Erholung: aus dem Schlag hochstemmen"
+      }
+    },
+    {
+      "id": "e7644a95e7d54bf5b6d6e032be264dee",
+      "timestamp": "2026-10-06T14:47:13+00:00",
+      "visual_id": "enemy.devourer",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "hit",
+        "frames": 6,
+        "fps": 24.0,
+        "frame_size": [
+          182,
+          236
+        ],
+        "origin": [
+          0.5,
+          0.8729
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.6,
+        "render_seconds": 17.0
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/enemy.devourer/render/hit.render.json",
+          "sha256": "7e2ee978f1d839c9c1ecc8c271d416f78b14828433eb8e9023fa4d2f55a06670"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/hit/n.png",
+          "sha256": "52836f697ef45fdd7d5c9de7c3f4d7ce53e796c830477b28612a5e069bf0b4bb"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/hit_normal/n.png",
+          "sha256": "1ba8968fd45f00fdb2a9b7b2539e67f17de08fd28ef59d69c7d235704e00ba77"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/hit/ne.png",
+          "sha256": "ec8120290a569e815d37e1fc4fe3de7ac19a63d77743774fdf4680692eaadc90"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/hit_normal/ne.png",
+          "sha256": "37bbdbd83dbae258b903bf391b363ea39ff4e94e14dea2e74947ae7bfe12cbd8"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/hit/e.png",
+          "sha256": "f90224c649d28aa7890779e9d65b858869435cd3a578db6e5a42e43afcbf2eb0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/hit_normal/e.png",
+          "sha256": "0b8374199875895d297dcb7f014a2072a470fb8a4e48930b0770c56ac2cba10a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/hit/se.png",
+          "sha256": "c3ec3c2b1ba53fac6f4721af965d8991a797b741c876c54eaa58589040991573"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/hit_normal/se.png",
+          "sha256": "5a360cc1ccc1a1c200b4c5f45da2cb0eca0aa842192bd545b10358b1431262ce"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/hit/s.png",
+          "sha256": "60deae574cad017ed228cf0cb7b6808c03e36aecd01f9b970ff9cf6acb7bfba0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/hit_normal/s.png",
+          "sha256": "866267dac4ee4e2a9e93da6813c9a259c7ce4b0fa7bb835235410e7607436f42"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/hit/sw.png",
+          "sha256": "f6fb7dc285a2000cda3f954432002d957d2953a436fd6f68a90f60bd0823f2ac"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/hit_normal/sw.png",
+          "sha256": "5ff615a0df39eedfad69e09444c5905d02737a2006d72dcdcd0ec40d44cae9b9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/hit/w.png",
+          "sha256": "6d8e6c24eb6e5282794474ee226fe9cc7b2efe78d451ba7f07f7edb9755b532f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/hit_normal/w.png",
+          "sha256": "a9b36d0e163a75a3c91e7696307a91f09e778c3037400c4d815e3a51d3e98c4f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/hit/nw.png",
+          "sha256": "49e724de35dfd705b25ccc3f1a25afadd43cf4d191c165d983de91a019e01eb1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/hit_normal/nw.png",
+          "sha256": "86b38589f805b792b49206e52bfb500276d5387d3fff495b80a38a0a7ab459ad"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.2,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Polish-Durchgang: Devourer-Treffer: schweres Zurückwippen"
+      }
+    },
+    {
+      "id": "cac23d34602442a6829d4d4b55ddab35",
+      "timestamp": "2026-10-06T14:47:14+00:00",
+      "visual_id": "enemy.burning",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "telegraph",
+        "frames": 14,
+        "fps": 24.0,
+        "frame_size": [
+          176,
+          194
+        ],
+        "origin": [
+          0.5,
+          0.8918
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.6,
+        "render_seconds": 38.0
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/enemy.burning/render/telegraph.render.json",
+          "sha256": "e467212c426583f654faeb67ce1e61881a7b7654667924a2519d29c9bb1e4be7"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/telegraph/n.png",
+          "sha256": "5382d07a6427522c5c89cdd4e13a041e9d463857a1f11c2ce9668faca9953ef3"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/telegraph_normal/n.png",
+          "sha256": "94fc2bc823ff94a72e31f9277e3f7a1f2150f34ce5ed2c3a02e61221babc18cd"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/telegraph/ne.png",
+          "sha256": "10ce1aa4a00e33efffc6a414ef98087c1bb530c1c6e6424ee9e86077c349dc1e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/telegraph_normal/ne.png",
+          "sha256": "50cfb42ac43089d1bddfb593288dfab9a17cab797ba1aed23006a2e56cacd0af"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/telegraph/e.png",
+          "sha256": "2fe7c4c32cb0bcfdada6fd77a2273ebc68a5574921968ce68d275ad9de0d885f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/telegraph_normal/e.png",
+          "sha256": "ba9f5dd0bc935f9771ec76e2b38dd046e1a0d9a6f33dc8b5f0a016a58c2ce1dd"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/telegraph/se.png",
+          "sha256": "d7ee97f924e26abc4a84375158b2c0bc713483e608a864d10955d6c2b3168bd4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/telegraph_normal/se.png",
+          "sha256": "2d60f5af337b464229855be7aeca3d0e743e9fdd21bb9d0e45eeaf39a7f5ba6f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/telegraph/s.png",
+          "sha256": "a0024b42dd3bda3986a064b2695889ed779d8bb48d0f7f3ee1d197a77729b658"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/telegraph_normal/s.png",
+          "sha256": "f35a8f9aaa1e8d83bb08a83a2f867a716c274a45141c72eb9457b58608b1d835"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/telegraph/sw.png",
+          "sha256": "44c9dec5b5f62a660797c2718207ae9d47f688376f6186a8e62e8b09c6544a47"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/telegraph_normal/sw.png",
+          "sha256": "696d7a3bc6accd099abe382a83df517be5fff4ca3228a1c8898ec21c85c07f44"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/telegraph/w.png",
+          "sha256": "55d39e02641c417a4b20137c1b77e49bae55d78f509bc0173ec9ada268f8bbaf"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/telegraph_normal/w.png",
+          "sha256": "ad604097804995407d12b01add64d777c503a21c98fec7d6d503680120593b5e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/telegraph/nw.png",
+          "sha256": "65d0f0f127a06d23ae446985b266c2715c86b4ac806bf9fad782e9cc0e707a11"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/telegraph_normal/nw.png",
+          "sha256": "f372ed75651937a14afbcae162bdfa4c48af08e0b9f7ddca5df1abcbcefa8138"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.34,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Polish-Durchgang: Burning-Ankündigung: Atem und Aufflammen, Scharren, Sprinterhocke mit Zittern"
+      }
+    },
+    {
+      "id": "8db186f3c37b45869ef0ca3b3d756ab1",
+      "timestamp": "2026-10-06T14:47:15+00:00",
+      "visual_id": "enemy.burning",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "charge",
+        "frames": 10,
+        "fps": 30.0,
+        "frame_size": [
+          202,
+          186
+        ],
+        "origin": [
+          0.5,
+          0.871
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.6,
+        "render_seconds": 28.8
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/enemy.burning/render/charge.render.json",
+          "sha256": "b1f2d513c82c7788175bf53ceab2bd339a949adfd2844a53c9338215d63f3d7b"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/charge/n.png",
+          "sha256": "c6d403b06308747f00c96562d3e15f36e912db58015f2d2333cce17a57b284c8"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/charge_normal/n.png",
+          "sha256": "ab2d1c30cb194930b4fa2df999422abcb020c44ceec71da4961cedb5d2c6d5b0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/charge/ne.png",
+          "sha256": "aa71db699f2cf61c36741d861a53bbda8878b32524cf75646f571ddd4f0037dc"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/charge_normal/ne.png",
+          "sha256": "80dab7554cb733399ca467be6e44a94ee3d21d11a92cb78fc43f2c70a9e9214e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/charge/e.png",
+          "sha256": "3ca2678d4759b0f2aa30d4e288b46634ebcd3b086012de9ba86d2e553ae310b5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/charge_normal/e.png",
+          "sha256": "abbbaac9ea2452ad7d63c0e85316b64217a280426e0c413e660c850ab1c5b847"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/charge/se.png",
+          "sha256": "8139b62550d54081e11a48b65ac291137a27a0c8473e1fd9c9999bed3af7fd3d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/charge_normal/se.png",
+          "sha256": "8cf3ddfae66086af59fc8de9034f8f063ebdb84d9288c7634d6fb06f2de58986"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/charge/s.png",
+          "sha256": "7b9dc0d5bc1842d5c3e78066bf8c70304532667deeda29b1b320c75bf9a5f5a4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/charge_normal/s.png",
+          "sha256": "f9d53e9dfecff34e46e3fab33dddc37b487c28be4260e01d5aa626882413e507"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/charge/sw.png",
+          "sha256": "6c6f9d4948a5e7092cf9d9bbb438ebdaaaeb872103dcdc7a6658e5973d3484de"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/charge_normal/sw.png",
+          "sha256": "445f31d07306ab91ed583aa74e9a1c61665006bf9540059a812049536e5a9536"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/charge/w.png",
+          "sha256": "5d84511bfc7ec85eb7d0130ff98dda6f6c783d7fc6a3e984b25afb96996df1f1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/charge_normal/w.png",
+          "sha256": "fd6b59e22efcf8479da0a06de7a5cd19fd6ebb781e9be7fb42d3b386403ac8b0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/charge/nw.png",
+          "sha256": "72afcc4f7dfa8ea02d9868631cb851e4ed5af6ccc73d84516e7fe897d8a64466"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/charge_normal/nw.png",
+          "sha256": "f208c62f844e0c48a7038d545d9ddc443f642da384817dd43ae3ae427d39a6f6"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.31,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Polish-Durchgang: Burning-Anlauf: langer Schritt mit Flugphase, Fäuste pumpen"
+      }
+    },
+    {
+      "id": "ae6a6678657d47c3ae704f1bd2497745",
+      "timestamp": "2026-10-06T14:47:16+00:00",
+      "visual_id": "enemy.burning",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "recover",
+        "frames": 12,
+        "fps": 24.0,
+        "frame_size": [
+          148,
+          188
+        ],
+        "origin": [
+          0.5,
+          0.8617
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.6,
+        "render_seconds": 32.5
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/enemy.burning/render/recover.render.json",
+          "sha256": "e189a2666c4fabf93540ddf43fcd5716fcaea57d8ba3b0c3103844e48b117d81"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/recover/n.png",
+          "sha256": "816f713f09cfabe935d4d3ffa652d84a5c412f6fddf41bf2515bccd45809464e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/recover_normal/n.png",
+          "sha256": "ecc246961e086c08a95386aefc582bd7aa3bddfa78c7537d7f055aad013189c6"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/recover/ne.png",
+          "sha256": "29a45203ff1b8ee55c9ef176e6fb1a56916dac7c54482f83422af37cf7154d13"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/recover_normal/ne.png",
+          "sha256": "d812f5987d80f53493ed55e6b78da97db6ffb3436e2ff9be0b9402ef54476f2f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/recover/e.png",
+          "sha256": "a7a61fa8b00779431427db22f81616d73202f73d28ccce1fe21f7ede9fb8b22b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/recover_normal/e.png",
+          "sha256": "b70f88d9e394493e33a6e8a31f0abca30e44ed480f869c53264be769ef6d6555"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/recover/se.png",
+          "sha256": "8e66b4925148c42edc8f71f783360c7e6898304b9947fd3e050306b3c399174d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/recover_normal/se.png",
+          "sha256": "b277dbbe55fae04f86ca3404456e6a1c125c1101c956e4a31b6a546ac2d2628e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/recover/s.png",
+          "sha256": "27b81e950736a5500168dcfe11c4f621c4bf66228775111f302b080c0e0efd34"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/recover_normal/s.png",
+          "sha256": "fbe382045a2aa5ee38845e5b1863958cabd8572fb769c6c048710a1fb5d28846"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/recover/sw.png",
+          "sha256": "f17cf7fbb46fcf138b01de3209d4e693c6a2c8ec8482d2e2d1cc108e72e57313"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/recover_normal/sw.png",
+          "sha256": "dbb2fa62db361c98676c5be07d1e8d864754309b1ee895a32c8e5881f94bf2fa"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/recover/w.png",
+          "sha256": "77bc86428f30186bdda47b145b8210e9600137cd0bd00bfe47a4118f2950fe76"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/recover_normal/w.png",
+          "sha256": "81c180194003e7826548f727c3ef5c46759bac0037e8a8a1b8ae4031a0ac4774"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/recover/nw.png",
+          "sha256": "40daff18702dfde082945e45978e0b5cf5d48cfd74b5b93a6e17b92615a23926"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/recover_normal/nw.png",
+          "sha256": "1231d21788f34ca090014e75623ac437cb0e62a68634e59b518562afd40f4362"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.24,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Polish-Durchgang: Burning-Erholung: Bremsen, Keuchen auf den Knien, Aufrichten"
+      }
+    },
+    {
+      "id": "2fdc02b652754d8bb9e94f4d656cfab2",
+      "timestamp": "2026-10-06T14:47:16+00:00",
+      "visual_id": "enemy.burning",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "hit",
+        "frames": 6,
+        "fps": 24.0,
+        "frame_size": [
+          136,
+          196
+        ],
+        "origin": [
+          0.5,
+          0.8776
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.6,
+        "render_seconds": 16.1
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/enemy.burning/render/hit.render.json",
+          "sha256": "4b8d9e25d0ad46c84702eb50c745e1a6c050761e890c5f4d71502e2758102003"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/hit/n.png",
+          "sha256": "30ea4edd199870a37e94fc28d193aab8b2e431e47e0b5db2f2c0b93cfd756c2b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/hit_normal/n.png",
+          "sha256": "4b6f48f369e0813dc138b6fff8ff017f642d5532f17a4690f2e2a65e9cbeb8a3"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/hit/ne.png",
+          "sha256": "4b5e63a4df6d4f6c4a47c99261dcc2d1867f2e27eb08e50162d7b55345150161"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/hit_normal/ne.png",
+          "sha256": "7b13abf456b7f183e2249a1729e6b2f0115f34f25e40a1762880c4f0c972353f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/hit/e.png",
+          "sha256": "08ce937e98379fa0fc04668c4ac5c3a7de1c8ecf0b86daf563b6cb7275157e80"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/hit_normal/e.png",
+          "sha256": "3bbabb204aea214484d5f975e070ddcc00526c63b0629ec8fd28c01c5b4c5e6b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/hit/se.png",
+          "sha256": "b7b4036d1886f33c2dfd3628366bd51246d25056c84d3a8331b28595c8a7ba65"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/hit_normal/se.png",
+          "sha256": "a5b891d91968edebda34b8f93ee06f8d9effdfc03441c2852c6c678aec914de0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/hit/s.png",
+          "sha256": "0612ed164f155797989925aa32df6b7223bfea72160c1b325fbc613a2d027e47"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/hit_normal/s.png",
+          "sha256": "0c23804c2351658d80994bf60a7e9f0083086a11c76313cc7c57e5d13688b86c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/hit/sw.png",
+          "sha256": "c16b7358476a9af4827ffe3bc8fb9b62e3bd28883b357d909d893af9be650f79"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/hit_normal/sw.png",
+          "sha256": "144d0d21997d77e221a29144f25cddcb8e7132b76b891fd4e6c167a61071d60a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/hit/w.png",
+          "sha256": "7c490e43dada930477bca59487109114af3d01073a8ddea0e828e1836a3b9616"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/hit_normal/w.png",
+          "sha256": "a89aa2a0317ab4d2b8c0ead96c5f25794fc1533d0628cb11ad78c3332852afed"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/hit/nw.png",
+          "sha256": "43816bf31f39217298798dbc4a95c34be07489b81d5115452837b65198c67312"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Burning/Rendered/hit_normal/nw.png",
+          "sha256": "191ca7cac17d225b4fad8d5ffed6fecc940db5781f0d441e76b2a5906343433c"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.12,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Polish-Durchgang: Burning-Treffer: aus der Spannung geworfen"
+      }
     }
   ]
 }

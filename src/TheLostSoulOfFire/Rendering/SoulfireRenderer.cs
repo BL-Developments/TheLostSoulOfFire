@@ -179,6 +179,9 @@ public sealed class SoulfireRenderer : IDisposable
             0f);
     }
 
+    /// <summary>The soft dark frame of the vignette (premultiplied black toward the edges).</summary>
+    public Texture2D VignetteTexture => _vignetteTexture;
+
     public void DrawVignette(SpriteBatch batch, Viewport viewport, float soulSenseAmount, bool resonanceActive)
     {
         float opacity = SoulfireRenderSettings.VignetteOpacity +

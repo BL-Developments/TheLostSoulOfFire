@@ -27,6 +27,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from figure_kit import (  # noqa: E402
     FINGERS, THUMB, Poser, add_outline, attach, cloth_shell, dominant_bone, ease, enable_mpfb, flat, ground_feet,
     ground_points, loose_fists, outline_material, rest_ground, shaped_coordinates, toon)
+from combat_kit import (  # noqa: E402
+    Feet, Keys, add_leg_ik, finish_rekey, fit_pelvis, key_legs, measure_axes, move_pelvis, replace_action, smooth,
+    step_arc, window)
 
 CHAR = (0.030, 0.026, 0.032)
 EMBER = (0.55, 0.22, 1.0)
@@ -36,6 +39,7 @@ LEATHER = (0.06, 0.04, 0.035)
 
 def parse(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(prog="build_burning.py")
+    parser.add_argument("--rekey", help="comma-separated actions to key again on the opened .blend (no rebuild)")
     parser.add_argument("--out", type=Path, required=True)
     return parser.parse_args(argv[argv.index("--") + 1:] if "--" in argv else [])
 
@@ -308,87 +312,142 @@ def key_move(poser: Poser, frames: int) -> bpy.types.Action:
     return action
 
 
+TELEGRAPH_KEYS = Keys([
+    # A sharp breath: it rears up a little, chest open, and every flame flares.
+    (0.00, dict(crouch=4, lean=0, rear=0.0, head=0, fists=0.0, glow=1.2, flame=1.0, sink=0.0, scrape=0.0)),
+    (0.14, dict(crouch=-6, lean=-8, rear=0.0, head=-8, fists=0.15, glow=2.6, flame=1.35, sink=-0.03, scrape=0.0)),
+    # It drops into a sprinter's crouch, the right foot pawing back once, fists drawn back.
+    (0.40, dict(crouch=14, lean=12, rear=0.6, head=6, fists=0.6, glow=2.4, flame=1.2, sink=0.05, scrape=1.0)),
+    (0.62, dict(crouch=20, lean=18, rear=0.8, head=10, fists=0.85, glow=3.0, flame=1.35, sink=0.08, scrape=0.0)),
+    # Loaded: the lowest point, trembling, flames streaming back.
+    (1.00, dict(crouch=26, lean=24, rear=1.0, head=12, fists=1.0, glow=3.8, flame=1.5, sink=0.11, scrape=0.0)),
+])
+
+
+def burning_arms(poser: Poser, fists: float) -> None:
+    """Fists from the ready guard to drawn back past the hips."""
+    for side in ("l", "r"):
+        poser.aim(f"upperarm_{side}", poser.world(0.14 - 0.75 * fists, 1.0, 0.28 + 0.12 * fists, side))
+        poser.aim(f"lowerarm_{side}", poser.world(0.9 - 0.6 * fists, 0.35 + 0.4 * fists, 0.05, side))
+    loose_fists(poser, 100)
+
+
 def key_telegraph(poser: Poser, frames: int) -> bpy.types.Action:
-    """Standstill before the run (0.62 s): it sinks deep, pulls its fists back, lowers the head;
-    the cracks and tongues flare up as the telegraph."""
-    action = bpy.data.actions.new("telegraph")
-    poser.rig.animation_data.action = action
-    ground = rest_ground(poser.rig)
+    """Standstill before the run (0.62 s): a sharp breath that flares every flame, then it drops
+    into a sprinter's crouch, paws the floor back once with the right foot and coils, fists
+    drawn, trembling at the lowest point; the cracks burn brighter all the while."""
+    action = replace_action(poser.rig, "telegraph")
+    keys = TELEGRAPH_KEYS
+    w = 0.179
     for frame in range(frames):
-        t = ease(frame / (frames - 1))
+        p = frame / (frames - 1)
         poser.clear()
-        stance(poser, crouch=4 + 18 * t, lean=10 * t)
-        poser.set("head", "forward", 10 * t)
-        poser.set("thigh_l" if poser.left > 0 else "thigh_r", "forward", 12 * t)
-        ground_feet(poser, ground)
-        for side in ("l", "r"):
-            poser.aim(f"upperarm_{side}", poser.world(0.14 - 0.6 * t, 1.0, 0.3 + 0.1 * t, side))
-            poser.aim(f"lowerarm_{side}", poser.world(0.9 - 0.4 * t, 0.4 + 0.3 * t, 0.05, side))
-        loose_fists(poser, 100)
+        stance(poser, crouch=keys("crouch", p), lean=keys("lean", p))
+        poser.set("head", "forward", keys("head", p))
+        planter = Feet(poser)
+        # The rear foot paws back across the floor, then sets far back like a starting block.
+        rear_y = -0.128 + 0.10 * keys("rear", p)
+        paw = 0.04 * math.sin(math.pi * min(1.0, max(0.0, (p - 0.22) / 0.28)))
+        planter.plant("r", Vector((-w * poser.left, rear_y, 0.0)), yaw=6 * keys("rear", p), heel=34 * keys("rear", p), lift=paw)
+        planter.plant("l", Vector((w * poser.left, -0.16, 0.0)), yaw=-6 * keys("rear", p), heel=0.0)
+        move_pelvis(poser, Vector((0.0, -0.03 * keys("rear", p), -keys("sink", p))))
+        fit_pelvis(poser, reach=0.95)
+        planter.settle()
+        burning_arms(poser, keys("fists", p))
         poser.key(frame + 1)
-        tremble = 0.15 * math.sin(frame * 2.7)
-        key_glow(poser, frame + 1, 1.2 + 2.6 * t + tremble, 1.0 + 0.45 * t)
+        key_legs(poser.rig, frame + 1, 1.0)
+        tremble = 0.25 * window(p, 0.6, 1.0) * math.sin(frame * 2.7)
+        key_glow(poser, frame + 1, keys("glow", p) + tremble, keys("flame", p) + 0.05 * tremble)
     return action
 
 
 def key_charge(poser: Poser, frames: int) -> bpy.types.Action:
-    """The explosive sprint, leaning hard into it, fists back, full stride (loop)."""
-    action = bpy.data.actions.new("charge")
-    poser.rig.animation_data.action = action
+    """The explosive sprint (loop): leaning hard into it, long strides with a real flight phase,
+    fists pumping low, head down like a ram, the flames streaming back."""
+    action = replace_action(poser.rig, "charge")
     ground = rest_ground(poser.rig)
     for frame in range(frames + 1):
         phase = frame / frames * math.tau
         poser.clear()
-        stance(poser, crouch=0, lean=26)
+        stance(poser, crouch=0, lean=30 + 3 * math.sin(phase * 2))
         poser.set("spine_01", "forward", 16)
+        poser.set("head", "forward", 8)
+        poser.turn("spine_02", 6 * math.sin(phase))
         for side, offset in (("l", 0.0), ("r", math.pi)):
             leg = phase + offset
-            poser.set(f"thigh_{side}", "forward", 40 * math.sin(leg) + 10)
+            poser.set(f"thigh_{side}", "forward", 46 * math.sin(leg) + 12)
             lift = max(0.0, math.cos(leg + 0.25)) ** 1.4
-            poser.set(f"calf_{side}", "back", 24 + 80 * lift)
-        ground_feet(poser, ground, settle=0.35)
-        for side in ("l", "r"):
-            poser.aim(f"upperarm_{side}", poser.world(-0.7, 0.8, 0.25, side))
-            poser.aim(f"lowerarm_{side}", poser.world(-0.6, 0.7, 0.15, side))
+            poser.set(f"calf_{side}", "back", 26 + 88 * lift)
+        ground_feet(poser, ground, settle=0.3)
+        for side, offset in (("l", math.pi), ("r", 0.0)):
+            pump = math.sin(phase + offset)
+            poser.aim(f"upperarm_{side}", poser.world(-0.55 + 0.45 * pump, 0.8, 0.25, side))
+            poser.aim(f"lowerarm_{side}", poser.world(-0.3 + 0.8 * pump, 0.6, 0.12, side))
         loose_fists(poser, 100)
         poser.key(frame + 1)
-        key_glow(poser, frame + 1, 3.6 + 0.4 * math.sin(phase * 2), 1.35)
+        key_legs(poser.rig, frame + 1, 0.0)
+        key_glow(poser, frame + 1, 3.6 + 0.4 * math.sin(phase * 2), 1.4 + 0.05 * math.sin(phase * 2))
     return action
 
 
 def key_recover(poser: Poser, frames: int) -> bpy.types.Action:
-    """After a missed or broken run (1.0 s): it skids upright, staggers, heaves, the glow sinks."""
-    action = bpy.data.actions.new("recover")
-    poser.rig.animation_data.action = action
-    ground = rest_ground(poser.rig)
+    """After a missed or broken run (1.0 s): it brakes, skidding on its heels and leaning back,
+    doubles over heaving with its hands on its knees, then straightens; the glow sinks."""
+    action = replace_action(poser.rig, "recover")
+    keys = Keys([
+        (0.00, dict(crouch=18, lean=-16, back=10, hands=0.0, glow=3.0, flame=1.3, skid=1.0)),
+        (0.15, dict(crouch=22, lean=-10, back=6, hands=0.3, glow=2.6, flame=1.25, skid=0.6)),
+        (0.40, dict(crouch=20, lean=26, back=0, hands=1.0, glow=1.9, flame=1.1, skid=0.0)),
+        (0.70, dict(crouch=14, lean=22, back=0, hands=1.0, glow=1.4, flame=1.05, skid=0.0)),
+        (1.00, dict(crouch=4, lean=2, back=0, hands=0.0, glow=1.0, flame=1.0, skid=0.0)),
+    ])
+    w = 0.179
     for frame in range(frames):
-        t = frame / (frames - 1)
-        settle = ease(t)
-        heave = math.sin(t * math.tau * 2) * (1 - t)
+        p = frame / (frames - 1)
+        heave = math.sin(p * math.tau * 2.5) * window(p, 0.3, 0.45) * (1 - window(p, 0.75, 1.0))
         poser.clear()
-        stance(poser, crouch=10 * (1 - settle), lean=-14 * (1 - settle) + 6 * heave)
-        poser.set("spine_02", "back", 8 * (1 - settle))
-        ground_feet(poser, ground)
-        fists_close(poser, forward=0.1 + 0.25 * settle, out=0.45 - 0.2 * settle, bend=0.5 + 0.4 * settle)
+        stance(poser, crouch=keys("crouch", p), lean=keys("lean", p) + 5 * heave)
+        poser.set("spine_02", "back", keys("back", p))
+        planter = Feet(poser)
+        skid = keys("skid", p)
+        # Braking: the front foot ahead on its heel, the rear foot dragging; then feet together.
+        planter.plant("l", Vector((w * poser.left, -0.128 - 0.22 * skid, 0.0)), heel=-18 * skid)
+        planter.plant("r", Vector((-w * poser.left, -0.128 + 0.06 * skid, 0.0)), heel=10 * skid)
+        move_pelvis(poser, Vector((0.0, 0.04 * skid, -0.03 * keys("hands", p))))
+        fit_pelvis(poser, reach=0.95)
+        planter.settle()
+        hands = keys("hands", p)
+        for side in ("l", "r"):
+            # Arms thrown back for balance while braking, then hands braced on the knees.
+            braced = poser.world(0.55, 1.0, 0.1, side)
+            thrown = poser.world(-0.4, 0.7, 0.55, side)
+            ready = poser.world(0.14, 1.0, 0.28, side)
+            upper = thrown.lerp(braced, hands).lerp(ready, window(p, 0.75, 1.0)).normalized()
+            poser.aim(f"upperarm_{side}", upper)
+            poser.aim(f"lowerarm_{side}", (upper + poser.world(0.6, 0.2, -0.2, side) * (1 - hands * 0.6)).normalized())
+        loose_fists(poser, 90)
         poser.key(frame + 1)
-        key_glow(poser, frame + 1, 3.0 - 2.0 * settle, 1.3 - 0.3 * settle)
+        key_legs(poser.rig, frame + 1, 1.0)
+        key_glow(poser, frame + 1, keys("glow", p) + 0.2 * heave, keys("flame", p))
     return action
 
 
 def key_hit(poser: Poser, frames: int) -> bpy.types.Action:
-    action = bpy.data.actions.new("hit")
-    poser.rig.animation_data.action = action
+    """Hit: knocked back off its coil, embers jumping out of the cracks, then it hunches again."""
+    action = replace_action(poser.rig, "hit")
     ground = rest_ground(poser.rig)
     for frame in range(frames):
-        k = (1.0 - frame / (frames - 1)) ** 1.3
+        p = frame / (frames - 1)
+        k = math.exp(-p * 3.0) * (1.0 - p) ** 0.6
         poser.clear()
-        stance(poser, crouch=6 * k, lean=-16 * k)
-        poser.set("head", "back", 14 * k)
-        poser.turn("spine_03", 12 * k)
+        stance(poser, crouch=8 * k, lean=-22 * k)
+        poser.set("head", "back", 18 * k)
+        poser.turn("spine_03", 14 * k)
         ground_feet(poser, ground)
-        fists_close(poser, forward=0.35 - 0.3 * k, out=0.25 + 0.3 * k)
+        fists_close(poser, forward=0.35 - 0.4 * k, out=0.25 + 0.35 * k)
         poser.key(frame + 1)
-        key_glow(poser, frame + 1, 1.0 + 1.6 * k, 1.0 + 0.2 * k)
+        key_legs(poser.rig, frame + 1, 0.0)
+        key_glow(poser, frame + 1, 1.0 + 2.2 * k, 1.0 + 0.3 * k)
     return action
 
 
@@ -456,8 +515,9 @@ def main() -> None:
     toe = (rig.matrix_world @ rig.data.bones["ball_l"].tail_local) - (rig.matrix_world @ rig.data.bones["foot_l"].head_local)
     poser = Poser(rig, Vector((0, toe.y, 0)).normalized())
     poser.measure_rest([f"{bone}_{side}" for bone in FINGERS + THUMB for side in ("l", "r")], "down")
-    actions = [key_idle(poser, 8), key_move(poser, 10), key_telegraph(poser, 8), key_charge(poser, 6),
-               key_recover(poser, 8), key_hit(poser, 4), key_death(poser, 8)]
+    add_leg_ik(rig)
+    actions = [key_idle(poser, 8), key_move(poser, 10), key_death(poser, 8)]
+    actions += [combat_action(poser, name) for name in COMBAT_FRAMES]
     for action in actions:
         action.use_fake_user = True
     rig.animation_data.action = actions[0]
@@ -468,4 +528,35 @@ def main() -> None:
     print(f"BUILD_BURNING_DONE {args.out} height={rig.dimensions.z:.2f}")
 
 
-main()
+#: Frames of the combat actions; render and pack take the same counts.
+COMBAT_FRAMES = {"telegraph": 14, "charge": 10, "recover": 12, "hit": 6}
+
+
+def combat_action(poser: Poser, name: str) -> bpy.types.Action:
+    return {"telegraph": key_telegraph, "charge": key_charge, "recover": key_recover, "hit": key_hit}[name](poser, COMBAT_FRAMES[name])
+
+
+def rekey(args: argparse.Namespace) -> None:
+    rig = bpy.data.objects["figure"]
+    toe = (rig.matrix_world @ rig.data.bones["ball_l"].tail_local) - (rig.matrix_world @ rig.data.bones["foot_l"].head_local)
+    poser = Poser(rig, Vector((0, toe.y, 0)).normalized())
+    add_leg_ik(rig)
+    measure_axes(poser, [(f"{bone}_{side}", "down") for bone in FINGERS + THUMB for side in ("l", "r")]
+                 + [(bone, way) for bone in ("pelvis", "spine_01", "spine_02", "spine_03", "neck_01", "head")
+                    for way in ("forward", "back")]
+                 + [(f"{bone}_{side}", way) for bone in ("thigh", "calf", "foot", "clavicle") for side in ("l", "r")
+                    for way in ("forward", "back", "down", "up")])
+    names = [name.strip() for name in args.rekey.split(",") if name.strip()]
+    for name in names:
+        combat_action(poser, name)
+        print(f"REKEYED {name} frames={COMBAT_FRAMES[name]}")
+    finish_rekey(rig, "idle", args.out.resolve())
+    print(f"REKEY_BURNING_DONE {args.out} actions={','.join(names)}")
+
+
+if __name__ == "__main__":
+    arguments = parse(sys.argv)
+    if arguments.rekey:
+        rekey(arguments)
+    else:
+        main()

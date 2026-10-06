@@ -28,6 +28,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from figure_kit import (  # noqa: E402
     FINGERS, MPFB, THUMB, Poser, add_outline, attach, blend_placement, cloth_shell, dominant_bone, ease, enable_mpfb,
     flat, ground_feet, ground_points, outline_material, place_bone, placement_of, rest_ground, shaped_coordinates, toon)
+from combat_kit import (  # noqa: E402
+    Feet, Keys, add_leg_ik, finish_rekey, fit_pelvis, key_legs, measure_axes, move_pelvis, replace_action, smooth,
+    step_arc, twist, window)
 
 CLOTH = (0.075, 0.075, 0.086)
 ASH = (0.11, 0.105, 0.11)
@@ -38,6 +41,7 @@ INK = (0.012, 0.009, 0.014)
 
 def parse(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(prog="build_hollow.py")
+    parser.add_argument("--rekey", help="comma-separated actions to key again on the opened .blend (no rebuild)")
     parser.add_argument("--out", type=Path, required=True)
     return parser.parse_args(argv[argv.index("--") + 1:] if "--" in argv else [])
 
@@ -256,43 +260,84 @@ def key_move(poser: Poser, frames: int) -> bpy.types.Action:
     return action
 
 
-def key_swipe(poser: Poser, frames: int, telegraph_frames: int) -> bpy.types.Action:
-    """Pull back (the telegraph, the mask tilting toward the target), then one wide grab with
-    the right arm sweeping in from the side; fingers open in the reach and close at the end."""
-    action = bpy.data.actions.new("swipe")
-    poser.rig.animation_data.action = action
-    ground = rest_ground(poser.rig)
+#: The swipe clip: the first frames follow the 0.42 s telegraph, the rest the 0.13 s grab
+#: (Hollow.SwipeFrames / SwipeTelegraphFrames read the same split).
+SWIPE_FRAMES = 20
+SWIPE_TELEGRAPH_FRAMES = 13
+
+#: Arm of the grab in stage directions (forward, down, out) per segment, from drawn back to across.
+ARM_DRAWN = {"upperarm": (-0.55, 0.45, 0.95), "lowerarm": (-0.15, 0.05, 0.75), "hand": (0.25, 0.1, 0.55)}
+ARM_REACH = {"upperarm": (1.0, 0.35, 0.35), "lowerarm": (1.0, 0.3, 0.05), "hand": (1.0, 0.35, -0.2)}
+ARM_ACROSS = {"upperarm": (1.1, 0.4, -0.25), "lowerarm": (1.1, 0.55, -0.75), "hand": (0.9, 0.6, -0.85)}
+
+SWIPE_KEYS = Keys([
+    # Notice: the mask snaps to the target, the body straightens a little.
+    (0.00, dict(lean=0, head=0, twist=0, crouch=0.0, draw=0.0, reach=0.0, guard=0.0, hips=0, rise=0.0)),
+    (0.10, dict(lean=-6, head=14, twist=-4, crouch=0.0, draw=0.12, reach=0.0, guard=0.25, hips=-2, rise=0.02)),
+    # Coil: the right arm draws back and up, the body sinks onto the back foot and turns away.
+    (0.55, dict(lean=-4, head=10, twist=-24, crouch=0.05, draw=0.78, reach=0.0, guard=0.6, hips=-10, rise=0.0)),
+    (0.632, dict(lean=-3, head=10, twist=-30, crouch=0.05, draw=1.0, reach=0.0, guard=0.7, hips=-13, rise=0.0)),
+    # Grab: a step in, the torso whips round, the arm sweeps across at shoulder height.
+    (0.74, dict(lean=12, head=6, twist=6, crouch=0.03, draw=1.0, reach=0.45, guard=0.3, hips=4, rise=0.0)),
+    (0.84, dict(lean=20, head=2, twist=30, crouch=0.02, draw=1.0, reach=0.85, guard=0.0, hips=14, rise=0.0)),
+    (1.00, dict(lean=24, head=0, twist=40, crouch=0.02, draw=1.0, reach=1.0, guard=-0.2, hips=18, rise=0.0)),
+])
+
+
+def pose_arm_path(poser: Poser, side: str, draw: float, reach: float) -> None:
+    """The grabbing arm along hang -> drawn back -> reaching -> across."""
+    if reach <= 0.0:
+        pose_arm(poser, side, ARM_HANG, ARM_DRAWN, draw)
+    elif reach < 0.5:
+        pose_arm(poser, side, ARM_DRAWN, ARM_REACH, reach / 0.5)
+    else:
+        pose_arm(poser, side, ARM_REACH, ARM_ACROSS, (reach - 0.5) / 0.5)
+
+
+def swipe_feet(p: float) -> dict:
+    """Weight back during the coil (the front heel lifts), then a step in on the left foot."""
+    w = 0.24
+    split = SWIPE_TELEGRAPH_FRAMES - 1
+    front, lift = step_arc(p, split / (SWIPE_FRAMES - 1) + 0.02, 0.86, Vector((w - 0.02, -0.19, 0)), Vector((w - 0.06, -0.44, 0)), 0.06)
+    return {"l": (front, -6 * window(p, 0.65, 0.9), 12 * window(p, 0.2, 0.6) * (1 - window(p, 0.64, 0.75)), lift),
+            "r": (Vector((-w, -0.13, 0)), 8 * window(p, 0.3, 0.6), 22 * window(p, 0.78, 1.0), 0.0)}
+
+
+def pose_swipe(poser: Poser, p: float) -> None:
+    keys = SWIPE_KEYS
+    planter = Feet(poser)
+    for side, (ball, yaw, heel, lift) in swipe_feet(p).items():
+        planter.plant(side, Vector((ball.x * poser.left, ball.y, 0.0)), yaw=yaw, heel=heel, lift=lift, knee_out=0.05)
+    poser.turn("pelvis", keys("hips", p))
+    move_pelvis(poser, Vector((0.0, -0.20 * keys("reach", p) + 0.04 * keys("draw", p) * (1 - keys("reach", p)), -keys("crouch", p) + keys("rise", p))))
+    stoop(poser, lean=keys("lean", p))
+    poser.set("head", "forward", keys("head", p))
+    twist(poser, keys("twist", p) - keys("hips", p))
+    poser.turn("neck_01", -keys("twist", p) * 0.45)
+    fit_pelvis(poser, reach=0.975)
+    planter.settle()
+    draw, reach = keys("draw", p), keys("reach", p)
+    pose_arm_path(poser, "r", draw, reach)
+    # The other arm comes up a little as a counterweight, then swings back as the grab lands.
+    guard = keys("guard", p)
+    hang_arm(poser, "l", 0.25 * guard, out=0.12 + 0.2 * abs(guard))
+    # Tension: the drawn hand trembles more the longer the coil holds.
+    tremble = 0.03 * window(p, 0.3, 0.632) * (1 - window(p, 0.632, 0.7)) * math.sin(p * 140.0)
+    if tremble:
+        poser.set("hand_r", "down", tremble * 400)
+    claws(poser, 30 - 26 * draw * (1 - reach) + 70 * reach ** 2)
+
+
+def key_swipe(poser: Poser, frames: int) -> bpy.types.Action:
+    """The Hollow notices, coils back with the arm drawn and trembling (the telegraph), then
+    steps in and whips one wide grab across at shoulder height, overreaching."""
+    action = replace_action(poser.rig, "swipe")
     for frame in range(frames):
+        p = frame / (frames - 1)
         poser.clear()
-        if frame < telegraph_frames:
-            t = frame / max(1, telegraph_frames - 1)
-            wind = 1.0 - (1.0 - t) ** 2
-            stoop(poser, lean=-3 * wind)
-            poser.set("head", "forward", 10 * wind)  # the mask leans toward the player
-            poser.turn("spine_01", -8 * wind)
-            poser.turn("spine_03", -14 * wind)
-            # Right arm drawn back and out, elbow bent, hand open.
-            poser.aim("upperarm_r", poser.world(-0.55 * wind, 1.0 - 0.45 * wind, 0.35 + 0.55 * wind, "r"))
-            poser.aim("lowerarm_r", poser.world(-0.1 * wind + 0.2 * (1 - wind), 1.0 - 0.9 * wind, 0.6 * wind + 0.06, "r"))
-            poser.aim("hand_r", poser.world(0.2, 1.0 - 0.9 * wind, 0.4 * wind, "r"))
-            hang_arm(poser, "l", 0.08 * wind)
-            claws(poser, 30 * (1 - wind) + 4 * wind)
-        else:
-            t = (frame - telegraph_frames + 1) / (frames - telegraph_frames)
-            stoop(poser, lean=10 * t)
-            poser.set("head", "forward", 10)
-            poser.turn("spine_01", -8 + 20 * t)
-            poser.turn("spine_03", -14 + 36 * t)
-            # The grab sweeps from the right side across the front at shoulder height.
-            across = -0.3 + 1.3 * t  # out (right) -> in front -> across
-            poser.aim("upperarm_r", poser.world(0.5 + 0.6 * t, 0.35, 0.9 - across, "r"))
-            poser.aim("lowerarm_r", poser.world(0.8 + 0.4 * t, 0.25, 0.6 - across * 1.2, "r"))
-            poser.aim("hand_r", poser.world(1.0, 0.3, 0.3 - across, "r"))
-            hang_arm(poser, "l", -0.1 * t)
-            claws(poser, 4 + 60 * t ** 2)
-            poser.set("thigh_l" if poser.left > 0 else "thigh_r", "forward", 14 * t)
-        ground_feet(poser, ground)
+        pose_swipe(poser, p)
         poser.key(frame + 1)
+        key_legs(poser.rig, frame + 1, 1.0)
     return action
 
 
@@ -323,44 +368,61 @@ def pose_arm(poser: Poser, side: str, a: dict, b: dict, t: float) -> None:
 
 
 def key_hit(poser: Poser, frames: int) -> bpy.types.Action:
-    """Hit flash: the head jerks back, the shoulders rise, the arms twitch out."""
-    action = bpy.data.actions.new("hit")
-    poser.rig.animation_data.action = action
+    """Hit: the blow lands at once: the mask snaps back, the chest caves and turns, the arms
+    are flung out and the knees give; then it hangs itself back into its stoop."""
+    action = replace_action(poser.rig, "hit")
     ground = rest_ground(poser.rig)
     for frame in range(frames):
-        k = (1.0 - frame / (frames - 1)) ** 1.3
+        p = frame / (frames - 1)
+        k = math.exp(-p * 3.2) * (1.0 - p) ** 0.6
         poser.clear()
-        stoop(poser, lean=-14 * k)
-        poser.set("head", "back", 16 * k)
-        poser.turn("spine_03", 10 * k)
+        stoop(poser, lean=-20 * k)
+        poser.set("head", "back", 24 * k)
+        poser.turn("spine_03", 14 * k)
+        poser.turn("spine_01", 5 * k)
+        for side in ("l", "r"):
+            poser.set(f"thigh_{side}", "forward", 10 * k)
+            poser.set(f"calf_{side}", "back", 18 * k)
         ground_feet(poser, ground)
         for side in ("l", "r"):
-            pose_arm(poser, side, ARM_HANG, ARM_FLUNG, 0.35 * k)
-        claws(poser, 30 + 20 * k)
+            pose_arm(poser, side, ARM_HANG, ARM_FLUNG, 0.5 * k)
+        claws(poser, 30 + 26 * k)
         poser.key(frame + 1)
+        key_legs(poser.rig, frame + 1, 0.0)
     return action
 
 
 def key_recover(poser: Poser, frames: int) -> bpy.types.Action:
-    """Recovery after the grab: from the end of the swipe the arm swings back down and the body
-    straightens into the stoop."""
-    action = bpy.data.actions.new("recover")
-    poser.rig.animation_data.action = action
-    ground = rest_ground(poser.rig)
-    right = "r"
+    """Recovery (0.48 s): overreached after the grab, it hangs there a moment, then drags the
+    arm back, unwinds and steps back into its stoop."""
+    action = replace_action(poser.rig, "recover")
+    end_feet = swipe_feet(1.0)
+    rest = {"l": Vector((0.24, -0.173, 0.0)), "r": Vector((-0.24, -0.173, 0.0))}
     for frame in range(frames):
-        r = ease(frame / (frames - 1))
+        p = frame / (frames - 1)
+        back = smooth(max(0.0, (p - 0.18) / 0.82))
         poser.clear()
-        stoop(poser, lean=10 * (1 - r))
-        poser.set("head", "forward", 10 * (1 - r))
-        poser.turn("spine_01", 12 * (1 - r))
-        poser.turn("spine_03", 22 * (1 - r))
-        poser.set("thigh_l" if poser.left > 0 else "thigh_r", "forward", 14 * (1 - r))
-        ground_feet(poser, ground)
-        pose_arm(poser, right, ARM_GRAB_END, ARM_HANG, r)
-        hang_arm(poser, "l", -0.1 * (1 - r))
-        claws(poser, 64 - 34 * r)
+        planter = Feet(poser)
+        for side in ("l", "r"):
+            ball, yaw, heel, _ = end_feet[side]
+            moved, lift = step_arc(p, 0.35, 0.8, ball, rest[side], 0.04 if side == "l" else 0.0)
+            planter.plant(side, Vector((moved.x * poser.left, moved.y, 0.0)), yaw=yaw * (1 - back), heel=heel * (1 - window(p, 0.1, 0.4)),
+                          lift=lift, knee_out=0.05)
+        settle = 1.0 - back
+        # A heavy hang at the end of the reach: a little further, then back.
+        sag = 0.06 * math.sin(math.pi * min(1.0, p / 0.3))
+        poser.turn("pelvis", SWIPE_KEYS("hips", 1.0) * settle)
+        move_pelvis(poser, Vector((0.0, -0.20 * settle, -(SWIPE_KEYS("crouch", 1.0) + sag) * settle)))
+        stoop(poser, lean=SWIPE_KEYS("lean", 1.0) * settle + 8 * sag)
+        twist(poser, (SWIPE_KEYS("twist", 1.0) - SWIPE_KEYS("hips", 1.0)) * settle)
+        poser.turn("neck_01", -SWIPE_KEYS("twist", 1.0) * 0.45 * settle)
+        fit_pelvis(poser, reach=0.975)
+        planter.settle()
+        pose_arm(poser, "r", ARM_ACROSS, ARM_HANG, smooth(max(0.0, (p - 0.25) / 0.75)))
+        hang_arm(poser, "l", -0.05 * settle, out=0.12 + 0.04 * settle)
+        claws(poser, 70 - 40 * back)
         poser.key(frame + 1)
+        key_legs(poser.rig, frame + 1, 1.0)
     return action
 
 
@@ -474,8 +536,9 @@ def main() -> None:
     toe = (rig.matrix_world @ rig.data.bones["ball_l"].tail_local) - (rig.matrix_world @ rig.data.bones["foot_l"].head_local)
     poser = Poser(rig, Vector((0, toe.y, 0)).normalized())
     poser.measure_rest([f"{bone}_{side}" for bone in FINGERS + THUMB for side in ("l", "r")], "down")
-    actions = [key_idle(poser, 12), key_move(poser, 12), key_swipe(poser, 10, 7),
-               key_hit(poser, 4), key_recover(poser, 6), key_stagger(poser, 12), key_death(poser, 9)]
+    add_leg_ik(rig)
+    actions = [key_idle(poser, 12), key_move(poser, 12), key_stagger(poser, 12), key_death(poser, 9)]
+    actions += [combat_action(poser, name) for name in COMBAT_FRAMES]
     for action in actions:
         action.use_fake_user = True
     rig.animation_data.action = actions[0]
@@ -487,4 +550,36 @@ def main() -> None:
     print(f"BUILD_HOLLOW_DONE {args.out} height={rig.dimensions.z:.2f}")
 
 
-main()
+#: Frames of the combat actions; render and pack take the same counts.
+COMBAT_FRAMES = {"swipe": SWIPE_FRAMES, "hit": 6, "recover": 10}
+
+
+def combat_action(poser: Poser, name: str) -> bpy.types.Action:
+    frames = COMBAT_FRAMES[name]
+    return {"swipe": key_swipe, "hit": key_hit, "recover": key_recover}[name](poser, frames)
+
+
+def rekey(args: argparse.Namespace) -> None:
+    rig = bpy.data.objects["figure"]
+    toe = (rig.matrix_world @ rig.data.bones["ball_l"].tail_local) - (rig.matrix_world @ rig.data.bones["foot_l"].head_local)
+    poser = Poser(rig, Vector((0, toe.y, 0)).normalized())
+    add_leg_ik(rig)
+    measure_axes(poser, [(f"{bone}_{side}", "down") for bone in FINGERS + THUMB for side in ("l", "r")]
+                 + [(bone, way) for bone in ("pelvis", "spine_01", "spine_02", "spine_03", "neck_01", "head")
+                    for way in ("forward", "back", "left")]
+                 + [(f"{bone}_{side}", way) for bone in ("thigh", "calf", "foot", "hand") for side in ("l", "r")
+                    for way in ("forward", "back", "down")])
+    names = [name.strip() for name in args.rekey.split(",") if name.strip()]
+    for name in names:
+        combat_action(poser, name)
+        print(f"REKEYED {name} frames={COMBAT_FRAMES[name]}")
+    finish_rekey(rig, "idle", args.out.resolve())
+    print(f"REKEY_HOLLOW_DONE {args.out} actions={','.join(names)}")
+
+
+if __name__ == "__main__":
+    arguments = parse(sys.argv)
+    if arguments.rekey:
+        rekey(arguments)
+    else:
+        main()

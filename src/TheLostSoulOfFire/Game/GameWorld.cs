@@ -264,6 +264,7 @@ public sealed partial class GameWorld : IDisposable
         _spriteVfx.Update(deltaTime);
         UpdateFps(deltaTime);
         _screenEffects.Update(deltaTime);
+        _camera.ZoomPunch = _screenEffects.ZoomPunch;
         _combatPresentation.Update(deltaTime);
         if (_phase is GamePhase.Title or GamePhase.Arena)
         {
@@ -592,8 +593,14 @@ public sealed partial class GameWorld : IDisposable
             ActiveWorldBounds,
             ActiveCombatBounds,
             viewport,
-            deltaTime);
+            deltaTime,
+            CameraLead);
     }
+
+    /// <summary>How far the combat camera leads toward the aim and the running direction (world units).</summary>
+    private Vector2 CameraLead => _player.IsDead
+        ? Vector2.Zero
+        : _player.FacingDirection * 22f + _player.Velocity * 0.045f;
 
     private void UpdateMenu(float deltaTime, InputState input, Viewport viewport)
     {
@@ -873,7 +880,7 @@ public sealed partial class GameWorld : IDisposable
         {
             return;
         }
-        DrawScreenFeedback(batch, pixel, viewport);
+        DrawScreenFeedback(batch, pixel, viewport, renderer);
         DrawHud(batch, pixel, viewport);
     }
 
@@ -1307,27 +1314,48 @@ public sealed partial class GameWorld : IDisposable
         }
     }
 
-    private void DrawScreenFeedback(SpriteBatch batch, Texture2D pixel, Viewport viewport)
+    /// <summary>
+    /// Impact frames darken the picture toward its edges for an instant (the middle, where the
+    /// blow lands, stays readable); flashes burst as light from where they happened and only
+    /// lightly wash the rest.
+    /// </summary>
+    private void DrawScreenFeedback(SpriteBatch batch, Texture2D pixel, Viewport viewport, SoulfireRenderer renderer)
     {
         batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, transformMatrix: RenderResolution.ScaleMatrix);
+        Rectangle screen = new(0, 0, viewport.Width, viewport.Height);
 
         if (_screenEffects.ImpactFrameAlpha > 0f)
         {
-            batch.FillRectangle(pixel, new Rectangle(0, 0, viewport.Width, viewport.Height), Color.Black * (_screenEffects.ImpactFrameAlpha * 0.82f));
+            float impact = _screenEffects.ImpactFrameAlpha;
+            batch.FillRectangle(pixel, screen, Color.Black * (impact * 0.32f));
+            batch.Draw(renderer.VignetteTexture, screen, Color.White * MathHelper.Clamp(impact * 1.6f, 0f, 1f));
         }
 
-        if (_screenEffects.FlashAlpha > 0f)
+        float flash = _screenEffects.FlashAlpha;
+        if (flash > 0f && _screenEffects.FlashCenter is null)
         {
-            batch.FillRectangle(pixel, new Rectangle(0, 0, viewport.Width, viewport.Height), GameBalance.DeathFlameBright * _screenEffects.FlashAlpha);
+            batch.FillRectangle(pixel, screen, GameBalance.DeathFlameBright * flash);
         }
 
         if (_player.ResonanceActivationRemaining > 0f)
         {
             float activationFade = MathHelper.Clamp(_player.ResonanceActivationRemaining / 0.5f, 0f, 1f);
-            batch.FillRectangle(pixel, new Rectangle(0, 0, viewport.Width, viewport.Height), Color.Black * (activationFade * 0.38f));
+            batch.FillRectangle(pixel, screen, Color.Black * (activationFade * 0.38f));
         }
 
         batch.End();
+
+        if (flash > 0f && _screenEffects.FlashCenter is { } center)
+        {
+            Vector2 at = Vector2.Transform(center, _camera.GetTransform(viewport, _screenEffects.CameraOffset));
+            batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, transformMatrix: RenderResolution.ScaleMatrix);
+            batch.FillRectangle(pixel, screen, GameBalance.DeathFlameBright * (flash * 0.3f));
+            batch.End();
+            batch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.LinearClamp, transformMatrix: RenderResolution.ScaleMatrix);
+            _art.DrawSoftSpot(batch, at, new Vector2(viewport.Height * 0.62f), GameBalance.DeathFlameBright * (flash * 0.85f));
+            _art.DrawSoftSpot(batch, at, new Vector2(viewport.Height * 0.2f), GameBalance.SoulWhite * (flash * 0.7f));
+            batch.End();
+        }
     }
 
     private void DrawHud(SpriteBatch batch, Texture2D pixel, Viewport viewport)
@@ -1457,6 +1485,7 @@ public sealed partial class GameWorld : IDisposable
         }
 
         bool hitAnything = false;
+        Vector2 firstContact = _player.Position + strike.Direction * 60f;
         foreach (Enemy enemy in _enemies.Where(enemy => enemy.IsAlive))
         {
             Vector2 toTarget = enemy.Position - _player.Position;
@@ -1490,6 +1519,10 @@ public sealed partial class GameWorld : IDisposable
                 contactPosition,
                 targetDirection,
                 coreHit);
+            if (!hitAnything)
+            {
+                firstContact = contactPosition;
+            }
             if (coreHit)
             {
                 _automatedCoreHits++;
@@ -1507,7 +1540,7 @@ public sealed partial class GameWorld : IDisposable
             return;
         }
 
-        _combatPresentation.PresentScytheImpact(strike.Step, strike.Direction);
+        _combatPresentation.PresentScytheImpact(strike.Step, strike.Direction, firstContact);
         // A landed hit sits above the swing that carried it.
         _audio.Play(AudioCue.ScytheHit, strike.Step == 3 ? 0.85f : 0.68f, strike.Step == 2 ? 0.08f : 0f);
     }

@@ -56,11 +56,12 @@ public sealed class Devourer : Enemy
     public Vector2 FacingDirection => _facing;
     public override string VisualId => VisualIds.Devourer;
     /// <summary>
-    /// The slam clip has nine announce frames and three strike frames; the death clip ends at
-    /// three quarters of the dying time and the dissolve takes the collapsed pose.
+    /// The slam clip has eighteen announce frames (inhale, arms rising, the hold at the top) and
+    /// six strike frames; the death clip ends at three quarters of the dying time and the
+    /// dissolve takes the collapsed pose.
     /// </summary>
-    private const int SlamFrames = 12;
-    private const int SlamAnnounceFrames = 9;
+    private const int SlamFrames = 24;
+    private const int SlamAnnounceFrames = 18;
     private const float DeathClipShare = 0.75f;
 
     public override string? VisualClip => State switch

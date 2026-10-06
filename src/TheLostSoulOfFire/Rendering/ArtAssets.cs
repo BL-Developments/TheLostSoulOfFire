@@ -518,6 +518,11 @@ public sealed class ArtAssets
             ? sizeScale / pixelsPerUnit
             : worldSize.X / clip.FrameWidth;
         (Vector2 impactScale, float lean, float flash) = figure.ImpactPose(_time);
+        if (owner is Player)
+        {
+            // The player's own figure flashes less, so it never vanishes into white in a crowd.
+            flash *= 0.7f;
+        }
         DrawFrame(batch, clip, elapsed, position, scale * impactScale, lean, tint, new Vector4(HitFlashColor, flash));
         if (figure.SettleRemaining > 0f && figure.Settling is { } previous)
         {

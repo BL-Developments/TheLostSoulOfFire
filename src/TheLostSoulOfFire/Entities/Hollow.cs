@@ -39,11 +39,12 @@ public sealed class Hollow : Enemy
     public Vector2 FacingDirection => _facing;
     public override string VisualId => VisualIds.Hollow;
     /// <summary>
-    /// The swipe clip has seven announce frames and three strike frames; the death clip ends
-    /// at a quarter of the dying time so the dissolve takes the collapsed pose.
+    /// The swipe clip has thirteen announce frames (notice, coil, trembling hold) and seven
+    /// strike frames (step in, grab across); the death clip ends at a quarter of the dying time
+    /// so the dissolve takes the collapsed pose.
     /// </summary>
-    private const int SwipeFrames = 10;
-    private const int SwipeTelegraphFrames = 7;
+    private const int SwipeFrames = 20;
+    private const int SwipeTelegraphFrames = 13;
     private const float DeathClipShare = 0.75f;
 
     public override string? VisualClip => State switch

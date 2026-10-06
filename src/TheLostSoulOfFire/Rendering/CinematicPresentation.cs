@@ -77,6 +77,8 @@ public sealed class CinematicPresentation
     public bool ShouldDrawAim(ArenaLoopState loopState, bool playerDead) =>
         !playerDead && loopState is ArenaLoopState.Combat or ArenaLoopState.Intermission or ArenaLoopState.Transition;
 
+    private Vector2 _lead;
+
     public void UpdateCamera(
         Camera2D camera,
         ArenaLoopState loopState,
@@ -85,10 +87,14 @@ public sealed class CinematicPresentation
         Rectangle worldBounds,
         Rectangle combatBounds,
         Viewport viewport,
-        float deltaTime)
+        float deltaTime,
+        Vector2 lead = default)
     {
         Vector2 arenaCenter = combatBounds.Center.ToVector2();
-        Vector2 target = playerPosition;
+        // The view leads a little toward where the player aims and runs, eased slowly so a
+        // flick of the mouse never jerks the picture.
+        _lead = Vector2.Lerp(_lead, lead, 1f - MathF.Exp(-deltaTime * 2.6f));
+        Vector2 target = playerPosition + _lead;
         float targetZoom = 1f;
         float followSpeed = 9f;
 

@@ -28,6 +28,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from figure_kit import (  # noqa: E402
     FINGERS, THUMB, Poser, add_outline, attach, cloth_shell, dominant_bone, ease, enable_mpfb, flat, ground_feet,
     ground_points, loose_fists, outline_material, rest_ground, toon)
+from combat_kit import (  # noqa: E402
+    Feet, Keys, add_leg_ik, finish_rekey, fit_pelvis, key_legs, measure_axes, move_pelvis, replace_action, smooth,
+    step_arc, window)
 
 COAT = (0.045, 0.042, 0.050)
 SKIN = (0.075, 0.068, 0.070)
@@ -40,6 +43,7 @@ EMBER = (0.55, 0.22, 1.0)
 
 def parse(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(prog="build_devourer.py")
+    parser.add_argument("--rekey", help="comma-separated actions to key again on the opened .blend (no rebuild)")
     parser.add_argument("--out", type=Path, required=True)
     return parser.parse_args(argv[argv.index("--") + 1:] if "--" in argv else [])
 
@@ -281,37 +285,99 @@ def slam_pose(poser: Poser, ground: float, raise_: float, strike: float) -> None
     loose_fists(poser, 100)
 
 
-def key_slam(poser: Poser, frames: int, announce: int) -> bpy.types.Action:
-    """Heavy slam: a long clear announce (arms and torso up), then the blow."""
-    action = bpy.data.actions.new("slam")
-    poser.rig.animation_data.action = action
-    ground = rest_ground(poser.rig)
+#: The slam clip: the first frames follow the 0.88 s announce, the rest the 0.18 s blow
+#: (Devourer.SlamFrames / SlamAnnounceFrames read the same split).
+SLAM_FRAMES = 24
+SLAM_ANNOUNCE_FRAMES = 18
+
+SLAM_SPLIT = (SLAM_ANNOUNCE_FRAMES - 1) / (SLAM_FRAMES - 1)
+
+SLAM_KEYS = Keys([
+    # Inhale: the chest swells, the maw widens, the shoulders come up.
+    (0.00, dict(bend=0, arch=0, arms=0.0, crash=0.0, crouch=0.0, maw=1.0, lift=0.0)),
+    (0.12, dict(bend=-6, arch=4, arms=0.12, crash=0.0, crouch=0.0, maw=1.12, lift=0.03)),
+    # The arms rise overhead, the torso arches back, the weight goes onto the back foot.
+    (0.45, dict(bend=-20, arch=12, arms=0.75, crash=0.0, crouch=0.02, maw=1.18, lift=0.04)),
+    # The top: fists together high, still rising a little: the hold that reads as "now".
+    (SLAM_SPLIT, dict(bend=-28, arch=18, arms=1.0, crash=0.0, crouch=0.04, maw=1.22, lift=0.05)),
+    # The blow: everything comes down at once and folds into the floor.
+    (SLAM_SPLIT + 0.08, dict(bend=6, arch=0, arms=1.0, crash=0.55, crouch=0.10, maw=1.05, lift=0.0)),
+    (SLAM_SPLIT + 0.17, dict(bend=34, arch=0, arms=1.0, crash=0.95, crouch=0.20, maw=0.92, lift=0.0)),
+    (1.00, dict(bend=36, arch=0, arms=1.0, crash=1.0, crouch=0.22, maw=0.94, lift=0.0)),
+])
+
+
+def slam_feet(p: float) -> dict:
+    """Braced: the left foot steps forward as the arms rise and both feet take the blow."""
+    w = 0.239
+    front, lift = step_arc(p, 0.18, 0.5, Vector((w, -0.166, 0)), Vector((w - 0.02, -0.40, 0)), 0.05)
+    return {"l": (front, -10 * window(p, 0.2, 0.5), 0.0, lift),
+            "r": (Vector((-w - 0.03, -0.10, 0)), 14 * window(p, 0.2, 0.5), 8 * window(p, 0.3, SLAM_SPLIT) * (1 - window(p, SLAM_SPLIT, 0.9)), 0.0)}
+
+
+def pose_slam(poser: Poser, keys: Keys, p: float, feet: dict) -> None:
+    planter = Feet(poser)
+    for side, (ball, yaw, heel, lift) in feet.items():
+        planter.plant(side, Vector((ball.x * poser.left, ball.y, 0.0)), yaw=yaw, heel=heel, lift=lift, knee_out=0.12)
+    crash = keys("crash", p)
+    move_pelvis(poser, Vector((0.0, 0.05 * keys("arms", p) * (1 - crash) - 0.12 * crash, -keys("crouch", p) + keys("lift", p))))
+    hunch(poser, bend=keys("bend", p))
+    poser.set("spine_02", "back", keys("arch", p))
+    poser.set("head", "back", 6 * keys("arms", p) * (1 - crash))
+    fit_pelvis(poser, reach=0.97)
+    planter.settle()
+    raised = keys("arms", p)
+    for side in ("l", "r"):
+        rest = poser.world(0.35, 1.0, 0.45, side)
+        # Raised: upper arms up and out with the elbows flared, so the fists meet over the head.
+        up = poser.world(0.05, -1.0, 0.55, side)
+        down = poser.world(1.0, 1.1, 0.08, side)
+        rising = rest.lerp(poser.world(0.7, 0.0, 0.6, side), min(1.0, raised * 2.0)).lerp(up, max(0.0, raised * 2.0 - 1.0))
+        arm = rising.lerp(down, crash).normalized()
+        poser.aim(f"upperarm_{side}", arm)
+        # Forearms fold in and back over the head (fists together), then hammer down.
+        inward = poser.world(-0.35, -0.2, -1.0, side)
+        fore = (arm + inward * (0.95 * raised * (1 - crash)) + Vector((0, 0, -0.35 * crash))).normalized()
+        poser.aim(f"lowerarm_{side}", fore)
+    loose_fists(poser, 100)
+
+
+def key_slam(poser: Poser, frames: int) -> bpy.types.Action:
+    """Heavy slam: an inhale, the arms rising overhead with a bracing step, a tense hold at the
+    top (the announce), then the blow folds the whole body into the floor."""
+    action = replace_action(poser.rig, "slam")
     for frame in range(frames):
+        p = frame / (frames - 1)
         poser.clear()
-        if frame < announce:
-            t = ease(frame / (announce - 1))
-            slam_pose(poser, ground, t, 0.0)
-            maw = 1.0 + 0.15 * t
-        else:
-            t = (frame - announce + 1) / (frames - announce)
-            slam_pose(poser, ground, 1.0, ease(t))
-            maw = 1.15 - 0.15 * t
+        pose_slam(poser, SLAM_KEYS, p, slam_feet(p))
         poser.key(frame + 1)
-        key_extras(poser, frame + 1, maw, frame * 0.4)
+        key_legs(poser.rig, frame + 1, 1.0)
+        tremble = 0.03 * window(p, 0.5, SLAM_SPLIT) * (1 - window(p, SLAM_SPLIT, SLAM_SPLIT + 0.03)) * math.sin(frame * 2.9)
+        key_extras(poser, frame + 1, SLAM_KEYS("maw", p) + tremble, frame * 0.35)
     return action
 
 
 def key_recover(poser: Poser, frames: int) -> bpy.types.Action:
-    """After the slam (0.78 s): bent low, fists on the ground, it heaves itself back up."""
-    action = bpy.data.actions.new("recover")
-    poser.rig.animation_data.action = action
-    ground = rest_ground(poser.rig)
+    """After the slam (0.78 s): it stays folded over its fists a moment, then heaves itself up
+    on its arms, draws the front foot back and settles into its hunch."""
+    action = replace_action(poser.rig, "recover")
+    end = slam_feet(1.0)
+    rest = {"l": Vector((0.239, -0.166, 0)), "r": Vector((-0.239, -0.166, 0))}
     for frame in range(frames):
-        t = ease(frame / (frames - 1))
+        p = frame / (frames - 1)
+        up = smooth(max(0.0, (p - 0.2) / 0.8))
+        heave = 0.04 * math.sin(math.pi * min(1.0, max(0.0, (p - 0.15) / 0.4)))
+        keys = Keys([(0.0, {c: SLAM_KEYS(c, 1.0) * (1 - up) for c in ("bend", "crouch", "crash", "arms")} | {"arch": 0.0, "lift": heave, "maw": 1.0})])
+        feet = {}
+        for side in ("l", "r"):
+            ball, yaw, heel, _ = end[side]
+            moved, lift = step_arc(p, 0.45, 0.85, ball, rest[side], 0.04 if side == "l" else 0.0)
+            feet[side] = (moved, yaw * (1 - up), heel * (1 - up), lift)
         poser.clear()
-        slam_pose(poser, ground, 1.0 - t, 1.0 - t)
+        pose_slam(poser, keys, 0.0, feet)
         poser.key(frame + 1)
-        key_extras(poser, frame + 1, 1.0, frame * 0.3)
+        key_legs(poser.rig, frame + 1, 1.0)
+        key_extras(poser, frame + 1, 0.94 + 0.06 * up + 0.05 * math.sin(p * math.tau * 1.5), frame * 0.3)
     return action
 
 
@@ -360,18 +426,22 @@ def key_stagger(poser: Poser, frames: int) -> bpy.types.Action:
 
 
 def key_hit(poser: Poser, frames: int) -> bpy.types.Action:
-    action = bpy.data.actions.new("hit")
-    poser.rig.animation_data.action = action
+    """Hit: too heavy to be thrown, it rocks back on its heels, the maw clenches, the arms
+    jerk up; then the weight rolls forward again."""
+    action = replace_action(poser.rig, "hit")
     ground = rest_ground(poser.rig)
     for frame in range(frames):
-        k = (1.0 - frame / (frames - 1)) ** 1.3
+        p = frame / (frames - 1)
+        k = math.exp(-p * 2.6) * (1.0 - p) ** 0.5
         poser.clear()
-        hunch(poser, bend=-10 * k)
-        poser.turn("spine_03", 8 * k)
+        hunch(poser, bend=-14 * k)
+        poser.set("head", "back", 10 * k)
+        poser.turn("spine_03", 10 * k)
         ground_feet(poser, ground)
-        guard(poser, open_amount=0.2 * k)
+        guard(poser, open_amount=0.35 * k)
         poser.key(frame + 1)
-        key_extras(poser, frame + 1, 1.0 + 0.1 * k, 0.0)
+        key_legs(poser.rig, frame + 1, 0.0)
+        key_extras(poser, frame + 1, 1.0 - 0.12 * k, 0.0)
     return action
 
 
@@ -456,8 +526,9 @@ def main() -> None:
     toe = (rig.matrix_world @ rig.data.bones["ball_l"].tail_local) - (rig.matrix_world @ rig.data.bones["foot_l"].head_local)
     poser = Poser(rig, Vector((0, toe.y, 0)).normalized())
     poser.measure_rest([f"{bone}_{side}" for bone in FINGERS + THUMB for side in ("l", "r")], "down")
-    actions = [key_idle(poser, 10), key_move(poser, 10), key_slam(poser, 12, 9), key_recover(poser, 8), key_devour(poser, 10),
-               key_stagger(poser, 10), key_hit(poser, 4), key_death(poser, 10)]
+    add_leg_ik(rig)
+    actions = [key_idle(poser, 10), key_move(poser, 10), key_devour(poser, 10), key_stagger(poser, 10), key_death(poser, 10)]
+    actions += [combat_action(poser, name) for name in COMBAT_FRAMES]
     for action in actions:
         action.use_fake_user = True
     rig.animation_data.action = actions[0]
@@ -468,4 +539,35 @@ def main() -> None:
     print(f"BUILD_DEVOURER_DONE {args.out} height={rig.dimensions.z:.2f} chest={tuple(round(v, 2) for v in chest)}")
 
 
-main()
+#: Frames of the combat actions; render and pack take the same counts.
+COMBAT_FRAMES = {"slam": SLAM_FRAMES, "recover": 12, "hit": 6}
+
+
+def combat_action(poser: Poser, name: str) -> bpy.types.Action:
+    return {"slam": key_slam, "recover": key_recover, "hit": key_hit}[name](poser, COMBAT_FRAMES[name])
+
+
+def rekey(args: argparse.Namespace) -> None:
+    rig = bpy.data.objects["figure"]
+    toe = (rig.matrix_world @ rig.data.bones["ball_l"].tail_local) - (rig.matrix_world @ rig.data.bones["foot_l"].head_local)
+    poser = Poser(rig, Vector((0, toe.y, 0)).normalized())
+    add_leg_ik(rig)
+    measure_axes(poser, [(f"{bone}_{side}", "down") for bone in FINGERS + THUMB for side in ("l", "r")]
+                 + [(bone, way) for bone in ("pelvis", "spine_01", "spine_02", "spine_03", "neck_01", "head")
+                    for way in ("forward", "back")]
+                 + [(f"{bone}_{side}", way) for bone in ("thigh", "calf", "clavicle") for side in ("l", "r")
+                    for way in ("forward", "back", "up")])
+    names = [name.strip() for name in args.rekey.split(",") if name.strip()]
+    for name in names:
+        combat_action(poser, name)
+        print(f"REKEYED {name} frames={COMBAT_FRAMES[name]}")
+    finish_rekey(rig, "idle", args.out.resolve())
+    print(f"REKEY_DEVOURER_DONE {args.out} actions={','.join(names)}")
+
+
+if __name__ == "__main__":
+    arguments = parse(sys.argv)
+    if arguments.rekey:
+        rekey(arguments)
+    else:
+        main()
