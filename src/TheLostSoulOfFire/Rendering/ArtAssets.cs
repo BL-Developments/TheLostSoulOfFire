@@ -388,6 +388,13 @@ public sealed class ArtAssets
             return;
         }
 
+        if (player.LeapProgress is { } leap && HasClip(VisualIds.Player, VisualClips.Retreat))
+        {
+            DrawCharacter(batch, player, VisualIds.Player, VisualClips.Retreat, player.FacingDirection, player.Position, 1f, Color.White,
+                progress: leap, snapFacing: true);
+            return;
+        }
+
         if (player.Scythe.ActiveStep > 0 && HasClip(VisualIds.Player, VisualClips.Swing(player.Scythe.ActiveStep)))
         {
             DrawCharacter(batch, player, VisualIds.Player, VisualClips.Swing(player.Scythe.ActiveStep), player.Scythe.AttackDirection,

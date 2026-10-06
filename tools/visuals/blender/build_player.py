@@ -966,6 +966,44 @@ def key_hit(poser: Poser, frames: int) -> bpy.types.Action:
     return action
 
 
+def key_retreat(poser: Poser, frames: int) -> bpy.types.Action:
+    """Rückstoßsprung (0.22 s, the ability's timer): the figure keeps facing the aim and leaps
+    backward: a quick crouch, a push off both feet, airborne with the knees drawn up and the chest
+    leaning forward against the flight, then it lands low and absorbs the stop."""
+    action = replace_action(poser.rig, "retreat")
+    left = poser.left
+    ground = rest_ground(poser.rig)
+    keys = Keys([
+        (0.00, dict(crouch=16, lean=10, air=0.0, tuck=0.0, guard=0.0)),
+        (0.14, dict(crouch=24, lean=14, air=0.0, tuck=0.0, guard=0.3)),
+        (0.30, dict(crouch=0, lean=18, air=0.14, tuck=0.6, guard=0.8)),
+        (0.62, dict(crouch=0, lean=16, air=0.16, tuck=1.0, guard=1.0)),
+        (0.84, dict(crouch=26, lean=12, air=0.0, tuck=0.2, guard=0.7)),
+        (1.00, dict(crouch=18, lean=8, air=0.0, tuck=0.0, guard=0.4)),
+    ])
+    for index in range(frames):
+        p = index / (frames - 1)
+        poser.clear()
+        crouch, tuck = keys("crouch", p), keys("tuck", p)
+        poser.set("spine_01", "forward", keys("lean", p) * 0.6)
+        poser.set("spine_02", "forward", keys("lean", p) * 0.4)
+        poser.set("neck_01", "back", keys("lean", p) * 0.5)
+        for side, lead in (("l", 1.0), ("r", 0.7)):
+            poser.set(f"thigh_{side}", "forward", crouch * 1.1 + 48 * tuck * lead)
+            poser.set(f"calf_{side}", "back", crouch * 1.9 + 70 * tuck * lead)
+            poser.set(f"foot_{side}", "down", 18 * tuck)
+        ground_feet(poser, ground, settle=1.0 if keys("air", p) <= 0.001 else 0.0)
+        move_pelvis(poser, Vector((0.0, 0.0, keys("air", p))))
+        guard = keys("guard", p)
+        centre, axis, up = weapon_idle(left)
+        place_weapon(poser, centre + Vector((0.0, -0.06 * guard, 0.08 * guard)), axis + Vector((0.0, 0.0, 0.25 * guard)), up)
+        loose_fists(poser, 80)
+        poser.key(index + 1)
+        key_hands(poser.rig, index + 1)
+        key_legs(poser.rig, index + 1, 0.0)
+    return action
+
+
 def key_death(poser: Poser, frames: int) -> bpy.types.Action:
     """Death: the blow throws him back, the knees buckle, the scythe slips from his hands and
     he falls forward onto the floor. Played once from the moment Health reaches zero."""
@@ -1087,7 +1125,7 @@ def main() -> None:
 COMBAT_FRAMES = {
     "swing1": 14, "swing2": 16, "swing3": 26,
     "swing1_return": 8, "swing2_return": 8, "swing3_return": 10,
-    "dash": 8, "hit": 6, "cannon_fire": 10,
+    "dash": 8, "hit": 6, "cannon_fire": 10, "retreat": 8,
 }
 
 
@@ -1097,7 +1135,7 @@ def combat_action(poser: Poser, name: str, paths: dict) -> bpy.types.Action:
         return key_swing_return(poser, int(name[5]), frames)
     if name.startswith("swing"):
         return key_swing(poser, int(name[5]), frames, paths)
-    return {"dash": key_dash, "hit": key_hit, "cannon_fire": key_cannon_fire}[name](poser, frames)
+    return {"dash": key_dash, "hit": key_hit, "cannon_fire": key_cannon_fire, "retreat": key_retreat}[name](poser, frames)
 
 
 def write_paths(path: Path, paths: dict) -> None:

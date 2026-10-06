@@ -136,6 +136,15 @@
           "loop": false,
           "normalMap": "Textures/Player/Animations/swing3_return_normal/{dir}",
           "origin": [0.5, 0.7992]
+        },
+        "retreat": {
+          "path": "Textures/Player/Animations/retreat/{dir}",
+          "frameSize": [252, 234],
+          "frames": 8,
+          "fps": 24.0,
+          "loop": false,
+          "normalMap": "Textures/Player/Animations/retreat_normal/{dir}",
+          "origin": [0.5, 0.8718]
         }
       },
       "pixelsPerUnit": 1.5

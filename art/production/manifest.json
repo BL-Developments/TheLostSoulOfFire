@@ -12434,6 +12434,117 @@
         "status": "angenommen",
         "reason": "Polish-Durchgang: Burning-Treffer: aus der Spannung geworfen"
       }
+    },
+    {
+      "id": "a45e90ccfddc43ae942857a6ade9dd35",
+      "timestamp": "2026-10-06T15:23:41+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "retreat",
+        "frames": 8,
+        "fps": 24.0,
+        "frame_size": [
+          252,
+          234
+        ],
+        "origin": [
+          0.5,
+          0.8718
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.0,
+        "render_seconds": 22.2
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/retreat.render.json",
+          "sha256": "9d1644496524ba5028c61063f5e45fbd408d1252d8c5c931f90009965c17199d"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat/n.png",
+          "sha256": "85e138dc67898f7e11d949737b1584c286fe658ce2fca2e4231e8bb2f5199952"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat_normal/n.png",
+          "sha256": "64c8eca37c5e6b8b03e815cbf1550b3989c4b4ea2073d0e0054b1fd11eb61210"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat/ne.png",
+          "sha256": "47e794a332438f96402bd30cec7d3e9d9f2fdeefc112b5e56ee5d200c2fff5a1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat_normal/ne.png",
+          "sha256": "0c78894a3c6896a1882671b63a8500b1862c53d277ca0eb1e6e5b5b0496409d8"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat/e.png",
+          "sha256": "b45460c3cfaea56493da2e80bca16e61122e0db465ea07ad50198e49646b647c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat_normal/e.png",
+          "sha256": "be2eb6026661972200169a0e5f604d2d738150e60ea4d7a5bb441db4edf7a6bc"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat/se.png",
+          "sha256": "9b3a6b25c744c7283a53696883fe06a9fda59cf1b453ee55ff16f7615e93e139"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat_normal/se.png",
+          "sha256": "277f929fdb3b1c0b4cb1a83d0a3b13f4940e318c44354f08556ea0d30e6e9511"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat/s.png",
+          "sha256": "4eca21b44ccdbec188242772de9af922c366d3df365e78da69427be65192efb2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat_normal/s.png",
+          "sha256": "b4e42ec2835ba3b4828b389801b177b54d304f2199b5bffc74754bfe9e021c15"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat/sw.png",
+          "sha256": "4a49c4c4ffc0429ecc32e47140bee7447cf012bb335eee0d66c21b5c6ef608fe"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat_normal/sw.png",
+          "sha256": "efd416ebf596141749e3e4f3bfc01217b2c0ba7985f61dcd9a8b9a2179d9b491"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat/w.png",
+          "sha256": "c4a2d05e3c1f1e8f3fa0082968bbd5bc3187a6200bdc3dfa920bd8da3e0646a7"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat_normal/w.png",
+          "sha256": "63caae84ee6c99b907de17fb32bf194b3668b6c47ff5c8e3306be46014d64ca4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat/nw.png",
+          "sha256": "664f8084479d693fc4d762d266473cb024b4d930da1ef947e9875d4f80cf5019"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat_normal/nw.png",
+          "sha256": "6832c7c174a54c4ab662df4bfd9cd5423444d4f0060fab4eb27620fcad8eade1"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.32,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Polish-Durchgang: Rückstoßsprung als Sprung statt Gleiten, an den Fähigkeitszeitgeber gekoppelt"
+      }
     }
   ]
 }

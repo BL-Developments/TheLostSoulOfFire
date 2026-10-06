@@ -606,6 +606,9 @@ internal sealed class TourVisualTest
             if (_world.AutomatedEnemies.OfType<TrainingDummy>().FirstOrDefault() is { } dummy) AimAt(dummy.Position);
             _input.InjectMousePresses(left: true, right: false);
         });
+        // The Rückstoßsprung leaps backward on the ability's own timer (0.22 s).
+        Do("retreat", () => { _world.SetAutomatedAim(Vector2.UnitX); _world.ShowAutomatedAbility(RunAbility.Retreat); });
+        Series("retreat_leap", 8, 2);
         Do("dev_menu", () => _input.InjectKeyPress(Keys.F), 0.4f);
         Shot("dev_menu");
         Do("dev_menu_close", () => _input.InjectKeyPress(Keys.F), 0.3f);

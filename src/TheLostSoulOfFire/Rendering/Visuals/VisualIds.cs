@@ -114,6 +114,9 @@ public static class VisualClips
     public const string Hit = "hit";
     public const string Death = "death";
 
+    /// <summary>Player: the backward leap of the Rückstoßsprung ability.</summary>
+    public const string Retreat = "retreat";
+
     /// <summary>Enemies: the rest after an attack and the long stagger after a full cannon.</summary>
     public const string Recover = "recover";
     public const string Telegraph = "telegraph";

@@ -48,6 +48,9 @@ public sealed class Player
     public float InvulnerabilityRemaining { get; private set; }
     public float HitFlashRemaining { get; private set; }
 
+    /// <summary>Presentation only: how far a backward leap (Rückstoßsprung) has run, 0..1, or null without one.</summary>
+    public float? LeapProgress { get; set; }
+
     /// <summary>Presentation only: the direction the last blow pushed the player (normalised).</summary>
     public Vector2 LastHitDirection { get; private set; } = Vector2.UnitY;
     public float DashCooldownRemaining => _dashCooldownTimer;

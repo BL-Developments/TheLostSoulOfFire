@@ -116,6 +116,7 @@ public sealed class RunAbilities
             float step = MathF.Min(dt, RetreatRemaining);
             player.MoveByAbility(_retreatDirection * (180f / 0.22f) * step, bounds);
             RetreatRemaining = MathF.Max(0, RetreatRemaining - dt);
+            player.LeapProgress = RetreatRemaining > 0 ? 1f - RetreatRemaining / 0.22f : null;
             particles.EmitDeathFlame(player.Position, 2, 0.8f);
         }
         if (VortexRemaining > 0)
@@ -159,6 +160,7 @@ public sealed class RunAbilities
         Array.Clear(_cooldowns);
         _projectiles.Clear();
         VortexRemaining = RetreatRemaining = FeedbackRemaining = 0;
+        player.LeapProgress = null;
         player.AbilityEffects.Clear();
     }
 
