@@ -422,14 +422,27 @@ def stone(name: str, image: str, size: float, tint=(1.0, 1.0, 1.0), spread: floa
     random_u = math_node("FRACT", math_node("MULTIPLY", random_out, 1.0))
     random_v = math_node("FRACT", math_node("MULTIPLY", random_out, 7.31))
     random_w = math_node("FRACT", math_node("MULTIPLY", random_out, 13.7))
+    second_axis = separate.outputs[axes[1]]
+    if axes in ("XY", "XZ"):
+        # Flat faces take their pattern from X and Y, upright ones (risers, sills, kerb fronts)
+        # from X and Z, so neither a floor nor a wall material streaks across the other kind of
+        # face. The faces each material was made for are unchanged.
+        geometry = nodes.new("ShaderNodeNewGeometry")
+        normal = nodes.new("ShaderNodeSeparateXYZ")
+        links.new(geometry.outputs["Normal"], normal.inputs["Vector"])
+        upright = math_node("LESS_THAN", math_node("ABSOLUTE", normal.outputs["Z"]), 0.5)
+        second_axis = math_node("ADD", math_node("MULTIPLY", separate.outputs["Y"], math_node("SUBTRACT", 1.0, upright)),
+                                math_node("MULTIPLY", separate.outputs["Z"], upright))
     u = math_node("ADD", math_node("MULTIPLY", separate.outputs[axes[0]], 1.0 / size), math_node("ADD", math_node("MULTIPLY", random_u, 0.5), 0.25))
-    v = math_node("ADD", math_node("MULTIPLY", separate.outputs[axes[1]], 1.0 / size), math_node("ADD", math_node("MULTIPLY", random_v, 0.5), 0.25))
+    v = math_node("ADD", math_node("MULTIPLY", second_axis, 1.0 / size), math_node("ADD", math_node("MULTIPLY", random_v, 0.5), 0.25))
     combine = nodes.new("ShaderNodeCombineXYZ")
     links.new(u, combine.inputs["X"])
     links.new(v, combine.inputs["Y"])
     texture = nodes.new("ShaderNodeTexImage")
     texture.image = bpy.data.images.load(image, check_existing=True)
-    texture.extension = "EXTEND"
+    # Mirrored, not extended: a stone longer than the painted surface (steps, long kerbs) would
+    # otherwise smear the image's last column across its ends.
+    texture.extension = "MIRROR"
     links.new(combine.outputs["Vector"], texture.inputs["Vector"])
     value = math_node("ADD", math_node("MULTIPLY", random_w, spread), 1.0 - spread * 0.5)
     tint_rgb = nodes.new("ShaderNodeMix")

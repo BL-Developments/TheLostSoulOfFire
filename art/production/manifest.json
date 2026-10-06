@@ -13910,6 +13910,324 @@
         "status": "kandidat",
         "reason": "Bodenplatte für das Spiel aufbereitet"
       }
+    },
+    {
+      "id": "9d0dcc7429f448c1aedcf42fc35a4b79",
+      "timestamp": "2026-10-06T17:33:13+00:00",
+      "visual_id": "environment.threshold",
+      "step": "place-environment",
+      "tool": {
+        "name": "place_environment.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "world": [
+          1800,
+          1000
+        ],
+        "output": [
+          2700,
+          1500
+        ],
+        "tiles": [
+          2,
+          1
+        ],
+        "layer": "ground",
+        "origin": [
+          0.0,
+          0.0
+        ],
+        "crop": null,
+        "mute_reds": null,
+        "target_median": null
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/threshold_v2/plate.png",
+          "sha256": "9c9a60edc30220c0cece94b1088311b4173ccf5d4cc175c9d6a93aca8314db33"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Threshold/plate_c0r0.png",
+          "sha256": "be7206d115dc3f9b566d71f31479ce9861a8241a24ab0b659dfbfb7284acbaf7"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Threshold/plate_c1r0.png",
+          "sha256": "473e694959646067f9352ee745283680064615709d673ad389d69162e274c4bc"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.43,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Bodenplatte für das Spiel aufbereitet"
+      }
+    },
+    {
+      "id": "7c4316a3c969498e8cb1c6b2733fbd76",
+      "timestamp": "2026-10-06T17:33:13+00:00",
+      "visual_id": "prop.threshold-gate",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "gate",
+        "box": [
+          1135,
+          0,
+          1565,
+          1053
+        ],
+        "layer": "high-prop"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/threshold_v2/gate_full.png",
+          "sha256": "80af46d12e10aa1b07409afdbb63a696e79baad88764d84a84aa1414348abe43"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Threshold/gate.png",
+          "sha256": "50edca438bbf9f355c13293c17413aae5aa83d788bfc882a8f8b51da06813a28"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.09,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "bc3ed5a4c9ed4b1fa5103a9c1c2964ba",
+      "timestamp": "2026-10-06T17:33:29+00:00",
+      "visual_id": "prop.threshold-gate",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "gate",
+        "box": [
+          1135,
+          0,
+          1565,
+          1053
+        ],
+        "layer": "high-prop"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/threshold_v2/gate_full.png",
+          "sha256": "80af46d12e10aa1b07409afdbb63a696e79baad88764d84a84aa1414348abe43"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Threshold/gate.png",
+          "sha256": "50edca438bbf9f355c13293c17413aae5aa83d788bfc882a8f8b51da06813a28"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.08,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "8c02ea69ae3b4068908c0336c36e7fe3",
+      "timestamp": "2026-10-06T17:34:53+00:00",
+      "visual_id": "environment.deck",
+      "step": "place-environment",
+      "tool": {
+        "name": "place_environment.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "world": [
+          1800,
+          1000
+        ],
+        "output": [
+          2700,
+          1500
+        ],
+        "tiles": [
+          2,
+          1
+        ],
+        "layer": "ground",
+        "origin": [
+          0.0,
+          0.0
+        ],
+        "crop": null,
+        "mute_reds": null,
+        "target_median": null
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/deck_v2/plate.png",
+          "sha256": "54ca3a43f21a74e66ad956caa2ee3185cf8ff182a340d6d8d672ce469fcf669c"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Deck/plate_c0r0.png",
+          "sha256": "f7ec246c12a68ea5e6144862193285b203088b33edb20971dbe429a0dda35879"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Deck/plate_c1r0.png",
+          "sha256": "9218c669e2d087aededaaa8e9f22f55d61e142bc12a51248b059b3d6c535d1b3"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.26,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Bodenplatte für das Spiel aufbereitet"
+      }
+    },
+    {
+      "id": "e6fed33bf659453f8ba7a919c1394856",
+      "timestamp": "2026-10-06T17:34:53+00:00",
+      "visual_id": "prop.deck-rail",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "rail",
+        "box": [
+          642,
+          1052,
+          2124,
+          1142
+        ],
+        "layer": "foreground"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/deck_v2/rail_full.png",
+          "sha256": "58bfe8e1f7d81f617a8c0f3eadd32d93526dcb351b9dc691f7deec2285b70ec6"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Deck/rail.png",
+          "sha256": "7f4ee7a34d971cb82b04a2623c64ddc9f1b2edc51aa709c1b7cb390ee9b6be1f"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.03,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "302988298bf14e59a405ee038b8cb4c6",
+      "timestamp": "2026-10-06T17:36:20+00:00",
+      "visual_id": "environment.hub",
+      "step": "place-environment",
+      "tool": {
+        "name": "place_environment.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "world": [
+          1500,
+          900
+        ],
+        "output": [
+          2250,
+          1350
+        ],
+        "tiles": [
+          2,
+          1
+        ],
+        "layer": "ground",
+        "origin": [
+          0.0,
+          0.0
+        ],
+        "crop": null,
+        "mute_reds": null,
+        "target_median": null
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.hub/v2/plate.png",
+          "sha256": "61b537653ad1312e7cc0a313bea5509645cd82b128fd381d8e8db4c2271414cd"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Hub/plate_c0r0.png",
+          "sha256": "e5fc15395a1045c7c2cd7399ead89f94ae3b558a95caa56eeab75b70dfe75ca6"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Hub/plate_c1r0.png",
+          "sha256": "3a0be669e0fda552bba85b3a9c12d91c0ddfae3195c2181cdb889ef7395a5bc9"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.31,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Bodenplatte für das Spiel aufbereitet"
+      }
     }
   ]
 }

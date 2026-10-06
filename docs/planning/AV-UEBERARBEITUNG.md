@@ -261,6 +261,12 @@ Rahmen wie oben (nur Darstellung und Ton).
   CLAP 0,86–0,99 zum Original, höchstens 0,60 zu anderen Tönen; Laufzeit- und Gameplay-
   Audiotest, `validate_audio.py` (141 Assets), `mix_report.py` (Arena ohne Ausreißer).
 
+- Material `kit.stone`: Steine länger als die gemalte Fläche schmierten deren letzte Spalte als
+  Streifen über ihre Enden (Stufen der Schwelle, Schwellen der Vorhallentüren, Deckplanken der
+  Überfahrt); und aufrechte Flächen eines Bodenmaterials streiften senkrecht. Jetzt gespiegelt
+  statt verlängert, und flache Flächen nehmen X/Y, aufrechte X/Z. Schwelle (mit Torhaus),
+  Deck (mit Reling) und Vorhalle neu gerendert; Türflügel und Siegel pixelgleich.
+
 **Befunde, offen (nach Wirkung):**
 1. Arena im Spielausschnitt: Boden gleichmäßig hell, wenig Lichtgefälle.
 2. Sprache: Erzähltexte englisch, HUD deutsch (Inhaltsfrage, nicht ohne Owner ändern).
