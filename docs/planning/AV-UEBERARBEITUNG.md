@@ -397,6 +397,12 @@ Rahmen wie oben (nur Darstellung und Ton).
   zieht sich zusammen (die Zeit bis zur Detonation bleibt lesbar), aus den Bruchstellen fließen
   Lichtreste hinein, hinter dem Anlauf zieht ein Kielwasser aus Glut, die Druckwelle ist ein sich
   ausbreitender Lichtschein. Die Warnzone vor dem Anlauf (Ring und Bahn) bleibt als Gefahrenzone.
+- Letzte Zierringe und Striche im Spiel ersetzt: Beim Erscheinen eines Gegners wird Licht von
+  ringsum in den Punkt gezogen und sammelt sich dort (vorher zwei Ringe); der Sog zeigt seine
+  Reichweite als weichen Schein (die kreisenden Lichtpunkte zeigen den Zug); Schutz und
+  Vergeltung als atmende Aura statt Ring; Glutfunken mit verblassenden Lichtkopien statt
+  Strich. Stationen `arena_spawn` (neu, Welle 5) und Fähigkeitentest. Nur Rückfallwege ohne
+  Grafik zeichnen noch Linien und Ringe.
 - Ringe aus den Flipbooks genommen (`vfx_kit.py`, neues `wash`): Kern-Treffer, Ladung der Kanone,
   Bodenring der Detonation, Freigabe der Seele, Bodenringe der Resonanz sind jetzt Lichtschein ohne
   Umriss (Vorher-nachher-Vorschau und Stationen `arena_player`, `arena_burning`).

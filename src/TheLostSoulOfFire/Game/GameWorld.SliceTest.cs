@@ -41,6 +41,9 @@ public sealed partial class GameWorld
 
     internal void SetAutomatedHudHidden(bool hidden) => _automatedHideHud = hidden;
 
+    /// <summary>Where enemies are about to appear (their telegraph is showing), if any.</summary>
+    internal Vector2? AutomatedPendingSpawn => _pendingSpawns.Count > 0 ? _pendingSpawns[0].Position : null;
+
     /// <summary>Hurts the player by <paramref name="amount"/> on the next update, ignoring armour.</summary>
     internal void RequestAutomatedDamage(int amount) => _automatedDamageRequest = Math.Max(0, amount);
 
@@ -98,6 +101,15 @@ public sealed partial class GameWorld
         }
         _waveRun.DiscardRemaining();
         _pendingSpawns.Clear();
+    }
+
+    /// <summary>Defeats the living enemies but keeps the wave's reinforcements coming.</summary>
+    internal void DefeatAutomatedLivingEnemies()
+    {
+        foreach (Enemy enemy in _enemies.Where(enemy => enemy.IsAlive).ToArray())
+        {
+            ApplyEnemyDamage(enemy, new DamageInfo(enemy.Health + enemy.MaxHealth, Vector2.Zero, enemy.Position));
+        }
     }
 
     internal void DefeatAutomatedEnemies()

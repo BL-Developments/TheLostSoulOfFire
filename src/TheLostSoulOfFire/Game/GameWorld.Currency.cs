@@ -240,11 +240,13 @@ public sealed partial class GameWorld
 
         foreach (GlutSpark spark in _glutSparks)
         {
-            // An ember flying home: a warm glow, a hot point and a short tail of light.
+            // An ember flying home: a warm glow, a hot point and a short tail of fading glows.
             Vector2 position = spark.PositionToward(_player.Position);
-            GlutSpark earlier = spark with { Elapsed = MathF.Max(0f, spark.Elapsed - 0.05f) };
-            Vector2 tail = earlier.PositionToward(_player.Position);
-            WorldMarks.Beam(batch, pixel, tail, position, 9f, GameBalance.Glut * 0.6f);
+            for (int echo = 3; echo >= 1; echo--)
+            {
+                GlutSpark earlier = spark with { Elapsed = MathF.Max(0f, spark.Elapsed - 0.018f * echo) };
+                _art.DrawSoftSpot(batch, earlier.PositionToward(_player.Position), new Vector2(9f - echo * 1.5f), GameBalance.Glut * (0.45f - echo * 0.11f));
+            }
             _art.DrawSoftSpot(batch, position, new Vector2(13f), GameBalance.Glut * 0.5f);
             _art.DrawSoftSpot(batch, position, new Vector2(4.5f), GameBalance.GlutBright);
         }

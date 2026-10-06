@@ -143,8 +143,13 @@ public sealed partial class GameWorld
             Vector2 center = _abilities.VortexCenter;
             float strength = MathHelper.Clamp(_abilities.VortexRemaining / 0.3f, 0f, 1f);
             _art.DrawSoftSpot(batch, center, new Vector2(155f, 155f), GameBalance.DeepViolet * (0.22f * strength));
-            WorldMarks.Ring(batch, pixel, center, 150f, GameBalance.DeathFlame * (0.35f * strength));
-            WorldMarks.Ring(batch, pixel, center, 70f + MathF.Sin(_presentationTime * 5f) * 6f, GameBalance.DeathFlameBright * (0.3f * strength));
+            // Its reach glows softly instead of being outlined; the motes show the pull.
+            Color well = GameBalance.DeathFlame * (0.16f * strength);
+            well.A = 0;
+            _art.DrawSoftSpot(batch, center, new Vector2(150f), well);
+            Color eye = GameBalance.DeathFlameBright * ((0.14f + MathF.Sin(_presentationTime * 5f) * 0.04f) * strength);
+            eye.A = 0;
+            _art.DrawSoftSpot(batch, center, new Vector2(64f), eye);
             for (int i = 0; i < 18; i++)
             {
                 float local = (_presentationTime * 0.8f + i / 18f) % 1f;
@@ -174,7 +179,10 @@ public sealed partial class GameWorld
             float pulse = 0.5f + 0.5f * MathF.Sin(_presentationTime * 4f);
             bool guard = _player.AbilityEffects.GuardRemaining > 0;
             _art.DrawSoftSpot(batch, body, new Vector2(42f), GameBalance.DeathFlameBright * (guard ? 0.18f : 0.1f));
-            WorldMarks.Ring(batch, pixel, body, 40f + pulse * 3f, GameBalance.DeathFlameBright * (guard ? 0.7f : 0.4f), guard);
+            // A breathing aura of light around the body, brighter while the guard holds; no ring.
+            Color ward = GameBalance.DeathFlameBright * ((guard ? 0.34f : 0.2f) + pulse * 0.1f);
+            ward.A = 0;
+            _art.DrawSoftSpot(batch, body, new Vector2(50f + pulse * 4f), ward);
         }
     }
 

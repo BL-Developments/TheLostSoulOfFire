@@ -2394,13 +2394,22 @@ public sealed partial class GameWorld : IDisposable
 
         foreach (PendingArenaSpawn spawn in _pendingSpawns)
         {
-            // Gathering death flame: the ring closes in while the enemy is about to appear.
+            // Gathering Death Flame: light is drawn in from all around the place where the enemy is
+            // about to appear and pools there, tighter and brighter as it comes; no ring.
             float progress = 1f - spawn.Remaining / GameBalance.ArenaSpawnTelegraphDuration;
             float pulse = 0.5f + 0.5f * MathF.Sin(_presentationTime * 14f);
             float radius = MathHelper.Lerp(62f, 26f, progress);
-            WorldMarks.Ring(batch, pixel, spawn.Position, radius, GameBalance.DeathFlameBright * (0.25f + progress * 0.45f), progress > 0.7f);
-            WorldMarks.Ring(batch, pixel, spawn.Position, radius * 0.55f + pulse * 4f, GameBalance.DeathFlame * (0.2f + progress * 0.4f));
-            _art.DrawSoftSpot(batch, spawn.Position, new Vector2(radius * 0.8f), GameBalance.DeathFlame * (0.1f + progress * 0.2f));
+            for (int strand = 0; strand < 6; strand++)
+            {
+                float angle = strand * MathHelper.TwoPi / 6f + _presentationTime * 0.7f + spawn.Position.X * 0.01f;
+                Vector2 from = spawn.Position + new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * (radius * 1.5f);
+                WorldMarks.Stream(batch, _art.SoftSpot, from, spawn.Position, _presentationTime, 0.35f + progress * 0.5f,
+                    GameBalance.DeathFlameBright, 80f + progress * 120f, 11f, strand);
+            }
+            Color pool = GameBalance.DeathFlame * (0.14f + progress * 0.26f);
+            pool.A = 0;
+            _art.DrawSoftSpot(batch, spawn.Position, new Vector2(radius * 1.1f), pool);
+            _art.DrawSoftSpot(batch, spawn.Position, new Vector2(6f + progress * 8f + pulse * 2f), GameBalance.SoulWhite * (0.15f + progress * 0.35f));
         }
 
         if (_loopState is ArenaLoopState.Intro or ArenaLoopState.Transition)

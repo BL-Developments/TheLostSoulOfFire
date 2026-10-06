@@ -144,6 +144,7 @@ internal sealed class TourVisualTest
         Station("arena_devourer", BuildDevourer);
         Station("arena_devourer_end", BuildDevourerEnd);
         Station("arena_devour", BuildDevour);
+        Station("arena_spawn", BuildSpawn);
         Station("arena_chest", BuildChest);
         Station("arena_death", BuildDeath);
         Station("menus", BuildMenus);
@@ -642,6 +643,18 @@ internal sealed class TourVisualTest
         Do("free", () => _world.DefeatAutomatedEnemiesExcept<Devourer>());
         Wait("hungry", () => _world.AutomatedEnemies.OfType<Devourer>().Any(devourer => devourer.State == DevourerState.ApproachSoul), 3f);
         Series("devour", 20, 5);
+    }
+
+    /// <summary>Enemies called in during a wave: light gathers where they are about to appear.</summary>
+    private void BuildSpawn()
+    {
+        // Wave 5 calls its second push in once the first falls.
+        EnterArena(5);
+        Wait("combat", () => _world.LoopState == ArenaLoopState.Combat, 20f);
+        Wait("spawning", () => _world.AutomatedPendingSpawn is not null, 20f,
+            everyFrame: () => { if (_world.AutomatedPendingSpawn is null) _world.DefeatAutomatedLivingEnemies(); });
+        Do("look", () => { if (_world.AutomatedPendingSpawn is { } spawn) _world.PlaceAutomatedPlayer(spawn + new Vector2(-160f, 40f)); });
+        Series("gather", 8, 6);
     }
 
     private void BuildChest()
