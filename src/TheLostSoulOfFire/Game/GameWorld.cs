@@ -223,6 +223,7 @@ public sealed partial class GameWorld : IDisposable
             return;
         }
 
+        if (UpdateTravelMenu(input, viewport)) { _audio.Update(deltaTime); return; }
         if (HandleAbilitySelection(input)) { _audio.Update(deltaTime); return; }
         if (_characterMenu.IsOpen)
         {
@@ -1085,6 +1086,7 @@ public sealed partial class GameWorld : IDisposable
             {
                 DrawArenaLoop(batch, pixel);
                 DrawCurrencyWorld(batch, pixel);
+                DrawTravelPointWorld(batch, pixel);
             }
         }
 
@@ -1748,6 +1750,7 @@ public sealed partial class GameWorld : IDisposable
         }
 
         DrawAbilityHud(batch, pixel, viewport);
+        DrawTravelPointOverlay(batch, pixel, viewport);
 
         // Story, prompt and cinematic text would compete with the pause menu's type;
         // the paused world and HUD stay visible under the veil.
@@ -2579,6 +2582,7 @@ public sealed partial class GameWorld : IDisposable
         _chests.Clear();
         _glutSparks.Clear();
         _openedChests.Clear();
+        ClearTravelPoint();
         _particles.Clear();
         _spriteVfx.Clear();
         _groundImpacts.Clear();
@@ -2690,6 +2694,7 @@ public sealed partial class GameWorld : IDisposable
                     {
                         _loopState = ArenaLoopState.Intermission;
                         SpawnChestAfterWave(_waveNumber);
+                        SpawnTravelPointAfterWave(_waveNumber);
                         _particles.EmitDeathFlame(_arena.CombatBounds.Center.ToVector2(), 12, 0.8f);
                     }
                 }

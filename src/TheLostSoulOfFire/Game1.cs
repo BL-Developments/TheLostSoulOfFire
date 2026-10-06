@@ -36,6 +36,8 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     private readonly bool _audioDeathRestartTest;
     private readonly bool _antechamberVisualTest;
     private readonly bool _currencyVisualTest;
+    private readonly bool _travelVisualTest;
+    private (int Geld, int Glut) _travelTestPartial;
     private readonly bool _abilityVisualTest;
     private readonly bool _sliceVisualTest;
     private SliceVisualTest? _sliceTest;
@@ -134,11 +136,14 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         bool currencyVisualTest = false,
         bool abilityVisualTest = false,
         bool sliceVisualTest = false,
-        bool tourVisualTest = false)
+        bool tourVisualTest = false,
+        bool travelVisualTest = false)
     {
         _tourVisualTest = tourVisualTest;
         _sliceVisualTest = sliceVisualTest;
-        _currencyVisualTest = currencyVisualTest;
+        // The travel point test shares the currency test's setup: temporary profile, no prologue.
+        _travelVisualTest = travelVisualTest;
+        _currencyVisualTest = currencyVisualTest || travelVisualTest;
         _abilityVisualTest = abilityVisualTest;
 
         _audioGameplayTest = audioGameplayTest;
@@ -273,6 +278,10 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         else if (_audioGameplayTest || _audioDeathRestartTest)
         {
             ConfigureAutomatedTest((float)gameTime.ElapsedGameTime.TotalSeconds);
+        }
+        else if (_travelVisualTest)
+        {
+            ConfigureTravelVisualTest((float)gameTime.ElapsedGameTime.TotalSeconds);
         }
         else if (_currencyVisualTest)
         {
@@ -675,6 +684,152 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         Console.WriteLine($"CURRENCY_VISUAL_TEST_{(pass ? "PASS" : "FAIL")} securedGeld={geld} securedGlut={glut}");
         Environment.ExitCode = pass ? 0 : 1;
         Exit();
+    }
+
+    /// <summary>
+    /// <c>--travel-visual-test</c>: both runs open the chest after wave 3. The first takes the partial securing
+    /// at the travel point after wave 5 and dies in wave 6, so only the unsecured half is lost. The
+    /// second run extracts at the travel point and checks the balances in the hub. Captures prompt,
+    /// menu and the extraction summary. Uses a temporary profile.
+    /// </summary>
+    private void ConfigureTravelVisualTest(float deltaTime)
+    {
+        _audioTestTotalTime += deltaTime;
+        int run = _currencyTestDone.Contains("died") ? 2 : 1;
+        string state = _world.Phase == GamePhase.Arena
+            ? $"arena-{run}-{_world.LoopState}-{_world.WaveNumber}-{_world.PlayerDead}-{_world.TravelMenuOpen}"
+            : $"{_world.Phase}-{run}";
+        if (state != _currencyTestState)
+        {
+            _currencyTestState = state;
+            _currencyTestStateTime = 0f;
+        }
+        _currencyTestStateTime += deltaTime;
+
+        bool Once(string key, float at) => _currencyTestStateTime >= at && _currencyTestDone.Add($"{key}:{run}");
+
+        void Fail(string reason)
+        {
+            Console.WriteLine($"TRAVEL_VISUAL_TEST_FAIL {reason}");
+            Environment.ExitCode = 1;
+            Exit();
+        }
+
+        if (_audioTestTotalTime >= 200f)
+        {
+            Fail($"timeout state={state}");
+            return;
+        }
+
+        CurrencyWallet wallet = _world.Wallet;
+        switch (_world.Phase)
+        {
+            case GamePhase.Title:
+                if (_currencyTestStateTime >= 0.3f) _input.InjectKeyPress(Keys.Space);
+                return;
+            case GamePhase.Antechamber:
+                if (_currencyTestDone.Contains("extracted:2"))
+                {
+                    if (Once("hub-shot", 1.0f)) _screenshotRequested = true;
+                    if (_currencyTestStateTime >= 1.4f)
+                    {
+                        // Run 1 secured half after its chest, run 2 extracted everything it held.
+                        bool pass = wallet.Run(Currency.Geld) == 0 && wallet.Run(Currency.Glut) == 0 &&
+                            wallet.Secured(Currency.Geld) == _travelTestPartial.Geld + GameBalance.ChestGeld &&
+                            wallet.Secured(Currency.Glut) > _travelTestPartial.Glut;
+                        Console.WriteLine($"TRAVEL_VISUAL_TEST_{(pass ? "PASS" : "FAIL")} securedGeld={wallet.Secured(Currency.Geld)} securedGlut={wallet.Secured(Currency.Glut)} partial={_travelTestPartial}");
+                        Environment.ExitCode = pass ? 0 : 1;
+                        Exit();
+                    }
+                }
+                else if (_currencyTestStateTime >= 0.4f)
+                {
+                    _world.RequestAutomatedDoorEntry();
+                }
+                return;
+            case GamePhase.Arena:
+                break;
+            default:
+                return;
+        }
+
+        int wave = _world.WaveNumber;
+        if (_world.PlayerDead)
+        {
+            if (Once("dead-check", 0.4f))
+            {
+                bool kept = wallet.Secured(Currency.Geld) == _travelTestPartial.Geld && wallet.Secured(Currency.Glut) == _travelTestPartial.Glut &&
+                    wallet.Run(Currency.Geld) == 0 && wallet.Run(Currency.Glut) == 0;
+                Console.WriteLine($"TRAVEL_DEFEAT secured={_travelTestPartial} kept={kept}");
+                if (!kept)
+                {
+                    Fail("defeat changed secured balances");
+                    return;
+                }
+            }
+            if (_currencyTestStateTime >= 0.8f && _currencyTestDone.Add("died"))
+            {
+                _input.InjectKeyPress(Keys.R);
+            }
+            return;
+        }
+
+        switch (_world.LoopState)
+        {
+            case ArenaLoopState.Combat:
+                if (run == 1 && wave == GameBalance.TravelPointWave + 1)
+                {
+                    if (Once("die", 0.5f)) _world.RequestAudioTestFatalDamage();
+                }
+                else if (Once($"kill-{wave}", 0.65f))
+                {
+                    _input.InjectKeyPress(Keys.F6);
+                }
+                break;
+            case ArenaLoopState.Intermission when wave == GameBalance.TravelPointWave:
+                if (Once("place", 0.15f)) _world.PlaceAutomatedPlayerAtTravelPoint();
+                if (run == 1 && Once("prompt-shot", 0.35f)) _screenshotRequested = true;
+                if (Once("open", 0.5f)) _input.InjectKeyPress(Keys.E);
+                if (_world.TravelMenuOpen)
+                {
+                    if (run == 1 && Once("menu-shot", 0.2f)) _screenshotRequested = true;
+                    if (run == 1 && Once("choose", 1.2f))
+                    {
+                        int runGeld = wallet.Run(Currency.Geld);
+                        int runGlut = wallet.Run(Currency.Glut);
+                        _input.InjectKeyPress(Keys.D1);
+                        _travelTestPartial = (runGeld / 2, runGlut / 2);
+                        Console.WriteLine($"TRAVEL_PARTIAL run=({runGeld},{runGlut}) expected={_travelTestPartial}");
+                    }
+                    if (run == 2 && Once("extract", 0.6f))
+                    {
+                        _currencyTestDone.Add("extracted:2");
+                        _input.InjectKeyPress(Keys.D3);
+                    }
+                }
+                break;
+            case ArenaLoopState.Intermission:
+                if (wave == 3)
+                {
+                    if (Once("place-chest", 0.15f)) _world.PlaceAutomatedPlayerAtNewestChest();
+                    if (Once("open-chest", 0.4f)) _input.InjectKeyPress(Keys.E);
+                }
+                if (Once($"to-centre-{wave}", 0.9f)) _world.PlaceAutomatedPlayerAtWaveTrigger();
+                if (Once($"next-{wave}", 1.4f)) _input.InjectKeyPress(Keys.E);
+                break;
+            case ArenaLoopState.Transition when run == 1 && wave == GameBalance.TravelPointWave:
+                if (Once("partial-check", 0.05f))
+                {
+                    bool halved = wallet.Secured(Currency.Geld) == _travelTestPartial.Geld && wallet.Secured(Currency.Glut) == _travelTestPartial.Glut;
+                    if (!halved)
+                    {
+                        Fail($"partial securing secured=({wallet.Secured(Currency.Geld)},{wallet.Secured(Currency.Glut)}) expected={_travelTestPartial}");
+                        return;
+                    }
+                }
+                if (Once("partial-shot", 0.2f)) _screenshotRequested = true;
+                break;
+        }
     }
 
     private void FinishAutomatedTestFrame()

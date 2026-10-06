@@ -58,8 +58,8 @@ public sealed class CurrencyWallet
     }
 
     /// <summary>
-    /// Moves both run balances into the secured balances. Placeholder for arena completion
-    /// until #53 decides partial securing and its ratio.
+    /// Moves both run balances into the secured balances: extraction at a travel point and
+    /// arena completion, which stands in for the boss victory (#53).
     /// </summary>
     public (int Geld, int Glut) SecureAllRun()
     {
@@ -67,6 +67,27 @@ public sealed class CurrencyWallet
         _secured[(int)Currency.Geld] += secured.Geld;
         _secured[(int)Currency.Glut] += secured.Glut;
         Array.Clear(_run);
+        return secured;
+    }
+
+    /// <summary>
+    /// What a partial securing would move: <paramref name="percent"/> of each run balance,
+    /// rounded down per currency (#53). The remainder stays in the run.
+    /// </summary>
+    public (int Geld, int Glut) PreviewPartialSecure(int percent)
+    {
+        int clamped = Math.Clamp(percent, 0, 100);
+        return (Run(Currency.Geld) * clamped / 100, Run(Currency.Glut) * clamped / 100);
+    }
+
+    /// <summary>Moves the share from <see cref="PreviewPartialSecure"/> into the secured balances.</summary>
+    public (int Geld, int Glut) SecurePartialRun(int percent)
+    {
+        (int Geld, int Glut) secured = PreviewPartialSecure(percent);
+        _run[(int)Currency.Geld] -= secured.Geld;
+        _run[(int)Currency.Glut] -= secured.Glut;
+        _secured[(int)Currency.Geld] += secured.Geld;
+        _secured[(int)Currency.Glut] += secured.Glut;
         return secured;
     }
 

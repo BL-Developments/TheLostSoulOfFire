@@ -55,6 +55,7 @@ public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, Pl
         "--ability-visual-test",
         "--slice-visual-test",
         "--tour-visual-test",
+        "--travel-visual-test",
         "--expect-audio-fallback"
     ];
 
