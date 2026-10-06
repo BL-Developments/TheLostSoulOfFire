@@ -387,12 +387,16 @@ def roof(name: str, centre: Vector, length: float, width: float, rise: float, ma
 def stone(name: str, image: str, size: float, tint=(1.0, 1.0, 1.0), spread: float = 0.25,
           ash_image: str | None = None, ash_amount: float = 0.0, ash_tint=(0.55, 0.53, 0.56),
           roughness: float = 0.85, bump: float = 0.35, axes: str = "XY", random_attribute: str | None = None,
-          wet: float = 0.0) -> bpy.types.Material:
+          wet: float = 0.0, solid: bool = False, extension: str = "MIRROR") -> bpy.types.Material:
     """Material for single stones (paving, ashlar): each object samples its own part of a
     jointless painted surface (Object Info > Random) and gets its own value, so hundreds of
     stones never repeat; ash settles across them in world space. With `random_attribute` the
     value comes from that point attribute instead (many stones in one mesh, see `setts`);
-    `wet` adds dark, nearly mirror-smooth puddles in world space as in `textured`."""
+    `wet` adds dark, nearly mirror-smooth puddles in world space as in `textured`. With `solid`
+    each stone takes one colour from the painted surface instead of a patch of it: small setts
+    then read as calm painted stones, not as busy grain. `extension` "EXTEND" with world-space
+    coordinates (many stones in one mesh) gives each stone the tone of the surface's edge at its
+    place: calmer still, the look of the harbour setts."""
     material, nodes, links, bsdf = _principled(name)
     coords = nodes.new("ShaderNodeTexCoord")
     if random_attribute:
@@ -433,16 +437,17 @@ def stone(name: str, image: str, size: float, tint=(1.0, 1.0, 1.0), spread: floa
         upright = math_node("LESS_THAN", math_node("ABSOLUTE", normal.outputs["Z"]), 0.5)
         second_axis = math_node("ADD", math_node("MULTIPLY", separate.outputs["Y"], math_node("SUBTRACT", 1.0, upright)),
                                 math_node("MULTIPLY", separate.outputs["Z"], upright))
-    u = math_node("ADD", math_node("MULTIPLY", separate.outputs[axes[0]], 1.0 / size), math_node("ADD", math_node("MULTIPLY", random_u, 0.5), 0.25))
-    v = math_node("ADD", math_node("MULTIPLY", second_axis, 1.0 / size), math_node("ADD", math_node("MULTIPLY", random_v, 0.5), 0.25))
+    position_scale = 0.0 if solid else 1.0 / size
+    u = math_node("ADD", math_node("MULTIPLY", separate.outputs[axes[0]], position_scale), math_node("ADD", math_node("MULTIPLY", random_u, 0.5), 0.25))
+    v = math_node("ADD", math_node("MULTIPLY", second_axis, position_scale), math_node("ADD", math_node("MULTIPLY", random_v, 0.5), 0.25))
     combine = nodes.new("ShaderNodeCombineXYZ")
     links.new(u, combine.inputs["X"])
     links.new(v, combine.inputs["Y"])
     texture = nodes.new("ShaderNodeTexImage")
     texture.image = bpy.data.images.load(image, check_existing=True)
-    # Mirrored, not extended: a stone longer than the painted surface (steps, long kerbs) would
+    # Mirrored by default: a stone longer than the painted surface (steps, long kerbs) would
     # otherwise smear the image's last column across its ends.
-    texture.extension = "MIRROR"
+    texture.extension = extension
     links.new(combine.outputs["Vector"], texture.inputs["Vector"])
     value = math_node("ADD", math_node("MULTIPLY", random_w, spread), 1.0 - spread * 0.5)
     tint_rgb = nodes.new("ShaderNodeMix")

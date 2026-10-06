@@ -84,7 +84,7 @@ def materials() -> dict[str, bpy.types.Material]:
         "setts": kit.textured("setts", setts, 2.2, tint=(0.70, 0.72, 0.78), roughness=0.55, bump=0.35, variation=0.3, wet=0.5),
         # Single granite setts: each samples its own patch and value, so the quay never repeats.
         "sett": kit.stone("sett", granite, 3.0, tint=(0.08, 0.088, 0.118), spread=0.9, random_attribute="stone_random",
-                          roughness=0.5, bump=0.3, wet=0.5),
+                          roughness=0.5, bump=0.3, wet=0.5, extension="EXTEND"),
         "hull": kit.painted("hull", (0.035, 0.035, 0.042), (0.09, 0.085, 0.095), scale=2.0, roughness=0.6, bump=0.5),
         "bone": kit.painted("bone", (0.32, 0.30, 0.26), (0.48, 0.46, 0.40), scale=4.0, roughness=0.6),
         "backing": kit.painted("backing", (0.012, 0.011, 0.015), (0.03, 0.028, 0.034), bump=0.0),

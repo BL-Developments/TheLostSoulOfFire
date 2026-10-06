@@ -265,7 +265,10 @@ Rahmen wie oben (nur Darstellung und Ton).
   Streifen über ihre Enden (Stufen der Schwelle, Schwellen der Vorhallentüren, Deckplanken der
   Überfahrt); und aufrechte Flächen eines Bodenmaterials streiften senkrecht. Jetzt gespiegelt
   statt verlängert, und flache Flächen nehmen X/Y, aufrechte X/Z. Schwelle (mit Torhaus),
-  Deck (mit Reling) und Vorhalle neu gerendert; Türflügel und Siegel pixelgleich.
+  Deck (mit Reling) und Vorhalle neu gerendert; Türflügel und Siegel pixelgleich. Auch Ufer,
+  Hafen und Damm neu (Kantsteinfronten, Wassertreppe, Trümmer ohne Streifen). Das Hafenpflaster
+  behält bewusst `extension="EXTEND"` (ein ruhiger Ton je Stein); gespiegelt oder mit einer
+  Farbe je Stein aus der Fläche wurde es zu unruhig und dunkler (verworfen).
 
 **Befunde, offen (nach Wirkung):**
 1. Arena im Spielausschnitt: Boden gleichmäßig hell, wenig Lichtgefälle.
