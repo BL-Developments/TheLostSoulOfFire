@@ -381,6 +381,13 @@ public sealed class ArtAssets
         // Every action shows its own clip, sampled by the gameplay timer that already defines it
         // (dash, swing, cannon states, hit flash); otherwise the figure runs where it moves and
         // stands facing the aim.
+        if (player.WakeProgress is { } wake && HasClip(VisualIds.Player, VisualClips.Wake))
+        {
+            DrawCharacter(batch, player, VisualIds.Player, VisualClips.Wake, player.FacingDirection, player.Position, 1f, Color.White,
+                progress: wake, snapFacing: true);
+            return;
+        }
+
         if (player.IsDashing && HasClip(VisualIds.Player, VisualClips.Dash))
         {
             DrawCharacter(batch, player, VisualIds.Player, VisualClips.Dash, player.DashDirection, player.Position, 1f, Color.White,

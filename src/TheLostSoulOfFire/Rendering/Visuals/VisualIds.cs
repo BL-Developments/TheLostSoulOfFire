@@ -131,6 +131,9 @@ public static class VisualClips
     /// <summary>Player: the backward leap of the Rückstoßsprung ability.</summary>
     public const string Retreat = "retreat";
 
+    /// <summary>Player: lying face down, pushing up, kneeling and rising at the start of the prologue.</summary>
+    public const string Wake = "wake";
+
     /// <summary>Enemies: the rest after an attack and the long stagger after a full cannon.</summary>
     public const string Recover = "recover";
     public const string Telegraph = "telegraph";

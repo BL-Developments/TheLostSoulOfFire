@@ -1168,6 +1168,62 @@ def key_death(poser: Poser, frames: int) -> bpy.types.Action:
     return action
 
 
+def key_wake(poser: Poser, frames: int) -> bpy.types.Action:
+    """Waking (the prologue's first 3.6 s, sampled by its timer; the player has no control yet):
+    he lies face down where he fell, breathes, braces his hands under his shoulders and pushes the
+    chest up, draws a knee under him and kneels, reaches for the scythe beside him, and rises
+    into the guard. The last frame is the first frame of the idle, so the hand-over is seamless."""
+    action = replace_action(poser.rig, "wake")
+    left = poser.left
+    ground = rest_ground(poser.rig)
+    contact = [("foot_l", "head"), ("foot_r", "head"), ("ball_l", "tail"), ("ball_r", "tail"),
+               ("calf_l", "head"), ("calf_r", "head"), ("head", "tail"), ("spine_03", "tail"),
+               ("hand_l", "tail"), ("hand_r", "tail"), ("pelvis", "head")]
+    on_floor = (Vector((left * 0.34, -0.42, 0.035)), Vector((left * 0.92, -0.38, 0.0)), Vector((0.0, 0.0, 1.0)))
+    for index in range(frames):
+        p = index / (frames - 1)
+        # Lying until 0.3, the push up to the knee by 0.62, rising from 0.68 to 0.92.
+        fall = 1.0 - ease((p - 0.30) / 0.32)
+        kneel = 1.0 - ease((p - 0.68) / 0.24)
+        settle = ease((p - 0.84) / 0.16)
+        breath = math.sin(p * math.tau * 2.2) * (1.0 - ease((p - 0.25) / 0.1))
+        poser.clear()
+        poser.set("pelvis", "forward", 86 * fall)
+        poser.set("spine_01", "forward", 22 * kneel * (1 - fall))
+        poser.set("spine_02", "forward", 10 * kneel + 1.5 * breath + 2 * settle)
+        poser.set("spine_03", "forward", 0.56 * settle)
+        # Head down while he kneels, then up toward what is ahead.
+        look = ease((p - 0.6) / 0.12)
+        poser.set("neck_01", "forward", (28 - 20 * look) * kneel * (1 - fall) - 25 * fall + 3.9 * settle)
+        poser.set("thigh_r", "forward", 82 * kneel * (1 - fall) + 6 * fall)
+        poser.set("calf_r", "back", 112 * kneel * (1 - fall) + 18 * fall)
+        poser.set("thigh_l", "forward", 64 * kneel * (1 - fall) - 4 * fall)
+        poser.set("calf_l", "back", 70 * kneel * (1 - fall) + 30 * fall)
+        holding = ease((p - 0.6) / 0.12)
+        if holding < 1.0:
+            # Arms spread on the floor, then braced under the shoulders for the push, then
+            # hanging while he kneels before the hands find the scythe.
+            spread = poser.world(0.9, 0.1, 0.55, "l"), poser.world(0.7, 0.2, 0.3, "r")
+            brace = poser.world(0.25, 1.0, 0.18, "l"), poser.world(0.25, 1.0, 0.18, "r")
+            hang = poser.world(0.35, 1.0, 0.25, "l"), poser.world(0.35, 1.0, 0.25, "r")
+            push = ease((p - 0.26) / 0.1) * (1.0 - ease((p - 0.5) / 0.1))
+            for side, sp, br, hg in (("l", spread[0], brace[0], hang[0]), ("r", spread[1], brace[1], hang[1])):
+                direction = hg.lerp(sp, fall).lerp(br, push).normalized()
+                poser.aim(f"upperarm_{side}", direction)
+                poser.aim(f"lowerarm_{side}", (direction + Vector((0, 0, -0.2))).normalized())
+        if kneel > 0.0 or fall > 0.0:
+            ground_points(poser, ground, contact)
+        else:
+            ground_feet(poser, ground)
+        lift = ease((p - 0.66) / 0.24)
+        centre, axis, up = blend_placement(on_floor, weapon_idle(left), lift)
+        place_weapon(poser, centre + Vector((0.0, 0.0, 0.008 * math.sin(0.4) * settle)), axis, up)
+        loose_fists(poser, 55 + 15 * holding)
+        poser.key(index + 1)
+        key_hands(poser.rig, index + 1, holding=holding)
+    return action
+
+
 # ---- Main ---------------------------------------------------------------------------------
 
 def main() -> None:
@@ -1244,7 +1300,7 @@ COMBAT_FRAMES = {
     "swing1": 14, "swing2": 16, "swing3": 26,
     "swing1_return": 8, "swing2_return": 8, "swing3_return": 10,
     "dash": 8, "hit": 6, "cannon_fire": 10, "retreat": 8, "aim_move": 12, "aim_move_2": 12, "aim_move_3": 12,
-    "aim": 9, "cannon_draw": 5,
+    "aim": 9, "cannon_draw": 5, "wake": 30,
 }
 
 #: The actions that carry the Soul Cannon in the hands (re-keyed by --recannon).
@@ -1260,7 +1316,7 @@ def combat_action(poser: Poser, name: str, paths: dict) -> bpy.types.Action:
     if name.startswith("aim_move"):
         return key_aim_move(poser, frames, name)
     return {"dash": key_dash, "hit": key_hit, "cannon_fire": key_cannon_fire, "retreat": key_retreat,
-            "aim": key_aim, "cannon_draw": key_cannon_draw}[name](poser, frames)
+            "aim": key_aim, "cannon_draw": key_cannon_draw, "wake": key_wake}[name](poser, frames)
 
 
 def write_paths(path: Path, paths: dict) -> None:

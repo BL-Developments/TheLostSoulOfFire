@@ -241,7 +241,7 @@ public sealed class SoulSensePresentation
         }
 
         float pulse = 0.5f + 0.5f * MathF.Sin(time * 4.8f);
-        Vector2 core = rendered ? player.Position - new Vector2(0f, FigureHeights.Core) : player.Position + player.FacingDirection * 2f;
+        Vector2 core = rendered ? player.Position - new Vector2(0f, player.DrawnCoreHeight) : player.Position + player.FacingDirection * 2f;
         WorldMarks.Ring(batch, pixel, core, 11f + pulse * 2f, GameBalance.DeathFlameBright * (0.45f * amount), false, 1.5f);
         if (!rendered)
         {

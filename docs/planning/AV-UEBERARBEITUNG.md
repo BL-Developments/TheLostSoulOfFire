@@ -308,6 +308,12 @@ Rahmen wie oben (nur Darstellung und Ton).
   Ziehen → Laden (+0,16 s) → Schuss → Verstauen (+0,28 s). Mix „action“ +2,0/+1,6 LU über dem
   Bett, Audiotests grün. Verworfen: Verstauen mit hartem Anschlag (CLAP: „gunshot“).
 
+- Prolog-Erwachen: Die Figur stand während „YOU REMEMBER THE IMPACT“ schon aufrecht. Neuer
+  Clip `wake` (30 Bilder, nach dem Prolog-Zeitgeber, `PrologueDirector.WakingDuration` 3,6 s
+  unverändert): liegt bäuchlings, atmet, stützt sich ab, kniet, greift die Sense, steht auf; das
+  letzte Bild ist das erste der Ruhe. Kernlicht und Seelensinn folgen der Körperhöhe
+  (`Player.DrawnCoreHeight`).
+
 **Befunde, offen (nach Wirkung):**
 1. Arena im Spielausschnitt: Boden gleichmäßig hell, wenig Lichtgefälle.
 2. Sprache: Erzähltexte englisch, HUD deutsch (Inhaltsfrage, nicht ohne Owner ändern).

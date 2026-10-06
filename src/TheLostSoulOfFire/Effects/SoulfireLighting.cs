@@ -190,7 +190,7 @@ public static class SoulfireLighting
         bool renderedPlayer)
     {
         Vector2 playerCore = renderedPlayer
-            ? player.Position - new Vector2(0f, FigureHeights.Core)
+            ? player.Position - new Vector2(0f, player.DrawnCoreHeight)
             : player.Position + player.FacingDirection * 2f;
         if (player.IsDead)
         {

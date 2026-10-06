@@ -51,6 +51,17 @@ public sealed class Player
     /// <summary>Presentation only: how far a backward leap (Rückstoßsprung) has run, 0..1, or null without one.</summary>
     public float? LeapProgress { get; set; }
 
+    /// <summary>Presentation only: how far the waking at the start of the prologue has run, 0..1, or null.</summary>
+    public float? WakeProgress { get; set; }
+
+    /// <summary>
+    /// Height of the Death Flame core above the feet as drawn: standing, or close to the floor
+    /// while the figure lies and rises at the start of the prologue (wake clip in build_player.py).
+    /// </summary>
+    public float DrawnCoreHeight => WakeProgress is { } wake
+        ? MathHelper.Lerp(10f, FigureHeights.Core, MathHelper.SmoothStep(0f, 1f, (wake - 0.3f) / 0.6f))
+        : FigureHeights.Core;
+
     /// <summary>Presentation only: the direction the last blow pushed the player (normalised).</summary>
     public Vector2 LastHitDirection { get; private set; } = Vector2.UnitY;
     public float DashCooldownRemaining => _dashCooldownTimer;
@@ -301,7 +312,7 @@ public sealed class Player
         // A rendered figure stands on Position and carries scythe and cannon in its frames; the
         // overlays then sit on its body. The older flat art is drawn around Position instead.
         bool rendered = art.HasClip(VisualIds.Player, VisualClips.Swing1);
-        Vector2 body = rendered ? Position - new Vector2(0f, FigureHeights.Core) : Position;
+        Vector2 body = rendered ? Position - new Vector2(0f, DrawnCoreHeight) : Position;
 
         if (ResonanceActive)
         {

@@ -145,6 +145,9 @@ public sealed class PrologueDirector
         _ => []
     };
 
+    /// <summary>How long the player lies and rises at the start, before the first objective.</summary>
+    public const float WakingDuration = 3.6f;
+
     public PrologueStage Stage { get; private set; } = PrologueStage.Dormant;
     public PrologueSector Sector => Stage switch
     {

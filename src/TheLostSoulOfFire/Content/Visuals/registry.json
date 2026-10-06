@@ -178,6 +178,15 @@
           "progress": "distance",
           "cycleDistance": 150.0,
           "origin": [0.5, 0.8135]
+        },
+        "wake": {
+          "path": "Textures/Player/Animations/wake/{dir}",
+          "frameSize": [342, 282],
+          "frames": 30,
+          "fps": 8.0,
+          "loop": true,
+          "normalMap": "Textures/Player/Animations/wake_normal/{dir}",
+          "origin": [0.5, 0.6773]
         }
       },
       "pixelsPerUnit": 1.5

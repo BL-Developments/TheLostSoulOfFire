@@ -93,10 +93,14 @@ public sealed partial class GameWorld
     private void UpdatePrologueFlow(float deltaTime)
     {
         _prologue.Update(deltaTime);
+        // Presentation only: while the player wakes, the figure lies, kneels and rises by this timer.
+        _player.WakeProgress = _prologue.Stage == PrologueStage.Waking
+            ? MathHelper.Clamp(_prologue.StateTime / PrologueDirector.WakingDuration, 0f, 1f)
+            : null;
         switch (_prologue.Stage)
         {
             case PrologueStage.Waking:
-                if (_prologue.StateTime >= 3.6f)
+                if (_prologue.StateTime >= PrologueDirector.WakingDuration)
                 {
                     _prologue.Enter(PrologueStage.FindTrace);
                     _loopState = ArenaLoopState.Combat;

@@ -16719,6 +16719,117 @@
         "status": "angenommen",
         "reason": "Animiertes Prop aus Blender mit der Spielkamera"
       }
+    },
+    {
+      "id": "224a82fd4d954792be3874c08936ca67",
+      "timestamp": "2026-10-06T18:43:57+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "wake",
+        "frames": 30,
+        "fps": 8.0,
+        "frame_size": [
+          342,
+          282
+        ],
+        "origin": [
+          0.5,
+          0.6773
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.4,
+        "render_seconds": 85.3
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/wake.render.json",
+          "sha256": "cb5bc8d2b08b5988dfdb2200ec26b5434026ddd47d4f670ab676818972d26e77"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake/n.png",
+          "sha256": "68c04a3d621fb6087e261074977dde8c971ecc7552ca950b12f53156384c6255"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake_normal/n.png",
+          "sha256": "5e5a3843cfe715ae3cb2728c8fd6c5bf7538de9383a6134f5d7c7411ad5fbd0c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake/ne.png",
+          "sha256": "6de6e709e27a98bf615c6e68310d65a801748c9ccd5dcf74c57676aef226cf77"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake_normal/ne.png",
+          "sha256": "1ef833a62518f4864442484a8272f6e7929bf3ce5c08edb6d0e323f5a4207674"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake/e.png",
+          "sha256": "bf68bc467bcdc40f0f935664e4dcf04f7e329375666da0043139034d3bda10f7"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake_normal/e.png",
+          "sha256": "a97fd6a3e00c6b7dcb5c6bd3ff0ac8a5e74b5fe39841dbfbb87712c6a19c9c5b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake/se.png",
+          "sha256": "ad9cf5a068812f2063556dc62e217d260a56adb44dca1f1de0698950f92197b0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake_normal/se.png",
+          "sha256": "bcdb99c7d3fac3b67a9498973fd87dacb31a81ac51ebcb670f7d82619518603e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake/s.png",
+          "sha256": "2385a31a466c77f634d1cd6b4d2379ec6547dcc76a34629d0f9f036d2cae2c60"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake_normal/s.png",
+          "sha256": "a0531f14bdba9985230ab6f9b3d24310b32aad8e3b4ff6720e1605538335373e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake/sw.png",
+          "sha256": "32532822c9c744f59cbc5b4f1366cdcf71ba45922d02d3a20d88b7cb05fd537a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake_normal/sw.png",
+          "sha256": "aa62a89a45b6c0908cc0112d478f2c1418995f4df6df48bbbd9ff94084a934a1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake/w.png",
+          "sha256": "a493635e62274a873b722c5b14e31aa26e72b1eccbef40d7e8a8c23455419b5c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake_normal/w.png",
+          "sha256": "9869399c4854cf8ec63d2635f895dcba674d420829e9a71b928ef8f0e82b86ae"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake/nw.png",
+          "sha256": "f12c7e6268555edd135bab200ba81d4f53291bf102a53500bc14e21f341c8b3c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake_normal/nw.png",
+          "sha256": "688aa253c05144da3f9ac5e899f9fbc084a56e59f6473191a0a4ee5cfdf36fa4"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 1.66,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Aufwachen im Prolog: liegend, abstützen, knien, Sense greifen, aufstehen (nach dem Prolog-Zeitgeber)"
+      }
     }
   ]
 }
