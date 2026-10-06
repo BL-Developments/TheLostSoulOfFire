@@ -505,6 +505,18 @@ internal sealed class TourVisualTest
             Shot($"{names[index]}_3");
             Do($"rest_{names[index]}", () => { }, 0.9f);
         }
+
+        // The mouse circles while the combo is held: each swing keeps the aim it started with,
+        // the next one turns to the new aim, and no fading flame swings round with it.
+        float sweep = 0f;
+        Do("place_sweep", () => { _world.PlaceAutomatedPlayer(ArenaCentre); _world.SetAutomatedAim(Vector2.UnitX); }, 0.7f);
+        Series("sweep", 30, every: 2, everyFrame: () =>
+        {
+            sweep += 0.06f;
+            _world.SetAutomatedAim(new Vector2(MathF.Cos(sweep), MathF.Sin(sweep)));
+            _input.InjectMousePresses(left: true, right: false);
+        });
+        Do("rest_sweep", () => _world.SetAutomatedAim(Vector2.UnitX), 0.9f);
     }
 
     private void BuildPlayerMotion()

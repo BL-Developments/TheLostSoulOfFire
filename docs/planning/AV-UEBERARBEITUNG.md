@@ -420,8 +420,10 @@ Fähigkeiten-, Vorhallen- (mit Seelensinn) und Währungstest; Audio-Laufzeit-, G
 **Nächste Schritte (nach Wirkung):**
 1. Hörabnahme durch den Owner: Wuchtschichten der Hiebe, sanfte Seelenglocke, Präsenz der
    Gegner, Hallfahnen, Ladebrummen, Resonanzgrollen, Feuer der Life Flame, Ende-Musik.
-2. Sichtabnahme der neuen Sense und der Wischspur mit eigener Steuerung (der Rundgang prüft jetzt
-   alle acht Richtungen, aber keine Mausbewegung während des Hiebs).
+2. Sichtabnahme der neuen Sense und der Wischspur mit eigener Steuerung. Automatisch geprüft
+   (Station `arena_swings`, Serie `sweep`, kreisende Maus während der Combo): Figur und Spur
+   behalten die Richtung, mit der der Hieb begann, der nächste Schlag dreht zur neuen Mausrichtung,
+   und keine verlöschende Spur schwenkt mit. Bleibt nur das Gefühl unter echter Hand.
 3. Lampenscheibe am Ufer meldet `clean_prop_halo.py --check` (echt, kein Fehler).
 
 **Befunde, offen (nach Wirkung):**
