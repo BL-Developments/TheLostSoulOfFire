@@ -277,36 +277,81 @@
       "fallbackClip": "idle",
       "clips": {
         "idle": {
-          "path": "Textures/Enemies/Devourer/Animations/idle/{dir}",
-          "frameSize": [192, 192],
-          "frames": 9,
-          "fps": 7,
-          "loop": true
+          "path": "Textures/Enemies/Devourer/Rendered/idle/{dir}",
+          "frameSize": [190, 236],
+          "frames": 10,
+          "fps": 8.0,
+          "loop": true,
+          "normalMap": "Textures/Enemies/Devourer/Rendered/idle_normal/{dir}",
+          "origin": [0.5, 0.8737]
         },
         "move": {
-          "path": "Textures/Enemies/Devourer/Animations/move/{dir}",
-          "frameSize": [192, 192],
-          "frames": 9,
-          "fps": 9,
+          "path": "Textures/Enemies/Devourer/Rendered/move/{dir}",
+          "frameSize": [192, 253],
+          "frames": 10,
+          "fps": 8.0,
           "loop": true,
+          "normalMap": "Textures/Enemies/Devourer/Rendered/move_normal/{dir}",
           "progress": "distance",
-          "cycleDistance": 72
+          "cycleDistance": 110.0,
+          "origin": [0.5, 0.8229]
         },
         "slam": {
-          "path": "Textures/Enemies/Devourer/Animations/slam/{dir}",
-          "frameSize": [192, 192],
-          "frames": 16,
-          "fps": 16,
-          "loop": false
+          "path": "Textures/Enemies/Devourer/Rendered/slam/{dir}",
+          "frameSize": [262, 310],
+          "frames": 12,
+          "fps": 12.0,
+          "loop": false,
+          "normalMap": "Textures/Enemies/Devourer/Rendered/slam_normal/{dir}",
+          "origin": [0.5, 0.8684]
         },
         "devour": {
-          "path": "Textures/Enemies/Devourer/Animations/devour/{dir}",
-          "frameSize": [192, 192],
-          "frames": 9,
-          "fps": 9,
-          "loop": true
+          "path": "Textures/Enemies/Devourer/Rendered/devour/{dir}",
+          "frameSize": [210, 245],
+          "frames": 10,
+          "fps": 9.0,
+          "loop": false,
+          "normalMap": "Textures/Enemies/Devourer/Rendered/devour_normal/{dir}",
+          "origin": [0.5, 0.8294]
+        },
+        "recover": {
+          "path": "Textures/Enemies/Devourer/Rendered/recover/{dir}",
+          "frameSize": [242, 244],
+          "frames": 8,
+          "fps": 10.0,
+          "loop": false,
+          "normalMap": "Textures/Enemies/Devourer/Rendered/recover_normal/{dir}",
+          "origin": [0.5, 0.8328]
+        },
+        "stagger": {
+          "path": "Textures/Enemies/Devourer/Rendered/stagger/{dir}",
+          "frameSize": [212, 238],
+          "frames": 10,
+          "fps": 8.0,
+          "loop": false,
+          "normalMap": "Textures/Enemies/Devourer/Rendered/stagger_normal/{dir}",
+          "origin": [0.5, 0.8748]
+        },
+        "hit": {
+          "path": "Textures/Enemies/Devourer/Rendered/hit/{dir}",
+          "frameSize": [180, 236],
+          "frames": 4,
+          "fps": 12.0,
+          "loop": false,
+          "normalMap": "Textures/Enemies/Devourer/Rendered/hit_normal/{dir}",
+          "origin": [0.5, 0.8737]
+        },
+        "death": {
+          "path": "Textures/Enemies/Devourer/Rendered/death/{dir}",
+          "frameSize": [228, 256],
+          "frames": 10,
+          "fps": 12.0,
+          "loop": false,
+          "normalMap": "Textures/Enemies/Devourer/Rendered/death_normal/{dir}",
+          "origin": [0.5, 0.7937]
         }
-      }
+      },
+      "pixelsPerUnit": 1.5
     },
     {
       "id": "environment.arena",

@@ -1,0 +1,471 @@
+"""The Devourer (enemy.devourer) as a rigged figure with its game actions.
+
+    blender -b -P tools/visuals/blender/build_devourer.py -- --out art/production/candidates/enemy.devourer/devourer.blend
+
+Follows docs/current/characters/devourer.md: the widest silhouette of all, big, heavy and bent,
+in a long heavy coat stretched over its mass and torn open in front; the torso is a prison: a
+mouth-like opening with a glassy, cracked rim, behind it the trapped souls glow and circle. The
+face is small, sunk between the shoulders, half hidden by the turned-up collar; tired, not
+greedy. Massive arms held protectively in front of the torso.
+
+Bones added to the rig: "maw" (the opening; its scale widens it) and "souls" (child of maw;
+turning it lets the trapped souls circle). Actions: idle, move, slam (announce and strike),
+recover, devour, stagger, hit, death.
+"""
+from __future__ import annotations
+
+import argparse
+import math
+import random
+import sys
+from pathlib import Path
+
+import bmesh
+import bpy
+from mathutils import Euler, Vector
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from figure_kit import (  # noqa: E402
+    FINGERS, THUMB, Poser, add_outline, attach, cloth_shell, dominant_bone, ease, enable_mpfb, flat, ground_feet,
+    ground_points, loose_fists, outline_material, rest_ground, toon)
+
+COAT = (0.045, 0.042, 0.050)
+SKIN = (0.075, 0.068, 0.070)
+BOOT = (0.035, 0.030, 0.030)
+RIM = (0.30, 0.26, 0.36)
+VOID = (0.10, 0.03, 0.20)
+SOUL = (0.85, 0.75, 1.0)
+EMBER = (0.55, 0.22, 1.0)
+
+
+def parse(argv: list[str]) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(prog="build_devourer.py")
+    parser.add_argument("--out", type=Path, required=True)
+    return parser.parse_args(argv[argv.index("--") + 1:] if "--" in argv else [])
+
+
+def zone(bone: str) -> str:
+    if bone in ("head", "neck_01") or bone.startswith(("hand_", "thumb", "index", "middle", "ring", "pinky")):
+        return "skin"
+    if bone.startswith(("foot_", "ball_")):
+        return "boots"
+    if bone.startswith(("calf_",)):
+        return "legs"
+    return "coat"
+
+
+def paint_body(body, rig, materials) -> list[str]:
+    body.data.materials.clear()
+    for name in ("skin", "boots", "coat"):
+        body.data.materials.append(materials[name])
+    per_vertex = [zone(bone) for bone in dominant_bone(body, {bone.name for bone in rig.data.bones})]
+    index = {"skin": 0, "boots": 1, "coat": 2, "legs": 2}
+    for polygon in body.data.polygons:
+        zones = [per_vertex[i] for i in polygon.vertices]
+        polygon.material_index = index[max(set(zones), key=zones.count)]
+    return per_vertex
+
+
+def open_front(shell: bpy.types.Object, chest: Vector, radius: Vector) -> None:
+    """Tear the coat open over the chest: remove the shell's faces in an ellipse in front."""
+    bm = bmesh.new()
+    bm.from_mesh(shell.data)
+    rng = random.Random(3)
+    remove = []
+    for face in bm.faces:
+        c = shell.matrix_world @ face.calc_center_median()
+        if c.y > chest.y + 0.05:
+            continue
+        dx, dz = (c.x - chest.x) / radius.x, (c.z - chest.z) / radius.z
+        if dx * dx + dz * dz < 1.0 + rng.uniform(-0.25, 0.25):
+            remove.append(face)
+    bmesh.ops.delete(bm, geom=remove, context="FACES")
+    bm.to_mesh(shell.data)
+    bm.free()
+
+
+def coat_skirt(rig, material, waist: float, hem: float) -> bpy.types.Object:
+    """The long coat below the waist, heavy and closed at the back, open a little in front."""
+    rings, segments = 9, 32
+    bm = bmesh.new()
+    rows = []
+    for ring in range(rings):
+        t = ring / (rings - 1)
+        z = waist - t * (waist - hem)
+        rx, ry = 0.25 + 0.09 * t, 0.2 + 0.08 * t
+        rows.append([bm.verts.new((rx * math.cos(a), ry * math.sin(a) + 0.02, z)) for a in (s / segments * math.tau for s in range(segments))])
+    front = {s for s in range(segments) if abs(math.sin(s / segments * math.tau) + 1.0) < 0.03}
+    for ring in range(rings - 1):
+        for s in range(segments):
+            if s in front:
+                continue
+            a, b = rows[ring][s], rows[ring][(s + 1) % segments]
+            c, d = rows[ring + 1][(s + 1) % segments], rows[ring + 1][s]
+            bm.faces.new((a, b, c, d))
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    mesh = bpy.data.meshes.new("coat_skirt")
+    bm.to_mesh(mesh)
+    bm.free()
+    obj = bpy.data.objects.new("coat_skirt", mesh)
+    bpy.context.collection.objects.link(obj)
+    mesh.materials.append(material)
+    obj.modifiers.new("Thickness", "SOLIDIFY").thickness = 0.015
+    left = 1.0 if rig.data.bones["thigh_l"].head_local.x > 0 else -1.0
+    knee = (rig.matrix_world @ rig.data.bones["calf_l"].head_local).z
+    for name in ("pelvis", "thigh_l", "thigh_r", "calf_l", "calf_r"):
+        obj.vertex_groups.new(name=name)
+    for vertex in mesh.vertices:
+        z = vertex.co.z
+        side = "l" if vertex.co.x * left > 0 else "r"
+        upper = max(0.0, min(1.0, (waist - z) / max(waist - knee, 1e-3)))
+        lower = max(0.0, min(1.0, (knee - z) / max(knee - hem, 1e-3)))
+        obj.vertex_groups["pelvis"].add([vertex.index], 1.0 - upper * 0.7, "REPLACE")
+        obj.vertex_groups[f"thigh_{side}"].add([vertex.index], upper * 0.7 * (1 - lower * 0.5), "REPLACE")
+        obj.vertex_groups[f"calf_{side}"].add([vertex.index], upper * 0.7 * lower * 0.5, "REPLACE")
+    armature = obj.modifiers.new("Armature", "ARMATURE")
+    armature.object = rig
+    obj.parent = rig
+    return obj
+
+
+def add_bones(rig, chest: Vector) -> None:
+    bpy.context.view_layer.objects.active = rig
+    bpy.ops.object.mode_set(mode="EDIT")
+    bones = rig.data.edit_bones
+    to_rig = rig.matrix_world.inverted()
+    maw = bones.new("maw")
+    maw.head = to_rig @ chest
+    maw.tail = to_rig @ (chest + Vector((0, -0.2, 0)))  # Y points forward, out of the opening
+    maw.parent = bones["spine_02"]
+    maw.use_deform = False
+    souls = bones.new("souls")
+    souls.head, souls.tail = maw.head.copy(), maw.tail.copy()
+    souls.parent = maw
+    souls.use_deform = False
+    bpy.ops.object.mode_set(mode="OBJECT")
+
+
+def build_maw(chest: Vector, materials, ember) -> tuple[list, list]:
+    """The opening: a recessed dark cavity, a jagged glassy rim with violet cracks, three
+    trapped souls inside (attached to `souls`)."""
+    parts, souls = [], []
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=20, ring_count=12, radius=0.2, location=chest + Vector((0, 0.1, 0)))
+    cavity = bpy.context.active_object
+    cavity.name = "cavity"
+    cavity.scale = (1.0, 0.55, 1.25)
+    cavity.data.materials.append(materials["void"])
+    parts.append(cavity)
+    rng = random.Random(11)
+    for k in range(18):
+        angle = k / 18 * math.tau
+        r = Vector((math.cos(angle) * 0.2, 0, math.sin(angle) * 0.25))
+        bpy.ops.mesh.primitive_cone_add(vertices=4, radius1=0.028, radius2=0.0, depth=rng.uniform(0.05, 0.1),
+                                        location=chest + r + Vector((0, -0.03, 0)))
+        shard = bpy.context.active_object
+        shard.name = f"rim_{k}"
+        inward = (-r).normalized() + Vector((0, -0.25, 0))
+        shard.rotation_euler = inward.to_track_quat("Z", "Y").to_euler()
+        shard.data.materials.append(materials["rim"] if k % 2 else ember)
+        parts.append(shard)
+    for k in range(3):
+        angle = k / 3 * math.tau
+        bpy.ops.mesh.primitive_uv_sphere_add(segments=12, ring_count=8, radius=0.05,
+                                             location=chest + Vector((math.cos(angle) * 0.09, 0.0, math.sin(angle) * 0.11)))
+        soul = bpy.context.active_object
+        soul.name = f"soul_{k}"
+        soul.data.materials.append(materials["soul"])
+        souls.append(soul)
+    return parts, souls
+
+
+def build_collar(rig, coat) -> bpy.types.Object:
+    neck = rig.matrix_world @ rig.data.bones["neck_01"].head_local
+    bpy.ops.mesh.primitive_cone_add(vertices=24, radius1=0.17, radius2=0.22, depth=0.26, location=(neck.x, neck.y + 0.02, neck.z + 0.08), end_fill_type="NOTHING")
+    collar = bpy.context.active_object
+    collar.name = "collar"
+    collar.scale = (1.3, 1.05, 1.0)
+    collar.data.materials.append(coat)
+    collar.modifiers.new("Thickness", "SOLIDIFY").thickness = 0.02
+    attach(collar, rig, "spine_03")
+    return collar
+
+
+# ---- Poses ----------------------------------------------------------------------------------
+
+def hunch(poser: Poser, bend: float = 0.0) -> None:
+    """Bent forward under its own weight, head low between the shoulders."""
+    poser.set("spine_01", "forward", 14 + bend * 0.5)
+    poser.set("spine_02", "forward", 12 + bend * 0.3)
+    poser.set("spine_03", "forward", 8 + bend * 0.2)
+    poser.set("neck_01", "forward", 4)
+    poser.set("head", "back", 16)
+    for side in ("l", "r"):
+        poser.set(f"clavicle_{side}", "up", 8)
+        poser.set(f"thigh_{side}", "forward", 10)
+        poser.set(f"calf_{side}", "back", 16)
+
+
+def guard(poser: Poser, open_amount: float = 0.0) -> None:
+    """Massive arms held in front of the torso, as if holding something."""
+    for side in ("l", "r"):
+        poser.aim(f"upperarm_{side}", poser.world(0.35 + 0.2 * open_amount, 1.0, 0.45 + 0.4 * open_amount, side))
+        poser.aim(f"lowerarm_{side}", poser.world(1.0, 0.3, -0.55 + 0.9 * open_amount, side))
+    loose_fists(poser, 60)
+
+
+def key_extras(poser: Poser, frame: int, maw: float, spin: float) -> None:
+    rig = poser.rig
+    bone = rig.pose.bones["maw"]
+    bone.scale = (maw, 1.0, maw)
+    bone.keyframe_insert("scale", frame=frame)
+    souls = rig.pose.bones["souls"]
+    souls.rotation_mode = "XYZ"
+    souls.rotation_euler = (0, spin, 0)
+    souls.keyframe_insert("rotation_euler", frame=frame)
+
+
+def key_idle(poser: Poser, frames: int) -> bpy.types.Action:
+    action = bpy.data.actions.new("idle")
+    poser.rig.animation_data_create().action = action
+    ground = rest_ground(poser.rig)
+    for frame in range(frames + 1):
+        phase = frame / frames * math.tau
+        poser.clear()
+        hunch(poser, bend=3 * math.sin(phase))
+        for side in ("l", "r"):
+            poser.set(f"clavicle_{side}", "up", 8 + 3 * math.sin(phase))
+        ground_feet(poser, ground)
+        guard(poser, open_amount=0.05 * math.sin(phase))
+        poser.key(frame + 1)
+        key_extras(poser, frame + 1, 1.0 + 0.04 * math.sin(phase), phase)
+    return action
+
+
+def key_move(poser: Poser, frames: int) -> bpy.types.Action:
+    """Slow and relentless: heavy steps, the body rolling from side to side."""
+    action = bpy.data.actions.new("move")
+    poser.rig.animation_data.action = action
+    ground = rest_ground(poser.rig)
+    for frame in range(frames + 1):
+        phase = frame / frames * math.tau
+        poser.clear()
+        hunch(poser, bend=6)
+        poser.set("spine_01", "left", 5 * math.sin(phase))
+        for side, offset in (("l", 0.0), ("r", math.pi)):
+            leg = phase + offset
+            poser.set(f"thigh_{side}", "forward", 18 * math.sin(leg) + 8)
+            lift = max(0.0, math.cos(leg + 0.3)) ** 2
+            poser.set(f"calf_{side}", "back", 14 + 38 * lift)
+        ground_feet(poser, ground)
+        guard(poser, open_amount=0.1 + 0.05 * math.sin(phase))
+        poser.key(frame + 1)
+        key_extras(poser, frame + 1, 1.0, phase)
+    return action
+
+
+def slam_pose(poser: Poser, ground: float, raise_: float, strike: float) -> None:
+    """Arms and torso rise overhead (raise_), then crash down (strike)."""
+    hunch(poser, bend=-24 * raise_ * (1 - strike) + 30 * strike)
+    poser.set("spine_02", "back", 10 * raise_ * (1 - strike))
+    for side in ("l", "r"):
+        poser.set(f"thigh_{side}", "forward", 10 + 20 * strike)
+        poser.set(f"calf_{side}", "back", 16 + 30 * strike)
+    ground_feet(poser, ground)
+    for side in ("l", "r"):
+        up = poser.world(0.3, -1.0, 0.35, side)
+        down = poser.world(1.0, 0.9, 0.15, side)
+        rest = poser.world(0.35, 1.0, 0.45, side)
+        arm = (rest.lerp(up, raise_)).lerp(down, strike).normalized()
+        poser.aim(f"upperarm_{side}", arm)
+        poser.aim(f"lowerarm_{side}", (arm + Vector((0, 0, -0.3 * strike))).normalized())
+    loose_fists(poser, 100)
+
+
+def key_slam(poser: Poser, frames: int, announce: int) -> bpy.types.Action:
+    """Heavy slam: a long clear announce (arms and torso up), then the blow."""
+    action = bpy.data.actions.new("slam")
+    poser.rig.animation_data.action = action
+    ground = rest_ground(poser.rig)
+    for frame in range(frames):
+        poser.clear()
+        if frame < announce:
+            t = ease(frame / (announce - 1))
+            slam_pose(poser, ground, t, 0.0)
+            maw = 1.0 + 0.15 * t
+        else:
+            t = (frame - announce + 1) / (frames - announce)
+            slam_pose(poser, ground, 1.0, ease(t))
+            maw = 1.15 - 0.15 * t
+        poser.key(frame + 1)
+        key_extras(poser, frame + 1, maw, frame * 0.4)
+    return action
+
+
+def key_recover(poser: Poser, frames: int) -> bpy.types.Action:
+    """After the slam (0.78 s): bent low, fists on the ground, it heaves itself back up."""
+    action = bpy.data.actions.new("recover")
+    poser.rig.animation_data.action = action
+    ground = rest_ground(poser.rig)
+    for frame in range(frames):
+        t = ease(frame / (frames - 1))
+        poser.clear()
+        slam_pose(poser, ground, 1.0 - t, 1.0 - t)
+        poser.key(frame + 1)
+        key_extras(poser, frame + 1, 1.0, frame * 0.3)
+    return action
+
+
+def key_devour(poser: Poser, frames: int) -> bpy.types.Action:
+    """Devouring (1.1 s): it bends over the soul, the opening widens, arms reach down to it."""
+    action = bpy.data.actions.new("devour")
+    poser.rig.animation_data.action = action
+    ground = rest_ground(poser.rig)
+    for frame in range(frames):
+        t = frame / (frames - 1)
+        lean = ease(min(1.0, t / 0.35))
+        pull = 0.5 + 0.5 * math.sin(t * math.tau * 2)
+        poser.clear()
+        hunch(poser, bend=26 * lean)
+        for side in ("l", "r"):
+            poser.set(f"thigh_{side}", "forward", 10 + 18 * lean)
+            poser.set(f"calf_{side}", "back", 16 + 26 * lean)
+        ground_feet(poser, ground)
+        for side in ("l", "r"):
+            poser.aim(f"upperarm_{side}", poser.world(0.9, 0.8, 0.6, side))
+            poser.aim(f"lowerarm_{side}", poser.world(0.7, 1.0, -0.2 - 0.2 * pull, side))
+        loose_fists(poser, 30)
+        poser.key(frame + 1)
+        key_extras(poser, frame + 1, 1.0 + 0.45 * lean + 0.1 * pull, t * math.tau * 2)
+    return action
+
+
+def key_stagger(poser: Poser, frames: int) -> bpy.types.Action:
+    """Staggered (full cannon on the torso, or a devour broken off): thrown back, arms wide, then
+    it gathers itself."""
+    action = bpy.data.actions.new("stagger")
+    poser.rig.animation_data.action = action
+    ground = rest_ground(poser.rig)
+    for frame in range(frames):
+        p = frame / (frames - 1)
+        throw = ease(min(1.0, p / 0.15)) * (1.0 - ease(max(0.0, (p - 0.15) / 0.85)))
+        poser.clear()
+        hunch(poser, bend=-26 * throw)
+        poser.set("head", "back", 20 * throw)
+        poser.set("thigh_r" if poser.left > 0 else "thigh_l", "forward", -14 * throw)
+        ground_feet(poser, ground)
+        guard(poser, open_amount=throw)
+        poser.key(frame + 1)
+        key_extras(poser, frame + 1, 1.0 + 0.3 * throw, frame * 0.5)
+    return action
+
+
+def key_hit(poser: Poser, frames: int) -> bpy.types.Action:
+    action = bpy.data.actions.new("hit")
+    poser.rig.animation_data.action = action
+    ground = rest_ground(poser.rig)
+    for frame in range(frames):
+        k = (1.0 - frame / (frames - 1)) ** 1.3
+        poser.clear()
+        hunch(poser, bend=-10 * k)
+        poser.turn("spine_03", 8 * k)
+        ground_feet(poser, ground)
+        guard(poser, open_amount=0.2 * k)
+        poser.key(frame + 1)
+        key_extras(poser, frame + 1, 1.0 + 0.1 * k, 0.0)
+    return action
+
+
+def key_death(poser: Poser, frames: int) -> bpy.types.Action:
+    """Dying (0.82 s): the prison cracks open (the opening widens), it sinks to its knees and
+    slumps; the game dissolves it and every trapped soul comes free."""
+    action = bpy.data.actions.new("death")
+    poser.rig.animation_data.action = action
+    ground = rest_ground(poser.rig)
+    contact = [("foot_l", "head"), ("foot_r", "head"), ("ball_l", "tail"), ("ball_r", "tail"),
+               ("calf_l", "head"), ("calf_r", "head"), ("hand_l", "tail"), ("hand_r", "tail")]
+    for frame in range(frames):
+        t = frame / (frames - 1)
+        burst = ease(min(1.0, t / 0.3))
+        kneel = ease((t - 0.2) / 0.6)
+        poser.clear()
+        hunch(poser, bend=-18 * burst * (1 - kneel) + 30 * kneel)
+        for side in ("l", "r"):
+            poser.set(f"thigh_{side}", "forward", 10 + 62 * kneel)
+            poser.set(f"calf_{side}", "back", 16 + 70 * kneel)
+        if kneel > 0:
+            ground_points(poser, ground, contact)
+        else:
+            ground_feet(poser, ground)
+        guard(poser, open_amount=burst * (1 - kneel * 0.6))
+        poser.key(frame + 1)
+        key_extras(poser, frame + 1, 1.0 + 0.7 * burst, t * math.tau)
+    return action
+
+
+def main() -> None:
+    args = parse(sys.argv)
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    human_service, target_service = enable_mpfb()
+    macro = target_service.get_default_macro_info_dict()
+    macro.update({"gender": 0.9, "age": 0.7, "muscle": 0.65, "weight": 1.0, "proportions": 0.3, "height": 0.95})
+    body = human_service.create_human(macro_detail_dict=macro)
+    # The widest silhouette of all: a barrel of a torso, broad shoulders, massive arms, a thick
+    # neck sunk into it. MPFB's measure and scale targets, before rigging.
+    import importlib
+    from figure_kit import MPFB
+    data = Path(importlib.import_module(MPFB).__file__).parent / "data" / "targets"
+    bulk = [("torso", "torso-scale-horiz-incr", 1.0), ("torso", "torso-scale-depth-incr", 1.0),
+            ("torso", "measure-shoulder-dist-incr", 1.0), ("torso", "measure-waist-circ-incr", 1.0),
+            ("torso", "measure-underbust-circ-incr", 0.8), ("hip", "hip-scale-horiz-incr", 0.6),
+            ("neck", "neck-scale-horiz-incr", 1.0), ("neck", "neck-scale-depth-incr", 0.8), ("neck", "measure-neck-height-decr", 0.8)]
+    for side in ("l", "r"):
+        for part in ("upperarm", "lowerarm"):
+            for kind in ("fat", "muscle", "scale-horiz", "scale-depth"):
+                bulk.append(("arms", f"{side}-{part}-{kind}-incr", 0.9))
+    for folder, name, weight in bulk:
+        path = data / folder / f"{name}.target.gz"
+        if path.exists():
+            target_service.load_target(body, str(path), weight=weight, name=name)
+    rig = human_service.add_builtin_rig(body, "game_engine")
+    rig.name = "figure"
+
+    materials = {"skin": toon("skin", SKIN, brush=0.1), "boots": toon("boots", BOOT), "coat": toon("coat", COAT, brush=0.14),
+                 "rim": toon("rim", RIM, brush=0.04), "void": flat("void", VOID), "soul": flat("soul", SOUL)}
+    ember = flat("ember", EMBER)
+    outline = outline_material()
+    per_vertex = paint_body(body, rig, materials)
+    coat = cloth_shell(body, per_vertex, {"coat"}, rig, materials["coat"], "coat", push=0.03)
+    chest_bone = rig.matrix_world @ rig.data.bones["spine_03"].head_local
+    front = min((rig.matrix_world @ v.co).y for v in body.data.vertices if abs((rig.matrix_world @ v.co).z - chest_bone.z) < 0.05)
+    chest = Vector((0.0, front + 0.02, chest_bone.z - 0.06))
+    open_front(coat, chest, Vector((0.24, 0, 0.3)))
+    open_front(body, chest, Vector((0.2, 0, 0.26)))
+    pelvis_z = (rig.matrix_world @ rig.data.bones["pelvis"].head_local).z
+    calf_z = (rig.matrix_world @ rig.data.bones["calf_l"].head_local).z
+    skirt = coat_skirt(rig, materials["coat"], waist=pelvis_z + 0.08, hem=calf_z - 0.22)
+    collar = build_collar(rig, materials["coat"])
+    add_bones(rig, chest)
+    parts, souls = build_maw(chest, materials, ember)
+    for part in parts:
+        attach(part, rig, "maw")
+    for soul in souls:
+        attach(soul, rig, "souls")
+    for obj in (body, coat, skirt, collar):
+        add_outline(obj, outline)
+
+    toe = (rig.matrix_world @ rig.data.bones["ball_l"].tail_local) - (rig.matrix_world @ rig.data.bones["foot_l"].head_local)
+    poser = Poser(rig, Vector((0, toe.y, 0)).normalized())
+    poser.measure_rest([f"{bone}_{side}" for bone in FINGERS + THUMB for side in ("l", "r")], "down")
+    actions = [key_idle(poser, 10), key_move(poser, 10), key_slam(poser, 12, 9), key_recover(poser, 8), key_devour(poser, 10),
+               key_stagger(poser, 10), key_hit(poser, 4), key_death(poser, 10)]
+    for action in actions:
+        action.use_fake_user = True
+    rig.animation_data.action = actions[0]
+    bpy.context.scene.frame_start, bpy.context.scene.frame_end = 1, 10
+    bpy.context.scene.render.fps = 12
+    args.out.parent.mkdir(parents=True, exist_ok=True)
+    bpy.ops.wm.save_as_mainfile(filepath=str(args.out.resolve()))
+    print(f"BUILD_DEVOURER_DONE {args.out} height={rig.dimensions.z:.2f} chest={tuple(round(v, 2) for v in chest)}")
+
+
+main()

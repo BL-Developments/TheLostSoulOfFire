@@ -218,7 +218,7 @@ public sealed class SoulSensePresentation
         float pulse,
         float amount)
     {
-        Vector2 torso = devourer.TorsoPosition;
+        Vector2 torso = devourer.DrawnTorso;
         batch.FillCircle(pixel, torso, 22f + pulse * 2f, GameBalance.DeepViolet * (0.48f * amount));
         batch.FillCircle(pixel, torso, 5f, GameBalance.SoulWhite * (0.94f * amount));
 

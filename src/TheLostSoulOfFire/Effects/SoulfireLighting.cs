@@ -135,7 +135,7 @@ public static class SoulfireLighting
                     break;
                 case Devourer devourer when devourer.State != DevourerState.Dead:
                     float torsoIntensity = 0.22f + devourer.ConsumedSoulCount * 0.07f;
-                    renderer.DrawGlow(batch, devourer.TorsoPosition, 66f, GameBalance.DeathFlameBright, torsoIntensity * soulSenseAmount);
+                    renderer.DrawGlow(batch, devourer.DrawnTorso, 66f, GameBalance.DeathFlameBright, torsoIntensity * soulSenseAmount);
                     break;
             }
         }
