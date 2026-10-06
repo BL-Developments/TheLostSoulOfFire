@@ -77,6 +77,26 @@ public sealed partial class GameWorld
         return hollow;
     }
 
+    /// <summary>A full-cannon blow of one point on every living enemy of type <typeparamref name="T"/> (staggers them).</summary>
+    internal void StaggerAutomatedEnemies<T>() where T : Enemy
+    {
+        foreach (T enemy in _enemies.OfType<T>().Where(enemy => enemy.IsAlive).ToArray())
+        {
+            ApplyEnemyDamage(enemy, new DamageInfo(1, _player.FacingDirection, enemy.Position, IsFullCannon: true));
+        }
+    }
+
+    /// <summary>Defeats every living enemy that is not a <typeparamref name="T"/> (to show one enemy alone).</summary>
+    internal void DefeatAutomatedEnemiesExcept<T>() where T : Enemy
+    {
+        foreach (Enemy enemy in _enemies.Where(enemy => enemy.IsAlive && enemy is not T).ToArray())
+        {
+            ApplyEnemyDamage(enemy, new DamageInfo(enemy.Health + enemy.MaxHealth, Vector2.Zero, enemy.Position));
+        }
+        _waveRun.DiscardRemaining();
+        _pendingSpawns.Clear();
+    }
+
     internal void DefeatAutomatedEnemies()
     {
         foreach (Enemy enemy in _enemies.Where(enemy => enemy.IsAlive).ToArray())

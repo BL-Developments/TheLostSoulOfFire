@@ -16830,6 +16830,228 @@
         "status": "angenommen",
         "reason": "Aufwachen im Prolog: liegend, abstützen, knien, Sense greifen, aufstehen (nach dem Prolog-Zeitgeber)"
       }
+    },
+    {
+      "id": "c700f01a13e84b0c87beaa3c5326523b",
+      "timestamp": "2026-10-06T18:50:35+00:00",
+      "visual_id": "enemy.devourer",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "stagger",
+        "frames": 18,
+        "fps": 13.0,
+        "frame_size": [
+          266,
+          266
+        ],
+        "origin": [
+          0.5,
+          0.8835
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.6,
+        "render_seconds": 51.8
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/enemy.devourer/render/stagger.render.json",
+          "sha256": "038e1f71efd9df71ad09e1b66f03173fa7ee6e004b0ce271991a7458b4bacf1d"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/stagger/n.png",
+          "sha256": "56cf62d0f266f27c414332d95203eaa7b3c291993a1f310c57c45e754c77ea45"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/stagger_normal/n.png",
+          "sha256": "c9d5e948e0387119018613c89fd2a864a217651a22e79e14f30b492d6bcf2fa0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/stagger/ne.png",
+          "sha256": "6ab910b6410dd466b055c8dd8ebaebcb788add484ec41cf5610a87f74c5068f2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/stagger_normal/ne.png",
+          "sha256": "ce79840ddbc058b323e326339067a11e2c8e6f3524bad1ef93bfe74d8a6cb6fe"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/stagger/e.png",
+          "sha256": "b439f59b797ed8df73d7470800113a784b9bfc532f23cab698a5a640b70cfb16"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/stagger_normal/e.png",
+          "sha256": "3b7b37ba39b1f3d6387364b66771c46e85d65790b902bab908c278be1c58b0ef"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/stagger/se.png",
+          "sha256": "eb61f649a2f1c106d987db07389951d981cb5ab1bc8e106466bb2983d3cdffc7"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/stagger_normal/se.png",
+          "sha256": "2e57fbbc04643980ca87212ccab431767f0442eff5bc24c9ea3f218ac65b6fe4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/stagger/s.png",
+          "sha256": "4e1f934ff470ac3515b2ad8d42eabbe9b759e35f08a89028f6e94b7a063a1456"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/stagger_normal/s.png",
+          "sha256": "869634011daadc804ffa7a38afffb43a2e18209a2bf985e4e0daaa77c1191434"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/stagger/sw.png",
+          "sha256": "4a0d1b7f8a95906ab4d2fda9e85aa392d5fe27d91f30f55df04b24468130c3a8"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/stagger_normal/sw.png",
+          "sha256": "403a24b2e053f4ea303a663dcae68a385a753d26006a050560037af8878b07fa"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/stagger/w.png",
+          "sha256": "9cf68da58b7518abd8592bfc8802726297c1ca4d677ecba183ee64c74b140d66"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/stagger_normal/w.png",
+          "sha256": "4a5aaf58216965c07d01fd548ba67df1de37c2844da10beb7016980be2c1da25"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/stagger/nw.png",
+          "sha256": "e94d88c5e9d2855e71e3384ebc9062bf79891b7be35c3ce178ae989b2b777889"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/stagger_normal/nw.png",
+          "sha256": "dadff0538500b714b7a736d94c81d9bb983b5526158f854e0fd1177d47eca851"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.91,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Taumeln: Rückwurf mit Schritt zurück, Wanken, Sammeln (nach dem Taumel-Zeitgeber)"
+      }
+    },
+    {
+      "id": "d1a024c595bc44b8918571d4cc982ca3",
+      "timestamp": "2026-10-06T18:50:36+00:00",
+      "visual_id": "enemy.devourer",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "death",
+        "frames": 14,
+        "fps": 23.0,
+        "frame_size": [
+          318,
+          346
+        ],
+        "origin": [
+          0.5,
+          0.7746
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.6,
+        "render_seconds": 39.4
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/enemy.devourer/render/death.render.json",
+          "sha256": "920de0c1248c21d6324d1ccfd98868112710cb8b6e619756d211b3c30cc9a609"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/death/n.png",
+          "sha256": "bedb1b8cf87d0fb603f2f874351c3c82f84f81f90f1f3d9ae12851a26759df7f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/death_normal/n.png",
+          "sha256": "aa3c300997d41b3ae9ba9805705c15e07b48fc7e344b8922a99e08872b1afbf2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/death/ne.png",
+          "sha256": "f2c72f0fa58142617fb71cbb568d89e81c6acb7e06ae7a08d23545cc6e6be920"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/death_normal/ne.png",
+          "sha256": "3df5a6d503483b9c370918bae9cf3cf05a704e3fcf91df461125c20a083e6195"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/death/e.png",
+          "sha256": "94bf077919cb2ef0925d61cc09f11eeb5e18876f40c2b00d4fbd7013c4e79d41"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/death_normal/e.png",
+          "sha256": "4db89565170cd05d0cb5287fd99341c8f8bf277e4b9735a2c8e5d1f44dd54c23"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/death/se.png",
+          "sha256": "714e89bda0ebe8db4c7a4d769da0155fca6fbde36211d9b7bcf21aad6e2996c4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/death_normal/se.png",
+          "sha256": "240cf7dfa23c9866e26d3cf124076627e2b1fc24a457651964275141b8eeca2b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/death/s.png",
+          "sha256": "85b660598b721749ab1ed9142231a305c95fbbebfc7412a55f9793c14db9faa9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/death_normal/s.png",
+          "sha256": "2de5a60f04561196860f2011eb34e0765c06410b3ba1dfb5210605eff5f12e66"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/death/sw.png",
+          "sha256": "88c6327f89590067d88906f60b2ca090785fab3265b4381e217bc3c1c152b83e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/death_normal/sw.png",
+          "sha256": "5fbe1de86d19083eb44df327ad2e94245ebad3308d9c95d1cf6f38469fa69bb1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/death/w.png",
+          "sha256": "8bae1f7d8d0b09a4e40655ab84c9d1e2df4212d8cd4e8706c53a23429e7fa5d1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/death_normal/w.png",
+          "sha256": "cf0dad3ba602378530cef58e76c88862dfa2ca65f2b87c6b06cea929cfd376e2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/death/nw.png",
+          "sha256": "3cef562ed7658586834ef9821f8a04cadb2d94eef9f5e703bb01571ae42dca70"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Devourer/Rendered/death_normal/nw.png",
+          "sha256": "e90f8c7e5eeb8b40eefeb342a5980afdd9830542d3f99b68afec0ebadb045cf9"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.97,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Tod: Aufbäumen, auf die Knie, Sturz nach vorn"
+      }
     }
   ]
 }

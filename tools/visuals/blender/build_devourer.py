@@ -404,22 +404,47 @@ def key_devour(poser: Poser, frames: int) -> bpy.types.Action:
 
 
 def key_stagger(poser: Poser, frames: int) -> bpy.types.Action:
-    """Staggered (full cannon on the torso, or a devour broken off): thrown back, arms wide, then
-    it gathers itself."""
-    action = bpy.data.actions.new("stagger")
-    poser.rig.animation_data.action = action
-    ground = rest_ground(poser.rig)
+    """Staggered (a full cannon on the torso, 1.4 s, or a devour broken off, 0.38 s; sampled by the
+    stagger timer): the blast throws the torso back and the arms wide, the maw gapes, the right
+    foot is driven back a heavy step; it reels on the back foot, the left foot slides after it,
+    the body sways, and then it hauls itself forward into its hunch and guard again."""
+    action = replace_action(poser.rig, "stagger")
+    w = 0.239
+    rest = {"l": Vector((w, -0.166, 0)), "r": Vector((-w, -0.166, 0))}
     for frame in range(frames):
         p = frame / (frames - 1)
-        throw = ease(min(1.0, p / 0.15)) * (1.0 - ease(max(0.0, (p - 0.15) / 0.85)))
+        throw = smooth(min(1.0, p / 0.1)) * (1.0 - smooth(max(0.0, (p - 0.18) / 0.62)))
+        sway = math.sin(max(0.0, p - 0.08) / 0.6 * math.tau * 1.25) * (1.0 - smooth(max(0.0, (p - 0.3) / 0.5)))
+        gather = smooth(max(0.0, (p - 0.55) / 0.4))
+        planter = Feet(poser)
+        back_r, lift_r = step_arc(p, 0.04, 0.22, rest["r"], Vector((-w - 0.04, 0.14, 0)), 0.06)
+        back_r, lift_r2 = step_arc(p, 0.62, 0.9, back_r, rest["r"], 0.05) if p > 0.62 else (back_r, 0.0)
+        slide_l, lift_l = step_arc(p, 0.18, 0.4, rest["l"], Vector((w + 0.02, 0.0, 0)), 0.03)
+        slide_l, lift_l2 = step_arc(p, 0.7, 0.95, slide_l, rest["l"], 0.04) if p > 0.7 else (slide_l, 0.0)
         poser.clear()
-        hunch(poser, bend=-26 * throw)
-        poser.set("head", "back", 20 * throw)
-        poser.set("thigh_r" if poser.left > 0 else "thigh_l", "forward", -14 * throw)
-        ground_feet(poser, ground)
-        guard(poser, open_amount=throw)
+        planter.plant("r", Vector((back_r.x * poser.left, back_r.y, 0.0)), yaw=12 * throw, heel=6 * throw,
+                      lift=lift_r + lift_r2, knee_out=0.12)
+        planter.plant("l", Vector((slide_l.x * poser.left, slide_l.y, 0.0)), yaw=-6 * throw, heel=14 * throw,
+                      lift=lift_l + lift_l2, knee_out=0.12)
+        move_pelvis(poser, Vector((0.025 * sway * poser.left, 0.1 * throw, -0.04 * throw)))
+        hunch(poser, bend=-34 * throw)
+        poser.set("spine_02", "back", 10 * throw)
+        poser.turn("spine_02", 9 * sway)
+        poser.set("head", "back", 24 * throw)
+        fit_pelvis(poser, reach=0.97)
+        planter.settle()
+        # Arms flung wide and up by the blast, flailing with the sway, then back into the guard.
+        for side in ("l", "r"):
+            flung = poser.world(0.25, -0.15, 1.0, side)
+            rest_arm = poser.world(0.35, 1.0, 0.45, side)
+            out = smooth(min(1.0, p / 0.08)) * (1.0 - gather)
+            reach = rest_arm.lerp(flung, out) + Vector((0, 0, 0.25 * sway * (1 if side == "l" else -1) * (1 - gather)))
+            poser.aim(f"upperarm_{side}", reach.normalized())
+            poser.aim(f"lowerarm_{side}", poser.world(0.9, 0.2 + 0.4 * gather, 0.4 - 0.9 * gather, side).lerp(reach, 0.4 * (1 - gather)).normalized())
+        loose_fists(poser, 40 + 20 * gather)
         poser.key(frame + 1)
-        key_extras(poser, frame + 1, 1.0 + 0.3 * throw, frame * 0.5)
+        key_legs(poser.rig, frame + 1, 1.0)
+        key_extras(poser, frame + 1, 1.0 + 0.45 * throw + 0.08 * sway, frame * 0.6)
     return action
 
 
@@ -444,29 +469,45 @@ def key_hit(poser: Poser, frames: int) -> bpy.types.Action:
 
 
 def key_death(poser: Poser, frames: int) -> bpy.types.Action:
-    """Dying (0.82 s): the prison cracks open (the opening widens), it sinks to its knees and
-    slumps; the game dissolves it and every trapped soul comes free."""
-    action = bpy.data.actions.new("death")
-    poser.rig.animation_data.action = action
+    """Dying (the first three quarters of 0.82 s; the dissolve then takes the last pose): the prison
+    cracks open, it rears back with the arms thrown up, the knees give, it drops onto them and
+    topples forward onto its fists and face, a heavy heap; the game dissolves it and every
+    trapped soul comes free."""
+    action = replace_action(poser.rig, "death")
     ground = rest_ground(poser.rig)
     contact = [("foot_l", "head"), ("foot_r", "head"), ("ball_l", "tail"), ("ball_r", "tail"),
-               ("calf_l", "head"), ("calf_r", "head"), ("hand_l", "tail"), ("hand_r", "tail")]
+               ("calf_l", "head"), ("calf_r", "head"), ("hand_l", "tail"), ("hand_r", "tail"),
+               ("head", "tail"), ("spine_03", "tail"), ("pelvis", "head")]
     for frame in range(frames):
         t = frame / (frames - 1)
-        burst = ease(min(1.0, t / 0.3))
-        kneel = ease((t - 0.2) / 0.6)
+        rear = smooth(min(1.0, t / 0.22)) * (1.0 - smooth(max(0.0, (t - 0.22) / 0.25)))
+        kneel = smooth((t - 0.18) / 0.32)
+        fall = smooth((t - 0.48) / 0.42) ** 1.4
         poser.clear()
-        hunch(poser, bend=-18 * burst * (1 - kneel) + 30 * kneel)
-        for side in ("l", "r"):
-            poser.set(f"thigh_{side}", "forward", 10 + 62 * kneel)
-            poser.set(f"calf_{side}", "back", 16 + 70 * kneel)
-        if kneel > 0:
+        poser.set("pelvis", "forward", 70 * fall)
+        hunch(poser, bend=-30 * rear + 26 * kneel * (1 - fall))
+        poser.set("head", "back", 22 * rear)
+        poser.set("neck_01", "forward", 18 * fall)
+        for side, lean in (("l", 1.0), ("r", 0.85)):
+            poser.set(f"thigh_{side}", "forward", 10 + 70 * kneel * lean * (1 - fall) + 8 * fall)
+            poser.set(f"calf_{side}", "back", 16 + 100 * kneel * (1 - fall) + 30 * fall)
+        if kneel > 0.0 or fall > 0.0:
             ground_points(poser, ground, contact)
         else:
             ground_feet(poser, ground)
-        guard(poser, open_amount=burst * (1 - kneel * 0.6))
+        # Arms thrown up as it cracks, hanging as it kneels, then out in front on the floor.
+        for side in ("l", "r"):
+            held = poser.world(0.35, 1.0, 0.45, side)
+            up = poser.world(0.2, -0.7, 0.7, side)
+            hang = poser.world(0.2, 1.0, 0.35, side)
+            ahead = poser.world(1.0, 0.25, 0.45, side)
+            arm = held.lerp(up, smooth(min(1.0, t / 0.12))).lerp(hang, smooth(max(0.0, (t - 0.2) / 0.25))).lerp(ahead, fall).normalized()
+            poser.aim(f"upperarm_{side}", arm)
+            poser.aim(f"lowerarm_{side}", (arm + Vector((0, 0, -0.25 * (1 - fall)))).normalized())
+        loose_fists(poser, 30 + 40 * fall)
         poser.key(frame + 1)
-        key_extras(poser, frame + 1, 1.0 + 0.7 * burst, t * math.tau)
+        key_legs(poser.rig, frame + 1, 0.0)
+        key_extras(poser, frame + 1, 1.0 + 0.8 * min(1.0, t / 0.3), t * math.tau)
     return action
 
 
@@ -525,7 +566,7 @@ def main() -> None:
     poser = Poser(rig, Vector((0, toe.y, 0)).normalized())
     poser.measure_rest([f"{bone}_{side}" for bone in FINGERS + THUMB for side in ("l", "r")], "down")
     add_leg_ik(rig)
-    actions = [key_idle(poser, LOOP_FRAMES["idle"]), key_move(poser, LOOP_FRAMES["move"]), key_devour(poser, 10), key_stagger(poser, 10), key_death(poser, 10)]
+    actions = [key_idle(poser, LOOP_FRAMES["idle"]), key_move(poser, LOOP_FRAMES["move"]), key_devour(poser, 10)]
     actions += [combat_action(poser, name) for name in COMBAT_FRAMES]
     for action in actions:
         action.use_fake_user = True
@@ -543,11 +584,12 @@ def main() -> None:
 LOOP_FRAMES = {"idle": 20, "move": 20}
 
 #: Frames of the combat actions; render and pack take the same counts.
-COMBAT_FRAMES = {"slam": SLAM_FRAMES, "recover": 12, "hit": 6}
+COMBAT_FRAMES = {"slam": SLAM_FRAMES, "recover": 12, "hit": 6, "stagger": 18, "death": 14}
 
 
 def combat_action(poser: Poser, name: str) -> bpy.types.Action:
-    return {"slam": key_slam, "recover": key_recover, "hit": key_hit}[name](poser, COMBAT_FRAMES[name])
+    return {"slam": key_slam, "recover": key_recover, "hit": key_hit, "stagger": key_stagger,
+            "death": key_death}[name](poser, COMBAT_FRAMES[name])
 
 
 def rekey(args: argparse.Namespace) -> None:

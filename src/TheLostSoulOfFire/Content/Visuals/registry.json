@@ -403,12 +403,12 @@
         },
         "stagger": {
           "path": "Textures/Enemies/Devourer/Rendered/stagger/{dir}",
-          "frameSize": [212, 238],
-          "frames": 10,
-          "fps": 8.0,
-          "loop": false,
+          "frameSize": [266, 266],
+          "frames": 18,
+          "fps": 13.0,
+          "loop": true,
           "normalMap": "Textures/Enemies/Devourer/Rendered/stagger_normal/{dir}",
-          "origin": [0.5, 0.8748]
+          "origin": [0.5, 0.8835]
         },
         "hit": {
           "path": "Textures/Enemies/Devourer/Rendered/hit/{dir}",
@@ -421,12 +421,12 @@
         },
         "death": {
           "path": "Textures/Enemies/Devourer/Rendered/death/{dir}",
-          "frameSize": [228, 256],
-          "frames": 10,
-          "fps": 12.0,
-          "loop": false,
+          "frameSize": [318, 346],
+          "frames": 14,
+          "fps": 23.0,
+          "loop": true,
           "normalMap": "Textures/Enemies/Devourer/Rendered/death_normal/{dir}",
-          "origin": [0.5, 0.7937]
+          "origin": [0.5, 0.7746]
         }
       },
       "pixelsPerUnit": 1.5

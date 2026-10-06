@@ -141,6 +141,7 @@ internal sealed class TourVisualTest
         Station("arena_player", BuildPlayerMotion);
         Station("arena_burning", BuildBurning);
         Station("arena_devourer", BuildDevourer);
+        Station("arena_devourer_end", BuildDevourerEnd);
         Station("arena_chest", BuildChest);
         Station("arena_death", BuildDeath);
         Station("menus", BuildMenus);
@@ -542,6 +543,26 @@ internal sealed class TourVisualTest
         Overview("overview");
         Do("defeat", () => _world.DefeatAutomatedEnemies());
         Series("defeat", 10, 4);
+    }
+
+    /// <summary>A fresh fight: a full cannon throws the Devourer back (1.4 s), then it dies.</summary>
+    private void BuildDevourerEnd()
+    {
+        EnterArena(3);
+        Wait("combat", () => _world.LoopState == ArenaLoopState.Combat && _world.AutomatedEnemies.OfType<Devourer>().Any(enemy => enemy.IsAlive), 20f);
+        Do("alone", () => _world.DefeatAutomatedEnemiesExcept<Devourer>(), 1.6f);
+        Do("place", () =>
+        {
+            if (Nearest<Devourer>() is { } devourer)
+            {
+                _world.PlaceAutomatedPlayer(devourer.Position + new Vector2(-230f, 60f));
+                AimAt(devourer.Position);
+            }
+        }, 0.3f);
+        Do("stagger", () => _world.StaggerAutomatedEnemies<Devourer>());
+        Series("stagger", 12, 7, () => { if (Nearest<Devourer>() is { } devourer) AimAt(devourer.Position); });
+        Do("defeat", () => _world.DefeatAutomatedEnemies());
+        Series("death", 10, 3);
     }
 
     private void BuildChest()

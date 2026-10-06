@@ -314,6 +314,12 @@ Rahmen wie oben (nur Darstellung und Ton).
   letzte Bild ist das erste der Ruhe. Kernlicht und Seelensinn folgen der Körperhöhe
   (`Player.DrawnCoreHeight`).
 
+- Devourer: Taumeln nach voller Kanone war kaum Bewegung, der Tod nur ein Zusammensacken in die
+  Hocke. Neu (18/14 Bilder, nach den bestehenden Zeitgebern): Rückwurf mit schwerem Schritt
+  zurück, Arme hochgerissen, Schlund weit, Wanken, Sammeln in die Haltung; Tod: Aufbäumen mit
+  hochgeworfenen Armen, auf die Knie, Sturz nach vorn. Rundgang-Station `arena_devourer_end`
+  zeigt beides (vorher war der Spieler dort schon tot).
+
 **Befunde, offen (nach Wirkung):**
 1. Arena im Spielausschnitt: Boden gleichmäßig hell, wenig Lichtgefälle.
 2. Sprache: Erzähltexte englisch, HUD deutsch (Inhaltsfrage, nicht ohne Owner ändern).
