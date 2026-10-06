@@ -2,6 +2,7 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TheLostSoulOfFire.Game;
+using TheLostSoulOfFire.Rendering.Visuals;
 
 namespace TheLostSoulOfFire.Rendering;
 
@@ -23,14 +24,27 @@ public static class PrologueEnvironment
     private static readonly Color IronLight = new(92, 88, 103);
     private static readonly Color Memory = new(93, 82, 112);
 
+    /// <summary>The rendered plate of the sector on screen, or null where the shapes below still stand in.</summary>
+    public static string? PlateOf(PrologueDirector prologue) => prologue.Sector switch
+    {
+        PrologueSector.Emergence => VisualIds.ShoreFloor,
+        PrologueSector.Search => VisualIds.SearchFloor,
+        _ => null
+    };
+
     public static void DrawGround(
         SpriteBatch batch,
         Texture2D pixel,
         PrologueDirector prologue,
         float time,
-        float soulSense)
+        float soulSense,
+        bool painted = false)
     {
         batch.FillRectangle(pixel, PrologueDirector.WorldBounds, Void);
+        if (painted)
+        {
+            return;
+        }
         switch (prologue.Sector)
         {
             case PrologueSector.Emergence:
@@ -53,8 +67,13 @@ public static class PrologueEnvironment
         Texture2D pixel,
         PrologueDirector prologue,
         float time,
-        float soulSense)
+        float soulSense,
+        bool painted = false)
     {
+        if (painted && prologue.Sector != PrologueSector.Emergence)
+        {
+            return;
+        }
         switch (prologue.Sector)
         {
             case PrologueSector.Emergence:
@@ -83,8 +102,12 @@ public static class PrologueEnvironment
         }
     }
 
-    public static void DrawForeground(SpriteBatch batch, Texture2D pixel, PrologueDirector prologue)
+    public static void DrawForeground(SpriteBatch batch, Texture2D pixel, PrologueDirector prologue, bool painted = false)
     {
+        if (painted && prologue.Sector != PrologueSector.Emergence)
+        {
+            return;
+        }
         Color near = new Color(5, 4, 9) * 0.96f;
         Color edge = new Color(33, 30, 42) * 0.82f;
         batch.FillRectangle(pixel, new Rectangle(0, 0, 1800, 30), near);

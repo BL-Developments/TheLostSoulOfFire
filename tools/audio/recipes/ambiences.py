@@ -55,8 +55,8 @@ def hub(rng) -> np.ndarray:
     n = dsp.seconds(32.0)
     room = dsp.impulse_response(3.2, rng, damping_hz=3500, predelay=0.02)
     # The furnace beyond the doors: a slow-breathing low rumble and a faint drone.
-    rumble = _bed(n, rng, "brown", 28, 110, 0.32, width=0.5, movement=0.45, rate=0.07)
-    drone = dsp.drone(41.2, 32.0, rng, movement=0.3) * 0.05
+    rumble = _bed(n, rng, "brown", 30, 95, 0.26, width=0.5, movement=0.15, rate=0.04)
+    drone = dsp.drone(41.2, 32.0, rng, movement=0.15) * 0.09
     rumble += np.stack([drone, drone], axis=-1)
     # Room tone: still air in a large stone hall.
     air = _bed(n, rng, "pink", 180, 1800, 0.035, movement=0.25, rate=0.05)
@@ -76,3 +76,64 @@ def hub(rng) -> np.ndarray:
     mix = rumble + air + flames + ash + chains + toll
     mix = dsp.reverb(mix, room, wet=0.35, loop=True)
     return dsp.normalise_loudness(mix, -30.0, peak_ceiling_db=-9.0)
+
+
+def _lap(rng) -> np.ndarray:
+    """One small wave slapping against a concrete edge: a soft swell, a wet slap, a sucking ebb."""
+    duration = rng.uniform(0.9, 1.6)
+    n = dsp.seconds(duration)
+    t = dsp.time_axis(n)
+    swell = dsp.lowpass(rng.standard_normal(n), 500) * np.exp(-((t - 0.25) / 0.18) ** 2)
+    slap_at = dsp.seconds(rng.uniform(0.3, 0.42))
+    slap = np.zeros(n)
+    m = min(n - slap_at, dsp.seconds(0.25))
+    slap[slap_at:slap_at + m] = dsp.bandpass(rng.standard_normal(m), 300, 2400) * np.exp(-np.arange(m) / (dsp.RATE * 0.05))
+    ebb = dsp.bandpass(rng.standard_normal(n), 800, 4500) * np.exp(-((t - duration * 0.6) / (duration * 0.25)) ** 2) * 0.25
+    # Bubbles in the ebb.
+    for _ in range(rng.integers(3, 8)):
+        start = int(rng.uniform(0.45, 0.85) * n)
+        length = dsp.seconds(0.03)
+        if start + length < n:
+            f = rng.uniform(600, 1400)
+            bt = dsp.time_axis(length)
+            ebb[start:start + length] += np.sin(2 * np.pi * f * (1 + 2 * bt) * bt) * np.exp(-bt / 0.008) * 0.3
+    return swell * 0.6 + slap * 0.8 + ebb
+
+
+def _flap(rng) -> np.ndarray:
+    """A split-flap board rattling through a few leaves: quick dry clicks."""
+    clicks = rng.integers(4, 11)
+    gap = rng.uniform(0.035, 0.06)
+    n = dsp.seconds(clicks * gap + 0.2)
+    out = np.zeros(n)
+    for k in range(clicks):
+        at = dsp.seconds(k * gap * rng.uniform(0.9, 1.1))
+        m = dsp.seconds(0.012)
+        click = dsp.bandpass(rng.standard_normal(m), 1500, 6000) * np.exp(-np.arange(m) / (dsp.RATE * 0.002))
+        if at + m < n:
+            out[at:at + m] += click * rng.uniform(0.6, 1.0)
+    return dsp.resonator(out, 900, 4) * 0.5 + out * 0.5
+
+
+@recipe("ambience-shore", "Unvollendetes Ufer: Wasser an der Bahnsteigkante, kalter Wind, Fallblätter, ferne Bojenglocke", loop=True)
+def shore(rng) -> np.ndarray:
+    n = dsp.seconds(40.0)
+    space = dsp.impulse_response(2.2, rng, damping_hz=5000, predelay=0.03, stereo_spread=1.0)
+    # Open sea and wind: wide, cold, slowly moving bands.
+    sea = _bed(n, rng, "pink", 90, 900, 0.10, movement=0.35, rate=0.09)
+    wind = np.zeros((n, 2))
+    for _ in range(2):
+        source = dsp.pink(n, rng)
+        centre = 500 + 900 * dsp.smooth_loop(n, 0.06, rng)
+        gust = dsp.circular(lambda x: dsp.swept_bandpass(x, np.concatenate([centre, centre]), q=1.6), source)
+        level = (0.35 + 0.65 * dsp.smooth_loop(n, 0.05, rng)) * 0.022
+        wind += dsp.pan(gust / (np.std(gust) + 1e-9) * level, rng.uniform(-0.7, 0.7))
+    laps = _grains(n, rng, 22, _lap, spread=0.8, gain_range=(0.04, 0.09))
+    flaps = _grains(n, rng, 3, _flap, spread=0.4, gain_range=(0.03, 0.05))
+    buoy = np.zeros((n, 2))
+    for at in (6.0, 26.5):
+        toll = dsp.lowpass(dsp.bell(311.0, 6.0, rng, brightness=0.5), 2200) * 0.025
+        dsp.place(buoy, dsp.pan(toll, 0.6), dsp.seconds(at))
+    mix = sea + wind + laps + flaps + buoy
+    mix = dsp.reverb(mix, space, wet=0.22, loop=True)
+    return dsp.normalise_loudness(mix, -29.0, peak_ceiling_db=-8.0)

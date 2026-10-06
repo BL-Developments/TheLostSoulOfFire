@@ -58,6 +58,9 @@ public sealed partial class GameWorld : IDisposable
     private readonly List<SceneProp> _hubProps = SoulFurnaceAntechamber.BrazierFeet
         .Select(foot => new SceneProp(VisualIds.HubBrazier, foot, new Vector2(48f, 76f), SceneLayer.HighProp))
         .ToList();
+    private readonly List<SceneProp> _searchProps = PrologueDirector.SearchProps
+        .Select(placement => new SceneProp(placement.VisualId, placement.Foot, placement.FallbackSize, placement.FallbackLayer))
+        .ToList();
     private readonly List<SceneProp> _shoreProps = PrologueDirector.ShoreProps
         .Select(placement => new SceneProp(placement.VisualId, placement.Foot, placement.FallbackSize, placement.FallbackLayer))
         .ToList();
@@ -115,6 +118,21 @@ public sealed partial class GameWorld : IDisposable
         GamePhase.Arena => VisualIds.GradeArena,
         _ => VisualIds.GradeNeutral
     };
+    /// <summary>The ambience and music zone of what is on screen (presentation only).</summary>
+    private AudioZone CurrentAudioZone => _phase switch
+    {
+        GamePhase.Title => AudioZone.Title,
+        GamePhase.Antechamber or GamePhase.EnteringArena => AudioZone.Hub,
+        GamePhase.Prologue => _prologue.Sector switch
+        {
+            PrologueSector.Emergence => AudioZone.Shore,
+            PrologueSector.Search => AudioZone.Harbour,
+            PrologueSector.Escape => _prologue.IsVehicleRide ? AudioZone.Crossing : AudioZone.Causeway,
+            _ => AudioZone.Threshold
+        },
+        _ => AudioZone.Arena
+    };
+
     private Rectangle ActiveCombatBounds => _phase == GamePhase.Prologue ? _prologue.MovementBounds : _arena.CombatBounds;
     private Rectangle ActiveWorldBounds => _phase == GamePhase.Prologue ? PrologueDirector.WorldBounds : _arena.Bounds;
     private ArenaLoopState CameraLoopState => _phase == GamePhase.Prologue && _loopState == ArenaLoopState.Complete
@@ -160,6 +178,7 @@ public sealed partial class GameWorld : IDisposable
     public void Update(GameTime gameTime, InputState input, Viewport viewport)
     {
         float deltaTime = MathF.Min((float)gameTime.ElapsedGameTime.TotalSeconds, 1f / 20f);
+        _audio.SetZone(CurrentAudioZone);
         if (_devMenu.IsOpen)
         {
             _audio.Update(deltaTime);
@@ -831,12 +850,14 @@ public sealed partial class GameWorld : IDisposable
         {
             if (_phase == GamePhase.Prologue)
             {
-                PrologueEnvironment.DrawGround(batch, pixel, _prologue, _presentationTime, _soulSensePresentation.WorldSuppression);
-                if (_prologue.Sector == PrologueSector.Emergence)
+                string? plate = PrologueEnvironment.PlateOf(_prologue);
+                bool painted = plate is not null && _art.HasArt(plate);
+                PrologueEnvironment.DrawGround(batch, pixel, _prologue, _presentationTime, _soulSensePresentation.WorldSuppression, painted);
+                if (painted)
                 {
-                    _art.DrawEnvironment(batch, VisualIds.ShoreFloor, Vector2.Zero);
+                    _art.DrawEnvironment(batch, plate!, Vector2.Zero);
                 }
-                PrologueEnvironment.DrawProps(batch, pixel, _prologue, _presentationTime, _soulSensePresentation.WorldSuppression);
+                PrologueEnvironment.DrawProps(batch, pixel, _prologue, _presentationTime, _soulSensePresentation.WorldSuppression, painted);
             }
             else
             {
@@ -865,9 +886,18 @@ public sealed partial class GameWorld : IDisposable
         {
             _antechamber.DrawBrazierFlames(batch, _art, _presentationTime);
         }
+        if (_phase == GamePhase.Prologue && PrologueEnvironment.PlateOf(_prologue) is { } dressed && _art.HasArt(dressed))
+        {
+            int index = 0;
+            foreach ((Vector2 flameBase, float height) in PrologueDirector.WardenFlames(_prologue.Sector, _prologue.IsVehicleRide))
+            {
+                _art.DrawWardenFlame(batch, flameBase, height, _presentationTime + index++ * 1.13f);
+            }
+        }
         if (_phase == GamePhase.Prologue)
         {
-            PrologueEnvironment.DrawForeground(batch, pixel, _prologue);
+            PrologueEnvironment.DrawForeground(batch, pixel, _prologue,
+                PrologueEnvironment.PlateOf(_prologue) is { } foregroundPlate && _art.HasArt(foregroundPlate));
         }
 
         if (IsCombatPhase)
@@ -928,6 +958,7 @@ public sealed partial class GameWorld : IDisposable
         GamePhase.Antechamber or GamePhase.EnteringArena => _hubProps.Concat(_sceneProps),
         GamePhase.Arena => _arenaProps.Concat(_sceneProps),
         GamePhase.Prologue when _prologue.Sector == PrologueSector.Emergence => _shoreProps.Concat(_sceneProps),
+        GamePhase.Prologue when _prologue.Sector == PrologueSector.Search && _art.HasArt(VisualIds.SearchFloor) => _searchProps.Concat(_sceneProps),
         _ => _sceneProps
     };
 

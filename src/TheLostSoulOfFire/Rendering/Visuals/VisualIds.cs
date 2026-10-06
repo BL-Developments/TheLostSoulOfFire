@@ -32,6 +32,10 @@ public static class VisualIds
     public const string ShoreCanopyPost = "prop.shore-canopy-post";
     public const string ShoreLamp = "prop.shore-lamp";
     public const string ShoreBollard = "prop.shore-bollard";
+    public const string SearchFloor = "environment.search";
+    public const string SearchLuggage = "prop.search-luggage";
+    public const string SearchMast = "prop.search-mast";
+    public const string WardenMarker = "prop.warden-marker";
     public const string HubFloor = "environment.hub";
     public const string HubBrazier = "prop.hub-brazier";
     public const string HubLeaves = "environment.hub-leaves";

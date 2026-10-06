@@ -5886,6 +5886,936 @@
         "status": "kandidat",
         "reason": "Bodenplatte für das Spiel aufbereitet"
       }
+    },
+    {
+      "id": "78c5878946494d5180f5fc3c16be61da",
+      "timestamp": "2026-10-05T23:49:28+00:00",
+      "visual_id": "environment.prologue",
+      "step": "texture",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "flat orthographic close-up texture, the whole image is one continuous surface of old wet concrete without joints, salt crust stains, dark damp patches, small pits and aggregate, faint tar smears, painted with visible soft gouache brushwork like a hand-painted game background, even lighting, mid-dark slate grey-blue, no objects, no lines across",
+      "seed": 301,
+      "parameters": {
+        "steps": 4,
+        "width": 1024,
+        "height": 1024,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/tex-concrete-s301.png",
+          "sha256": "412767e518ab5ec4b4568daa454af7515f82575aafa6ff48b5b900a877a6fff8"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 63.15,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "1b996ba29b844366a7f874a01b6b8603",
+      "timestamp": "2026-10-05T23:50:32+00:00",
+      "visual_id": "environment.prologue",
+      "step": "texture",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "flat orthographic close-up texture, the whole image is one continuous surface of weathered dark tarred wood grain without any plank joints, long grain running horizontally, salt-bleached streaks, small cracks, painted with visible soft gouache brushwork like a hand-painted game background, even lighting, very dark brown-black with grey weathering, no objects, no nails",
+      "seed": 307,
+      "parameters": {
+        "steps": 4,
+        "width": 1024,
+        "height": 1024,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/tex-wood-s307.png",
+          "sha256": "2267d684beeefe4f7c956f98ed8f055e1ede8525ed9feecb3e6984336afe0a02"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 64.48,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "f0c949ab174841098039025729c15f04",
+      "timestamp": "2026-10-05T23:51:41+00:00",
+      "visual_id": "environment.prologue",
+      "step": "texture",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "flat orthographic close-up texture, the whole image is one continuous surface of soot-stained weathered red-brown fired clay, like the face of a single huge brick, mottled, salt efflorescence, damp dark streaks, painted with visible soft gouache brushwork like a hand-painted game background, even lighting, dark muted oxide red, no joints, no lines, no objects",
+      "seed": 311,
+      "parameters": {
+        "steps": 4,
+        "width": 1024,
+        "height": 1024,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/tex-brick-s311.png",
+          "sha256": "edde41bce91fcacaa1f46f8005e3f34f6e2f28d019fb981aaac8ae14a20fe981"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 68.39,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "91e0a08968a542159a7b7df43a145e6a",
+      "timestamp": "2026-10-05T23:52:51+00:00",
+      "visual_id": "environment.prologue",
+      "step": "texture",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "flat orthographic close-up texture, the whole image is one continuous surface of worn grey granite without joints, speckled grain, wet sheen patches, salt crust, painted with visible soft gouache brushwork like a hand-painted game background, even lighting, cool mid grey, no objects, no lines across",
+      "seed": 313,
+      "parameters": {
+        "steps": 4,
+        "width": 1024,
+        "height": 1024,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/tex-granite-s313.png",
+          "sha256": "b0c8d5cf8350baa1d223334cc8051d6692aa10966c20ba21adde1152eb2fbce8"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 69.94,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "24bf95e1bc7b41078636543733c6a4a7",
+      "timestamp": "2026-10-05T23:53:54+00:00",
+      "visual_id": "environment.prologue",
+      "step": "texture",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "seen straight down, orthographic texture, the whole image is dark still deep sea water at night, slow ripples and faint reflections of a cold overcast sky, a little drifting foam, painted with visible soft gouache brushwork like a hand-painted game background, very dark slate blue-black with cold grey highlights, no objects, no horizon",
+      "seed": 317,
+      "parameters": {
+        "steps": 4,
+        "width": 1024,
+        "height": 1024,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/tex-water-s317.png",
+          "sha256": "d0c7261f563f8e0ac830db33bec51f156c9941efc367162fcaff883b472de056"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 62.52,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "f68e87f5a8cb42cebdfb49eaceefd034",
+      "timestamp": "2026-10-05T23:56:50+00:00",
+      "visual_id": "environment.prologue",
+      "step": "texture",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "seen straight down from high above, orthographic top-down game floor texture, the whole image is an old wet harbour quay paved with small dark grey granite setts in gently curving rows, about twenty-five setts across the width, dark wet joints, shallow puddles reflecting a cold night sky, salt crusts, a little dark seaweed in some joints, tar stains, calm and even, painted with visible soft gouache brushwork like a hand-painted game background, mid-dark slate grey with a cold blue cast, no objects, no rails",
+      "seed": 331,
+      "parameters": {
+        "steps": 4,
+        "width": 1024,
+        "height": 1024,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/tex-setts-s331.png",
+          "sha256": "a73016fbf7fa6bdbece4ba7f94954f59f77ee5c98a07a6b2016aa55bda93a95a"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 62.38,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "4a31460d29084261b7a8bf1e5c9bc458",
+      "timestamp": "2026-10-05T23:57:53+00:00",
+      "visual_id": "environment.prologue",
+      "step": "texture",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "seen straight down from high above, orthographic top-down game floor texture, the whole image is an old wet harbour quay paved with small dark grey granite setts in gently curving rows, about twenty-five setts across the width, dark wet joints, shallow puddles reflecting a cold night sky, salt crusts, a little dark seaweed in some joints, tar stains, calm and even, painted with visible soft gouache brushwork like a hand-painted game background, mid-dark slate grey with a cold blue cast, no objects, no rails",
+      "seed": 337,
+      "parameters": {
+        "steps": 4,
+        "width": 1024,
+        "height": 1024,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/tex-setts-s337.png",
+          "sha256": "752779b26d34e81dd195066680d847d8e25e58795cfa10a2301520ef6551518a"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 62.76,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "9ea45f0d5f5047539d23090ab1dfe3e5",
+      "timestamp": "2026-10-06T00:00:08+00:00",
+      "visual_id": "environment.prologue",
+      "step": "texture",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "seen straight down from high above, orthographic top-down game floor texture, the whole image is an old wet harbour quay paved with small dark grey granite setts laid in straight parallel rows running left to right, staggered joints, about twenty-five setts across the width, no arcs, no circles, no curves, dark wet joints, a few shallow puddles reflecting a cold night sky, salt crusts, a little dark seaweed in some joints, tar stains, calm and even, painted with visible soft gouache brushwork like a hand-painted game background, mid-dark slate grey with a cold blue cast, no objects, no rails",
+      "seed": 347,
+      "parameters": {
+        "steps": 4,
+        "width": 1024,
+        "height": 1024,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/tex-setts-s347.png",
+          "sha256": "b9243d03eebe9feb701cd9a8d420599ac4a03e6a1c48edf49a56311969395cd4"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 119.14,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "5878c77ecafe465eadcddd72183bcbb2",
+      "timestamp": "2026-10-06T00:01:15+00:00",
+      "visual_id": "environment.prologue",
+      "step": "texture",
+      "tool": {
+        "name": "mflux",
+        "version": "0.21.0"
+      },
+      "model": {
+        "name": "black-forest-labs/FLUX.2-klein-4B",
+        "license": "Apache-2.0"
+      },
+      "prompt": "seen straight down from high above, orthographic top-down game floor texture, the whole image is an old wet harbour quay paved with small dark grey granite setts laid in straight parallel rows running left to right, staggered joints, about twenty-five setts across the width, no arcs, no circles, no curves, dark wet joints, a few shallow puddles reflecting a cold night sky, salt crusts, a little dark seaweed in some joints, tar stains, calm and even, painted with visible soft gouache brushwork like a hand-painted game background, mid-dark slate grey with a cold blue cast, no objects, no rails",
+      "seed": 353,
+      "parameters": {
+        "steps": 4,
+        "width": 1024,
+        "height": 1024,
+        "quantize": 8,
+        "init_strength": null,
+        "lora_scale": null
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/tex-setts-s353.png",
+          "sha256": "d011985d90ae3f014486e552ae0e7571049fef703bab7b3fa175ba1e8b740377"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 66.05,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Probeaufruf, noch nicht bewertet"
+      }
+    },
+    {
+      "id": "7a32df3a1c804730b1783a5ebb780d35",
+      "timestamp": "2026-10-06T00:03:13+00:00",
+      "visual_id": "environment.search",
+      "step": "place-environment",
+      "tool": {
+        "name": "place_environment.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "world": [
+          1800,
+          1000
+        ],
+        "output": [
+          2700,
+          1500
+        ],
+        "tiles": [
+          2,
+          1
+        ],
+        "layer": "ground",
+        "origin": [
+          0.0,
+          0.0
+        ],
+        "crop": null,
+        "mute_reds": null,
+        "target_median": null
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/search/plate.png",
+          "sha256": "31fa625da27bc9346b3b1c32beaa14cd400291c2a8897b5a5de7d9a604b47dd3"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Search/plate_c0r0.png",
+          "sha256": "13e9b471455aad1f17b74573d1cc7255a79a3bd4041be3a852c669fd09396adb"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Search/plate_c1r0.png",
+          "sha256": "d1afdd9f77bbc8d5514dfd4ad929d94706ebc09fd7f6dbd0ba5a6ba2f6be03bd"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.49,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Bodenplatte für das Spiel aufbereitet"
+      }
+    },
+    {
+      "id": "9be608fc97154a8b863c4522378f9276",
+      "timestamp": "2026-10-06T00:03:13+00:00",
+      "visual_id": "prop.search-luggage",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "luggage",
+        "box": [
+          1165,
+          1010,
+          1335,
+          1130
+        ],
+        "layer": "high-prop"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/search/luggage_full.png",
+          "sha256": "83becee5ff7bbc489e9042f1556bc35e29ccff5ba416fb06457a2ad0714edf17"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Search/luggage.png",
+          "sha256": "a1f006dca27d3802646594436aa608018f25e85c22364a5241a59284a8a69e96"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.02,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "df44612c2b284c4b83c3d46e930e4b87",
+      "timestamp": "2026-10-06T00:03:13+00:00",
+      "visual_id": "prop.warden-marker",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "marker",
+        "box": [
+          793,
+          506,
+          852,
+          667
+        ],
+        "layer": "high-prop"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/search/marker_full.png",
+          "sha256": "ea5e2afa7e225e15931b9d99ca09ca5ccc4a0320dbfe1178cb5f93df14768f9e"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Warden/marker.png",
+          "sha256": "6b4d74200c21ea2bf513d399d7f655d30ca83ff72e003c31d04185780d7793d2"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.03,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "7f8b05690fe247c6aa3699edc98dbef6",
+      "timestamp": "2026-10-06T00:03:13+00:00",
+      "visual_id": "prop.search-mast",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "mast",
+        "box": [
+          410,
+          678,
+          580,
+          1500
+        ],
+        "layer": "occluder"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/search/mast_full.png",
+          "sha256": "fc827b81d4b94b49ffdea2e41a8b7cb56bceebeadb4ba7ae6453e207de4296f8"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Search/mast.png",
+          "sha256": "fba600e0503bd21e546c03fc0cdb676514dcd003b57c98de1be82e89d51e9bc1"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.05,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "1c17dc7c15c847628698765a350d0c63",
+      "timestamp": "2026-10-06T00:04:08+00:00",
+      "visual_id": "environment.search",
+      "step": "place-environment",
+      "tool": {
+        "name": "place_environment.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "world": [
+          1800,
+          1000
+        ],
+        "output": [
+          2700,
+          1500
+        ],
+        "tiles": [
+          2,
+          1
+        ],
+        "layer": "ground",
+        "origin": [
+          0.0,
+          0.0
+        ],
+        "crop": null,
+        "mute_reds": null,
+        "target_median": null
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/search/plate.png",
+          "sha256": "c2ca078ed2c967a30cfe6b89e33dda8388f32e2ae334dedd706d54d5e18e7064"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Search/plate_c0r0.png",
+          "sha256": "e9578fd7684871daedd942138a7a2bb239c48bc822b07ce84458d9f9b4576256"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Search/plate_c1r0.png",
+          "sha256": "0ac6c607f92cb55f449fcffd2e4fe7d62688fbfc00ab9b7c614f770c268fd33d"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.48,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Bodenplatte für das Spiel aufbereitet"
+      }
+    },
+    {
+      "id": "a06e550e0c254854b94d9881f05a7bfc",
+      "timestamp": "2026-10-06T00:04:08+00:00",
+      "visual_id": "prop.search-luggage",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "luggage",
+        "box": [
+          1165,
+          1010,
+          1335,
+          1130
+        ],
+        "layer": "high-prop"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/search/luggage_full.png",
+          "sha256": "ebb63f33d37658288b87b14087d5faba502f61dc7004da21dc7310395033d246"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Search/luggage.png",
+          "sha256": "50f882b9fb223b39f81b33e12a793cc5379088d727da544e6b71edc914fa6d21"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.02,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "8def767ddd5f4d34ae6005d5ef6912e1",
+      "timestamp": "2026-10-06T00:04:08+00:00",
+      "visual_id": "prop.warden-marker",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "marker",
+        "box": [
+          793,
+          506,
+          852,
+          667
+        ],
+        "layer": "high-prop"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/search/marker_full.png",
+          "sha256": "7573ec1d66881bfbaba2307b319a8ccad14e2ba4b11672e0501063b8997d18bc"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Warden/marker.png",
+          "sha256": "b202c5f619033987e0bf9434fabbde04e8e09d925b9a1254216d1bf37aa3af80"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.02,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "40aff6dd348c40f39027e709cb36e42e",
+      "timestamp": "2026-10-06T00:04:08+00:00",
+      "visual_id": "prop.search-mast",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "mast",
+        "box": [
+          410,
+          678,
+          580,
+          1500
+        ],
+        "layer": "occluder"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/search/mast_full.png",
+          "sha256": "f7b47e26afea820368561bf06ae1b283d2cff4ad1b5558c9b8841f92913e973e"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Search/mast.png",
+          "sha256": "327e5439a9d6b1f85dfd2abe6afa5c111bc163620e964aa0c4f2f78b921415db"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.05,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "4f1ca7ee7cc949e48ac3634dfcdd679a",
+      "timestamp": "2026-10-06T00:04:45+00:00",
+      "visual_id": "environment.search",
+      "step": "place-environment",
+      "tool": {
+        "name": "place_environment.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "world": [
+          1800,
+          1000
+        ],
+        "output": [
+          2700,
+          1500
+        ],
+        "tiles": [
+          2,
+          1
+        ],
+        "layer": "ground",
+        "origin": [
+          0.0,
+          0.0
+        ],
+        "crop": null,
+        "mute_reds": null,
+        "target_median": null
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/search/plate.png",
+          "sha256": "a68de7015aa468762f4a4d5321bcbe8e3e86ad6497409bfe413b089990ea21b6"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Search/plate_c0r0.png",
+          "sha256": "18952a7d34536491aa8c3e3f87255f09268b73f0bdaef9776b86e8496a003182"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Environment/Search/plate_c1r0.png",
+          "sha256": "038a1ed61a74413a352fcc8964b1dda5db7d242aa3866c0c090b1ccbb4e07bc0"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.49,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Bodenplatte für das Spiel aufbereitet"
+      }
+    },
+    {
+      "id": "baa7ed9e5f3840b39335e972ca793d94",
+      "timestamp": "2026-10-06T00:07:04+00:00",
+      "visual_id": "prop.search-luggage",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "luggage",
+        "box": [
+          1165,
+          1010,
+          1335,
+          1130
+        ],
+        "layer": "high-prop"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/search/luggage_full.png",
+          "sha256": "797da1a6294f70e02f9a14af3c9e75396d2e9e7d50265eb8b5548f2760b8da3f"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Search/luggage.png",
+          "sha256": "379d56945bcce5b06cf448a8bd44f04c2441d2e58e5cd7bd7df4c763d94cb522"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.03,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "90bb3fb8e2ba4225bfc2f655c6333927",
+      "timestamp": "2026-10-06T00:07:04+00:00",
+      "visual_id": "prop.warden-marker",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "marker",
+        "box": [
+          793,
+          506,
+          852,
+          667
+        ],
+        "layer": "high-prop"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/search/marker_full.png",
+          "sha256": "0e04bcb7d672d08f4da94b4cec7702c67a714c042ecf894ee49c9db90847e004"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Warden/marker.png",
+          "sha256": "e55c05a64ae0434c653c41a3e6c72be0f531581e6c1d762e8faed8f28d7af536"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.03,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
+    },
+    {
+      "id": "2cb08fda520b4680b573ec265ae97b73",
+      "timestamp": "2026-10-06T00:07:04+00:00",
+      "visual_id": "prop.search-mast",
+      "step": "place-piece",
+      "tool": {
+        "name": "Blender + place_pieces.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "piece": "mast",
+        "box": [
+          410,
+          700,
+          580,
+          1500
+        ],
+        "layer": "occluder"
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/environment.prologue/search/mast_full.png",
+          "sha256": "fc9b5a533b57dafc48c8f627ca2beff3fa84761bdfb63d8ed83bccd97c889f44"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Search/mast.png",
+          "sha256": "fa22902dafc5ae93f4516764a04d98109ed5c92412b72c75571d09735210fd8b"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.05,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Teil einer 3D-Umgebung (Blender, Spielkamera), pixelgenau zur Platte"
+      }
     }
   ]
 }

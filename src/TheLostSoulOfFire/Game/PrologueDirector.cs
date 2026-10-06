@@ -74,6 +74,31 @@ public sealed class PrologueDirector
         new(VisualIds.ShoreBoard, new Vector2(1180f, 992f), new Vector2(180f, 200f), SceneLayer.Occluder)
     ];
 
+    /// <summary>
+    /// Props of the searchway, rendered with its plate (tools/visuals/blender/build_prologue.py):
+    /// the luggage the passengers left, the three Warden way-marks and the harbour signal mast in
+    /// the south-west, whose search fire lights the quay. Visual only; none of them collide.
+    /// </summary>
+    public static IReadOnlyList<PropPlacement> SearchProps { get; } =
+    [
+        new(VisualIds.SearchLuggage, new Vector2(835f, 735f), new Vector2(110f, 70f), SceneLayer.HighProp),
+        new(VisualIds.WardenMarker, new Vector2(548f, 432f), new Vector2(30f, 90f), SceneLayer.HighProp),
+        new(VisualIds.WardenMarker, new Vector2(1038f, 652f), new Vector2(30f, 90f), SceneLayer.HighProp),
+        new(VisualIds.WardenMarker, new Vector2(1416f, 533f), new Vector2(30f, 90f), SceneLayer.HighProp),
+        new(VisualIds.SearchMast, new Vector2(330f, 968f), new Vector2(110f, 520f), SceneLayer.Occluder)
+    ];
+
+    /// <summary>Warden flames standing in the fittings of a sector's props: base point and height.</summary>
+    public static IReadOnlyList<(Vector2 Base, float Height)> WardenFlames(PrologueSector sector, bool ride) => sector switch
+    {
+        PrologueSector.Search =>
+        [
+            (new Vector2(548f, 353f), 24f), (new Vector2(1038f, 573f), 24f), (new Vector2(1416f, 454f), 24f),
+            (new Vector2(330f, 500f), 46f)
+        ],
+        _ => []
+    };
+
     public PrologueStage Stage { get; private set; } = PrologueStage.Dormant;
     public PrologueSector Sector => Stage switch
     {

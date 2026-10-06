@@ -282,7 +282,7 @@ def blocks(name: str, dark, light, mortar, width: float = 0.9, height: float = 0
 
 
 def textured(name: str, image: str, size: float, tint=(1.0, 1.0, 1.0), roughness: float = 0.85,
-             bump: float = 0.3, axes: str = "XY", variation: float = 0.15) -> bpy.types.Material:
+             bump: float = 0.3, axes: str = "XY", variation: float = 0.15, wet: float = 0.0) -> bpy.types.Material:
     """A painted texture (FLUX) repeated every `size` metres, projected along two axes ("XY" for
     floors, "XZ" for walls facing the camera, "BOX" for objects), tinted, with a bump from its
     own brightness and a slow large-scale value variation so repeats do not read."""
@@ -329,14 +329,59 @@ def textured(name: str, image: str, size: float, tint=(1.0, 1.0, 1.0), roughness
         links.new(colour_out, vary.inputs["A"])
         links.new(shade.outputs["Color"], vary.inputs["B"])
         colour_out = vary.outputs["Result"]
+    if wet > 0:
+        # Puddles: soft world-space patches that are darker and nearly mirror-smooth.
+        geometry = nodes.new("ShaderNodeNewGeometry")
+        puddle = nodes.new("ShaderNodeTexNoise")
+        puddle.inputs["Scale"].default_value = 0.45
+        puddle.inputs["Detail"].default_value = 4.0
+        puddle.inputs["Roughness"].default_value = 0.55
+        links.new(geometry.outputs["Position"], puddle.inputs["Vector"])
+        mask = _ramp(nodes, [(0.66 - wet * 0.12, (0, 0, 0)), (0.7 - wet * 0.1, (1, 1, 1))])
+        links.new(puddle.outputs["Fac"], mask.inputs["Fac"])
+        darker = nodes.new("ShaderNodeMix")
+        darker.data_type = "RGBA"
+        darker.blend_type = "MULTIPLY"
+        links.new(mask.outputs["Color"], darker.inputs["Factor"])
+        links.new(colour_out, darker.inputs["A"])
+        darker.inputs["B"].default_value = (0.45, 0.48, 0.55, 1.0)
+        colour_out = darker.outputs["Result"]
+        rough = nodes.new("ShaderNodeMix")
+        rough.data_type = "FLOAT"
+        links.new(mask.outputs["Color"], rough.inputs["Factor"])
+        rough.inputs["A"].default_value = roughness
+        rough.inputs["B"].default_value = 0.05
+        links.new(rough.outputs["Result"], bsdf.inputs["Roughness"])
+    else:
+        bsdf.inputs["Roughness"].default_value = roughness
     links.new(colour_out, bsdf.inputs["Base Color"])
-    bsdf.inputs["Roughness"].default_value = roughness
     if bump > 0:
         bump_node = nodes.new("ShaderNodeBump")
         bump_node.inputs["Strength"].default_value = bump
         links.new(texture.outputs["Color"], bump_node.inputs["Height"])
         links.new(bump_node.outputs["Normal"], bsdf.inputs["Normal"])
     return material
+
+
+def roof(name: str, centre: Vector, length: float, width: float, rise: float, material: bpy.types.Material,
+         yaw: float = 0.0) -> bpy.types.Object:
+    """A pitched roof (ridge along x before `yaw`): a triangular prism, its eaves at centre.z."""
+    import bmesh
+    mesh = bpy.data.meshes.new(name)
+    bm = bmesh.new()
+    half_l, half_w = length / 2, width / 2
+    verts = [bm.verts.new(v) for v in ((-half_l, -half_w, 0), (half_l, -half_w, 0), (half_l, half_w, 0), (-half_l, half_w, 0),
+                                       (-half_l, 0, rise), (half_l, 0, rise))]
+    for face in ((0, 1, 5, 4), (2, 3, 4, 5), (0, 4, 3), (1, 2, 5), (0, 3, 2, 1)):
+        bm.faces.new([verts[i] for i in face])
+    bm.to_mesh(mesh)
+    bm.free()
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(obj)
+    obj.location = centre
+    obj.rotation_euler = (0, 0, yaw)
+    mesh.materials.append(material)
+    return obj
 
 
 def stone(name: str, image: str, size: float, tint=(1.0, 1.0, 1.0), spread: float = 0.25,

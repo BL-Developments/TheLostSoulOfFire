@@ -37,6 +37,19 @@ public enum AudioCue
     EndingReveal
 }
 
+/// <summary>Where the player is, for the ambience bed and the music (presentation only).</summary>
+public enum AudioZone
+{
+    Title,
+    Shore,
+    Harbour,
+    Causeway,
+    Crossing,
+    Threshold,
+    Hub,
+    Arena
+}
+
 /// <summary>
 /// Central authored sound bank and mix policy. Real content-pipeline assets are
 /// preferred; generated tones remain a non-fatal fallback for missing content.
@@ -99,6 +112,47 @@ public sealed class AudioDirector : IDisposable
     private SoundEffectInstance _ambience;
     private Song _music;
     private bool _musicPlaying;
+
+    /// <summary>Ambience bed and music per zone; a zone without its own asset keeps silence or the arena bed.</summary>
+    private static readonly Dictionary<AudioZone, string> AmbienceAssets = new()
+    {
+        [AudioZone.Title] = "Audio/Ambience/hub_ambience",
+        [AudioZone.Shore] = "Audio/Ambience/shore_ambience",
+        [AudioZone.Harbour] = "Audio/Ambience/harbour_ambience",
+        [AudioZone.Causeway] = "Audio/Ambience/causeway_ambience",
+        [AudioZone.Crossing] = "Audio/Ambience/crossing_ambience",
+        [AudioZone.Threshold] = "Audio/Ambience/threshold_ambience",
+        [AudioZone.Hub] = "Audio/Ambience/hub_ambience",
+        [AudioZone.Arena] = "Audio/Ambience/arena_ambience"
+    };
+
+    private static readonly Dictionary<AudioZone, string> MusicAssets = new()
+    {
+        [AudioZone.Title] = "Audio/Music/title_theme",
+        [AudioZone.Shore] = "Audio/Music/shore_theme",
+        [AudioZone.Harbour] = "Audio/Music/shore_theme",
+        [AudioZone.Causeway] = "Audio/Music/causeway_theme",
+        [AudioZone.Crossing] = "Audio/Music/crossing_theme",
+        [AudioZone.Threshold] = "Audio/Music/threshold_theme",
+        [AudioZone.Hub] = "Audio/Music/hub_theme",
+        [AudioZone.Arena] = "Audio/Music/arena_loop"
+    };
+
+    private const float ZoneCrossfadeSeconds = 1.6f;
+    private const float MusicFadeOutSeconds = 1.4f;
+    private const float MusicFadeInSeconds = 2.4f;
+
+    private readonly ContentManager _content;
+    private readonly Dictionary<string, SoundEffect?> _beds = [];
+    private readonly Dictionary<string, Song?> _songs = [];
+    private AudioZone _zone = AudioZone.Arena;
+    private AudioZone _fadingZone = AudioZone.Arena;
+    private SoundEffectInstance? _fadingAmbience;
+    private float _zoneBlend = 1f;
+    private Song? _wantedSong;
+    private float _musicGain = 1f;
+
+    public AudioZone Zone => _zone;
     private bool _calm;
     private bool _soulSense;
     private float _arenaMix = 1f;
@@ -120,6 +174,7 @@ public sealed class AudioDirector : IDisposable
 
     public AudioDirector(ContentManager content)
     {
+        _content = content;
         try
         {
             Add(content, AudioCue.ScytheSwing1, "Audio/Sfx/scythe_swing_1", 250f, 0.09f, 0.32f, 0.22f);
@@ -151,6 +206,7 @@ public sealed class AudioDirector : IDisposable
             Add(content, AudioCue.EndingReveal, "Audio/Sfx/ending_reveal", 147f, 0.9f, 0.3f, 0.015f, rising: true);
 
             _ambienceSound = LoadOrCreateFallback(content, "Audio/Ambience/arena_ambience", 43f, 2.4f, 0.2f, 0.16f, false);
+            _beds[AmbienceAssets[AudioZone.Arena]] = _ambienceSound;
             _ambience = _ambienceSound.CreateInstance();
             _ambience.IsLooped = true;
             _ambience.Play();
@@ -191,8 +247,112 @@ public sealed class AudioDirector : IDisposable
         _arenaMix = _arenaMix < _targetArenaMix
             ? MathF.Min(_targetArenaMix, _arenaMix + mixStep)
             : MathF.Max(_targetArenaMix, _arenaMix - mixStep);
+        UpdateZoneFades(deltaTime);
         EnsureMusicPlaying();
         ApplyMix();
+    }
+
+    /// <summary>
+    /// Moves the ambience bed and the music to the zone the player is in: the beds crossfade,
+    /// the music fades out, switches and fades in. Calling it every frame with the same zone is free.
+    /// </summary>
+    public void SetZone(AudioZone zone)
+    {
+        if (!_available || zone == _zone)
+        {
+            return;
+        }
+
+        try
+        {
+            SoundEffect? bed = Bed(zone) ?? Bed(AudioZone.Arena);
+            if (bed is not null && bed != _ambienceSound)
+            {
+                _fadingAmbience?.Stop();
+                _fadingAmbience?.Dispose();
+                _fadingAmbience = _ambience;
+                _fadingZone = _zone;
+                _ambienceSound = bed;
+                _ambience = bed.CreateInstance();
+                _ambience.IsLooped = true;
+                _ambience.Volume = 0f;
+                _ambience.Play();
+                if (_paused) _ambience.Pause();
+                _zoneBlend = 0f;
+            }
+            _zone = zone;
+            _wantedSong = SongFor(zone);
+        }
+        catch
+        {
+            _available = false;
+        }
+        ApplyMix();
+    }
+
+    private SoundEffect? Bed(AudioZone zone)
+    {
+        string asset = AmbienceAssets[zone];
+        if (!_beds.TryGetValue(asset, out SoundEffect? bed))
+        {
+            try { bed = _content.Load<SoundEffect>(asset); }
+            catch (ContentLoadException) { bed = null; }
+            _beds[asset] = bed;
+        }
+        return bed;
+    }
+
+    private Song? SongFor(AudioZone zone)
+    {
+        string asset = MusicAssets[zone];
+        if (!_songs.TryGetValue(asset, out Song? song))
+        {
+            try { song = asset == "Audio/Music/arena_loop" && _music is not null ? _music : _content.Load<Song>(asset); }
+            catch (ContentLoadException) { song = null; }
+            _songs[asset] = song;
+        }
+        return song;
+    }
+
+    private void UpdateZoneFades(float deltaTime)
+    {
+        if (_zoneBlend < 1f)
+        {
+            _zoneBlend = MathF.Min(1f, _zoneBlend + deltaTime / ZoneCrossfadeSeconds);
+            if (_zoneBlend >= 1f && _fadingAmbience is not null)
+            {
+                try { _fadingAmbience.Stop(); _fadingAmbience.Dispose(); } catch { }
+                _fadingAmbience = null;
+            }
+        }
+
+        if (_wantedSong != _music)
+        {
+            _musicGain = MathF.Max(0f, _musicGain - deltaTime / MusicFadeOutSeconds);
+            if (_musicGain <= 0f)
+            {
+                try
+                {
+                    MediaPlayer.Stop();
+                    _music = _wantedSong;
+                    _musicPlaying = _music is not null;
+                    if (_music is not null)
+                    {
+                        MediaPlayer.IsRepeating = true;
+                        MediaPlayer.Play(_music);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    _musicPlaying = false;
+                    Console.Error.WriteLine($"AUDIO_MUSIC_SWITCH_FAILED message={exception.Message}");
+                }
+            }
+        }
+        else if (_musicGain < 1f)
+        {
+            _musicGain = MathF.Min(1f, _musicGain + deltaTime / MusicFadeInSeconds);
+        }
     }
 
     public void SetVolumes(float master, float music, float effects)
@@ -342,6 +502,8 @@ public sealed class AudioDirector : IDisposable
         try
         {
             _music = content.Load<Song>(assetName);
+            _wantedSong = _music;
+            _songs[assetName] = _music;
             MediaPlayer.IsMuted = false;
             MediaPlayer.IsRepeating = true;
             MediaPlayer.Play(_music);
@@ -397,10 +559,32 @@ public sealed class AudioDirector : IDisposable
         ApplyMix();
     }
 
+    /// <summary>Bed level of a zone before Soul Sense, pause and event ducking.</summary>
+    private float AmbienceLevel(AudioZone zone) => zone switch
+    {
+        AudioZone.Arena => Lerp(0.048f, _calm ? 0.035f : 0.12f, _arenaMix),
+        AudioZone.Title => 0.07f,
+        AudioZone.Hub => 0.13f,
+        AudioZone.Crossing => _calm ? 0.13f : 0.16f,
+        _ => _calm ? 0.15f : 0.11f
+    };
+
+    /// <summary>Music level of a zone: quiet under exploration, fuller in fights; the arena keeps its mix.</summary>
+    private float MusicLevel(AudioZone zone) => zone switch
+    {
+        AudioZone.Arena => (_calm ? MusicCalmVolume : MusicGameplayVolume) * _arenaMix,
+        AudioZone.Title => 0.5f,
+        AudioZone.Hub => 0.3f,
+        AudioZone.Crossing => 0.46f,
+        AudioZone.Threshold => 0.34f,
+        _ => _calm ? 0.26f : 0.4f
+    };
+
     private void ApplyMix()
     {
-        float ambienceBase = Lerp(0.048f, _calm ? 0.035f : 0.12f, _arenaMix);
-        float musicBase = (_calm ? MusicCalmVolume : MusicGameplayVolume) * _arenaMix;
+        float ambienceBase = AmbienceLevel(_zone);
+        float fadingBase = AmbienceLevel(_fadingZone);
+        float musicBase = MusicLevel(_zone) * _musicGain;
         if (_soulSense)
         {
             ambienceBase *= 0.52f;
@@ -413,9 +597,14 @@ public sealed class AudioDirector : IDisposable
             musicBase *= PausedBedVolume;
         }
 
+        float bedScale = _masterVolume * _effectsVolume * (1f - _duckAmount * 0.72f) * (_soulSense ? 0.52f : 1f) * (_paused ? PausedBedVolume : 1f);
         if (_ambience is not null)
         {
-            _ambience.Volume = Math.Clamp(ambienceBase * _masterVolume * _effectsVolume * (1f - _duckAmount * 0.72f), 0f, 1f);
+            _ambience.Volume = Math.Clamp(ambienceBase * _zoneBlend * _masterVolume * _effectsVolume * (1f - _duckAmount * 0.72f), 0f, 1f);
+        }
+        if (_fadingAmbience is not null)
+        {
+            _fadingAmbience.Volume = Math.Clamp(fadingBase * (1f - _zoneBlend) * bedScale, 0f, 1f);
         }
         if (_musicPlaying)
         {
@@ -505,6 +694,9 @@ public sealed class AudioDirector : IDisposable
         _ambience?.Stop();
         _ambience?.Dispose();
         _ambience = null;
+        _fadingAmbience?.Stop();
+        _fadingAmbience?.Dispose();
+        _fadingAmbience = null;
         _ambienceSound = null;
 
         foreach (List<SoundEffectInstance> instances in _activeInstances.Values)
