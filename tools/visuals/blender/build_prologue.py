@@ -113,12 +113,18 @@ def puddle_material() -> bpy.types.Material:
     return material
 
 
-def puddles(m, rng: random.Random, area: tuple[float, float, float, float], count: int, z: float, name: str) -> list[bpy.types.Object]:
-    """Irregular puddles (world area x0, y0, x1, y1): flat blobs with a noisy outline."""
+def puddles(m, rng: random.Random, area: tuple[float, float, float, float], count: int, z: float, name: str,
+            avoid: tuple[tuple[float, float, float], ...] = ()) -> list[bpy.types.Object]:
+    """Irregular puddles (world area x0, y0, x1, y1): flat blobs with a noisy outline. None lies
+    within `avoid` (world x, y, radius): a puddle under a lamp mirrors it as a flat pale sheet."""
     import bmesh
     parts = []
     for index in range(count):
-        centre = ground(rng.uniform(area[0], area[2]), rng.uniform(area[1], area[3]), z)
+        while True:
+            wx, wy = rng.uniform(area[0], area[2]), rng.uniform(area[1], area[3])
+            if all(math.hypot(wx - ax, wy - ay) > radius for ax, ay, radius in avoid):
+                break
+        centre = ground(wx, wy, z)
         rx, ry = rng.uniform(0.4, 1.2), rng.uniform(0.3, 0.8)
         mesh = bpy.data.meshes.new(f"{name}_{index}")
         bm = bmesh.new()
@@ -154,14 +160,14 @@ def water(m, level: float = -0.9) -> bpy.types.Object:
 
 def quay(m, x0: float, x1: float, y0: float, y1: float, top: float = 0.0, seed: int = 1,
          kerb_south: bool = True, kerb_north: bool = False, slab=(2.0, 3.4), row: float = 1.5,
-         slabs: bool = True) -> list[bpy.types.Object]:
+         slabs: bool = True, tilt: float = 0.01) -> list[bpy.types.Object]:
     """A quay: concrete slabs on a block whose faces drop to the water, granite kerbs on its edges."""
     a, b = ground(x0, y0), ground(x1, y1)
     # The body sits just under the slabs; only its faces toward the water show.
     parts = [kit.box("quay_body", Vector(((a.x + b.x) / 2, (a.y + b.y) / 2, top - 1.75)), (b.x - a.x, a.y - b.y, 3.2), m["kerb_face"])]
     if slabs:
         parts += kit.paving("slab", a.x, b.x, b.y + (0.5 if kerb_south else 0), a.y - (0.5 if kerb_north else 0), m["slab"],
-                            seed=seed, row=row, lengths=slab, gap=0.05, height=0.14, jitter=0.02)
+                            seed=seed, row=row, lengths=slab, gap=0.05, height=0.14, jitter=0.02, tilt=tilt)
     for slab_obj in parts[1:]:
         slab_obj.location.z += top
     if kerb_south:
@@ -325,13 +331,16 @@ def build_shore(m, scene) -> dict[str, list]:
     pieces: dict[str, list] = {}
     rng = random.Random(3)
     water(m)
-    platform = quay(m, -60, 1900, 120, 915, seed=11, kerb_north=True, slab=(2.4, 3.8), row=1.8)
+    # Platform slabs at the size of real ones (not the hall-sized plates of the first build),
+    # each leaning a little after decades of settling, so the wet surface breaks the light.
+    platform = quay(m, -60, 1900, 120, 915, seed=11, kerb_north=True, slab=(1.3, 2.3), row=1.15, tilt=0.022)
     for obj in platform:
         if obj.name.startswith("slab"):
             obj.data.materials[0] = m["slab_old"] if rng.random() < 0.25 else m["slab_wet"]
     # Moss and wet dirt in the joints between the slabs.
     kit.plane("joints", ground(-60, 122, -0.07), ground(1900, 913, -0.07), m["joint_moss"])
-    puddles(m, rng, (150, 180, 1650, 860), 11, 0.024, "puddle")
+    # Their own random stream, so they do not move whenever the slab layout changes.
+    puddles(m, random.Random(43), (150, 180, 1650, 860), 11, 0.045, "puddle", avoid=((1600, 455, 260),))
     # The white edge line, worn away in places, a stride inside both kerbs.
     for y in (148, 887):
         x = -60

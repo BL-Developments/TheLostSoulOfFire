@@ -592,9 +592,10 @@ def setts(prefix: str, x0: float, x1: float, y0: float, y1: float, material: bpy
 
 def paving(prefix: str, x0: float, x1: float, y0: float, y1: float, material: bpy.types.Material, seed: int = 1,
            row: float = 0.62, lengths=(0.7, 1.5), gap: float = 0.035, height: float = 0.12,
-           jitter: float = 0.012, skip=None) -> list[bpy.types.Object]:
+           jitter: float = 0.012, skip=None, tilt: float = 0.01) -> list[bpy.types.Object]:
     """Paving stones in running rows between Blender x0..x1 and y0..y1 (metres), each its own
-    bevelled object, slightly uneven. `skip(x, y)` leaves a stone out (e.g. under a wall)."""
+    bevelled object, slightly uneven (`tilt`: largest lean in radians, so each catches the light
+    a little differently). `skip(x, y)` leaves a stone out (e.g. under a wall)."""
     import random
     rng = random.Random(seed)
     stones = []
@@ -606,7 +607,7 @@ def paving(prefix: str, x0: float, x1: float, y0: float, y1: float, material: bp
             centre = Vector((x + length / 2, y + row / 2, -height / 2 + rng.uniform(-jitter, jitter)))
             if skip is None or not skip(centre.x, centre.y):
                 bpy.ops.mesh.primitive_cube_add(size=1.0, location=centre,
-                                                rotation=(rng.uniform(-0.01, 0.01), rng.uniform(-0.01, 0.01), rng.uniform(-0.012, 0.012)))
+                                                rotation=(rng.uniform(-tilt, tilt), rng.uniform(-tilt, tilt), rng.uniform(-0.012, 0.012)))
                 obj = bpy.context.active_object
                 obj.name = f"{prefix}_{len(stones)}"
                 obj.scale = (length - gap, row - gap, height)

@@ -248,13 +248,20 @@ Rahmen wie oben (nur Darstellung und Ton).
   nassem Schotterstreifen (sonst verschwanden die Schwellen zwischen den Steinen); das
   Schotterbett des Damms als gebrochener Stein (Voronoi) statt glatter heller Fläche.
 
-**Befunde, offen (nach Wirkung):**
-1. Prolog I: große, leere Steinplatten, wenig Material.
-2. Arena im Spielausschnitt: Boden gleichmäßig hell, wenig Lichtgefälle.
-3. Sprache: Erzähltexte englisch, HUD deutsch (Inhaltsfrage, nicht ohne Owner ändern).
+- Prolog I: Die Bahnsteigplatten waren 2,4–3,8 m lang und 1,8 m tief und wirkten neben der
+  Figur wie eine leere Fläche; jetzt 1,3–2,3 m × 1,15 m, jede leicht gesetzt und gekippt
+  (`kit.paving(..., tilt=)`, Standard unverändert). Pfützen mit eigenem Zufallsstrom und nicht
+  unter der Laterne (sie spiegelte sich dort als flache helle Fläche).
 
-4. Arena: Die Nordwand wirkt im Endbild hinter einem leichten Dunstschleier (Luftperspektive
+**Befunde, offen (nach Wirkung):**
+1. Arena im Spielausschnitt: Boden gleichmäßig hell, wenig Lichtgefälle.
+2. Sprache: Erzähltexte englisch, HUD deutsch (Inhaltsfrage, nicht ohne Owner ändern).
+
+3. Arena: Die Nordwand wirkt im Endbild hinter einem leichten Dunstschleier (Luftperspektive
    nach Bildhöhe trifft die Wand); prüfen, ob die Wand davon ausgenommen werden sollte.
+
+**Hinweis:** Nach `place_environment.py` immer `dotnet build` vor dem Rundgang, sonst zeigt
+das Spiel noch die alten Kacheln (Content-Pipeline).
 
 **Verworfen:**
 - Pflaster aus Granit mit der Tönung der Kantsteine (0,56): sechs- bis achtmal zu hell, die
