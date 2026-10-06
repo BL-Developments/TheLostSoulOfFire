@@ -2346,9 +2346,10 @@ public sealed partial class GameWorld : IDisposable
         {
             float pulse = 0.5f + 0.5f * MathF.Sin(_presentationTime * 3f);
             Vector2 center = _arena.CombatBounds.Center.ToVector2();
-            WorldMarks.Ring(batch, pixel, center, GameBalance.WaveTriggerRadius, GameBalance.DeathFlameBright * (0.3f + pulse * 0.25f));
-            WorldMarks.Ring(batch, pixel, center, GameBalance.WaveTriggerRadius * 0.55f, GameBalance.DeathFlame * (0.2f + pulse * 0.2f));
-            _art.DrawSoftSpot(batch, center, new Vector2(GameBalance.WaveTriggerRadius * 0.5f), GameBalance.DeathFlame * (0.06f + pulse * 0.05f));
+            // One quiet, breathing zone (its edge is the trigger radius); the zone texture fills
+            // toward the edge, so a second ring inside only doubled the line.
+            WorldMarks.Ring(batch, pixel, center, GameBalance.WaveTriggerRadius, GameBalance.DeathFlameBright * (0.18f + pulse * 0.14f));
+            _art.DrawSoftSpot(batch, center, new Vector2(GameBalance.WaveTriggerRadius * 0.5f), GameBalance.DeathFlame * (0.05f + pulse * 0.04f));
         }
 
         foreach (PendingArenaSpawn spawn in _pendingSpawns)
@@ -2365,7 +2366,7 @@ public sealed partial class GameWorld : IDisposable
         if (_loopState is ArenaLoopState.Intro or ArenaLoopState.Transition)
         {
             float pulse = 0.5f + 0.5f * MathF.Sin(_presentation.StateTime * 8f);
-            WorldMarks.Ring(batch, pixel, _arena.CombatBounds.Center.ToVector2(), 118f + pulse * 14f, GameBalance.DeathFlame * (0.24f + pulse * 0.2f));
+            WorldMarks.Ring(batch, pixel, _arena.CombatBounds.Center.ToVector2(), 118f + pulse * 14f, GameBalance.DeathFlame * (0.16f + pulse * 0.14f));
         }
     }
 

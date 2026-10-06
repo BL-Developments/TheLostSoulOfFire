@@ -382,6 +382,11 @@ Rahmen wie oben (nur Darstellung und Ton).
   zwei Stolperschritte zurück, benommenes Wanken, Zurückschlurfen in die Haltung; im Rundgang
   (`arena_wave1_hollow_stagger`) zu sehen.
 
+- Rundgang-Station `arena_swings`: die Kombo in alle acht Richtungen, je eine Aufnahme zur
+  Kontaktzeit jedes Hiebs. Sense und Wischspur lesen sich von allen Seiten.
+- Wellenstart-Markierung der Zwischenpause: eine ruhige, atmende Zone statt zweier kräftiger Ringe
+  (mit den Zonen-Texturen doppelte sich die Linie); Radius unverändert.
+
 **Geprüft (Stand 06.10.2026, 22:40):** voller Rundgang über 18 Stationen (497 Aufnahmen, kein
 Platzhalter), CPU je Frame 0,24–0,52 ms, Wandzeit im Mittel 0,9–1,6 ms (95. Perzentil höchstens
 5,7 ms); 258 Unit-Tests; Slice-, Fähigkeiten-, Vorhallen- und Währungstest; Audio-Laufzeit-,
@@ -391,8 +396,8 @@ Gameplay- (10 Wellen) und Tod-Neustart-Test; `validate_audio.py` (169 Assets);
 **Nächste Schritte (nach Wirkung):**
 1. Hörabnahme durch den Owner: Wuchtschichten der Hiebe, sanfte Seelenglocke, Präsenz der
    Gegner, Hallfahnen, Ladebrummen, Resonanzgrollen, Feuer der Life Flame, Ende-Musik.
-2. Sichtabnahme der neuen Sense und der Wischspur im Spiel (eigene Hand an Maus und Tastatur:
-   die Rundgänge sehen nur feste Zielrichtungen).
+2. Sichtabnahme der neuen Sense und der Wischspur mit eigener Steuerung (der Rundgang prüft jetzt
+   alle acht Richtungen, aber keine Mausbewegung während des Hiebs).
 3. Lampenscheibe am Ufer meldet `clean_prop_halo.py --check` (echt, kein Fehler).
 
 **Befunde, offen (nach Wirkung):**

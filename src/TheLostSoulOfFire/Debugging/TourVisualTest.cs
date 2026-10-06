@@ -139,6 +139,7 @@ internal sealed class TourVisualTest
         Station("hub", BuildHub);
         Station("arena_wave1", BuildArenaWave1);
         Station("arena_player", BuildPlayerMotion);
+        Station("arena_swings", BuildSwingDirections);
         Station("arena_burning", BuildBurning);
         Station("arena_devourer", BuildDevourer);
         Station("arena_devourer_end", BuildDevourerEnd);
@@ -475,6 +476,35 @@ internal sealed class TourVisualTest
         Do("defeat", () => _world.DefeatAutomatedEnemies());
         Series("hollow_death", 12, 3);
         Series("soul_release", 10, 6);
+    }
+
+    /// <summary>
+    /// The full combo aimed in each of the eight directions: one capture at the contact of every
+    /// swing, so blade, sweep and figure can be checked from every side.
+    /// </summary>
+    private void BuildSwingDirections()
+    {
+        EnterArena(1);
+        Wait("combat", () => _world.LoopState == ArenaLoopState.Combat, 20f);
+        Do("clear", () => _world.DefeatAutomatedEnemies(), 2.5f);
+        string[] names = ["e", "se", "s", "sw", "w", "nw", "n", "ne"];
+        for (int index = 0; index < names.Length; index++)
+        {
+            float angle = index * MathHelper.PiOver4;
+            Vector2 aim = new(MathF.Cos(angle), MathF.Sin(angle));
+            Do($"place_{names[index]}", () => { _world.PlaceAutomatedPlayer(ArenaCentre); _world.SetAutomatedAim(aim); }, 0.7f);
+            // Contacts at 0.062 s, 0.205 + 0.085 s and 0.46 + 0.155 s into the held combo.
+            Wait($"swing_{names[index]}_1", () => _world.AutomatedPlayer.Scythe.ActiveStep == 1 && _world.AutomatedPlayer.Scythe.NormalizedProgress >= 0.32f, 2f,
+                everyFrame: () => _input.InjectMousePresses(left: true, right: false));
+            Shot($"{names[index]}_1", everyFrame: () => _input.InjectMousePresses(left: true, right: false));
+            Wait($"swing_{names[index]}_2", () => _world.AutomatedPlayer.Scythe.ActiveStep == 2 && _world.AutomatedPlayer.Scythe.NormalizedProgress >= 0.36f, 2f,
+                everyFrame: () => _input.InjectMousePresses(left: true, right: false));
+            Shot($"{names[index]}_2", everyFrame: () => _input.InjectMousePresses(left: true, right: false));
+            Wait($"swing_{names[index]}_3", () => _world.AutomatedPlayer.Scythe.ActiveStep == 3 && _world.AutomatedPlayer.Scythe.NormalizedProgress >= 0.42f, 2f,
+                everyFrame: () => _input.InjectMousePresses(left: true, right: false));
+            Shot($"{names[index]}_3");
+            Do($"rest_{names[index]}", () => { }, 0.9f);
+        }
     }
 
     private void BuildPlayerMotion()
