@@ -216,7 +216,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
             profileStore: CreateProfileStore());
         if (_abilityVisualTest) _world.ApplyDeveloperStart(new DeveloperStartOptions(DeveloperStartArea.Arena, 1), VirtualViewport);
         if (_sliceVisualTest) _sliceTest = new SliceVisualTest(_world, _input, VirtualViewport);
-        if (_tourVisualTest) _tourTest = new TourVisualTest(_world, _input, VirtualViewport);
+        if (_tourVisualTest) _tourTest = new TourVisualTest(_world, _input, VirtualViewport, _art.RegistryError);
         if (_developerStart is not null)
         {
             Console.WriteLine(_developerStart.Describe());

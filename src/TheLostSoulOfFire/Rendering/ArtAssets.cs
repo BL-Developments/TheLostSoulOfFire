@@ -648,6 +648,27 @@ public sealed class ArtAssets
             ? RectangleF.FromFoot(foot, entry.WorldSize, entry.Origin)
             : RectangleF.FromFoot(foot, fallbackSize, new Vector2(0.5f, 1f));
 
+    /// <summary>
+    /// Draws one frame of a prop's clip chosen by <paramref name="progress"/> (0 = first, 1 = last
+    /// frame), on its foot point: an animation driven by a gameplay timer, such as a chest's lid.
+    /// Returns false without the clip.
+    /// </summary>
+    public bool DrawPropFrame(SpriteBatch batch, string id, string clipName, Vector2 foot, float progress, Color tint)
+    {
+        SpriteClip? clip = Resolve(id, clipName, null, out _);
+        if (clip is null)
+        {
+            return false;
+        }
+
+        RectangleF bounds = PropBounds(id, foot, Vector2.One);
+        int index = (int)MathF.Round(MathHelper.Clamp(progress, 0f, 1f) * (clip.FrameCount - 1));
+        float elapsed = (index + 0.5f) / clip.FramesPerSecond;
+        Rectangle destination = new((int)MathF.Round(bounds.X), (int)MathF.Round(bounds.Y), (int)MathF.Round(bounds.Width), (int)MathF.Round(bounds.Height));
+        batch.Draw(clip.Texture, destination, clip.GetSourceRectangle(elapsed), tint);
+        return true;
+    }
+
     /// <summary>Draws a prop on its foot point; occluders pass a reduced <paramref name="alpha"/> while they hide something.</summary>
     /// <summary>Whether a Visual-ID has a loaded texture (no dummy), e.g. a rendered room.</summary>
     public bool HasArt(string id) =>

@@ -37,8 +37,16 @@ internal sealed class TourVisualTest
     private float _stepTime;
     private string _station = string.Empty;
 
-    public TourVisualTest(GameWorld world, InputState input, Viewport viewport)
+    public TourVisualTest(GameWorld world, InputState input, Viewport viewport, string? registryError = null)
     {
+        if (registryError is not null)
+        {
+            // An invalid registry turns every graphic into a dummy; the tour would only photograph placeholders.
+            Console.WriteLine($"TOUR_VISUAL_TEST_FAIL step=start reason=registry {registryError.ReplaceLineEndings(" ")}");
+            Finished = true;
+            ExitCode = 1;
+        }
+
         _world = world;
         _input = input;
         _viewport = viewport;

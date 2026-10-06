@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Input;
 using TheLostSoulOfFire.Entities;
 using TheLostSoulOfFire.Input;
 using TheLostSoulOfFire.Rendering;
+using TheLostSoulOfFire.Rendering.Visuals;
 
 namespace TheLostSoulOfFire.Game;
 
@@ -35,7 +36,8 @@ public sealed partial class GameWorld
     {
         if (_phase == GamePhase.Arena && _chests.Count > 0)
         {
-            _player.Reset(_chests[^1].Position + new Vector2(0f, 40f));
+            // Beside the chest, inside its reach, so captures show the chest and not the figure in front of it.
+            _player.Reset(_chests[^1].Position + new Vector2(56f, 22f));
         }
     }
 
@@ -44,6 +46,7 @@ public sealed partial class GameWorld
         _wallet.BeginRun(GameBalance.GlutStarterStock);
         _chests.Clear();
         _glutSparks.Clear();
+        _openedChests.Clear();
         _geldPulse = 0f;
         _glutPulse = 0f;
         _lastSecured = (0, 0);
@@ -74,6 +77,7 @@ public sealed partial class GameWorld
         _lastSecured = _wallet.SecureAllRun();
         _chests.Clear();
         _glutSparks.Clear();
+        _openedChests.Clear();
         _profileStore.Save(_wallet.ToProfile());
     }
 
@@ -148,7 +152,16 @@ public sealed partial class GameWorld
         }
 
         foreach (ArenaChest arenaChest in _chests) arenaChest.Update(deltaTime);
+        // An emptied chest leaves the game at once; its open lid lingers a moment as an image.
+        foreach (ArenaChest gone in _chests)
+            if (gone.IsGone) _openedChests.Add(new OpenedChest(gone.Position));
         _chests.RemoveAll(arenaChest => arenaChest.IsGone);
+        for (int index = _openedChests.Count - 1; index >= 0; index--)
+        {
+            OpenedChest opened = _openedChests[index] with { Age = _openedChests[index].Age + deltaTime };
+            if (opened.Age >= OpenedChestLinger) _openedChests.RemoveAt(index);
+            else _openedChests[index] = opened;
+        }
 
         for (int index = _glutSparks.Count - 1; index >= 0; index--)
         {
@@ -158,10 +171,51 @@ public sealed partial class GameWorld
         }
     }
 
+    private const float OpenedChestLinger = 1.6f;
+    private readonly List<OpenedChest> _openedChests = [];
+
+    /// <summary>Presentation only: where an emptied chest stood and for how long it has been open.</summary>
+    private readonly record struct OpenedChest(Vector2 Position, float Age = 0f);
+
+    /// <summary>The rendered chest stands this far below its gameplay position (floor centre of the box).</summary>
+    private static readonly Vector2 ChestFoot = new(0f, 8f);
+
     private void DrawCurrencyWorld(SpriteBatch batch, Texture2D pixel)
     {
+        bool rendered = _art.HasArt(VisualIds.ArenaChest);
+        foreach (OpenedChest opened in _openedChests)
+        {
+            float fade = 1f - MathHelper.SmoothStep(0f, 1f, (opened.Age - 0.5f) / (OpenedChestLinger - 0.5f));
+            if (rendered)
+            {
+                _art.DrawSoftSpot(batch, opened.Position + ChestFoot + new Vector2(4f, 2f), new Vector2(40f, 14f), new Color(3, 3, 7) * (0.6f * fade));
+                _art.DrawPropFrame(batch, VisualIds.ArenaChest, "open", opened.Position + ChestFoot, 1f, Color.White * fade);
+                _art.DrawSoftSpot(batch, opened.Position - new Vector2(0f, 12f), new Vector2(34f, 22f), GameBalance.Geld * (0.25f * fade * fade));
+            }
+        }
+
         foreach (ArenaChest chest in _chests)
         {
+            if (rendered)
+            {
+                Vector2 foot = chest.Position + ChestFoot;
+                float open = chest.OpenProgress;
+                _art.DrawSoftSpot(batch, foot + new Vector2(4f, 2f), new Vector2(40f, 14f), new Color(3, 3, 7) * 0.6f);
+                if (chest.IsOpened)
+                {
+                    _art.DrawPropFrame(batch, VisualIds.ArenaChest, "open", foot, open, Color.White);
+                    _art.DrawSoftSpot(batch, chest.Position - new Vector2(0f, 12f + open * 6f), new Vector2(30f + open * 16f, 20f + open * 10f), GameBalance.Geld * (0.4f * open));
+                }
+                else
+                {
+                    float glow = 0.35f + MathF.Sin(_presentationTime * 3f) * 0.12f;
+                    _art.DrawSoftSpot(batch, chest.Position, new Vector2(46f, 30f), GameBalance.Geld * (glow * 0.3f));
+                    WorldMarks.Ring(batch, pixel, chest.Position, 40f, GameBalance.Geld * glow);
+                    _art.DrawPropFrame(batch, VisualIds.ArenaChest, VisualClips.Default, foot, 0f, Color.White);
+                }
+                continue;
+            }
+
             float fade = 1f - chest.OpenProgress;
             float lift = chest.OpenProgress * 14f;
             Vector2 position = chest.Position;
@@ -176,15 +230,20 @@ public sealed partial class GameWorld
             if (!chest.IsOpened)
             {
                 float glow = 0.35f + MathF.Sin(_presentationTime * 3f) * 0.12f;
-                batch.DrawCircle(pixel, position, 40f, GameBalance.Geld * glow, 2f, 28);
+                _art.DrawSoftSpot(batch, position, new Vector2(46f, 30f), GameBalance.Geld * (glow * 0.3f));
+                WorldMarks.Ring(batch, pixel, position, 40f, GameBalance.Geld * glow);
             }
         }
 
         foreach (GlutSpark spark in _glutSparks)
         {
+            // An ember flying home: a warm glow, a hot point and a short tail of light.
             Vector2 position = spark.PositionToward(_player.Position);
-            batch.FillCircle(pixel, position, 9f, GameBalance.Glut * 0.35f);
-            batch.FillCircle(pixel, position, 4.5f, GameBalance.GlutBright);
+            GlutSpark earlier = spark with { Elapsed = MathF.Max(0f, spark.Elapsed - 0.05f) };
+            Vector2 tail = earlier.PositionToward(_player.Position);
+            WorldMarks.Beam(batch, pixel, tail, position, 9f, GameBalance.Glut * 0.6f);
+            _art.DrawSoftSpot(batch, position, new Vector2(13f), GameBalance.Glut * 0.5f);
+            _art.DrawSoftSpot(batch, position, new Vector2(4.5f), GameBalance.GlutBright);
         }
     }
 

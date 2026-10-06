@@ -25,6 +25,7 @@ public static class VisualIds
     public const string ArenaSlag = "prop.arena-slag";
     public const string ArenaChains = "prop.arena-chains";
     public const string ArenaGate = "prop.arena-gate";
+    public const string ArenaChest = "prop.arena-chest";
     public const string ShoreFloor = "environment.shore";
     public const string ShoreBench = "prop.shore-bench";
     public const string ShoreSuitcase = "prop.shore-suitcase";

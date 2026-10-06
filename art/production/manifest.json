@@ -9533,6 +9533,91 @@
         "status": "angenommen",
         "reason": "Devourer-Tod: das Gefängnis bricht auf"
       }
+    },
+    {
+      "id": "a6a74a135ab54c01ae659b63b377fc45",
+      "timestamp": "2026-10-06T02:08:03+00:00",
+      "visual_id": "prop.arena-chest",
+      "step": "pack-prop-clip",
+      "tool": {
+        "name": "Blender + pack_prop_clip.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "clip": "open",
+        "frames": 10,
+        "box": [
+          59,
+          40,
+          151,
+          158
+        ]
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/prop.arena-chest/open/0001.png",
+          "sha256": "601b5aa6ee87f704214d5acf719cfacb396a45038bd5800951f8698413df4e7d"
+        },
+        {
+          "path": "art/production/candidates/prop.arena-chest/open/0002.png",
+          "sha256": "bf54dcf10a0763f4dccc1d1aa7999f38df33e670d67e35a814792695267cfbfb"
+        },
+        {
+          "path": "art/production/candidates/prop.arena-chest/open/0003.png",
+          "sha256": "e869bea5c498e293e1ed7d038628d6e78879550fbb80970896d7d20c2f9bd25c"
+        },
+        {
+          "path": "art/production/candidates/prop.arena-chest/open/0004.png",
+          "sha256": "3de2d9e18f735ad524af84ea47fb388b00c222ff97a0aa42e7057ff23bc915e9"
+        },
+        {
+          "path": "art/production/candidates/prop.arena-chest/open/0005.png",
+          "sha256": "09afc92bae81e73e6c39a9d854c1de2665b3090749fe5392ac553da03b245774"
+        },
+        {
+          "path": "art/production/candidates/prop.arena-chest/open/0006.png",
+          "sha256": "e9ea98d5194699bf7c796df309beacba0e157de6595dd78b193a5c5241d01dfb"
+        },
+        {
+          "path": "art/production/candidates/prop.arena-chest/open/0007.png",
+          "sha256": "1ff7973d08763a46f528c2a6a893fa2c5d12daa064691119a3fd9d66e3b88f99"
+        },
+        {
+          "path": "art/production/candidates/prop.arena-chest/open/0008.png",
+          "sha256": "f546bf0a514cbd7ac1798737fa69b6ae5fbee7a3ed43d95e6c8216eed5b54dd1"
+        },
+        {
+          "path": "art/production/candidates/prop.arena-chest/open/0009.png",
+          "sha256": "97c71ce53e36d9b85d3c14443bfab3df8abb7a5435e612ee895ff1ddeb244d08"
+        },
+        {
+          "path": "art/production/candidates/prop.arena-chest/open/0010.png",
+          "sha256": "4b7c1c07ea1efedce8d8ccb99bb887bc073b861114f7ec2827f4d683b8abf13f"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Arena/chest.png",
+          "sha256": "4845a9847d33642a8fc437820de04b10286650a8bcc79e0e0cbcf3b84b073471"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Props/Arena/chest_closed.png",
+          "sha256": "71fa73004d7ecfbf0b7154f4edd442be4e71a1a2540034aa39c680f4f36ac7ca"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.01,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Animiertes Prop aus Blender mit der Spielkamera"
+      }
     }
   ]
 }

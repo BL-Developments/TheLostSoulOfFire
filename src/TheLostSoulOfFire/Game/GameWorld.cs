@@ -1706,6 +1706,7 @@ public sealed partial class GameWorld : IDisposable
         _cannonShots.Clear();
         _chests.Clear();
         _glutSparks.Clear();
+        _openedChests.Clear();
         _particles.Clear();
         _spriteVfx.Clear();
         _art.ClearTransient();

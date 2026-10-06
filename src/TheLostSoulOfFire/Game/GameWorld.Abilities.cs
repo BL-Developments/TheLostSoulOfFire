@@ -6,6 +6,7 @@ using TheLostSoulOfFire.Audio;
 using TheLostSoulOfFire.Combat;
 using TheLostSoulOfFire.Input;
 using TheLostSoulOfFire.Rendering;
+using TheLostSoulOfFire.Rendering.Visuals;
 
 namespace TheLostSoulOfFire.Game;
 
@@ -126,27 +127,55 @@ public sealed partial class GameWorld
     private void DrawAbilityWorld(SpriteBatch batch, Texture2D pixel)
     {
         if (_phase != GamePhase.Arena) return;
+        bool rendered = _art.HasClip(VisualIds.Player, VisualClips.Aim);
         foreach (AbilityProjectile projectile in _abilities.Projectiles)
         {
-            batch.FillCircle(pixel, projectile.Position, 15, GameBalance.DeathFlame * 0.25f);
-            batch.FillCircle(pixel, projectile.Position, 6, GameBalance.SoulWhite * 0.9f);
+            // The piercing shot flies at body height like the cannon's shots: a soul-fire bolt.
+            Vector2 travel = projectile.Position - projectile.PreviousPosition;
+            float angle = travel.LengthSquared() > 0.01f ? MathF.Atan2(travel.Y, travel.X) : 0f;
+            Vector2 drawn = rendered ? projectile.Position - new Vector2(0f, FigureHeights.Air) : projectile.Position;
+            _art.DrawSoftSpot(batch, drawn, new Vector2(30f), GameBalance.DeathFlame * 0.35f);
+            _art.DrawLoopingEffect(batch, projectile, VisualIds.CannonProjectileFull, drawn, angle, 0.62f, Color.White);
         }
         if (_abilities.VortexRemaining > 0)
         {
-            batch.FillCircle(pixel, _abilities.VortexCenter, 155, GameBalance.DeepViolet * 0.13f);
-            for (int i = 0; i < 12; i++)
+            // The vortex: a slowly turning well of Death Flame drawing motes inward.
+            Vector2 center = _abilities.VortexCenter;
+            float strength = MathHelper.Clamp(_abilities.VortexRemaining / 0.3f, 0f, 1f);
+            _art.DrawSoftSpot(batch, center, new Vector2(155f, 155f), GameBalance.DeepViolet * (0.22f * strength));
+            WorldMarks.Ring(batch, pixel, center, 150f, GameBalance.DeathFlame * (0.35f * strength));
+            WorldMarks.Ring(batch, pixel, center, 70f + MathF.Sin(_presentationTime * 5f) * 6f, GameBalance.DeathFlameBright * (0.3f * strength));
+            for (int i = 0; i < 18; i++)
             {
-                float angle = i * MathF.Tau / 12 + _presentationTime * 3;
-                float radius = 30 + (i % 4) * 30;
-                Vector2 point = _abilities.VortexCenter + new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * radius;
-                batch.FillCircle(pixel, point, 7, GameBalance.DeathFlameBright * 0.35f);
+                float local = (_presentationTime * 0.8f + i / 18f) % 1f;
+                float radius = MathHelper.Lerp(150f, 18f, local * local);
+                float angle = i * 2.4f + _presentationTime * 3f + local * 4f;
+                Vector2 point = center + new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * radius;
+                float glow = MathF.Sin(local * MathF.PI) * strength;
+                _art.DrawSoftSpot(batch, point, new Vector2(9f), GameBalance.DeathFlame * (0.6f * glow));
+                _art.DrawSoftSpot(batch, point, new Vector2(3.5f), GameBalance.SoulWhite * (0.8f * glow));
             }
+            _art.DrawSoftSpot(batch, center, new Vector2(22f), GameBalance.SoulWhite * (0.35f * strength));
         }
         foreach (var enemy in _enemies)
             if (enemy.IsAlive && enemy.AbilityMarkRemaining > 0)
-                batch.FillCircle(pixel, enemy.Position - Vector2.UnitY * (enemy.Radius + 20), 6, GameBalance.GlutBright);
+            {
+                // A Glut mark burning above the head of a marked enemy.
+                Vector2 mark = enemy.DrawnAsFigure ? enemy.Position - new Vector2(0f, 122f) : enemy.Position - Vector2.UnitY * (enemy.Radius + 20);
+                float pulse = 0.5f + 0.5f * MathF.Sin(_presentationTime * 6f);
+                _art.DrawSoftSpot(batch, mark, new Vector2(16f + pulse * 3f), GameBalance.Glut * 0.45f);
+                UiKit.FillDiamond(batch, pixel, mark, 6, GameBalance.Glut);
+                UiKit.FillDiamond(batch, pixel, mark, 3, GameBalance.GlutBright);
+            }
         if (_player.AbilityEffects.GuardRemaining > 0 || _player.AbilityEffects.RevengeRemaining > 0)
-            batch.FillCircle(pixel, _player.Position, 32, GameBalance.DeathFlameBright * 0.16f);
+        {
+            // Guard and the stored counter: a ward of Death Flame around the body.
+            Vector2 body = rendered ? _player.Position - new Vector2(0f, FigureHeights.Core) : _player.Position;
+            float pulse = 0.5f + 0.5f * MathF.Sin(_presentationTime * 4f);
+            bool guard = _player.AbilityEffects.GuardRemaining > 0;
+            _art.DrawSoftSpot(batch, body, new Vector2(42f), GameBalance.DeathFlameBright * (guard ? 0.18f : 0.1f));
+            WorldMarks.Ring(batch, pixel, body, 40f + pulse * 3f, GameBalance.DeathFlameBright * (guard ? 0.7f : 0.4f), guard);
+        }
     }
 
     private void DrawAbilityHud(SpriteBatch batch, Texture2D pixel, Viewport viewport)
