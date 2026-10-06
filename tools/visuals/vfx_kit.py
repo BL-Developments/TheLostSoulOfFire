@@ -489,12 +489,21 @@ def light_image(core: np.ndarray, glow: np.ndarray) -> np.ndarray:
     return np.stack([light, light, light, alpha], axis=-1)
 
 
+def canvas_fade(x: np.ndarray, y: np.ndarray) -> np.ndarray:
+    """1 inside, falling smoothly to 0 before the canvas border: the glow of a ring near the edge
+    of its 256 px canvas would otherwise be cut off square and show as a rectangle in the game."""
+    r = np.sqrt(x * x + y * y)
+    t = np.clip((127.0 - r) / 7.0, 0, 1)
+    return t * t * (3 - 2 * t)
+
+
 def mark_ring(width: float, glow: float) -> np.ndarray:
     n = 256 * SS
     ys, xs = np.mgrid[0:n, 0:n].astype(float)
     x, y = (xs + 0.5) / SS - 128, (ys + 0.5) / SS - 128
     d = np.sqrt(x * x + y * y) - MARK_RING_RADIUS
-    image = light_image(np.exp(-(d / width) ** 2), 0.45 * np.exp(-(d / glow) ** 2))
+    fade = canvas_fade(x, y)
+    image = light_image(np.exp(-(d / width) ** 2) * fade, 0.45 * np.exp(-(d / glow) ** 2) * fade)
     return image.reshape(256, SS, 256, SS, 4).mean(axis=(1, 3))
 
 
@@ -505,7 +514,8 @@ def mark_arc(span: float = 1.6) -> np.ndarray:
     d = np.sqrt(x * x + y * y) - MARK_RING_RADIUS
     angle = np.abs(np.arctan2(y, x))
     ends = np.clip((span / 2 - angle) / 0.22, 0, 1) ** 1.5
-    image = light_image(np.exp(-(d / 3.2) ** 2) * ends, 0.5 * np.exp(-(d / 11) ** 2) * ends)
+    fade = canvas_fade(x, y)
+    image = light_image(np.exp(-(d / 3.2) ** 2) * ends * fade, 0.5 * np.exp(-(d / 11) ** 2) * ends * fade)
     return image.reshape(256, SS, 256, SS, 4).mean(axis=(1, 3))
 
 
