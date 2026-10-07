@@ -73,6 +73,8 @@ public sealed class GroundImpacts
 
     private sealed class Impact
     {
+        /// <summary>Wood (the skiff's deck) splinters instead of breaking into a stone crater.</summary>
+        public bool Wooden;
         public Vector2 Center;
         public float Radius;
         public float Rotation;
@@ -259,12 +261,12 @@ public sealed class GroundImpacts
     }
 
     /// <summary>The blow lands: the floor breaks under <paramref name="center"/> out to <paramref name="radius"/>.</summary>
-    public void Slam(object key, Vector2 center, float radius)
+    public void Slam(object key, Vector2 center, float radius, bool wooden = false)
     {
         Windup? windup = _windups.Find(candidate => ReferenceEquals(candidate.Key, key));
         float rotation = windup?.Rotation ?? (float)(_random.NextDouble() * MathHelper.TwoPi);
         _windups.Remove(windup!);
-        _impacts.Add(new Impact { Center = center, Radius = radius, Rotation = rotation });
+        _impacts.Add(new Impact { Center = center, Radius = radius, Rotation = rotation, Wooden = wooden });
         if (!Loaded)
         {
             return;
@@ -423,8 +425,11 @@ public sealed class GroundImpacts
             // The slab of floor punches down: a quick settle from slightly large.
             float settle = 1f + 0.05f * MathF.Max(0f, 1f - impact.Age / 0.12f);
             float scale = impact.Radius / Edge * settle;
-            batch.Draw(_shatter!, impact.Center, null, Color.White * alpha, impact.Rotation,
-                new Vector2(_shatter!.Width, _shatter.Height) * 0.5f, scale, SpriteEffects.None, 0f);
+            if (!impact.Wooden)
+            {
+                batch.Draw(_shatter!, impact.Center, null, Color.White * alpha, impact.Rotation,
+                    new Vector2(_shatter!.Width, _shatter.Height) * 0.5f, scale, SpriteEffects.None, 0f);
+            }
 
             // The cracks flare with the soul light the blow drove in and cool to embers.
             float flare = MathF.Max(0f, 1f - impact.Age / FlareTime);

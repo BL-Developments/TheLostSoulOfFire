@@ -679,6 +679,11 @@ Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreati
   Kern oder mit der Seelenspaltung Porzellansplitter der Maske; vom Burning verkohlte Kruste; vom
   Devourer schwere dunkle Brocken; mehr bei schwereren Hieben (`GameWorld.EmitHitMatter`).
 
+- Devourer auf dem Fährdeck (Überfahrt, Welle 5): Sein Schlag hätte einen Steinkrater in die
+  Planken gebrochen. Auf dem Deck splittert jetzt Holz (braune Splitter, Staub, aufflammende
+  Fugen, kein Steinkrater). Gebaut und Unit-Tests grün, im Bild nicht geprüft: Im Rundgang
+  schlägt dort kein Devourer zu.
+
 **Verworfen (Durchgang 4):**
 - Zweite Hollow-Variante mit Lederschürze (Restspur der Gießhalle): rund 450 MB unkomprimierte
   Texturen zusätzlich; Masken, Bewegungsversatz und Stimmen geben bereits Individualität.

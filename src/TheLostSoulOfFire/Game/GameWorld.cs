@@ -1543,17 +1543,21 @@ public sealed partial class GameWorld : IDisposable
     {
         Vector2 center = devourer.Position;
         float radius = GameBalance.DevourerSlamRange;
-        _groundImpacts.Slam(devourer, center, radius);
+        // On the skiff's deck the planks splinter; everywhere else stone breaks.
+        bool deck = _phase == GamePhase.Prologue && _prologue.IsVehicleRide;
+        _groundImpacts.Slam(devourer, center, radius, deck);
         _audio.Play(AudioCue.GroundBreak, 0.82f, 0f, PanOf(center) * 0.6f);
 
         // Slabs from the crater and stones from all over the broken floor.
-        _particles.EmitDebris(center + new Vector2(0f, FigureHeights.Air), center.Y + FigureHeights.Air, 12, new Color(78, 71, 86), 360f, 11f, 0.85f);
+        Color slab = deck ? new Color(74, 58, 50) : new Color(78, 71, 86);
+        Color chips = deck ? new Color(88, 70, 58) : new Color(70, 64, 78);
+        _particles.EmitDebris(center + new Vector2(0f, FigureHeights.Air), center.Y + FigureHeights.Air, 12, slab, 360f, 11f, 0.85f);
         for (int chip = 0; chip < 12; chip++)
         {
             float angle = chip * MathHelper.TwoPi / 12f + 0.4f;
             float reach = radius * (chip % 2 == 0 ? 0.45f : 0.8f);
             Vector2 at = center + new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * reach;
-            _particles.EmitDebris(at + new Vector2(0f, FigureHeights.Air), at.Y + FigureHeights.Air, 3, new Color(70, 64, 78), 210f, 4.5f, 0.6f);
+            _particles.EmitDebris(at + new Vector2(0f, FigureHeights.Air), at.Y + FigureHeights.Air, 3, chips, 210f, 4.5f, 0.6f);
         }
 
         // The weight lands in the view too, less the further away the player stands.
