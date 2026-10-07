@@ -644,7 +644,9 @@ Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreati
   Jetzt glimmt sein Rachen immer: leise Glut, wenn leer, heller und unruhiger mit jeder
   gefangenen Seele, von hinten verdeckt (`SoulfireLighting`, Licht auf der Brust). Station
   `arena_devour` zeigt das Aufglühen nach dem Verschlingen. Verworfen: Lichtstärke 0,07 (im
-  Lichtdurchgang unsichtbar).
+  Lichtdurchgang unsichtbar). Nachgezogen (neue Aufnahmen `holding`/`holding_sense`): Der Schein
+  färbte Oberkörper und Kopf; jetzt kleiner (30 + 5 je Seele), tiefer und vorn auf der Brust,
+  Grundstärke 0,26; mit Seelensinn kein Doppelleuchten.
 
 - Burning-Anlauf ohne Ring und Pfeilbahn (wie beim Devourer: Anzeige durch Materie): Beim
   Ausholen züngeln Flammen auf dem Boden auf, eine nach der anderen in Laufrichtung, bis zur

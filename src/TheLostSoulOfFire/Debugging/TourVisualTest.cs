@@ -691,6 +691,10 @@ internal sealed class TourVisualTest
         Do("free", () => _world.DefeatAutomatedEnemiesExcept<Devourer>());
         Wait("hungry", () => _world.AutomatedEnemies.OfType<Devourer>().Any(devourer => devourer.State == DevourerState.ApproachSoul), 3f);
         Series("devour", 20, 5);
+        // Holding a soul, seen with and without Soul Sense: the maw's glow and the prison in its chest.
+        Shot("holding", minWait: 0.3f);
+        Shot("holding_sense", () => _world.SetAutomatedSoulSense(true), minWait: 1f);
+        Do("sense_off", () => _world.SetAutomatedSoulSense(false));
     }
 
     /// <summary>Enemies called in during a wave: light gathers where they are about to appear.</summary>

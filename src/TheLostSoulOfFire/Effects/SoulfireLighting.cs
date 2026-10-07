@@ -128,8 +128,8 @@ public static class SoulfireLighting
                 float front = MathHelper.Clamp(0.7f + prison.VisualFacing.Y, 0f, 1f);
                 int held = prison.ConsumedSoulCount;
                 float restless = 0.75f + 0.25f * breathe * (held > 0 ? 1.4f : 1f);
-                Vector2 maw = prison.Position + new Vector2(prison.VisualFacing.X * 10f, prison.VisualFacing.Y * 6f - 86f * prison.VisualScale);
-                renderer.DrawGlow(batch, maw, 44f + held * 8f, GameBalance.DeathFlame, (0.3f + held * 0.12f) * restless * front);
+                Vector2 maw = prison.Position + new Vector2(prison.VisualFacing.X * 15f, prison.VisualFacing.Y * 9f - 78f * prison.VisualScale);
+                renderer.DrawGlow(batch, maw, 30f + held * 5f, GameBalance.DeathFlame, (0.26f + held * 0.1f) * restless * front);
             }
 
             if (soulSenseAmount <= 0.001f)
