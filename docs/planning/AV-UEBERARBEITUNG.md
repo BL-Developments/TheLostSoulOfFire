@@ -983,3 +983,12 @@ Gegner-Zuckens, Deutlichkeit von Schattenhand und Schlagrand im Gedränge, die I
   aufflammende Fugen, kein Steinkrater – wie gedacht. Befund dabei: Die helle Staubwalze stand auf den
   dunklen Planken als deutlicher Ring (vom Owner abgelehnte Form). Auf Holz jetzt eine dunkle,
   unregelmäßige Staubwolke (Ruß, 18 Wolken mit zufälliger Weite), kein Ring mehr; Steinboden unverändert.
+
+**Stand Durchgang 5, 13:55:** Weitere Zyklen nach dem Abschluss um 13:05: nasse Schritte mit
+Spritzern am Ufer und im Hafen (Spieler, Gegner, Dash-Absprung), Gischt und Bugwelle der Überfahrt,
+Nachprüfung zweier früher nur gebauter Wirkungen (Ofen im Takt: verstärkt; Deckschlag: heller Ring
+entfernt). Verworfen: Zischen/Dampf des Burning auf nassem Pflaster. Abschlussprüfung: voller
+Rundgang 20261007_134939 (742 Aufnahmen, kein Platzhalter, CPU im Mittel ≤ 0,57 ms), 263 Unit-Tests,
+`validate_audio.py` (241), Audio-Laufzeit- (79 Töne), Gameplay- (10 Wellen) und Tod-Neustart-Test,
+Slice-, Fähigkeiten-, Währungs- und Vorhallen-Bildtest. Behalten: Basislauf 20261007_101956 und
+dieser Lauf.
