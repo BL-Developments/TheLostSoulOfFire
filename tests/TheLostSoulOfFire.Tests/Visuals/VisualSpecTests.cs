@@ -94,7 +94,7 @@ public sealed class VisualSpecTests
     [TestMethod]
     public void MissingSection_Fails()
     {
-        string[] problems = ProblemsOf(CompleteSpec.Replace("## Silhouette\n        Hoch und schmal.", "").Replace("## Silhouette\nHoch und schmal.", ""));
+        string[] problems = ProblemsOf(CompleteSpec.ReplaceLineEndings("\n").Replace("## Silhouette\nHoch und schmal.\n", ""));
 
         Assert.IsTrue(problems.Any(problem => problem.Contains("'## Silhouette'")), string.Join("\n", problems));
     }
