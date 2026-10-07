@@ -19,21 +19,20 @@ public static class FigureHeights
     /// <summary>The eyes, about 1.66 m up.</summary>
     public const float Eyes = 91f;
 
-    /// <summary>The braced Soul Cannon's muzzle, about 1.2 m up ...</summary>
-    public const float Muzzle = 66f;
+    /// <summary>The braced Soul Cannon's muzzle, about 1.1 m up ...</summary>
+    public const float Muzzle = 60f;
 
     /// <summary>
-    /// ... and ahead of the feet: the grip 0.14 m ahead, the cannon 0.95 m long along the aim,
-    /// growing by <see cref="CannonGrowth"/> at full charge (tools/visuals/blender/build_player.py,
-    /// cannon_aimed and CANNON_GROWTH). Level distances, before squashing.
+    /// ... and ahead of the feet, uncharged and at full charge (the 0.85 m cannon grows by 10 %
+    /// while the body sinks into the brace). Level distances, before squashing, measured on the
+    /// aim clip (tools/visuals/blender/build_player.py --recannon prints CANNON_POINT).
     /// </summary>
-    public const float MuzzleGrip = 9f;
-    public const float MuzzleLength = 63.5f;
-    public const float CannonGrowth = 0.3f;
+    public const float MuzzleAhead = 54f;
+    public const float MuzzleAheadFull = 57f;
 
     /// <summary>How far ahead of the feet the muzzle is at this charge (0–1).</summary>
     public static float MuzzleReach(float charge) =>
-        MuzzleGrip + MuzzleLength * (1f + CannonGrowth * MathHelper.Clamp(charge, 0f, 1f));
+        MathHelper.Lerp(MuzzleAhead, MuzzleAheadFull, MathHelper.Clamp(charge, 0f, 1f));
 
     /// <summary>
     /// Shots, sparks and slashes are drawn this far above their gameplay position, so they fly

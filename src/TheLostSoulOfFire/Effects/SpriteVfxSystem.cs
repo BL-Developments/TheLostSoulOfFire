@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -17,6 +18,9 @@ public sealed class SpriteVfxSystem
         public Color Color = Color.White;
         public float Elapsed;
 
+        /// <summary>Where the effect is held each frame (a muzzle that moves with its owner), or null to stay put.</summary>
+        public Func<Vector2>? Anchor;
+
         public bool Loops => Clip?.Loop ?? false;
         public float Duration => Clip?.Duration ?? ArtAssets.EffectDummyLifetime;
     }
@@ -34,7 +38,8 @@ public sealed class SpriteVfxSystem
         Vector2 position,
         float rotation = 0f,
         float scale = 1f,
-        Color? color = null)
+        Color? color = null,
+        Func<Vector2>? anchor = null)
     {
         _instances.Add(new Instance
         {
@@ -43,7 +48,8 @@ public sealed class SpriteVfxSystem
             Position = position,
             Rotation = rotation,
             Scale = scale,
-            Color = color ?? Color.White
+            Color = color ?? Color.White,
+            Anchor = anchor
         });
     }
 
@@ -53,6 +59,10 @@ public sealed class SpriteVfxSystem
         {
             Instance instance = _instances[index];
             instance.Elapsed += deltaTime;
+            if (instance.Anchor is not null)
+            {
+                instance.Position = instance.Anchor();
+            }
             if (!instance.Loops && instance.Elapsed >= instance.Duration)
             {
                 _instances.RemoveAt(index);

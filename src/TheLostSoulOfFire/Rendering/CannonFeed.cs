@@ -18,14 +18,15 @@ public static class CannonFeed
 
     /// <summary>
     /// The reliquary chamber of the braced cannon, where its grilles are: by the right hip, just
-    /// ahead of the grip (measured on the rendered aim clip: about 16 units ahead, 53 up).
+    /// ahead of the grip (measured on the aim clip, CANNON_POINT: 14 units ahead, 13.5 to the right,
+    /// 58 up uncharged and 56.5 at full charge, as the body sinks into the brace).
     /// </summary>
     public static Vector2 ChamberOf(Vector2 foot, Vector2 facing, float charge)
     {
         Vector2 right = new(-facing.Y, facing.X);
-        float reach = FigureHeights.MuzzleGrip + FigureHeights.MuzzleLength * 0.12f * (1f + FigureHeights.CannonGrowth * charge);
-        Vector2 level = facing * reach + right * 12f;
-        return foot + new Vector2(level.X, level.Y * FigureHeights.LevelSquash - 53f);
+        Vector2 level = facing * 14f + right * 13.5f;
+        float up = MathHelper.Lerp(58f, 56.5f, MathHelper.Clamp(charge, 0f, 1f));
+        return foot + new Vector2(level.X, level.Y * FigureHeights.LevelSquash - up);
     }
 
     public static void Draw(SpriteBatch batch, Texture2D softSpot, Vector2 foot, Vector2 core, Vector2 facing, float charge, bool full, float time)

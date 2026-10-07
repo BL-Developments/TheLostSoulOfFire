@@ -242,8 +242,6 @@ Abgeleitet mit `tools/audio/derive_variants.py` (Tonhöhe ±4,5 %, Klangneigung,
 | `Audio/Sfx/soul_release_v3.wav` | Ableitung von soul_release.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.94 s, 1 Kanal, -17.2 LUFS, Spitze -4.4 dBFS |
 | `Audio/Sfx/enemy_emerge_v2.wav` | Ableitung von enemy_emerge.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.86 s, 1 Kanal, -21.0 LUFS, Spitze -4.1 dBFS |
 | `Audio/Sfx/enemy_emerge_v3.wav` | Ableitung von enemy_emerge.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.94 s, 1 Kanal, -21.0 LUFS, Spitze -4.0 dBFS |
-| `Audio/Sfx/cannon_fire_v2.wav` | Ableitung von cannon_fire.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.53 s, 1 Kanal, -15.3 LUFS, Spitze -2.4 dBFS |
-| `Audio/Sfx/cannon_fire_v3.wav` | Ableitung von cannon_fire.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.58 s, 1 Kanal, -15.3 LUFS, Spitze -1.8 dBFS |
 | `Audio/Sfx/burning_detonation_v2.wav` | Ableitung von burning_detonation.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.67 s, 1 Kanal, -16.1 LUFS, Spitze -1.6 dBFS |
 | `Audio/Sfx/burning_detonation_v3.wav` | Ableitung von burning_detonation.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.73 s, 1 Kanal, -16.1 LUFS, Spitze -2.8 dBFS |
 | `Audio/Sfx/burning_charge_v2.wav` | Ableitung von burning_charge.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.53 s, 1 Kanal, -21.5 LUFS, Spitze -3.0 dBFS |
@@ -261,7 +259,6 @@ Mit `tools/audio/hall_tails.py`: der trockene Take gefaltet mit der Impulsantwor
 | --- | --- | --- |
 | `Audio/Sfx/scythe_hit_hall.wav` | Hallfahne von scythe_hit.wav (Gießhalle, RT60 2.4 s) | 2.51 s, 1 Kanal, -24.9 LUFS, Spitze -9.1 dBFS |
 | `Audio/Sfx/core_hit_hall.wav` | Hallfahne von core_hit.wav (Gießhalle, RT60 2.4 s) | 2.44 s, 1 Kanal, -20.9 LUFS, Spitze -4.4 dBFS |
-| `Audio/Sfx/cannon_fire_hall.wav` | Hallfahne von cannon_fire.wav (Gießhalle, RT60 2.4 s) | 2.71 s, 1 Kanal, -23.3 LUFS, Spitze -5.0 dBFS |
 | `Audio/Sfx/cannon_impact_hall.wav` | Hallfahne von cannon_impact.wav (Gießhalle, RT60 2.4 s) | 2.62 s, 1 Kanal, -22.0 LUFS, Spitze -3.7 dBFS |
 | `Audio/Sfx/burning_detonation_hall.wav` | Hallfahne von burning_detonation.wav (Gießhalle, RT60 2.4 s) | 2.89 s, 1 Kanal, -24.1 LUFS, Spitze -7.0 dBFS |
 | `Audio/Sfx/devourer_slam_hall.wav` | Hallfahne von devourer_slam.wav (Gießhalle, RT60 2.4 s) | 2.71 s, 1 Kanal, -21.0 LUFS, Spitze -3.5 dBFS |
@@ -278,7 +275,6 @@ Rezepte `cannon-draw` und `cannon-stow` in `tools/audio/recipes/cues.py`: Riemen
 | Datei | Quelle | Messung |
 | --- | --- | --- |
 | `Audio/Sfx/cannon_draw.wav` | cannon-draw Seed 1 | 0.42 s, 1 Kanal/Kanäle, -24.5 LUFS, Spitze -3.0 dBFS |
-| `Audio/Sfx/cannon_stow.wav` | cannon-stow Seed 2 | 0.36 s, 1 Kanal/Kanäle, -23.0 LUFS, Spitze -8.5 dBFS |
 | `Audio/Sfx/footstep_stone_1_hall_foundry.wav` | Hallfahne von footstep_stone_1.wav (Gießhalle, RT60 2.4 s) | 2.46 s, 1 Kanal, -34.0 LUFS, Spitze -15.3 dBFS |
 
 ## Präsenz der Gegner (Durchgang 3, 06.10.2026)
@@ -305,7 +301,6 @@ Rezept `cannon-hum` in `tools/audio/recipes/cues.py`: Brummen der Kammer (55–3
 
 | Datei | Quelle | Messung |
 | --- | --- | --- |
-| `Audio/Sfx/cannon_hum.wav` | cannon-hum Seed 1 | 2.00 s, 1 Kanal/Kanäle, -22.0 LUFS, Spitze -11.8 dBFS |
 
 ## Sanfte Seelenfreigabe (Durchgang 3, 06.10.2026)
 
@@ -415,3 +410,34 @@ Owner: Atmosphäre, Spannung und Gefühl dürfen kreativer werden. Über dem gle
 | `Audio/Sfx/shore_horn_2.wav` | shore-horn Seed 2 | 5.00 s, 1 Kanal/Kanäle, -30.0 LUFS, Spitze -16.7 dBFS |
 | `Audio/Sfx/shore_board_1.wav` | shore-board Seed 1 | 1.80 s, 1 Kanal/Kanäle, -30.2 LUFS, Spitze -3.0 dBFS |
 | `Audio/Sfx/shore_board_2.wav` | shore-board Seed 3 | 1.80 s, 1 Kanal/Kanäle, -30.0 LUFS, Spitze -3.8 dBFS |
+
+## Seelenkanone aus Eisen und Feuer (Durchgang 5, 07.10.2026)
+
+Owner: Klang (und Aussehen) der Soul Cannon müssen noch einmal überarbeitet werden. CLAP hörte den Ludo-Ladeton `cannon_charge` als „sci-fi energy weapon charging“ 0,79 + „laser gun“ 0,12, das Ladebrummen `cannon_hum` als „bell“ 0,70 + „electric hum“ 0,23 und das Verstauen als „gunshot“ 0,24. 07_SOUL_CANNON beschreibt eine Death-Flame-Leitung aus geschwärztem Eisen, die die Flamme des Spielers nur hält und abfeuert. Rezepte in `tools/audio/recipes/cannon.py` (Grenzwert-Begrenzer, damit alle Takes eines Cues gleich laut sind):
+
+- `cannon-ignite` (Laden beginnt): die Flamme fängt in der Kammer, wird ansteigend hineingesogen, das Eisen tickt. CLAP „flame igniting“ 0,57–0,71.
+- `cannon-charge-loop` (ersetzt `cannon_hum`, nahtlos, das Spiel hebt Tonhöhe −0,35 → +0,18 und Pegel mit der Ladung): flackerndes Fauchen unter Druck mit Glutknistern, hohles Brausen des Kessels, tickendes Eisen. CLAP „blowtorch“ 0,55 + „flame igniting“ 0,15, „wind“ 0,09. Erste Fassung mit glattem tiefem Rauschen: „wind“ 0,29–0,40 (verworfen).
+- `cannon-stage` (neu, Ladestufe 2 und 3): die Raste rattert über einige Zähne (resonante Stahlklicks), das Eisen setzt sich dumpf. CLAP „mechanical latch click“ 0,68–0,85. Verworfen: Breitband-Klicks und Eisenschlag („gunshot“ 0,55–0,92), Klangring („bell“), Aufflammen („gunshot“).
+- `cannon-full` (ersetzt den Ludo-Take im Spiel): die Raste schlägt mit nachklingendem schwerem Eisen ein, die Flamme faucht hinter den Gittern auf und zittert. CLAP „heavy metal clank“ 0,51–0,70.
+- `cannon-fire` (Schuss, drei Takes): trockener Knall, schwerer tiefer Schlag, Flammenstoß, eiserner Rückschlag in die Hände, zischendes Abblasen der Kammer, Asche. CLAP „explosion“ 0,64–0,85 + „gunshot“ 0,10–0,27. Hallfahne der Gießhalle aus Take 1 (`hall_tails.py`).
+- `cannon-fire-full` (neu, nur unter dem vollen Schuss): gewaltiger tiefer Druckstoß und brüllend ausfahrende Flamme, die nachfaucht. CLAP „explosion“ 0,58–0,77 + „heavy cannon blast“ 0,13–0,27.
+- `cannon-stow` neu (in `recipes/cues.py`): weicher Einsatz statt harten Anschlags. CLAP „heavy object put down on fabric“ 0,65 (vorher „gunshot“ 0,24).
+
+Die Ludo-Takes `cannon_charge.wav`, `cannon_full.wav` und `cannon_fire.wav` bleiben im Bestand, werden aber nicht mehr gespielt; ihre Ableitungen `cannon_fire_v2/_v3`, die Hallfahne `cannon_fire_hall` und das Brummen `cannon_hum` (Rezept `cannon-hum`) sind entfernt. `cannon_impact` (Treffer am Ziel) bleibt.
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/cannon_ignite_1.wav` | cannon-ignite Seed 2 | 0.75 s, 1 Kanal/Kanäle, -21.0 LUFS, Spitze -4.2 dBFS |
+| `Audio/Sfx/cannon_ignite_2.wav` | cannon-ignite Seed 1 | 0.75 s, 1 Kanal/Kanäle, -21.0 LUFS, Spitze -3.9 dBFS |
+| `Audio/Sfx/cannon_charge_loop.wav` | cannon-charge-loop Seed 2 | 2.00 s, 1 Kanal/Kanäle, -22.0 LUFS, Spitze -6.6 dBFS |
+| `Audio/Sfx/cannon_stage_1.wav` | cannon-stage Seed 1 | 0.40 s, 1 Kanal/Kanäle, -24.0 LUFS, Spitze -3.0 dBFS |
+| `Audio/Sfx/cannon_stage_2.wav` | cannon-stage Seed 3 | 0.40 s, 1 Kanal/Kanäle, -23.5 LUFS, Spitze -3.0 dBFS |
+| `Audio/Sfx/cannon_full_1.wav` | cannon-full Seed 2 | 0.90 s, 1 Kanal/Kanäle, -18.5 LUFS, Spitze -2.0 dBFS |
+| `Audio/Sfx/cannon_full_2.wav` | cannon-full Seed 1 | 0.90 s, 1 Kanal/Kanäle, -18.5 LUFS, Spitze -2.0 dBFS |
+| `Audio/Sfx/cannon_shot_1.wav` | cannon-fire Seed 2 | 0.95 s, 1 Kanal/Kanäle, -16.6 LUFS, Spitze -1.5 dBFS |
+| `Audio/Sfx/cannon_shot_2.wav` | cannon-fire Seed 3 | 0.95 s, 1 Kanal/Kanäle, -17.0 LUFS, Spitze -1.5 dBFS |
+| `Audio/Sfx/cannon_shot_3.wav` | cannon-fire Seed 1 | 0.95 s, 1 Kanal/Kanäle, -16.6 LUFS, Spitze -1.5 dBFS |
+| `Audio/Sfx/cannon_blast_1.wav` | cannon-fire-full Seed 1 | 1.40 s, 1 Kanal/Kanäle, -18.5 LUFS, Spitze -2.0 dBFS |
+| `Audio/Sfx/cannon_blast_2.wav` | cannon-fire-full Seed 2 | 1.40 s, 1 Kanal/Kanäle, -18.6 LUFS, Spitze -2.0 dBFS |
+| `Audio/Sfx/cannon_stow.wav` | cannon-stow Seed 2 | 0.36 s, 1 Kanal/Kanäle, -24.0 LUFS, Spitze -9.3 dBFS |
+| `Audio/Sfx/cannon_shot_1_hall.wav` | Hallfahne von cannon_shot_1.wav (Gießhalle, RT60 2.4 s) | 2.53 s, 1 Kanal, -24.6 LUFS, Spitze -6.4 dBFS |

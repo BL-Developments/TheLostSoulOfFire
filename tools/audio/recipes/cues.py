@@ -317,41 +317,29 @@ def cannon_draw(rng) -> np.ndarray:
     return _finish(x, -21.0, -3.0)
 
 
-@recipe("cannon-stow", "Seelenkanone verstaut: Eisen schlägt gedämpft gegen den Rücken, der Riemen zieht nach")
+@recipe("cannon-stow", "Seelenkanone verstaut: der Riemen zieht an, das Eisen legt sich gedämpft gegen den Mantel auf dem Rücken, Schnalle und Gitter klappern leise nach; kein harter Anschlag")
 def cannon_stow(rng) -> np.ndarray:
     n = dsp.seconds(0.36)
-    # No hard crack: the iron is laid against the coat, so it thuds softly and then rings.
     t = dsp.time_axis(n)
+    # The iron is laid against the coat: a dull thud through cloth with a soft attack (a hard
+    # crack, or a ring right at the start, read as a gunshot), its metal heard only faintly.
+    at = 0.05
+    local = np.maximum(t - at, 0)
+    soft = np.clip((t - at) / 0.008, 0, 1)
+    thud = dsp.lowpass(rng.standard_normal(n), 220) * soft * np.exp(-local / 0.045) * 0.9
     base = rng.uniform(380, 440)
-    ring = sum(np.sin(2 * np.pi * base * r * t + rng.uniform(0, 6.3)) * a * np.exp(-t * d)
-               for r, a, d in ((1.0, 0.5, 14), (2.43, 0.3, 22), (3.97, 0.16, 32)))
-    thud = dsp.lowpass(rng.standard_normal(n), 180) * np.exp(-t / 0.035) * 0.6
-    clunk = (ring * 0.5 + thud) * np.clip(t / 0.004, 0, 1)
+    ring = sum(np.sin(2 * np.pi * base * r * local + rng.uniform(0, 6.3)) * a * np.exp(-local * d)
+               for r, a, d in ((1.0, 0.5, 18), (2.43, 0.3, 28))) * soft * 0.12
     rattle = np.zeros(n)
     for k in range(3):  # the strap's buckle and the chamber bars settling
-        at = dsp.seconds(0.05 + k * rng.uniform(0.025, 0.045))
+        r_at = dsp.seconds(at + 0.04 + k * rng.uniform(0.025, 0.045))
         m = dsp.seconds(0.06)
         rt = dsp.time_axis(m)
         f = rng.uniform(1700, 2900)
-        rattle[at:at + m] += (np.sin(2 * np.pi * f * rt) + 0.5 * np.sin(2 * np.pi * f * 2.7 * rt)) * np.exp(-rt / 0.012) * rng.uniform(0.15, 0.3)
-    x = clunk + rattle + _strap(rng, n, 0.03, 0.2, 0.55)
-    x = _room(x, rng, 0.4, 0.12)
-    return _finish(x, -23.0, -4.0)
-
-
-@recipe("cannon-hum", "Seelenkanone lädt: Brummen der Kammer, darüber ein Seelenwimmern, leises Vibrieren; nahtlose Mono-Schleife, das Spiel hebt Tonhöhe und Pegel mit der Ladung")
-def cannon_hum(rng) -> np.ndarray:
-    seconds = 2.0  # every frequency below completes whole cycles in the loop: seamless
-    n = dsp.seconds(seconds)
-    t = dsp.time_axis(n)
-    hum = sum(np.sin(2 * np.pi * f * t + rng.uniform(0, 6.3)) * a for f, a in ((55, 0.6), (110, 1.0), (165, 0.45), (220, 0.3), (330, 0.12)))
-    vibrato = 1.0 + 0.004 * np.sin(2 * np.pi * 5.0 * t)
-    whine = (np.sin(2 * np.pi * 880 * np.cumsum(vibrato) / dsp.RATE) + 0.35 * np.sin(2 * np.pi * 1320 * np.cumsum(vibrato) / dsp.RATE))
-    whine *= 0.5 + 0.5 * np.sin(2 * np.pi * 1.5 * t) ** 2
-    tremolo = 0.82 + 0.18 * np.sin(2 * np.pi * 18.0 * t)
-    grit = dsp.circular(lambda x: dsp.bandpass(x, 2000, 6000), dsp.white(n, rng)) * 0.02
-    x = (hum * 0.55 + whine * 0.12) * tremolo + grit
-    return dsp.normalise_loudness(x, -22.0, peak_ceiling_db=-4.0)
+        rattle[r_at:r_at + m] += (np.sin(2 * np.pi * f * rt) + 0.5 * np.sin(2 * np.pi * f * 2.7 * rt)) * np.exp(-rt / 0.01) * rng.uniform(0.08, 0.16)
+    x = thud + ring + rattle + _strap(rng, n, 0.0, 0.22, 0.7)
+    x = _room(x, rng, 0.35, 0.1)
+    return _finish(x, -24.0, -5.0)
 
 
 @recipe("soul-release-breath", "Seele frei: die Seele atmet aus und lässt los, ein geflüstertes Seufzen ohne Tonhöhe, die Death Flame flackert kurz auf, wenn sie die Seele nimmt, ein leiser Luftzug, wenn sie zum Spieler fliegt; kein Glockenton, kein Piepen")

@@ -43,7 +43,7 @@ RELATIVE_LU = -8.0
 TAILS = {
     "scythe_hit": FOUNDRY,
     "core_hit": FOUNDRY,
-    "cannon_fire": FOUNDRY,
+    "cannon_shot_1": FOUNDRY,
     "cannon_impact": FOUNDRY,
     "burning_detonation": FOUNDRY,
     "devourer_slam": FOUNDRY,

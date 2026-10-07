@@ -440,6 +440,13 @@ public sealed class ArtAssets
             return;
         }
 
+        if (cannonClip == VisualClips.Aim && player.Cannon.IsFullCharge && HasClip(VisualIds.Player, VisualClips.AimFull))
+        {
+            // Full: the chamber strains against the flame it holds, and the cannon trembles until it is fired.
+            DrawCharacter(batch, player, VisualIds.Player, VisualClips.AimFull, player.FacingDirection, player.Position, 1f, Color.White);
+            return;
+        }
+
         if (cannonClip is not null && HasClip(VisualIds.Player, cannonClip))
         {
             // Standing, the braced cannon is drawn at its charge: it grows as the Death Flame fills it.

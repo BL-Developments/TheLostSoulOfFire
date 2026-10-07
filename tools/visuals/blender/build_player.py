@@ -468,10 +468,12 @@ def place_weapon(poser: Poser, centre: Vector, shaft: Vector, blade: Vector) -> 
 
 def build_cannon(materials: dict[str, bpy.types.Material], outline: bpy.types.Material) -> bpy.types.Object:
     """Soul Cannon (07_SOUL_CANNON, protagonist sheet): a heavy Death-Flame conduit of blackened
-    iron about 1.2 m long. A braced reliquary chamber with grated windows over the Death Flame,
-    a stock behind it, a thick banded barrel fed by two silver pipes and a wide, flared, ribbed
-    muzzle with silver ribs; bone-white only at the butt plate and the rune plates. Cannon space: origin at
-    the pistol grip (the right hand), barrel along +Y, top along +Z."""
+    iron, about 0.85 m long, sized to the body (the 1.2 m version with its 38 cm horn read as a
+    gramophone on the back and outgrew the figure when charged). A braced reliquary chamber with
+    grated windows over the Death Flame, a short stock, a thick banded barrel fed by two silver
+    pipes and a heavy vented muzzle collar with only a slight flare; bone-white only at the butt
+    plate and the rune plates. Cannon space: origin at the pistol grip (the right hand), barrel
+    along +Y, top along +Z."""
     parts = []
 
     def box(name: str, size: tuple[float, float, float], at: tuple[float, float, float], material: str,
@@ -499,47 +501,51 @@ def build_cannon(materials: dict[str, bpy.types.Material], outline: bpy.types.Ma
         parts.append(obj)
         return obj
 
-    centre_z = 0.14
-    # Pistol grip under the chamber and the stock behind it, its butt plate bone-white.
-    box("cannon_grip", (0.045, 0.06, 0.13), (0, 0.0, -0.04), "wood")
-    box("cannon_stock", (0.15, 0.16, 0.15), (0, -0.12, 0.12), "iron", bevel=0.015)
-    box("cannon_butt", (0.17, 0.02, 0.17), (0, -0.205, 0.12), "bone", bevel=0.006)
-    # The reliquary chamber, framed in silver.
-    box("cannon_chamber", (0.25, 0.32, 0.25), (0, 0.12, centre_z), "iron", bevel=0.02)
-    for index, y in enumerate((-0.035, 0.275)):
-        box(f"cannon_frame_{index}", (0.27, 0.03, 0.27), (0, y, centre_z), "steel", bevel=0.008)
+    centre_z = 0.10
+    # Pistol grip under the chamber and a short stock behind it, its butt plate bone-white.
+    box("cannon_grip", (0.04, 0.055, 0.12), (0, 0.0, -0.035), "wood")
+    box("cannon_stock", (0.11, 0.12, 0.11), (0, -0.085, 0.09), "iron", bevel=0.012)
+    box("cannon_butt", (0.125, 0.018, 0.125), (0, -0.152, 0.09), "bone", bevel=0.005)
+    # The reliquary chamber, framed in silver: the heaviest, widest part.
+    box("cannon_chamber", (0.18, 0.23, 0.18), (0, 0.085, centre_z), "iron", bevel=0.016)
+    for index, y in enumerate((-0.03, 0.2)):
+        box(f"cannon_frame_{index}", (0.196, 0.024, 0.196), (0, y, centre_z), "steel", bevel=0.007)
     for side in (-1, 1):
         # A grated window on each side: Death Flame behind dark bars.
-        box(f"cannon_window_{side}", (0.006, 0.18, 0.11), (side * 0.127, 0.12, 0.125), "death_flame")
-        for bar in range(4):
-            box(f"cannon_bar_{side}_{bar}", (0.014, 0.016, 0.13), (side * 0.132, 0.045 + bar * 0.05, 0.125), "iron")
-        box(f"cannon_rune_{side}", (0.008, 0.12, 0.035), (side * 0.13, 0.12, 0.225), "bone")
-    box("cannon_window_top", (0.12, 0.18, 0.006), (0, 0.12, centre_z + 0.127), "death_flame")
+        box(f"cannon_window_{side}", (0.005, 0.13, 0.08), (side * 0.091, 0.085, 0.09), "death_flame")
+        for bar in range(3):
+            box(f"cannon_bar_{side}_{bar}", (0.011, 0.012, 0.095), (side * 0.095, 0.035 + bar * 0.05, 0.09), "iron")
+        box(f"cannon_rune_{side}", (0.006, 0.09, 0.026), (side * 0.094, 0.085, 0.165), "bone")
+    box("cannon_window_top", (0.085, 0.13, 0.005), (0, 0.085, centre_z + 0.091), "death_flame")
     for bar in range(3):
-        box(f"cannon_bar_top_{bar}", (0.016, 0.2, 0.014), ((bar - 1) * 0.04, 0.12, centre_z + 0.132), "iron")
+        box(f"cannon_bar_top_{bar}", (0.012, 0.145, 0.011), ((bar - 1) * 0.03, 0.085, centre_z + 0.095), "iron")
     # The barrel: thick blackened iron with silver bands, fed by two pipes from the chamber.
-    tube("cannon_barrel", 0.085, Vector((0, 0.27, centre_z)), Vector((0, 0.80, centre_z)), "iron", vertices=24)
-    for index, y in enumerate((0.38, 0.58, 0.76)):
-        tube(f"cannon_band_{index}", 0.098, Vector((0, y - 0.018, centre_z)), Vector((0, y + 0.018, centre_z)), "steel", vertices=24)
+    tube("cannon_barrel", 0.058, Vector((0, 0.2, centre_z)), Vector((0, 0.56, centre_z)), "iron", vertices=24)
+    for index, y in enumerate((0.29, 0.43)):
+        tube(f"cannon_band_{index}", 0.066, Vector((0, y - 0.015, centre_z)), Vector((0, y + 0.015, centre_z)), "steel", vertices=24)
     for side in (-1, 1):
-        tube(f"cannon_pipe_{side}", 0.017, Vector((side * 0.075, 0.02, centre_z + 0.13)), Vector((side * 0.06, 0.66, centre_z + 0.09)), "steel", vertices=10)
-    # Flared, ribbed muzzle, wide enough to read from every direction.
-    bpy.ops.mesh.primitive_cone_add(vertices=24, radius1=0.095, radius2=0.19, depth=0.2, end_fill_type="NOTHING",
-                                    location=(0, 0.89, centre_z), rotation=(math.radians(-90), 0, 0))
+        tube(f"cannon_pipe_{side}", 0.011, Vector((side * 0.055, 0.02, centre_z + 0.095)), Vector((side * 0.045, 0.5, centre_z + 0.06)), "steel", vertices=10)
+    # The muzzle: a heavy collar with dark vents and a slight flare, a cannon's mouth, not a horn.
+    tube("cannon_collar", 0.075, Vector((0, 0.53, centre_z)), Vector((0, 0.645, centre_z)), "iron", vertices=24)
+    for side in (-1, 1):
+        box(f"cannon_vent_{side}", (0.006, 0.055, 0.026), (side * 0.075, 0.588, centre_z), "ink")
+    box("cannon_vent_top", (0.026, 0.055, 0.006), (0, 0.588, centre_z + 0.075), "ink")
+    bpy.ops.mesh.primitive_cone_add(vertices=24, radius1=0.075, radius2=0.092, depth=0.05, end_fill_type="NOTHING",
+                                    location=(0, 0.668, centre_z), rotation=(math.radians(-90), 0, 0))
     muzzle = bpy.context.active_object
     muzzle.name = "cannon_muzzle"
     muzzle.data.materials.append(materials["iron"])
-    muzzle.modifiers.new("Thickness", "SOLIDIFY").thickness = 0.016
+    muzzle.modifiers.new("Thickness", "SOLIDIFY").thickness = 0.012
     parts.append(muzzle)
-    for index, (y, radius) in enumerate(((0.82, 0.112), (0.89, 0.148), (0.965, 0.186))):
-        bpy.ops.mesh.primitive_torus_add(major_radius=radius, minor_radius=0.011, major_segments=24, minor_segments=8,
+    for index, (y, radius) in enumerate(((0.535, 0.078), (0.64, 0.078), (0.69, 0.092))):
+        bpy.ops.mesh.primitive_torus_add(major_radius=radius, minor_radius=0.009, major_segments=24, minor_segments=8,
                                          location=(0, y, centre_z), rotation=(math.radians(90), 0, 0))
         rib = bpy.context.active_object
         rib.name = f"cannon_rib_{index}"
         rib.data.materials.append(materials["steel"])
         parts.append(rib)
     # The bore: dark, with the Death Flame deep inside.
-    tube("cannon_bore", 0.07, Vector((0, 0.70, centre_z)), Vector((0, 0.805, centre_z)), "ink", vertices=20)
+    tube("cannon_bore", 0.05, Vector((0, 0.58, centre_z)), Vector((0, 0.694, centre_z)), "ink", vertices=20)
 
     bpy.context.view_layer.update()
     for part in parts:
@@ -555,12 +561,12 @@ def build_cannon(materials: dict[str, bpy.types.Material], outline: bpy.types.Ma
 
 
 #: The cannon on the back: grip low on the left behind the hip, the barrel rising across the back
-#: so the flared muzzle stands over the right shoulder; its top faces away from the back.
-CANNON_BACK_GRIP = (0.16, 0.13, 0.80)
+#: so the muzzle sits by the right shoulder; its top faces away from the back.
+CANNON_BACK_GRIP = (0.15, 0.14, 0.86)
 CANNON_BACK_AXIS = (-0.42, 0.04, 0.9)
 
 #: How much the Soul Cannon grows at full charge (scaled about the grip; presentation only).
-CANNON_GROWTH = 0.3
+CANNON_GROWTH = 0.1
 
 
 def cannon_scale(charge: float) -> float:
@@ -886,23 +892,90 @@ def braced_torso(poser: Poser, t: float = 1.0) -> None:
     poser.set("spine_02", "back", 2 * t)
 
 
+#: The brace behind the cannon: the left foot set forward, the right one back to take the recoil
+#: (ball positions in rig space before the side sign; the combat stance is ±STANCE_WIDTH, -0.15).
+BRACE_FEET = {"l": (STANCE_WIDTH, -0.21, 3.0), "r": (-STANCE_WIDTH - 0.02, -0.04, -14.0)}
+COMBAT_FEET = {"l": (STANCE_WIDTH, -0.15, 0.0), "r": (-STANCE_WIDTH, -0.144, 0.0)}
+
+
+def stance_foot(poser: Poser, side: str, t: float) -> tuple[Vector, float]:
+    """A foot between the combat stance (0) and the cannon brace (1): ball position and yaw."""
+    (x0, y0, yaw0), (x1, y1, yaw1) = COMBAT_FEET[side], BRACE_FEET[side]
+    return Vector(((x0 + (x1 - x0) * t) * poser.left, y0 + (y1 - y0) * t, 0.0)), yaw0 + (yaw1 - yaw0) * t
+
+
+def brace_body(poser: Poser, charge: float, feet: Feet) -> Vector:
+    """The figure set behind the cannon: hips back and down into the brace, lower and leaning
+    further back as the Death Flame fills it. Returns how far the pelvis moved (rig space), so
+    the cannon in the hands can move with the body."""
+    move_pelvis(poser, Vector((0.0, 0.025 + 0.02 * charge, -0.035 - 0.035 * charge)))
+    braced_torso(poser, 1.0)
+    poser.set("spine_01", "back", 2.5 * charge)
+    poser.set("spine_02", "back", 1.5 * charge)
+    fit_pelvis(poser)
+    feet.settle()
+    return poser.rig.pose.bones["pelvis"].head - poser.rig.data.bones["pelvis"].head_local
+
+
+def braced_feet(poser: Poser) -> Feet:
+    feet = Feet(poser)
+    for side in ("l", "r"):
+        ball, yaw = stance_foot(poser, side, 1.0)
+        feet.plant(side, ball, yaw=yaw)
+    return feet
+
+
 def key_aim(poser: Poser, frames: int) -> bpy.types.Action:
     """The Soul Cannon braced at the right hip toward the aim, the scythe trailing in the left
-    hand. The game samples this clip by the charge (frame i = charge i / (frames - 1)): the
-    cannon grows by CANNON_GROWTH as the Death Flame fills it, and the body settles lower."""
+    hand, the feet set apart (left forward, right back against the recoil). The game samples
+    this clip by the charge (frame i = charge i / (frames - 1)): the cannon grows a little
+    (CANNON_GROWTH) as the Death Flame fills it, and the body sinks lower into the brace."""
     action = replace_action(poser.rig, "aim")
     for frame in range(frames):
         charge = frame / (frames - 1)
         poser.clear()
-        braced_torso(poser, 1.0)
-        poser.set("spine_01", "back", 2 * charge)  # the growing weight pulls him back
+        feet = braced_feet(poser)
+        sunk = brace_body(poser, charge, feet)
         centre, axis, up = cannon_aimed(poser.left)
-        place_bone(poser, "cannon", centre - Vector((0.0, 0.0, 0.02 * charge)), axis, up)
+        place_bone(poser, "cannon", centre + sunk * 0.85 - Vector((0.0, 0.0, 0.01 * charge)), axis, up)
         place_weapon(poser, *weapon_trailing(poser.left))
         loose_fists(poser, 75)
         poser.key(frame + 1)
         key_cannon_scale(poser.rig, frame + 1, cannon_scale(charge))
         key_hands(poser.rig, frame + 1, cannon=1.0)
+        key_legs(poser.rig, frame + 1, 1.0)
+    return action
+
+
+def key_aim_full(poser: Poser, frames: int) -> bpy.types.Action:
+    """Holding a full charge (a loop after the last frame of key_aim): the chamber strains against
+    the flame it holds. The cannon trembles in the hands (6, 8 and 10 Hz, about a centimetre and
+    two to three degrees), the chamber swells and shrinks a little, the shoulders and head shake with it and
+    the chest heaves twice a second. Every term completes whole cycles, so the loop is seamless."""
+    action = replace_action(poser.rig, "aim_full")
+    for frame in range(frames + 1):
+        p = frame / frames
+        a = math.sin(math.tau * 3 * p)
+        b = math.sin(math.tau * 4 * p + 1.3)
+        c = math.sin(math.tau * 5 * p + 2.1)
+        heave = math.sin(math.tau * 1 * p)
+        poser.clear()
+        feet = braced_feet(poser)
+        sunk = brace_body(poser, 1.0, feet)
+        poser.set("spine_03", "back", 2.0 * heave)
+        poser.turn("spine_03", 2.2 * a)
+        poser.set("neck_01", "forward", 1.8 * b)
+        bpy.context.view_layer.update()
+        centre, axis, up = cannon_aimed(poser.left)
+        shake = Vector((0.01 * b, 0.007 * c, 0.013 * a))
+        axis = axis + Vector((0.03 * c, 0.0, 0.045 * a + 0.02 * b))
+        place_bone(poser, "cannon", centre + sunk * 0.85 - Vector((0.0, 0.0, 0.01)) + shake, axis, up)
+        place_weapon(poser, *weapon_trailing(poser.left))
+        loose_fists(poser, 80)
+        poser.key(frame + 1)
+        key_cannon_scale(poser.rig, frame + 1, cannon_scale(1.0) + 0.012 * math.sin(math.tau * 2 * p))
+        key_hands(poser.rig, frame + 1, cannon=1.0)
+        key_legs(poser.rig, frame + 1, 1.0)
     return action
 
 
@@ -934,7 +1007,7 @@ def key_aim_move(poser: Poser, frames: int, name: str = "aim_move") -> bpy.types
         poser.turn("spine_02", -4 * math.sin(phase))  # the chest holds the aim against the hips
         bob = (poser.rig.pose.bones["pelvis"].head - poser.rig.data.bones["pelvis"].head_local).z
         centre, axis, up = cannon_aimed(poser.left)
-        place_bone(poser, "cannon", centre + Vector((0.0, 0.0, bob * 0.8 - 0.02 * charge)), axis, up)
+        place_bone(poser, "cannon", centre + Vector((0.0, 0.0, bob * 0.8 - 0.01 * charge)), axis, up)
         trail_centre, trail_shaft, trail_blade = weapon_trailing(poser.left)
         place_weapon(poser, trail_centre + Vector((0.0, 0.0, bob)), trail_shaft, trail_blade)
         loose_fists(poser, 75)
@@ -968,11 +1041,21 @@ def weapon_trailing(left: float) -> tuple[Vector, Vector, Vector]:
     return Vector((left * 0.25, -0.13, 1.01)), Vector((0.12 * left, 0.85, -0.42)), Vector((left, 0.0, -0.4))
 
 
+def weapon_swap(left: float, t: float) -> tuple[Vector, Vector, Vector]:
+    """The scythe between the guard (0) and trailing in the left hand (1). The direct turn swings
+    the blade up over the head; this one goes through a low pose with the shaft out to the left
+    and the blade hanging, so the scythe swings round low."""
+    low = (Vector((left * 0.2, -0.22, 0.96)), Vector((left * 1.0, 0.05, -0.18)), Vector((left * 0.35, 0.0, -1.0)))
+    if t < 0.5:
+        return blend_placement(weapon_idle(left), low, ease(t * 2.0))
+    return blend_placement(low, weapon_trailing(left), ease(t * 2.0 - 1.0))
+
+
 def cannon_aimed(left: float) -> tuple[Vector, Vector, Vector]:
-    """Braced: the grip at the right hip, the barrel a little upward and turned about 11° inward,
-    so the muzzle lies on the line of fire in front of the figure (FigureHeights.MuzzleOf: about
-    0.14 m + 0.95 m · scale ahead of the feet, 1.2 m up, a few centimetres right of the line)."""
-    return Vector((-left * 0.27, -0.14, 1.0)), Vector((left * 0.196, -0.98, 0.06)), Vector((0.0, 0.0, 1.0))
+    """Braced: the grip at the right hip, the barrel a little upward and turned about 13° inward,
+    so the muzzle lies on the line of fire in front of the figure, a few centimetres right of it
+    (FigureHeights.MuzzleOf, measured with --report-muzzle)."""
+    return Vector((-left * 0.22, -0.16, 1.0)), Vector((left * 0.225, -0.974, 0.06)), Vector((0.0, 0.0, 1.0))
 
 
 def torso_aim(poser: Poser, t: float) -> None:
@@ -985,68 +1068,101 @@ def torso_aim(poser: Poser, t: float) -> None:
 
 
 def key_cannon_draw(poser: Poser, frames: int) -> bpy.types.Action:
-    """Drawing (0.16 s): the right hand lets go of the scythe, reaches over the shoulder for the
-    cannon on the back and swings it forward in an arc into the aim; the scythe drops to trail."""
+    """Drawing (0.16 s): the right hand lets go of the scythe and reaches over the shoulder for
+    the cannon on the back, rips it round in an arc (muzzle swinging down past the shoulder) and
+    the weight lands in the hands: the body dips under it while the right foot steps back into
+    the brace. The last frame is the first frame of key_aim."""
     action = replace_action(poser.rig, "cannon_draw")
     left = poser.left
     for index in range(frames):
         p = index / (frames - 1)
-        reach = ease(min(1.0, p / 0.25))
-        pull = ease(max(0.0, (p - 0.25) / 0.75))
+        reach = ease(min(1.0, p / 0.3))
+        pull = ease(max(0.0, (p - 0.25) / 0.6))
+        land = math.sin(math.pi * max(0.0, min(1.0, (p - 0.7) / 0.3)))  # the weight arriving
         poser.clear()
+        feet = Feet(poser)
+        for side in ("l", "r"):
+            start, start_yaw = stance_foot(poser, side, 0.0)
+            end, end_yaw = stance_foot(poser, side, 1.0)
+            if side == "r":
+                ball, lift = step_arc(p, 0.3, 0.85, start, end, 0.04)
+            else:
+                ball, lift = start.lerp(end, smooth(window(p, 0.3, 0.85))), 0.0
+            feet.plant(side, ball, yaw=start_yaw + (end_yaw - start_yaw) * smooth(window(p, 0.3, 0.85)), lift=lift)
+        brace = smooth(window(p, 0.2, 1.0))
+        move_pelvis(poser, Vector((0.0, 0.025 * brace, -0.035 * brace - 0.025 * land - 0.012 * reach * (1 - pull))))
         braced_torso(poser, 0.15 * reach + 0.85 * pull)
-        poser.turn("spine_03", -14 * reach * (1 - pull))  # right shoulder back while it grabs
+        poser.turn("spine_03", -16 * reach * (1 - pull))  # right shoulder back while it grabs
+        poser.set("spine_02", "forward", 4 * land)  # the weight pulls the chest down for a moment
+        fit_pelvis(poser)
+        feet.settle()
+        sunk = poser.rig.pose.bones["pelvis"].head - poser.rig.data.bones["pelvis"].head_local
         back = placement_of(poser, "cannon")
-        centre, axis, up = blend_placement(back, cannon_aimed(left), pull)
-        centre = centre + Vector((0.0, 0.0, 0.14 * math.sin(math.pi * pull)))  # swung round from the back
+        aim_centre, aim_axis, aim_up = cannon_aimed(left)
+        centre, axis, up = blend_placement(back, (aim_centre + sunk * 0.85, aim_axis, aim_up), pull)
+        # Swung round from the back over the shoulder, and dipping as it lands.
+        centre = centre + Vector((0.0, 0.0, 0.16 * math.sin(math.pi * pull) - 0.03 * land))
+        axis = axis + Vector((0.0, 0.0, -0.25 * land))
         place_bone(poser, "cannon", centre, axis, up)
-        place_weapon(poser, *blend_placement(weapon_idle(left), weapon_trailing(left), ease(min(1.0, p / 0.6))))
+        place_weapon(poser, *weapon_swap(left, min(1.0, p / 0.6)))
         loose_fists(poser, 75)
         poser.key(index + 1)
         key_cannon_scale(poser.rig, index + 1, 1.0)
         key_hands(poser.rig, index + 1, cannon=reach)
+        key_legs(poser.rig, index + 1, 1.0)
     return action
 
 
 def key_cannon_fire(poser: Poser, frames: int) -> bpy.types.Action:
-    """Returning (0.28 s after the shot): the recoil throws the muzzle up and the right shoulder
-    back, the right foot is driven back half a step and the knees soak up the kick; the figure
-    comes forward again, swings the cannon back over the shoulder and takes the scythe again."""
+    """Returning (0.28 s after the shot): the recoil throws the muzzle high and drives the cannon
+    back along the hip, the chest and head snap back and the right shoulder round, the whole
+    figure is shoved back a few centimetres (both feet slide, the front heel lifts) and the knees
+    soak up the kick; then it rocks forward, swings the cannon back over the shoulder, steps back
+    into the combat stance and takes the scythe again."""
     action = replace_action(poser.rig, "cannon_fire")
     left = poser.left
-    w = STANCE_WIDTH
     for index in range(frames):
         p = index / (frames - 1)
         # A sharp kick (peak in the first frames) that decays with a small rebound.
-        kick = math.exp(-p * 7.0) * (1.0 - 0.1 * math.sin(p * 12.0))
+        kick = math.exp(-p * 6.0) * (1.0 - 0.12 * math.sin(p * 13.0))
+        shove = smooth(min(1.0, p / 0.12))  # the slide back on the floor
         settle = smooth(max(0.0, (p - 0.2) / 0.5))
         stow = smooth(max(0.0, (p - 0.42) / 0.58))
         poser.clear()
         feet = Feet(poser)
-        back_r = Vector((-w * left, -0.144 + 0.12 * (1 - settle) * smooth(p / 0.12), 0.0))
-        feet.plant("r", back_r, yaw=-8 * (1 - settle), lift=0.035 * math.sin(math.pi * min(1.0, p / 0.14)))
-        feet.plant("l", Vector((w * left, -0.15, 0.0)), heel=10 * kick)
-        move_pelvis(poser, Vector((0.0, 0.06 * kick, -0.07 * kick)))
-        poser.set("spine_01", "back", 10 * kick)
-        poser.set("spine_02", "back", 16 * kick)
-        poser.set("neck_01", "back", 14 * kick)
+        slide = Vector((0.0, 0.06 * shove, 0.0))
+        for side in ("l", "r"):
+            brace, brace_yaw = stance_foot(poser, side, 1.0)
+            rest, _ = stance_foot(poser, side, 0.0)
+            if side == "r":
+                # Shoved back, then the back foot steps forward into the combat stance.
+                ball, lift = step_arc(p, 0.5, 0.9, brace + slide, rest, 0.035)
+                feet.plant(side, ball, yaw=brace_yaw * (1 - smooth(window(p, 0.5, 0.9))), lift=lift)
+            else:
+                ball = (brace + slide).lerp(rest, smooth(window(p, 0.45, 0.85)))
+                feet.plant(side, ball, yaw=0.0, heel=14 * kick)
+        move_pelvis(poser, Vector((0.0, 0.025 * (1 - stow) + 0.08 * kick, -0.035 * (1 - stow) - 0.07 * kick)))
+        poser.set("spine_01", "back", 12 * kick)
+        poser.set("spine_02", "back", 20 * kick)
+        poser.set("neck_01", "back", 18 * kick)
         braced_torso(poser, (1 - stow) * (1 - 0.8 * kick))
-        poser.turn("spine_03", -22 * kick)
+        poser.turn("spine_03", -26 * kick)
         fit_pelvis(poser)
         feet.settle()
+        sunk = poser.rig.pose.bones["pelvis"].head - poser.rig.data.bones["pelvis"].head_local
         back = placement_of(poser, "cannon")
         aim_centre, aim_axis, aim_up = cannon_aimed(left)
-        # The heavy cannon kicks back along the hip and the muzzle climbs.
-        recoiled = (aim_centre + Vector((0.0, 0.2 * kick, 0.1 * kick)),
-                    Vector((0.0, -1.0, 0.06 + 0.8 * kick)), Vector((0.0, 0.8 * kick, 1.0)))
+        # The heavy cannon kicks back along the hip and the muzzle climbs steeply.
+        recoiled = (aim_centre + sunk * 0.85 + Vector((0.0, 0.24 * kick, 0.13 * kick)),
+                    Vector((aim_axis.x * (1 - kick), -1.0, 0.06 + 1.05 * kick)), Vector((0.0, 0.9 * kick, 1.0)))
         centre, axis, up = blend_placement(recoiled, back, stow)
         centre = centre + Vector((0.0, 0.0, 0.12 * math.sin(math.pi * stow)))
         place_bone(poser, "cannon", centre, axis, up)
-        place_weapon(poser, *blend_placement(weapon_trailing(left), weapon_idle(left), stow))
+        place_weapon(poser, *weapon_swap(left, 1.0 - stow))
         loose_fists(poser, 75)
         poser.key(index + 1)
         # The shot empties the chamber: the cannon vents back to its resting size.
-        key_cannon_scale(poser.rig, index + 1, 1.0 + 0.15 * (1.0 - smooth(min(1.0, p / 0.35))))
+        key_cannon_scale(poser.rig, index + 1, 1.0 + 0.5 * CANNON_GROWTH * (1.0 - smooth(min(1.0, p / 0.35))))
         # The hand stays on the cannon until it sits on the back, then takes the scythe again.
         key_hands(poser.rig, index + 1, cannon=1.0 - ease(max(0.0, (p - 0.8) / 0.2)))
         key_legs(poser.rig, index + 1, 1.0)
@@ -1348,12 +1464,12 @@ LOOP_FRAMES = {"idle": 24, "run": 24}
 COMBAT_FRAMES = {
     "swing1": 14, "swing2": 16, "swing3": 26,
     "swing1_return": 8, "swing2_return": 8, "swing3_return": 10,
-    "dash": 8, "hit": 6, "cannon_fire": 10, "retreat": 8, "aim_move": 12, "aim_move_2": 12, "aim_move_3": 12,
-    "aim": 9, "cannon_draw": 5, "wake": 30, "death": 16,
+    "dash": 8, "hit": 6, "cannon_fire": 16, "retreat": 8, "aim_move": 12, "aim_move_2": 12, "aim_move_3": 12,
+    "aim": 9, "aim_full": 12, "cannon_draw": 8, "wake": 30, "death": 16,
 }
 
 #: The actions that carry the Soul Cannon in the hands (re-keyed by --recannon).
-CANNON_ACTIONS = ["aim", "aim_move", "aim_move_2", "aim_move_3", "cannon_draw", "cannon_fire"]
+CANNON_ACTIONS = ["aim", "aim_full", "aim_move", "aim_move_2", "aim_move_3", "cannon_draw", "cannon_fire"]
 
 
 def combat_action(poser: Poser, name: str, paths: dict) -> bpy.types.Action:
@@ -1365,7 +1481,8 @@ def combat_action(poser: Poser, name: str, paths: dict) -> bpy.types.Action:
     if name.startswith("aim_move"):
         return key_aim_move(poser, frames, name)
     return {"dash": key_dash, "hit": key_hit, "cannon_fire": key_cannon_fire, "retreat": key_retreat,
-            "aim": key_aim, "cannon_draw": key_cannon_draw, "wake": key_wake, "death": key_death}[name](poser, frames)
+            "aim": key_aim, "aim_full": key_aim_full, "cannon_draw": key_cannon_draw, "wake": key_wake,
+            "death": key_death}[name](poser, frames)
 
 
 def write_paths(path: Path, paths: dict) -> None:
@@ -1427,6 +1544,27 @@ def rescythe(args: argparse.Namespace) -> None:
     rekey(args)
 
 
+#: In cannon space (build_cannon): the muzzle's mouth and the middle of the chamber's windows.
+CANNON_MUZZLE_POINT = Vector((0.0, 0.693, 0.10))
+CANNON_CHAMBER_POINT = Vector((0.0, 0.085, 0.09))
+
+
+def report_cannon(rig: bpy.types.Object) -> None:
+    """Where the braced cannon's muzzle and chamber are in the aim clip (first and last frame), in
+    game units for Rendering/FigureHeights.cs and CannonFeed.cs: ahead of the feet along the aim,
+    to the figure's right, and the screen height above the feet (h · cos 35° · 66.7)."""
+    left = 1.0 if rig.data.bones["upperarm_l"].head_local.x > 0 else -1.0
+    rig.animation_data.action = bpy.data.actions["aim"]
+    for frame in (1, COMBAT_FRAMES["aim"]):
+        bpy.context.scene.frame_set(frame)
+        bpy.context.view_layer.update()
+        bone = rig.pose.bones["cannon"]
+        for name, point in (("muzzle", CANNON_MUZZLE_POINT), ("chamber", CANNON_CHAMBER_POINT)):
+            at = rig.matrix_world @ (bone.matrix @ point)
+            ahead, right, height = -at.y * 66.7, -at.x * left * 66.7, at.z * math.cos(math.radians(35)) * 66.7
+            print(f"CANNON_POINT frame={frame} {name} ahead={ahead:.1f} right={right:.1f} up={height:.1f}")
+
+
 def recannon(args: argparse.Namespace) -> None:
     """Replace the Soul Cannon of the opened figure: the old model goes, the new one is built,
     the `cannon` bone gets its new place on the back and the actions that hold the cannon are keyed
@@ -1457,6 +1595,7 @@ def recannon(args: argparse.Namespace) -> None:
     attach(cannon, rig, "cannon")
     args.rekey = ",".join(CANNON_ACTIONS)
     rekey(args)
+    report_cannon(rig)
 
 
 if __name__ == "__main__":

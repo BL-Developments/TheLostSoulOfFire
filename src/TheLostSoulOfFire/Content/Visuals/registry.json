@@ -16,27 +16,27 @@
           "fps": 16.0,
           "loop": true,
           "normalMap": "Textures/Player/Animations/idle_normal/{dir}",
-          "origin": [0.5, 0.7634]
+          "origin": [0.5, 0.762]
         },
         "move": {
           "path": "Textures/Player/Animations/move/{dir}",
-          "frameSize": [374, 278],
+          "frameSize": [374, 279],
           "frames": 24,
           "fps": 24.0,
           "loop": true,
           "normalMap": "Textures/Player/Animations/move_normal/{dir}",
           "progress": "distance",
           "cycleDistance": 180.0,
-          "origin": [0.5, 0.7518]
+          "origin": [0.5, 0.7513]
         },
         "swing1": {
           "path": "Textures/Player/Animations/swing1/{dir}",
-          "frameSize": [396, 286],
+          "frameSize": [396, 287],
           "frames": 14,
           "fps": 24.0,
           "loop": true,
           "normalMap": "Textures/Player/Animations/swing1_normal/{dir}",
-          "origin": [0.5, 0.7832]
+          "origin": [0.5, 0.7826]
         },
         "swing2": {
           "path": "Textures/Player/Animations/swing2/{dir}",
@@ -45,43 +45,43 @@
           "fps": 24.0,
           "loop": true,
           "normalMap": "Textures/Player/Animations/swing2_normal/{dir}",
-          "origin": [0.5, 0.7612]
+          "origin": [0.5, 0.7629]
         },
         "swing3": {
           "path": "Textures/Player/Animations/swing3/{dir}",
-          "frameSize": [392, 398],
+          "frameSize": [392, 397],
           "frames": 26,
           "fps": 24.0,
           "loop": true,
           "normalMap": "Textures/Player/Animations/swing3_normal/{dir}",
-          "origin": [0.5, 0.7513]
+          "origin": [0.5, 0.7496]
         },
         "aim": {
           "path": "Textures/Player/Animations/aim/{dir}",
-          "frameSize": [296, 269],
+          "frameSize": [282, 227],
           "frames": 9,
           "fps": 6.0,
           "loop": true,
           "normalMap": "Textures/Player/Animations/aim_normal/{dir}",
-          "origin": [0.5, 0.768]
+          "origin": [0.5, 0.7251]
         },
         "cannon_draw": {
           "path": "Textures/Player/Animations/cannon_draw/{dir}",
-          "frameSize": [382, 288],
-          "frames": 5,
-          "fps": 12.0,
+          "frameSize": [382, 290],
+          "frames": 8,
+          "fps": 24.0,
           "loop": true,
           "normalMap": "Textures/Player/Animations/cannon_draw_normal/{dir}",
-          "origin": [0.5, 0.7729]
+          "origin": [0.5, 0.7331]
         },
         "cannon_fire": {
           "path": "Textures/Player/Animations/cannon_fire/{dir}",
           "frameSize": [382, 289],
-          "frames": 10,
+          "frames": 16,
           "fps": 24.0,
           "loop": true,
           "normalMap": "Textures/Player/Animations/cannon_fire_normal/{dir}",
-          "origin": [0.5, 0.7737]
+          "origin": [0.5, 0.7356]
         },
         "dash": {
           "path": "Textures/Player/Animations/dash/{dir}",
@@ -90,7 +90,7 @@
           "fps": 24.0,
           "loop": true,
           "normalMap": "Textures/Player/Animations/dash_normal/{dir}",
-          "origin": [0.5, 0.7358]
+          "origin": [0.5, 0.7343]
         },
         "hit": {
           "path": "Textures/Player/Animations/hit/{dir}",
@@ -99,7 +99,7 @@
           "fps": 24.0,
           "loop": true,
           "normalMap": "Textures/Player/Animations/hit_normal/{dir}",
-          "origin": [0.5, 0.7819]
+          "origin": [0.5, 0.7805]
         },
         "death": {
           "path": "Textures/Player/Animations/death/{dir}",
@@ -112,12 +112,12 @@
         },
         "swing1_return": {
           "path": "Textures/Player/Animations/swing1_return/{dir}",
-          "frameSize": [382, 287],
+          "frameSize": [382, 288],
           "frames": 8,
           "fps": 24.0,
           "loop": true,
           "normalMap": "Textures/Player/Animations/swing1_return_normal/{dir}",
-          "origin": [0.5, 0.7387]
+          "origin": [0.5, 0.7382]
         },
         "swing2_return": {
           "path": "Textures/Player/Animations/swing2_return/{dir}",
@@ -126,16 +126,16 @@
           "fps": 24.0,
           "loop": true,
           "normalMap": "Textures/Player/Animations/swing2_return_normal/{dir}",
-          "origin": [0.5, 0.795]
+          "origin": [0.5, 0.7937]
         },
         "swing3_return": {
           "path": "Textures/Player/Animations/swing3_return/{dir}",
-          "frameSize": [382, 302],
+          "frameSize": [382, 303],
           "frames": 10,
           "fps": 24.0,
           "loop": true,
           "normalMap": "Textures/Player/Animations/swing3_return_normal/{dir}",
-          "origin": [0.5, 0.702]
+          "origin": [0.5, 0.7017]
         },
         "retreat": {
           "path": "Textures/Player/Animations/retreat/{dir}",
@@ -144,40 +144,40 @@
           "fps": 24.0,
           "loop": true,
           "normalMap": "Textures/Player/Animations/retreat_normal/{dir}",
-          "origin": [0.5, 0.7923]
+          "origin": [0.5, 0.7911]
         },
         "aim_move": {
           "path": "Textures/Player/Animations/aim_move/{dir}",
-          "frameSize": [282, 253],
+          "frameSize": [282, 234],
           "frames": 12,
           "fps": 12.0,
           "loop": true,
           "normalMap": "Textures/Player/Animations/aim_move_normal/{dir}",
           "progress": "distance",
           "cycleDistance": 150.0,
-          "origin": [0.5, 0.7375]
+          "origin": [0.5, 0.7162]
         },
         "aim_move_2": {
           "path": "Textures/Player/Animations/aim_move_2/{dir}",
-          "frameSize": [282, 262],
+          "frameSize": [282, 234],
           "frames": 12,
           "fps": 12.0,
           "loop": true,
           "normalMap": "Textures/Player/Animations/aim_move_2_normal/{dir}",
           "progress": "distance",
           "cycleDistance": 150.0,
-          "origin": [0.5, 0.7466]
+          "origin": [0.5, 0.7162]
         },
         "aim_move_3": {
           "path": "Textures/Player/Animations/aim_move_3/{dir}",
-          "frameSize": [288, 271],
+          "frameSize": [282, 234],
           "frames": 12,
           "fps": 12.0,
           "loop": true,
           "normalMap": "Textures/Player/Animations/aim_move_3_normal/{dir}",
           "progress": "distance",
           "cycleDistance": 150.0,
-          "origin": [0.5, 0.755]
+          "origin": [0.5, 0.7162]
         },
         "wake": {
           "path": "Textures/Player/Animations/wake/{dir}",
@@ -187,6 +187,15 @@
           "loop": true,
           "normalMap": "Textures/Player/Animations/wake_normal/{dir}",
           "origin": [0.5, 0.6423]
+        },
+        "aim_full": {
+          "path": "Textures/Player/Animations/aim_full/{dir}",
+          "frameSize": [282, 227],
+          "frames": 12,
+          "fps": 24.0,
+          "loop": true,
+          "normalMap": "Textures/Player/Animations/aim_full_normal/{dir}",
+          "origin": [0.5, 0.7251]
         }
       },
       "pixelsPerUnit": 1.5

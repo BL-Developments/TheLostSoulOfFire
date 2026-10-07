@@ -20153,6 +20153,2283 @@
         "status": "angenommen",
         "reason": "Bereichs-Grading der Scheibe; Flammenfarben geschützt"
       }
+    },
+    {
+      "id": "ea969881040742a098af828f5c225080",
+      "timestamp": "2026-10-07T08:39:26+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "idle",
+        "frames": 24,
+        "fps": 16.0,
+        "frame_size": [
+          382,
+          279
+        ],
+        "origin": [
+          0.5,
+          0.762
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 67.4
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/idle.render.json",
+          "sha256": "fa81765b5fa810838ad963eff8716ed94c378e01c5f6d5e1bbd0956258bf2210"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle/n.png",
+          "sha256": "6d57d05513372da6a2c72c493fe27fcb90e6e660334035548f54b07f741cc89c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle_normal/n.png",
+          "sha256": "b252b6c738058a13ad508e3be2d9ce32de7cda99900fd9bd1f80ddb6fe6819d4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle/ne.png",
+          "sha256": "22d3bea9b07ad2101ec8383bd841fc1290b7e99d592a5dd19a19180e6bf6dc8f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle_normal/ne.png",
+          "sha256": "54033cd7c08e87ed277786e04587a69ae3a121b350651afb128994767efde06b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle/e.png",
+          "sha256": "a4d90cf5e0642a4e1366f33edde0656379c07f6f56d7ece18aff7a02b9e48f4e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle_normal/e.png",
+          "sha256": "bc36f7c92f827be9a0f4a49a6b1818b80f6ae0b174a52d1514be409c1f5c2b14"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle/se.png",
+          "sha256": "7e85025e87a4789def4a33312087d5880276b3479afb42f46b58af730fe6a53e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle_normal/se.png",
+          "sha256": "d9f5b8c2b567325c0f6568f77cc9e79ca0c423e9bb00e92203d1082507ed2231"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle/s.png",
+          "sha256": "ccf88245d0078cfb8950ceb78a2f04dfc6f796b32b05e588bbb1540f03132356"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle_normal/s.png",
+          "sha256": "4e818b8b43795f97f38546ca8e4173991e589c092f422d890c7e367beb8c919a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle/sw.png",
+          "sha256": "1355116fd63f1d7e0105b78048d6486f3dfda2f9ef2a595da47f82230752e331"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle_normal/sw.png",
+          "sha256": "7460052849fc258641ff6412e10d799d5e27c52ce758093212aee74722d05676"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle/w.png",
+          "sha256": "3ecb19d1ac445b91d0194f0d1ec0f902af38769959dca63a861d3ce7f3800d20"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle_normal/w.png",
+          "sha256": "2d140aac41ddae24794487810f9b694e1c744a00db1c2004d688012308cfc23e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle/nw.png",
+          "sha256": "4232ffae49751559d0b12fe3514d78aa28b669fcf89d71c736c735b123b0a9ff"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/idle_normal/nw.png",
+          "sha256": "41e0c52377cbd6db42cb22e9e0f6289751aa266a331f7be5da0ddc7250c44a10"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 1.29,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Kompakte Soul Cannon (0,85 m, Mündungskragen statt Trichter, Wachsen 10 %) und neue Kanonenbewegung (Owner 07.10.: viel zu groß)"
+      }
+    },
+    {
+      "id": "baa061212774470e889dd606b584e0e7",
+      "timestamp": "2026-10-07T08:40:37+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "move",
+        "frames": 24,
+        "fps": 24.0,
+        "frame_size": [
+          374,
+          279
+        ],
+        "origin": [
+          0.5,
+          0.7513
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 68.1
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/move.render.json",
+          "sha256": "56125634161e5fb139dfa4bf76af96914b7930564f9cc0d84214cd5bfc81f6a8"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move/n.png",
+          "sha256": "51aefd1962c8d57a05e378c8b85fe0eaa0c351ef87a31b401c6dbce3bb3885d0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move_normal/n.png",
+          "sha256": "bc47218a1abd18c6b534a2a90d6c601768554cb7074585a9788bc386d593bb24"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move/ne.png",
+          "sha256": "05dbd9182f9c8b2465d03ed92fa95d4793f24fe9799c604d42d52419982a0888"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move_normal/ne.png",
+          "sha256": "34beb95a8b03a05a66932ad4d21f3b16dc70d5f819c2175e6dba7a04fb6345ee"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move/e.png",
+          "sha256": "e56a32d5bc623e27a60b2c5fd4b9c878779ad2f09030b27a74788a1957634a98"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move_normal/e.png",
+          "sha256": "3d6d8a3cc8072f376f132d0206f8d109b2bba94cfcbf2d0e112b647cd5715e55"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move/se.png",
+          "sha256": "44afb920f36cdb054d5aed4c20f08959836ee6d535014a98e662fce2a7b6f2bf"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move_normal/se.png",
+          "sha256": "2230d736ceb6236bc344a64d83869897140ba70fb7433a342ae6c553897f7420"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move/s.png",
+          "sha256": "9097f3794824023e3d6527f8970cc3076e454d51753a84fad5f4476814cddbe4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move_normal/s.png",
+          "sha256": "c5d5d8fd5f36b5f7c52075793b859fa8503923959f534d23898965167b045fe0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move/sw.png",
+          "sha256": "0909dac7f785a1e3d5d625b97ca73a027f98194ae40a690ab052ca023407a445"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move_normal/sw.png",
+          "sha256": "4286b0fc846209289f891e71a1153875dff14b28b018a9855c44bfe0360cd5d8"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move/w.png",
+          "sha256": "ed291ce2e382c85176fefa5e16fc00faeea73ab7f25eb0e583b4e12500c25fd9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move_normal/w.png",
+          "sha256": "d5d36747f73ce9dd5567d70e62f42bb5fc0324fbca00a17cd0164beca5ae03e3"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move/nw.png",
+          "sha256": "8d4bb7e7e5c7e8c4c1b802449a08e2d45c51a59214cd37fa6266af82bd3d4ad9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/move_normal/nw.png",
+          "sha256": "d74e3331bbc68ba782478df777a79432bc5413a46e5e6fb8d2c3a9b1a0f9ed81"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 1.36,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Kompakte Soul Cannon (0,85 m, Mündungskragen statt Trichter, Wachsen 10 %) und neue Kanonenbewegung (Owner 07.10.: viel zu groß)"
+      }
+    },
+    {
+      "id": "3be13adc40804ac2a070b4f9c0c72103",
+      "timestamp": "2026-10-07T08:41:23+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "swing1",
+        "frames": 14,
+        "fps": 24.0,
+        "frame_size": [
+          396,
+          287
+        ],
+        "origin": [
+          0.5,
+          0.7826
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 42.3
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/swing1.render.json",
+          "sha256": "696a699d4bceecb9dd76b277f22b3f43d556c841d739d69581781a8d3c8ad48f"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/n.png",
+          "sha256": "e96d0e7dbd10eced0432c1e744da6adc65963a5301d99e9355823cb99f81d980"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/n.png",
+          "sha256": "8c6a784b95502d5b7a510ab4b3570b0707f0364ebe5aedc54e21feaf1acfce8f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/ne.png",
+          "sha256": "21005def59c2e19f0174e379c123ad463bc5ee21418bad031fe85f5ab37823e8"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/ne.png",
+          "sha256": "cf2cd0cf464ba4b6ab3d42754c7bea3f57afdfa4a2a50e183e253c85540a02b7"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/e.png",
+          "sha256": "f6f5f7f4075bbdd34ead76858556a2c431d15af2f1f2d542ef5c94bb2b2de70a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/e.png",
+          "sha256": "74684fe27a1146479a2763080b043206cea06e314c298d9668f2320dbdcf62ff"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/se.png",
+          "sha256": "87e268d302d2f59f5fe95eb70d9794e81a5ace3b74c2221e4337c14b7795931c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/se.png",
+          "sha256": "5e63ab58149e620851a50f4d7c84d28f2daac3e9b65b4708ca0a285085d88c8e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/s.png",
+          "sha256": "c164c4d4314b3a488a96dc58a45e8f4b72cd97b29fa06c4694d8ce2074941ef1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/s.png",
+          "sha256": "07e40a30e735e7666eec49438c1ff53eb945be3c498d1fbd18acea28acc88f27"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/sw.png",
+          "sha256": "a8c433d8c0d3f8d211a90f734e4d4b10deb2a30fff5b70ee1bbd001ce7f6b28a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/sw.png",
+          "sha256": "2672470213de92e35d371762e4f9406411bac658d04d71a3b101e6acb9ab7db4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/w.png",
+          "sha256": "fe6d3cd3fe9a680d230fa9208258a06da6c8cf8992aa482accacec99dadabcca"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/w.png",
+          "sha256": "013bb76f174282d7247332cbfbd2edab7cf957736df9325d8405399f4328a39f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1/nw.png",
+          "sha256": "cf0c16fbe3f8790d71b3b1fc7ffed37c2c305670632c3cb41dfe2e7953346a3e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_normal/nw.png",
+          "sha256": "d15b6c6e91bbf0e9871b19dbbd0f06c29803b1be0316efae07291a13d60a6206"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.94,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Kompakte Soul Cannon (0,85 m, Mündungskragen statt Trichter, Wachsen 10 %) und neue Kanonenbewegung (Owner 07.10.: viel zu groß)"
+      }
+    },
+    {
+      "id": "140ce4ee51034d93b0de1670e6bc8f59",
+      "timestamp": "2026-10-07T08:42:14+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "swing2",
+        "frames": 16,
+        "fps": 24.0,
+        "frame_size": [
+          398,
+          356
+        ],
+        "origin": [
+          0.5,
+          0.7629
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 47.6
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/swing2.render.json",
+          "sha256": "4d3cdeb7ab252a9aa9e9811f5c18b32775251e7ae0c58c4d17fb9144463b86de"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/n.png",
+          "sha256": "7b0b0a7e3fd05905703754fb43ee45d26a97f4d47a94c9377b24529a901975c5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/n.png",
+          "sha256": "457d00755e11fd2fb456b1a10c3f142494c383c27ded91e15b5ff5e2ec392300"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/ne.png",
+          "sha256": "0c80c42b653a49a058c9551261db5823e4866be59644582d51035ec8c50b2bbd"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/ne.png",
+          "sha256": "97c14e39f5c1230a8f368c3318e24725ec2546fe73d1bc8be50138c8a5f514a9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/e.png",
+          "sha256": "614d8399a220ca769d4a271ea32e5949c48dfbb2611a3568d34c248aa8501beb"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/e.png",
+          "sha256": "210ae123eb2dfba7ca4e40b8f74f24729f0a8b15b5f3f6c99e1b68a07ce94fa6"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/se.png",
+          "sha256": "ac0d2bf3ffb9d3c56e89655145a8cc401098aa0ab7353e2f61cbdf7d42ecd94a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/se.png",
+          "sha256": "0e6dac2a9ac0fa8ad8f7395772c59fd56c9fe45dbad69c0b63a0996b45163181"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/s.png",
+          "sha256": "f47cab56322727cc678d78da6d6c39cdec477061597d4074055f3c0165e20b2c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/s.png",
+          "sha256": "6cd8671bf1632dd84ff827fecce8c7cfe351f2ce4c55c840de072dd8a44c098b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/sw.png",
+          "sha256": "9ca9d89d93d4dfb88aa9b35bc449915ecc6f3555376a01dde20b716b2f7b6cde"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/sw.png",
+          "sha256": "e7087fbe4c1517518f7c1cbed2ffa84d2bdb76eb52a4a7eb758b59f1d147c6ae"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/w.png",
+          "sha256": "4c1adb21d1bd8ac07cf96a592d23b171b1eb6cc5fe7ffcb499532057ff078602"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/w.png",
+          "sha256": "476628c176913457672fc7a48d8fe339accc6f93d087420545584760da55a954"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2/nw.png",
+          "sha256": "60f7084adf85a848e2ee00c837b4516809daaed1c45c9387ba6abf8ca1c32840"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_normal/nw.png",
+          "sha256": "07ad40935185baad4b5fa6d59d8372ec87944ca55acca1ee7febeab456499d83"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 1.21,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Kompakte Soul Cannon (0,85 m, Mündungskragen statt Trichter, Wachsen 10 %) und neue Kanonenbewegung (Owner 07.10.: viel zu groß)"
+      }
+    },
+    {
+      "id": "4014bb228c8e43b69458b4416da31f1b",
+      "timestamp": "2026-10-07T08:43:38+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "swing3",
+        "frames": 26,
+        "fps": 24.0,
+        "frame_size": [
+          392,
+          397
+        ],
+        "origin": [
+          0.5,
+          0.7496
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 78.6
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/swing3.render.json",
+          "sha256": "1bcc1b4075791869e08d1da2bcf3f9241dda77b833c799dd67a8a0d153a2eb07"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/n.png",
+          "sha256": "797d60af1d2d96e24e86a62ff10ee0e335a213291bbab074b3ac34ce292c429f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/n.png",
+          "sha256": "2992e8c037998bd728a82d0694bbad3909744f967e13b71cd9e5bb1afe3fea48"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/ne.png",
+          "sha256": "eb2de095dc261a69aa3bfc8717d06302c40b4113c82d36325b015004f0a62d13"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/ne.png",
+          "sha256": "5502320186448c0ee4f4e8e195fa28c069d24532a2443eae32aa00ca0652ad08"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/e.png",
+          "sha256": "3e08fb8da1ca635056e339c6db4d6f398a04c4ee6dac7e957af504b35a84e6ca"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/e.png",
+          "sha256": "0cc7cc5a54f1c76b5f262d489cf0d064646c29068b7a4641e012d786d289719e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/se.png",
+          "sha256": "32627fc7fb6b4f7ea42fa6f2eb8b311c209fc6f3af334e9c18e0237ffd85ec15"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/se.png",
+          "sha256": "cd7665412f7ec39a9314571d1e4385297d9502aa73b9aa112503d76b5b9650c2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/s.png",
+          "sha256": "130282bb77111c82ad676871ef1501534cbdded8fa7cd6230c0bfd7c8bce57fd"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/s.png",
+          "sha256": "a1f38b7370c65c84fb8a00473a91bb195503fda0eff908155c2a836851b2c063"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/sw.png",
+          "sha256": "b3557ece72e27d62dc8b5c08605e3bbe288ef41ebaa72aaace4d913cfbc68225"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/sw.png",
+          "sha256": "4d410784bf9672d5394201c2e8ed28ac806d6437b8e146b9c9277fc1326fef79"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/w.png",
+          "sha256": "40239a7ab8e2fa220b7f645aa8fcf8f469a4d1fa24d4f441173de2d91f87ca34"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/w.png",
+          "sha256": "3096a9d714f7ca75be5644959a42bf36028286848e08d5f122a8696bb89d71fe"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3/nw.png",
+          "sha256": "4cb2f82ce6c9aad747b6c6b700e28b92b15486dce2be6645f19086b7d34e834c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_normal/nw.png",
+          "sha256": "46bb7c22399857e8d4694c670c72d225987673f1a9ffb17fed701df3baf7c913"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 2.23,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Kompakte Soul Cannon (0,85 m, Mündungskragen statt Trichter, Wachsen 10 %) und neue Kanonenbewegung (Owner 07.10.: viel zu groß)"
+      }
+    },
+    {
+      "id": "8a7cff41a67d4e1986970470f0d16f1e",
+      "timestamp": "2026-10-07T08:44:04+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "swing1_return",
+        "frames": 8,
+        "fps": 24.0,
+        "frame_size": [
+          382,
+          288
+        ],
+        "origin": [
+          0.5,
+          0.7382
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 23.7
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/swing1_return.render.json",
+          "sha256": "f9f83ee3b8ec050495088bbdb1d4337458d263c24ad6c5eeaf34afd068d56b04"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return/n.png",
+          "sha256": "b6351f9576d7fc41ac633c4e5b300a9ca5458492f29196bf246172855ddfad00"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return_normal/n.png",
+          "sha256": "77b587299599edffab72309d95ed1b297899dafe428e14362e201b4f152398fd"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return/ne.png",
+          "sha256": "d347b7b4fa9f0dbfc7a93fe4cf4136e32af21faeed793a018548adbdbd244ab2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return_normal/ne.png",
+          "sha256": "599dd7ec30fc5cf2326f8aa8fcd2a4de675e9f26318b76aca795639ccd383700"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return/e.png",
+          "sha256": "ad0b1e93758ffa248d62e0ea7cc6b34d7ef3efb41cde61d657b21b9f05299231"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return_normal/e.png",
+          "sha256": "9859d5189591dcd20d1bc45f6f13bdf1557c686642457758c7b5015d4bf2325e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return/se.png",
+          "sha256": "3629523884c685d1adcd8dc2b5704bea40bfbd6e075b23bef66baf03d054c01a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return_normal/se.png",
+          "sha256": "23463f84f8a3c5a4ab5707088b0a7ec52f1ffe0394718a4f9ac9a1c8efedec22"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return/s.png",
+          "sha256": "14170826766460d251bc44f5f3338e299c51f1e84028dfc9913e60e5584319e9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return_normal/s.png",
+          "sha256": "d672ed4500cb67bc678862d3e64279ab5d0e827592122c5be5b911104ada9801"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return/sw.png",
+          "sha256": "ddd830a0bf0e77937e3f93e12b00bd8ba3602bcabe890c3859728836cd08c760"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return_normal/sw.png",
+          "sha256": "37c58b4378aac4e3535f1e041183afe25c9b68389ecfb45daaef59f737014901"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return/w.png",
+          "sha256": "42ac9ad69bb8d992fa56c04a23943783af2bc54be6fa69dc2455115f375133c2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return_normal/w.png",
+          "sha256": "000206d455d786ae40788d297643f186455d5380cde6ce425a9da746126a466f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return/nw.png",
+          "sha256": "8309b3669e718ad2a59cdf450eb517c3989b20f7b1831c8bd805beca0b24912e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing1_return_normal/nw.png",
+          "sha256": "09b8116b6b994ac8d98fde6c78eb59da399df478f495c23501b2828014341b91"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.56,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Kompakte Soul Cannon (0,85 m, Mündungskragen statt Trichter, Wachsen 10 %) und neue Kanonenbewegung (Owner 07.10.: viel zu groß)"
+      }
+    },
+    {
+      "id": "962ca6536a6c484c8e39785da8bf30cd",
+      "timestamp": "2026-10-07T08:44:30+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "swing2_return",
+        "frames": 8,
+        "fps": 24.0,
+        "frame_size": [
+          382,
+          317
+        ],
+        "origin": [
+          0.5,
+          0.7937
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 23.6
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/swing2_return.render.json",
+          "sha256": "6b9e6e04ec82d0db12a282ef5f287b71b599a820e7069c922138b5cdabc80f2c"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return/n.png",
+          "sha256": "3a4173c3d2114a8100784e42fe14275f71a4f5dfbfe0ac51b4ac7f6dffe17235"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return_normal/n.png",
+          "sha256": "d06e10bbccbd384c15900d4afa823ee29494d75aa30aa6018c8b70dc66537ab2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return/ne.png",
+          "sha256": "a7b43629b8dbf6cdb2f080ceb40a7493fb2701fb28e7ad9ae3e182202440cc26"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return_normal/ne.png",
+          "sha256": "d1ac82091cec4d86546f3464f5dd88355ff05ff25bbe47a9a72bf2c0f63f7080"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return/e.png",
+          "sha256": "f9db772eee677e79cbd50cd701ef3531cded20b077506cd94dc3fc52bb0156e6"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return_normal/e.png",
+          "sha256": "7d3ad1a1ff9a5799ef8b7b5529eb696afa6287b24f9be2bcea69ebb0ac6a8a86"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return/se.png",
+          "sha256": "cbfabc8cff8a5bf60c098a2b09969721f3d88e131265e34ec3a521df1ecabceb"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return_normal/se.png",
+          "sha256": "3df793f2297d95dc04e0bdbd456f9817fad966cb06976e2c1deec418791411be"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return/s.png",
+          "sha256": "742f02594f1a270237ffff69f5e357a95d0b8ab90cce06204cd1ed36e9ca30f7"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return_normal/s.png",
+          "sha256": "84e61b8addb9eb809b4b58e62e409b00d05552fdfba3acd266a8abb8ad707259"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return/sw.png",
+          "sha256": "1371e64607fd1db6ff698a645b59583c8a32237767857822f86d1531ba2c2595"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return_normal/sw.png",
+          "sha256": "d1e951dad4a42833a1a111f198edf1027051717e489fdbf790c1683e66a18627"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return/w.png",
+          "sha256": "dae5244ad99cf5ed807346635f646953dc28d830b8f5efbe8ccc13c84e491d53"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return_normal/w.png",
+          "sha256": "37636a6fa7b1d03a8c49e905320b4b9ac66c085251b0cebd97bd82469302d450"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return/nw.png",
+          "sha256": "adf446bc98a434ba5c5490a12fc4c16048e2ecc47d2f12eb8870235dfa715586"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing2_return_normal/nw.png",
+          "sha256": "4e56c0fd555deb251a05cb8a62a27f9aa79811d1375dcb3d732090cc3e8b2c6f"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.6,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Kompakte Soul Cannon (0,85 m, Mündungskragen statt Trichter, Wachsen 10 %) und neue Kanonenbewegung (Owner 07.10.: viel zu groß)"
+      }
+    },
+    {
+      "id": "7f9c3b08bcbc4f8da42d836cbc84daa2",
+      "timestamp": "2026-10-07T08:45:02+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "swing3_return",
+        "frames": 10,
+        "fps": 24.0,
+        "frame_size": [
+          382,
+          303
+        ],
+        "origin": [
+          0.5,
+          0.7017
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 29.3
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/swing3_return.render.json",
+          "sha256": "6f83b59808f65243e96cbc2302a14207c104561404e0b2d8f7bddd0a31a86a2e"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return/n.png",
+          "sha256": "6844423ef302f178f2fdd9d099c7984c1170dc0486d9d55067e94b5ed240cde2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return_normal/n.png",
+          "sha256": "2aabd0ee87cc8884915719eced0c379295b6fc766a39638ed145794b9bef8fbd"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return/ne.png",
+          "sha256": "814f79f70760d668bc46e652517f901b6914cabbb2be6a366f797150ce8cf104"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return_normal/ne.png",
+          "sha256": "0824d2f33397a16737d20849bb2462df55ba30c2da0bb132dcbc6883085e3fa3"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return/e.png",
+          "sha256": "ffc1167257291b09a6cfcaaa94769604ab24dde87bf1a0a46041e9bcff9ac246"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return_normal/e.png",
+          "sha256": "86342aa0fb1b89f61357eb7610e6f5f9d35194d1ed1f24481f0c7c9b4ad2f742"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return/se.png",
+          "sha256": "0109a66a569c498e9f4f20f43fbb1aac00b7e355c02fcc53340db2649576a007"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return_normal/se.png",
+          "sha256": "387cdd972256e70d7f9ed586169e9b3d6a88b792efdd51a5fa9fd6e8a15b4b8b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return/s.png",
+          "sha256": "e525cd02e278f188f0e99c07d34b00d9dfb722492172cde38c5b2210d79ae392"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return_normal/s.png",
+          "sha256": "ba1e126029b973863d18082534a4da55dc7b6bbaa86e425bfa741fe627ffa808"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return/sw.png",
+          "sha256": "b77cd6d31712b1c95f63cd1bc2e50e77d5c6bc732a6cc9acbecef1aaa27eca5a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return_normal/sw.png",
+          "sha256": "47d4e90445dd0b15897aafdb481357080f376530bd3e00001b83d2249ab74155"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return/w.png",
+          "sha256": "264657016f34f8c4f31ca8100995438519a0c021cb0cc664e5b5157b1ac24908"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return_normal/w.png",
+          "sha256": "fc05ca5858d585423fdebf787ea0ee11f67b2ff8328c082b86350821050579b0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return/nw.png",
+          "sha256": "8d9a1a83a6899d4628c6207efff96e7258434cfd00d97278d2c2cc5803209f1c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/swing3_return_normal/nw.png",
+          "sha256": "50ddd001c2c884414fd4a6377445146e9f71e8649bbda1604a40b9d0819391f3"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.72,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Kompakte Soul Cannon (0,85 m, Mündungskragen statt Trichter, Wachsen 10 %) und neue Kanonenbewegung (Owner 07.10.: viel zu groß)"
+      }
+    },
+    {
+      "id": "731b64af6f4543bab8f6529f924e6e08",
+      "timestamp": "2026-10-07T08:45:27+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "dash",
+        "frames": 8,
+        "fps": 24.0,
+        "frame_size": [
+          342,
+          265
+        ],
+        "origin": [
+          0.5,
+          0.7343
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 23.8
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/dash.render.json",
+          "sha256": "9a3bd8b41308a56287af0086fb746170a4942660b8c5c2615e6af6a4fbd8bcd7"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/n.png",
+          "sha256": "5e96fa614242edea3ac2e000ea628c67d9edd40a863de808e18f0594eb349eef"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/n.png",
+          "sha256": "3662a363f310c6ddb71ae60cd9226db3fc72b716d47fab4d4d2b8f7c379a702d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/ne.png",
+          "sha256": "43442d574c45cf314fe94a38e1aef9c79dbadb3c536930b391d29f2b7d44067f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/ne.png",
+          "sha256": "97479be0f0acb046fbdb4b5134adfe85376d182b9c69cb74d48ecc2dc76856f3"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/e.png",
+          "sha256": "81725fef82944fa4b7fd962c020ce669f0e4f291ade6be047bf46e1f1f6d3b59"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/e.png",
+          "sha256": "ba541e39220e897de483e0d371c0e106a9de817f2030c8ad763e3e33dafff383"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/se.png",
+          "sha256": "a062c9578278b8609abf80524ea78b2ed1ce4faa490bd74038c060b17b977447"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/se.png",
+          "sha256": "5c55718f5f2aa0a3ca408b1cc65780b435be539029ba31e4a7bf38508bbb26d9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/s.png",
+          "sha256": "44b2378fe90f1dd1b8b1173c62f977ecc17c0e9c01c1c4de997f3a18ba2ee64b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/s.png",
+          "sha256": "592d5541a7913036c2358761dcc38e54ef32b2f6dc6b2732dbe65e1ea55555df"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/sw.png",
+          "sha256": "a68ac8619ec25caf8a3d4dfc3bb11f07fe80b4e581960d9045c7b4d32e00089c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/sw.png",
+          "sha256": "ec43382e016a6dea55ae81596f7595954422fd9e725a0b45ccb934cd62d990c5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/w.png",
+          "sha256": "bacad0c40a9093fc70225f4e0a0e3bcd8cf2928f3fa68962f24552eee6512312"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/w.png",
+          "sha256": "a977d5e89f94dcd6a2ed8fc3a0070e5468164d492beee34b82eaff9a5e7661c7"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash/nw.png",
+          "sha256": "8903042b20e7d999da21d4c4416edd1511b19a934039497553b8780c4035b5fb"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/dash_normal/nw.png",
+          "sha256": "38843bb718b7ade86080504ec7e52fe578fcb3aeda749d9934d1fb151c08f902"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.49,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Kompakte Soul Cannon (0,85 m, Mündungskragen statt Trichter, Wachsen 10 %) und neue Kanonenbewegung (Owner 07.10.: viel zu groß)"
+      }
+    },
+    {
+      "id": "ac49a7f4223844218cf1caab87bd6460",
+      "timestamp": "2026-10-07T08:45:47+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "hit",
+        "frames": 6,
+        "fps": 24.0,
+        "frame_size": [
+          382,
+          298
+        ],
+        "origin": [
+          0.5,
+          0.7805
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 18.0
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/hit.render.json",
+          "sha256": "a125fa1c4701a72aeb549aede121fa9ff772880715fc3170a7baa0e5b5ee145e"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/n.png",
+          "sha256": "04b2c7a065b046a603a7cf300d44ef46ee7e8df11b1b2fd3d803de094ed1a9e9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/n.png",
+          "sha256": "f11ecc6ccfc352b9912ae12167f0aa32eae1d94473786e74eca81c9446b3a1fb"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/ne.png",
+          "sha256": "851f19707393f33f8009024d942d4231a19bb805837c3bd5463167c40d9abbb8"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/ne.png",
+          "sha256": "6d3c9a67e2d600883514bc8094ae1e176bb4693fc0e6fee97329289d6798bd5d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/e.png",
+          "sha256": "2259a16f22e08076310666a4a3449a25ad1036ea3fb69e0a0a8279fc85858d45"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/e.png",
+          "sha256": "aec46e65b12ee1d1eecdc6a370bfe687c3c18f2dd88df57f80df549cae1710c2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/se.png",
+          "sha256": "a07eb53f775a9753d18767696f2a7e7611f8be1537b38f2b018770f36b7b5eb8"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/se.png",
+          "sha256": "13fbcecf5ccb46d3c1875e90b56f356ceb574061990d63087090452259bfa6c3"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/s.png",
+          "sha256": "d94d03cef93a6314801d772a915f126efffed7670fec6c05519dcbdebb16bd7b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/s.png",
+          "sha256": "4e0b32b18e55efe41ff4f5d13e4cea30424b095c0e88c0ec1f699a113ced6471"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/sw.png",
+          "sha256": "2506bbd984129e7db935cfe406d1338999b3b26de3a1203b6249d2941529336f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/sw.png",
+          "sha256": "ccca563dc453896a6817cd7abc21016f0ca88202a3ed2ff3628acb150ea22da8"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/w.png",
+          "sha256": "2af8a286346c94bc51215b5439466b8fe9b1ebfaf78affc49cc2f6446e7aa9d6"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/w.png",
+          "sha256": "170475eb9e1942dcbf283b47bdec8ec9617fb5a0863f36db98f7738e9368b7a1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit/nw.png",
+          "sha256": "38c59b5df39fd1df11592d6a5c9c2bbb430424f42c04426d6cc978a3893df073"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/hit_normal/nw.png",
+          "sha256": "c4a687321762ccc242b09455f4d3225874bfb82d466fdd146d3b9bcf103a5664"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.4,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Kompakte Soul Cannon (0,85 m, Mündungskragen statt Trichter, Wachsen 10 %) und neue Kanonenbewegung (Owner 07.10.: viel zu groß)"
+      }
+    },
+    {
+      "id": "350b5ca9bb304887ad9fb200c51100f3",
+      "timestamp": "2026-10-07T08:46:36+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "cannon_fire",
+        "frames": 16,
+        "fps": 24.0,
+        "frame_size": [
+          382,
+          289
+        ],
+        "origin": [
+          0.5,
+          0.7356
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 46.1
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/cannon_fire.render.json",
+          "sha256": "1861c65426029e20536a6215b6b487d22f045c07c59948cc03cc142a9c1f2e38"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/n.png",
+          "sha256": "f9c1b8a3cd5c78ffba88d376632e234b53421f3549c3bc6250559301e35ddaea"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/n.png",
+          "sha256": "6e396737da802e99388e2f5760d37f8c0ead084b30a3505e7c915338d3cd2304"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/ne.png",
+          "sha256": "bb0b49fd15b7522cb21c067fb09556c75915bd02b1728e0f1c9c2f78332adead"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/ne.png",
+          "sha256": "1b22d20ff6e46535c2346e75d76048a34eb652ca679d63c973738708aee89eef"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/e.png",
+          "sha256": "70c25a008dc7bbb9dcfbaef5637b4f5a99e3174daf1ff8735f546aecc8edf6bb"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/e.png",
+          "sha256": "2a978f7ae0b3f404fc43d6f9b8158272d88afdd0ee8c2e27704c08150bbbd40a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/se.png",
+          "sha256": "6bc86729c928d7e13133fb365e894a67ba24e96560f13234adafd3c6ed33a82a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/se.png",
+          "sha256": "8099ae11016bd1d4f00aac46d7219948663b6cd21cfde4f9f9d71ac61af02ed7"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/s.png",
+          "sha256": "703cd21924831a6a9bb37bfe37252b5f43e07b4e4013e7fdd7ef99ea26c6415a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/s.png",
+          "sha256": "1913960b9801036d47e9e29bb143c3e34d0c34bb85bc5f8bfb3875391edc9426"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/sw.png",
+          "sha256": "97df0c2050555c58eb00bfd9677fdbdedebdafcc3445efecf50f4a32d60f2e4a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/sw.png",
+          "sha256": "53fdc458c7c81e148e4b724ac91e61676cfe89bb27e77aab402f052d91261a9c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/w.png",
+          "sha256": "8b4d9e68e303612240bdad52acde38fefb8a20ffa7460b2ac416f410c42f6139"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/w.png",
+          "sha256": "b98fda2ee334778a7d27472f620caffefef12381b69e643e444f30d2ed299768"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire/nw.png",
+          "sha256": "601111ccc792f1b770aaa18eb1b31c8714d2a676edd2507e7ad8913df3ff040f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_fire_normal/nw.png",
+          "sha256": "48f590881e16242fcb08ccc4faaa6e95a51f7493502dc12443d94f55169074cd"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.96,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Kompakte Soul Cannon (0,85 m, Mündungskragen statt Trichter, Wachsen 10 %) und neue Kanonenbewegung (Owner 07.10.: viel zu groß)"
+      }
+    },
+    {
+      "id": "789390dff79e4809baf6a6c542603a3f",
+      "timestamp": "2026-10-07T08:47:02+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "retreat",
+        "frames": 8,
+        "fps": 24.0,
+        "frame_size": [
+          382,
+          313
+        ],
+        "origin": [
+          0.5,
+          0.7911
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 23.4
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/retreat.render.json",
+          "sha256": "36227dc57f59452bbe7b55c385e67b47e6dc35c31fd024573e0646460c65bca2"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat/n.png",
+          "sha256": "2903dc6ca4d92a6f32cbd2722f6151c0233134e6ecb6a934aee0577a721d585d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat_normal/n.png",
+          "sha256": "25ad4541e72cf40795a7a618638b48a4c9fddb79e25e045e37b86dbe23708c16"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat/ne.png",
+          "sha256": "c0e259b97e3d5cc34cd5f84a0d73cbdaf4b7fb45ca65087b12508bdcd48c4e65"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat_normal/ne.png",
+          "sha256": "0ddca3589f3944bcbfd03a3be361cfd5b9aa03b892f7c83dac8c2974815932bc"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat/e.png",
+          "sha256": "a4099f2ab677aa2130414c8435b97a6e08c992be7fe7a7a081633c801a2db5f0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat_normal/e.png",
+          "sha256": "d05b6e65f9e58ff4fd14f74a87fae92564c79af385e7d8caa1138145e226dba3"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat/se.png",
+          "sha256": "b9031cb19a12d0a7103a485aeb607793a91083bcec1a8283ccc2e8c4cb784dee"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat_normal/se.png",
+          "sha256": "52fd4262dbed0a161265265ba4dc6fa4fcff77b4f721efc55d35300acd759813"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat/s.png",
+          "sha256": "66f8479b1db26ef343cb7614c6cee6c4f5509cba207abb30fc011b12433787f0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat_normal/s.png",
+          "sha256": "f14a9c68d04c1a4189ebb3d1bba21c2cbaa18311805819ea2a174f5b3dbb1b45"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat/sw.png",
+          "sha256": "27c23daccdb7c0848c7b94d856f8e60fdd434a379f73c66e0ad5ec5345ede387"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat_normal/sw.png",
+          "sha256": "6304cbc4cf8de1165d69c851f5ce899d745d939dc16a4f764f0ddf319d7e8ea4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat/w.png",
+          "sha256": "90b4f862a907838efebefd38385a9d2f0ac1a7659ce7ff71df0a022eb4eba7b7"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat_normal/w.png",
+          "sha256": "0df5257fdb5d5ff29911b2d9157a3ed2467844d270233eaad30088ac8fc8535c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat/nw.png",
+          "sha256": "aff84fa3b3bd8be77338c604fcffbdec5ee673e7ee636bfe5cdee93b9bd0ee2f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/retreat_normal/nw.png",
+          "sha256": "dbd220be79e2488561b44f573b93848c8e478f56d2fbc6734757ce6491091290"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.59,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Kompakte Soul Cannon (0,85 m, Mündungskragen statt Trichter, Wachsen 10 %) und neue Kanonenbewegung (Owner 07.10.: viel zu groß)"
+      }
+    },
+    {
+      "id": "43d855a2aece4331814b95f24eebc576",
+      "timestamp": "2026-10-07T08:47:38+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "aim_move",
+        "frames": 12,
+        "fps": 12.0,
+        "frame_size": [
+          282,
+          234
+        ],
+        "origin": [
+          0.5,
+          0.7162
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 34.1
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/aim_move.render.json",
+          "sha256": "6a7d351b63419a98db85c7c9b03d8c7c87b1d79d9c6950c63bd99d4ec7036297"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move/n.png",
+          "sha256": "c2efd4f94bb23b0c1c608d467bdea6644f55411d3cd5c5c090b25285e14d54b9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_normal/n.png",
+          "sha256": "0fb2b54a09fe8df6d1e67d286a95302049f105a97f28b739451d1331f2d3ff30"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move/ne.png",
+          "sha256": "aad0b2968ae3b34513e6e22813764099499ff754f2f8a8ef79366761bf2c51ee"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_normal/ne.png",
+          "sha256": "88846845f8ee6a3ce1e2a638e6711bd9d74d0839e166c8ede9f60b42faee64c4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move/e.png",
+          "sha256": "bba4aee2bfd80ea47bad119d046f787a832e54ef0e1583160b64445a4bbb6b66"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_normal/e.png",
+          "sha256": "e552a944ba5b5b9357337904d372ae42506a53b02efac458f123632e9d37bde2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move/se.png",
+          "sha256": "aaeb4387b51ced9b56fcdbfae5e76c3f7701c80ecf582fc4d1043b2fa7643722"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_normal/se.png",
+          "sha256": "afd323f47132bb5a0f077f1c7d208bdc030a4d006dbfdd78eb6ac95f19aa103d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move/s.png",
+          "sha256": "a179de32c308184f64b137d17078e641ecf77ab74c724593aa8f8cf0f5d17233"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_normal/s.png",
+          "sha256": "e6704efd7ce688d4d0680cd51af966661b392f93e59c3d9224157d0b1432cc13"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move/sw.png",
+          "sha256": "2e5ddc80653482391e7d7ab8ae1e7f8e951f31422b843ed8ee299da42c0ef120"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_normal/sw.png",
+          "sha256": "9c5b409cbd0483deda52eacac77f56c1d8c67ecffa73ec0c133a2778ece81aa1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move/w.png",
+          "sha256": "3a917928475a2c021a931401292f66dac2f1b2255f68e112c8deba679f907a89"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_normal/w.png",
+          "sha256": "fc99744bea0c81239c5549ab766e01fe790dc16be3dde3700edeaf8b6f0102a5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move/nw.png",
+          "sha256": "73c162c16d9cff879332a8e32b1edef7de95c5600ff4f498e35cf48c3e6723c5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_normal/nw.png",
+          "sha256": "e0d3a1796fc0a2ac6626bb76513ca0cfb58b396868c6b9340dbe713af691afff"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.51,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Kompakte Soul Cannon (0,85 m, Mündungskragen statt Trichter, Wachsen 10 %) und neue Kanonenbewegung (Owner 07.10.: viel zu groß)"
+      }
+    },
+    {
+      "id": "a1584267b69445c48b421d1881748ca1",
+      "timestamp": "2026-10-07T08:48:15+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "aim_move_2",
+        "frames": 12,
+        "fps": 12.0,
+        "frame_size": [
+          282,
+          234
+        ],
+        "origin": [
+          0.5,
+          0.7162
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 34.3
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/aim_move_2.render.json",
+          "sha256": "f90f3bf1c2859a5e4b974e8e08bf81c7779f584ad39cee2922119afbe58ebf7a"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2/n.png",
+          "sha256": "55c2645d1be4bdc63da30a236c1722f1fbdd7eeec8b89e0854534b1317abcd59"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2_normal/n.png",
+          "sha256": "53d0939b0d28630353fc18fcaea984c25f5a0367d4149843f1b2f955ad7fade6"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2/ne.png",
+          "sha256": "a8e97c39cebcbfe827ff169cc2664ebb554c3bce82b0790ee86f69f3d4758ad9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2_normal/ne.png",
+          "sha256": "987071643638894ead7caa32e946d58a2699b7bb848728987534fd3fc8ff9fbe"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2/e.png",
+          "sha256": "78ad931cb9d8ab9c9ce41d27bcb6912f1d179e029f806550536ba462cd344dd1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2_normal/e.png",
+          "sha256": "00332036f2b84fbffdb9bfcd47da5d627649d2e9370fb91a6bca50ef93430ff0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2/se.png",
+          "sha256": "9b7351611a559e0f5f10542013278b1b483c0469f45819d3d6383dd66d228a59"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2_normal/se.png",
+          "sha256": "f326eace0f20c84d7189417d81bcaa26b93d07c2fe23e2e13ab17b78d4785b93"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2/s.png",
+          "sha256": "fa7538cf04eeb0c9102755cb83a93e65d9f48abd1ebe9e64ed38c35f62642392"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2_normal/s.png",
+          "sha256": "4f08e6887a981bb8581e6d7d82944bf4e8b2a5eeacf4169fe8669d24349613c7"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2/sw.png",
+          "sha256": "fb53ee2ca08390d947809de8fd7a26ad5da59877dc2f4547935edfc60f324a2f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2_normal/sw.png",
+          "sha256": "8d273c0f4711ac95ab3e543b21729253182af231b2fb632b1d5c0576aeeed31a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2/w.png",
+          "sha256": "fe873b23605ff8e818f2c59695a66a52388f8e259ecb921d3742d37a389a70b4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2_normal/w.png",
+          "sha256": "11e36208d7a70078a2f6358baa80efb72ce774914feefcb4e64c220162725dd1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2/nw.png",
+          "sha256": "0f4468d3cf5d010bbaeb043e5a8ffec5d8915ebcfac1fd979ed4dbaf3be4115f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_2_normal/nw.png",
+          "sha256": "78de8ad3c4b5395d2ca53e8234d25d575d5d4abf98157282fc39a9b8839c2671"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.51,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Kompakte Soul Cannon (0,85 m, Mündungskragen statt Trichter, Wachsen 10 %) und neue Kanonenbewegung (Owner 07.10.: viel zu groß)"
+      }
+    },
+    {
+      "id": "5fb3588c0e8c45fda5b006dcbcb4f151",
+      "timestamp": "2026-10-07T08:48:51+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "aim_move_3",
+        "frames": 12,
+        "fps": 12.0,
+        "frame_size": [
+          282,
+          234
+        ],
+        "origin": [
+          0.5,
+          0.7162
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 34.6
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/aim_move_3.render.json",
+          "sha256": "ad1ecd0ef6b1ea08c054267230bebe2d26099d700de13dd22744b11dd10e2c6e"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3/n.png",
+          "sha256": "86caa41da092fed461db73644478e4b6b0fd643dc13637f43f358ca2a58322c5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3_normal/n.png",
+          "sha256": "79e76151b6a17d233c6683496c448b2c1bda120f059c85b2170d5fc7a33b8a50"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3/ne.png",
+          "sha256": "bc5814231ddff4889756c369513334d637cd42c7c6eea95765ee8cdc2d9da7e8"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3_normal/ne.png",
+          "sha256": "51343f36d66f11af489494398a2af13ba06d6841d67a983a08141272e4492d3a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3/e.png",
+          "sha256": "e596d5ddce84255564bc336a884441912693c6ce3a164f6e66240c16f9692002"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3_normal/e.png",
+          "sha256": "17b82458e5848c084a15861a02d4a567ccca2cd1d515b6886f19fe8f013201aa"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3/se.png",
+          "sha256": "f30d070afee5bbd857de0fc321a09840ecbbd6d2e60361dea357052edeccf953"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3_normal/se.png",
+          "sha256": "99d1eb46362fb70823c270afb470cc2c550fc67f7cd431c6c0cdea00870ab398"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3/s.png",
+          "sha256": "e9de6d1b7f7fc5e822131117aa22f8f8082cb50308b5a9d767da6a8fab09528a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3_normal/s.png",
+          "sha256": "fb5dfb34963343ab011a789f376fc6154af926251ba71791edaba5800436e89b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3/sw.png",
+          "sha256": "2151449af068f64f5d3308abb8e501c15af15e3b4d7b76bf777d2cf24b45ba9c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3_normal/sw.png",
+          "sha256": "4714c0d917bba882004333cca9f4d74ea18e97cdaffb577d910ed9741b7b7d28"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3/w.png",
+          "sha256": "aa932afe24255772596d1665082c4e9d3ac9b575fb2678898970e9c25642bf33"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3_normal/w.png",
+          "sha256": "eb82fe95e6b29b2a105a8c5f2b7e1a7cbf28c8cf879cb962725c75e5c3471246"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3/nw.png",
+          "sha256": "2271c6a64deb6ee7a5d69728990d21e8b2199708cb7fdbff12a04b4324a948f3"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_move_3_normal/nw.png",
+          "sha256": "c2d3b77c0f598e581666f688b0a0651e341f1233d0b3ed8616a5bef9dcc305bd"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.53,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Kompakte Soul Cannon (0,85 m, Mündungskragen statt Trichter, Wachsen 10 %) und neue Kanonenbewegung (Owner 07.10.: viel zu groß)"
+      }
+    },
+    {
+      "id": "3a00c656cd774305a4889a87823076eb",
+      "timestamp": "2026-10-07T08:49:19+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "aim",
+        "frames": 9,
+        "fps": 6.0,
+        "frame_size": [
+          282,
+          227
+        ],
+        "origin": [
+          0.5,
+          0.7251
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 25.5
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/aim.render.json",
+          "sha256": "0effda90ae414376544bc5a93b4d8667f65879431e156702bc27f113f0befdfd"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim/n.png",
+          "sha256": "d1593f3a00fca379ea288fc1f393eea3562470c092ecbccea973d68b6e3def2a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_normal/n.png",
+          "sha256": "8355ad29247d86450566da1b8a34f77f29ed2f97c831e0a04c24e6b760963b2a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim/ne.png",
+          "sha256": "38068712cc05e73d8c21e961ad0243ae135381541e8b67cafb2af92c80158323"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_normal/ne.png",
+          "sha256": "ca716e8b478fb8d42596c2b1bb1fb0b106833d2b41d8d08afc921a3b24740c2b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim/e.png",
+          "sha256": "9b851dbbc459e789eae3766d531ab9a1b5848f2a7e5ce0e0d1b4052986975100"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_normal/e.png",
+          "sha256": "c57a2db1c49c46048c8db3701a7031c80a40f01fa89bdd1f555a449912691587"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim/se.png",
+          "sha256": "e7ca0c0c438d10cddfdaffd5018804a8acf153e791a62fff10896eb1740d7e33"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_normal/se.png",
+          "sha256": "03cf32a9ff4fa43ecf7f4e5f167d9c99cff9fd4480de1c60ada024625d9b8a4f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim/s.png",
+          "sha256": "76955683a60dbee060e64a1e4e89aa8f6983db5b48d76e5c97fb0bb97cab6d6c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_normal/s.png",
+          "sha256": "37b52eb402a28ec4d75c4d3b92e6220e7b91817dd1bed2022484114f2b4fb638"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim/sw.png",
+          "sha256": "021dc31315a68d4596e850b40590b89e90b6929f7469a48520e36a83d42fa026"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_normal/sw.png",
+          "sha256": "899f40356d95063008671a6649252ef99581b9b5e1387c4225249189ad96abd1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim/w.png",
+          "sha256": "bf70dc787483e076f68766b39ea81b29b6778fbe08a2634cef5259a39bf9423b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_normal/w.png",
+          "sha256": "3457616ab2acf8dcbbfcef1c93a46cf48c1955c70ab7e8f6d5f5667850f3b0dc"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim/nw.png",
+          "sha256": "0c0788f851d44b63071ac944b19766413fcb4ee39fd2db594dce6f5f6d63ce1c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_normal/nw.png",
+          "sha256": "54d6fa640279dada901c0c72ca55ed36c8e3be0c2a8caa61758800a294c4a208"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.38,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Kompakte Soul Cannon (0,85 m, Mündungskragen statt Trichter, Wachsen 10 %) und neue Kanonenbewegung (Owner 07.10.: viel zu groß)"
+      }
+    },
+    {
+      "id": "f172b5cc668d46f499f92daefedd9de8",
+      "timestamp": "2026-10-07T08:49:55+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "aim_full",
+        "frames": 12,
+        "fps": 24.0,
+        "frame_size": [
+          282,
+          227
+        ],
+        "origin": [
+          0.5,
+          0.7251
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 34.2
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/aim_full.render.json",
+          "sha256": "38b327b2905a3af78d4e3433d544585e529b282b0b00a0f9f9ad6b2ff531c485"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_full/n.png",
+          "sha256": "bebb702a26d78c497ea239972a2a90cb2bf0276cff979ef85121eaa79e92361f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_full_normal/n.png",
+          "sha256": "760ce6b7811c6e8b9cab46a232bf2c40334a1ee3baf0c90493db92361a9c4693"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_full/ne.png",
+          "sha256": "a2a932c0119724cf172816f043517ac3f58c03e2b31f19683a64c5d76fc96188"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_full_normal/ne.png",
+          "sha256": "574346e8dd01890cc6e50f60d3fb32bb5b6e0663e7e256af0382d393462979fe"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_full/e.png",
+          "sha256": "e2458100e8c3ec3a99b12728c2b612eca410fbe957984a03083f370bac303718"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_full_normal/e.png",
+          "sha256": "c410a31ba7b31a5c017db3bf82e6dd9b1bc8cdc2a760ccc0f502a314461d075f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_full/se.png",
+          "sha256": "c7379fa7542c120f9ab4fbfdc5d7efcc75a7b6f26dfed11005872bf0eb676625"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_full_normal/se.png",
+          "sha256": "7f3545e675eab75d29722794524d0c30553939bea31fb9bacb7aa90d7ef2402b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_full/s.png",
+          "sha256": "8842ab85fcae1cdc5a3c1bea70894f461057b02a26e4ac0500a659551b58b404"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_full_normal/s.png",
+          "sha256": "b41400f17a46da7a135cdac6d23ca8ea0e06f09995378b2593a91383f72da2b9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_full/sw.png",
+          "sha256": "10bf7204af19abd8294347685428631338d0be1b95c30e4bc14d7d7b1727ef77"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_full_normal/sw.png",
+          "sha256": "24491c740050db4d31ceaacad4a31755753da32b8e8b78329340b21d512bbc6d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_full/w.png",
+          "sha256": "9c33c8f5c58b7fd71871039f35bc6c52848d6754833e83f78c119eac70652a72"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_full_normal/w.png",
+          "sha256": "b80ca30248c884565d604ca83613eac1337b65eb6f7b4bd41408f77360c76884"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_full/nw.png",
+          "sha256": "f9046d7f0a450773e2ef2575e9ecf7d0d83446dac69fee4dd3aeeb422e088cd2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/aim_full_normal/nw.png",
+          "sha256": "49e0e757c0f24bcd4beb49c802ad7444a02cdbd04d53e1eecd32bfeb4986d433"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.46,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Kompakte Soul Cannon (0,85 m, Mündungskragen statt Trichter, Wachsen 10 %) und neue Kanonenbewegung (Owner 07.10.: viel zu groß)"
+      }
+    },
+    {
+      "id": "df435f7bad104c75a25057d3f3f6322b",
+      "timestamp": "2026-10-07T08:50:21+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "cannon_draw",
+        "frames": 8,
+        "fps": 24.0,
+        "frame_size": [
+          382,
+          290
+        ],
+        "origin": [
+          0.5,
+          0.7331
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 23.8
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/cannon_draw.render.json",
+          "sha256": "1001efa975de71bb9eb9be35009c27266747e53825ce6419e6a233c3a84c0437"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw/n.png",
+          "sha256": "8ec0dd01f2e98aa7feb5a5f9d5697784b8f7cef3d46f8276f4065583fb7b3762"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw_normal/n.png",
+          "sha256": "8fa0365d546edb30c0b481ccb767a15277e298a07b412a8d4ad3dd697f6b46c8"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw/ne.png",
+          "sha256": "5b6c0d093a56c4c351c4c393447645ef06df4fd8261d5a9e12341df9bb8cb186"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw_normal/ne.png",
+          "sha256": "f2b209e31236465e9729a8dcacba542d4679cd9bce1f6d68d7f80c574bc3e45c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw/e.png",
+          "sha256": "3a732d22f6da23c169d5d9e4ec8d4f5d557d57d2ff40314cb4a9747db1f34361"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw_normal/e.png",
+          "sha256": "4ffa902a7e656a13a90062c0662fcf49ea1b63b7481ec6961d4e444b9e484b76"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw/se.png",
+          "sha256": "e79c9baedf49fa047dd55a5df3f1ba1f2ef8877c4791937683d01cb17a86966c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw_normal/se.png",
+          "sha256": "f2d4f3610d091e54cf18be2773027ea3bab67bc7f494758039785079d9676879"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw/s.png",
+          "sha256": "81b49665f62dace3f74cd8492e26488f4c3ebe5faced08a6709727134dbe76e8"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw_normal/s.png",
+          "sha256": "dec673418faa8c0d982df12b8e8b9980246991f8f9fdb83bf1194964e3086523"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw/sw.png",
+          "sha256": "9c87618622604240dace1f8fdb6f4ec360664004bb180204ca575b8de300ea22"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw_normal/sw.png",
+          "sha256": "6d737f03077908ba829afb33fc9d2b8d5094f7dc4107ecf70ac5bec884a61e6b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw/w.png",
+          "sha256": "2d92ba9af328d306b6a9509614d7aa35626fbd73a0e4558b08cced61e8d74a94"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw_normal/w.png",
+          "sha256": "90e7db48ae90fc49388dfeecb692f2521ad9212a4f136d6dfd3b8c0221cec990"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw/nw.png",
+          "sha256": "8f18ff19ad8de5b7822c2833da20cd3d3eaa6c1bc82b6f6ef38061daf132310f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/cannon_draw_normal/nw.png",
+          "sha256": "1bacfcd62dc89f0e095f894e394afb1484d7fa438e49fd958e8939af8afe9cdd"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.59,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Kompakte Soul Cannon (0,85 m, Mündungskragen statt Trichter, Wachsen 10 %) und neue Kanonenbewegung (Owner 07.10.: viel zu groß)"
+      }
+    },
+    {
+      "id": "19b0578f3270438aab27610ddb61739d",
+      "timestamp": "2026-10-07T08:51:57+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "wake",
+        "frames": 30,
+        "fps": 8.0,
+        "frame_size": [
+          412,
+          331
+        ],
+        "origin": [
+          0.5,
+          0.6423
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 91.1
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/wake.render.json",
+          "sha256": "e6a0df3206ea611dfae5369b2c98a6dab9bf51b173cc68e693c4eba139b8f170"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake/n.png",
+          "sha256": "030f00e0f232dae5143f13ebcf2ecb0986c9375d0b2603dcf8438d4dee0079f1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake_normal/n.png",
+          "sha256": "57471f8e7939f1cc2612aba6c8bdb024ab25bed225d767555defb0a4e79b9fe5"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake/ne.png",
+          "sha256": "9f98894276c8c6e3149e2413126a99ed3e33f50e0f2a269ee1d378a8cad7b842"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake_normal/ne.png",
+          "sha256": "83417f1b87550ff18ddd6d2663cc30e25859fa6b9211eae54d0830c68a8431a2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake/e.png",
+          "sha256": "6a4c04af4e06eb68c7e1883466d95e6935f3d26a436e9bab27e90828d150d962"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake_normal/e.png",
+          "sha256": "22da0275991fcbe86d06bdbcf5babbc018f58f9407989097145e905d8ead20ef"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake/se.png",
+          "sha256": "6f549f80984d0acb07cff162ed743c03329c0986ae4d0c923636a3cf07ae67c8"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake_normal/se.png",
+          "sha256": "af2bbe84e52aa121e9563604f3313b3f1ed729deca22e2d2e689960227582bac"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake/s.png",
+          "sha256": "161fcce1e026eb47f6a0fd8648c741854dce59d848f8a0df27a7c07b7dc91d48"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake_normal/s.png",
+          "sha256": "32acb82a9f296b8a15a800fbb29ad7db870abf6b14b692085f7a244f0f7140cb"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake/sw.png",
+          "sha256": "7540dcda94862f3c8df4d4c7139880753d2eec4e999235db26721f4acce9c8e9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake_normal/sw.png",
+          "sha256": "ce83543bdaec290361011b554ed9393b1a2f2748643921e1298a9a570ed4d162"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake/w.png",
+          "sha256": "806c18f90c0f6e1044aa4da954c256063d6200800af40895504fc1ead4a1001e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake_normal/w.png",
+          "sha256": "51816d4210cd99d50df08ff7ea6b5182c3c38d6b97b9a0f00a614874c676421f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake/nw.png",
+          "sha256": "401e046b60725421ea323f868ddc36c2eb572a3fab9d4625ce248465337ef246"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/wake_normal/nw.png",
+          "sha256": "7d37f569dde8b654b4719be318af0633e22fe9dd87a9c482a11781e0adb9f49b"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 2.12,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Kompakte Soul Cannon (0,85 m, Mündungskragen statt Trichter, Wachsen 10 %) und neue Kanonenbewegung (Owner 07.10.: viel zu groß)"
+      }
+    },
+    {
+      "id": "c53369a52cfc4d489820d00a05e20d5e",
+      "timestamp": "2026-10-07T08:52:47+00:00",
+      "visual_id": "player",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "death",
+        "frames": 16,
+        "fps": 12.0,
+        "frame_size": [
+          434,
+          338
+        ],
+        "origin": [
+          0.5,
+          0.629
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 4.8,
+        "render_seconds": 46.5
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/player/render/death.render.json",
+          "sha256": "b86475673164fad9061f4faea513b38e6ce6480ac73f2a6c8b3b4bdd4befe501"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death/n.png",
+          "sha256": "fbce00a60b957a2e3058da7e9449bc923ac0c76cc930a1064fa6894ecac0532d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death_normal/n.png",
+          "sha256": "2cc64d3b82fd05bf5ca61163d5a23c11e3f9ae84ed7bcd3ded1ce4d8d245c3cf"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death/ne.png",
+          "sha256": "b98cdb2e91b2b5b84b7672e2ce5f37b928f762999bb7bfca1fae043a3a60ad13"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death_normal/ne.png",
+          "sha256": "532000f7be4d6b79d648076e08a9ba154716ae5f0ea40678d3048252c334486d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death/e.png",
+          "sha256": "9a2c9d4d7b9823ff3fb83ca8cdd35d01df7d0c6250f79e7f205e495e8c2d6516"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death_normal/e.png",
+          "sha256": "87e105756c1d76aeae8c150d2ba161a5f19a3c4fa42f7509bee48106a7234e9b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death/se.png",
+          "sha256": "77fe625ee19cc579b0a32a755f3bb978a5d40f3b81a1081f74178fdf66db30bb"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death_normal/se.png",
+          "sha256": "4aba5964ba05ff41b3a084a05df3d843f4e2a7b1c17ff4381c80bcd7fa13eff1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death/s.png",
+          "sha256": "15a129478224dc0af1d1404a9d18058437d28053ca6e1a8aa71868e19cc4089f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death_normal/s.png",
+          "sha256": "0d473da3666c54be4d1ba2d7bc63fde90c002efc493fe16953bc3fbf6fe233bd"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death/sw.png",
+          "sha256": "1f89f39d6e6a4eb08f2febb061fa8d1c40bab26298408e781a0795a1f1ca7a7f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death_normal/sw.png",
+          "sha256": "fecb9a4da00e406ff5387afd0be110c08c3cbc1daad920b6bbfeb8b3ee1def8d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death/w.png",
+          "sha256": "f821ed810ae6b37ae40a7d2e5444e93f46ae136ac1b11fc6811e3a541fe72355"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death_normal/w.png",
+          "sha256": "b8f297d621da719ea04d0804522b28ca828c8bd34ef88edf37404388bdf1551c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death/nw.png",
+          "sha256": "e895eb06cbb7b28a6389163c42683a0aec1da2e9399cbff56b555cda892518d1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Player/Animations/death_normal/nw.png",
+          "sha256": "6ee06685a2f83cc839efbe9f8afb9124af9487d23d2610af1e0d549ce6dc7836"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 1.22,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Kompakte Soul Cannon (0,85 m, Mündungskragen statt Trichter, Wachsen 10 %) und neue Kanonenbewegung (Owner 07.10.: viel zu groß)"
+      }
+    },
+    {
+      "id": "9058d911b9bc47b9bccd1090cd73ba51",
+      "timestamp": "2026-10-07T09:08:25+00:00",
+      "visual_id": "environment.title",
+      "step": "place-environment",
+      "tool": {
+        "name": "place_environment.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "world": [
+          1280,
+          720
+        ],
+        "output": [
+          1920,
+          1080
+        ],
+        "tiles": [
+          1,
+          1
+        ],
+        "layer": "background",
+        "origin": [
+          0.0,
+          0.0
+        ],
+        "crop": null,
+        "mute_reds": null,
+        "target_median": null
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/title/v3/backdrop.png",
+          "sha256": "841a5dc29a3aa1fd47fe9ae4719f13e0a7d277290c676fe04d6573c0e0d3ade5"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Title/backdrop.png",
+          "sha256": "613b8141f718ab2d4bd360ec3f95ae6dd83fbec93b2084db868baf8f826c4e3c"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.24,
+      "decision": {
+        "status": "kandidat",
+        "reason": "Bodenplatte für das Spiel aufbereitet"
+      }
     }
   ]
 }

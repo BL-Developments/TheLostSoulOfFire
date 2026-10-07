@@ -300,6 +300,7 @@ internal sealed class TourVisualTest
     private string Named(string name) => $"{_station}_{name}";
 
     private int _frame;
+    private bool _fullLogged;
 
     /// <summary>
     /// Cannon handling cues while the tour runs, with the cannon state at that moment, the bound
@@ -307,7 +308,8 @@ internal sealed class TourVisualTest
     /// </summary>
     private void LogCannon(AudioCue cue)
     {
-        if (cue is AudioCue.CannonDraw or AudioCue.CannonStow or AudioCue.CannonCharge or AudioCue.CannonFire or AudioCue.CannonFull)
+        if (cue is AudioCue.CannonDraw or AudioCue.CannonStow or AudioCue.CannonCharge or AudioCue.CannonFire or AudioCue.CannonFull
+            or AudioCue.CannonStage or AudioCue.CannonBlast)
         {
             Console.WriteLine($"TOUR_CUE frame={_frame} cue={cue} state={_world.AutomatedPlayer.Cannon.State}");
         }
@@ -589,6 +591,17 @@ internal sealed class TourVisualTest
         Do("rest", () => { }, 0.6f);
         Do("listen_cannon", () => _world.AutomatedAudio.CuePlayed += LogCannon);
         Series("cannon_draw_charge", 30, 2, () => _input.InjectMousePresses(left: false, right: true));
+        // Held past full charge: the chamber strains and the cannon trembles (aim_full), then the full
+        // shot. A step without the button would release it and fire, so the level is logged in the hold.
+        Series("cannon_full_hold", 12, 4, () =>
+        {
+            _input.InjectMousePresses(left: false, right: true);
+            if (_world.AutomatedPlayer.Cannon.IsFullCharge && !_fullLogged)
+            {
+                _fullLogged = true;
+                Console.WriteLine($"TOUR_AUDIO station=arena_player full {_world.AutomatedAudio.DescribePresence()}");
+            }
+        });
         Do("hum_audio", () => Console.WriteLine($"TOUR_AUDIO station=arena_player charging {_world.AutomatedAudio.DescribePresence()}"), 0.0f);
         Series("cannon_fire", 30, 1);
         Do("stop_listening_cannon", () => _world.AutomatedAudio.CuePlayed -= LogCannon);

@@ -121,7 +121,7 @@ public sealed class SoulCannon
                 if (IsFullCharge && !_fullCueCreated)
                 {
                     _fullCueCreated = true;
-                    Vector2 muzzle = playerPosition + _aimDirection * 68f;
+                    Vector2 muzzle = playerPosition + _aimDirection * FigureHeights.MuzzleReach(1f);
                     particles.EmitConvergence(muzzle, 18, 82f, GameBalance.SoulWhite, 0.2f, 5.5f);
                     particles.EmitBurst(muzzle, -_aimDirection, 7, GameBalance.SoulWhite, 105f, 5f);
                 }
@@ -259,7 +259,7 @@ public sealed class SoulCannon
             2 => 0.075f,
             _ => IsFullCharge ? 0.045f : 0.055f
         };
-        Vector2 muzzle = playerPosition + _aimDirection * 68f;
+        Vector2 muzzle = playerPosition + _aimDirection * FigureHeights.MuzzleReach(ChargeProgress);
         int particleCount = ChargeStage switch { 1 => 1, 2 => 2, _ => 3 };
         float convergenceRadius = ChargeStage switch { 1 => 38f, 2 => 56f, _ => 72f };
         Color color = IsFullCharge

@@ -109,6 +109,9 @@ public static class VisualClips
     public const string Swing3 = "swing3";
     public const string Aim = "aim";
 
+    /// <summary>Player: holding a full charge, the cannon trembling with the flame it holds (time loop).</summary>
+    public const string AimFull = "aim_full";
+
     /// <summary>Player: walking while the Soul Cannon charges (distance clip, played backward when backing away).</summary>
     public const string AimMove = "aim_move";
 

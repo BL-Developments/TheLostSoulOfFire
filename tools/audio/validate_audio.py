@@ -105,8 +105,6 @@ AUTHORED_SFX_DURATIONS = {
     "soul_release_v3.wav": 0.942,
     "enemy_emerge_v2.wav": 0.861,
     "enemy_emerge_v3.wav": 0.942,
-    "cannon_fire_v2.wav": 0.526,
-    "cannon_fire_v3.wav": 0.576,
     "burning_detonation_v2.wav": 0.670,
     "burning_detonation_v3.wav": 0.733,
     "burning_charge_v2.wav": 0.526,
@@ -118,7 +116,6 @@ AUTHORED_SFX_DURATIONS = {
     # Hall tails (tools/audio/hall_tails.py): wet-only reverberation of the foundry and the antechamber.
     "scythe_hit_hall.wav": 2.507,
     "core_hit_hall.wav": 2.443,
-    "cannon_fire_hall.wav": 2.711,
     "cannon_impact_hall.wav": 2.618,
     "burning_detonation_hall.wav": 2.888,
     "devourer_slam_hall.wav": 2.706,
@@ -137,8 +134,16 @@ AUTHORED_SFX_DURATIONS = {
     "presence_devourer.wav": 7.000,
     # The player's own Death Flame burning during Resonance (recipes/ambiences.py), looped.
     "resonance_rumble.wav": 4.000,
-    # The Soul Cannon's charge hum (recipes/cues.py), looped; the game raises its pitch with the charge.
-    "cannon_hum.wav": 2.000,
+    # The Soul Cannon as iron and fire (recipes/cannon.py): ignition, the charge loop (the game raises
+    # its pitch with the charge), the latch at each stage, full charge, the shot (with its foundry
+    # tail) and the blow under a full shot.
+    "cannon_ignite_1.wav": 0.750, "cannon_ignite_2.wav": 0.750,
+    "cannon_charge_loop.wav": 2.000,
+    "cannon_stage_1.wav": 0.400, "cannon_stage_2.wav": 0.400,
+    "cannon_full_1.wav": 0.900, "cannon_full_2.wav": 0.900,
+    "cannon_shot_1.wav": 0.950, "cannon_shot_2.wav": 0.950, "cannon_shot_3.wav": 0.950,
+    "cannon_shot_1_hall.wav": 2.525,
+    "cannon_blast_1.wav": 1.400, "cannon_blast_2.wav": 1.400,
     # The soul breathing out as it is released (recipes/cues.py): no pitch, so crowds never beep.
     "soul_release_breath_1.wav": 1.450,
     "soul_release_breath_2.wav": 1.450,
@@ -175,7 +180,7 @@ AUTHORED_SFX_DURATIONS = {
 }
 
 #: Looping point sources: mono (the game pans them) and seamless like the beds.
-POINT_LOOPS = {"warden_flame_loop.wav", "life_flame_loop.wav", "presence_burning.wav", "presence_hollow.wav", "presence_devourer.wav", "resonance_rumble.wav", "cannon_hum.wav"}
+POINT_LOOPS = {"warden_flame_loop.wav", "life_flame_loop.wav", "presence_burning.wav", "presence_hollow.wav", "presence_devourer.wav", "resonance_rumble.wav", "cannon_charge_loop.wav"}
 
 #: Ambience beds and music per zone (AudioDirector.AmbienceAssets / MusicAssets).
 ZONE_AMBIENCES = ["shore_ambience.wav", "hub_ambience.wav", "harbour_ambience.wav", "causeway_ambience.wav",

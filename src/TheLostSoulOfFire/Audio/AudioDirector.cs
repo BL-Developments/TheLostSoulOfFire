@@ -95,7 +95,13 @@ public enum AudioCue
     /// <summary>The places themselves, now and then (tools/audio/recipes/ambient_events.py).</summary>
     FoundryBell,
     ShoreHorn,
-    ShoreBoard
+    ShoreBoard,
+    /// <summary>
+    /// The Soul Cannon (tools/audio/recipes/cannon.py): the chamber's latch taking the next notch
+    /// at each charge stage, and the deep blow and roar under a full shot.
+    /// </summary>
+    CannonStage,
+    CannonBlast
 }
 
 /// <summary>
@@ -226,7 +232,9 @@ public sealed class AudioDirector : IDisposable
         [AudioCue.DevourerHunger] = new(0.6f, 1, 0.03f),
         [AudioCue.FoundryBell] = new(4f, 1, 0.03f),
         [AudioCue.ShoreHorn] = new(4f, 1, 0.02f),
-        [AudioCue.ShoreBoard] = new(2f, 1, 0.04f)
+        [AudioCue.ShoreBoard] = new(2f, 1, 0.04f),
+        [AudioCue.CannonStage] = new(0.12f, 1, 0.02f),
+        [AudioCue.CannonBlast] = new(0.3f, 1, 0.02f)
     };
 
     /// <summary>
@@ -252,7 +260,7 @@ public sealed class AudioDirector : IDisposable
     [
         AudioCue.ScytheSwing1, AudioCue.ScytheSwing2, AudioCue.SoulCleave, AudioCue.Dash, AudioCue.CannonCharge,
         AudioCue.Footstep, AudioCue.FootstepWood, AudioCue.HollowStep, AudioCue.BurningStep, AudioCue.DevourerStep,
-        AudioCue.EnemyEmerge, AudioCue.SoulRelease, AudioCue.CannonDraw, AudioCue.CannonStow,
+        AudioCue.EnemyEmerge, AudioCue.SoulRelease, AudioCue.CannonDraw, AudioCue.CannonStow, AudioCue.CannonStage,
         AudioCue.ScytheWeight1, AudioCue.ScytheWeight2, AudioCue.ScytheWeight3,
         AudioCue.HollowCall, AudioCue.BurningCackle, AudioCue.DevourerGrowl,
         AudioCue.FoundryBell, AudioCue.ShoreHorn, AudioCue.ShoreBoard
@@ -268,7 +276,7 @@ public sealed class AudioDirector : IDisposable
     [
         (AudioCue.ScytheHit, "Audio/Sfx/scythe_hit_hall", AudioZone.Arena, 0.34f),
         (AudioCue.CoreHit, "Audio/Sfx/core_hit_hall", AudioZone.Arena, 0.3f),
-        (AudioCue.CannonFire, "Audio/Sfx/cannon_fire_hall", AudioZone.Arena, 0.36f),
+        (AudioCue.CannonFire, "Audio/Sfx/cannon_shot_1_hall", AudioZone.Arena, 0.36f),
         (AudioCue.CannonImpact, "Audio/Sfx/cannon_impact_hall", AudioZone.Arena, 0.34f),
         (AudioCue.BurningDetonation, "Audio/Sfx/burning_detonation_hall", AudioZone.Arena, 0.4f),
         (AudioCue.DevourerSlam, "Audio/Sfx/devourer_slam_hall", AudioZone.Arena, 0.4f),
@@ -435,9 +443,11 @@ public sealed class AudioDirector : IDisposable
             Add(content, AudioCue.SoulCleave, "Audio/Sfx/soul_cleave", 82f, 0.22f, 0.7f, 0.48f);
             Add(content, AudioCue.ScytheHit, "Audio/Sfx/scythe_hit", 118f, 0.08f, 0.48f, 0.72f);
             Add(content, AudioCue.Dash, "Audio/Sfx/dash", 72f, 0.16f, 0.48f, 0.3f);
-            Add(content, AudioCue.CannonCharge, "Audio/Sfx/cannon_charge", 105f, 0.34f, 0.32f, 0.08f, rising: true);
-            Add(content, AudioCue.CannonFull, "Audio/Sfx/cannon_full", 740f, 0.18f, 0.45f, 0.05f);
-            Add(content, AudioCue.CannonFire, "Audio/Sfx/cannon_fire", 58f, 0.3f, 0.8f, 0.62f);
+            // The Soul Cannon is iron and fire (recipes/cannon.py); the Ludo takes read as a sci-fi
+            // energy weapon and stay in the bank unplayed.
+            AddVariants(content, AudioCue.CannonCharge, "Audio/Sfx/cannon_ignite", 2, 105f, 0.34f, 0.32f, 0.5f);
+            AddVariants(content, AudioCue.CannonFull, "Audio/Sfx/cannon_full", 2, 250f, 0.4f, 0.45f, 0.4f);
+            AddVariants(content, AudioCue.CannonFire, "Audio/Sfx/cannon_shot", 3, 58f, 0.3f, 0.8f, 0.62f);
             Add(content, AudioCue.BurningCharge, "Audio/Sfx/burning_charge", 145f, 0.23f, 0.5f, 0.24f, rising: true);
             Add(content, AudioCue.BurningDetonation, "Audio/Sfx/burning_detonation", 48f, 0.34f, 0.82f, 0.8f);
             Add(content, AudioCue.CoreHit, "Audio/Sfx/core_hit", 910f, 0.13f, 0.42f, 0.08f);
@@ -466,7 +476,7 @@ public sealed class AudioDirector : IDisposable
                 (AudioCue.CannonImpact, "Audio/Sfx/cannon_impact"), (AudioCue.EnemyDeath, "Audio/Sfx/enemy_death"),
                 (AudioCue.Dash, "Audio/Sfx/dash"), (AudioCue.HollowSwipe, "Audio/Sfx/hollow_swipe"),
                 (AudioCue.SoulCleave, "Audio/Sfx/soul_cleave"),
-                (AudioCue.CannonFire, "Audio/Sfx/cannon_fire"), (AudioCue.BurningDetonation, "Audio/Sfx/burning_detonation"),
+                (AudioCue.BurningDetonation, "Audio/Sfx/burning_detonation"),
                 (AudioCue.BurningCharge, "Audio/Sfx/burning_charge"), (AudioCue.PlayerHit, "Audio/Sfx/player_hit")
             })
             {
@@ -511,6 +521,8 @@ public sealed class AudioDirector : IDisposable
             AddVariants(content, AudioCue.ShoreBoard, "Audio/Sfx/shore_board", 2, 2400f, 0.8f, 0.15f, 0.9f);
             Add(content, AudioCue.CannonDraw, "Audio/Sfx/cannon_draw", 140f, 0.3f, 0.3f, 0.4f);
             Add(content, AudioCue.CannonStow, "Audio/Sfx/cannon_stow", 120f, 0.3f, 0.3f, 0.4f);
+            AddVariants(content, AudioCue.CannonStage, "Audio/Sfx/cannon_stage", 2, 3000f, 0.1f, 0.3f, 0.6f);
+            AddVariants(content, AudioCue.CannonBlast, "Audio/Sfx/cannon_blast", 2, 40f, 0.8f, 0.6f, 0.6f);
             AddVariants(content, AudioCue.HitHollow, "Audio/Sfx/hit_hollow", 3, 180f, 0.1f, 0.3f, 0.7f);
             AddVariants(content, AudioCue.HitBurning, "Audio/Sfx/hit_burning", 3, 240f, 0.12f, 0.3f, 0.8f);
             AddVariants(content, AudioCue.HitDevourer, "Audio/Sfx/hit_devourer", 3, 70f, 0.2f, 0.35f, 0.5f);
@@ -970,8 +982,9 @@ public sealed class AudioDirector : IDisposable
 
     /// <summary>
     /// The Soul Cannon's chamber while it charges (16_AUDIO_DIRECTION: the charge audibly rises):
-    /// a hum whose pitch and level climb with <paramref name="charge"/> and hold, vibrating, at
-    /// full; null when not charging, and it is gone at once (the shot carries the moment).
+    /// the Death Flame roaring under pressure in the iron, its pitch and level climbing with
+    /// <paramref name="charge"/> and held, straining, at full; null when not charging, and it is
+    /// gone at once (the shot carries the moment).
     /// </summary>
     public void SetCannonHum(float? charge, float deltaTime)
     {
@@ -994,7 +1007,7 @@ public sealed class AudioDirector : IDisposable
             }
             if (_hum is null)
             {
-                _humSound ??= _content.Load<SoundEffect>("Audio/Sfx/cannon_hum");
+                _humSound ??= _content.Load<SoundEffect>("Audio/Sfx/cannon_charge_loop");
                 _hum = _humSound.CreateInstance();
                 _hum.IsLooped = true;
                 _hum.Volume = 0f;
@@ -1002,8 +1015,8 @@ public sealed class AudioDirector : IDisposable
                 if (_paused) _hum.Pause();
             }
             float c = MathHelper.Clamp(charge ?? 1f, 0f, 1f);
-            _hum.Pitch = MathHelper.Clamp(-0.4f + 0.5f * c + (c >= 1f ? 0.1f : 0f), -1f, 1f);
-            _hum.Volume = Math.Clamp((0.1f + 0.22f * c) * _humLevel, 0f, 1f);
+            _hum.Pitch = MathHelper.Clamp(-0.35f + 0.45f * c + (c >= 1f ? 0.08f : 0f), -1f, 1f);
+            _hum.Volume = Math.Clamp((0.14f + 0.3f * c) * _humLevel, 0f, 1f);
         }
         catch (ContentLoadException)
         {

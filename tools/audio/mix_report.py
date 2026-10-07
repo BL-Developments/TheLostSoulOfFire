@@ -79,6 +79,7 @@ CLASS = {
     "HollowCall": "call", "BurningCackle": "call", "DevourerGrowl": "call",
     "HollowGrasp": "layer", "BurningShriek": "layer",
     "FoundryBell": "place", "ShoreHorn": "place", "ShoreBoard": "place",
+    "CannonStage": "action", "CannonBlast": "layer",
 }
 
 #: Menu sounds play over the paused beds (AudioDirector.PausedBedVolume).

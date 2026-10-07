@@ -761,10 +761,10 @@ starr (der Clip `aim` hält das letzte Bild).
 
 **Prioritäten:**
 1. ☑ Seelen-Einsammeln ohne Piepen (siehe unten).
-2. ☐ Kanone kleiner und als Waffe lesbar (kein Trichter), Wachsen nur angedeutet.
-3. ☐ Kanonen-Animation: Ziehen, Anschlag mit Gewicht, Zittern bei voller Ladung, kräftiger
+2. ☑ Kanone kleiner und als Waffe lesbar (kein Trichter), Wachsen nur angedeutet.
+3. ☑ Kanonen-Animation: Ziehen, Anschlag mit Gewicht, Zittern bei voller Ladung, kräftiger
    Rückstoß, Verstauen.
-4. ☐ Kanonen-Klang: Death Flame statt Elektro-Brummen beim Laden, Stufen hörbar, Schuss mit
+4. ☑ Kanonen-Klang: Death Flame statt Elektro-Brummen beim Laden, Stufen hörbar, Schuss mit
    Körper.
 
 **Erledigt und im Spiel geprüft:**
@@ -776,3 +776,40 @@ starr (der Clip `aim` hält das letzte Bild).
   Glocke und Glockenspiel je unter 0,01. Mix +4,9 bis +6,5 LU über dem Bett (im Band),
   Audio-Laufzeittest (74 Töne, kein Ersatzklang), `validate_audio.py` (199), Rundgang
   `arena_wave1` protokolliert `TOUR_CUE cue=SoulRelease`.
+- Soul Cannon, Aussehen (Owner: „viel zu groß“): neues Modell (`build_player.py`
+  `build_cannon`, `--recannon`) rund 0,85 m statt 1,2 m: Reliquienkammer 18 statt 25 cm,
+  Rohr 11,6 cm, schwerer Mündungskragen mit dunklen Schlitzen und nur leichter Aufweitung
+  (20 statt 38 cm; der Trichter wirkte auf dem Rücken wie ein Grammophon). Wachsen beim Laden
+  10 % statt 30 %. Auf dem Rücken diagonal von der linken Hüfte bis zur rechten Schulter, die
+  Mündung nicht mehr über dem Kopf. Alle 20 Spielerclips (8 Richtungen, Normalen) und das
+  Titelbild neu gerendert. Mündung und Kammer im Spiel nach Messung (`CANNON_POINT`):
+  `FigureHeights.MuzzleAhead` 54/57, Höhe 60; `CannonFeed.ChamberOf` 14 vor, 13,5 rechts,
+  58/56,5 hoch; Ladepartikel und Voll-Signal an der gezeichneten Mündung statt fest bei 68.
+- Soul Cannon, Bewegung: Anschlag mit Ausfallschritt (links vor, rechts zurück, Fuß
+  ausgedreht), Hüfte sinkt mit der Ladung tiefer in den Stand. Neuer Halte-Loop `aim_full`
+  (12 Bilder, 24 fps) bei voller Ladung: Kanone zittert (6/8/10 Hz, etwa 1 cm und 2–3°), Kammer
+  schwillt, Schultern und Kopf zittern mit, Brust hebt sich (vorher stand die Figur starr auf dem
+  letzten Bild). Ziehen (8 statt 5 Bilder): Griff über die Schulter, Kanone kommt im Bogen über
+  die Schulter, das Gewicht landet sichtbar, der rechte Fuß tritt in den Anschlag. Schuss (16
+  statt 10 Bilder): Mündung reißt steil hoch, Brust und Kopf fliegen zurück, Ferse hebt sich, die
+  Figur rutscht ein Stück, dann Schritt zurück in den Kampfstand. Die Sense kippte beim
+  Wechsel zwischen Garde und Nachziehen senkrecht über den Kopf (auch vorher schon); jetzt über
+  eine tiefe seitliche Zwischenhaltung (`weapon_swap`). Mündungsblitz läuft mit der Figur mit,
+  die der Rückstoß zurückstößt (`SpriteVfxSystem` mit Anker; vorher blieb er in der Luft stehen).
+- Soul Cannon, Klang (`tools/audio/recipes/cannon.py`, Details in `SOURCES.md`): Zünden statt
+  Sci-Fi-Ladeton (CLAP vorher „sci-fi energy weapon charging“ 0,79), Lade-Schleife aus Feuer unter
+  Druck statt Glocke/Elektrobrummen („blowtorch“ 0,55), Ratsche bei Ladestufe 2 und 3 (neu,
+  „mechanical latch click“ 0,68–0,85), Voll als schwerer Eisenschlag mit Auffauchen („heavy metal
+  clank“ 0,51–0,70), Schuss in drei Takes mit Rückschlag und Abblasen der Kammer, darunter beim
+  vollen Schuss ein tiefer Druckstoß mit brüllender Flamme (neu), Verstauen weich („heavy object
+  put down on fabric“ statt „gunshot“). Rundgang protokolliert: Ziehen → Zünden +0,17 s → Raste
+  +0,32 s → Raste +0,82 s → Voll +1,22 s → Schuss + Druckstoß → Verstauen +0,28 s.
+  Mix in Arena, Kampf, Ufer, Überfahrt, Vorhalle im Band.
+- Geprüft: Vorschauen (Ruhe von vorn/hinten, Anschlag in drei Richtungen, Halte-Loop, Ziehen und
+  Schuss von Südost und Ost), Rundgang `arena_player` (neu: Halten über volle Ladung,
+  `cannon_full_hold`) und `title`, 263 Unit-Tests, Audio-Laufzeit- (76 Töne, kein Ersatzklang),
+  Gameplay- (10 Wellen) und Tod-Neustart-Test, `validate_audio.py` (208). Ein Frame mit 61–66 ms
+  im Teillauf `arena_player` liegt beim Betreten der Arena (Zonenwechsel), nicht an der Kanone.
+- Verworfen: Ratsche aus Breitband-Klicks (CLAP „gunshot“ 0,55–0,92), mit Klangring („bell“) oder
+  Auffauchen („gunshot“); Lade-Schleife aus glattem tiefem Rauschen („wind“ 0,29–0,40); Zittern
+  mit wenigen Millimetern (im Spiel unter einem Pixel).

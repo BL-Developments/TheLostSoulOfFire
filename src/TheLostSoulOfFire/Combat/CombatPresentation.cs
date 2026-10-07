@@ -148,7 +148,8 @@ public sealed class CombatPresentation
         }
     }
 
-    public void PresentCannonFire(Vector2 origin, CannonShotRequest request)
+    /// <param name="muzzle">Where the drawn muzzle is while the recoil shoves the player back, so the flash stays on it.</param>
+    public void PresentCannonFire(Vector2 origin, CannonShotRequest request, Func<Vector2>? muzzle = null)
     {
         Color color = request.IsFullCharge ? Color.White : new Color(205, 164, 242);
         _spriteVfx.Spawn(
@@ -156,7 +157,8 @@ public sealed class CombatPresentation
             origin,
             MathF.Atan2(request.Direction.Y, request.Direction.X),
             request.IsFullCharge ? 0.76f : 0.43f,
-            color);
+            color,
+            muzzle);
         _particles.EmitBurst(
             origin,
             request.Direction,

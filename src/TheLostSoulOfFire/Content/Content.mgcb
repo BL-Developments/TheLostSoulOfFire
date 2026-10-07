@@ -9919,16 +9919,6 @@
 /processor:SoundEffectProcessor
 /build:Audio/Sfx/enemy_emerge_v3.wav
 
-#begin Audio/Sfx/cannon_fire_v2.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/build:Audio/Sfx/cannon_fire_v2.wav
-
-#begin Audio/Sfx/cannon_fire_v3.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/build:Audio/Sfx/cannon_fire_v3.wav
-
 #begin Audio/Sfx/burning_detonation_v2.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
@@ -9978,11 +9968,6 @@
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /build:Audio/Sfx/core_hit_hall.wav
-
-#begin Audio/Sfx/cannon_fire_hall.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/build:Audio/Sfx/cannon_fire_hall.wav
 
 #begin Audio/Sfx/cannon_impact_hall.wav
 /importer:WavImporter
@@ -10635,11 +10620,6 @@
 /processor:SoundEffectProcessor
 /build:Audio/Sfx/resonance_rumble.wav
 
-#begin Audio/Sfx/cannon_hum.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/build:Audio/Sfx/cannon_hum.wav
-
 #begin Audio/Sfx/scythe_weight_1_1.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
@@ -10906,3 +10886,260 @@
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /build:Audio/Sfx/soul_release_breath_4.wav
+
+#begin Audio/Sfx/cannon_ignite_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/cannon_ignite_1.wav
+
+#begin Audio/Sfx/cannon_ignite_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/cannon_ignite_2.wav
+
+#begin Audio/Sfx/cannon_charge_loop.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/cannon_charge_loop.wav
+
+#begin Audio/Sfx/cannon_stage_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/cannon_stage_1.wav
+
+#begin Audio/Sfx/cannon_stage_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/cannon_stage_2.wav
+
+#begin Audio/Sfx/cannon_full_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/cannon_full_1.wav
+
+#begin Audio/Sfx/cannon_full_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/cannon_full_2.wav
+
+#begin Audio/Sfx/cannon_shot_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/cannon_shot_1.wav
+
+#begin Audio/Sfx/cannon_shot_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/cannon_shot_2.wav
+
+#begin Audio/Sfx/cannon_shot_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/cannon_shot_3.wav
+
+#begin Audio/Sfx/cannon_blast_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/cannon_blast_1.wav
+
+#begin Audio/Sfx/cannon_blast_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/cannon_blast_2.wav
+
+#begin Textures/Player/Animations/aim_full/n.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=True
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/Player/Animations/aim_full/n.png
+
+#begin Textures/Player/Animations/aim_full_normal/n.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=True
+/processorParam:PremultiplyAlpha=False
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/Player/Animations/aim_full_normal/n.png
+
+#begin Textures/Player/Animations/aim_full/ne.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=True
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/Player/Animations/aim_full/ne.png
+
+#begin Textures/Player/Animations/aim_full_normal/ne.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=True
+/processorParam:PremultiplyAlpha=False
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/Player/Animations/aim_full_normal/ne.png
+
+#begin Textures/Player/Animations/aim_full/e.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=True
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/Player/Animations/aim_full/e.png
+
+#begin Textures/Player/Animations/aim_full_normal/e.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=True
+/processorParam:PremultiplyAlpha=False
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/Player/Animations/aim_full_normal/e.png
+
+#begin Textures/Player/Animations/aim_full/se.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=True
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/Player/Animations/aim_full/se.png
+
+#begin Textures/Player/Animations/aim_full_normal/se.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=True
+/processorParam:PremultiplyAlpha=False
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/Player/Animations/aim_full_normal/se.png
+
+#begin Textures/Player/Animations/aim_full/s.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=True
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/Player/Animations/aim_full/s.png
+
+#begin Textures/Player/Animations/aim_full_normal/s.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=True
+/processorParam:PremultiplyAlpha=False
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/Player/Animations/aim_full_normal/s.png
+
+#begin Textures/Player/Animations/aim_full/sw.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=True
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/Player/Animations/aim_full/sw.png
+
+#begin Textures/Player/Animations/aim_full_normal/sw.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=True
+/processorParam:PremultiplyAlpha=False
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/Player/Animations/aim_full_normal/sw.png
+
+#begin Textures/Player/Animations/aim_full/w.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=True
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/Player/Animations/aim_full/w.png
+
+#begin Textures/Player/Animations/aim_full_normal/w.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=True
+/processorParam:PremultiplyAlpha=False
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/Player/Animations/aim_full_normal/w.png
+
+#begin Textures/Player/Animations/aim_full/nw.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=True
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/Player/Animations/aim_full/nw.png
+
+#begin Textures/Player/Animations/aim_full_normal/nw.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=True
+/processorParam:PremultiplyAlpha=False
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/Player/Animations/aim_full_normal/nw.png
+
+#begin Audio/Sfx/cannon_shot_1_hall.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/cannon_shot_1_hall.wav

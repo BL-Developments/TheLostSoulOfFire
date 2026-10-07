@@ -286,6 +286,7 @@ public sealed partial class GameWorld : IDisposable
         bool wasSoulSenseActive = _player.SoulSenseActive;
         bool wasCannonFull = _player.Cannon.IsFullCharge;
         SoulCannonState previousCannonState = _player.Cannon.State;
+        int previousCannonStage = _player.Cannon.ChargeStage;
         int previousHealth = _player.Health;
         _art.Update(deltaTime);
         UpdateSceneProps(deltaTime);
@@ -530,7 +531,7 @@ public sealed partial class GameWorld : IDisposable
             _combatPresentation.BeginResonance(_player.Position);
             _arenaAtmosphere.ReactToResonance();
         }
-        PlayPlayerActionAudio(wasDashing, wasResonanceActive, wasSoulSenseActive, wasCannonFull, previousCannonState);
+        PlayPlayerActionAudio(wasDashing, wasResonanceActive, wasSoulSenseActive, wasCannonFull, previousCannonState, previousCannonStage);
         UpdateAbilities(deltaTime, input);
         SpawnCannonShot();
         ResolveScytheStrike();
@@ -2856,15 +2857,24 @@ public sealed partial class GameWorld : IDisposable
         // The flash bursts from the drawn muzzle (presentation only; the shot itself starts at its
         // gameplay origin, inside the flash). The recoil clip shows the cannon already discharged
         // to its resting size, so the flash sits at that muzzle, not at the grown one.
-        Vector2 flash = _art.HasClip(VisualIds.Player, VisualClips.Aim)
+        bool drawnMuzzle = _art.HasClip(VisualIds.Player, VisualClips.Aim);
+        Vector2 flash = drawnMuzzle
             ? _player.Position + request.Direction * FigureHeights.MuzzleReach(0f)
             : origin;
-        _combatPresentation.PresentCannonFire(flash, request);
+        // The recoil shoves the player back (a full shot about 40 units in the flash's 0.1 s); the
+        // flash rides on the muzzle instead of hanging in the air where the shot left.
+        Vector2 muzzleOffset = flash - _player.Position;
+        _combatPresentation.PresentCannonFire(flash, request, drawnMuzzle ? () => _player.Position + muzzleOffset : null);
         if (request.IsFullCharge)
         {
             _arenaAtmosphere.ReactToForce(origin, 460f, 135f);
         }
-        _audio.Play(AudioCue.CannonFire, request.IsFullCharge ? 0.8f : 0.58f, request.IsFullCharge ? -0.08f : 0.08f);
+        _audio.Play(AudioCue.CannonFire, request.IsFullCharge ? 0.72f : 0.55f, request.IsFullCharge ? -0.06f : 0.06f);
+        if (request.IsFullCharge)
+        {
+            // A full shot empties the whole chamber: the deep blow and the roar of the flame leaving.
+            _audio.Play(AudioCue.CannonBlast, 0.62f);
+        }
         _player.ApplyCannonRecoil(request.Direction, request.Charge);
     }
 
@@ -3072,7 +3082,8 @@ public sealed partial class GameWorld : IDisposable
         bool wasResonanceActive,
         bool wasSoulSenseActive,
         bool wasCannonFull,
-        SoulCannonState previousCannonState)
+        SoulCannonState previousCannonState,
+        int previousCannonStage)
     {
         if (_player.Scythe.StartedThisFrame)
         {
@@ -3108,6 +3119,12 @@ public sealed partial class GameWorld : IDisposable
         if (previousCannonState != SoulCannonState.Charging && _player.Cannon.State == SoulCannonState.Charging)
         {
             _audio.Play(AudioCue.CannonCharge, 0.42f);
+        }
+        if (_player.Cannon.State == SoulCannonState.Charging && previousCannonStage is 1 or 2 &&
+            _player.Cannon.ChargeStage > previousCannonStage && !_player.Cannon.IsFullCharge)
+        {
+            // The chamber's latch takes the next notch: the three stages are heard, not only seen.
+            _audio.Play(AudioCue.CannonStage, _player.Cannon.ChargeStage == 3 ? 0.9f : 0.75f, _player.Cannon.ChargeStage == 3 ? 0.12f : 0f);
         }
         if (!wasCannonFull && _player.Cannon.IsFullCharge)
         {
