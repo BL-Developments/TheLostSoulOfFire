@@ -691,10 +691,46 @@ public sealed partial class GameWorld : IDisposable
             CameraLead);
     }
 
-    /// <summary>How far the combat camera leads toward the aim and the running direction (world units).</summary>
+    /// <summary>
+    /// How far the combat camera leads toward the aim and the running direction (world units),
+    /// and a little toward where the nearby enemies stand, so a crowd at one edge comes into view
+    /// (at most 46 units; presentation only, the aim maps through the same camera).
+    /// </summary>
     private Vector2 CameraLead => _player.IsDead
         ? Vector2.Zero
-        : _player.FacingDirection * 22f + _player.Velocity * 0.045f;
+        : _player.FacingDirection * 22f + _player.Velocity * 0.045f + ThreatBias;
+
+    private Vector2 ThreatBias
+    {
+        get
+        {
+            Vector2 sum = Vector2.Zero;
+            float weight = 0f;
+            foreach (Enemy enemy in _enemies)
+            {
+                if (!enemy.IsAlive)
+                {
+                    continue;
+                }
+                Vector2 offset = enemy.Position - _player.Position;
+                float distance = offset.Length();
+                if (distance > 700f)
+                {
+                    continue;
+                }
+                float w = 1f - distance / 700f;
+                sum += offset * w;
+                weight += w;
+            }
+            if (weight <= 0.001f)
+            {
+                return Vector2.Zero;
+            }
+            Vector2 bias = sum / weight * 0.2f;
+            float length = bias.Length();
+            return length > 46f ? bias / length * 46f : bias;
+        }
+    }
 
     private void UpdateMenu(float deltaTime, InputState input, Viewport viewport)
     {

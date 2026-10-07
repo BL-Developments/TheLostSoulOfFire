@@ -719,6 +719,12 @@ Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreati
 - Hollows und Burnings haben je eine eigene Größe innerhalb ±6 % aus ihrem Seed (nur Darstellung,
   Trefferkreis unverändert): eine Gruppe derselben Art wirkt nicht mehr wie Klone.
 
+- Kamera im Gedränge: Zum Vorlauf in Ziel- und Laufrichtung kommt ein sanfter Zug zum
+  Schwerpunkt der Gegner im Umkreis von 700 (nach Nähe gewichtet, 20 %, höchstens 46 Einheiten,
+  gleich träge geglättet): eine Menge am Bildrand kommt früher ins Bild. Bewusst dezent (im
+  Vergleich derselben Szene nur eine kleine Verschiebung); Mauszuordnung läuft über dieselbe
+  Kamera.
+
 **Verworfen (Durchgang 4):**
 - Zweite Hollow-Variante mit Lederschürze (Restspur der Gießhalle): rund 450 MB unkomprimierte
   Texturen zusätzlich; Masken, Bewegungsversatz und Stimmen geben bereits Individualität.
