@@ -235,20 +235,35 @@ def burning_rush(rng) -> np.ndarray:
 
 # ---- deaths ------------------------------------------------------------------------------------
 
-@recipe("death-hollow", "Hollow stirbt: die Maske springt mit hellem Knack, der Stoff fällt in sich zusammen, die Maske klappert auf den Boden")
+def _shard(rng, n: int, at: float, gain: float, q: float = 14) -> np.ndarray:
+    """A piece of porcelain hit or breaking: a burst of grit ringing a few short, rough modes
+    (resonators excited by noise: it knocks and cracks; clean sine partials read as a chime)."""
+    out = np.zeros(n)
+    start = dsp.seconds(at)
+    m = min(n - start, dsp.seconds(0.06))
+    if m <= 0:
+        return out
+    grit = rng.standard_normal(m) * np.exp(-np.arange(m) / (dsp.RATE * 0.0025))
+    modes = sum(dsp.resonator(grit, f * rng.uniform(0.9, 1.1), q) * g for f, g in ((1900, 1.0), (3100, 0.7), (4700, 0.45), (6900, 0.25)))
+    out[start:start + m] = (modes / (np.max(np.abs(modes)) + 1e-9) + dsp.highpass(grit, 2500) * 0.6) * gain
+    return out
+
+
+@recipe("death-hollow", "Hollow stirbt: die Porzellanmaske bricht mit trockenem Knack und Splittern, der Stoff fällt in sich zusammen, Scherben klappern auf den Boden; kein Glöckchen")
 def death_hollow(rng) -> np.ndarray:
     n = dsp.seconds(0.9)
     t = dsp.time_axis(n)
-    crack = _ring(n, [(2150, 0.3, 0.05), (3380, 0.22, 0.035), (4960, 0.15, 0.025), (7100, 0.08, 0.015)], rng)
-    crack += _burst(rng, n, 0.0, 2000, 9000, 0.005, 0.6)
-    splinters = _grains(rng, n, 0.003, 0.05, 20, 3000, 10000, 0.3, (0.001, 0.003))
+    crack = _shard(rng, n, 0.0, 1.0) + _shard(rng, n, rng.uniform(0.008, 0.016), 0.6)
+    crack += _burst(rng, n, 0.0, 2000, 9000, 0.005, 0.2)
+    splinters = _grains(rng, n, 0.003, 0.06, 26, 3000, 10000, 0.35, (0.001, 0.003))
     collapse = dsp.lowpass(rng.standard_normal(n), 1800) * np.exp(-((t - 0.32) / 0.14) ** 2) * 0.45
     collapse += _thump(n, 90, 55, 0.08, at=0.42) * 0.5
     clatter = np.zeros(n)
-    for k, at in enumerate((0.48, 0.58, 0.64)):
-        clatter += _ring(n, [(2600, 0.12 / (k + 1), 0.02), (4100, 0.08 / (k + 1), 0.014)], rng, at=at + rng.uniform(-0.01, 0.01))
+    for k, at in enumerate((0.48, 0.56, 0.61, 0.69)):
+        clatter += _shard(rng, n, at + rng.uniform(-0.01, 0.01), 0.35 / (k + 1), q=10)
     x = crack + splinters + collapse + clatter
-    return _finish(_room(x, rng, 0.7, 0.18), -19.0, -2.5, 0.1)
+    x = dsp.fades(dsp.highpass(_room(x, rng, 0.7, 0.14), 28), 0.0005, 0.1)
+    return dsp.loud_and_limited(x, -19.0, -2.5)
 
 
 @recipe("death-burning", "Burning erlischt: die Flammen fallen mit einem tiefen Fauchen in sich zusammen, Glut zischt aus, letzte Funken")

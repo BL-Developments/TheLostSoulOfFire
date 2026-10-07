@@ -280,6 +280,29 @@ def normalise_peak(x: np.ndarray, peak_db: float) -> np.ndarray:
     return x * (10 ** (peak_db / 20) / peak)
 
 
+def limit(x: np.ndarray, ceiling_db: float, release: float = 0.04, lookahead: float = 0.0015) -> np.ndarray:
+    """A peak limiter: the gain drops at once (looking a little ahead) and recovers over
+    `release`, so a transient is held under the ceiling without dulling the body behind it."""
+    from scipy.ndimage import minimum_filter1d
+    ceiling = 10 ** (ceiling_db / 20)
+    need = np.minimum(1.0, ceiling / np.maximum(np.abs(x), 1e-9))
+    need = minimum_filter1d(need, size=2 * seconds(lookahead) + 1)
+    gain = np.empty_like(need)
+    current, coefficient = 1.0, np.exp(-1.0 / (RATE * release))
+    for index, target in enumerate(need):
+        current = target if target < current else target + (current - target) * coefficient
+        gain[index] = current
+    return x * gain
+
+
+def loud_and_limited(x: np.ndarray, lufs: float, peak_db: float) -> np.ndarray:
+    """Loudness and limiter in turn: a transient take reaches its loudness instead of stopping
+    at the peak ceiling (normalising alone left such takes several dB quieter)."""
+    for _ in range(3):
+        x = limit(x * 10 ** ((lufs - loudness(x)) / 20), peak_db)
+    return x
+
+
 def loudness(x: np.ndarray) -> float:
     import pyloudnorm as pyln
     data = x if x.ndim == 2 else x[:, None]

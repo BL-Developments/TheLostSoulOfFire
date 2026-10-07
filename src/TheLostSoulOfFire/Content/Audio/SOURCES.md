@@ -198,8 +198,6 @@ Anlauf des Burning und ein eigener Tod je Gegner. Takes einer Gruppe auf ±0,5 L
 | `Audio/Sfx/devourer_windup_2.wav` | devourer-windup Seed 2 | 0.86 s, 1 Kanal, -21.0 LUFS, Spitze -5.8 dBFS (Takes angeglichen) |
 | `Audio/Sfx/burning_rush_1.wav` | burning-rush Seed 1 | 0.62 s, 1 Kanal, -22.1 LUFS, Spitze -3.7 dBFS (Takes angeglichen) |
 | `Audio/Sfx/burning_rush_2.wav` | burning-rush Seed 2 | 0.62 s, 1 Kanal, -22.6 LUFS, Spitze -3.0 dBFS (Takes angeglichen) |
-| `Audio/Sfx/death_hollow_1.wav` | death-hollow Seed 1 | 0.90 s, 1 Kanal, -20.2 LUFS, Spitze -2.5 dBFS (Takes angeglichen) |
-| `Audio/Sfx/death_hollow_2.wav` | death-hollow Seed 2 | 0.90 s, 1 Kanal, -20.5 LUFS, Spitze -2.5 dBFS (Takes angeglichen) |
 | `Audio/Sfx/death_burning_1.wav` | death-burning Seed 1 | 0.90 s, 1 Kanal, -25.2 LUFS, Spitze -3.0 dBFS (Takes angeglichen) |
 | `Audio/Sfx/death_burning_2.wav` | death-burning Seed 2 | 0.90 s, 1 Kanal, -24.7 LUFS, Spitze -6.0 dBFS (Takes angeglichen) |
 | `Audio/Sfx/death_devourer_1.wav` | death-devourer Seed 1 | 1.40 s, 1 Kanal, -20.0 LUFS, Spitze -2.3 dBFS (Takes angeglichen) |
@@ -468,3 +466,12 @@ Dieselbe CLAP-Durchsicht fand Sinustöne in Rezepten aus `recipes/cues.py`, die 
 | `Audio/Sfx/title_ignite.wav` | title-confirm Seed 2 | 0.60 s, 1 Kanal/Kanäle, -24.0 LUFS, Spitze -9.7 dBFS |
 | `Audio/Sfx/currency_gain_v2.wav` | Ableitung von currency_gain.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.48 s, 1 Kanal, -29.3 LUFS, Spitze -6.5 dBFS |
 | `Audio/Sfx/currency_gain_v3.wav` | Ableitung von currency_gain.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.52 s, 1 Kanal, -29.3 LUFS, Spitze -7.0 dBFS |
+
+## Hollow-Tod ohne Glöckchen (Durchgang 5, 07.10.2026)
+
+Der Hollow-Tod, der häufigste Gegnertod kurz vor dem Einsammeln der Seele, ließ die Porzellanmaske mit reinen Sinus-Teiltönen springen; CLAP hörte „notification chime“ 0,46–0,63. Jetzt knacken und splittern die Scherben (Resonatoren, von kurzem Rauschen angeregt, `_shard`), der Stoff fällt, Scherben klappern; mit Begrenzer auf −19 LUFS (`dsp.loud_and_limited`, jetzt gemeinsam für alle Rezepte). CLAP „impact“ 0,35–0,50, „notification chime“ höchstens 0,09.
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/death_hollow_1.wav` | death-hollow Seed 1 | 0.90 s, 1 Kanal/Kanäle, -19.0 LUFS, Spitze -2.5 dBFS |
+| `Audio/Sfx/death_hollow_2.wav` | death-hollow Seed 3 | 0.90 s, 1 Kanal/Kanäle, -19.0 LUFS, Spitze -2.5 dBFS |

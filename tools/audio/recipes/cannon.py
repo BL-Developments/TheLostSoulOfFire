@@ -23,29 +23,12 @@ from recipes import recipe
 from recipes.combat import _burst, _grains, _ring, _thump
 
 
-def _limit(x: np.ndarray, ceiling_db: float, release: float = 0.04, lookahead: float = 0.0015) -> np.ndarray:
-    """A peak limiter: the gain drops at once (looking a little ahead) and recovers over
-    `release`, so a transient is held under the ceiling without dulling the body behind it."""
-    from scipy.ndimage import minimum_filter1d
-    ceiling = 10 ** (ceiling_db / 20)
-    need = np.minimum(1.0, ceiling / np.maximum(np.abs(x), 1e-9))
-    need = minimum_filter1d(need, size=2 * dsp.seconds(lookahead) + 1)
-    gain = np.empty_like(need)
-    current, coefficient = 1.0, np.exp(-1.0 / (dsp.RATE * release))
-    for index, target in enumerate(need):
-        current = target if target < current else target + (current - target) * coefficient
-        gain[index] = current
-    return x * gain
-
-
 def _finish(x: np.ndarray, lufs: float, peak: float = -2.0, fade_out: float = 0.04) -> np.ndarray:
     """High-pass, fades, then loudness and limiter in turn: every take of a cue lands at the same
     loudness (normalising alone stops at the peak ceiling, so transient takes ended up quieter)."""
     x = dsp.highpass(x, 28)
     x = dsp.fades(x, 0.0005, fade_out)
-    for _ in range(3):
-        x = _limit(x * 10 ** ((lufs - dsp.loudness(x)) / 20), peak)
-    return x
+    return dsp.loud_and_limited(x, lufs, peak)
 
 
 def _room(x: np.ndarray, rng, seconds: float = 0.5, wet: float = 0.14, damping: float = 4500) -> np.ndarray:

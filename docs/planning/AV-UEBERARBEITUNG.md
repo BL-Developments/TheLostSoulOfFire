@@ -850,3 +850,10 @@ Wellenstart/-ende, Verschlingen, Menü-/Truhen-/Münz-/Fähigkeitsklänge, Gegne
 - Kanonentreffer reißen jetzt Materie vom Ziel wie Sensentreffer (voller Schuss so viel wie die
   Seelenspaltung); der Mündungsblitz ist auf die kleinere Kanone verkleinert (voll 0,76 → 0,64).
   Neue Rundgang-Folge `arena_wave1_cannon_hold/hit`: echter voller Schuss auf einen Hollow.
+- Hollow-Tod ohne Glöckchen: Der häufigste Gegnertod, unmittelbar vor dem Einsammeln der Seele,
+  ließ die Maske mit Sinus-Teiltönen springen (CLAP „notification chime“ bis 0,63) – womöglich
+  Teil des vom Owner gemeinten „Bleep“. Jetzt knacken und splittern die Scherben (`_shard`),
+  „impact“ 0,35–0,50. Begrenzer als `dsp.loud_and_limited` für alle Rezepte (Kanonen-Takes
+  bitgleich nachgebaut). Treffer auf Burning hört CLAP zu 0,31 als „chime“, enthält aber keinen
+  Ton (nur Glutkörner) – belassen.
+- Kanonen-Haltungswechsel (Stand-Anschlag, Ziehen, Lade-Gang) blenden in 0,1 s über.
