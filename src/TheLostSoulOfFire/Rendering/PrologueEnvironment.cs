@@ -37,16 +37,28 @@ public static class PrologueEnvironment
     /// <summary>
     /// The crossing: the sea and the drowned town slide past the skiff (far gables slowly, near
     /// mast stumps fast) while the deck stays still, so motion reads without moving the floor.
+    /// The skiff also rides the swell: everything outside the deck rises and sinks a few units
+    /// against it, slow and uneven (the deck is where the camera stands).
     /// </summary>
     public static void DrawCrossing(SpriteBatch batch, ArtAssets art, float time)
     {
-        art.DrawEnvironmentScrolled(batch, VisualIds.DeckSea, 0f, time * 110f, 1800f);
+        float swell = Swell(time);
+        art.DrawEnvironmentScrolled(batch, VisualIds.DeckSea, swell, time * 110f, 1800f);
+        // The sea plate is exactly the world's height; a second copy closes the strip the swell opens.
+        art.DrawEnvironmentScrolled(batch, VisualIds.DeckSea, swell + (swell > 0f ? -SeaHeight : SeaHeight), time * 110f, 1800f);
         // The drowned town sinks into the night with distance: the far gables darkest and
         // coolest, the near masts a little less so.
-        art.DrawEnvironmentScrolled(batch, VisualIds.PassingFar, 0f, time * 34f, 1800f, new Color(118, 124, 150));
+        art.DrawEnvironmentScrolled(batch, VisualIds.PassingFar, swell, time * 34f, 1800f, new Color(118, 124, 150));
         art.DrawEnvironment(batch, VisualIds.DeckFloor, Vector2.Zero);
-        art.DrawEnvironmentScrolled(batch, VisualIds.PassingNear, 746f, time * 190f, 1800f, new Color(170, 172, 190));
+        art.DrawEnvironmentScrolled(batch, VisualIds.PassingNear, 746f + swell, time * 190f, 1800f, new Color(170, 172, 190));
     }
+
+    /// <summary>Height of the sea plate (environment.sea), the world's height.</summary>
+    private const float SeaHeight = 1000f;
+
+    /// <summary>How far the world outside the skiff has risen (negative) or sunk against its deck.</summary>
+    public static float Swell(float time) =>
+        5f * MathF.Sin(time * MathHelper.TwoPi / 5.4f) + 1.5f * MathF.Sin(time * MathHelper.TwoPi / 2.3f + 1.1f);
 
     public static void DrawGround(
         SpriteBatch batch,

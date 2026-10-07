@@ -883,3 +883,8 @@ aim_move* 12, wake 8, death 12).
   Verworfen: Zündschicht unter dem Dash – der Ludo-Dash ist mit Feuer-Etiketten „flame igniting“
   0,95 (die frühere „ui click“-Lesart lag an der Etikettenliste), die Schicht machte ihn zu
   „impact“. Lehre: CLAP immer mit Etiketten der gemeinten Sache und der Fehllesart prüfen.
+- Überfahrt: Das Fährdeck stand still, nur das Meer scrollte seitlich – die Fahrt fühlte sich
+  nicht nach Schiff an. Jetzt wogen Meer und versunkene Stadt gegen das Deck (5 Einheiten bei
+  5,4 s, 1,5 bei 2,3 s; `PrologueEnvironment.Swell`), eine zweite Meerkopie schließt den Rand.
+  Messung im Rundgang `prologue_transit`: senkrechte Verschiebung von wenigen Pixeln zwischen den
+  Aufnahmen, wie berechnet.
