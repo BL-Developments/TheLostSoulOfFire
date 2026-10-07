@@ -19329,6 +19329,783 @@
         "status": "angenommen",
         "reason": "Taumeln: Rückwurf, zwei Stolperschritte zurück, benommenes Wanken, Sammeln"
       }
+    },
+    {
+      "id": "be57289017844485af4d686b60e351f2",
+      "timestamp": "2026-10-07T00:48:22+00:00",
+      "visual_id": "enemy.hollow",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "idle",
+        "frames": 24,
+        "fps": 12.0,
+        "frame_size": [
+          108,
+          237
+        ],
+        "origin": [
+          0.5,
+          0.8945
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.2,
+        "render_seconds": 67.3
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/enemy.hollow/render3/idle.render.json",
+          "sha256": "cb3e4fbafe7eecb0732aa8a416d205dd1b9ea4a865b0744a04e976af54c23446"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle/n.png",
+          "sha256": "e80de6292988d9d1d9c5684ac992ec1f650fa589e7f1fa28491ba4f8b8aedd3c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle_normal/n.png",
+          "sha256": "ecceeaf13a5870768a27315e4c4725ca15f12629934aff9d583a744882a99e53"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle/ne.png",
+          "sha256": "b45e0a07bfc228a2587c1739b3d2a37d8b766641580ea659ce9019e1463f025e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle_normal/ne.png",
+          "sha256": "fb2c8630aa020892c883002a6fd2287ebaf52ac0a94a98e1a4fe41b141b56e98"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle/e.png",
+          "sha256": "07adea36f24722208d1978211aa602f5e26c383d4c9e2b873108272597f327a7"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle_normal/e.png",
+          "sha256": "32b31369861393a3fd24d41b904cdb9d8b078cb31610a4dddeaf11adf629fda8"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle/se.png",
+          "sha256": "837c7a03998e20ff248c12b96e6884cb13881257d50c5552ec65a8c43c50e25d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle_normal/se.png",
+          "sha256": "11b7e2cc3b667208ccb76bb353b7ee1df8daff918afaba62ebdc9647789dca70"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle/s.png",
+          "sha256": "cd49d38b20723e3043ecb0c59540b7305d49a54b3a08bb259744ab7cf98f38dd"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle_normal/s.png",
+          "sha256": "4ac89b823b60da10d0f8185d0c59a6d3a300b9a335394406f324d69dd98dd545"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle/sw.png",
+          "sha256": "26e71cc8c3326e617aff9327f8ed9447cc390ad88d25192db095dee49646f362"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle_normal/sw.png",
+          "sha256": "fc8cc0c2a1f5d5fd44f647619d02d9ebf724ce4370101f4f15b2c714b0b438db"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle/w.png",
+          "sha256": "72f29fa30f34700b415d5f2584690d6b2961c76b3dbff5123198dcc51c2f80c9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle_normal/w.png",
+          "sha256": "2ecded1a9c179c0950571eb1c65dd1ebf914502a15c45605df53c25b1880f68f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle/nw.png",
+          "sha256": "95586a1bdbe247fa6a1b14816418658a9af9eae86c61153d038e05bfefe06e69"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/idle_normal/nw.png",
+          "sha256": "1746c007f567b1cfde830c6bc52cab49b699b1b679490d64996778e96107ad4f"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.43,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Porzellanmaske über Gesicht, Stirn und Scheitel, Kopf leicht gehoben: aus jeder Richtung außer von hinten die hellste Fläche (hollow.md)"
+      }
+    },
+    {
+      "id": "53209a475dab4591b6352e8d5943baa5",
+      "timestamp": "2026-10-07T00:48:23+00:00",
+      "visual_id": "enemy.hollow",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "move",
+        "frames": 24,
+        "fps": 24.0,
+        "frame_size": [
+          162,
+          250
+        ],
+        "origin": [
+          0.5,
+          0.86
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.2,
+        "render_seconds": 65.9
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/enemy.hollow/render3/move.render.json",
+          "sha256": "4a737e8987d8aebe8f23b5e370e24073f47efc738df5cdc9190d71cf9606c461"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move/n.png",
+          "sha256": "a1393725af208da76193cf8a85ac689fac846567c40124b3b4fcf9584cf810e8"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move_normal/n.png",
+          "sha256": "50b01fae04db11ebe67fe1d8ee4a4225eba82fae55fb93320debc0af0eee78f0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move/ne.png",
+          "sha256": "49d60fd7ac2857fa237b0f1b3574d2809afc68e0ea5f13b0826732ea23570218"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move_normal/ne.png",
+          "sha256": "54333bca079324cb009d5628dc26be4aa21ce28dd1fbe624eb4a99ee646a0e65"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move/e.png",
+          "sha256": "8e57560e754de37d0798ecce5a2513032c5b52cc0024b5c52ae231940d7e83e3"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move_normal/e.png",
+          "sha256": "3f5dc0ec83bb91a31b81015d37a8ad3e63d8e45294d37df26d7ee211549a7ed4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move/se.png",
+          "sha256": "38134e40018d3c44645ca0ea4e127d1c082865fb3541b30f3ff8693df40d1a1f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move_normal/se.png",
+          "sha256": "7609a107572d19fb87fea1ca4ee1cd0e604333905cb6036fa16dd276c13bf9e2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move/s.png",
+          "sha256": "7ab5ee0b2bdf7ad1e89b16e25e7722f4862f33b7200d43f3e4b6b547d8538f5d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move_normal/s.png",
+          "sha256": "8f26eb943ccd2acea92f7326a5e7e2e8634659f8ee916421c7f02e11c2bcbad8"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move/sw.png",
+          "sha256": "735bf10cb928304df4931ba50ad6ed74792a896f076863f54510a0d59ab938cf"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move_normal/sw.png",
+          "sha256": "1f85232241fa0f66fd0b28b1bc16fd2456731b6338a634d8afde7aaed591a43a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move/w.png",
+          "sha256": "39bafc787c56bacc759ef767deda3c7b57927151ffa0c947481c361894b7a57a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move_normal/w.png",
+          "sha256": "5655d7d39914d8410aa37c153d27db1c625f69ccb76993987cc9b3841c21b964"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move/nw.png",
+          "sha256": "c1df4c084366b99278656a51744e813a96f9d2d78b650b4ca5f5057f1b2dc929"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/move_normal/nw.png",
+          "sha256": "643fb14059e59d3709681c2496dde59f09511c7cfe8ffaaaca32aacf4a28eb24"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.73,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Porzellanmaske über Gesicht, Stirn und Scheitel, Kopf leicht gehoben: aus jeder Richtung außer von hinten die hellste Fläche (hollow.md)"
+      }
+    },
+    {
+      "id": "db9b8e32f46f4bc9b335a0950f944dbf",
+      "timestamp": "2026-10-07T00:48:25+00:00",
+      "visual_id": "enemy.hollow",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "swipe",
+        "frames": 20,
+        "fps": 24.0,
+        "frame_size": [
+          290,
+          248
+        ],
+        "origin": [
+          0.5,
+          0.8589
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.6,
+        "render_seconds": 54.5
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/enemy.hollow/render3/swipe.render.json",
+          "sha256": "760c1d40fcdc11714784a040130c84aca8fdd50de91c1436805a8cfe8455471e"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/n.png",
+          "sha256": "5311a6ec0f321f0c35a0bdc0c88f3bd498fcf84706937bb72afeb0eca1ba845d"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/n.png",
+          "sha256": "3cba4d7235a9ee5a295fd2b4654b1929e54e2700c5cf2e9b2e7439cadb34736f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/ne.png",
+          "sha256": "7679f75bb4178bc2f0d13e603c479e0a9f95b4f8ca99703ff8a7d90710d478e9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/ne.png",
+          "sha256": "17203d1eca299376cb49989c3bcb6b0d3be25e6a17a9a2d343a89586970d4af0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/e.png",
+          "sha256": "1e4cc09200f42476c23c83eaf9c6b455187f5d3553743b393b606ae5600468ee"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/e.png",
+          "sha256": "d78d45927d9eca95dd8a15b1ff0ad9add8d2605a8b203de1618f1f6d9264a118"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/se.png",
+          "sha256": "2b2958801ce8f081139edeb0ffe84f78388fb767c2f38c89f736e1743c6969ac"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/se.png",
+          "sha256": "1adf8ff1f2dc59fd20d37f2cccaa2a514d89e3f3908aea2a4e5a0de53113d4d2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/s.png",
+          "sha256": "0f59ccf378125502bfe5b731adf5ea00a45f0766d91ab0b3178fbad48ddb6fd1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/s.png",
+          "sha256": "4f5c68baf11ef113e17bb44d091b98f5639a214acabe04faa6ac3020b70bfe4b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/sw.png",
+          "sha256": "67bff9bc226258d413c4a79cced4b5bbbdaae42bdf22918e77e000a7bc676cac"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/sw.png",
+          "sha256": "091345e5c345671e14dd6194ba7cfc861013ec665733a001411c481d40bd8c36"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/w.png",
+          "sha256": "940006edecd2edb7a786bec442519af1d19af1e82f56d678caeccc20bcf69df4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/w.png",
+          "sha256": "32944b4922a2899f62b25cb0408f88919320ca4d65697b7befe1b579f97e43b7"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe/nw.png",
+          "sha256": "70d8077eefdd59599229ee149f18c6aae89d10559d1c93f2904f88d52c115ebb"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/swipe_normal/nw.png",
+          "sha256": "e3fc83e76c8ae77e799d9c3d2b8da7ebbbc71a2621558ad651964eaa0d7d4252"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.89,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Porzellanmaske über Gesicht, Stirn und Scheitel, Kopf leicht gehoben: aus jeder Richtung außer von hinten die hellste Fläche (hollow.md)"
+      }
+    },
+    {
+      "id": "0c3fd75a94134de0b1b681ccc748a3c9",
+      "timestamp": "2026-10-07T00:48:25+00:00",
+      "visual_id": "enemy.hollow",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "hit",
+        "frames": 6,
+        "fps": 24.0,
+        "frame_size": [
+          144,
+          241
+        ],
+        "origin": [
+          0.5,
+          0.8797
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.2,
+        "render_seconds": 16.9
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/enemy.hollow/render3/hit.render.json",
+          "sha256": "03ee3b5463914040a473e35a325375c4b50a9e700dd77c0ddd6d9de56db93c2c"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit/n.png",
+          "sha256": "5f685333e3a47ff60507da3f20eb29919d861654de1a59155f692eac28f542c2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit_normal/n.png",
+          "sha256": "ca486c7781bf1eee3be6d4637de1da7a3e748d5e9478df17425541124f05a95a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit/ne.png",
+          "sha256": "42bec28a23715df614d74216a6d25681a6d6f849e2f9da99e5557891942d7413"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit_normal/ne.png",
+          "sha256": "b0ce52ff39910b11f290dcd958b138eb1ce104e9b9de709fce7d7438943af2bc"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit/e.png",
+          "sha256": "a4acf9615feb5554a8b275980713032478e1f6badcb3d8a2a6011b7297fc30c3"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit_normal/e.png",
+          "sha256": "07c347e298dc8b2b953b920bbee43959db10f98216109a447aaa7c7e2279918b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit/se.png",
+          "sha256": "2ca566308f293d14e1d58d5767ccf38a7cc09e8d0cf504c40eb25a004c34e680"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit_normal/se.png",
+          "sha256": "c3c9f1b965776a58cc0419cfe61909c9c430d0289d06bf09648a0450defe9679"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit/s.png",
+          "sha256": "30e2dcfd2e170cfb1662b4f8ce21743305046ef0c3b4f238ed25a09102e56b3f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit_normal/s.png",
+          "sha256": "639b53e4f65b684d038b9d7342cfa93c966bc8527e11149ec15a949ee01488ee"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit/sw.png",
+          "sha256": "a92c388a74052f9d9ea1d51d42856131da5eb3e81069d5cb036a3ae7f0627888"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit_normal/sw.png",
+          "sha256": "25460b40473199b236d2df77ac6bf4b755e8b0ec7a97142f3fcd9c2eb3fe4387"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit/w.png",
+          "sha256": "1dc2a720a5fe9a21834a48e13d25ab392ae21c6005038cd6bb5ead3b70ff926f"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit_normal/w.png",
+          "sha256": "22a615a7eaff166acea3ae73039fc0b8222a645ef61fb654d0b7674c2bf7768b"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit/nw.png",
+          "sha256": "36bcd2272f8ba95fd7a8fe0f2e82b3293b27fa857d31bd1b606104ec5bd4628c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/hit_normal/nw.png",
+          "sha256": "f910503580d7142063f3fd7a3ee3d58639363d706194f2be6b8a69fc8ea15418"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.18,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Porzellanmaske über Gesicht, Stirn und Scheitel, Kopf leicht gehoben: aus jeder Richtung außer von hinten die hellste Fläche (hollow.md)"
+      }
+    },
+    {
+      "id": "c2f6d87d8d2241aaa3a69343af681af2",
+      "timestamp": "2026-10-07T00:48:26+00:00",
+      "visual_id": "enemy.hollow",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "recover",
+        "frames": 10,
+        "fps": 24.0,
+        "frame_size": [
+          292,
+          249
+        ],
+        "origin": [
+          0.5,
+          0.8554
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.6,
+        "render_seconds": 28.5
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/enemy.hollow/render3/recover.render.json",
+          "sha256": "844ae1d2dad71e01479de98acf96511a535f034fe0d59e650a02578b6eb0d4f4"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover/n.png",
+          "sha256": "db408f9d5747b254687c3882efbe1cc1826a22d0312d8c8745471458113a2012"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover_normal/n.png",
+          "sha256": "8377e4462b3e8a755fa32650fac179d68500ad34090618dee696627882933ef1"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover/ne.png",
+          "sha256": "e70ce9494dc2ae6108eeaf97bff7c72793a6dc1638de0d08993a0c2babe92132"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover_normal/ne.png",
+          "sha256": "24232a12e1e748c5c2dceb44adc39f137594888f21244ca347f07920bbba539c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover/e.png",
+          "sha256": "42a84944346974cb07db16bb6615e2a735c7f461759a69def3f8949a4d297469"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover_normal/e.png",
+          "sha256": "3d7669b0ba332b83d49bb835e05115ea2a39218254041dbf0958437a6dc7bdc6"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover/se.png",
+          "sha256": "a3266f9f751fa2b9c87bc6bc5c109c1b4f4990e90608d829f84a5a88dd618adf"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover_normal/se.png",
+          "sha256": "409a412e0d44aa89d28f149468eb17d74760146ce2fe1ef25903bd5daf26e082"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover/s.png",
+          "sha256": "f9e9e46d372588ca9ed5660692be4fb485afce193f0a671ba8d6fd38ccb5d9b0"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover_normal/s.png",
+          "sha256": "fec3707659981d3a6398c11d67aecbea6b1796c5d923ed97446561f9514abbf3"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover/sw.png",
+          "sha256": "39ff36a84af50df416eeb3d72a6fdc756d03b841f974e5d32027882d7d02a895"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover_normal/sw.png",
+          "sha256": "f40f59aba6d2a504fb551072ec57211394969a519b12386b536b30d5c08bacaa"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover/w.png",
+          "sha256": "230f70147fa915742154418ca23d2e4d7f13bcc516fee1ce7ab3b6e0856b53fc"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover_normal/w.png",
+          "sha256": "a305ce97992acd6da30cc99a39957e4a2615530fe03d63b9e84c8f65a78a589e"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover/nw.png",
+          "sha256": "3d1920e048ec906463c1ea21c82ff6bce1ef5d0205de34861581ea0fa46f96a6"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/recover_normal/nw.png",
+          "sha256": "aaab7be7a84b42cf9f6d58243bce36892b113178514a417425ce2c1daf886f8a"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.51,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Porzellanmaske über Gesicht, Stirn und Scheitel, Kopf leicht gehoben: aus jeder Richtung außer von hinten die hellste Fläche (hollow.md)"
+      }
+    },
+    {
+      "id": "93cbf90e486c45d9a57db7b710ef97ff",
+      "timestamp": "2026-10-07T00:48:27+00:00",
+      "visual_id": "enemy.hollow",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "stagger",
+        "frames": 16,
+        "fps": 14.0,
+        "frame_size": [
+          204,
+          234
+        ],
+        "origin": [
+          0.5,
+          0.8932
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.4,
+        "render_seconds": 44.1
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/enemy.hollow/render3/stagger.render.json",
+          "sha256": "27a43f5419826bbf6b45f6f381671e479bef2864bbc28a4924f37a2845b2190f"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger/n.png",
+          "sha256": "084cc068234c903ad40f394a28af0ab568d76d8d0c7fb19e85219552604fb91c"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger_normal/n.png",
+          "sha256": "6f47c23cca2952dd501fb9f18db8820b235e6106eeeb7c90e0252775489071fc"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger/ne.png",
+          "sha256": "d48be06dcf3016904f21b20a9c2ce3d6f76489b1945ebf73ab20d5694cfe19f4"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger_normal/ne.png",
+          "sha256": "e3a72d6453697e6ea915fefb9ebdaee0ecf9405476a3544e8f35173c60780d41"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger/e.png",
+          "sha256": "23d2613e46721664bdf127aeeaf970e0d0bea1d5b60c413ae15364e4722a9e87"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger_normal/e.png",
+          "sha256": "89266cc67df471f44b6994b3614a68e18023edb8d1186fb50d619e5d462c0f10"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger/se.png",
+          "sha256": "601580eb7bb228c51b298af2498e3ea1dc29a874eaa838e05cd87a897a76b5ad"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger_normal/se.png",
+          "sha256": "054ed540eacfafe8854c63207653e6c9c3c7d5151a4ec844138be6eae93663e9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger/s.png",
+          "sha256": "f7726dd429db100cc3e9831d8df1fca9c36da2dff132fcf7fb7072039d68b72a"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger_normal/s.png",
+          "sha256": "a97e56560dcf420fcee9e4d1788cb0a3138b83d0967c6118040d801c098dbbeb"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger/sw.png",
+          "sha256": "f04e2f7b600b4fe430dfb42c459eb80da7bd5aeac83e31d22df8822d40e29d78"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger_normal/sw.png",
+          "sha256": "0b380c43356585213ad5c64b254effa213ebf4eeb43794bdec52bae7f4a93680"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger/w.png",
+          "sha256": "08ab74fc847a0792fc1fc9911403b062cfbed8a5302cf4d39e961cddcc23b697"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger_normal/w.png",
+          "sha256": "4beb53e71e03ccaf9a0e22b29c2e28776b91783f9c65e8652741a00b161ff6df"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger/nw.png",
+          "sha256": "5a4bea2f3a45232196be1adc325741d56e46357ab333a149f0ea5392dbe73530"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/stagger_normal/nw.png",
+          "sha256": "bcc2458461476c553821c28cd348468697cd5cdb81b3cb97e9a7c839f1c2caee"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.54,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Porzellanmaske über Gesicht, Stirn und Scheitel, Kopf leicht gehoben: aus jeder Richtung außer von hinten die hellste Fläche (hollow.md)"
+      }
+    },
+    {
+      "id": "0e757175337444ba8c6645f43b8708b0",
+      "timestamp": "2026-10-07T00:48:28+00:00",
+      "visual_id": "enemy.hollow",
+      "step": "render-pack",
+      "tool": {
+        "name": "Blender + pack_sheets.py",
+        "version": "Blender 5.2.2 LTS, BLENDER_EEVEE"
+      },
+      "model": {
+        "name": "Blender procedural test figure",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "animation": "death",
+        "frames": 9,
+        "fps": 12.0,
+        "frame_size": [
+          226,
+          275
+        ],
+        "origin": [
+          0.5,
+          0.7673
+        ],
+        "elevation_deg": 35.0,
+        "ortho_scale": 3.2,
+        "render_seconds": 24.9
+      },
+      "inputs": [
+        {
+          "path": "art/production/candidates/enemy.hollow/render3/death.render.json",
+          "sha256": "7e6b745b90d184114fa5fc8a1674dab90f4bd6c2f82b66a68640bd5dc6da38f3"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death/n.png",
+          "sha256": "a903d2e7c721164f6256b760a153129dfc0bfe741d5c1053a8b8464de6370521"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death_normal/n.png",
+          "sha256": "0e684b95ad95c71ea8c261e2efaaf5b76cfc699a553ac039cc7c149e63eba822"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death/ne.png",
+          "sha256": "13fc4bb4811e1578fa968e83f47a62a1f725dc0e7cb587ab63d3eb7fb82cc4ab"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death_normal/ne.png",
+          "sha256": "bd07b045d7b9cc977a6da2a4322f9a05ea5430e55d6460449d79ff42e3a7b738"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death/e.png",
+          "sha256": "13a59bafb37b73011a603c03b96db355ab2fcca5454c1366d7a6b566a2a41525"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death_normal/e.png",
+          "sha256": "5a3107477b48a2a7f371e717924dab525d9dea8e2f487a2ad51e46b57f3ddb11"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death/se.png",
+          "sha256": "1d91d2480578afed60439e56efb18529eba78eaeb5044fbfa9d444b12b0c2ba3"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death_normal/se.png",
+          "sha256": "ce9d0af3844eb7b011a7fadab7f02257dfea53f38e7f5893bb3a68e42858d8dd"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death/s.png",
+          "sha256": "ccb48f9728476586743563631eafbd78641ec67f235a9ef1c49e918e0618eb37"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death_normal/s.png",
+          "sha256": "1d9248bdc4ae184e8bfdc604f9e668cc4d88378f913b37f9be8244eff1fd4401"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death/sw.png",
+          "sha256": "ba929a736997aabd718fed4cf595cd638cac91ab61c10b42a9f6e7b44733ffd9"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death_normal/sw.png",
+          "sha256": "cbbc86d12034f89d37144d5e2d7da9fef852f0d47bbdab545457c001558fa4d2"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death/w.png",
+          "sha256": "f17ac45dc2d2f36b2e911226ea4c9b663e8a676d6c6ff8a4d8d847bf61fba194"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death_normal/w.png",
+          "sha256": "4429e8248d1425ae4bfae92ce7c11d3da02d5308f79948647e48aa79d2dafa57"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death/nw.png",
+          "sha256": "e49db9c1fba47be4b757235d037929a89c57e5eb7effe6e244a25f7342c73823"
+        },
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Enemies/Hollow/Animations/death_normal/nw.png",
+          "sha256": "2dbb28e8955564a7114f2e80ed05d3e61fd6f91274eb989a893faf44fb7ca7ac"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.36,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Porzellanmaske über Gesicht, Stirn und Scheitel, Kopf leicht gehoben: aus jeder Richtung außer von hinten die hellste Fläche (hollow.md)"
+      }
     }
   ]
 }

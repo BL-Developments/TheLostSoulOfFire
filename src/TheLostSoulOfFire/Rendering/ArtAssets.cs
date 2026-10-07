@@ -525,7 +525,7 @@ public sealed class ArtAssets
         bool snapFacing = false,
         Vector2? walkAxis = null)
     {
-        FigureState figure = _figures.GetValue(owner, _ => new FigureState());
+        FigureState figure = _figures.GetValue(owner, created => new FigureState(created is Enemy));
         float deltaTime = figure.Advance(_time, position, out float distance, out Vector2 moved);
         if (walkAxis is { } axis && axis.LengthSquared() > 0.0001f)
         {
@@ -741,6 +741,29 @@ public sealed class ArtAssets
         private string _clipName = string.Empty;
         private float _elapsed;
 
+        /// <summary>
+        /// Enemies of a wave appear together and would breathe and sway in lockstep, like clones:
+        /// each takes its own place in its first rest cycle and its own idle tempo (within 8 %).
+        /// After an action the rest starts on its first frame as before (actions end on it).
+        /// </summary>
+        private readonly float _phase;
+        private readonly float _tempo = 1f;
+        private bool _phased;
+
+        /// <summary>Seeded, so a tour run shows the same figures the same way each time.</summary>
+        private static readonly Random Individuality = new(7121);
+
+        public FigureState(bool individual = false)
+        {
+            if (!individual)
+            {
+                _phased = true;
+                return;
+            }
+            _phase = (float)Individuality.NextDouble();
+            _tempo = 0.92f + 0.16f * (float)Individuality.NextDouble();
+        }
+
         public FacingTracker Facing { get; } = new();
 
         private float _lastHitRemaining;
@@ -829,12 +852,17 @@ public sealed class ArtAssets
                 }
                 _clipName = name;
                 _elapsed = 0f;
+                if (!_phased && intoRest && clip.Loop)
+                {
+                    _elapsed = _phase * clip.Duration;
+                }
+                _phased = true;
                 _cycleLength = clip.Duration;
                 return _elapsed;
             }
 
             _clipName = name;
-            _elapsed = ClipClock.Advance(_elapsed, clip, deltaTime, distance);
+            _elapsed = ClipClock.Advance(_elapsed, clip, name == VisualClips.Idle ? deltaTime * _tempo : deltaTime, distance);
             _cycleLength = clip.Duration;
             return _elapsed;
         }

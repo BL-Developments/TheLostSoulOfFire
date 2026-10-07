@@ -42,6 +42,7 @@ INK = (0.012, 0.009, 0.014)
 def parse(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(prog="build_hollow.py")
     parser.add_argument("--rekey", help="comma-separated actions to key again on the opened .blend (no rebuild)")
+    parser.add_argument("--remask", action="store_true", help="replace the mask on the opened .blend (then --rekey if given)")
     parser.add_argument("--out", type=Path, required=True)
     return parser.parse_args(argv[argv.index("--") + 1:] if "--" in argv else [])
 
@@ -122,46 +123,78 @@ def robe(rig: bpy.types.Object, cloth: bpy.types.Material, waist: float) -> bpy.
     return obj
 
 
-def build_mask(body: bpy.types.Object, rig: bpy.types.Object, mask: bpy.types.Material, ink: bpy.types.Material) -> list[bpy.types.Object]:
-    """A smooth, slightly oval half-shell over the face, placed from MPFB's eye helpers, with a
-    few hairline cracks. No eyes, no mouth."""
-    shaped = shaped_coordinates(body)
-    points = []
-    for side in ("l", "r"):
-        group = body.vertex_groups.get(f"helper-{side}-eye")
-        if group is not None:
-            points += [body.matrix_world @ shaped[v.index] for v in body.data.vertices
-                       if any(g.group == group.index and g.weight > 0.5 for g in v.groups)]
-    eyes = sum(points, Vector()) / len(points)
-    front = min(point.y for point in points)
-    # Far enough forward that nose and lips stay behind the shell.
-    centre = Vector((0.0, front + 0.045, eyes.z - 0.025))
-    bpy.ops.mesh.primitive_uv_sphere_add(segments=24, ring_count=16, radius=0.1, location=centre)
+def build_mask(body: bpy.types.Object, rig: bpy.types.Object, mask: bpy.types.Material, ink: bpy.types.Material,
+               anchor: tuple[float, float] | None = None) -> list[bpy.types.Object]:
+    """A smooth, tall oval shell of porcelain over the face, placed from MPFB's eye helpers: it
+    runs from the chin up over the forehead onto the front of the crown, so the game camera,
+    looking down at 35 degrees on a stooped head, sees it as the brightest part of the figure
+    (hollow.md: the mask is the value accent). Branching hairline cracks where the camera looks.
+    No eyes, no mouth."""
+    if anchor is None:
+        shaped = shaped_coordinates(body)
+        points = []
+        for side in ("l", "r"):
+            group = body.vertex_groups.get(f"helper-{side}-eye")
+            if group is not None:
+                points += [body.matrix_world @ shaped[v.index] for v in body.data.vertices
+                           if any(g.group == group.index and g.weight > 0.5 for g in v.groups)]
+        eyes_z = (sum(points, Vector()) / len(points)).z
+        front = min(point.y for point in points)
+    else:
+        eyes_z, front = anchor
+    eyes = Vector((0.0, 0.0, eyes_z))
+    # Far enough forward that nose and lips stay behind the shell, a little up so it climbs the brow.
+    radius = 0.104
+    scale = Vector((0.93, 0.98, 1.26))
+    centre = Vector((0.0, front + 0.05, eyes.z + 0.012))
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=32, ring_count=20, radius=radius, location=centre)
     shell = bpy.context.active_object
     shell.name = "mask"
     bm = bmesh.new()
     bm.from_mesh(shell.data)
     for vertex in list(bm.verts):
-        if vertex.co.y > -0.012:  # keep the half facing forward (-Y)
+        # Keep the front and, higher up, more of the dome, so the shell wraps over the brow.
+        reach = 0.004 + 0.05 * max(0.0, vertex.co.z / radius)
+        if vertex.co.y > reach:
             bm.verts.remove(vertex)
     bm.to_mesh(shell.data)
     bm.free()
-    shell.scale = (0.90, 0.95, 1.12)
+    shell.scale = scale
     shell.data.materials.append(mask)
     shell.modifiers.new("Thickness", "SOLIDIFY").thickness = 0.006
     bpy.ops.object.shade_smooth()
     parts = [shell]
+
+    def surface(azimuth: float, elevation: float, lift: float = 0.0016) -> tuple[Vector, Vector]:
+        """A point on the shell (azimuth from the front, elevation up) and its outward normal."""
+        local = Vector((math.sin(azimuth) * math.cos(elevation), -math.cos(azimuth) * math.cos(elevation), math.sin(elevation)))
+        point = Vector((local.x * scale.x, local.y * scale.y, local.z * scale.z)) * radius
+        normal = Vector((local.x / scale.x, local.y / scale.y, local.z / scale.z)).normalized()
+        return centre + point + normal * (lift + 0.006), normal
+
     rng = random.Random(4)
-    for index in range(3):
-        x = rng.uniform(-0.03, 0.03)
-        z = rng.uniform(-0.04, 0.05)
-        bpy.ops.mesh.primitive_cube_add(size=1, location=(centre.x + x, front - 0.049 + abs(x) * 0.45, centre.z + z))
-        crack = bpy.context.active_object
-        crack.name = f"mask_crack_{index}"
-        crack.scale = (0.0018, 0.002, rng.uniform(0.03, 0.05))
-        crack.rotation_euler = (0, rng.uniform(-0.6, 0.6), 0)
-        crack.data.materials.append(ink)
-        parts.append(crack)
+    for crack in range(4):
+        azimuth, elevation = rng.uniform(-0.55, 0.55), rng.uniform(0.15, 0.85)
+        heading = rng.uniform(-1.0, 1.0)
+        for piece in range(rng.randint(3, 5)):
+            step = rng.uniform(0.07, 0.12)
+            heading += rng.uniform(-0.8, 0.8)
+            a2, e2 = azimuth + math.sin(heading) * step, elevation - math.cos(heading) * step
+            start, normal = surface(azimuth, elevation)
+            end, _ = surface(a2, e2)
+            along = end - start
+            bpy.ops.mesh.primitive_cube_add(size=1, location=(start + end) * 0.5)
+            line = bpy.context.active_object
+            line.name = f"mask_crack_{crack}_{piece}"
+            line.scale = (0.0016 * (1.0 - 0.15 * piece), 0.0016, along.length * 0.5 + 0.001)
+            # Local Z along the crack, local Y out of the shell.
+            z = along.normalized()
+            y = (normal - z * normal.dot(z)).normalized()
+            x = y.cross(z)
+            line.rotation_euler = Matrix((x, y, z)).transposed().to_euler()
+            line.data.materials.append(ink)
+            parts.append(line)
+            azimuth, elevation = a2, e2
     for part in parts:
         attach(part, rig, "mask")
     return parts
@@ -202,7 +235,7 @@ def stoop(poser: Poser, lean: float = 0.0) -> None:
     poser.set("spine_02", "forward", 7 + lean * 0.3)
     poser.set("spine_03", "forward", 8 + lean * 0.3)
     poser.set("neck_01", "forward", 16)
-    poser.set("head", "forward", -10)
+    poser.set("head", "forward", -17)
 
 
 def hang_arm(poser: Poser, side: str, swing: float = 0.0, out: float = 0.12) -> None:
@@ -541,7 +574,7 @@ def main() -> None:
     poser = Poser(rig, Vector((0, toe.y, 0)).normalized())
     poser.measure_rest([f"{bone}_{side}" for bone in FINGERS + THUMB for side in ("l", "r")], "down")
     add_leg_ik(rig)
-    actions = [key_idle(poser, LOOP_FRAMES["idle"]), key_move(poser, LOOP_FRAMES["move"]), key_death(poser, 9)]
+    actions = [key_idle(poser, LOOP_FRAMES["idle"]), key_move(poser, LOOP_FRAMES["move"]), key_death(poser, DEATH_FRAMES)]
     actions += [combat_action(poser, name) for name in COMBAT_FRAMES]
     for action in actions:
         action.use_fake_user = True
@@ -559,6 +592,9 @@ def main() -> None:
 #: from stepping at the game's 60 Hz; the idle keeps its duration (the pack step sets the fps).
 LOOP_FRAMES = {"idle": 24, "move": 24}
 
+#: Frames of the death clip (the mask comes off and falls).
+DEATH_FRAMES = 9
+
 #: Frames of the combat actions; render and pack take the same counts.
 COMBAT_FRAMES = {"swipe": SWIPE_FRAMES, "hit": 6, "recover": 10, "stagger": 16}
 
@@ -566,6 +602,29 @@ COMBAT_FRAMES = {"swipe": SWIPE_FRAMES, "hit": 6, "recover": 10, "stagger": 16}
 def combat_action(poser: Poser, name: str) -> bpy.types.Action:
     frames = COMBAT_FRAMES[name]
     return {"swipe": key_swipe, "hit": key_hit, "recover": key_recover, "stagger": key_stagger}[name](poser, frames)
+
+
+def remask(args: argparse.Namespace) -> None:
+    """Replace the mask on the opened figure (built in the rest pose, so it sits on the mask
+    bone as a fresh build would), then key the named actions again if --rekey is given."""
+    rig = bpy.data.objects["figure"]
+    body = next(obj for obj in bpy.data.objects if obj.type == "MESH" and obj.vertex_groups.get("helper-l-eye") is not None)
+    rig.data.pose_position = "REST"
+    bpy.context.view_layer.update()
+    # The first build placed the old shell at (0, front + 0.045, eyes - 0.025); the eye helpers
+    # are gone from the saved body, so read the face from there.
+    old = bpy.data.objects["mask"].matrix_world.translation
+    anchor = (old.z + 0.025, old.y - 0.045)
+    for obj in [obj for obj in bpy.data.objects if obj.name == "mask" or obj.name.startswith("mask_crack")]:
+        bpy.data.objects.remove(obj, do_unlink=True)
+    parts = build_mask(body, rig, bpy.data.materials["mask"], bpy.data.materials["ink"], anchor)
+    add_outline(parts[0], bpy.data.materials["outline"])
+    rig.data.pose_position = "POSE"
+    print(f"REMASK_HOLLOW parts={len(parts)}")
+    if args.rekey:
+        rekey(args)
+    else:
+        finish_rekey(rig, "idle", args.out.resolve())
 
 
 def rekey(args: argparse.Namespace) -> None:
@@ -584,6 +643,10 @@ def rekey(args: argparse.Namespace) -> None:
             {"idle": key_idle, "move": key_move}[name](poser, LOOP_FRAMES[name])
             print(f"REKEYED {name} frames={LOOP_FRAMES[name]}")
             continue
+        if name == "death":
+            key_death(poser, DEATH_FRAMES)
+            print(f"REKEYED death frames={DEATH_FRAMES}")
+            continue
         combat_action(poser, name)
         print(f"REKEYED {name} frames={COMBAT_FRAMES[name]}")
     finish_rekey(rig, "idle", args.out.resolve())
@@ -592,7 +655,9 @@ def rekey(args: argparse.Namespace) -> None:
 
 if __name__ == "__main__":
     arguments = parse(sys.argv)
-    if arguments.rekey:
+    if arguments.remask:
+        remask(arguments)
+    elif arguments.rekey:
         rekey(arguments)
     else:
         main()

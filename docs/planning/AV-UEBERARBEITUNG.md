@@ -570,6 +570,15 @@ Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreati
   `mix_report.py --zone combat` (alle Stems voll): alle Warnsignale im Band. Install-Option
   `--seamless` (ohne Randblende, sonst fiel der Bass alle 30 s für 16 ms aus).
 
+- Hollow (Owner: „Monster wirken monoton“): Die Porzellanmaske, laut Figurenblatt die hellste
+  Fläche, war in der 35°-Kamera nur ein Rand, weil der gebeugte Kopf den Scheitel zeigte. Neue
+  Maske (`build_hollow.py --remask`): hohe ovale Schale vom Kinn über Stirn bis auf den vorderen
+  Scheitel, verzweigte Haarrisse; Kopf 7° gehoben. Alle sieben Clips neu gerendert (gleiche
+  Bildzahlen, fps, Laufdistanz); aus jeder Richtung außer von hinten ein klares weißes Gesicht,
+  im Tod fällt die neue Maske ab. Gegner einer Welle bewegten sich im Gleichtakt (jeder Ruhe-Loop
+  begann bei Bild 0): jetzt eigene Startphase im ersten Ruhezyklus und eigenes Ruhetempo
+  (±8 %, geseedet); nach Aktionen beginnt die Ruhe weiter auf dem Endbild der Aktion.
+
 **Verworfen (Durchgang 4):**
 - Raserei als schwebende Tremolo-Flächen: die volle Mischung kippte zu „calm cinematic“.
 - Schreie aus reiner Stimmlippenquelle durch Formanten, auch mit Biphonation: CLAP „horn“ und
