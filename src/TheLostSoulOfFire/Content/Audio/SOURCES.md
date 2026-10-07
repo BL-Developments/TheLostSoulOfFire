@@ -525,3 +525,14 @@ Die Vorhalle hatte als einziger Ort keinen Ortsklang. Hinter einer der versiegel
 | --- | --- | --- |
 | `Audio/Sfx/door_whispers_1.wav` | door-whispers Seed 1 | 3.20 s, 1 Kanal/Kanäle, -31.0 LUFS, Spitze -16.0 dBFS |
 | `Audio/Sfx/door_whispers_2.wav` | door-whispers Seed 5 | 3.20 s, 1 Kanal/Kanäle, -30.7 LUFS, Spitze -14.3 dBFS |
+
+## Nasse Schritte am Ufer und im Hafen (Durchgang 5, 07.10.2026)
+
+Bahnsteig und Hafenpflaster des Prologs sind nass (Pfützen, Seewasser in den Fugen), die Schritte klangen wie auf trockenem Stein. Rezept `footstep-wet`: Absatz auf Stein, kurzer Wasserschlag und Spritzer, die Sohle schmatzt beim Abrollen; Energie 300–1500 Hz 44–47 % statt 34 % beim Steinschritt, weniger Tiefe. Gespielt in den Sektoren Ufer und Suchgang. CLAP taugt für einzelne kurze Schritte nicht (auch der bestehende Steinschritt gilt als Folge als „gunshots“ 0,86, weichere Prototypen ebenso); Hörabnahme beim Owner.
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/footstep_wet_1.wav` | footstep-wet Seed 1 | 0.34 s, 1 Kanal/Kanäle, -27.2 LUFS, Spitze -6.0 dBFS |
+| `Audio/Sfx/footstep_wet_2.wav` | footstep-wet Seed 2 | 0.34 s, 1 Kanal/Kanäle, -26.0 LUFS, Spitze -6.3 dBFS |
+| `Audio/Sfx/footstep_wet_3.wav` | footstep-wet Seed 3 | 0.34 s, 1 Kanal/Kanäle, -26.0 LUFS, Spitze -7.0 dBFS |
+| `Audio/Sfx/footstep_wet_4.wav` | footstep-wet Seed 4 | 0.34 s, 1 Kanal/Kanäle, -26.5 LUFS, Spitze -6.0 dBFS |

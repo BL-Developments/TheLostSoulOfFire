@@ -945,3 +945,10 @@ weder alt noch neu als Stein hört), ob die Kanone jetzt die richtige Größe ha
 Gegner-Zuckens, Deutlichkeit von Schattenhand und Schlagrand im Gedränge, die Inhaltsfragen
 (Sprache, „ENTER BIOME I“, „PROTOTYPE COMPLETE“) und ältere Rundgänge in `artifacts/tour/`
 (~100 GB, nur der Owner sollte sie löschen).
+- Nasse Schritte: Am Ufer und im Hafen (nasses Pflaster, Pfützen) klangen die Schritte des Spielers
+  wie auf trockenem Stein. Neu `footstep-wet` (Absatz, Wasserschlag, Spritzer, schmatzende Sohle; 4
+  Takes), im Rundgang am Ufer `TOUR_STEP cue=FootstepWet` auf den Fußaufsätzen 0,26/0,77, Mix −6,9 LU.
+  Befund ohne Änderung: CLAP hört auch die bestehenden Steinschritte als Folge „gunshots“ (0,86) –
+  einzelne kurze Schritte in Stille sind für CLAP nicht beurteilbar (weichere Prototypen ebenso);
+  die Hörabnahme der Schritte bleibt beim Owner (Steinschritt hat 23 % Energie über 4 kHz – falls
+  er zu klickig wirkt, dort ansetzen).

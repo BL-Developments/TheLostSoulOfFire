@@ -91,6 +91,22 @@ def footstep_stone(rng) -> np.ndarray:
     return _finish(x, -26.0, -6.0)
 
 
+@recipe("footstep-wet", "Schritt auf nassem Pflaster: Absatz auf Stein, das Wasser in der Fuge spritzt kurz, die Sohle schmatzt beim Abrollen")
+def footstep_wet(rng) -> np.ndarray:
+    n = dsp.seconds(0.34)
+    t = dsp.time_axis(n)
+    heel = _impact(rng, n, 0, 60, 1400, 0.016, 1.0)
+    body = dsp.lowpass(_impact(rng, n, 0, 40, 300, 0.03, 1.0), 250)
+    # A thin film of water thrown up: a short slap and a spray of droplets.
+    slap = dsp.bandpass(rng.standard_normal(n), 400, 2200) * np.exp(-t / 0.012) * 0.5
+    droplets = _crunch(rng, n, 0.006, 0.07, int(rng.integers(18, 30)), 2000, 7000, 0.3)
+    # The sole peeling off the wet stone as the foot rolls: a soft suck.
+    roll_at = rng.uniform(0.07, 0.1)
+    squelch = dsp.bandpass(rng.standard_normal(n), 300, 1200) * np.exp(-((t - roll_at) / 0.02) ** 2) * 0.35
+    x = _room(heel * 0.8 + body + slap + droplets + squelch, rng, 0.35, 0.08)
+    return _finish(x, -26.0, -6.0)
+
+
 @recipe("footstep-wood", "Schritt auf Planken: hohler Aufsatz, Ballen, die Bohle gibt nach")
 def footstep_wood(rng) -> np.ndarray:
     n = dsp.seconds(0.34)

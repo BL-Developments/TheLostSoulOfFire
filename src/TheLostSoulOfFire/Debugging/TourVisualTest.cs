@@ -327,10 +327,10 @@ internal sealed class TourVisualTest
     /// <summary>Footsteps while the tour runs: each with the run phase drawn at that moment.</summary>
     private void LogStep(AudioCue cue)
     {
-        if (cue is AudioCue.Footstep or AudioCue.FootstepWood)
+        if (cue is AudioCue.Footstep or AudioCue.FootstepWood or AudioCue.FootstepWet)
         {
             Console.WriteLine(string.Create(System.Globalization.CultureInfo.InvariantCulture,
-                $"TOUR_STEP frame={_frame} phase={_world.AutomatedRunPhase ?? -1f:0.00}"));
+                $"TOUR_STEP frame={_frame} cue={cue} phase={_world.AutomatedRunPhase ?? -1f:0.00}"));
         }
     }
 
@@ -405,7 +405,9 @@ internal sealed class TourVisualTest
     {
         Do("enter", () => _world.ApplyDeveloperStart(new DeveloperStartOptions(DeveloperStartArea.PrologueFindTrace, 1), _viewport));
         Overview("overview");
+        Do("listen_steps", () => _world.AutomatedAudio.CuePlayed += LogStep);
         Shot("walk", () => _world.SetAutomatedAim(Vector2.UnitX), minWait: 0.8f, everyFrame: () => _input.InjectKeyDown(Keys.D));
+        Do("stop_listening_steps", () => _world.AutomatedAudio.CuePlayed -= LogStep);
         Shot("trace", () =>
         {
             _world.PlaceAutomatedPlayer(PrologueDirector.SoulTrace + new Vector2(-150f, 60f));

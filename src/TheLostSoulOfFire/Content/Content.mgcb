@@ -11288,3 +11288,23 @@
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /build:Audio/Sfx/door_whispers_2.wav
+
+#begin Audio/Sfx/footstep_wet_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/footstep_wet_1.wav
+
+#begin Audio/Sfx/footstep_wet_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/footstep_wet_2.wav
+
+#begin Audio/Sfx/footstep_wet_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/footstep_wet_3.wav
+
+#begin Audio/Sfx/footstep_wet_4.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/footstep_wet_4.wav

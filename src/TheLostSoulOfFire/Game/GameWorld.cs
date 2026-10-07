@@ -2145,12 +2145,15 @@ public sealed partial class GameWorld : IDisposable
         float moved = Vector2.Distance(position, _footstepFrom);
         _footstepFrom = position;
         bool wood = _phase == GamePhase.Prologue && _prologue.IsVehicleRide;
+        // The shore's platform and the harbour's cobbles are wet: puddles, a film of sea water.
+        bool wet = !wood && _phase == GamePhase.Prologue && _prologue.Sector is PrologueSector.Emergence or PrologueSector.Search;
+        AudioCue stepCue = wood ? AudioCue.FootstepWood : wet ? AudioCue.FootstepWet : AudioCue.Footstep;
         if (!_player.IsDead && !_player.IsDashing && _art.CyclePhase(_player, VisualClips.Move) is { } phase)
         {
             // The rendered run: a step on every drawn footfall.
             if (CrossedFootfall(_playerStepPhase, phase, Footfalls))
             {
-                _audio.Play(wood ? AudioCue.FootstepWood : AudioCue.Footstep, 0.42f);
+                _audio.Play(stepCue, 0.42f);
                 if (OnDustyFloor)
                 {
                     // The foot lands in the ash: a faint breath of it is kicked back from the heel,
@@ -2175,7 +2178,7 @@ public sealed partial class GameWorld : IDisposable
         if (_footstepDistance >= FootstepStride)
         {
             _footstepDistance -= FootstepStride;
-            _audio.Play(wood ? AudioCue.FootstepWood : AudioCue.Footstep, 0.42f);
+            _audio.Play(stepCue, 0.42f);
         }
     }
 

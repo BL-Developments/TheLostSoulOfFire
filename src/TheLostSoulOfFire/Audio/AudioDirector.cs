@@ -39,6 +39,8 @@ public enum AudioCue
     EndingReveal,
     Footstep,
     FootstepWood,
+    /// <summary>The player's step on the wet stone of the shore and the harbour.</summary>
+    FootstepWet,
     HollowStep,
     BurningStep,
     DevourerStep,
@@ -192,6 +194,7 @@ public sealed class AudioDirector : IDisposable
         [AudioCue.EndingReveal] = new(1f, 1),
         [AudioCue.Footstep] = new(0.12f, 2, 0.05f),
         [AudioCue.FootstepWood] = new(0.12f, 2, 0.05f),
+        [AudioCue.FootstepWet] = new(0.12f, 2, 0.05f),
         [AudioCue.HollowStep] = new(0.06f, 3, 0.06f),
         [AudioCue.BurningStep] = new(0.05f, 3, 0.07f),
         [AudioCue.DevourerStep] = new(0.12f, 2, 0.04f),
@@ -269,7 +272,7 @@ public sealed class AudioDirector : IDisposable
     private static readonly HashSet<AudioCue> Yielding =
     [
         AudioCue.ScytheSwing1, AudioCue.ScytheSwing2, AudioCue.SoulCleave, AudioCue.Dash, AudioCue.CannonCharge,
-        AudioCue.Footstep, AudioCue.FootstepWood, AudioCue.HollowStep, AudioCue.BurningStep, AudioCue.DevourerStep,
+        AudioCue.Footstep, AudioCue.FootstepWood, AudioCue.FootstepWet, AudioCue.HollowStep, AudioCue.BurningStep, AudioCue.DevourerStep,
         AudioCue.EnemyEmerge, AudioCue.SoulRelease, AudioCue.CannonDraw, AudioCue.CannonStow, AudioCue.CannonStage,
         AudioCue.ScytheWeight1, AudioCue.ScytheWeight2, AudioCue.ScytheWeight3,
         AudioCue.HollowCall, AudioCue.BurningCackle, AudioCue.DevourerGrowl,
@@ -498,6 +501,7 @@ public sealed class AudioDirector : IDisposable
             }
             AddVariants(content, AudioCue.Footstep, "Audio/Sfx/footstep_stone", 4, 90f, 0.08f, 0.2f, 0.6f);
             AddVariants(content, AudioCue.FootstepWood, "Audio/Sfx/footstep_wood", 4, 120f, 0.09f, 0.2f, 0.5f);
+            AddVariants(content, AudioCue.FootstepWet, "Audio/Sfx/footstep_wet", 4, 90f, 0.08f, 0.2f, 0.7f);
             AddVariants(content, AudioCue.HollowStep, "Audio/Sfx/step_hollow", 4, 70f, 0.12f, 0.15f, 0.7f);
             AddVariants(content, AudioCue.BurningStep, "Audio/Sfx/step_burning", 4, 180f, 0.06f, 0.15f, 0.8f);
             AddVariants(content, AudioCue.DevourerStep, "Audio/Sfx/step_devourer", 4, 45f, 0.2f, 0.25f, 0.5f);

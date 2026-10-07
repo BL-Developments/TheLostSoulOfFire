@@ -70,7 +70,7 @@ CLASS = {
     "CannonDraw": "action", "CannonStow": "action",
     "ScytheWeight1": "action", "ScytheWeight2": "action", "ScytheWeight3": "action",
     "EnemyEmerge": "event",
-    "Footstep": "step", "FootstepWood": "step", "HollowStep": "step", "BurningStep": "step", "DevourerStep": "step",
+    "Footstep": "step", "FootstepWood": "step", "FootstepWet": "step", "HollowStep": "step", "BurningStep": "step", "DevourerStep": "step",
     "UiMove": "ui", "UiBack": "ui", "UiOpen": "ui", "UiClose": "ui", "CurrencyGain": "ui",
     "SoulSenseOn": "sense", "SoulSenseOff": "sense", "SoulThrob": "sense",
     "HitHollow": "layer", "HitBurning": "layer", "HitDevourer": "layer", "HitDummy": "layer", "HitHeavy": "layer",
@@ -149,7 +149,7 @@ INDIRECT = {
     "HitHollow": 0.78, "HitBurning": 0.78, "HitDevourer": 0.78, "HitDummy": 0.78,
     "DeathHollow": 0.66, "DeathBurning": 0.66, "DeathDevourer": 0.64,
     "HollowCall": 0.55, "BurningCackle": 0.6, "DevourerGrowl": 0.72,
-    "FoundryBell": 0.55, "ShoreHorn": 0.6, "ShoreBoard": 0.5, "SkiffCreak": 0.55, "DoorWhispers": 0.45,
+    "FoundryBell": 0.55, "ShoreHorn": 0.6, "ShoreBoard": 0.5, "SkiffCreak": 0.55, "DoorWhispers": 0.45, "FootstepWet": 0.42,
 }
 
 
