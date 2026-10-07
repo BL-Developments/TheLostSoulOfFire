@@ -823,3 +823,16 @@ starr (der Clip `aim` hält das letzte Bild).
 - Erzählzeilen: Die Texte trennen Aussagen mit zwei Leerzeichen (Erbe der Pixelschrift); in der
   gesetzten Schrift las sich das wie ein fehlendes Wort. Erzähler und Prolog-Story setzen die Pause
   als Gedankenstrich, Zielzeilen als Mittelpunkt (`PixelText.Prose`/`Steps`); Wortlaut unverändert.
+- Piepen im ganzen Spiel (Owner: „der Bleep nervt“): CLAP-Durchsicht aller Spielklänge auf
+  „electronic beep“/„notification chime“/„bell“/„sci-fi laser“. Ersetzt (Details `SOURCES.md`):
+  Wellenstart (Ludo, Piepen 0,90) durch `wave-gate` (Ofentor, Ketten, Ofen brüllt, Trommel;
+  „drum hit“ 0,9), Wellenende (0,66) durch `wave-ease` (Flamme sinkt, Glut knistert aus;
+  „whoosh“ 0,99), Verschlingen des Devourer („sci-fi laser“ 0,56) durch `devourer-devour`
+  (Zug durch die Kehle, Seele hineingerissen, Schlucken; „monster inhaling“ 0,89), dazu
+  Menü-Ticks, Menü öffnen/schließen, Truhe, Münzen, Marke, Vergeltung, Sog und Titel-
+  bestätigung ohne Sinustöne (Piep-Anteil je unter 0,1). Bleiben bewusst: Treffer und Kern-
+  treffer der Sense (Owner hat Sensenklang abgenommen), Ende-Enthüllung (Glocke/Gong gewollt).
+  Verworfen: Wellenende mit Einsatz auf Sample 0 und tiefer Eisenplatte („explosion“ 0,97),
+  mit lauterem Knistern („explosion“ 0,64); Titelbestätigung mit tiefem Aufwallen („explosion“).
+  Geprüft: `validate_audio.py` (215), `mix_report.py` in Arena, Kampf, Ufer, Überfahrt, Vorhalle
+  im Band, Audio-Laufzeit- (76 Töne, kein Ersatzklang) und Gameplay-Test (10 Wellen).
