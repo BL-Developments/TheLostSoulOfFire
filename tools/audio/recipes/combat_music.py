@@ -36,6 +36,11 @@ SCORE_SEED = 1287
 #: where all three stems (seed 1) step by less than -57 dBFS from one sample to the next.
 OFFSET = 1714
 
+#: The game's motif (recipes/music.py): D#-C#-B-G#, stopping on A# - the lost soul that cannot
+#: leave. (MIDI, beats.) The drive layer rings it on a bell over the G# bars 8-9.
+MOTIF = [(63, 1.0), (61, 1.0), (59, 1.0), (56, 2.0), (58, 3.0)]
+MOTIF_BAR = 8
+
 #: Root (MIDI) of each bar: i i i bII | i i bVI bVII | i i i bII | bVI bVII bII V.
 ROOTS = [44, 44, 44, 45, 44, 44, 40, 42, 44, 44, 44, 45, 40, 42, 45, 39]
 
@@ -266,6 +271,13 @@ def combat_drive(rng) -> np.ndarray:
                 _put(track, toms[min(3, k // 2)], at(bar, step), 0.55 + 0.05 * k, -0.4 + 0.1 * k)
         if bar % 4 == 3 and score.random() < 0.7:
             _put(track, anvils[1], at(bar, 14), 0.3, 0.6)
+    # The motif, once per loop, on a bell an octave below the zone themes' (it cuts through the
+    # hammers without a synthetic lead).
+    beat = 0.0
+    for midi, beats in MOTIF:
+        ring = dsp.bell(hz(midi), max(1.2, beats * 0.6), rng, brightness=0.9)
+        _put(track, ring, at(MOTIF_BAR) + int(beat * 4 * SIXTEENTH), 0.42 if beats < 3 else 0.5, -0.15)
+        beat += beats
     return _stem(track, rng, 0.2, 1.8, -21.0)
 
 

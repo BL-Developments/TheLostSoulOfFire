@@ -499,11 +499,13 @@ Taumeln und -Tod, Burning-Tod, Burning-Angriff, HUD, Seelensinn der Vorhalle.
 
 ## Arbeitsnotiz Durchgang 4 (ab 07.10.2026)
 
-**Stand (07.10.2026, 03:50):** Alle sechs Owner-Punkte haben einen ersten umgesetzten Schritt.
-Geprüft: voller Rundgang (21 Stationen, 611 Aufnahmen, kein Platzhalter; CPU je Frame
-0,3–0,7 ms, Wandzeit im Mittel ≤ 1,5 ms), 263 Unit-Tests, Audio-Laufzeit- (74 Töne, kein
-Ersatzklang), Gameplay- (10 Wellen) und Tod-Neustart-Test, `validate_audio.py` (198),
-`mix_report.py` in arena/combat/shore/crossing ohne Ausreißer. Der Rundgang protokolliert
+**Stand (07.10.2026, 04:30):** Alle sechs Owner-Punkte haben umgesetzte Schritte, dazu Angriffe
+aller Gegner ohne Zonen, Kampfspuren auf dem Boden, Materie bei Treffern, kompaktes HUD,
+Ortsklänge, das Leitmotiv in der Kampfmusik. Geprüft (Gesamtlauf nach allen Änderungen): voller
+Rundgang (21 Stationen, 621 Aufnahmen, kein Platzhalter; CPU je Frame im Mittel ≤ 0,7 ms),
+263 Unit-Tests, Audio-Laufzeit- (74 Töne, kein Ersatzklang), Gameplay- (10 Wellen),
+Tod-Neustart-, Slice-, Fähigkeiten-, Währungs- und Vorhallentest, `validate_audio.py` (198),
+`mix_report.py` in arena/combat/shore/crossing/hub ohne Ausreißer. Der Rundgang protokolliert
 `TOUR_AUDIO score=…`, `voices=…` und `TOUR_NARRATION`.
 
 **Owner-Abnahme offen (ich kann nicht hören):** Monsterstimmen und ihre Häufigkeit, Kampfmusik
@@ -691,6 +693,10 @@ Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreati
 - Wellenwechsel weniger filmisch: Das Banner sagte „WAVE IV“, Plakette und Hinweis „WELLE“; jetzt
   „WELLE IV“/„LETZTE WELLE“. Keine Kinobalken mehr, Schleier 0,18 → 0,1, Einblenden 0,2 → 0,08 s,
   der Titel schlägt die ersten 0,07 s eine Stufe größer ein und setzt sich; Zeiten unverändert.
+
+- Leitmotiv im Kampf: Die neue Kampfmusik hatte das gemeinsame Motiv aller Zonen-Themen nicht
+  (D#–C#–H–G#, bleibt auf A# stehen). Jetzt läutet es im Antrieb in den Takten 8–9 über G# auf
+  einer Glocke eine Oktave tiefer; Naht −52 dB, Mix im Band.
 
 **Verworfen (Durchgang 4):**
 - Zweite Hollow-Variante mit Lederschürze (Restspur der Gießhalle): rund 450 MB unkomprimierte
