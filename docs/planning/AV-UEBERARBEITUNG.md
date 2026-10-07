@@ -725,6 +725,12 @@ Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreati
   Vergleich derselben Szene nur eine kleine Verschiebung); Mauszuordnung läuft über dieselbe
   Kamera.
 
+- Bild und Ton gekoppelt: Der Ofen der Nordwand wallt auf jedem Kick der Kampfmusik auf (alle
+  zwei Schläge, 0,94 s), stärker je lauter der Puls spielt, als schüre die letzte Schicht im Takt
+  (`AudioDirector.CombatKickPhase`, `ArenaAtmosphere.SetBeat`). Protokolliert: die Phase läuft im
+  Kampf alle 0,94 s von 0 bis 1. Das Aufwallen selbst nicht im Standbild verglichen (der Ofen
+  liegt im Kampf meist am oberen Bildrand).
+
 **Verworfen (Durchgang 4):**
 - Zweite Hollow-Variante mit Lederschürze (Restspur der Gießhalle): rund 450 MB unkomprimierte
   Texturen zusätzlich; Masken, Bewegungsversatz und Stimmen geben bereits Individualität.

@@ -2206,6 +2206,7 @@ public sealed partial class GameWorld : IDisposable
             intensity = MathF.Min(intensity, 0.6f);
         }
         _audio.SetCombatIntensity(active, MathHelper.Clamp(intensity, 0f, 1f), deltaTime);
+        _arenaAtmosphere.SetBeat(_audio.CombatKickPhase, _audio.CombatMusicLevel);
     }
 
     /// <summary>

@@ -535,12 +535,26 @@ public sealed class ArenaAtmosphere
         }
     }
 
+    private float _beatPhase = -1f;
+    private float _beatStrength;
+
+    /// <summary>
+    /// The combat score's kick (phase 0..1, -1 without score) and how loud its pulse plays: the
+    /// furnace flares on each kick, as if the last shift stoked it in time with the fight.
+    /// </summary>
+    public void SetBeat(float phase, float strength)
+    {
+        _beatPhase = phase;
+        _beatStrength = MathHelper.Clamp(strength, 0f, 1f);
+    }
+
     private float GetFurnacePulse(int index)
     {
         FurnaceSource source = FurnaceSources[index];
+        float stoke = _beatPhase >= 0f ? _beatStrength * 0.28f * MathF.Exp(-_beatPhase * 7f) : 0f;
         float slowPulse = 0.5f + 0.5f * MathF.Sin(_time * (0.72f + index * 0.08f) + source.Phase);
         float machineBreath = 0.5f + 0.5f * MathF.Sin(_time * 0.19f + source.Phase * 1.7f);
-        float pulse = 0.72f + slowPulse * ArenaAtmosphereTuning.FurnacePulseStrength + machineBreath * 0.05f;
+        float pulse = 0.72f + slowPulse * ArenaAtmosphereTuning.FurnacePulseStrength + machineBreath * 0.05f + stoke;
 
         // Now and then the furnace stutters, in a short authored cadence.
         if (index == 0 && _machineFaultRemaining > 0f)

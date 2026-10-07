@@ -377,6 +377,11 @@ public sealed class AudioDirector : IDisposable
     private readonly SoundEffectInstance?[] _combatStems = new SoundEffectInstance?[3];
     private readonly float[] _combatStemLevels = new float[3];
     private bool _combatStemsMissing;
+    /// <summary>Seconds since the stems started; the score's first downbeat lies 1714 samples in.</summary>
+    private float _combatClock;
+    private const float CombatDownbeat = 1714f / 48000f;
+    /// <summary>The kick of the pulse layer lands every two beats at 128 bpm.</summary>
+    private const float CombatKickPeriod = 2f * 60f / 128f;
     private float _resonanceLevel;
     private const float ResonanceRumbleVolume = 0.4f;
     private SoundEffect? _lifeFlameSound;
@@ -1059,6 +1064,7 @@ public sealed class AudioDirector : IDisposable
             return;
         }
 
+        _combatClock += deltaTime;
         float wanted0 = active ? 1f : 0f;
         float wanted1 = active ? Smooth(0.3f, 0.55f, intensity) : 0f;
         float wanted2 = active ? Smooth(0.62f, 0.85f, intensity) : 0f;
@@ -1092,6 +1098,7 @@ public sealed class AudioDirector : IDisposable
                 {
                     stem!.Play();
                 }
+                _combatClock = 0f;
             }
             else if (!any && !active && _combatStems[0] is not null)
             {
@@ -1133,6 +1140,14 @@ public sealed class AudioDirector : IDisposable
             _placeEventTimers[cue] = left;
         }
     }
+
+    /// <summary>
+    /// Where the score's kick is (0 on the hit, rising to 1 just before the next), for things in
+    /// the room that move with the music; -1 while no score plays.
+    /// </summary>
+    public float CombatKickPhase => _combatStems[0] is null || _combatClock < CombatDownbeat
+        ? -1f
+        : (_combatClock - CombatDownbeat) % CombatKickPeriod / CombatKickPeriod;
 
     /// <summary>How much of the combat score plays (its pulse layer), 0..1.</summary>
     public float CombatMusicLevel => _combatStems[0] is null ? 0f : _combatStemLevels[0];
