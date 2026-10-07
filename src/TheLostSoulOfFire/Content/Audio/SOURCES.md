@@ -265,7 +265,6 @@ Mit `tools/audio/hall_tails.py`: der trockene Take gefaltet mit der Impulsantwor
 | `Audio/Sfx/enemy_death_hall.wav` | Hallfahne von enemy_death.wav (Gießhalle, RT60 2.4 s) | 2.88 s, 1 Kanal, -22.3 LUFS, Spitze -4.6 dBFS |
 | `Audio/Sfx/soul_cleave_hall.wav` | Hallfahne von soul_cleave.wav (Gießhalle, RT60 2.4 s) | 2.64 s, 1 Kanal, -26.2 LUFS, Spitze -6.1 dBFS |
 | `Audio/Sfx/player_hit_hall.wav` | Hallfahne von player_hit.wav (Gießhalle, RT60 2.4 s) | 2.51 s, 1 Kanal, -27.5 LUFS, Spitze -11.8 dBFS |
-| `Audio/Sfx/wave_start_hall.wav` | Hallfahne von wave_start.wav (Gießhalle, RT60 2.4 s) | 2.96 s, 1 Kanal, -28.3 LUFS, Spitze -14.6 dBFS |
 | `Audio/Sfx/footstep_stone_1_hall.wav` | Hallfahne von footstep_stone_1.wav (Vorhalle, RT60 3.2 s) | 3.26 s, 1 Kanal, -34.0 LUFS, Spitze -15.6 dBFS |
 
 ## Seelenkanone ziehen und verstauen (Durchgang 3, 06.10.2026)
@@ -441,3 +440,23 @@ Die Ludo-Takes `cannon_charge.wav`, `cannon_full.wav` und `cannon_fire.wav` blei
 | `Audio/Sfx/cannon_blast_2.wav` | cannon-fire-full Seed 2 | 1.40 s, 1 Kanal/Kanäle, -18.6 LUFS, Spitze -2.0 dBFS |
 | `Audio/Sfx/cannon_stow.wav` | cannon-stow Seed 2 | 0.36 s, 1 Kanal/Kanäle, -24.0 LUFS, Spitze -9.3 dBFS |
 | `Audio/Sfx/cannon_shot_1_hall.wav` | Hallfahne von cannon_shot_1.wav (Gießhalle, RT60 2.4 s) | 2.53 s, 1 Kanal, -24.6 LUFS, Spitze -6.4 dBFS |
+
+## Signale aus Eisen und Feuer statt Piepen (Durchgang 5, 07.10.2026)
+
+Owner: Piepen nervt. Eine CLAP-Durchsicht aller Spielklänge („electronic beep“, „notification chime“, „bell“, „sci-fi laser“) fand die häufigsten Signale des Kampfs: den Ludo-Wellenstart `wave_start` (gedacht als Ofentor und Bronzeglocke, gehört „electronic beep“ 0,90), den Wellenabschluss `wave_clear` (Glas und Bronze, „electronic beep“ 0,66) und das Verschlingen des Devourer `devourer_devour` („sci-fi laser“ 0,56). Rezepte in `tools/audio/recipes/foundry.py`:
+
+- `wave-gate` (Welle beginnt): das Ofentor schlägt zu, Ketten laufen nach, der Ofen brüllt auf, eine Trommel der Gießerei antwortet. CLAP „drum hit“ 0,88–0,92, „notification chime“ höchstens 0,06. Hallfahne der Gießhalle aus Take 1.
+- `wave-ease` (Welle geschafft): die Flamme sinkt langsam fauchend in sich zusammen, Glut knistert aus, Asche rieselt, die Halle summt tief. CLAP „whoosh“ 0,99. Verworfen: mit Einsatz auf Sample 0 und tiefem Plattenklang („explosion“ 0,86–0,97), mit lauterem Knistern („explosion“ bis 0,64).
+- `devourer-devour`: ein langer Zug durch die Kehle (Vokal schließt sich von „aw“ zu „u“), das Flüstern der Seele wird hineingerissen, nasses Schlucken, die Rumpföffnung schnappt zu. CLAP „monster inhaling“ 0,69–0,89.
+
+Die Ludo-Takes `wave_start.wav`, `wave_clear.wav` und `devourer_devour.wav` bleiben im Bestand, werden aber nicht mehr gespielt; die Hallfahne `wave_start_hall` ist entfernt.
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/wave_gate_1.wav` | wave-gate Seed 3 | 1.50 s, 1 Kanal/Kanäle, -17.0 LUFS, Spitze -1.7 dBFS |
+| `Audio/Sfx/wave_gate_2.wav` | wave-gate Seed 2 | 1.50 s, 1 Kanal/Kanäle, -17.0 LUFS, Spitze -1.5 dBFS |
+| `Audio/Sfx/wave_ease_1.wav` | wave-ease Seed 3 | 2.00 s, 1 Kanal/Kanäle, -23.0 LUFS, Spitze -6.1 dBFS |
+| `Audio/Sfx/wave_ease_2.wav` | wave-ease Seed 1 | 2.00 s, 1 Kanal/Kanäle, -23.0 LUFS, Spitze -6.9 dBFS |
+| `Audio/Sfx/devourer_devour_1.wav` | devourer-devour Seed 1 | 1.25 s, 1 Kanal/Kanäle, -19.0 LUFS, Spitze -5.0 dBFS |
+| `Audio/Sfx/devourer_devour_2.wav` | devourer-devour Seed 3 | 1.25 s, 1 Kanal/Kanäle, -19.0 LUFS, Spitze -6.4 dBFS |
+| `Audio/Sfx/wave_gate_1_hall.wav` | Hallfahne von wave_gate_1.wav (Gießhalle, RT60 2.4 s) | 2.97 s, 1 Kanal, -24.7 LUFS, Spitze -8.7 dBFS |

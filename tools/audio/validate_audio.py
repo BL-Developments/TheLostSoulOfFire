@@ -122,7 +122,6 @@ AUTHORED_SFX_DURATIONS = {
     "enemy_death_hall.wav": 2.878,
     "soul_cleave_hall.wav": 2.635,
     "player_hit_hall.wav": 2.511,
-    "wave_start_hall.wav": 2.959,
     "footstep_stone_1_hall.wav": 3.260,
     "footstep_stone_1_hall_foundry.wav": 2.462,
     # The heavy Soul Cannon drawn from the back and laid back (tools/audio/recipes/cues.py).
@@ -144,6 +143,11 @@ AUTHORED_SFX_DURATIONS = {
     "cannon_shot_1.wav": 0.950, "cannon_shot_2.wav": 0.950, "cannon_shot_3.wav": 0.950,
     "cannon_shot_1_hall.wav": 2.525,
     "cannon_blast_1.wav": 1.400, "cannon_blast_2.wav": 1.400,
+    # The fight's signals as iron and fire (recipes/foundry.py): a wave begins (with its foundry
+    # tail), a wave is won, the Devourer drinks a soul.
+    "wave_gate_1.wav": 1.500, "wave_gate_2.wav": 1.500, "wave_gate_1_hall.wav": 2.975,
+    "wave_ease_1.wav": 2.000, "wave_ease_2.wav": 2.000,
+    "devourer_devour_1.wav": 1.250, "devourer_devour_2.wav": 1.250,
     # The soul breathing out as it is released (recipes/cues.py): no pitch, so crowds never beep.
     "soul_release_breath_1.wav": 1.450,
     "soul_release_breath_2.wav": 1.450,

@@ -50,7 +50,7 @@ TAILS = {
     "enemy_death": FOUNDRY,
     "soul_cleave": FOUNDRY,
     "player_hit": FOUNDRY,
-    "wave_start": FOUNDRY,
+    "wave_gate_1": FOUNDRY,
     "footstep_stone_1": ANTECHAMBER,
     # The same step in the foundry, its own file (a cue can have a tail per hall).
     "footstep_stone_1@foundry": FOUNDRY,

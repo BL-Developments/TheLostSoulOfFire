@@ -9999,11 +9999,6 @@
 /processor:SoundEffectProcessor
 /build:Audio/Sfx/player_hit_hall.wav
 
-#begin Audio/Sfx/wave_start_hall.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/build:Audio/Sfx/wave_start_hall.wav
-
 #begin Audio/Sfx/footstep_stone_1_hall.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
@@ -11143,3 +11138,38 @@
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /build:Audio/Sfx/cannon_shot_1_hall.wav
+
+#begin Audio/Sfx/wave_gate_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/wave_gate_1.wav
+
+#begin Audio/Sfx/wave_gate_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/wave_gate_2.wav
+
+#begin Audio/Sfx/wave_ease_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/wave_ease_1.wav
+
+#begin Audio/Sfx/wave_ease_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/wave_ease_2.wav
+
+#begin Audio/Sfx/devourer_devour_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/devourer_devour_1.wav
+
+#begin Audio/Sfx/devourer_devour_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/devourer_devour_2.wav
+
+#begin Audio/Sfx/wave_gate_1_hall.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/wave_gate_1_hall.wav

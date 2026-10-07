@@ -283,7 +283,7 @@ public sealed class AudioDirector : IDisposable
         (AudioCue.EnemyDeath, "Audio/Sfx/enemy_death_hall", AudioZone.Arena, 0.34f),
         (AudioCue.SoulCleave, "Audio/Sfx/soul_cleave_hall", AudioZone.Arena, 0.36f),
         (AudioCue.PlayerHit, "Audio/Sfx/player_hit_hall", AudioZone.Arena, 0.3f),
-        (AudioCue.WaveStart, "Audio/Sfx/wave_start_hall", AudioZone.Arena, 0.4f),
+        (AudioCue.WaveStart, "Audio/Sfx/wave_gate_1_hall", AudioZone.Arena, 0.4f),
         (AudioCue.Footstep, "Audio/Sfx/footstep_stone_1_hall", AudioZone.Hub, 0.3f),
         (AudioCue.Footstep, "Audio/Sfx/footstep_stone_1_hall_foundry", AudioZone.Arena, 0.2f)
     ];
@@ -460,14 +460,16 @@ public sealed class AudioDirector : IDisposable
             Add(content, AudioCue.PlayerDeath, "Audio/Sfx/player_death", 52f, 0.65f, 0.7f, 0.32f);
             Add(content, AudioCue.SoulSenseOn, "Audio/Sfx/soul_sense_on", 440f, 0.18f, 0.24f, 0.04f, rising: true);
             Add(content, AudioCue.SoulSenseOff, "Audio/Sfx/soul_sense_off", 320f, 0.13f, 0.18f, 0.03f);
-            Add(content, AudioCue.WaveStart, "Audio/Sfx/wave_start", 64f, 0.42f, 0.5f, 0.24f);
+            // The fight's signals are the foundry's own iron and fire (recipes/foundry.py); the Ludo
+            // gate-and-bell and glass cadence read as electronic beeps and stay in the bank unplayed.
+            AddVariants(content, AudioCue.WaveStart, "Audio/Sfx/wave_gate", 2, 64f, 0.42f, 0.5f, 0.6f);
             Add(content, AudioCue.HollowSwipe, "Audio/Sfx/hollow_swipe", 190f, 0.24f, 0.42f, 0.52f);
             Add(content, AudioCue.DevourerSlam, "Audio/Sfx/devourer_slam", 42f, 0.48f, 0.76f, 0.62f);
-            Add(content, AudioCue.DevourerDevour, "Audio/Sfx/devourer_devour", 74f, 0.58f, 0.54f, 0.36f);
+            AddVariants(content, AudioCue.DevourerDevour, "Audio/Sfx/devourer_devour", 2, 74f, 0.58f, 0.54f, 0.36f);
             Add(content, AudioCue.EnemyDeath, "Audio/Sfx/enemy_death", 68f, 0.38f, 0.52f, 0.48f);
             Add(content, AudioCue.CannonImpact, "Audio/Sfx/cannon_impact", 72f, 0.24f, 0.6f, 0.52f);
             Add(content, AudioCue.TitleConfirm, "Audio/Sfx/title_confirm", 440f, 0.26f, 0.3f, 0.015f);
-            Add(content, AudioCue.WaveClear, "Audio/Sfx/wave_clear", 294f, 0.52f, 0.32f, 0.01f, rising: true);
+            AddVariants(content, AudioCue.WaveClear, "Audio/Sfx/wave_ease", 2, 120f, 0.8f, 0.32f, 0.7f);
             Add(content, AudioCue.EndingReveal, "Audio/Sfx/ending_reveal", 147f, 0.9f, 0.3f, 0.015f, rising: true);
             foreach ((AudioCue cue, string asset) in new[]
             {
