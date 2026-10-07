@@ -79,7 +79,7 @@ CLASS = {
     "HollowCall": "call", "BurningCackle": "call", "DevourerGrowl": "call",
     "HollowGrasp": "layer", "BurningShriek": "layer",
     "FoundryBell": "place", "ShoreHorn": "place", "ShoreBoard": "place",
-    "CannonStage": "action", "CannonBlast": "layer", "SkiffCreak": "place",
+    "CannonStage": "action", "CannonBlast": "layer", "SkiffCreak": "place", "DoorWhispers": "place",
 }
 
 #: Menu sounds play over the paused beds (AudioDirector.PausedBedVolume).
@@ -89,7 +89,7 @@ PAUSED_BED_DB = 20 * np.log10(0.4)
 ARENA_ONLY = {"EnemyEmerge", "ChestOpen", "CurrencyGain", "WaveStart", "WaveClear", "EndingReveal", "TitleConfirm", "DoorAwaken"}
 ZONE_CUES = {
     "arena": lambda cue, kind: cue not in {"DoorAwaken", "TitleConfirm"},
-    "hub": lambda cue, kind: (kind in ("ui", "sense") and cue not in ("CurrencyGain", "SoulThrob")) or cue in ("Footstep", "DoorAwaken"),
+    "hub": lambda cue, kind: (kind in ("ui", "sense") and cue not in ("CurrencyGain", "SoulThrob")) or cue in ("Footstep", "DoorAwaken", "DoorWhispers"),
     "shore": lambda cue, kind: cue not in ARENA_ONLY,
     "crossing": lambda cue, kind: cue not in ARENA_ONLY,
     # During a wave: no menus, chests or wave calls, only the fight.
@@ -149,7 +149,7 @@ INDIRECT = {
     "HitHollow": 0.78, "HitBurning": 0.78, "HitDevourer": 0.78, "HitDummy": 0.78,
     "DeathHollow": 0.66, "DeathBurning": 0.66, "DeathDevourer": 0.64,
     "HollowCall": 0.55, "BurningCackle": 0.6, "DevourerGrowl": 0.72,
-    "FoundryBell": 0.55, "ShoreHorn": 0.6, "ShoreBoard": 0.5, "SkiffCreak": 0.55,
+    "FoundryBell": 0.55, "ShoreHorn": 0.6, "ShoreBoard": 0.5, "SkiffCreak": 0.55, "DoorWhispers": 0.45,
 }
 
 

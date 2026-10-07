@@ -103,7 +103,9 @@ public enum AudioCue
     CannonStage,
     CannonBlast,
     /// <summary>The crossing's own sound now and then: the skiff's planks groaning in the swell.</summary>
-    SkiffCreak
+    SkiffCreak,
+    /// <summary>The antechamber's: souls whispering behind one of the sealed doors.</summary>
+    DoorWhispers
 }
 
 /// <summary>
@@ -237,7 +239,8 @@ public sealed class AudioDirector : IDisposable
         [AudioCue.ShoreBoard] = new(2f, 1, 0.04f),
         [AudioCue.CannonStage] = new(0.12f, 1, 0.02f),
         [AudioCue.CannonBlast] = new(0.3f, 1, 0.02f),
-        [AudioCue.SkiffCreak] = new(3f, 1, 0.05f)
+        [AudioCue.SkiffCreak] = new(3f, 1, 0.05f),
+        [AudioCue.DoorWhispers] = new(6f, 1, 0.05f)
     };
 
     /// <summary>
@@ -253,7 +256,9 @@ public sealed class AudioDirector : IDisposable
         [AudioZone.Title] = [(AudioCue.ShoreHorn, 18f, 34f, 0.55f)],
         [AudioZone.Harbour] = [(AudioCue.ShoreHorn, 34f, 60f, 0.45f)],
         // The skiff rides the swell (PrologueEnvironment.Swell): its planks groan now and then.
-        [AudioZone.Crossing] = [(AudioCue.SkiffCreak, 7f, 14f, 0.55f)]
+        [AudioZone.Crossing] = [(AudioCue.SkiffCreak, 7f, 14f, 0.55f)],
+        // Behind one of the sealed doors the souls of its region whisper, now and then.
+        [AudioZone.Hub] = [(AudioCue.DoorWhispers, 18f, 34f, 0.45f)]
     };
     private readonly Dictionary<AudioCue, float> _placeEventTimers = [];
 
@@ -538,6 +543,7 @@ public sealed class AudioDirector : IDisposable
             AddVariants(content, AudioCue.ShoreHorn, "Audio/Sfx/shore_horn", 2, 72f, 3f, 0.2f, 0.1f);
             AddVariants(content, AudioCue.ShoreBoard, "Audio/Sfx/shore_board", 2, 2400f, 0.8f, 0.15f, 0.9f);
             AddVariants(content, AudioCue.SkiffCreak, "Audio/Sfx/skiff_creak", 2, 140f, 1.2f, 0.15f, 0.6f);
+            AddVariants(content, AudioCue.DoorWhispers, "Audio/Sfx/door_whispers", 2, 900f, 1.5f, 0.1f, 0.9f);
             // Drawn and stowed with every shot: two takes each, so it never repeats exactly.
             AddVariants(content, AudioCue.CannonDraw, "Audio/Sfx/cannon_draw", 2, 140f, 0.3f, 0.3f, 0.4f);
             AddVariants(content, AudioCue.CannonStow, "Audio/Sfx/cannon_stow", 2, 120f, 0.3f, 0.3f, 0.4f);

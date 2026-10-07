@@ -918,3 +918,9 @@ aim_move* 12, wake 8, death 12).
   Wirkradius tragen die leuchtenden Risse. Dunklerer Staub wäre der nächste Schritt, falls der
   Owner den Rand deutlicher will.
 - Abschnittstitel des Prologs: Zahl und Name durch Mittelpunkt getrennt („I · THE UNFINISHED SHORE“ statt „I  THE …“, las sich als Satz).
+- Vorhalle hörbar belebt: Hinter einer der versiegelten Türen flüstern selten Seelen (`door-whispers`,
+  Ortsklang alle 18–34 s, −2,5 LU zum Bett; CLAP „ghostly whispers“ 0,48). Rundgang zählt
+  `hub:DoorWhispers=1`. Verworfen: „durch Stein“ stark gedämpft (CLAP „monster growling“ bis 0,81),
+  dichte Silben, langer Hall („hiss“).
+- Voller Rundgang 20261007_125110 nach allen Änderungen bis 12:50: 693 Aufnahmen, kein Platzhalter,
+  CPU im Mittel ≤ 0,52 ms.

@@ -516,3 +516,12 @@ Devourer-Schlag, Seelensinn an/aus und die Fähigkeiten Durchschlag, Rückstoßs
 | `Audio/Sfx/ability_guard_v3.wav` | Ableitung von ability_guard.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 1.05 s, 1 Kanal, -18.0 LUFS, Spitze -3.7 dBFS |
 | `Audio/Sfx/ability_mark_v2.wav` | Ableitung von ability_mark.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.57 s, 1 Kanal, -20.2 LUFS, Spitze -3.2 dBFS |
 | `Audio/Sfx/ability_mark_v3.wav` | Ableitung von ability_mark.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.63 s, 1 Kanal, -20.2 LUFS, Spitze -2.7 dBFS |
+
+## Flüstern hinter den Türen der Vorhalle (Durchgang 5, 07.10.2026)
+
+Die Vorhalle hatte als einziger Ort keinen Ortsklang. Hinter einer der versiegelten Türen (sie führen in die Regionen, in denen Seelen warten) flüstern selten zwei, drei Stimmen ohne Worte nacheinander, alle 18–34 s von zufälliger Seite. Rezept `door-whispers` in `recipes/ambient_events.py`: gehauchte Ausatmer durch gleitende Vokalformanten (keine Tonhöhe), leicht gedämpft, kleiner Raum. CLAP „ghostly whispers“ 0,48, „hiss“ 0,37–0,42. Verworfen: stark gedämpft „durch Stein“ (Tiefpass 1,4 kHz: „monster growling“ bis 0,81), dichte Silben („growling“/„hiss“), langer Hall („hiss“ bis 0,60).
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/door_whispers_1.wav` | door-whispers Seed 1 | 3.20 s, 1 Kanal/Kanäle, -31.0 LUFS, Spitze -16.0 dBFS |
+| `Audio/Sfx/door_whispers_2.wav` | door-whispers Seed 5 | 3.20 s, 1 Kanal/Kanäle, -30.7 LUFS, Spitze -14.3 dBFS |

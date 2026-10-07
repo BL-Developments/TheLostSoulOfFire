@@ -163,7 +163,7 @@ internal sealed class TourVisualTest
     [
         AudioCue.HollowCall, AudioCue.HollowGrasp, AudioCue.BurningCackle, AudioCue.BurningShriek,
         AudioCue.DevourerGrowl, AudioCue.DevourerHunger, AudioCue.FoundryBell, AudioCue.ShoreHorn, AudioCue.ShoreBoard,
-        AudioCue.SkiffCreak
+        AudioCue.SkiffCreak, AudioCue.DoorWhispers
     ];
     private readonly SortedDictionary<string, int> _voices = new();
     private float _clock;
@@ -487,6 +487,8 @@ internal sealed class TourVisualTest
         Do("sense_off", () => _world.SetAutomatedSoulSense(false));
         Shot("door_i", () => _world.PlaceAutomatedPlayerAtDoor(0), minWait: 0.8f);
         Shot("door_sealed", () => _world.PlaceAutomatedPlayerAtDoor(1), minWait: 0.8f);
+        // Long enough in the hall for the souls behind a sealed door to whisper (place event, 18-34 s).
+        Do("whispers", () => { }, 14f);
         Do("door_enter", () => _world.RequestAutomatedDoorEntry());
         Series("door_transition", 8, 10);
     }

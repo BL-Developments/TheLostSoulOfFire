@@ -103,3 +103,27 @@ def skiff_creak(rng) -> np.ndarray:
     wash = dsp.bandpass(rng.standard_normal(n), 300, 2500) * np.exp(-((t - slap_at - 0.15) / 0.18) ** 2) * 0.25
     x = wood * 0.8 + slap + wash
     return _finish(_distant(x, rng, 0.6, 0.15, 3000, 4000), -27.0, fade_out=0.3)
+
+
+@recipe("door-whispers", "Vorhalle: hinter einer der versiegelten Türen flüstern Seelen, zwei, drei gehauchte Stimmen ohne Worte nacheinander, leicht gedämpft, im Hall der Vorhalle")
+def door_whispers(rng) -> np.ndarray:
+    from recipes.voices import GAINS, QS, _vowel_track
+    n = dsp.seconds(3.2)
+    t = dsp.time_axis(n)
+    vowel_pairs = (("a", "u"), ("e", "o"), ("i", "a"), ("o", "e"), ("aw", "i"))
+    x = np.zeros(n)
+    at = rng.uniform(0.0, 0.3)
+    for _ in range(int(rng.integers(2, 4))):
+        # One whisper: a long breath through a gliding mouth, swelling and sinking (no voiced pitch).
+        length = rng.uniform(0.5, 0.9)
+        a, b = vowel_pairs[int(rng.integers(0, len(vowel_pairs)))]
+        share0, share1 = at / 3.2, min(1.0, (at + length) / 3.2)
+        vowels = _vowel_track(n, [(0.0, a), (share0, a), (share1, b), (1.0, b)], shift=rng.uniform(1.1, 1.3))
+        local = t - at
+        exhale = np.where(local < 0, 0.0, np.clip(local / 0.08, 0, 1) ** 1.5 * np.exp(-np.maximum(local - 0.1, 0) / (length * 0.45)))
+        air = dsp.highpass(rng.standard_normal(n), 250) * exhale
+        voice = sum(dsp.swept_bandpass(air, centre, q=q * 0.75) * g for centre, g, q in zip(vowels, GAINS, QS))
+        x += voice / (np.std(voice) + 1e-9) * rng.uniform(0.6, 1.0)
+        at += length * rng.uniform(0.6, 1.0)
+    x = dsp.lowpass(x, 3600, order=4)
+    return _finish(_distant(x, rng, 1.2, 0.2, 3000, 4500), -31.0, fade_out=0.5)

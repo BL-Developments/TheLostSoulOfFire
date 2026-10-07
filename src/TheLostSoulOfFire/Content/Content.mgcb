@@ -11278,3 +11278,13 @@
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /build:Audio/Sfx/ability_mark_v3.wav
+
+#begin Audio/Sfx/door_whispers_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/door_whispers_1.wav
+
+#begin Audio/Sfx/door_whispers_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/door_whispers_2.wav
