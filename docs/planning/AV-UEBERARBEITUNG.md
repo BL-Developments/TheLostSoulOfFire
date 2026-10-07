@@ -836,3 +836,14 @@ starr (der Clip `aim` hält das letzte Bild).
   mit lauterem Knistern („explosion“ 0,64); Titelbestätigung mit tiefem Aufwallen („explosion“).
   Geprüft: `validate_audio.py` (215), `mix_report.py` in Arena, Kampf, Ufer, Überfahrt, Vorhalle
   im Band, Audio-Laufzeit- (76 Töne, kein Ersatzklang) und Gameplay-Test (10 Wellen).
+- Kanone nachgezogen: Bei voller Ladung überstrahlte der noch für die 1,2-m-Kanone bemessene Schein
+  Kanone und Arm weiß; jetzt kleiner mit weißem Kern an der Mündung (Kanone und Zittern lesbar).
+  Die Feuer-Lade-Schleife lag in der Kampfmusik voll geladen 7,5 LU unter dem Bett (Rauschen
+  maskiert Rauschen); Pegel 0,20–0,65 statt 0,14–0,44 (voll etwa −4 LU im Kampf, +2 LU in der
+  ruhigen Arena).
+- Voller Rundgang nach allen Änderungen (20261007_113146): 21 Stationen, 655 Aufnahmen, kein
+  Platzhalter, CPU je Frame im Mittel ≤ 0,55 ms, Wandzeit 95. Perzentil ≤ 3,9 ms.
+
+**Owner-Abnahme offen (Durchgang 5):** neue Kanone (Größe, Haltung, Halte-Zittern, Rückstoß),
+ihr Klang (Zünden, Feuer-Schleife, Ratsche, Voll, Schuss, Druckstoß), Seelen-Atem statt Glocke,
+Wellenstart/-ende, Verschlingen, Menü-/Truhen-/Münz-/Fähigkeitsklänge, Gegner-Zucken.
