@@ -33,16 +33,20 @@ MGCB = CONTENT / "Content.mgcb"
 #: Colour scripts per area. Values are deliberately small; the painting carries the look.
 PRESETS = {
     # Casting hall: cold steel shadows, soot-muted mids, a breath of brass in the highlights.
-    "arena": {"shadow_tint": (0.92, 0.94, 1.10), "highlight_tint": (1.05, 1.0, 0.92), "saturation": 0.86,
-              "contrast": 1.08, "black_lift": 0.012, "gamma": 1.04},
+    # Durchgang 4 (Owner: too cinematic, not action): the pale lavender floor (sat ~0.2) sat inside
+    # the flame protection and stayed pastel; protection now starts at real flame saturation, the
+    # stone loses some lavender and gains depth, so fighters and flames stand out against it.
+    "arena": {"shadow_tint": (0.92, 0.94, 1.10), "highlight_tint": (1.05, 1.0, 0.92), "saturation": 0.74,
+              "contrast": 1.22, "black_lift": 0.012, "gamma": 1.12, "protect_from": 0.28},
     # Shore: slate-blue night, salt-white highlights, mist lifting the darks a little.
     "shore": {"shadow_tint": (0.88, 0.97, 1.12), "highlight_tint": (0.97, 1.0, 1.04), "saturation": 0.8,
               "contrast": 0.96, "black_lift": 0.03, "gamma": 1.0},
 }
 
 
-def flame_protection(rgb: np.ndarray) -> np.ndarray:
-    """1 where a colour is a saturated flame colour (violet 250-310 deg or orange 15-50 deg)."""
+def flame_protection(rgb: np.ndarray, violet_from: float = 0.1) -> np.ndarray:
+    """1 where a colour is a saturated flame colour (violet 250-310 deg or orange 15-50 deg).
+    `violet_from` is the saturation where violet protection begins (fully on 0.15 above)."""
     r, g, b = rgb[..., 0], rgb[..., 1], rgb[..., 2]
     maximum = rgb.max(axis=-1)
     minimum = rgb.min(axis=-1)
@@ -53,7 +57,7 @@ def flame_protection(rgb: np.ndarray) -> np.ndarray:
     orange = (hue >= 15) & (hue <= 50)
     bright = np.clip((maximum - 0.25) / 0.2, 0, 1)
     # Death Flame runs from deep violet to near white, so violet is protected from low saturation on.
-    violet_strength = np.clip((saturation - 0.1) / 0.15, 0, 1) * bright
+    violet_strength = np.clip((saturation - violet_from) / 0.15, 0, 1) * bright
     orange_strength = np.clip((saturation - 0.35) / 0.25, 0, 1) * bright
     return np.where(violet, violet_strength, np.where(orange, orange_strength, 0.0))
 
@@ -68,7 +72,7 @@ def grade(rgb: np.ndarray, preset: dict) -> np.ndarray:
     out = (out - 0.5) * preset["contrast"] + 0.5
     out = np.clip(out, 0, 1) ** preset["gamma"]
     out = preset["black_lift"] + out * (1 - preset["black_lift"])
-    keep = flame_protection(rgb)[..., None]
+    keep = flame_protection(rgb, preset.get("protect_from", 0.1))[..., None]
     return np.clip(out * (1 - keep) + rgb * keep, 0, 1)
 
 

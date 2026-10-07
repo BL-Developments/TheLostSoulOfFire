@@ -20106,6 +20106,53 @@
         "status": "angenommen",
         "reason": "Porzellanmaske über Gesicht, Stirn und Scheitel, Kopf leicht gehoben: aus jeder Richtung außer von hinten die hellste Fläche (hollow.md)"
       }
+    },
+    {
+      "id": "9d1558c91bc14757aa83ae33159b76dc",
+      "timestamp": "2026-10-07T01:22:24+00:00",
+      "visual_id": "grade.arena",
+      "step": "make-lut",
+      "tool": {
+        "name": "make_lut.py",
+        "version": "1"
+      },
+      "model": {
+        "name": "procedural colour script",
+        "license": "CC0 (eigene Ausgabe)"
+      },
+      "prompt": "",
+      "seed": null,
+      "parameters": {
+        "shadow_tint": [
+          0.92,
+          0.94,
+          1.1
+        ],
+        "highlight_tint": [
+          1.05,
+          1.0,
+          0.92
+        ],
+        "saturation": 0.74,
+        "contrast": 1.22,
+        "black_lift": 0.012,
+        "gamma": 1.12,
+        "protect_from": 0.28
+      },
+      "inputs": [],
+      "outputs": [
+        {
+          "path": "src/TheLostSoulOfFire/Content/Textures/Grading/lut_arena.png",
+          "sha256": "f1051f509b5aa325bf5509d6c3ca5bf981e044d5736694e26cf27c3b7d19fca9"
+        }
+      ],
+      "machine": "mac (Darwin arm64)",
+      "cost_eur": 0.0,
+      "duration_s": 0.03,
+      "decision": {
+        "status": "angenommen",
+        "reason": "Bereichs-Grading der Scheibe; Flammenfarben geschützt"
+      }
     }
   ]
 }

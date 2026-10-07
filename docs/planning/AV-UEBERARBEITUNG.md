@@ -603,6 +603,14 @@ Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreati
   letzte Welle. Erzähltext bleibt englisch (Inhaltsentscheidung); Wortlaut ist ein Vorschlag zur
   Owner-Abnahme. Schrift der Storybänder 13 → 15. Rundgang protokolliert `TOUR_NARRATION`.
 
+- Arena-Farbe (Owner: „zu cinematisch“): Der blass-lavendelfarbene Boden (Farbton 273°, Sättigung
+  0,20) lag im Schutzband der Flammenfarben, die Arena-Abstimmung griff auf ihm nur zu einem
+  Drittel; Wertebereich p5–p95 nur 0,25–0,55. Der Schutz beginnt in der Arena jetzt bei echter
+  Flammensättigung (`make_lut.py`, `protect_from` 0,28), Sättigung 0,86 → 0,74, Kontrast
+  1,08 → 1,22, Gamma 1,04 → 1,12: Stein statt Pastell, die Lichtinsel der Fensterrose hebt sich
+  von dunkleren Rändern ab, Figuren und violette Flammen unverändert. Verworfen: noch
+  kräftiger (Sättigung 0,65, Gamma 1,25, Kontrast 1,35) – dunkle Figuren sanken in den Boden.
+
 **Verworfen (Durchgang 4):**
 - Raserei als schwebende Tremolo-Flächen: die volle Mischung kippte zu „calm cinematic“.
 - Schreie aus reiner Stimmlippenquelle durch Formanten, auch mit Biphonation: CLAP „horn“ und

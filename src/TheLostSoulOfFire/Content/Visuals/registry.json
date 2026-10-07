@@ -918,22 +918,6 @@
       }
     },
     {
-      "id": "grade.arena",
-      "kind": "grade",
-      "palette": "world",
-      "worldSize": [1024, 32],
-      "origin": [0, 0],
-      "clips": {
-        "default": {
-          "path": "Textures/Grading/lut_arena",
-          "frameSize": [1024, 32],
-          "frames": 1,
-          "fps": 1,
-          "loop": true
-        }
-      }
-    },
-    {
       "id": "grade.shore",
       "kind": "grade",
       "palette": "world",
@@ -1432,6 +1416,22 @@
         "default": {
           "path": "Textures/Props/Sandbox/dummy",
           "frameSize": [118, 196],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "grade.arena",
+      "kind": "grade",
+      "palette": "world",
+      "worldSize": [1024, 32],
+      "origin": [0, 0],
+      "clips": {
+        "default": {
+          "path": "Textures/Grading/lut_arena",
+          "frameSize": [1024, 32],
           "frames": 1,
           "fps": 1,
           "loop": true
