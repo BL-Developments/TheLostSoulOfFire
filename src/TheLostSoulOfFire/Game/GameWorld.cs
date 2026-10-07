@@ -2154,6 +2154,13 @@ public sealed partial class GameWorld : IDisposable
             if (CrossedFootfall(_playerStepPhase, phase, Footfalls))
             {
                 _audio.Play(stepCue, 0.42f);
+                if (wet)
+                {
+                    // The water in the joints splashes up from the heel, as it is heard.
+                    Vector2 back = _player.Velocity.LengthSquared() > 0.001f ? -Vector2.Normalize(_player.Velocity) : Vector2.Zero;
+                    // Particles are drawn at body height (the air pass); the heel is that much lower.
+                    _particles.EmitSplash(position + new Vector2(0f, FigureHeights.Air), back, 4);
+                }
                 if (OnDustyFloor)
                 {
                     // The foot lands in the ash: a faint breath of it is kicked back from the heel,

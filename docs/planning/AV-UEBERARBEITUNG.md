@@ -952,8 +952,9 @@ Gegner-Zuckens, Deutlichkeit von Schattenhand und Schlagrand im Gedränge, die I
   einzelne kurze Schritte in Stille sind für CLAP nicht beurteilbar (weichere Prototypen ebenso);
   die Hörabnahme der Schritte bleibt beim Owner (Steinschritt hat 23 % Energie über 4 kHz – falls
   er zu klickig wirkt, dort ansetzen).
-- Verworfen (vor dem Einbau): Wassertropfen an nassen Schritten – der vorhandene Partikeltyp
-  (Splitter, die 1,1–1,8 s am Boden liegen) würde wie Kiesel wirken; bräuchte einen eigenen,
-  kurzlebigen Tropfen-Partikel.
+- Wassertropfen an nassen Schritten: kurzlebige Tropfen (0,3–0,42 s, verschwinden beim Aufkommen,
+  `ParticleSystem.EmitSplash`) spritzen an der Ferse auf; Partikel liegen im Luft-Pass, daher um
+  `FigureHeights.Air` nach unten versetzt (erste Fassung spritzte auf Schulterhöhe). Rundgang-
+  Serie `prologue_shore_walk_wet`.
 - Weitere Stationen ohne Befund gesichtet: Seelenfreigabe (Bild passt zum Atem: Aufsteigen,
   Aufblitzen, Flug), erster Hollow am Ufer, Truhe, Wellenbanner, Tod, Damm, Schwelle, Titel.

@@ -407,6 +407,8 @@ internal sealed class TourVisualTest
         Overview("overview");
         Do("listen_steps", () => _world.AutomatedAudio.CuePlayed += LogStep);
         Shot("walk", () => _world.SetAutomatedAim(Vector2.UnitX), minWait: 0.8f, everyFrame: () => _input.InjectKeyDown(Keys.D));
+        // Walking on the wet platform: the steps splash.
+        Series("walk_wet", 10, 2, () => _input.InjectKeyDown(Keys.D));
         Do("stop_listening_steps", () => _world.AutomatedAudio.CuePlayed -= LogStep);
         Shot("trace", () =>
         {

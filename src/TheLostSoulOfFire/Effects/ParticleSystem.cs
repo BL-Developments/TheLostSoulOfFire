@@ -130,6 +130,20 @@ public sealed class ParticleSystem
         }
     }
 
+    /// <summary>
+    /// A foot landing on wet stone: a few droplets thrown up and back from the heel; they fall
+    /// back and are gone as they land (short-lived chips, so nothing lies on the floor).
+    /// </summary>
+    public void EmitSplash(Vector2 foot, Vector2 back, int count)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            Vector2 velocity = new(back.X * RandomRange(30f, 80f) + RandomRange(-25f, 25f), -RandomRange(110f, 190f));
+            Add(foot + new Vector2(RandomRange(-4f, 4f), -2f), velocity, RandomRange(0.3f, 0.42f), RandomRange(1.6f, 2.6f), 1.2f,
+                new Color(150, 166, 194) * 0.85f, ParticleShape.Chip, ParticleMotion.Fall, new Vector2(0f, foot.Y + RandomRange(-2f, 3f)));
+        }
+    }
+
     public void EmitSoulRelease(Vector2 position)
     {
         for (int i = 0; i < 18; i++)
