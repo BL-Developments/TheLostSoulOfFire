@@ -2866,6 +2866,11 @@ public sealed partial class GameWorld : IDisposable
                     shot.Direction,
                     shot.IsFullCharge,
                     coreHit);
+                if (shot.IsFullCharge)
+                {
+                    // The heavy bolt scorches the floor under what it hit.
+                    _groundImpacts.Blast(enemy.Position, shot.Radius * 1.4f);
+                }
                 if (coreHit)
                 {
                     _player.AddResonance(GameBalance.ResonancePerCoreHit * (shot.IsFullCharge ? 2f : 1f));
@@ -2928,6 +2933,7 @@ public sealed partial class GameWorld : IDisposable
     private void ResolveBurningDetonation(Burning source, Vector2 position)
     {
         _combatPresentation.PresentBurningDetonation(position);
+        _groundImpacts.Blast(position, GameBalance.BurningDetonationRadius * 0.6f);
         _arenaAtmosphere.ReactToForce(position, 560f, 190f);
         _audio.Play(AudioCue.BurningDetonation, 0.9f, 0f, PanOf(position) * 0.6f);
 

@@ -32,6 +32,10 @@ public sealed class GroundImpacts
     private static Texture2D? _fissures;
     private static Texture2D? _dust;
     private static Texture2D? _grasp;
+    private static Texture2D? _blast;
+
+    /// <summary>Pixels from the blast texture's centre to its frayed edge (ground_kit.BLAST_EDGE).</summary>
+    private const float BlastEdge = 116f;
 
     /// <summary>Pixels from the grasp texture's centre to the fingertips (ground_kit.GRASP_REACH).</summary>
     private const float GraspReach = 116f;
@@ -44,6 +48,7 @@ public sealed class GroundImpacts
             _fissures = content.Load<Texture2D>("Textures/Effects/ground_fissures");
             _dust = content.Load<Texture2D>("Textures/Effects/dust_puffs");
             _grasp = content.Load<Texture2D>("Textures/Effects/grasp_shadow");
+            _blast = content.Load<Texture2D>("Textures/Effects/blast_scorch");
         }
         catch (ContentLoadException)
         {
@@ -52,7 +57,7 @@ public sealed class GroundImpacts
     }
 
     /// <summary>Without the textures the old rings remain the telegraph.</summary>
-    public static bool Loaded => _shatter is not null && _fissures is not null && _dust is not null && _grasp is not null;
+    public static bool Loaded => _shatter is not null && _fissures is not null && _dust is not null && _grasp is not null && _blast is not null;
 
     private sealed class Windup
     {
@@ -128,6 +133,20 @@ public sealed class GroundImpacts
     }
 
     private readonly List<Grasping> _grasps = [];
+
+    /// <summary>Soot a blast left on the floor, and the embers in it.</summary>
+    private sealed class Blasted
+    {
+        public Vector2 Center;
+        public float Radius;
+        public float Rotation;
+        public float Age;
+        public Vector2[] Embers = [];
+    }
+
+    private const float BlastHold = 3.2f;
+    private const float BlastFade = 2.2f;
+    private readonly List<Blasted> _blasts = [];
 
     private const float ScorchLife = 2.6f;
     private const float ScorchSpacing = 12f;
@@ -214,6 +233,20 @@ public sealed class GroundImpacts
         grasp.Seen = true;
     }
 
+    /// <summary>A blast scorches the floor out to <paramref name="radius"/>: soot, rays, embers dying in it.</summary>
+    public void Blast(Vector2 center, float radius)
+    {
+        int count = (int)MathHelper.Clamp(radius / 9f, 3f, 14f);
+        Vector2[] embers = new Vector2[count];
+        for (int index = 0; index < count; index++)
+        {
+            float angle = (float)(_random.NextDouble() * MathHelper.TwoPi);
+            float reach = radius * MathF.Sqrt((float)_random.NextDouble()) * 0.8f;
+            embers[index] = center + new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * reach;
+        }
+        _blasts.Add(new Blasted { Center = center, Radius = radius, Rotation = (float)(_random.NextDouble() * MathHelper.TwoPi), Embers = embers });
+    }
+
     /// <summary>Called every frame a Burning rushes: it burns its path into the floor.</summary>
     public void Scorch(object key, Vector2 at)
     {
@@ -272,6 +305,14 @@ public sealed class GroundImpacts
                 continue;
             }
             kindling.Seen = false;
+        }
+        for (int index = _blasts.Count - 1; index >= 0; index--)
+        {
+            _blasts[index].Age += deltaTime;
+            if (_blasts[index].Age >= BlastHold + BlastFade)
+            {
+                _blasts.RemoveAt(index);
+            }
         }
         for (int index = _grasps.Count - 1; index >= 0; index--)
         {
@@ -335,6 +376,7 @@ public sealed class GroundImpacts
     {
         _kindlings.Clear();
         _grasps.Clear();
+        _blasts.Clear();
         _scorches.Clear();
         _lastScorch.Clear();
         _windups.Clear();
@@ -348,6 +390,31 @@ public sealed class GroundImpacts
         if (!Loaded)
         {
             return;
+        }
+
+        foreach (Blasted blast in _blasts)
+        {
+            float alpha = blast.Age < BlastHold ? 1f : 1f - (blast.Age - BlastHold) / BlastFade;
+            // It spreads in a few frames, then lies.
+            float spread = 0.6f + 0.4f * MathF.Min(1f, blast.Age / 0.12f);
+            Texture2D soot = _blast!;
+            batch.Draw(soot, blast.Center, null, Color.White * alpha, blast.Rotation,
+                new Vector2(soot.Width, soot.Height) * 0.5f, blast.Radius / BlastEdge * spread, SpriteEffects.None, 0f);
+            Vector2 origin = new(softSpot.Width * 0.5f, softSpot.Height * 0.5f);
+            for (int index = 0; index < blast.Embers.Length; index++)
+            {
+                float life = 0.8f + 1.2f * Hash(index * 2.3f + blast.Rotation);
+                float glow = MathF.Max(0f, 1f - blast.Age / life);
+                if (glow <= 0f)
+                {
+                    continue;
+                }
+                float flicker = 0.65f + 0.35f * MathF.Sin(_time * (17f + index) + index);
+                Color ember = GameBalance.DeathFlame * (0.7f * glow * flicker);
+                ember.A = 0;
+                float size = 6f + 4f * Hash(index + blast.Rotation);
+                batch.Draw(softSpot, blast.Embers[index], null, ember, 0f, origin, new Vector2(size * 2.4f, size * 1.6f) / softSpot.Width, SpriteEffects.None, 0f);
+            }
         }
 
         foreach (Impact impact in _impacts)

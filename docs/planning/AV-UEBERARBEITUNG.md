@@ -656,6 +656,15 @@ Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreati
   Fähre, die nie kommt (28–50 s; auch über dem Titel und leiser im Hafen). Nicht im Pausenmenü,
   treten bei Gefahr zurück; Mix in Klasse `place` (−12…+2 LU) im Band. Rundgang zählt sie.
 
+- Spuren des Kampfs: Die Burning-Detonation hinterlässt einen Rußfleck mit ausgeworfenen
+  Brandstrahlen (0,6 × Detonationsradius) und nachglimmender Glut, ein voller Kanonentreffer einen
+  kleinen Brandfleck; beide liegen 3,2 s und verblassen in 2,2 s (`ground_kit.py`
+  `blast_scorch`, `GroundImpacts.Blast`). Erste Fassung zu schwach: nur der Kern war auf dem Stein
+  sichtbar (Diagnose mit eingefärbtem Fleck), jetzt größerer Kern, kräftigere Strahlen, Fläche bis
+  zum Rand.
+- Offen zur Owner-Frage: Der Türhinweis der Vorhalle lautet „E ENTER BIOME I“ (Entwicklerbegriff,
+  in der archivierten Änderung `add-hub-biome-doors` so festgelegt) – nicht eigenmächtig geändert.
+
 **Verworfen (Durchgang 4):**
 - Hammerschläge, Ketten, ächzendes Dach und Murmeln der letzten Schicht als Ortsklänge: CLAP
   hörte Piepton/Schritte/Glocke, Türknarren, Schiffshorn bzw. Monster-Knurren.

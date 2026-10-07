@@ -13,6 +13,8 @@ Writes premultiplied RGBA (Content.mgcb imports them with PremultiplyAlpha=False
                         fissures and creeps out to the edge of its blow; the eighth lights every
                         crack for the moment the floor breaks. Tinted violet in game.
 - dust_puffs.png        four soft, ragged clouds of stone dust (2 x 2), pale; tinted in game.
+- blast_scorch.png      soot and burn of a blast on the floor: dark at the heart, rays of soot
+                        thrown outward, frayed at the edge at BLAST_EDGE px; fades in game.
 - grasp_shadow.png      the shadow of a Hollow's grasping hand on the floor, reaching along +X:
                         a palm at the body and four long fingers fanning over 1.5 rad, their
                         tips exactly at GRASP_REACH px (the swipe's reach), soft penumbra.
@@ -290,6 +292,34 @@ def dust_puff(seed: int, size: int = 128) -> np.ndarray:
     return np.concatenate([rgb, density[..., None]], axis=-1)
 
 
+BLAST_SIZE = 256
+BLAST_EDGE = 116.0
+
+
+def blast_scorch(rng) -> np.ndarray:
+    size = BLAST_SIZE
+    ys, xs = np.mgrid[0:size, 0:size].astype(float)
+    x, y = xs + 0.5 - size / 2, ys + 0.5 - size / 2
+    r = np.hypot(x, y) / BLAST_EDGE
+    a = np.arctan2(y, x)
+    noise = Noise(SEED + 31, 32)
+    grain = noise.fbm(xs / 7, ys / 7, 4)
+    # Rays of soot thrown out from the heart, uneven in length and strength.
+    rays = np.zeros_like(r)
+    for _ in range(26):
+        angle = rng.uniform(-math.pi, math.pi)
+        width = rng.uniform(0.04, 0.12)
+        length = rng.uniform(0.55, 1.0)
+        d = np.abs(((a - angle + math.pi) % (2 * math.pi)) - math.pi)
+        rays = np.maximum(rays, np.exp(-(d / width) ** 2) * np.clip(1 - r / length, 0, 1) ** 0.8 * rng.uniform(0.4, 1.0))
+    heart = np.clip(1 - r / 0.6, 0, 1) ** 0.5
+    edge = np.clip((1.0 + 0.15 * (grain - 0.5) - r) / 0.25, 0, 1)
+    alpha = np.clip(heart * 0.9 + rays * 0.85 + 0.45 * np.clip(1 - r, 0, 1) ** 0.7, 0, 0.94) * edge
+    alpha *= 0.8 + 0.4 * (grain - 0.5)
+    rgb = np.stack([np.full_like(r, 0.035), np.full_like(r, 0.025), np.full_like(r, 0.045)], axis=-1) * alpha[..., None]
+    return np.concatenate([rgb, np.clip(alpha, 0, 1)[..., None]], axis=-1)
+
+
 GRASP_SIZE = 256
 GRASP_REACH = 116.0  # px from the centre to the fingertips; the game scales by reach / this
 
@@ -379,6 +409,7 @@ def main() -> int:
     save(tile(fissures, 4), args.out / "ground_fissures.png")
     save(tile(puffs, 2), args.out / "dust_puffs.png")
     save(grasp_shadow(np.random.default_rng(SEED + 20)), args.out / "grasp_shadow.png")
+    save(blast_scorch(np.random.default_rng(SEED + 30)), args.out / "blast_scorch.png")
     if args.preview:
         preview(shatter_image, fissures, puffs, args.preview)
     return 0
