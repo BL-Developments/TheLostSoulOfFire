@@ -847,3 +847,6 @@ starr (der Clip `aim` hält das letzte Bild).
 **Owner-Abnahme offen (Durchgang 5):** neue Kanone (Größe, Haltung, Halte-Zittern, Rückstoß),
 ihr Klang (Zünden, Feuer-Schleife, Ratsche, Voll, Schuss, Druckstoß), Seelen-Atem statt Glocke,
 Wellenstart/-ende, Verschlingen, Menü-/Truhen-/Münz-/Fähigkeitsklänge, Gegner-Zucken.
+- Kanonentreffer reißen jetzt Materie vom Ziel wie Sensentreffer (voller Schuss so viel wie die
+  Seelenspaltung); der Mündungsblitz ist auf die kleinere Kanone verkleinert (voll 0,76 → 0,64).
+  Neue Rundgang-Folge `arena_wave1_cannon_hold/hit`: echter voller Schuss auf einen Hollow.
