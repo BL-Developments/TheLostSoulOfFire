@@ -517,7 +517,7 @@ Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreati
    unruhige, zuckende Bewegungen.
 5. ☑ Soul Cannon verständlich: Die Flamme wandert sichtbar Kern → Schulter → Arm → Kanone
    (07_SOUL_CANNON, Schritt 3), die Kammer füllt sich.
-6. ☐ Story verständlich: Prolog-Zeilen sagen klar, wer man ist, wo man ist und warum man
+6. ☑ Story verständlich: Prolog-Zeilen sagen klar, wer man ist, wo man ist und warum man
    kämpft (ohne neue Mechanik).
 
 **Erledigt und im Spiel geprüft:**
@@ -590,6 +590,18 @@ Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreati
   Durchmessers), schwach klein, voll ein schwerer Bolzen, in der Resonanz größer. Der
   Mündungsblitz saß 19 Einheiten vor dem Rohr (an der geladenen Größe, der Rückstoß-Clip zeigt
   die entladene): jetzt an der gezeichneten Mündung. Station `arena_player` (Laden, Schuss).
+
+- Story (Owner: „Der Nutzer versteht noch nicht wirklich, was die Story ist“): Der Prolog sprach
+  in Andeutungen („YOU REMEMBER THE IMPACT“, „THE DEAD DID NOT LEAVE THE WAITING BEHIND“). Jetzt
+  eine klare Folge im Ton des Spiels (`PrologueDirector.Story`, Zeilen mit Zeitfenster je Stufe,
+  weich ein- und ausgeblendet, Stufenzeiten unverändert): YOU DIED / BUT YOUR SOUL DID NOT CROSS
+  OVER; die Death Layer; die Death Flame gibt einer Seele die Kraft loszulassen; das Fährunglück;
+  was ein Hollow ist; die Warden-Zeichen und dass jemand sucht; was der Devourer tut; Freilassung
+  und Echo; die Wardens am Ziel. In der Arena spricht ein Erzähler in Untertiteln
+  (`Rendering/Narration.cs`, oben mittig, je einmal pro Sitzung): die letzte Schicht, die ihren
+  Ofen nicht loslässt (Welle 1), was ein Burning und ein Devourer sind (erstes Auftreten), die
+  letzte Welle. Erzähltext bleibt englisch (Inhaltsentscheidung); Wortlaut ist ein Vorschlag zur
+  Owner-Abnahme. Schrift der Storybänder 13 → 15. Rundgang protokolliert `TOUR_NARRATION`.
 
 **Verworfen (Durchgang 4):**
 - Raserei als schwebende Tremolo-Flächen: die volle Mischung kippte zu „calm cinematic“.

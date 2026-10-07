@@ -264,6 +264,7 @@ internal sealed class TourVisualTest
             }
             Console.WriteLine("TOUR_AUDIO hall_tails=" + string.Join(",",
                 _world.AutomatedAudio.HallTailsPlayed.Select(pair => $"{pair.Key}:{pair.Value}")));
+            Console.WriteLine("TOUR_NARRATION " + string.Join(" | ", _world.AutomatedNarration.History));
             Console.WriteLine("TOUR_AUDIO voices=" + string.Join(",", _voices.Select(pair => $"{pair.Key}={pair.Value}")) +
                 string.Create(System.Globalization.CultureInfo.InvariantCulture, $" closest_calls_s={_closestCalls:0.00}"));
             Console.WriteLine($"TOUR_VISUAL_TEST_PASS captures={_captured} dir={_directory}");

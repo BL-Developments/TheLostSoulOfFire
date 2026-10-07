@@ -54,6 +54,7 @@ public sealed partial class GameWorld : IDisposable
     private readonly SpriteVfxSystem _spriteVfx;
     private readonly GroundImpacts _groundImpacts = new();
     private readonly EnemyVoices _enemyVoices = new();
+    private readonly Narration _narration = new();
     private Action<AudioCue, float, Vector2>? _speak;
     private float _dangerHeat;
     private readonly List<SceneProp> _sceneProps = [];
@@ -611,6 +612,7 @@ public sealed partial class GameWorld : IDisposable
         UpdateBurningHandoff();
         _speak ??= (cue, volume, at) => _audio.Play(cue, volume, 0f, PanOf(at));
         _enemyVoices.Update(deltaTime, _enemies, _player.Position, !_player.IsDead, _speak);
+        Narrate(deltaTime);
 
         _enemies.RemoveAll(enemy => enemy.IsFinished);
         foreach (Soul soul in _souls)
@@ -1632,6 +1634,10 @@ public sealed partial class GameWorld : IDisposable
                 {
                     HudRenderer.DrawWave(batch, pixel, viewport, _waveNumber, GameBalance.ArenaWaveCount, _waveRun.PushesReleased, ArenaWaves.Pushes(_waveNumber).Count);
                 }
+                if (!IsGamePaused)
+                {
+                    _narration.Draw(batch, pixel, viewport);
+                }
             }
 
             if (!IsGamePaused)
@@ -2066,6 +2072,38 @@ public sealed partial class GameWorld : IDisposable
     private float PanOf(Vector2 source) => MathHelper.Clamp((source.X - _player.Position.X) / 700f, -0.8f, 0.8f);
 
     /// <summary>
+    /// The narrator's lines in the arena (<see cref="Narration"/>): why the foundry fights, what
+    /// the Burning and the Devourer are when they first appear, what the last wave means. Each
+    /// once per session; nothing in the sandbox or while dead.
+    /// </summary>
+    private void Narrate(float deltaTime)
+    {
+        if (_phase == GamePhase.Arena && !_sandboxActive && !_player.IsDead && _loopState == ArenaLoopState.Combat)
+        {
+            if (_waveNumber == 1)
+            {
+                _narration.SayOnce("foundry", "THE LAST SHIFT NEVER LEFT THIS FOUNDRY  THEY STILL FEED ITS FIRE");
+            }
+            if (_waveNumber >= GameBalance.ArenaWaveCount)
+            {
+                _narration.SayOnce("final", "THE LAST OF THEM  THEN THE FURNACE CAN FINALLY GO OUT");
+            }
+            foreach (Enemy enemy in _enemies)
+            {
+                if (enemy is Burning { IsAlive: true })
+                {
+                    _narration.SayOnce("burning", "TOO MUCH IS LEFT IN THESE  RAGE AND PANIC BURN THEM FROM WITHIN");
+                }
+                else if (enemy is Devourer { IsAlive: true })
+                {
+                    _narration.SayOnce("devourer", "THIS ONE LOVED UNTIL IT OWNED  NOW IT LETS NO SOUL LEAVE");
+                }
+            }
+        }
+        _narration.Update(deltaTime);
+    }
+
+    /// <summary>
     /// How hot the fight runs, for the combat score (presentation only): a fight is on during an
     /// arena wave or while enemies stand in the prologue. More enemies, a nearby wind-up (it keeps
     /// the heat for a few seconds), little health, Resonance and later waves push it up; the
@@ -2393,6 +2431,7 @@ public sealed partial class GameWorld : IDisposable
         _spriteVfx.Clear();
         _groundImpacts.Clear();
         _enemyVoices.Clear();
+        _narration.Clear();
         _art.ClearTransient();
         _combatPresentation.Clear();
         _screenEffects.Clear();

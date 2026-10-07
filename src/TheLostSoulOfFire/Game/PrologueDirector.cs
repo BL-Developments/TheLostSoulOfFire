@@ -182,7 +182,7 @@ public sealed class PrologueDirector
         PrologueStage.Waking => "STAND",
         PrologueStage.FindTrace => "FOLLOW THE HUMAN ECHO  HOLD Q FOR SOUL SENSE",
         PrologueStage.TraceWitnessed => "THE PLACE REMEMBERS",
-        PrologueStage.EmergenceThreat => "CUT THE MANIFESTATION  RELEASE THE SOUL",
+        PrologueStage.EmergenceThreat => "CUT DOWN THE HOLLOW  THEN RELEASE ITS SOUL",
         PrologueStage.LeaveEmergence => "FOLLOW THE WHITE WARDEN MARKS EAST",
         PrologueStage.SearchApproach => "FOLLOW THE SEARCH FIRES",
         PrologueStage.HollowLesson => "READ THE SWIPE  DASH LATE  STRIKE THE ANCHOR",
@@ -197,23 +197,54 @@ public sealed class PrologueDirector
         _ => string.Empty
     };
 
-    public string StoryLine
+    /// <summary>
+    /// What the player is told, in order (Owner 07.10.2026: the story was not understood). Each
+    /// line belongs to a stage and a window of its time; the stages' own timers are unchanged,
+    /// lines in stages the player paces simply fade after their window. Who you are (dead, not
+    /// crossed over), where (the Death Layer), what you carry (the Death Flame lets souls go),
+    /// what the enemies are (souls that held on too long), who is coming (the Wardens).
+    /// </summary>
+    private static readonly (PrologueStage Stage, float From, float To, string Text)[] Story =
+    [
+        (PrologueStage.Waking, 0.0f, 1.9f, "YOU DIED"),
+        (PrologueStage.Waking, 1.9f, 3.6f, "BUT YOUR SOUL DID NOT CROSS OVER"),
+        (PrologueStage.FindTrace, 0.3f, 5.0f, "THIS IS THE DEATH LAYER  WHERE THE DEAD WAIT BEFORE THEY LET GO"),
+        (PrologueStage.FindTrace, 5.0f, 10.0f, "YOU CARRY THE DEATH FLAME NOW  IT GIVES A SOUL THE STRENGTH TO LET GO"),
+        (PrologueStage.TraceWitnessed, 0.0f, 2.8f, "THEY WAITED HERE FOR A FERRY THAT NEVER CAME BACK"),
+        (PrologueStage.TraceWitnessed, 2.8f, 5.6f, "THEY NEVER STOPPED WAITING  NOT EVEN AFTER DEATH"),
+        (PrologueStage.EmergenceThreat, 0.0f, 4.5f, "A SOUL THAT HOLDS ON TOO LONG HOLLOWS OUT  CUT IT DOWN AND SET IT FREE"),
+        (PrologueStage.LeaveEmergence, 0.3f, 5.0f, "WHITE MARKS  WARDENS WERE HERE  SOMEONE IS SEARCHING FOR YOU"),
+        (PrologueStage.SearchApproach, 0.3f, 5.0f, "WARDENS GUARD THE DEAD  THEY FIND THOSE WHO WAKE BURNING LIKE YOU"),
+        (PrologueStage.DevourerPressure, 0.0f, 4.5f, "IT FEEDS ON SOULS  BREAK IT OPEN AND THE ONE IT SWALLOWED GOES FREE"),
+        (PrologueStage.ReleaseWitness, 0.0f, 2.6f, "FREED  THE PERSON MOVES ON"),
+        (PrologueStage.ReleaseWitness, 2.6f, 5.2f, "ONLY THE ECHO STAYS BEHIND"),
+        (PrologueStage.Transit, 0.0f, 5.0f, "THE THRESHOLD IS SIXTY SECONDS EAST"),
+        (PrologueStage.Arrival, 0.0f, 3.6f, "BEHIND THIS WALL THE WARDENS HOLD THE LINE"),
+        (PrologueStage.Arrival, 3.6f, 9.0f, "NOT FOREVER  ONLY UNTIL THE WORK IS DONE"),
+        (PrologueStage.Complete, 0.0f, float.MaxValue, "YOU WOKE ALONE  THE FURNACE STILL BURNS")
+    ];
+
+    private const float StoryFade = 0.3f;
+
+    public string StoryLine => CurrentStory.Text;
+
+    /// <summary>The line on screen and how far it has faded in (0..1).</summary>
+    public (string Text, float Alpha) CurrentStory
     {
         get
         {
-            if (Stage == PrologueStage.Waking)
-                return StateTime < 2.3f ? "YOU REMEMBER THE IMPACT" : "THEN COLD  THEN FLAME";
-            if (Stage == PrologueStage.TraceWitnessed)
-                return StateTime < 2.4f ? "A BENCH  A DEPARTURE BOARD  NOBODY CAME BACK" : "THE DEAD DID NOT LEAVE THE WAITING BEHIND";
-            if (Stage == PrologueStage.ReleaseWitness)
-                return "THE PERSON LEAVES  ONLY THE ECHO RETURNS";
-            if (Stage == PrologueStage.Transit && StateTime < 5f)
-                return "THE THRESHOLD IS SIXTY SECONDS EAST";
-            if (Stage == PrologueStage.Arrival)
-                return StateTime < 3.6f ? "THIS IS WHERE WARDENS HOLD" : "NOT FOREVER  ONLY UNTIL THE WORK IS DONE";
-            if (Stage == PrologueStage.Complete)
-                return "YOU WOKE ALONE  THE FURNACE STILL BURNS";
-            return string.Empty;
+            foreach ((PrologueStage stage, float from, float to, string text) in Story)
+            {
+                if (stage != Stage || StateTime < from || StateTime >= to)
+                {
+                    continue;
+                }
+                // Lines that follow one another without a gap cross over quickly; the first and
+                // last of a stage fade in and out.
+                float alpha = MathHelper.Clamp(MathF.Min((StateTime - from) / StoryFade, (to - StateTime) / StoryFade), 0f, 1f);
+                return (text, alpha);
+            }
+            return (string.Empty, 0f);
         }
     }
 

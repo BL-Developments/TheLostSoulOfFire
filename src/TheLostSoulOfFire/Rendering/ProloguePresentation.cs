@@ -55,11 +55,11 @@ public static class ProloguePresentation
             UiKit.KeyLine(batch, pixel, left + moveWidth + 28f + attackWidth * 0.5f, 30f, "MOUSE", "ATTACK", hint, 1);
         }
 
-        string story = prologue.StoryLine;
-        if (!string.IsNullOrEmpty(story))
+        (string story, float storyAlpha) = prologue.CurrentStory;
+        if (!string.IsNullOrEmpty(story) && storyAlpha > 0.001f)
         {
-            UiKit.CaptionBand(batch, pixel, new Rectangle(80, viewport.Height - 146, viewport.Width - 160, 64), 0.78f);
-            PixelText.DrawFace(batch, pixel, story, new Vector2(centerX - PixelText.MeasureFace(story, TextFace.Body, 13f) * 0.5f, viewport.Height - 121), TextFace.Body, 13f, GameBalance.SoulWhite);
+            UiKit.CaptionBand(batch, pixel, new Rectangle(80, viewport.Height - 146, viewport.Width - 160, 64), 0.78f * storyAlpha);
+            PixelText.DrawFace(batch, pixel, story, new Vector2(centerX - PixelText.MeasureFace(story, TextFace.Body, 15f) * 0.5f, viewport.Height - 123), TextFace.Body, 15f, GameBalance.SoulWhite * storyAlpha);
         }
 
         if (!string.IsNullOrEmpty(prologue.Objective) && prologue.Stage != PrologueStage.Complete)

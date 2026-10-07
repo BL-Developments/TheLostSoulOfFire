@@ -49,6 +49,9 @@ public sealed partial class GameWorld
 
     internal AudioDirector AutomatedAudio => _audio;
 
+    /// <summary>The arena narrator, for the tour's protocol.</summary>
+    internal Narration AutomatedNarration => _narration;
+
     /// <summary>The drawn run phase of the player (0–1), or null when the figure is not running.</summary>
     internal float? AutomatedRunPhase => _art.CyclePhase(_player, VisualClips.Move);
 
