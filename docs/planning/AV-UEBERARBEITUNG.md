@@ -607,6 +607,9 @@ Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreati
   Durchmessers), schwach klein, voll ein schwerer Bolzen, in der Resonanz größer. Der
   Mündungsblitz saß 19 Einheiten vor dem Rohr (an der geladenen Größe, der Rückstoß-Clip zeigt
   die entladene): jetzt an der gezeichneten Mündung. Station `arena_player` (Laden, Schuss).
+  Nachgezogen nach Ansicht von vorn und hinten (neue Serien `cannon_charge_south/north`): Kammer
+  weiter an der rechten Hüfte; mit dem Rücken zur Kamera wird nichts mehr über den Rücken
+  gezeichnet (Arm und Kammer sind dann verdeckt).
 
 - Story (Owner: „Der Nutzer versteht noch nicht wirklich, was die Story ist“): Der Prolog sprach
   in Andeutungen („YOU REMEMBER THE IMPACT“, „THE DEAD DID NOT LEAVE THE WAITING BEHIND“). Jetzt

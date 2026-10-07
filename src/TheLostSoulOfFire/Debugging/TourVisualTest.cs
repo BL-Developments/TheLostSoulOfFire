@@ -584,6 +584,13 @@ internal sealed class TourVisualTest
         Series("cannon_fire", 30, 1);
         Do("stop_listening_cannon", () => _world.AutomatedAudio.CuePlayed -= LogCannon);
         // Charging on the move: aiming right while backing away to the left walks the legs backward.
+        // The flame running from the core into the chamber, seen from the front and from behind.
+        Do("place_cannon_south", () => { _world.PlaceAutomatedPlayer(ArenaCentre); _world.SetAutomatedAim(Vector2.UnitY); }, 0.6f);
+        Series("cannon_charge_south", 5, 9, () => _input.InjectMousePresses(left: false, right: true));
+        Do("release_south", () => { }, 1.4f);
+        Do("place_cannon_north", () => { _world.PlaceAutomatedPlayer(ArenaCentre); _world.SetAutomatedAim(-Vector2.UnitY); }, 0.6f);
+        Series("cannon_charge_north", 5, 9, () => _input.InjectMousePresses(left: false, right: true));
+        Do("release_north", () => { }, 1.4f);
         Do("place_cannon_walk", () => { _world.PlaceAutomatedPlayer(ArenaCentre + new Vector2(200f, 0f)); _world.SetAutomatedAim(Vector2.UnitX); }, 0.6f);
         Series("cannon_walk_back", 16, 3, () =>
         {
