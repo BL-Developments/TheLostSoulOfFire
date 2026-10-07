@@ -511,7 +511,7 @@ Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreati
 2. ☑ Monster mit Stimme: Rufe beim Bemerken, Angriffsschreie, Schmerzlaute, verrückte
    Zwischenrufe, je Art eigen und lore-treu (Hollow: Greifen nach Gehenden; Burning: instabile
    Glut; Devourer: Hunger, gefangene Seelen).
-3. ☐ Kampfmusik treibender: Schichten, die mit der Kampflage anziehen (Gegnerzahl, Gefahr,
+3. ☑ Kampfmusik treibender: Schichten, die mit der Kampflage anziehen (Gegnerzahl, Gefahr,
    wenig Leben); weniger Flächen, mehr Puls.
 4. ☐ Monster weniger monoton: Hollow-Maske lesbar, Unterschiede im Körperbau und im Gang;
    unruhige, zuckende Bewegungen.
@@ -553,7 +553,25 @@ Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreati
   `TOUR_AUDIO voices=…` je Station und den kürzesten Abstand zweier Rufe (0,62 s). Audio-
   Laufzeit- (71 Töne), Gameplay- (10 Wellen) und Tod-Neustart-Test grün, 263 Unit-Tests.
 
+- Kampfmusik (Owner: „zu cinematisch, nicht actionreich und spannend“; CLAP hörte den Ludo-Loop als
+  „calm cinematic music“ 0,57): Während einer Welle und in Prolog-Kämpfen spielt eine neue
+  Partitur aus drei Stems (`tools/audio/recipes/combat_music.py`, 128 bpm, G# phrygisch, 30 s,
+  deckungsgleich, nahtlos): Puls (Taiko, Sub-Kick, galoppierender Bass, Orgelpunkt des Ofens),
+  Antrieb (Ambosse und Hämmer der Gießhalle, Eisen-Snare, Blechstöße, Tom-Fills), Raserei
+  (Spiccato über Grundton, kleiner Sekunde und Quinte, Chorschreie mit Glissando, zu schnelles
+  Uhrwerk, Spieluhr, Riser). `AudioDirector.SetCombatIntensity` schichtet nach Kampflage
+  (Gegnerzahl, nahe Ausholbewegung mit 4 s Nachglühen, wenig Leben, Resonanz, Wellennummer; im
+  Prolog höchstens 0,6): Puls immer, Antrieb ab ~0,3, Raserei ab ~0,62; Ebenen steigen in 1,2 s,
+  fallen in 3 s; jeder Kampf beginnt auf dem Downbeat; der Ludo-Loop tritt darunter zurück und
+  bleibt für Intro, Pausen, Sandbox. Unter frischen Warnsignalen dippt die Partitur um 25 %.
+  Rundgang protokolliert `score=Puls/Antrieb/Raserei song=…` (Intro 0/0/0, Wellenbeginn steigend,
+  Devourer im Gedränge und wenig Leben 1/1/1, nach dem Tod ausblendend, Song zurück).
+  CLAP: Puls+Antrieb „intense action music with drums“ 0,61, alle drei 0,39 (vorn).
+  `mix_report.py --zone combat` (alle Stems voll): alle Warnsignale im Band. Install-Option
+  `--seamless` (ohne Randblende, sonst fiel der Bass alle 30 s für 16 ms aus).
+
 **Verworfen (Durchgang 4):**
+- Raserei als schwebende Tremolo-Flächen: die volle Mischung kippte zu „calm cinematic“.
 - Schreie aus reiner Stimmlippenquelle durch Formanten, auch mit Biphonation: CLAP „horn“ und
   „synthesizer tone“ bis 0,57. Erst Luft durch die Formanten und tiefe Rauheit machen eine Kehle.
 - Gleichmäßig getaktetes Kichern: mechanisch; jetzt ungleiche Silben, fallender Atem, Kiekser.

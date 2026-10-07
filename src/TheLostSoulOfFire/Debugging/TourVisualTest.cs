@@ -490,8 +490,11 @@ internal sealed class TourVisualTest
     {
         EnterArena(1);
         Series("intro", 6, 15);
+        Do("score_intro", () => Console.WriteLine($"TOUR_AUDIO station=arena_wave1 intro {_world.AutomatedAudio.DescribePresence()}"));
         Shot("combat", () => _world.PlaceAutomatedPlayer(ArenaCentre),
             () => _world.LoopState == ArenaLoopState.Combat && _world.AutomatedEnemies.Any(enemy => enemy.IsAlive), 20f, 0.5f);
+        // The combat score has come in: the pulse at least, the drive with a few enemies.
+        Do("score_combat", () => Console.WriteLine($"TOUR_AUDIO station=arena_wave1 combat {_world.AutomatedAudio.DescribePresence()}"), 2.5f);
         Shot("hollow_telegraph", ready: () => _world.AutomatedEnemies.OfType<Hollow>().Any(hollow => hollow.State == HollowState.Telegraph), timeout: 12f,
             everyFrame: () => { if (Nearest<Hollow>() is { } hollow) AimAt(hollow.Position); });
         Series("hollow_swipe", 12, 2);
@@ -716,9 +719,11 @@ internal sealed class TourVisualTest
         Do("wound", () => _world.RequestAutomatedDamage(_world.AutomatedPlayer.Health - 15), 0.2f);
         Series("low", 18, 8);
         Do("stop_listening_throb", () => _world.AutomatedAudio.CuePlayed -= LogCannon);
+        Do("score_low", () => Console.WriteLine($"TOUR_AUDIO station=arena_death low {_world.AutomatedAudio.DescribePresence()}"));
         Do("damage", () => _world.RequestAudioTestFatalDamage());
         Series("dying", 16, 4);
         Shot("dead", minWait: 1.5f);
+        Do("score_dead", () => Console.WriteLine($"TOUR_AUDIO station=arena_death dead {_world.AutomatedAudio.DescribePresence()}"));
     }
 
     private void BuildMenus()

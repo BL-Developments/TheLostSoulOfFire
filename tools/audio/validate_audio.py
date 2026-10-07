@@ -175,6 +175,8 @@ POINT_LOOPS = {"warden_flame_loop.wav", "life_flame_loop.wav", "presence_burning
 #: Ambience beds and music per zone (AudioDirector.AmbienceAssets / MusicAssets).
 ZONE_AMBIENCES = ["shore_ambience.wav", "hub_ambience.wav", "harbour_ambience.wav", "causeway_ambience.wav",
                   "crossing_ambience.wav", "threshold_ambience.wav"]
+#: The combat score (recipes/combat_music.py): three stems of one loop, exactly 30 s at 128 bpm.
+COMBAT_STEMS = ["combat_pulse.wav", "combat_drive.wav", "combat_frenzy.wav"]
 ZONE_MUSIC = ["title_theme.ogg", "shore_theme.ogg", "hub_theme.ogg", "causeway_theme.ogg", "crossing_theme.ogg",
               "threshold_theme.ogg"]
 
@@ -276,7 +278,8 @@ def main() -> int:
     expected_paths.extend((sfx_root / filename, "SoundEffectProcessor", duration) for filename, duration in AUTHORED_SFX_DURATIONS.items())
     expected_paths.extend((args.content_root / "Audio" / "Ambience" / name, "SoundEffectProcessor", None) for name in ZONE_AMBIENCES)
     expected_paths.extend((args.content_root / "Audio" / "Music" / name, "SongProcessor", None) for name in ZONE_MUSIC)
-    loops = {"arena_ambience.wav", "arena_loop.ogg", *ZONE_AMBIENCES, *ZONE_MUSIC}
+    expected_paths.extend((args.content_root / "Audio" / "Music" / name, "SoundEffectProcessor", 30.0) for name in COMBAT_STEMS)
+    loops = {"arena_ambience.wav", "arena_loop.ogg", *ZONE_AMBIENCES, *ZONE_MUSIC, *COMBAT_STEMS}
 
     manifest_path = args.content_root / "Content.mgcb"
     sources_path = args.content_root / "Audio" / "SOURCES.md"

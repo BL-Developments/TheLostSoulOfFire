@@ -55,6 +55,7 @@ public sealed partial class GameWorld : IDisposable
     private readonly GroundImpacts _groundImpacts = new();
     private readonly EnemyVoices _enemyVoices = new();
     private Action<AudioCue, float, Vector2>? _speak;
+    private float _dangerHeat;
     private readonly List<SceneProp> _sceneProps = [];
     private readonly List<SceneProp> _arenaProps = Arena.Props
         .Select(placement => new SceneProp(placement.VisualId, placement.Foot, placement.FallbackSize, placement.FallbackLayer))
@@ -206,6 +207,7 @@ public sealed partial class GameWorld : IDisposable
         _audio.SetLifeFlame(ending ? _presentation.GetLifeFlameAlpha() * _presentation.GetLifeFlameKindle() : 0f,
             PanOf(_presentation.GetLifeFlamePosition()) * 0.7f);
         UpdateEnemyPresence(deltaTime);
+        UpdateCombatMusic(deltaTime);
         UpdateWardenFlames(deltaTime);
         _audio.SetResonanceRumble(IsCombatPhase && _player.ResonanceActive && !_player.IsDead, deltaTime);
         _audio.SetCannonHum(IsCombatPhase && !_player.IsDead && _player.Cannon.State == SoulCannonState.Charging
@@ -2056,6 +2058,42 @@ public sealed partial class GameWorld : IDisposable
 
     /// <summary>Stereo position of a sound source left or right of the player (presentation only).</summary>
     private float PanOf(Vector2 source) => MathHelper.Clamp((source.X - _player.Position.X) / 700f, -0.8f, 0.8f);
+
+    /// <summary>
+    /// How hot the fight runs, for the combat score (presentation only): a fight is on during an
+    /// arena wave or while enemies stand in the prologue. More enemies, a nearby wind-up (it keeps
+    /// the heat for a few seconds), little health, Resonance and later waves push it up; the
+    /// prologue's lessons stay below the frenzy.
+    /// </summary>
+    private void UpdateCombatMusic(float deltaTime)
+    {
+        bool arenaFight = _phase == GamePhase.Arena && !_sandboxActive && _loopState == ArenaLoopState.Combat;
+        int alive = 0;
+        bool danger = false;
+        foreach (Enemy enemy in _enemies)
+        {
+            if (!enemy.IsAlive)
+            {
+                continue;
+            }
+            alive++;
+            bool windingUp = enemy is Hollow { State: HollowState.Telegraph or HollowState.Swipe } ||
+                enemy is Burning { State: BurningState.Telegraph or BurningState.Charge } ||
+                enemy is Devourer { State: DevourerState.SlamTelegraph or DevourerState.Slam };
+            danger |= windingUp && Vector2.DistanceSquared(enemy.Position, _player.Position) < 650f * 650f;
+        }
+        bool prologueFight = _phase == GamePhase.Prologue && alive > 0;
+        bool active = (arenaFight || prologueFight) && !_player.IsDead;
+        _dangerHeat = danger ? 1f : MathF.Max(0f, _dangerHeat - deltaTime / 4f);
+        float intensity = 0.28f + 0.06f * Math.Min(alive, 6) + 0.15f * _dangerHeat +
+            (_player.Health <= _player.MaxHealth * 0.3f ? 0.22f : 0f) + (_player.ResonanceActive ? 0.12f : 0f) +
+            (arenaFight ? 0.025f * _waveNumber : 0f);
+        if (prologueFight)
+        {
+            intensity = MathF.Min(intensity, 0.6f);
+        }
+        _audio.SetCombatIntensity(active, MathHelper.Clamp(intensity, 0f, 1f), deltaTime);
+    }
 
     /// <summary>
     /// Each enemy kind is heard where the nearest of its kind stands (presentation only): louder

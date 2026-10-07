@@ -37,6 +37,10 @@ ZONE_BEDS = {
     "hub": ("Audio/Ambience/hub_ambience", 0.13, "Audio/Music/hub_theme", 0.3),
     "shore": ("Audio/Ambience/shore_ambience", 0.11, "Audio/Music/shore_theme", 0.5),
     "crossing": ("Audio/Ambience/crossing_ambience", 0.10, "Audio/Music/crossing_theme", 0.32),
+    # A hot arena fight: the combat score's three stems at full (AudioDirector.CombatStemGains,
+    # times MusicGameplayVolume); the arena loop steps back under it.
+    "combat": ("Audio/Ambience/arena_ambience", 0.12,
+               [("Audio/Music/combat_pulse", 0.6), ("Audio/Music/combat_drive", 0.54), ("Audio/Music/combat_frenzy", 0.48)], None),
 }
 
 #: Expected bands in LU above the bed: (lower, upper).
@@ -84,6 +88,8 @@ ZONE_CUES = {
     "hub": lambda cue, kind: (kind in ("ui", "sense") and cue not in ("CurrencyGain", "SoulThrob")) or cue in ("Footstep", "DoorAwaken"),
     "shore": lambda cue, kind: cue not in ARENA_ONLY,
     "crossing": lambda cue, kind: cue not in ARENA_ONLY,
+    # During a wave: no menus, chests or wave calls, only the fight.
+    "combat": lambda cue, kind: kind not in ("ui",) and cue not in ARENA_ONLY,
 }
 
 
@@ -166,7 +172,8 @@ def main(argv: list[str]) -> int:
         found = re.search(r"MusicGameplayVolume\s*=\s*([\d.]+)f", text)
         music_level = float(found.group(1)) if found else 0.5
     beds = []
-    for path, level in ((ambience_path, ambience_level), (music_path, music_level)):
+    music = [(path, gain * music_level) for path, gain in music_path] if isinstance(music_path, list) else [(music_path, music_level)]
+    for path, level in [(ambience_path, ambience_level), *music]:
         data = load(path)
         if data is None:
             print(f"fehlt: {path}")

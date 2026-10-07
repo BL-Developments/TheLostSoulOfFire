@@ -341,6 +341,19 @@ public sealed class AudioDirector : IDisposable
     private float _humLevel;
     private SoundEffect? _resonanceSound;
     private SoundEffectInstance? _resonance;
+
+    /// <summary>
+    /// The combat score (tools/audio/recipes/combat_music.py): three stems of one 30 s loop at
+    /// 128 bpm - pulse, drive, frenzy - started together at the top of a fight so they stay
+    /// aligned, and layered by how hot the fight runs. While they play, the zone's song steps back.
+    /// </summary>
+    private static readonly string[] CombatStemAssets = ["Audio/Music/combat_pulse", "Audio/Music/combat_drive", "Audio/Music/combat_frenzy"];
+    /// <summary>Level of each stem against the gameplay music level: pulse and drive together about as loud as the arena loop.</summary>
+    private static readonly float[] CombatStemGains = [0.6f, 0.54f, 0.48f];
+    private readonly SoundEffect?[] _combatStemSounds = new SoundEffect?[3];
+    private readonly SoundEffectInstance?[] _combatStems = new SoundEffectInstance?[3];
+    private readonly float[] _combatStemLevels = new float[3];
+    private bool _combatStemsMissing;
     private float _resonanceLevel;
     private const float ResonanceRumbleVolume = 0.4f;
     private SoundEffect? _lifeFlameSound;
@@ -376,7 +389,9 @@ public sealed class AudioDirector : IDisposable
     /// <summary>Diagnostics for the tour: the volume and pan of each presence loop that plays.</summary>
     public string DescribePresence() => string.Join(" ", _presence.Select(pair => string.Create(
         System.Globalization.CultureInfo.InvariantCulture, $"{pair.Key}={pair.Value.Volume:0.00}@{pair.Value.Pan:+0.00;-0.00}"))) +
-        string.Create(System.Globalization.CultureInfo.InvariantCulture, $" resonance={_resonance?.Volume ?? 0f:0.00} hum={_hum?.Volume ?? 0f:0.00}@{_hum?.Pitch ?? 0f:+0.00;-0.00}");
+        string.Create(System.Globalization.CultureInfo.InvariantCulture, $" resonance={_resonance?.Volume ?? 0f:0.00} hum={_hum?.Volume ?? 0f:0.00}@{_hum?.Pitch ?? 0f:+0.00;-0.00}") +
+        string.Create(System.Globalization.CultureInfo.InvariantCulture,
+            $" score={_combatStemLevels[0]:0.00}/{_combatStemLevels[1]:0.00}/{_combatStemLevels[2]:0.00} song={(_musicPlaying ? MediaPlayer.Volume : 0f):0.00}");
 
     /// <summary>Diagnostics for the tour: what plays now (song asset, Life Flame loop level).</summary>
     public string DescribeEnding() => string.Create(System.Globalization.CultureInfo.InvariantCulture,
@@ -1002,6 +1017,88 @@ public sealed class AudioDirector : IDisposable
         }
     }
 
+    /// <summary>
+    /// The combat score's layers for this frame: <paramref name="active"/> while a fight is on,
+    /// <paramref name="intensity"/> (0..1) how hot it runs. The pulse comes in with any fight, the
+    /// drive from about a third, the frenzy near the top; layers rise within ~1.2 s and fall
+    /// over ~3 s, so a moment of danger does not make the music flicker. When the fight ends all
+    /// three fade and stop, and the next fight starts again on the downbeat.
+    /// </summary>
+    public void SetCombatIntensity(bool active, float intensity, float deltaTime)
+    {
+        if (!_available || _combatStemsMissing)
+        {
+            return;
+        }
+
+        float wanted0 = active ? 1f : 0f;
+        float wanted1 = active ? Smooth(0.3f, 0.55f, intensity) : 0f;
+        float wanted2 = active ? Smooth(0.62f, 0.85f, intensity) : 0f;
+        bool any = false;
+        for (int index = 0; index < 3; index++)
+        {
+            float wanted = index == 0 ? wanted0 : index == 1 ? wanted1 : wanted2;
+            float level = _combatStemLevels[index];
+            level = wanted > level ? MathF.Min(wanted, level + deltaTime / 1.2f) : MathF.Max(wanted, level - deltaTime / 3f);
+            _combatStemLevels[index] = level;
+            any |= level > 0.001f;
+        }
+
+        try
+        {
+            if (any && _combatStems[0] is null)
+            {
+                for (int index = 0; index < 3; index++)
+                {
+                    _combatStemSounds[index] ??= _content.Load<SoundEffect>(CombatStemAssets[index]);
+                }
+                // Created first and started back to back, so the three loops run in step.
+                for (int index = 0; index < 3; index++)
+                {
+                    SoundEffectInstance stem = _combatStemSounds[index]!.CreateInstance();
+                    stem.IsLooped = true;
+                    stem.Volume = 0f;
+                    _combatStems[index] = stem;
+                }
+                foreach (SoundEffectInstance? stem in _combatStems)
+                {
+                    stem!.Play();
+                }
+            }
+            else if (!any && !active && _combatStems[0] is not null)
+            {
+                StopCombatStems();
+            }
+        }
+        catch (ContentLoadException)
+        {
+            // Without the score the zone's song simply plays on.
+            _combatStemsMissing = true;
+            StopCombatStems();
+            return;
+        }
+        ApplyMix();
+    }
+
+    /// <summary>How much of the combat score plays (its pulse layer), 0..1.</summary>
+    public float CombatMusicLevel => _combatStems[0] is null ? 0f : _combatStemLevels[0];
+
+    private void StopCombatStems()
+    {
+        for (int index = 0; index < 3; index++)
+        {
+            try { _combatStems[index]?.Stop(); _combatStems[index]?.Dispose(); } catch { }
+            _combatStems[index] = null;
+            _combatStemLevels[index] = 0f;
+        }
+    }
+
+    private static float Smooth(float from, float to, float value)
+    {
+        float t = Math.Clamp((value - from) / (to - from), 0f, 1f);
+        return t * t * (3f - 2f * t);
+    }
+
     /// <summary>Discards every running or paused effect, e.g. when a run is abandoned.</summary>
     public void StopEffects()
     {
@@ -1077,6 +1174,7 @@ public sealed class AudioDirector : IDisposable
 
     public void Dispose()
     {
+        StopCombatStems();
         DisposeSounds();
         try { SoundEffect.MasterVolume = 1f; } catch { }
         GC.SuppressFinalize(this);
@@ -1265,9 +1363,24 @@ public sealed class AudioDirector : IDisposable
         {
             _fadingAmbience.Volume = Math.Clamp(fadingBase * (1f - _zoneBlend) * bedScale, 0f, 1f);
         }
+        // The zone's song steps back while the combat score plays.
+        float combat = CombatMusicLevel;
         if (_musicPlaying)
         {
-            MediaPlayer.Volume = Math.Clamp(musicBase * _masterVolume * _musicVolume * (1f - _duckAmount * 0.62f), 0f, 1f);
+            MediaPlayer.Volume = Math.Clamp(musicBase * (1f - 0.92f * combat) * _masterVolume * _musicVolume * (1f - _duckAmount * 0.62f), 0f, 1f);
+        }
+        if (_combatStems[0] is not null)
+        {
+            // A fresh warning cuts through: the score dips a little under it.
+            float stemBase = MusicGameplayVolume * _masterVolume * _musicVolume * (1f - _duckAmount * 0.62f) *
+                (1f - 0.25f * _focus) * (_soulSense ? 0.68f : 1f) * (_paused ? PausedBedVolume : 1f);
+            for (int index = 0; index < 3; index++)
+            {
+                if (_combatStems[index] is { } stem)
+                {
+                    stem.Volume = Math.Clamp(stemBase * CombatStemGains[index] * _combatStemLevels[index], 0f, 1f);
+                }
+            }
         }
     }
 

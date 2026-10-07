@@ -379,3 +379,19 @@ CLAP (ausgewählte Takes): hollow-call „zombie groan“/„ghostly moaning voi
 | `Audio/Sfx/devourer_growl_3.wav` | devourer-growl Seed 4 | 1.48 s, 1 Kanal/Kanäle, -20.0 LUFS, Spitze -8.1 dBFS |
 | `Audio/Sfx/devourer_hunger_1.wav` | devourer-hunger Seed 1 | 1.60 s, 1 Kanal/Kanäle, -21.0 LUFS, Spitze -8.4 dBFS |
 | `Audio/Sfx/devourer_hunger_2.wav` | devourer-hunger Seed 2 | 1.60 s, 1 Kanal/Kanäle, -21.0 LUFS, Spitze -8.0 dBFS |
+
+## Kampfmusik der Gießhalle (Durchgang 4, 07.10.2026)
+
+Owner: Die Stimmung ist zu filmisch und atmosphärisch, nicht actionreich und spannend genug. CLAP hört den Ludo-Arena-Loop als „calm cinematic music“ (0,57). Der Loop bleibt für Intro, Zwischenpausen und Sandbox; während einer Welle (und während Prolog-Kämpfen) übernimmt eine Partitur aus drei Stems, die das Spiel nach Kampflage schichtet (`AudioDirector.SetCombatIntensity`). Rezepte in `tools/audio/recipes/combat_music.py`, 128 bpm (ein Schlag genau 22 500 Samples, 16 Takte genau 30 s), G# phrygisch über einem Orgelpunkt (i–bII), alle drei aus derselben festen Partitur und deckungsgleich; Hall um die Schleifengrenze gefaltet, die Datei beginnt 1714 Samples vor dem Downbeat, wo alle drei weniger als −57 dBFS springen; installiert mit `--seamless` (ohne Randblende).
+
+- Puls: Taiko und Sub-Kick, galoppierender verzerrter Bass, Orgelpunkt des Ofens.
+- Antrieb: Ambosse und Hämmer der Gießhalle auf dem Backbeat, Eisen-Snare, gehämmerte Hats, Blechstöße in Quinten, Tom-Fills am Phrasenende.
+- Raserei: Spiccato-Ostinato über Grundton, kleiner Sekunde und Quinte, darunter leise Tremolo-Cluster, Chorschreie mit fallendem Glissando, ein zu schnelles Uhrwerk, verstimmte Spieluhr, Riser in die Phrasen.
+
+CLAP (je 10 s): Puls + Antrieb „intense action music with drums“ 0,61; alle drei „intense action music with drums“ 0,39 vor „calm cinematic“ 0,27; die Raserei allein „techno“ 0,86 (sie spielt nie allein). Mix (`mix_report.py --zone combat`, alle Stems voll): alle Warnsignale im Band (+6,3 bis +14 LU), zusätzlich duckt die Partitur kurz unter frischen Warnsignalen. Verworfen: Raserei als schwebende Tremolo-Flächen (die volle Mischung kippte zu „calm cinematic“ 0,35).
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Music/combat_pulse.wav` | combat-pulse Seed 1 | 30.00 s, 2 Kanal/Kanäle, -20.0 LUFS, Spitze -9.9 dBFS |
+| `Audio/Music/combat_drive.wav` | combat-drive Seed 1 | 30.00 s, 2 Kanal/Kanäle, -21.0 LUFS, Spitze -9.9 dBFS |
+| `Audio/Music/combat_frenzy.wav` | combat-frenzy Seed 1 | 30.00 s, 2 Kanal/Kanäle, -22.0 LUFS, Spitze -11.8 dBFS |

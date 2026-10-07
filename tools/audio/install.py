@@ -4,10 +4,13 @@
     tools/audio/.venv/bin/python tools/audio/install.py CANDIDATE.wav Audio/Sfx/ui_move.wav
     tools/audio/.venv/bin/python tools/audio/install.py CANDIDATE.wav Audio/Music/title_theme.ogg
     tools/audio/.venv/bin/python tools/audio/install.py CANDIDATE.wav Audio/Ambience/x.wav --crossfade 1.5
+    tools/audio/.venv/bin/python tools/audio/install.py CANDIDATE.wav Audio/Music/combat_pulse.wav --seamless
 
 WAV targets are copied as 16-bit PCM (effects mono, ambience stereo, 48 kHz); OGG targets are
 encoded with oggenc at quality 5 (48 kHz stereo), like the approved arena loop. Loops get 8 ms
-edge fades, or with --crossfade an equal-power crossfade of tail into head (seamless texture). The mgcb block
+edge fades, or with --crossfade an equal-power crossfade of tail into head (seamless texture); with
+--seamless they stay untouched (a recipe that already wraps its tails, like the combat stems, whose
+continuous bass would drop out for 16 ms at a faded seam). The mgcb block
 matches what tools/audio/validate_audio.py expects. Prints the ledger line for SOURCES.md
 (recipe, seed, LUFS, peak) from the candidate's JSON report next to it.
 """
@@ -48,6 +51,8 @@ def crossfade_loop(data: np.ndarray, rate: int, seconds: float) -> np.ndarray:
 
 def main(argv: list[str]) -> int:
     crossfade = 0.0
+    seamless = "--seamless" in argv
+    argv = [arg for arg in argv if arg != "--seamless"]
     if "--crossfade" in argv:
         index = argv.index("--crossfade")
         crossfade = float(argv[index + 1])
@@ -62,7 +67,7 @@ def main(argv: list[str]) -> int:
         data = data.mean(axis=1, keepdims=True)
     if crossfade > 0 and relative.startswith(("Audio/Ambience/", "Audio/Music/")):
         data = crossfade_loop(data, rate, crossfade)
-    elif relative.startswith(("Audio/Ambience/", "Audio/Music/")):
+    elif relative.startswith(("Audio/Ambience/", "Audio/Music/")) and not seamless:
         # Loops: an 8 ms fade at both edges keeps the seam free of a sample jump (a downbeat
         # that starts on sample 0 would otherwise click once per loop).
         edge = int(0.008 * rate)
