@@ -970,3 +970,6 @@ Gegner-Zuckens, Deutlichkeit von Schattenhand und Schlagrand im Gedränge, die I
   CPU im Mittel ≤ 0,52 ms; Ortsklänge in allen Zonen gezählt (Ufer Fallblatt/Horn, Überfahrt
   Bootsächzen ×2, Vorhalle Flüstern, Gießhalle Glocke), kürzester Abstand zweier Rufe 0,65 s.
   Behalten: Basislauf 20261007_101956 und dieser Lauf; Zwischenläufe dieser Sitzung gelöscht.
+- Verworfen: Burning auf nassem Pflaster – Zischen als Klang (CLAP hört kurze Rauschimpulse als
+  „gunshot“ 0,52–0,68, auch mit weichem Einsatz) und Dampfwolken an seinen Schritten (ausgelöst,
+  aber neben dem Hollow und auf dem Hafenpflaster selbst mit Deckkraft 0,5 kaum zu sehen).
