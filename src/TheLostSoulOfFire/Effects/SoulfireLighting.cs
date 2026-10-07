@@ -183,13 +183,15 @@ public static class SoulfireLighting
         Vector2 muzzle = renderedPlayer
             ? FigureHeights.MuzzleOf(player.Position, player.FacingDirection, charge)
             : player.Position + player.FacingDirection * 74f;
-        float chargeRadius = SoulfireRenderSettings.CannonGlowRadius * MathHelper.Lerp(0.68f, 1.55f, charge);
+        // Sized to the 0.85 m cannon: at full charge a white core at the mouth, but the cannon and the
+        // arm holding it stay readable (the 1.2 m cannon's glow washed the whole weapon white).
+        float chargeRadius = SoulfireRenderSettings.CannonGlowRadius * MathHelper.Lerp(0.55f, 1.15f, charge);
         Color chargeColor = player.Cannon.IsFullCharge ? GameBalance.SoulWhite : GameBalance.DeathFlameBright;
-        float intensity = SoulfireRenderSettings.CannonGlowIntensity * MathHelper.Lerp(0.55f, 1.35f, charge);
+        float intensity = SoulfireRenderSettings.CannonGlowIntensity * MathHelper.Lerp(0.55f, 1.15f, charge);
         renderer.DrawGlow(batch, muzzle, chargeRadius, chargeColor, intensity);
         if (player.Cannon.IsFullCharge)
         {
-            renderer.DrawGlow(batch, muzzle, chargeRadius * 0.48f, GameBalance.SoulWhite, 0.58f);
+            renderer.DrawGlow(batch, muzzle, chargeRadius * 0.4f, GameBalance.SoulWhite, 0.5f);
         }
     }
 

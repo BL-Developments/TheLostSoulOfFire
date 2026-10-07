@@ -1467,7 +1467,7 @@ public sealed partial class GameWorld : IDisposable
                 VisualIds.CannonChargeLoop,
                 muzzle,
                 0f,
-                _player.Cannon.IsFullCharge ? 0.68f : MathHelper.Lerp(0.28f, 0.61f, charge),
+                _player.Cannon.IsFullCharge ? 0.52f : MathHelper.Lerp(0.24f, 0.46f, charge),
                 chargeColor);
             if (rendered)
             {

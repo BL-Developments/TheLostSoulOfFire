@@ -1018,7 +1018,9 @@ public sealed class AudioDirector : IDisposable
             }
             float c = MathHelper.Clamp(charge ?? 1f, 0f, 1f);
             _hum.Pitch = MathHelper.Clamp(-0.35f + 0.45f * c + (c >= 1f ? 0.08f : 0f), -1f, 1f);
-            _hum.Volume = Math.Clamp((0.14f + 0.3f * c) * _humLevel, 0f, 1f);
+            // Noise masks noise: the roar needs more level than the old tonal hum to rise audibly
+            // over the combat score (about -4 LU under it at full charge, mix_report).
+            _hum.Volume = Math.Clamp((0.2f + 0.45f * c) * _humLevel, 0f, 1f);
         }
         catch (ContentLoadException)
         {

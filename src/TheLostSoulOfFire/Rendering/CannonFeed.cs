@@ -73,12 +73,12 @@ public static class CannonFeed
         float beat = full ? 0.85f + 0.15f * MathF.Sin(time * 22f) : 1f;
         Color fill = flame * ((0.25f + 0.55f * charge) * beat * seen);
         fill.A = 0;
-        batch.Draw(softSpot, chamber, null, fill, 0f, origin, (10f + 8f * charge) * 2f / softSpot.Width, SpriteEffects.None, 0f);
+        batch.Draw(softSpot, chamber, null, fill, 0f, origin, (8f + 5f * charge) * 2f / softSpot.Width, SpriteEffects.None, 0f);
         if (charge > 0.5f)
         {
-            Color white = GameBalance.SoulWhite * ((charge - 0.5f) * (full ? 1.2f : 0.8f) * beat * seen);
+            Color white = GameBalance.SoulWhite * ((charge - 0.5f) * (full ? 0.9f : 0.6f) * beat * seen);
             white.A = 0;
-            batch.Draw(softSpot, chamber, null, white, 0f, origin, (4f + 3f * charge) * 2f / softSpot.Width, SpriteEffects.None, 0f);
+            batch.Draw(softSpot, chamber, null, white, 0f, origin, (3f + 2f * charge) * 2f / softSpot.Width, SpriteEffects.None, 0f);
         }
     }
 }
