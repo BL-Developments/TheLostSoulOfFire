@@ -346,3 +346,12 @@ Owner: Der Klang beim Schlagen muss mächtiger werden. Rezepte `scythe-weight-1/
 | `Audio/Sfx/scythe_weight_2_2.wav` | scythe-weight-2 Seed 2 | 0.48 s, 1 Kanal/Kanäle, -19.6 LUFS, Spitze -2.0 dBFS |
 | `Audio/Sfx/scythe_weight_3_1.wav` | scythe-weight-3 Seed 1 | 0.70 s, 1 Kanal/Kanäle, -19.3 LUFS, Spitze -2.0 dBFS |
 | `Audio/Sfx/scythe_weight_3_2.wav` | scythe-weight-3 Seed 2 | 0.70 s, 1 Kanal/Kanäle, -19.9 LUFS, Spitze -2.0 dBFS |
+
+## Bodenbruch unter dem Devourer-Schlag (Durchgang 4, 07.10.2026)
+
+Owner: Der Devourer soll seinen Flächenschaden durch einen echten Bodenschlag zeigen statt durch einen Kreis. Rezept `ground-break` in `tools/audio/recipes/combat.py` liegt unter dem Ludo-Schlag und spielt im selben Frame wie der Bodenbruch im Bild: tiefer fallender Einschlag, eine Kette scharfer Risse in den ersten 120 ms, mahlende Platten, Geröll und Grus prasseln eine Sekunde lang nieder; Rissspitzen weich begrenzt, damit das Gewicht trägt. CLAP: „heavy impact cracking a stone floor“ 0,73/0,83 (Seed 3 mit „gunshot“ 0,18 verworfen).
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/ground_break_1.wav` | ground-break Seed 1 | 1.70 s, 1 Kanal/Kanäle, -21.7 LUFS, Spitze -2.0 dBFS |
+| `Audio/Sfx/ground_break_2.wav` | ground-break Seed 2 | 1.70 s, 1 Kanal/Kanäle, -23.0 LUFS, Spitze -2.0 dBFS |

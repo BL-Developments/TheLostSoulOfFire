@@ -496,3 +496,47 @@ Taumeln und -Tod, Burning-Tod, Burning-Angriff, HUD, Seelensinn der Vorhalle.
   Streuung je Stein ging in der Tonkurve unter.
 - Feuerknistern mit kräftigem Brausen und Atemband: CLAP hörte „Wind“ (0,5–0,8); das Brausen
   ist jetzt leise und tief, das Knistern trägt.
+
+## Arbeitsnotiz Durchgang 4 (ab 07.10.2026)
+
+**Owner-Befund 07.10.:** Die Soul Cannon ergibt noch keinen Sinn; man versteht die Story
+nicht; die Stimmung ist zu filmisch-atmosphärisch, zu wenig actionreich, spannend und etwas
+verrückt, mit Klangsignalen der Monster; die Monster wirken in Bewegung und Aussehen
+monoton. Beispiel: Der Devourer soll Flächenschaden nicht durch einen Kreis zeigen, sondern
+durch einen harten Schlag auf den Boden, der den Boden ringsum sichtbar trifft. Sense- und
+Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreativer werden.
+
+**Prioritäten (nach Wirkung):**
+1. ☑ Devourer-Schlag als Bodenbruch statt Kreis.
+2. ☐ Monster mit Stimme: Rufe beim Bemerken, Angriffsschreie, Schmerzlaute, verrückte
+   Zwischenrufe, je Art eigen und lore-treu (Hollow: Greifen nach Gehenden; Burning: instabile
+   Glut; Devourer: Hunger, gefangene Seelen).
+3. ☐ Kampfmusik treibender: Schichten, die mit der Kampflage anziehen (Gegnerzahl, Gefahr,
+   wenig Leben); weniger Flächen, mehr Puls.
+4. ☐ Monster weniger monoton: Hollow-Maske lesbar, Unterschiede im Körperbau und im Gang;
+   unruhige, zuckende Bewegungen.
+5. ☐ Soul Cannon verständlich: Die Flamme wandert sichtbar Kern → Schulter → Arm → Kanone
+   (07_SOUL_CANNON, Schritt 3), die Kammer füllt sich.
+6. ☐ Story verständlich: Prolog-Zeilen sagen klar, wer man ist, wo man ist und warum man
+   kämpft (ohne neue Mechanik).
+
+**Erledigt und im Spiel geprüft:**
+- Devourer-Schlag (Owner-Beispiel): Beim Ausholen sickert Licht entlang der Hauptrisse aus
+  dem Boden und kriecht bis an den Rand des Schlags; lose Steine am Rand beginnen zu hüpfen,
+  Staub hebt sich. Beim Aufschlag bricht der Boden: Krater mit gekippten Platten, Risse bis
+  genau zum Wirkradius (sie ersetzen den Ring als Anzeige), Aufflammen der Risse, Staubwalze
+  bis an den Rand, aufsteigende Staubwolke über den Figuren, große Bodenplatten und Steine
+  als Trümmer, Kamerastoß nach unten mit Nachbeben auch ohne Treffer; die Risse bleiben 2,4 s
+  liegen und verblassen. Unterbrochenes Ausholen blendet aus. Neu: `tools/visuals/ground_kit.py`
+  (Texturen `ground_shatter`, `ground_fissures` mit 8 Stufen, `dust_puffs`),
+  `Rendering/GroundImpacts.cs`. Der Abwärtsschwung des Clips liegt jetzt in den letzten 0,07 s
+  des Ausholens, die Fäuste treffen im Frame der Schadensauflösung auf (vorher 0,07 s danach);
+  Ausholdauer, Radius, Schaden unverändert. Ton: `ground-break` unter dem Ludo-Schlag (Risse,
+  mahlende Platten, Geröll; CLAP „heavy impact cracking a stone floor“ 0,73/0,83), Mix
+  +9,3 LU über dem Arena-Bett. Ohne Texturen bleibt der alte Ring als Rückfall.
+  Geprüft: Rundgang `arena_devourer` (Serie vor und nach), 263 Unit-Tests, Audio-Laufzeittest
+  (65 Töne, kein Ersatzklang), `validate_audio.py` (174), `mix_report.py --zone arena`.
+
+**Verworfen (Durchgang 4):**
+- Ausholrisse mit allen Verästelungen als scharfe Lichtlinien: wirkten wie violette Blitze.
+  Jetzt nur die Hauptrisse als weiche Lichtnaht; alle Risse erst beim Bruch.

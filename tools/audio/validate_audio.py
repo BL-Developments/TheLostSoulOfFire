@@ -155,6 +155,9 @@ AUTHORED_SFX_DURATIONS = {
     "scythe_weight_2_2.wav": 0.480,
     "scythe_weight_3_1.wav": 0.700,
     "scythe_weight_3_2.wav": 0.700,
+    # The floor breaking under a Devourer's slam (recipes/combat.py), under the Ludo blow.
+    "ground_break_1.wav": 1.700,
+    "ground_break_2.wav": 1.700,
     # The Life Flame's fire after the last wave (tools/audio/recipes/ambiences.py), looped.
     "life_flame_loop.wav": 9.0,
 }

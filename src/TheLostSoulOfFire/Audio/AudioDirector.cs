@@ -79,7 +79,9 @@ public enum AudioCue
     ScytheWeight1,
     ScytheWeight2,
     ScytheWeight3,
-    SoulThrob
+    SoulThrob,
+    /// <summary>The floor breaking under a Devourer's slam, under the Ludo blow: cracks, grinding slabs, falling rubble.</summary>
+    GroundBreak
 }
 
 /// <summary>
@@ -197,7 +199,8 @@ public sealed class AudioDirector : IDisposable
         [AudioCue.ScytheWeight1] = new(0.04f, 2, 0.03f),
         [AudioCue.ScytheWeight2] = new(0.05f, 2, 0.03f),
         [AudioCue.ScytheWeight3] = new(0.12f, 1, 0.02f),
-        [AudioCue.SoulThrob] = new(0.4f, 1)
+        [AudioCue.SoulThrob] = new(0.4f, 1),
+        [AudioCue.GroundBreak] = new(0.18f, 2, 0.03f, CueGroup.Enemy)
     };
 
     /// <summary>
@@ -432,6 +435,7 @@ public sealed class AudioDirector : IDisposable
             AddVariants(content, AudioCue.ScytheWeight3, "Audio/Sfx/scythe_weight_3", 2, 120f, 0.5f, 0.35f, 0.6f);
             // The bound soul throbbing when health runs low, heard from within, dry.
             AddVariants(content, AudioCue.SoulThrob, "Audio/Sfx/soul_throb", 2, 46f, 0.3f, 0.3f, 0.1f);
+            AddVariants(content, AudioCue.GroundBreak, "Audio/Sfx/ground_break", 2, 40f, 0.6f, 0.4f, 0.7f);
             Add(content, AudioCue.CannonDraw, "Audio/Sfx/cannon_draw", 140f, 0.3f, 0.3f, 0.4f);
             Add(content, AudioCue.CannonStow, "Audio/Sfx/cannon_stow", 120f, 0.3f, 0.3f, 0.4f);
             AddVariants(content, AudioCue.HitHollow, "Audio/Sfx/hit_hollow", 3, 180f, 0.1f, 0.3f, 0.7f);

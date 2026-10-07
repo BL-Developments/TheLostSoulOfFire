@@ -52,6 +52,7 @@ public sealed partial class GameWorld : IDisposable
     private readonly CinematicPresentation _presentation = new();
     private readonly ArtAssets _art;
     private readonly SpriteVfxSystem _spriteVfx;
+    private readonly GroundImpacts _groundImpacts = new();
     private readonly List<SceneProp> _sceneProps = [];
     private readonly List<SceneProp> _arenaProps = Arena.Props
         .Select(placement => new SceneProp(placement.VisualId, placement.Foot, placement.FallbackSize, placement.FallbackLayer))
@@ -284,6 +285,7 @@ public sealed partial class GameWorld : IDisposable
         _art.Update(deltaTime);
         UpdateSceneProps(deltaTime);
         _spriteVfx.Update(deltaTime);
+        _groundImpacts.Update(deltaTime);
         UpdateFps(deltaTime);
         _screenEffects.Update(deltaTime);
         _camera.ZoomPunch = _screenEffects.ZoomPunch;
@@ -549,6 +551,10 @@ public sealed partial class GameWorld : IDisposable
             {
                 _audio.Play(AudioCue.DevourerWindup, 0.72f, 0f, PanOf(enemy.Position) * 0.6f);
             }
+            if (enemy is Devourer gatheringDevourer && gatheringDevourer.State == DevourerState.SlamTelegraph)
+            {
+                _groundImpacts.WindUp(gatheringDevourer, gatheringDevourer.Position, GameBalance.DevourerSlamRange, gatheringDevourer.SlamWindup, deltaTime);
+            }
             if (enemy is Hollow hollowAfter && previousHollowState != HollowState.Swipe && hollowAfter.State == HollowState.Swipe)
             {
                 // The grab is a danger signal: clearly above the room, below a hit.
@@ -563,13 +569,7 @@ public sealed partial class GameWorld : IDisposable
                 if (previousDevourerState != DevourerState.Slam && devourerAfter.State == DevourerState.Slam)
                 {
                     _audio.Play(AudioCue.DevourerSlam, 0.76f, 0f, PanOf(devourerAfter.Position) * 0.6f);
-                    // Stone chips jump from the floor all around the impact.
-                    for (int chip = 0; chip < 6; chip++)
-                    {
-                        float angle = chip * MathHelper.TwoPi / 6f + 0.4f;
-                        Vector2 at = devourerAfter.Position + new Vector2(MathF.Cos(angle) * 70f, MathF.Sin(angle) * 40f);
-                        _particles.EmitDebris(at + new Vector2(0f, FigureHeights.Air), at.Y + FigureHeights.Air, 3, new Color(70, 64, 78), 150f, 4f, 0.7f);
-                    }
+                    PresentDevourerSlam(devourerAfter);
                 }
                 if (previousDevourerState != DevourerState.Devour && devourerAfter.State == DevourerState.Devour)
                 {
@@ -990,6 +990,7 @@ public sealed partial class GameWorld : IDisposable
             }
             DrawSceneProps(batch, layer => layer < SceneLayer.Actor);
             DrawFloorDepth(batch, viewport);
+            _groundImpacts.DrawFloor(batch);
             if (IsCombatPhase && _phase == GamePhase.Arena)
             {
                 DrawArenaLoop(batch, pixel);
@@ -1005,6 +1006,7 @@ public sealed partial class GameWorld : IDisposable
             _art.DrawDissolves(batch);
         }
         DrawActorBand(batch, pixel, shouldDrawPlayer && (inAntechamber || IsCombatPhase));
+        _groundImpacts.DrawAir(batch);
         DrawAutomatedStaging(batch);
 
         DrawSceneProps(batch, layer => layer is SceneLayer.Occluder or SceneLayer.Foreground);
@@ -1474,12 +1476,42 @@ public sealed partial class GameWorld : IDisposable
             renderedPlayer: _art.HasClip(VisualIds.Player, VisualClips.Aim),
             renderedEnemy: enemy => _art.IsRendered(enemy.VisualId));
 
+        renderer.BeginLighting(batch, RenderResolution.ToOutput(_camera.GetTransform(viewport, _screenEffects.CameraOffset)));
+        _groundImpacts.DrawLighting(batch, renderer);
         if (_automatedLightSource is not null)
         {
-            renderer.BeginLighting(batch, RenderResolution.ToOutput(_camera.GetTransform(viewport, _screenEffects.CameraOffset)));
             DrawAutomatedLights(renderer, batch);
-            batch.End();
         }
+        batch.End();
+    }
+
+    /// <summary>
+    /// The Devourer's fists hit the floor: it breaks out to the edge of the blow, slabs and stones
+    /// fly, the view drops with the weight (<see cref="GroundImpacts"/>). The hit itself is
+    /// resolved by the Devourer and unchanged.
+    /// </summary>
+    private void PresentDevourerSlam(Devourer devourer)
+    {
+        Vector2 center = devourer.Position;
+        float radius = GameBalance.DevourerSlamRange;
+        _groundImpacts.Slam(devourer, center, radius);
+        _audio.Play(AudioCue.GroundBreak, 0.82f, 0f, PanOf(center) * 0.6f);
+
+        // Slabs from the crater and stones from all over the broken floor.
+        _particles.EmitDebris(center + new Vector2(0f, FigureHeights.Air), center.Y + FigureHeights.Air, 12, new Color(78, 71, 86), 360f, 11f, 0.85f);
+        for (int chip = 0; chip < 12; chip++)
+        {
+            float angle = chip * MathHelper.TwoPi / 12f + 0.4f;
+            float reach = radius * (chip % 2 == 0 ? 0.45f : 0.8f);
+            Vector2 at = center + new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * reach;
+            _particles.EmitDebris(at + new Vector2(0f, FigureHeights.Air), at.Y + FigureHeights.Air, 3, new Color(70, 64, 78), 210f, 4.5f, 0.6f);
+        }
+
+        // The weight lands in the view too, less the further away the player stands.
+        float near = MathHelper.Clamp(1.2f - Vector2.Distance(_player.Position, center) / 900f, 0.35f, 1f);
+        _screenEffects.AddShake(0.34f, 9f * near);
+        _screenEffects.AddCameraKick(Vector2.UnitY, 7f * near);
+        _screenEffects.AddZoomPunch(0.012f * near);
     }
 
     /// <summary>
@@ -2303,6 +2335,7 @@ public sealed partial class GameWorld : IDisposable
         _openedChests.Clear();
         _particles.Clear();
         _spriteVfx.Clear();
+        _groundImpacts.Clear();
         _art.ClearTransient();
         _combatPresentation.Clear();
         _screenEffects.Clear();

@@ -192,6 +192,34 @@ def devourer_windup(rng) -> np.ndarray:
     return _finish(_room(x, rng, 0.8, 0.2, 3000), -21.0, -3.0, 0.02)
 
 
+@recipe("ground-break", "Der Boden bricht unter dem Devourer-Schlag: ein tiefer Einschlag, Stein birst und splittert nach außen, Platten mahlen, Geröll prasselt nieder")
+def ground_break(rng) -> np.ndarray:
+    n = dsp.seconds(1.7)
+    t = dsp.time_axis(n)
+    # The blow itself: a deep falling thump and a short pressure wave, no boom tail.
+    thump = _thump(n, 70, 34, 0.16) * 0.9 + _body(rng, n, 25, 220, 0.09, 1.1)
+    # The floor fractures outward: a cluster of sharp cracks over the first 120 ms, each a
+    # broadband snap with a little stony ring, getting smaller and further apart.
+    cracks = np.zeros(n)
+    for k in range(int(rng.integers(7, 11))):
+        at = 0.002 + rng.exponential(0.035) + k * 0.006
+        if at > 0.16:
+            continue
+        snap = _burst(rng, n, at, 900, 7500, rng.uniform(0.003, 0.008), rng.uniform(0.5, 1.0) * (1 - at * 3))
+        snap += dsp.resonator(_burst(rng, n, at, 400, 4000, 0.002, 1.0), rng.uniform(900, 1700), 6) * 0.25
+        cracks += snap
+    # Slabs grinding against each other as they settle.
+    grind = dsp.bandpass(rng.standard_normal(n), 70, 520) * dsp.envelope(n, 0.02, 0.35) * 0.55
+    grind *= 1 + 0.8 * np.abs(dsp.lowpass(rng.standard_normal(n), 18)) / 0.12
+    # Rubble thrown up rains back: stones and grit patter over a second, thinning out.
+    stones = _grains(rng, n, 0.18, 0.7, int(rng.integers(26, 38)), 700, 4200, 0.55, (0.004, 0.012))
+    grit = _grains(rng, n, 0.12, 0.9, int(rng.integers(90, 130)), 2500, 9000, 0.22, (0.0008, 0.003))
+    x = thump + cracks * 0.8 + grind + stones + grit
+    # Tame the crack transients so the weight carries: the peaks would otherwise set the level.
+    x = dsp.soft_clip(x / np.max(np.abs(x)) * 2.4, 1.0)
+    return _finish(_room(x, rng, 0.9, 0.12, 3500), -18.0, -2.0, 0.25)
+
+
 @recipe("burning-rush", "Burning stürmt los: Glut faucht auf, Luft reißt, ein brüllendes Feuerrauschen, das mitläuft")
 def burning_rush(rng) -> np.ndarray:
     n = dsp.seconds(0.62)
