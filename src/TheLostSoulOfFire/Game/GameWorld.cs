@@ -528,6 +528,7 @@ public sealed partial class GameWorld : IDisposable
                 _player.Position - _player.DashDirection * 24f,
                 MathF.Atan2(_player.DashDirection.Y, _player.DashDirection.X),
                 0.72f);
+            KickOffGround();
         }
         if (!wasResonanceActive && _player.ResonanceActive)
         {
@@ -2059,6 +2060,7 @@ public sealed partial class GameWorld : IDisposable
                 MathF.Atan2(_player.DashDirection.Y, _player.DashDirection.X),
                 0.72f);
             _audio.Play(AudioCue.Dash, 0.5f);
+            KickOffGround();
         }
 
         if (wasSoulSenseActive != _player.SoulSenseActive)
@@ -2134,6 +2136,19 @@ public sealed partial class GameWorld : IDisposable
     }
 
     private float _playerStepSide = 1f;
+
+    /// <summary>
+    /// The dash pushes off hard: on the wet stone of the shore and the harbour water sprays back
+    /// from the feet (on dry floors the ignition flash carries the push-off).
+    /// </summary>
+    private void KickOffGround()
+    {
+        bool wet = _phase == GamePhase.Prologue && !_prologue.IsVehicleRide && _prologue.Sector is PrologueSector.Emergence or PrologueSector.Search;
+        if (wet)
+        {
+            _particles.EmitSplash(_player.Position + new Vector2(0f, FigureHeights.Air), -_player.DashDirection, 9);
+        }
+    }
 
     /// <summary>Ash and stone dust underfoot: the foundry, the antechamber and the threshold (not the wet shore or the deck).</summary>
     private bool OnDustyFloor => _phase is GamePhase.Arena or GamePhase.Antechamber or GamePhase.EnteringArena ||

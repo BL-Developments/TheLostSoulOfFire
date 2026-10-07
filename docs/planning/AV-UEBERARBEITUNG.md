@@ -959,3 +959,5 @@ Gegner-Zuckens, Deutlichkeit von Schattenhand und Schlagrand im Gedränge, die I
 - Weitere Stationen ohne Befund gesichtet: Seelenfreigabe (Bild passt zum Atem: Aufsteigen,
   Aufblitzen, Flug), erster Hollow am Ufer, Truhe, Wellenbanner, Tod, Damm, Schwelle, Titel.
   Auch die gezeichneten Schritte der Gegner spritzen am Ufer und im Hafen (Hollow 3, Devourer 6 Tropfen); in `prologue_shore_hollow_spawn` an den Füßen zu sehen.
+- Dash-Absprung auf nassem Pflaster spritzt Wasser (9 Tropfen; Serie `prologue_shore_dash_wet`).
+  Verworfen: Aschehauch beim Dash-Absprung in der Arena – vom Zündblitz völlig überdeckt.

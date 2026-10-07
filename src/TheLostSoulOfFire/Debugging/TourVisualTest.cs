@@ -407,8 +407,13 @@ internal sealed class TourVisualTest
         Overview("overview");
         Do("listen_steps", () => _world.AutomatedAudio.CuePlayed += LogStep);
         Shot("walk", () => _world.SetAutomatedAim(Vector2.UnitX), minWait: 0.8f, everyFrame: () => _input.InjectKeyDown(Keys.D));
-        // Walking on the wet platform: the steps splash.
+        // Walking on the wet platform: the steps splash; a dash sprays water from the push-off.
         Series("walk_wet", 10, 2, () => _input.InjectKeyDown(Keys.D));
+        Series("dash_wet", 6, 2, () =>
+        {
+            _input.InjectKeyDown(Keys.D);
+            if (!_world.AutomatedPlayer.IsDashing) _input.InjectKeyPress(Keys.Space);
+        });
         Do("stop_listening_steps", () => _world.AutomatedAudio.CuePlayed -= LogStep);
         Shot("trace", () =>
         {
