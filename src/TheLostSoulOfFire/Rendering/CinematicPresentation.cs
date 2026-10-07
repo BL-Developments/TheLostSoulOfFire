@@ -660,22 +660,26 @@ public sealed class CinematicPresentation
         PixelText.DrawCentered(batch, pixel, "THE FURNACE WAKES", viewport.Width * 0.5f, viewport.Height * 0.78f, 3, GameBalance.DeathFlameBright * (0.82f * warning));
     }
 
+    /// <summary>
+    /// The next wave is called: the title strikes in a size larger and settles at once, in the
+    /// HUD's language (its plaque and prompt read WELLE), over a light veil; no letterbox, the
+    /// fight goes on (Durchgang 4: less cinematic, more punch). Timing unchanged.
+    /// </summary>
     private void DrawWaveTransition(SpriteBatch batch, Texture2D pixel, Viewport viewport, int nextWave)
     {
-        float open = Ease(_stateTime / 0.2f);
+        float open = Ease(_stateTime / 0.08f);
         float close = 1f - Ease((_stateTime - 0.82f) / 0.23f);
         float alpha = open * close;
-        batch.FillRectangle(pixel, viewport.Bounds, Color.Black * (0.18f * alpha));
-        DrawLetterbox(batch, pixel, viewport, 13, 0.54f * alpha);
+        batch.FillRectangle(pixel, viewport.Bounds, Color.Black * (0.1f * alpha));
 
-        string label = nextWave >= GameBalance.ArenaWaveCount ? "FINAL WAVE" : $"WAVE {ToRoman(nextWave)}";
-        // Above the figure (the camera centres it), settling down a little as it fades in.
         bool final = nextWave >= GameBalance.ArenaWaveCount;
-        float y = viewport.Height * 0.18f + (1f - open) * 10f;
-        DrawTitleRules(batch, pixel, viewport, y - 24f, alpha * 0.7f);
-        PixelText.DrawCentered(batch, pixel, label, viewport.Width * 0.5f, y, 5,
-            (final ? GameBalance.DeathFlameBright : GameBalance.SoulWhite) * (0.92f * alpha));
-        DrawTitleRules(batch, pixel, viewport, y + 50f, alpha * 0.4f);
+        string label = final ? "LETZTE WELLE" : $"WELLE {ToRoman(nextWave)}";
+        bool strike = _stateTime < 0.07f;
+        float y = viewport.Height * 0.18f;
+        DrawTitleRules(batch, pixel, viewport, y - 24f, alpha * (strike ? 1f : 0.7f));
+        PixelText.DrawCentered(batch, pixel, label, viewport.Width * 0.5f, y - (strike ? 4f : 0f), strike ? 6 : 5,
+            (final ? GameBalance.DeathFlameBright : GameBalance.SoulWhite) * (0.95f * alpha));
+        DrawTitleRules(batch, pixel, viewport, y + 50f, alpha * (strike ? 0.8f : 0.4f));
     }
 
     private void DrawDeath(SpriteBatch batch, Texture2D pixel, Viewport viewport)

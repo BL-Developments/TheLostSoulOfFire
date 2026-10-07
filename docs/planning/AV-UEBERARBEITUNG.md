@@ -688,6 +688,10 @@ Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreati
   auf, und nahe am Spieler (Nähe > 0,55) bebt die Kamera kurz (0,07 s). Protokolliert: Auslösungen
   beim Herankommen mit wachsender Nähe 0,38 → 0,83. Der Staub ist in Standbildern dezent.
 
+- Wellenwechsel weniger filmisch: Das Banner sagte „WAVE IV“, Plakette und Hinweis „WELLE“; jetzt
+  „WELLE IV“/„LETZTE WELLE“. Keine Kinobalken mehr, Schleier 0,18 → 0,1, Einblenden 0,2 → 0,08 s,
+  der Titel schlägt die ersten 0,07 s eine Stufe größer ein und setzt sich; Zeiten unverändert.
+
 **Verworfen (Durchgang 4):**
 - Zweite Hollow-Variante mit Lederschürze (Restspur der Gießhalle): rund 450 MB unkomprimierte
   Texturen zusätzlich; Masken, Bewegungsversatz und Stimmen geben bereits Individualität.
