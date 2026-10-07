@@ -966,3 +966,7 @@ Gegner-Zuckens, Deutlichkeit von Schattenhand und Schlagrand im Gedränge, die I
   (`PrologueEnvironment.DrawWake`, Rumpf am Alpha der Deckplatte vermessen). Verworfen: gleichmäßig
   verteilte Flecken (Perlenkette) und Gischt auf der fernen Seite (hinter dem Deck verdeckt, schwebte
   über der Reling); zu schwach bemessen war die erste Fassung unsichtbar (mit Markierungen geprüft).
+- Voller Rundgang 20261007_132752 nach allen Änderungen bis 13:27: 709 Aufnahmen, kein Platzhalter,
+  CPU im Mittel ≤ 0,52 ms; Ortsklänge in allen Zonen gezählt (Ufer Fallblatt/Horn, Überfahrt
+  Bootsächzen ×2, Vorhalle Flüstern, Gießhalle Glocke), kürzester Abstand zweier Rufe 0,65 s.
+  Behalten: Basislauf 20261007_101956 und dieser Lauf; Zwischenläufe dieser Sitzung gelöscht.
