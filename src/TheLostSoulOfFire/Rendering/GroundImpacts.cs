@@ -32,6 +32,7 @@ public sealed class GroundImpacts
     private static Texture2D? _fissures;
     private static Texture2D? _dust;
     private static Texture2D? _grasp;
+    private static Texture2D? _graspTips;
     private static Texture2D? _blast;
 
     /// <summary>Pixels from the blast texture's centre to its frayed edge (ground_kit.BLAST_EDGE).</summary>
@@ -48,6 +49,7 @@ public sealed class GroundImpacts
             _fissures = content.Load<Texture2D>("Textures/Effects/ground_fissures");
             _dust = content.Load<Texture2D>("Textures/Effects/dust_puffs");
             _grasp = content.Load<Texture2D>("Textures/Effects/grasp_shadow");
+            _graspTips = content.Load<Texture2D>("Textures/Effects/grasp_tips");
             _blast = content.Load<Texture2D>("Textures/Effects/blast_scorch");
         }
         catch (ContentLoadException)
@@ -129,6 +131,7 @@ public sealed class GroundImpacts
         public float Angle;
         public float Reach;
         public float Strength;
+        public float Glint;
         public float Visible;
         public bool Seen;
         public float Seed;
@@ -220,7 +223,7 @@ public sealed class GroundImpacts
     /// floor along <paramref name="facing"/>, its fingertips at <paramref name="reach"/> (it
     /// replaces the arc of light). When it is no longer renewed it fades at once.
     /// </summary>
-    public void Grasp(object key, Vector2 from, Vector2 facing, float reach, float strength)
+    public void Grasp(object key, Vector2 from, Vector2 facing, float reach, float strength, float glint = 0f)
     {
         Grasping? grasp = _grasps.Find(candidate => ReferenceEquals(candidate.Key, key));
         if (grasp is null)
@@ -232,6 +235,7 @@ public sealed class GroundImpacts
         grasp.Angle = MathF.Atan2(facing.Y, facing.X);
         grasp.Reach = reach;
         grasp.Strength = strength;
+        grasp.Glint = glint;
         grasp.Seen = true;
     }
 
@@ -474,9 +478,18 @@ public sealed class GroundImpacts
             float flex = 1f + 0.05f * MathF.Sin(_time * 11f + grasp.Seed);
             float scale = grasp.Reach / GraspReach;
             Texture2D hand = _grasp!;
+            float sway = grasp.Angle + 0.04f * MathF.Sin(_time * 7f + grasp.Seed);
             batch.Draw(hand, grasp.From, null, Color.White * (grasp.Strength * grasp.Visible),
-                grasp.Angle + 0.04f * MathF.Sin(_time * 7f + grasp.Seed), new Vector2(hand.Width, hand.Height) * 0.5f,
+                sway, new Vector2(hand.Width, hand.Height) * 0.5f,
                 new Vector2(scale * flex, scale), SpriteEffects.None, 0f);
+            if (_graspTips is { } tips && grasp.Glint > 0.001f)
+            {
+                // The fingertips glint cold as the grab comes: the reach reads where the target stands.
+                Color glint = Color.Lerp(GameBalance.DeathFlame, GameBalance.DeathFlameBright, grasp.Glint) * (grasp.Glint * grasp.Visible);
+                glint.A = 0;
+                batch.Draw(tips, grasp.From, null, glint, sway, new Vector2(tips.Width, tips.Height) * 0.5f,
+                    new Vector2(scale * flex, scale), SpriteEffects.None, 0f);
+            }
         }
 
         foreach (Windup windup in _windups)

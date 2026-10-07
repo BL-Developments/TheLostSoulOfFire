@@ -17,7 +17,8 @@ Writes premultiplied RGBA (Content.mgcb imports them with PremultiplyAlpha=False
                         thrown outward, frayed at the edge at BLAST_EDGE px; fades in game.
 - grasp_shadow.png      the shadow of a Hollow's grasping hand on the floor, reaching along +X:
                         a palm at the body and four long fingers fanning over 1.5 rad, their
-                        tips exactly at GRASP_REACH px (the swipe's reach), soft penumbra.
+                        tips exactly at GRASP_REACH px (the swipe's reach), soft penumbra;
+                        grasp_tips.png lights the last fifth of each finger (white light).
 
 The crack field is one seeded layout, so the fissures of the windup and the shattered floor are
 the same cracks. The blow's radius sits at EDGE px from the centre of a SIZE canvas; the game
@@ -324,10 +325,14 @@ GRASP_SIZE = 256
 GRASP_REACH = 116.0  # px from the centre to the fingertips; the game scales by reach / this
 
 
-def grasp_shadow(rng) -> np.ndarray:
+def grasp_shadow(rng) -> tuple[np.ndarray, np.ndarray]:
+    """The hand's shadow, and a light for its fingertips (the same fingers): the tips glint
+    cold when the grab is about to come, so the reach reads even where the target stands on it."""
     size = GRASP_SIZE
     image = Image.new("L", (size * SS, size * SS), 0)
     draw = ImageDraw.Draw(image)
+    tips_image = Image.new("L", (size * SS, size * SS), 0)
+    tips_draw = ImageDraw.Draw(tips_image)
     c = size / 2
 
     def px(x, y):
@@ -351,12 +356,20 @@ def grasp_shadow(rng) -> np.ndarray:
             x, y = math.cos(a) * r, math.sin(a) * r
             width = (7.0 - 5.0 * t) * (1.0 + 0.25 * math.sin(t * 9 + k))  # knuckles
             draw.ellipse([*px(x - width, y - width), *px(x + width, y + width)], fill=255)
+            if t > 0.72:
+                glint = int(255 * min(1.0, (t - 0.72) / 0.18))
+                r = width + 3
+                tips_draw.ellipse([*px(x - r, y - r), *px(x + r, y + r)], fill=glint)
     hand = np.asarray(image, dtype=float).reshape(size, SS, size, SS).mean(axis=(1, 3)) / 255
     core = blur(hand, 1.5)
     penumbra = blur(hand, 9.0)
     alpha = np.clip(core * 0.85 + penumbra * 0.45, 0, 0.92)
     rgb = np.zeros((size, size, 3))
-    return np.concatenate([rgb, alpha[..., None]], axis=-1)
+    shadow = np.concatenate([rgb, alpha[..., None]], axis=-1)
+    tips = np.asarray(tips_image, dtype=float).reshape(size, SS, size, SS).mean(axis=(1, 3)) / 255
+    light = np.clip(blur(tips, 1.5) * 1.0 + blur(tips, 7.0) * 1.2, 0, 1)
+    glow = np.stack([light, light, light, light * 0.25], axis=-1)
+    return shadow, glow
 
 
 def tile(frames: list[np.ndarray], columns: int) -> np.ndarray:
@@ -408,7 +421,9 @@ def main() -> int:
     save(shatter_image, args.out / "ground_shatter.png")
     save(tile(fissures, 4), args.out / "ground_fissures.png")
     save(tile(puffs, 2), args.out / "dust_puffs.png")
-    save(grasp_shadow(np.random.default_rng(SEED + 20)), args.out / "grasp_shadow.png")
+    shadow, tips = grasp_shadow(np.random.default_rng(SEED + 20))
+    save(shadow, args.out / "grasp_shadow.png")
+    save(tips, args.out / "grasp_tips.png")
     save(blast_scorch(np.random.default_rng(SEED + 30)), args.out / "blast_scorch.png")
     if args.preview:
         preview(shatter_image, fissures, puffs, args.preview)

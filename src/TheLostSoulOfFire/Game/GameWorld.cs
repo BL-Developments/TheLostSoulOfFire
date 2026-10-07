@@ -563,11 +563,12 @@ public sealed partial class GameWorld : IDisposable
                     // The reach the old arc showed while it winds up (48 growing to 68), then the
                     // full swipe range on the grab.
                     float windup = graspingHollow.SwipeWindup;
-                    _groundImpacts.Grasp(graspingHollow, graspingHollow.Position, graspingHollow.FacingDirection, 48f + windup * 20f, 0.3f + windup * 0.35f);
+                    float glint = MathHelper.Clamp((windup - 0.4f) / 0.6f, 0f, 1f);
+                    _groundImpacts.Grasp(graspingHollow, graspingHollow.Position, graspingHollow.FacingDirection, 48f + windup * 20f, 0.45f + windup * 0.4f, glint * glint);
                 }
                 else if (graspingHollow.State == HollowState.Swipe)
                 {
-                    _groundImpacts.Grasp(graspingHollow, graspingHollow.Position, graspingHollow.FacingDirection, GameBalance.HollowSwipeRange, 0.8f);
+                    _groundImpacts.Grasp(graspingHollow, graspingHollow.Position, graspingHollow.FacingDirection, GameBalance.HollowSwipeRange, 1f, 1f);
                 }
             }
             if (enemy is Burning kindlingBurning)

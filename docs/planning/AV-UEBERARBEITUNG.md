@@ -661,8 +661,11 @@ Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreati
   schnellt er auf die volle Reichweite (92) und verblasst (`ground_kit.py` `grasp_shadow`,
   `GroundImpacts.Grasp`). Lore: der Hollow greift nach jemandem, der geht. Damit zeigen alle drei
   Gegner ihre Angriffe über Boden, Schatten und Feuer statt über Zonen; ohne Texturen bleiben
-  die alten Zeichen. Offen zur Owner-Abnahme: Lesbarkeit im Gedränge (der Schatten ist leiser als
-  der Lichtbogen).
+  die alten Zeichen. Nachgezogen, weil die Finger im Schlagschatten des Getroffenen und im
+  dunkleren Boden verschwanden: Schatten kräftiger (Ausholen 0,45 → 0,85, Griff 1,0), und die
+  Fingerspitzen glimmen in der zweiten Hälfte des Ausholens kalt violett auf (`grasp_tips`, aus
+  denselben Fingern erzeugt): die Reichweite liest sich auch unter den Füßen des Ziels. Erste
+  Fassung der Spitzen zu klein (nach Skalierung wenige Pixel). Owner-Abnahme im Gedränge bleibt.
 
 - Klänge der Orte (Owner: Atmo kreativer): Über dem Bett spielen selten einzelne Klänge von einer
   zufälligen Seite (`AudioDirector.PlaceEvents`, `recipes/ambient_events.py`): in der Gießhalle
