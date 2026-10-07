@@ -857,3 +857,23 @@ Wellenstart/-ende, Verschlingen, Menü-/Truhen-/Münz-/Fähigkeitsklänge, Gegne
   bitgleich nachgebaut). Treffer auf Burning hört CLAP zu 0,31 als „chime“, enthält aber keinen
   Ton (nur Glutkörner) – belassen.
 - Kanonen-Haltungswechsel (Stand-Anschlag, Ziehen, Lade-Gang) blenden in 0,1 s über.
+- Ladeflamme beim Zielen von der Kamera weg: wurde über den Kopf gezeichnet (glühender Kopf),
+  jetzt vor der Figur, Kopf und Schultern verdecken sie.
+
+**Stand Durchgang 5 (07.10.2026, 12:00):** Alle Owner-Punkte des Vormittags umgesetzt und im Spiel
+geprüft (Kanone: Größe, Bewegung, Klang; Piepen beim Einsammeln und im ganzen Spiel). Geprüft
+nach allen Änderungen: voller Rundgang (655 Aufnahmen, kein Platzhalter, CPU ≤ 0,55 ms im Mittel),
+Teilläufe `arena_player`, `arena_wave1`, `arena_devourer`, `title`, `prologue_shore`; 263 Unit-Tests;
+Slice-, Fähigkeiten-, Währungs- und Vorhallen-Bildtest; Audio-Laufzeit- (76 Töne, kein Ersatzklang),
+Gameplay- (10 Wellen) und Tod-Neustart-Test; `validate_audio.py` (215); `mix_report.py` in allen
+Zonen im Band.
+
+**Nächste Schritte (nach Owner-Rückmeldung):** Hörabnahme der neuen Kanonen-, Wellen-, Seelen- und
+Menüklänge (Pegel in `GameWorld`/`AudioDirector.SetCannonHum`, Takes über die Rezept-Seeds);
+Sichtabnahme der Kanone (falls noch zu groß: `build_cannon` skalieren, `--recannon`, alle 20 Clips
+mit `render_player.sh`-Ablauf aus dieser Notiz neu rendern, `CANNON_POINT` in `FigureHeights`/
+`CannonFeed` übernehmen); Stärke des Gegner-Zuckens (`ArtAssets.TwitchPose`, Abstände und Winkel).
+Render-Ablauf je Clip: `render_directions.py --resolution 480 --ortho-scale 4.8 --foot 0.62`, dann
+`pack_sheets.py --fps <Clip-fps> --pixels-per-unit 1.5 [--progress-distance 180|150] --register`
+(fps: idle 16, move 24, Hiebe/Rückwege/Dash/Treffer/Rückstoß/Schuss/Ziehen/Halten 24, aim 6,
+aim_move* 12, wake 8, death 12).
