@@ -913,3 +913,7 @@ aim_move* 12, wake 8, death 12).
   zu sehen. Neu: leiser Aschehauch an der Ferse bei jedem gezeichneten Schritt des Spielers auf
   staubigem Boden (Gießhalle, Vorhalle, Schwelle; nicht Ufer/Deck), über der Figur gezeichnet
   (im Bodenpass verdeckten ihn Beine und Kontaktschatten); bewusst dezent, im Standbild kaum.
+  Auch der Ausholstaub am Rand des Devourer-Schlags ist auf die Textur bemessen (36–90 statt
+  22–60); auf dem hellen Hallenboden bleibt er dennoch kaum sichtbar, die Lesbarkeit des
+  Wirkradius tragen die leuchtenden Risse. Dunklerer Staub wäre der nächste Schritt, falls der
+  Owner den Rand deutlicher will.

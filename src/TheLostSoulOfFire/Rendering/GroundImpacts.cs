@@ -193,7 +193,7 @@ public sealed class GroundImpacts
                 float angle = (float)(_random.NextDouble() * MathHelper.TwoPi);
                 Vector2 direction = new(MathF.Cos(angle), MathF.Sin(angle));
                 AddPuff(center + direction * radius * Range(0.9f, 1.0f), direction, Range(2f, 8f), 0.5f,
-                    new Vector2(0f, -Range(8f, 18f)), Range(0.6f, 0.9f), Range(22f, 32f), Range(46f, 60f), 0.3f);
+                    new Vector2(0f, -Range(8f, 18f)), Range(0.6f, 0.9f), Range(36f, 48f), Range(70f, 90f), 0.3f);
             }
         }
     }
