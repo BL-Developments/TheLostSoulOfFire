@@ -419,7 +419,10 @@ internal sealed class TourVisualTest
         Overview("overview");
         Shot("hollows", () => _world.PlaceAutomatedPlayer(new Vector2(540f, 600f)),
             () => _world.AutomatedEnemies.Count(enemy => enemy.IsAlive) >= 2, 6f, 1.2f);
+        // The combat score takes over in the prologue's fights too, capped below the frenzy.
+        Do("score_fight", () => Console.WriteLine($"TOUR_AUDIO station=prologue_search fight {_world.AutomatedAudio.DescribePresence()}"), 1.5f);
         Do("clear", () => _world.DefeatAutomatedEnemies(), 2.4f);
+        Do("score_after", () => Console.WriteLine($"TOUR_AUDIO station=prologue_search after {_world.AutomatedAudio.DescribePresence()}"), 3.5f);
         Shot("burning_lesson", () => _world.PlaceAutomatedPlayer(new Vector2(960f, 600f)),
             () => _world.AutomatedEnemies.OfType<Burning>().Any(enemy => enemy.IsAlive), 6f, 1.2f);
         Do("clear_burning", () => _world.DefeatAutomatedEnemies(), 2.4f);

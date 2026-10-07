@@ -587,7 +587,9 @@ Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreati
   Devourer im Gedränge und wenig Leben 1/1/1, nach dem Tod ausblendend, Song zurück).
   CLAP: Puls+Antrieb „intense action music with drums“ 0,61, alle drei 0,39 (vorn).
   `mix_report.py --zone combat` (alle Stems voll): alle Warnsignale im Band. Install-Option
-  `--seamless` (ohne Randblende, sonst fiel der Bass alle 30 s für 16 ms aus).
+  `--seamless` (ohne Randblende, sonst fiel der Bass alle 30 s für 16 ms aus). Im Prolog geprüft
+  (Station `prologue_search`): im Kampf Puls 1,0/Antrieb 0,35/Raserei 0 (gedeckelt), Zonen-Thema
+  0,03; nach dem Kampf blendet die Partitur aus (0,19 nach 3,5 s), das Thema kehrt zurück (0,21).
 
 - Hollow (Owner: „Monster wirken monoton“): Die Porzellanmaske, laut Figurenblatt die hellste
   Fläche, war in der 35°-Kamera nur ein Rand, weil der gebeugte Kopf den Scheitel zeigte. Neue
