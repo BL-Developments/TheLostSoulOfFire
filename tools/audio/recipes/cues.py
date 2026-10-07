@@ -45,6 +45,41 @@ def _crunch(rng, n: int, start: float, span: float, count: int, low: float, high
     return out
 
 
+def _spectral_whoosh(rng, seconds: float, start_hz: float, end_hz: float, swell: bool) -> np.ndarray:
+    """Air moving past: noise through a band sweeping from start_hz to end_hz, swelling in
+    (swell) or striking at once and dying away."""
+    n = dsp.seconds(seconds)
+    t = dsp.time_axis(n)
+    centre = start_hz * (end_hz / start_hz) ** np.clip(t / seconds, 0, 1)
+    air = dsp.swept_bandpass(rng.standard_normal(n), centre, q=1.8)
+    shape = np.sin(np.pi * np.clip(t / seconds, 0, 1)) ** 1.5 if swell else np.exp(-t / (seconds * 0.35))
+    return air / (np.std(air) + 1e-9) * shape
+
+
+def _tick(rng, n: int, at: float, freq: float, gain: float, q: float = 12) -> np.ndarray:
+    """A small tactile tick: an impulse ringing a tiny piece of iron or wood for a few
+    milliseconds (resonant and short; a sine with a tail reads as a chime)."""
+    pulse = np.zeros(n)
+    i = dsp.seconds(at)
+    if i + 1 < n:
+        pulse[i], pulse[i + 1] = 1.0, -0.5
+    return sum(dsp.resonator(pulse, freq * r * rng.uniform(0.97, 1.03), q) * g for r, g in ((1.0, 1.0), (1.73, 0.45), (2.9, 0.2))) * gain
+
+
+def _embers(rng, n: int, start: float, span: float, count: int, gain: float) -> np.ndarray:
+    """Soft crackles of embers waking or dying (violet fire: small ticks, no woody snap)."""
+    out = np.zeros(n)
+    for _ in range(count):
+        at = start + rng.exponential(span / 2.5)
+        m = dsp.seconds(0.02)
+        i = dsp.seconds(at)
+        if i + m >= n:
+            continue
+        burst = rng.standard_normal(m) * np.exp(-np.arange(m) / (dsp.RATE * rng.uniform(0.0006, 0.0018)))
+        out[i:i + m] += dsp.bandpass(burst, 1200, 6000) * rng.uniform(0.2, 1.0) * gain * np.exp(-(at - start) / span)
+    return out
+
+
 @recipe("footstep-stone", "Schritt auf Stein: Absatz, Ballen, Knirschen von Sand und Asche unter der Sohle")
 def footstep_stone(rng) -> np.ndarray:
     n = dsp.seconds(0.3)
@@ -107,46 +142,46 @@ def step_devourer(rng) -> np.ndarray:
     return _finish(x, -24.0, -4.0)
 
 
-@recipe("ui-move", "Menü: leises gläsernes Klicken mit violettem Nachklang")
+@recipe("ui-move", "Menü: ein kleines trockenes Klicken von Eisen, wie eine Raste, die einen Zahn weiterspringt; kein Glöckchen")
 def ui_move(rng) -> np.ndarray:
-    n = dsp.seconds(0.18)
+    n = dsp.seconds(0.12)
     t = dsp.time_axis(n)
-    tick = dsp.bandpass(rng.standard_normal(n), 2000, 7000) * np.exp(-t / 0.004)
-    ring = sum(np.sin(2 * np.pi * f * t) * g * np.exp(-t / d) for f, g, d in ((1568, 0.5, 0.05), (2349, 0.25, 0.035), (3136, 0.12, 0.025)))
-    return _finish(tick * 0.4 + ring, -30.0, -8.0)
+    tick = _tick(rng, n, 0.0, rng.uniform(1700, 2000), 1.0, 9)
+    grit = dsp.bandpass(rng.standard_normal(n), 2500, 8000) * np.exp(-t / 0.002) * 0.3
+    body = dsp.lowpass(rng.standard_normal(n), 400) * np.exp(-t / 0.008) * 0.25
+    return _finish(tick + grit + body, -30.0, -8.0)
 
-
-@recipe("ui-back", "Menü zurück: tieferes, gedämpftes Klicken, nach unten")
+@recipe("ui-back", "Menü zurück: ein tieferes, gedämpftes Klicken, als glitte die Raste einen Zahn zurück; kein Glöckchen")
 def ui_back(rng) -> np.ndarray:
-    n = dsp.seconds(0.2)
+    n = dsp.seconds(0.14)
     t = dsp.time_axis(n)
-    tick = dsp.bandpass(rng.standard_normal(n), 800, 3500) * np.exp(-t / 0.005)
-    ring = sum(np.sin(2 * np.pi * f * (1 - 0.15 * t) * t) * g * np.exp(-t / d) for f, g, d in ((1046, 0.5, 0.05), (1568, 0.2, 0.03)))
-    return _finish(tick * 0.4 + ring, -31.0, -8.0)
+    tick = _tick(rng, n, 0.0, rng.uniform(900, 1050), 1.0, 8) + _tick(rng, n, 0.018, rng.uniform(700, 800), 0.5, 8)
+    body = dsp.lowpass(rng.standard_normal(n), 300) * np.exp(-t / 0.012) * 0.35
+    return _finish(tick + body, -31.0, -8.0)
 
-
-@recipe("ui-open", "Menü öffnen: ein kurzer, weicher Atemzug von Asche und Stoff, gläserner Schimmer")
+@recipe("ui-open", "Menü öffnen: ein schweres Lederheft schlägt auf, ein Atemzug von Asche, die Glut darin regt sich; kein Schimmerton")
 def ui_open(rng) -> np.ndarray:
     n = dsp.seconds(0.45)
     t = dsp.time_axis(n)
     swell = dsp.bandpass(rng.standard_normal(n), 400, 3000) * np.sin(np.pi * np.clip(t / 0.4, 0, 1)) ** 2
-    shimmer = sum(np.sin(2 * np.pi * f * t) * g for f, g in ((1244, 0.2), (1661, 0.12))) * np.clip((t - 0.1) / 0.1, 0, 1) * np.exp(-np.maximum(t - 0.2, 0) / 0.12)
-    return _finish(swell * 0.6 + shimmer, -30.0, -8.0)
+    flap = dsp.lowpass(rng.standard_normal(n), 900) * np.exp(-np.maximum(t - 0.05, 0) / 0.03) * (t > 0.05) * 0.8
+    embers = _embers(rng, n, 0.1, 0.25, 8, 0.5)
+    return _finish(swell * 0.5 + flap + embers, -30.0, -8.0)
 
-
-@recipe("ui-close", "Menü schließen: der Atemzug rückwärts, kürzer")
+@recipe("ui-close", "Menü schließen: das Lederheft klappt zu, ein kurzer Luftzug, ein gedämpfter Schlag; kein Piepen")
 def ui_close(rng) -> np.ndarray:
-    return ui_open(rng)[::-1][: dsp.seconds(0.32)].copy()
+    n = dsp.seconds(0.32)
+    t = dsp.time_axis(n)
+    draft = dsp.bandpass(rng.standard_normal(n), 500, 2500) * np.sin(np.pi * np.clip(t / 0.2, 0, 1)) ** 2 * 0.5
+    shut = dsp.lowpass(rng.standard_normal(n), 700) * np.clip((t - 0.17) / 0.003, 0, 1) * np.exp(-np.maximum(t - 0.17, 0) / 0.035)
+    return _finish(draft + shut, -31.0, -8.0)
 
-
-@recipe("chest-open", "Kiste: Eisenriegel springt, Deckel knarrt auf, ein Schimmer von Glut")
+@recipe("chest-open", "Kiste: der Eisenriegel springt, der Deckel knarrt auf, die Glut im Samt erwacht knisternd; kein Glöckchen")
 def chest_open(rng) -> np.ndarray:
     n = dsp.seconds(0.9)
     t = dsp.time_axis(n)
-    latch = np.zeros(n)
-    m = dsp.seconds(0.08)
-    latch[:m] = sum(np.sin(2 * np.pi * f * dsp.time_axis(m)) * g for f, g in ((1830, 0.6), (4120, 0.3))) * np.exp(-dsp.time_axis(m) / 0.015)
-    latch[:m] += dsp.bandpass(rng.standard_normal(m), 1500, 6000) * np.exp(-dsp.time_axis(m) / 0.006)
+    latch = _tick(rng, n, 0.0, rng.uniform(1500, 1800), 1.0, 10) + _tick(rng, n, 0.012, rng.uniform(2500, 2900), 0.6, 10)
+    latch += dsp.bandpass(rng.standard_normal(n), 1500, 6000) * np.clip(t / 0.002, 0, 1) * np.exp(-t / 0.003) * 0.15
     creak = np.zeros(n)
     start = dsp.seconds(0.09)
     length = dsp.seconds(0.45)
@@ -158,30 +193,43 @@ def chest_open(rng) -> np.ndarray:
             pulses[i] = rng.uniform(0.6, 1.0)
         tt += 1.0 / (40 + 30 * tt / 0.45)
     creak[start:start + length] = sum(dsp.resonator(pulses, f, 14) * g for f, g in ((300, 1.0), (640, 0.5), (1250, 0.2))) * np.sin(np.pi * np.linspace(0, 1, length))
-    glow_start = dsp.seconds(0.3)
-    glow = np.zeros(n)
-    m = n - glow_start
-    gt = dsp.time_axis(m)
-    glow[glow_start:] = sum(np.sin(2 * np.pi * f * gt) * g for f, g in ((622, 0.35), (933, 0.2), (1244, 0.15))) * np.minimum(1, gt / 0.08) * np.exp(-gt / 0.35)
-    x = _room(latch * 0.7 + creak * 0.25 + glow * 0.5, rng, 0.7, 0.2)
+    glow = dsp.bandpass(dsp.brown(n, rng), 100, 800) * np.clip((t - 0.3) / 0.12, 0, 1) * np.exp(-np.maximum(t - 0.42, 0) / 0.25)
+    glow = glow / (np.std(glow) + 1e-9)
+    embers = _embers(rng, n, 0.32, 0.4, 16, 0.6)
+    x = _room(latch * 0.35 + creak * 0.45 + glow * 0.08 + embers, rng, 0.7, 0.2)
     return _finish(x, -20.0, -3.0)
 
-
-@recipe("currency-gain", "Währung: ein kurzes Klirren mehrerer Münzen, ein heller Funke")
+@recipe("currency-gain", "Währung: eine Handvoll alter Münzen fällt klappernd zusammen, Metall auf Metall, kurz und dicht; kein Glöckchen")
 def currency_gain(rng) -> np.ndarray:
     n = dsp.seconds(0.5)
     out = np.zeros(n)
-    for k in range(rng.integers(5, 9)):
-        at = dsp.seconds(rng.uniform(0, 0.22))
-        m = dsp.seconds(0.25)
-        mt = dsp.time_axis(m)
-        f = rng.uniform(2800, 4800)
-        coin = sum(np.sin(2 * np.pi * f * r * mt + rng.uniform(0, 6)) * g * np.exp(-mt / d)
-                   for r, g, d in ((1.0, 1.0, 0.1), (2.41, 0.6, 0.07), (3.93, 0.35, 0.05), (5.28, 0.2, 0.035)))
-        coin += dsp.bandpass(rng.standard_normal(m), 4000, 10000) * np.exp(-mt / 0.003) * 0.6
-        if at + m < n:
-            out[at:at + m] += coin * rng.uniform(0.35, 1.0)
-    return _finish(_room(out, rng, 0.3, 0.12), -27.0, -7.0)
+    for _ in range(rng.integers(7, 12)):
+        at = rng.uniform(0, 0.2) + rng.exponential(0.03)
+        m = dsp.seconds(0.12)
+        i = dsp.seconds(at)
+        if i + m >= n:
+            continue
+        hit = np.zeros(m)
+        hit[0] = 1.0
+        # A worn coin: a few inharmonic modes, damped fast by the others it lands on.
+        f = rng.uniform(2600, 4600)
+        coin = sum(dsp.resonator(hit, f * r, q) * g for r, q, g in ((1.0, 60, 1.0), (2.41, 50, 0.5), (3.93, 40, 0.25)))
+        coin += dsp.bandpass(rng.standard_normal(m), 3000, 9000) * np.exp(-np.arange(m) / (dsp.RATE * 0.002)) * 2.0
+        out[i:i + m] += coin * rng.uniform(0.3, 1.0)
+    clatter = dsp.bandpass(rng.standard_normal(n), 1500, 6000) * np.exp(-dsp.time_axis(n) / 0.12) * 0.05
+    return _finish(_room(out + clatter, rng, 0.3, 0.1), -27.0, -7.0)
+
+@recipe("title-confirm", "Titel bestätigt: die Glut fängt Feuer, ein weiches Aufwallen der Death Flame, eine schwere Raste springt ein; warm und bestimmt, kein Piepen")
+def title_confirm(rng) -> np.ndarray:
+    n = dsp.seconds(0.6)
+    t = dsp.time_axis(n)
+    catch = dsp.bandpass(rng.standard_normal(n), 600, 3000) * np.clip(t / 0.01, 0, 1) * np.exp(-t / 0.03) * 0.15
+    swell = dsp.bandpass(dsp.brown(n, rng) * 0.5 + dsp.pink(n, rng), 300, 2200)
+    swell = swell / (np.std(swell) + 1e-9) * np.clip(t / 0.12, 0, 1) ** 2 * np.exp(-np.maximum(t - 0.12, 0) / 0.2)
+    latch = _tick(rng, n, 0.06, rng.uniform(900, 1100), 0.8, 10)
+    thud = dsp.lowpass(rng.standard_normal(n), 250) * np.clip((t - 0.06) / 0.003, 0, 1) * np.exp(-np.maximum(t - 0.06, 0) / 0.04) * (t > 0.06)
+    x = catch + swell * 0.35 + latch * 0.6 + thud * 0.25 + _embers(rng, n, 0.08, 0.3, 12, 0.5)
+    return _finish(_room(x, rng, 0.6, 0.18), -24.0, -4.0)
 
 
 @recipe("ability-heal", "Zweiter Atem: ein tiefer Atemzug, warmer Akkord schwillt an (Death-Flame, kein Feuer)")
@@ -214,34 +262,41 @@ def ability_leap(rng) -> np.ndarray:
     return _finish(_room(thump + burst + whoosh, rng, 0.5, 0.15), -17.0, -2.0)
 
 
-@recipe("ability-vortex", "Sog: ein ansteigender Wirbel, der nach innen zieht")
+@recipe("ability-vortex", "Sog: ein ansteigender Wirbel aus Asche und Flamme, der nach innen zieht, ein tiefes Brausen darunter; kein Sirenenton")
 def ability_vortex(rng) -> np.ndarray:
     n = dsp.seconds(1.2)
     t = dsp.time_axis(n)
     swirl = _spectral_whoosh(rng, 1.2, 250, 2500, True) * (0.6 + 0.4 * np.sin(2 * np.pi * (3 + 6 * t) * t))
-    tone = np.sin(2 * np.pi * (110 + 220 * t ** 2) * t) * np.minimum(1, t / 0.3) * np.exp(-np.maximum(t - 0.9, 0) / 0.1) * 0.35
-    return _finish(_room(swirl + tone, rng, 0.9, 0.25), -18.0, -2.5)
+    roar = dsp.swept_bandpass(dsp.brown(n, rng), 90 + 260 * np.clip(t / 1.0, 0, 1) ** 2, q=2.0)
+    roar = roar / (np.std(roar) + 1e-9) * np.minimum(1, t / 0.3) * np.exp(-np.maximum(t - 0.9, 0) / 0.1) * 0.35
+    return _finish(_room(swirl + roar, rng, 0.9, 0.25), -18.0, -2.5)
 
-
-@recipe("ability-guard", "Vergeltung: ein hell klingender, gefasster Eisenring der Abwehr, tief nachhallend")
+@recipe("ability-guard", "Vergeltung: eine Wand aus Death Flame schlägt um den Körper hoch, dunkles Eisen setzt sich wie eine Rüstung, ein tiefer Stoß; kein Glockenton")
 def ability_guard(rng) -> np.ndarray:
     n = dsp.seconds(1.0)
     t = dsp.time_axis(n)
-    strike = dsp.bandpass(rng.standard_normal(n), 1500, 7000) * np.exp(-t / 0.004) * 0.4
-    ring = sum(np.sin(2 * np.pi * 329.6 * r * t + rng.uniform(0, 6)) * g * np.exp(-t / d)
-               for r, g, d in ((1.0, 1.0, 0.45), (2.32, 0.6, 0.3), (4.25, 0.35, 0.18), (6.1, 0.2, 0.1)))
-    low = np.sin(2 * np.pi * 82 * t) * np.exp(-t / 0.25) * 0.5
-    return _finish(_room(strike + ring * 0.7 + low, rng, 0.8, 0.22), -18.0, -2.5)
+    wall = _spectral_whoosh(rng, 0.7, 300, 1800, True)
+    wall = np.concatenate([wall, np.zeros(n - len(wall))])
+    flame = dsp.bandpass(dsp.brown(n, rng) + dsp.pink(n, rng) * 0.4, 80, 1200)
+    flame = flame / (np.std(flame) + 1e-9) * np.clip(t / 0.15, 0, 1) * np.exp(-np.maximum(t - 0.15, 0) / 0.35)
+    hit = np.zeros(n)
+    hit[dsp.seconds(0.12)] = 1.0
+    plate = sum(dsp.resonator(hit, f * rng.uniform(0.97, 1.03), q) * g for f, q, g in ((210, 25, 1.0), (510, 22, 0.5), (830, 20, 0.3), (1290, 18, 0.15)))
+    thud = dsp.lowpass(rng.standard_normal(n), 200) * np.clip((t - 0.12) / 0.004, 0, 1) * np.exp(-np.maximum(t - 0.12, 0) / 0.06) * (t > 0.12)
+    x = wall * 0.35 + flame * 0.3 + plate / (np.max(np.abs(plate)) + 1e-9) * 0.6 + thud
+    return _finish(_room(x, rng, 0.8, 0.2), -18.0, -2.5)
 
-
-@recipe("ability-mark", "Vorlage: ein Zeichen wird eingebrannt, kurzes Zischen und heller Punkt")
+@recipe("ability-mark", "Vorlage: ein Zeichen wird eingebrannt, das Eisen zischt auf dem Ziel, Glut knistert, ein kurzes Aufflammen; kein heller Ton")
 def ability_mark(rng) -> np.ndarray:
-    n = dsp.seconds(0.5)
+    n = dsp.seconds(0.6)
     t = dsp.time_axis(n)
-    sizzle = dsp.bandpass(rng.standard_normal(n), 3000, 9000) * np.exp(-t / 0.12) * 0.35
-    ping = sum(np.sin(2 * np.pi * f * t) * g for f, g in ((1661, 0.4), (2489, 0.2))) * np.exp(-t / 0.08)
-    return _finish(_room(sizzle + ping, rng, 0.4, 0.15), -20.0, -3.0)
-
+    press = dsp.lowpass(rng.standard_normal(n), 400) * np.clip(t / 0.006, 0, 1) * np.exp(-t / 0.02) * 0.2
+    sizzle = dsp.bandpass(rng.standard_normal(n), 2500, 8000) * np.clip(t / 0.01, 0, 1) * np.exp(-t / 0.18)
+    sizzle *= np.clip(0.55 + 0.45 * (dsp.smooth_random(n, 30.0, rng) - 0.5) * 2.5, 0.15, None)
+    flare = dsp.bandpass(dsp.brown(n, rng), 100, 900)
+    flare = flare / (np.std(flare) + 1e-9) * np.clip(t / 0.03, 0, 1) * np.exp(-t / 0.12) * 0.25
+    x = press + sizzle * 0.6 + flare * 0.5 + _embers(rng, n, 0.05, 0.3, 14, 0.4)
+    return _finish(_room(x, rng, 0.4, 0.15), -20.0, -3.0)
 
 @recipe("door-awaken", "Tür erwacht: Stein schiebt sich mahlend, das Siegel löst sich mit einem tiefen Glockenton")
 def door_awaken(rng) -> np.ndarray:

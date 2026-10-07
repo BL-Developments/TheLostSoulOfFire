@@ -11173,3 +11173,8 @@
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /build:Audio/Sfx/wave_gate_1_hall.wav
+
+#begin Audio/Sfx/title_ignite.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/title_ignite.wav

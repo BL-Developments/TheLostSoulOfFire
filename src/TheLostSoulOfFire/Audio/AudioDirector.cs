@@ -468,7 +468,7 @@ public sealed class AudioDirector : IDisposable
             AddVariants(content, AudioCue.DevourerDevour, "Audio/Sfx/devourer_devour", 2, 74f, 0.58f, 0.54f, 0.36f);
             Add(content, AudioCue.EnemyDeath, "Audio/Sfx/enemy_death", 68f, 0.38f, 0.52f, 0.48f);
             Add(content, AudioCue.CannonImpact, "Audio/Sfx/cannon_impact", 72f, 0.24f, 0.6f, 0.52f);
-            Add(content, AudioCue.TitleConfirm, "Audio/Sfx/title_confirm", 440f, 0.26f, 0.3f, 0.015f);
+            Add(content, AudioCue.TitleConfirm, "Audio/Sfx/title_ignite", 440f, 0.26f, 0.3f, 0.3f);
             AddVariants(content, AudioCue.WaveClear, "Audio/Sfx/wave_ease", 2, 120f, 0.8f, 0.32f, 0.7f);
             Add(content, AudioCue.EndingReveal, "Audio/Sfx/ending_reveal", 147f, 0.9f, 0.3f, 0.015f, rising: true);
             foreach ((AudioCue cue, string asset) in new[]

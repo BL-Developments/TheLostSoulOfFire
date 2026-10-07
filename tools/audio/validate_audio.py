@@ -50,8 +50,8 @@ AUTHORED_SFX_DURATIONS = {
     **{f"step_hollow_{index}.wav": 0.42 for index in range(1, 5)},
     **{f"step_burning_{index}.wav": 0.26 for index in range(1, 5)},
     **{f"step_devourer_{index}.wav": 0.7 for index in range(1, 5)},
-    "ui_move.wav": 0.18,
-    "ui_back.wav": 0.20,
+    "ui_move.wav": 0.12,
+    "ui_back.wav": 0.14,
     "ui_open.wav": 0.45,
     "ui_close.wav": 0.32,
     "chest_open.wav": 0.9,
@@ -61,7 +61,7 @@ AUTHORED_SFX_DURATIONS = {
     "ability_leap.wav": 0.55,
     "ability_vortex.wav": 1.2,
     "ability_guard.wav": 1.0,
-    "ability_mark.wav": 0.5,
+    "ability_mark.wav": 0.6,
     "door_awaken.wav": 1.8,
     "enemy_emerge.wav": 0.9,
     # Variants derived from the Ludo takes (tools/audio/derive_variants.py).
@@ -148,6 +148,8 @@ AUTHORED_SFX_DURATIONS = {
     "wave_gate_1.wav": 1.500, "wave_gate_2.wav": 1.500, "wave_gate_1_hall.wav": 2.975,
     "wave_ease_1.wav": 2.000, "wave_ease_2.wav": 2.000,
     "devourer_devour_1.wav": 1.250, "devourer_devour_2.wav": 1.250,
+    # The title's confirmation as an ember catching (recipes/cues.py), in place of the Ludo glass tap.
+    "title_ignite.wav": 0.600,
     # The soul breathing out as it is released (recipes/cues.py): no pitch, so crowds never beep.
     "soul_release_breath_1.wav": 1.450,
     "soul_release_breath_2.wav": 1.450,

@@ -131,18 +131,9 @@ Ergebnisse sind eigene Arbeit des Projekts.
 | `Audio/Sfx/footstep_wood_2.wav` | footstep-wood Seed 2 | 0.34 s, 1 Kanal/Kanäle, -26.0 LUFS, Spitze -7.4 dBFS |
 | `Audio/Sfx/footstep_wood_3.wav` | footstep-wood Seed 3 | 0.34 s, 1 Kanal/Kanäle, -26.0 LUFS, Spitze -7.2 dBFS |
 | `Audio/Sfx/footstep_wood_4.wav` | footstep-wood Seed 4 | 0.34 s, 1 Kanal/Kanäle, -26.0 LUFS, Spitze -6.1 dBFS |
-| `Audio/Sfx/ui_move.wav` | ui-move Seed 1 | 0.18 s, 1 Kanal/Kanäle, -30.0 LUFS, Spitze -17.3 dBFS |
-| `Audio/Sfx/ui_back.wav` | ui-back Seed 1 | 0.20 s, 1 Kanal/Kanäle, -31.0 LUFS, Spitze -17.0 dBFS |
-| `Audio/Sfx/ui_open.wav` | ui-open Seed 1 | 0.45 s, 1 Kanal/Kanäle, -30.0 LUFS, Spitze -17.0 dBFS |
-| `Audio/Sfx/ui_close.wav` | ui-close Seed 1 | 0.32 s, 1 Kanal/Kanäle, -29.7 LUFS, Spitze -17.0 dBFS |
-| `Audio/Sfx/chest_open.wav` | chest-open Seed 1 | 0.90 s, 1 Kanal/Kanäle, -22.4 LUFS, Spitze -3.0 dBFS |
-| `Audio/Sfx/currency_gain.wav` | currency-gain Seed 1 | 0.50 s, 1 Kanal/Kanäle, -27.0 LUFS, Spitze -14.5 dBFS |
 | `Audio/Sfx/ability_heal.wav` | ability-heal Seed 1 | 1.10 s, 1 Kanal/Kanäle, -20.0 LUFS, Spitze -7.5 dBFS |
 | `Audio/Sfx/ability_pierce.wav` | ability-pierce Seed 1 | 0.60 s, 1 Kanal/Kanäle, -17.0 LUFS, Spitze -5.6 dBFS |
 | `Audio/Sfx/ability_leap.wav` | ability-leap Seed 1 | 0.55 s, 1 Kanal/Kanäle, -17.0 LUFS, Spitze -5.6 dBFS |
-| `Audio/Sfx/ability_vortex.wav` | ability-vortex Seed 1 | 1.20 s, 1 Kanal/Kanäle, -18.0 LUFS, Spitze -4.5 dBFS |
-| `Audio/Sfx/ability_guard.wav` | ability-guard Seed 1 | 1.00 s, 1 Kanal/Kanäle, -18.0 LUFS, Spitze -2.7 dBFS |
-| `Audio/Sfx/ability_mark.wav` | ability-mark Seed 1 | 0.50 s, 1 Kanal/Kanäle, -20.0 LUFS, Spitze -3.4 dBFS |
 | `Audio/Sfx/door_awaken.wav` | door-awaken Seed 1 | 1.80 s, 1 Kanal/Kanäle, -18.0 LUFS, Spitze -2.2 dBFS |
 | `Audio/Sfx/step_hollow_1.wav` | step-hollow Seed 1 | 0.42 s, 1 Kanal/Kanäle, -29.0 LUFS, Spitze -15.2 dBFS |
 | `Audio/Sfx/step_hollow_2.wav` | step-hollow Seed 2 | 0.42 s, 1 Kanal/Kanäle, -29.0 LUFS, Spitze -15.8 dBFS |
@@ -248,8 +239,6 @@ Abgeleitet mit `tools/audio/derive_variants.py` (Tonhöhe ±4,5 %, Klangneigung,
 | `Audio/Sfx/burning_charge_v3.wav` | Ableitung von burning_charge.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.58 s, 1 Kanal, -21.5 LUFS, Spitze -3.4 dBFS |
 | `Audio/Sfx/player_hit_v2.wav` | Ableitung von player_hit.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.19 s, 1 Kanal, -19.5 LUFS, Spitze -3.1 dBFS |
 | `Audio/Sfx/player_hit_v3.wav` | Ableitung von player_hit.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.21 s, 1 Kanal, -19.5 LUFS, Spitze -3.0 dBFS |
-| `Audio/Sfx/currency_gain_v2.wav` | Ableitung von currency_gain.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.48 s, 1 Kanal, -27.0 LUFS, Spitze -14.4 dBFS |
-| `Audio/Sfx/currency_gain_v3.wav` | Ableitung von currency_gain.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.52 s, 1 Kanal, -27.0 LUFS, Spitze -15.4 dBFS |
 
 ## Hallfahnen (Durchgang 3, 06.10.2026)
 
@@ -460,3 +449,22 @@ Die Ludo-Takes `wave_start.wav`, `wave_clear.wav` und `devourer_devour.wav` blei
 | `Audio/Sfx/devourer_devour_1.wav` | devourer-devour Seed 1 | 1.25 s, 1 Kanal/Kanäle, -19.0 LUFS, Spitze -5.0 dBFS |
 | `Audio/Sfx/devourer_devour_2.wav` | devourer-devour Seed 3 | 1.25 s, 1 Kanal/Kanäle, -19.0 LUFS, Spitze -6.4 dBFS |
 | `Audio/Sfx/wave_gate_1_hall.wav` | Hallfahne von wave_gate_1.wav (Gießhalle, RT60 2.4 s) | 2.97 s, 1 Kanal, -24.7 LUFS, Spitze -8.7 dBFS |
+
+## Menü, Truhe, Münzen und Fähigkeiten ohne Glöckchen (Durchgang 5, 07.10.2026)
+
+Dieselbe CLAP-Durchsicht fand Sinustöne in Rezepten aus `recipes/cues.py`, die als Glöckchen oder Piepen gehört wurden: Menü schließen („electronic beep“ 0,85), Menü öffnen und bewegen („notification chime“ bis 0,37), Truhe („notification chime“ 0,66), Münzen (0,84), Marke (0,86), Vergeltung („bell“ 0,68), Sog („sci-fi laser“ 0,22) und die Ludo-Titelbestätigung („electronic beep“ 0,64). Neu gebaut ohne Sinustöne: Menü-Ticks als kurze resonante Eisenklicks (`_tick`), Öffnen und Schließen als Lederheft und Glut, Truhe mit weichem Riegel, knarrendem Deckel und erwachender Glut, Münzen aus angeschlagenem Metall mit Klappern, Marke als Einbrennen (Zischen, Glut, kleines Aufflammen), Vergeltung als Flammenwand mit dunklem Eisen (Resonatoren statt Sinus), Sog mit tiefem Brausen statt Sirenenton, die Titelbestätigung als zündende Glut mit Raste (`title-confirm` → `title_ignite.wav`; der Ludo-Take bleibt unbenutzt im Bestand). CLAP: Piep-/Glöckchen-Anteil je unter 0,1 (Münzen „coins clinking“ 0,65; Marke „flame igniting“ 0,82; Titel „flame igniting“ 0,42). `_spectral_whoosh`, das Heilung, Durchschlag und Rückstoßsprung aufrufen, war im Rezeptmodul nicht definiert und ist ergänzt (deren Dateien unverändert).
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/ui_move.wav` | ui-move Seed 1 | 0.12 s, 1 Kanal/Kanäle, -30.0 LUFS, Spitze -9.3 dBFS |
+| `Audio/Sfx/ui_back.wav` | ui-back Seed 1 | 0.14 s, 1 Kanal/Kanäle, -31.0 LUFS, Spitze -13.4 dBFS |
+| `Audio/Sfx/ui_open.wav` | ui-open Seed 1 | 0.45 s, 1 Kanal/Kanäle, -30.0 LUFS, Spitze -16.5 dBFS |
+| `Audio/Sfx/ui_close.wav` | ui-close Seed 1 | 0.32 s, 1 Kanal/Kanäle, -31.0 LUFS, Spitze -17.3 dBFS |
+| `Audio/Sfx/chest_open.wav` | chest-open Seed 2 | 0.90 s, 1 Kanal/Kanäle, -20.0 LUFS, Spitze -3.1 dBFS |
+| `Audio/Sfx/currency_gain.wav` | currency-gain Seed 2 | 0.50 s, 1 Kanal/Kanäle, -29.3 LUFS, Spitze -7.0 dBFS |
+| `Audio/Sfx/ability_vortex.wav` | ability-vortex Seed 1 | 1.20 s, 1 Kanal/Kanäle, -18.0 LUFS, Spitze -3.3 dBFS |
+| `Audio/Sfx/ability_guard.wav` | ability-guard Seed 1 | 1.00 s, 1 Kanal/Kanäle, -18.0 LUFS, Spitze -4.0 dBFS |
+| `Audio/Sfx/ability_mark.wav` | ability-mark Seed 1 | 0.60 s, 1 Kanal/Kanäle, -20.2 LUFS, Spitze -3.0 dBFS |
+| `Audio/Sfx/title_ignite.wav` | title-confirm Seed 2 | 0.60 s, 1 Kanal/Kanäle, -24.0 LUFS, Spitze -9.7 dBFS |
+| `Audio/Sfx/currency_gain_v2.wav` | Ableitung von currency_gain.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.48 s, 1 Kanal, -29.3 LUFS, Spitze -6.5 dBFS |
+| `Audio/Sfx/currency_gain_v3.wav` | Ableitung von currency_gain.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.52 s, 1 Kanal, -29.3 LUFS, Spitze -7.0 dBFS |
