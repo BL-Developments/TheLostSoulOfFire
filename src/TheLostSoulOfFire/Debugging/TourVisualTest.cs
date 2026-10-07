@@ -526,6 +526,21 @@ internal sealed class TourVisualTest
             }
         });
         Series("hollow_hit_reaction", 10, 2);
+        // A real full cannon shot at a Hollow: the bolt, the matter it tears off, the scorch.
+        Do("place_cannon", () =>
+        {
+            if (Nearest<Hollow>() is { } hollow)
+            {
+                _world.PlaceAutomatedPlayer(hollow.Position + new Vector2(-260f, 0f));
+                AimAt(hollow.Position);
+            }
+        }, 0.05f);
+        Series("cannon_hold", 22, 4, () =>
+        {
+            _input.InjectMousePresses(left: false, right: true);
+            if (Nearest<Hollow>() is { } hollow) AimAt(hollow.Position);
+        });
+        Series("cannon_hit", 16, 2, () => { if (Nearest<Hollow>() is { } hollow) AimAt(hollow.Position); });
         // A full cannon throws the Hollows back (1.15 s).
         Do("stagger", () => _world.StaggerAutomatedEnemies<Hollow>());
         Series("hollow_stagger", 10, 7);

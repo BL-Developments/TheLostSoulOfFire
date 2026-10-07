@@ -156,7 +156,8 @@ public sealed class CombatPresentation
             VisualIds.CannonMuzzleFull,
             origin,
             MathF.Atan2(request.Direction.Y, request.Direction.X),
-            request.IsFullCharge ? 0.76f : 0.43f,
+            // Sized to the 0.85 m cannon (the old flash was made for a muzzle twice as wide).
+            request.IsFullCharge ? 0.64f : 0.36f,
             color,
             muzzle);
         _particles.EmitBurst(

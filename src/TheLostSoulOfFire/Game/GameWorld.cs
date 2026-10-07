@@ -2924,6 +2924,8 @@ public sealed partial class GameWorld : IDisposable
 
                 Vector2 impactPosition = coreHit ? weakPoint : enemy.Position;
                 PlayMaterialHit(enemy, shot.IsFullCharge ? 0.75f : 0.5f, shot.IsFullCharge ? -0.05f : 0.03f);
+                // The bolt tears matter off what it hits, like a blade does: a full shot as much as the Soul Cleave.
+                EmitHitMatter(enemy, impactPosition, shot.IsFullCharge ? 3 : 1, coreHit);
                 if (shot.IsFullCharge)
                 {
                     _audio.Play(AudioCue.HitHeavy, 0.6f, -0.04f, PanOf(impactPosition) * 0.5f);
