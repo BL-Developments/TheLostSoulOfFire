@@ -556,6 +556,19 @@ public sealed partial class GameWorld : IDisposable
             {
                 _audio.Play(AudioCue.DevourerWindup, 0.72f, 0f, PanOf(enemy.Position) * 0.6f);
             }
+            if (enemy is Burning kindlingBurning)
+            {
+                if (kindlingBurning.State == BurningState.Telegraph)
+                {
+                    // The lane the old chevrons showed: 90 growing to 170 units ahead.
+                    _groundImpacts.Kindle(kindlingBurning, kindlingBurning.Position, kindlingBurning.ChargeDirection,
+                        90f + kindlingBurning.ChargeWindup * 80f, kindlingBurning.ChargeWindup);
+                }
+                else if (kindlingBurning.State == BurningState.Charge)
+                {
+                    _groundImpacts.Scorch(kindlingBurning, kindlingBurning.Position);
+                }
+            }
             if (enemy is Devourer gatheringDevourer && gatheringDevourer.State == DevourerState.SlamTelegraph)
             {
                 _groundImpacts.WindUp(gatheringDevourer, gatheringDevourer.Position, GameBalance.DevourerSlamRange, gatheringDevourer.SlamWindup, deltaTime);
@@ -1006,7 +1019,7 @@ public sealed partial class GameWorld : IDisposable
             }
             DrawSceneProps(batch, layer => layer < SceneLayer.Actor);
             DrawFloorDepth(batch, viewport);
-            _groundImpacts.DrawFloor(batch);
+            _groundImpacts.DrawFloor(batch, _art.SoftSpot);
             if (IsCombatPhase && _phase == GamePhase.Arena)
             {
                 DrawArenaLoop(batch, pixel);

@@ -617,6 +617,14 @@ Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreati
   `arena_devour` zeigt das Aufglühen nach dem Verschlingen. Verworfen: Lichtstärke 0,07 (im
   Lichtdurchgang unsichtbar).
 
+- Burning-Anlauf ohne Ring und Pfeilbahn (wie beim Devourer: Anzeige durch Materie): Beim
+  Ausholen züngeln Flammen auf dem Boden auf, eine nach der anderen in Laufrichtung, bis zur
+  bisherigen Bahnlänge (90 → 170), darunter versengter Stein; beim Anlauf brennt der Burning
+  seine Spur in den Boden (Glut, die zuerst verlischt, dunkle Brandflecken für 2,6 s)
+  (`GroundImpacts.Kindle`/`Scorch`). Richtung, Zeiten und Treffer unverändert; ohne Texturen
+  bleiben Ring und Bahn. Verworfen: Funken aus der Staubtextur (zu schwach), dichte Kette aus
+  elf Glutpunkten (verschmolz zu einem Strahl).
+
 **Verworfen (Durchgang 4):**
 - Raserei als schwebende Tremolo-Flächen: die volle Mischung kippte zu „calm cinematic“.
 - Schreie aus reiner Stimmlippenquelle durch Formanten, auch mit Biphonation: CLAP „horn“ und

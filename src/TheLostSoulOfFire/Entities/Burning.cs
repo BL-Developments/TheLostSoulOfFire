@@ -41,6 +41,10 @@ public sealed class Burning : Enemy
     public bool IsCharging => State == BurningState.Charge;
     public bool IsAggressionCommitted => State is BurningState.Telegraph or BurningState.Charge;
     public Vector2 FacingDirection => _facing;
+
+    /// <summary>Where the rush will go, and how far its wind-up has run (0 to 1), for the presentation.</summary>
+    public Vector2 ChargeDirection => _chargeDirection;
+    public float ChargeWindup => State == BurningState.Telegraph ? 1f - _stateTimer / GameBalance.BurningChargeTelegraph : 0f;
     public override string VisualId => VisualIds.Burning;
     /// <summary>The death clip ends at three quarters of the dying time; the dissolve takes the rest.</summary>
     private const float DeathClipShare = 0.75f;
@@ -306,8 +310,9 @@ public sealed class Burning : Enemy
             }
         }
 
-        if (State == BurningState.Telegraph)
+        if (State == BurningState.Telegraph && !GroundImpacts.Loaded)
         {
+            // With the ground textures the floor itself kindles along the rush (Rendering/GroundImpacts).
             WorldMarks.Ring(batch, pixel, Position, 42f + telegraph * 30f, GameBalance.DeathFlame * (0.35f + telegraph * 0.55f), telegraph > 0.6f, 5f + telegraph * 5f);
             WorldMarks.Lane(batch, pixel, Position, _chargeDirection, 90f + telegraph * 80f, 30f, GameBalance.DeathFlameBright * (0.3f + telegraph * 0.5f));
         }

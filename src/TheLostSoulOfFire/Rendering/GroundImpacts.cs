@@ -88,6 +88,33 @@ public sealed class GroundImpacts
         public bool Air;
     }
 
+    /// <summary>A Burning about to rush: embers catching along the floor ahead of it.</summary>
+    private sealed class Kindling
+    {
+        public required object Key;
+        public Vector2 From;
+        public Vector2 Direction;
+        public float Length;
+        public float Progress;
+        public float Visible;
+        public bool Seen;
+    }
+
+    /// <summary>Where a rush has burnt the floor.</summary>
+    private sealed class Burn
+    {
+        public Vector2 At;
+        public float Age;
+        public float Size;
+        public float Seed;
+    }
+
+    private const float ScorchLife = 2.6f;
+    private const float ScorchSpacing = 12f;
+
+    private readonly List<Kindling> _kindlings = [];
+    private readonly List<Burn> _scorches = [];
+    private readonly Dictionary<object, Vector2> _lastScorch = new(ReferenceEqualityComparer.Instance);
     private readonly List<Windup> _windups = [];
     private readonly List<Impact> _impacts = [];
     private readonly List<Puff> _puffs = [];
@@ -127,6 +154,37 @@ public sealed class GroundImpacts
         }
     }
 
+    /// <summary>
+    /// Called every frame a Burning winds up its rush along <paramref name="direction"/>: embers
+    /// catch on the floor one after another out to <paramref name="length"/>, the way it will
+    /// run (it replaces the ring and lane of chevrons). A rush that is called off fades.
+    /// </summary>
+    public void Kindle(object key, Vector2 from, Vector2 direction, float length, float progress)
+    {
+        Kindling? kindling = _kindlings.Find(candidate => ReferenceEquals(candidate.Key, key));
+        if (kindling is null)
+        {
+            kindling = new Kindling { Key = key };
+            _kindlings.Add(kindling);
+        }
+        kindling.From = from;
+        kindling.Direction = direction.LengthSquared() > 0.0001f ? Vector2.Normalize(direction) : Vector2.UnitX;
+        kindling.Length = length;
+        kindling.Progress = MathHelper.Clamp(progress, 0f, 1f);
+        kindling.Seen = true;
+    }
+
+    /// <summary>Called every frame a Burning rushes: it burns its path into the floor.</summary>
+    public void Scorch(object key, Vector2 at)
+    {
+        if (_lastScorch.TryGetValue(key, out Vector2 last) && Vector2.DistanceSquared(last, at) < ScorchSpacing * ScorchSpacing)
+        {
+            return;
+        }
+        _lastScorch[key] = at;
+        _scorches.Add(new Burn { At = at, Size = Range(14f, 20f), Seed = (float)_random.NextDouble() * 100f });
+    }
+
     /// <summary>The blow lands: the floor breaks under <paramref name="center"/> out to <paramref name="radius"/>.</summary>
     public void Slam(object key, Vector2 center, float radius)
     {
@@ -162,6 +220,31 @@ public sealed class GroundImpacts
     public void Update(float deltaTime)
     {
         _time += deltaTime;
+        for (int index = _kindlings.Count - 1; index >= 0; index--)
+        {
+            Kindling kindling = _kindlings[index];
+            kindling.Visible = kindling.Seen
+                ? MathF.Min(1f, kindling.Visible + deltaTime * 10f)
+                : kindling.Visible - deltaTime * 5f;
+            if (!kindling.Seen && kindling.Visible <= 0f)
+            {
+                _kindlings.RemoveAt(index);
+                continue;
+            }
+            kindling.Seen = false;
+        }
+        for (int index = _scorches.Count - 1; index >= 0; index--)
+        {
+            _scorches[index].Age += deltaTime;
+            if (_scorches[index].Age >= ScorchLife)
+            {
+                _scorches.RemoveAt(index);
+            }
+        }
+        if (_scorches.Count == 0)
+        {
+            _lastScorch.Clear();
+        }
         for (int index = _windups.Count - 1; index >= 0; index--)
         {
             Windup windup = _windups[index];
@@ -199,13 +282,16 @@ public sealed class GroundImpacts
 
     public void Clear()
     {
+        _kindlings.Clear();
+        _scorches.Clear();
+        _lastScorch.Clear();
         _windups.Clear();
         _impacts.Clear();
         _puffs.Clear();
     }
 
     /// <summary>On the floor, under the figures: broken ground, glowing fissures, dust.</summary>
-    public void DrawFloor(SpriteBatch batch)
+    public void DrawFloor(SpriteBatch batch, Texture2D softSpot)
     {
         if (!Loaded)
         {
@@ -230,6 +316,16 @@ public sealed class GroundImpacts
                 DrawFissures(batch, impact.Center, impact.Radius / Edge, impact.Rotation, GrowthFrames - 1,
                     Color.Lerp(GameBalance.DeathFlame, GameBalance.DeathFlameBright, flare) * MathF.Min(1f, glow));
             }
+        }
+
+        foreach (Burn scorch in _scorches)
+        {
+            DrawScorch(batch, scorch, softSpot);
+        }
+
+        foreach (Kindling kindling in _kindlings)
+        {
+            DrawKindling(batch, kindling, softSpot);
         }
 
         foreach (Windup windup in _windups)
@@ -323,6 +419,59 @@ public sealed class GroundImpacts
                 new Vector2(dust.Width / 4f), new Vector2(size * 1.3f, size * 0.5f) / (dust.Width / 2f), SpriteEffects.None, 0f);
             batch.Draw(dust, at - new Vector2(0f, hop), SourceOf(index % DustVariants), new Color(62, 56, 70) * shake, seed,
                 new Vector2(dust.Width / 4f), size / (dust.Width / 2f) * 1.4f, SpriteEffects.None, 0f);
+        }
+    }
+
+    private void DrawKindling(SpriteBatch batch, Kindling kindling, Texture2D light)
+    {
+        Vector2 lightOrigin = new(light.Width * 0.5f, light.Height * 0.5f);
+        const int embers = 8;
+        Texture2D dust = _dust!;
+        Vector2 side = new(-kindling.Direction.Y, kindling.Direction.X);
+        float front = kindling.Progress * 1.15f * kindling.Length;
+        for (int index = 0; index < embers; index++)
+        {
+            float distance = (index + 0.6f) / embers * kindling.Length;
+            float lit = MathHelper.Clamp((front - distance) / 22f, 0f, 1f) * kindling.Visible;
+            if (lit <= 0f)
+            {
+                continue;
+            }
+            float seed = index * 3.71f + kindling.From.X * 0.01f;
+            Vector2 at = kindling.From + kindling.Direction * (distance + (Hash(seed + 5f) - 0.5f) * 8f) + side * ((Hash(seed) - 0.5f) * 16f);
+            // Singed stone under each ember, then the ember itself, flickering.
+            batch.Draw(dust, at, SourceOf(index % DustVariants), new Color(10, 6, 14) * (0.32f * lit), seed,
+                new Vector2(dust.Width / 4f), 22f / (dust.Width / 2f), SpriteEffects.None, 0f);
+            float flicker = 0.7f + 0.3f * MathF.Sin(_time * (19f + 7f * Hash(seed + 1f)) + seed);
+            float size = (7f + 4f * Hash(seed + 2f)) * (0.85f + 0.4f * kindling.Progress);
+            Color ember = Color.Lerp(GameBalance.DeathFlame, GameBalance.DeathFlameBright, kindling.Progress) * (0.85f * lit * flicker);
+            ember.A = 0;
+            // A tongue of flame standing on the floor: taller than wide, licking up.
+            float lick = 1f + 0.35f * MathF.Sin(_time * 13f + seed * 2f);
+            batch.Draw(light, at - new Vector2(0f, 3f + size * 0.35f * lick), null, ember, 0f, lightOrigin,
+                new Vector2(size * 1.7f, size * 2.6f * lick) / light.Width, SpriteEffects.None, 0f);
+            Color hot = GameBalance.SoulWhite * (0.75f * lit * flicker * (0.4f + 0.6f * kindling.Progress));
+            hot.A = 0;
+            batch.Draw(light, at - new Vector2(0f, 3f), null, hot, 0f, lightOrigin,
+                new Vector2(size * 1.0f, size * 0.8f) / light.Width, SpriteEffects.None, 0f);
+        }
+    }
+
+    private void DrawScorch(SpriteBatch batch, Burn scorch, Texture2D light)
+    {
+        Texture2D dust = _dust!;
+        float t = scorch.Age / ScorchLife;
+        float dark = 0.38f * (1f - t * t);
+        batch.Draw(dust, scorch.At, SourceOf((int)scorch.Seed % DustVariants), new Color(8, 5, 12) * dark, scorch.Seed,
+            new Vector2(dust.Width / 4f), scorch.Size * 1.6f / (dust.Width / 2f), SpriteEffects.None, 0f);
+        // Embers left in the burn die out first.
+        float glow = MathF.Max(0f, 1f - scorch.Age / 0.7f);
+        if (glow > 0f)
+        {
+            Color ember = GameBalance.DeathFlame * (0.6f * glow * (0.7f + 0.3f * MathF.Sin(_time * 23f + scorch.Seed)));
+            ember.A = 0;
+            batch.Draw(light, scorch.At, null, ember, 0f, new Vector2(light.Width * 0.5f, light.Height * 0.5f),
+                new Vector2(scorch.Size * 2.2f, scorch.Size * 1.3f) / light.Width, SpriteEffects.None, 0f);
         }
     }
 
