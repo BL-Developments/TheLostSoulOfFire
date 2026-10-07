@@ -499,6 +499,23 @@ Taumeln und -Tod, Burning-Tod, Burning-Angriff, HUD, Seelensinn der Vorhalle.
 
 ## Arbeitsnotiz Durchgang 4 (ab 07.10.2026)
 
+**Stand (07.10.2026, 03:50):** Alle sechs Owner-Punkte haben einen ersten umgesetzten Schritt.
+Geprüft: voller Rundgang (21 Stationen, 611 Aufnahmen, kein Platzhalter; CPU je Frame
+0,3–0,7 ms, Wandzeit im Mittel ≤ 1,5 ms), 263 Unit-Tests, Audio-Laufzeit- (74 Töne, kein
+Ersatzklang), Gameplay- (10 Wellen) und Tod-Neustart-Test, `validate_audio.py` (198),
+`mix_report.py` in arena/combat/shore/crossing ohne Ausreißer. Der Rundgang protokolliert
+`TOUR_AUDIO score=…`, `voices=…` und `TOUR_NARRATION`.
+
+**Owner-Abnahme offen (ich kann nicht hören):** Monsterstimmen und ihre Häufigkeit, Kampfmusik
+(drei Stems) und ihr Wechsel mit dem Ludo-Loop, Bodenbruch-Ton, Ortsklänge; Wortlaut der
+Story- und Erzählzeilen; Lesbarkeit der Angriffsanzeigen ohne Zonen (Schattenhand, Glutspur,
+Lichtnähte) im Gedränge.
+
+**Nächste Schritte (nach Wirkung):** Kampfmusik auch im Prolog prüfen (Übergang zu den
+Zonen-Themen); weitere Gegner-Vielfalt (Restspuren laut Figurenblatt, z. B. Lederschürze der
+Gießhallen-Hollows); Vorhalle und Schwelle mit frischem Blick auf „zu filmisch“; Kamera im
+Gedränge.
+
 **Owner-Befund 07.10.:** Die Soul Cannon ergibt noch keinen Sinn; man versteht die Story
 nicht; die Stimmung ist zu filmisch-atmosphärisch, zu wenig actionreich, spannend und etwas
 verrückt, mit Klangsignalen der Monster; die Monster wirken in Bewegung und Aussehen
