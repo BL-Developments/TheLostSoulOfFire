@@ -499,7 +499,7 @@ Taumeln und -Tod, Burning-Tod, Burning-Angriff, HUD, Seelensinn der Vorhalle.
 
 ## Arbeitsnotiz Durchgang 4 (ab 07.10.2026)
 
-**Stand (07.10.2026, 04:30):** Alle sechs Owner-Punkte haben umgesetzte Schritte, dazu Angriffe
+**Stand (07.10.2026, 04:50, Abschlusslauf nach allen Änderungen grün):** Alle sechs Owner-Punkte haben umgesetzte Schritte, dazu Angriffe
 aller Gegner ohne Zonen, Kampfspuren auf dem Boden, Materie bei Treffern, kompaktes HUD,
 Ortsklänge, das Leitmotiv in der Kampfmusik. Geprüft (Gesamtlauf nach allen Änderungen): voller
 Rundgang (21 Stationen, 621 Aufnahmen, kein Platzhalter; CPU je Frame im Mittel ≤ 0,7 ms),
@@ -513,10 +513,15 @@ Tod-Neustart-, Slice-, Fähigkeiten-, Währungs- und Vorhallentest, `validate_au
 Story- und Erzählzeilen; Lesbarkeit der Angriffsanzeigen ohne Zonen (Schattenhand, Glutspur,
 Lichtnähte) im Gedränge.
 
-**Nächste Schritte (nach Wirkung):** Kampfmusik auch im Prolog prüfen (Übergang zu den
-Zonen-Themen); weitere Gegner-Vielfalt (Restspuren laut Figurenblatt, z. B. Lederschürze der
-Gießhallen-Hollows); Vorhalle und Schwelle mit frischem Blick auf „zu filmisch“; Kamera im
-Gedränge.
+**Owner-Fragen (Inhalt, nicht eigenmächtig geändert):** Sprache (Erzähltext englisch, HUD
+deutsch); Türhinweis „E ENTER BIOME I“ (archivierte Änderung `add-hub-biome-doors`); „PROTOTYPE
+COMPLETE“ im Endbild.
+
+**Nächste Schritte (nach Owner-Rückmeldung):** Klang nach Hörabnahme nachstellen (Stimmenpegel
+und -häufigkeit in `EnemyVoices`, Stem-Pegel `CombatStemGains`, Intensitätsgewichte in
+`UpdateCombatMusic`, Takte der Ortsklänge in `PlaceEvents`); Lesbarkeit der Angriffsanzeigen im
+Gedränge (Schattenhand ggf. kräftiger); Kamera im Gedränge. Die Prolog-Kampfmusik ist geprüft
+(siehe Kampfmusik).
 
 **Owner-Befund 07.10.:** Die Soul Cannon ergibt noch keinen Sinn; man versteht die Story
 nicht; die Stimmung ist zu filmisch-atmosphärisch, zu wenig actionreich, spannend und etwas
