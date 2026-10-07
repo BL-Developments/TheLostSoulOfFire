@@ -907,3 +907,9 @@ aim_move* 12, wake 8, death 12).
   (Rundgänge früherer Durchgänge). Teilläufe dieser Sitzung gelöscht (7,3 GB frei); Basislauf
   20261007_101956 und voller Lauf 20261007_113146 behalten. Teilläufe nach dem Sichten löschen;
   ältere Läufe kann der Owner entfernen.
+- Staub unter den Füßen: Die Staubwolken des Devourer-Schritts waren praktisch unsichtbar – die
+  Wolken der Staubtextur füllen nur knapp die Hälfte ihrer Zelle, bei Größe 16–44 blieben wenige
+  Pixel (mit Rotfärbung gemessen: ~40 px). Jetzt 30–80, im Rundgang als helle Wolke an den Füßen
+  zu sehen. Neu: leiser Aschehauch an der Ferse bei jedem gezeichneten Schritt des Spielers auf
+  staubigem Boden (Gießhalle, Vorhalle, Schwelle; nicht Ufer/Deck), über der Figur gezeichnet
+  (im Bodenpass verdeckten ihn Beine und Kontaktschatten); bewusst dezent, im Standbild kaum.

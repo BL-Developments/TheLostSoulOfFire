@@ -2133,6 +2133,12 @@ public sealed partial class GameWorld : IDisposable
         return false;
     }
 
+    private float _playerStepSide = 1f;
+
+    /// <summary>Ash and stone dust underfoot: the foundry, the antechamber and the threshold (not the wet shore or the deck).</summary>
+    private bool OnDustyFloor => _phase is GamePhase.Arena or GamePhase.Antechamber or GamePhase.EnteringArena ||
+        (_phase == GamePhase.Prologue && _prologue.Sector == PrologueSector.Threshold);
+
     private void UpdateFootsteps()
     {
         Vector2 position = _player.Position;
@@ -2145,6 +2151,15 @@ public sealed partial class GameWorld : IDisposable
             if (CrossedFootfall(_playerStepPhase, phase, Footfalls))
             {
                 _audio.Play(wood ? AudioCue.FootstepWood : AudioCue.Footstep, 0.42f);
+                if (OnDustyFloor)
+                {
+                    // The foot lands in the ash: a faint breath of it is kicked back from the heel,
+                    // left and right foot in turn.
+                    Vector2 heading = _player.Velocity;
+                    Vector2 side = heading.LengthSquared() > 0.001f ? Vector2.Normalize(new Vector2(-heading.Y, heading.X)) : Vector2.UnitX;
+                    _playerStepSide = -_playerStepSide;
+                    _groundImpacts.Scuff(position + side * (5f * _playerStepSide), heading);
+                }
             }
             _playerStepPhase = phase;
             return;

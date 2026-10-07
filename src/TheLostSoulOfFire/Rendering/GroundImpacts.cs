@@ -275,9 +275,26 @@ public sealed class GroundImpacts
         {
             float angle = (float)(_random.NextDouble() * MathHelper.TwoPi);
             Vector2 direction = new(MathF.Cos(angle), MathF.Sin(angle) * 0.5f);
-            AddPuff(at + direction * 6f, direction, Range(10f, 22f), 0.3f, new Vector2(0f, -Range(4f, 10f)), Range(0.6f, 0.9f),
-                Range(16f, 22f), Range(34f, 44f), 0.32f);
+            AddPuff(at + direction * 8f, direction, Range(14f, 28f), 0.3f, new Vector2(0f, -Range(4f, 10f)), Range(0.6f, 0.9f),
+                Range(30f, 40f), Range(60f, 80f), 0.32f);
         }
+    }
+
+    /// <summary>
+    /// A running footfall on a dusty floor: a faint breath of ash kicked back from the heel, much
+    /// lighter than a Devourer's stomp (presentation only).
+    /// </summary>
+    public void Scuff(Vector2 at, Vector2 heading)
+    {
+        if (!Loaded)
+        {
+            return;
+        }
+        Vector2 back = heading.LengthSquared() > 0.001f ? -Vector2.Normalize(heading) : Vector2.UnitY;
+        Vector2 direction = Vector2.Normalize(new Vector2(back.X + Range(-0.4f, 0.4f), (back.Y + Range(-0.4f, 0.4f)) * 0.5f));
+        // Thrown up behind the heel, over the foot (on the floor pass the legs and the contact shadow hid it).
+        AddPuff(at + direction * 4f, direction, Range(8f, 14f), 0.25f, new Vector2(0f, -Range(3f, 6f)), Range(0.4f, 0.6f),
+            Range(20f, 26f), Range(40f, 50f), 0.4f, air: true);
     }
 
     /// <summary>The blow lands: the floor breaks under <paramref name="center"/> out to <paramref name="radius"/>.</summary>
