@@ -2405,6 +2405,12 @@ public sealed partial class GameWorld : IDisposable
                     {
                         _audio.Play(cue, loudness * nearness * nearness, 0f, PanOf(enemy.Position));
                     }
+                    if (_phase == GamePhase.Prologue && !_prologue.IsVehicleRide && _prologue.Sector is PrologueSector.Emergence or PrologueSector.Search)
+                    {
+                        // The same wet stone as under the player's feet: a little water splashes up.
+                        Vector2 back = enemy.VisualFacing.LengthSquared() > 0.001f ? -Vector2.Normalize(enemy.VisualFacing) : Vector2.Zero;
+                        _particles.EmitSplash(enemy.Position + new Vector2(0f, FigureHeights.Air), back, enemy is Devourer ? 6 : 3);
+                    }
                     if (enemy is Devourer)
                     {
                         // Its weight lands: dust kicks up at the foot, and close by the view trembles.
