@@ -91,7 +91,11 @@ public enum AudioCue
     BurningCackle,
     BurningShriek,
     DevourerGrowl,
-    DevourerHunger
+    DevourerHunger,
+    /// <summary>The places themselves, now and then (tools/audio/recipes/ambient_events.py).</summary>
+    FoundryBell,
+    ShoreHorn,
+    ShoreBoard
 }
 
 /// <summary>
@@ -219,8 +223,26 @@ public sealed class AudioDirector : IDisposable
         [AudioCue.DevourerGrowl] = new(0.8f, 1, 0.04f, CueGroup.Voice),
         [AudioCue.HollowGrasp] = new(0.08f, 2, 0.05f),
         [AudioCue.BurningShriek] = new(0.15f, 2, 0.04f),
-        [AudioCue.DevourerHunger] = new(0.6f, 1, 0.03f)
+        [AudioCue.DevourerHunger] = new(0.6f, 1, 0.03f),
+        [AudioCue.FoundryBell] = new(4f, 1, 0.03f),
+        [AudioCue.ShoreHorn] = new(4f, 1, 0.02f),
+        [AudioCue.ShoreBoard] = new(2f, 1, 0.04f)
     };
+
+    /// <summary>
+    /// What each place sounds like now and then, on top of its bed, from a random side: the works
+    /// bell tolling far off over the foundry, the departure board flipping its letters on the
+    /// shore and the horn of a ferry out on the water that never comes closer. Seconds between
+    /// two of a kind, and their level.
+    /// </summary>
+    private static readonly Dictionary<AudioZone, (AudioCue Cue, float MinGap, float MaxGap, float Volume)[]> PlaceEvents = new()
+    {
+        [AudioZone.Arena] = [(AudioCue.FoundryBell, 26f, 48f, 0.55f)],
+        [AudioZone.Shore] = [(AudioCue.ShoreBoard, 14f, 26f, 0.5f), (AudioCue.ShoreHorn, 28f, 50f, 0.6f)],
+        [AudioZone.Title] = [(AudioCue.ShoreHorn, 18f, 34f, 0.55f)],
+        [AudioZone.Harbour] = [(AudioCue.ShoreHorn, 34f, 60f, 0.45f)]
+    };
+    private readonly Dictionary<AudioCue, float> _placeEventTimers = [];
 
     /// <summary>
     /// Sounds that make way for a danger signal: started while one is fresh, they come in
@@ -232,7 +254,8 @@ public sealed class AudioDirector : IDisposable
         AudioCue.Footstep, AudioCue.FootstepWood, AudioCue.HollowStep, AudioCue.BurningStep, AudioCue.DevourerStep,
         AudioCue.EnemyEmerge, AudioCue.SoulRelease, AudioCue.CannonDraw, AudioCue.CannonStow,
         AudioCue.ScytheWeight1, AudioCue.ScytheWeight2, AudioCue.ScytheWeight3,
-        AudioCue.HollowCall, AudioCue.BurningCackle, AudioCue.DevourerGrowl
+        AudioCue.HollowCall, AudioCue.BurningCackle, AudioCue.DevourerGrowl,
+        AudioCue.FoundryBell, AudioCue.ShoreHorn, AudioCue.ShoreBoard
     ];
 
     /// <summary>
@@ -477,6 +500,9 @@ public sealed class AudioDirector : IDisposable
             AddVariants(content, AudioCue.BurningShriek, "Audio/Sfx/burning_shriek", 2, 420f, 0.6f, 0.3f, 0.6f);
             AddVariants(content, AudioCue.DevourerGrowl, "Audio/Sfx/devourer_growl", 3, 58f, 1.1f, 0.3f, 0.5f);
             AddVariants(content, AudioCue.DevourerHunger, "Audio/Sfx/devourer_hunger", 2, 76f, 1.3f, 0.3f, 0.5f);
+            AddVariants(content, AudioCue.FoundryBell, "Audio/Sfx/foundry_bell", 2, 210f, 3f, 0.2f, 0.05f);
+            AddVariants(content, AudioCue.ShoreHorn, "Audio/Sfx/shore_horn", 2, 72f, 3f, 0.2f, 0.1f);
+            AddVariants(content, AudioCue.ShoreBoard, "Audio/Sfx/shore_board", 2, 2400f, 0.8f, 0.15f, 0.9f);
             Add(content, AudioCue.CannonDraw, "Audio/Sfx/cannon_draw", 140f, 0.3f, 0.3f, 0.4f);
             Add(content, AudioCue.CannonStow, "Audio/Sfx/cannon_stow", 120f, 0.3f, 0.3f, 0.4f);
             AddVariants(content, AudioCue.HitHollow, "Audio/Sfx/hit_hollow", 3, 180f, 0.1f, 0.3f, 0.7f);
@@ -532,6 +558,8 @@ public sealed class AudioDirector : IDisposable
         {
             return;
         }
+
+        UpdatePlaceEvents(deltaTime);
 
         foreach (AudioCue cue in Enum.GetValues<AudioCue>())
         {
@@ -1078,6 +1106,32 @@ public sealed class AudioDirector : IDisposable
             return;
         }
         ApplyMix();
+    }
+
+    /// <summary>Plays each place's sounds now and then (<see cref="PlaceEvents"/>); nothing while paused.</summary>
+    private void UpdatePlaceEvents(float deltaTime)
+    {
+        if (_paused || !PlaceEvents.TryGetValue(_zone, out (AudioCue Cue, float MinGap, float MaxGap, float Volume)[]? events))
+        {
+            return;
+        }
+
+        foreach ((AudioCue cue, float minGap, float maxGap, float volume) in events)
+        {
+            if (!_placeEventTimers.TryGetValue(cue, out float left))
+            {
+                // The first comes sooner, so a place speaks soon after one arrives.
+                _placeEventTimers[cue] = minGap * 0.4f + (NextSignedFloat() * 0.5f + 0.5f) * (maxGap - minGap) * 0.5f;
+                continue;
+            }
+            left -= deltaTime;
+            if (left <= 0f)
+            {
+                Play(cue, volume, 0f, NextSignedFloat() * 0.7f);
+                left = minGap + (NextSignedFloat() * 0.5f + 0.5f) * (maxGap - minGap);
+            }
+            _placeEventTimers[cue] = left;
+        }
     }
 
     /// <summary>How much of the combat score plays (its pulse layer), 0..1.</summary>

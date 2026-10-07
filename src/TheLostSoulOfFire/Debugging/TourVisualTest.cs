@@ -162,7 +162,7 @@ internal sealed class TourVisualTest
     private static readonly HashSet<AudioCue> VoiceCues =
     [
         AudioCue.HollowCall, AudioCue.HollowGrasp, AudioCue.BurningCackle, AudioCue.BurningShriek,
-        AudioCue.DevourerGrowl, AudioCue.DevourerHunger
+        AudioCue.DevourerGrowl, AudioCue.DevourerHunger, AudioCue.FoundryBell, AudioCue.ShoreHorn, AudioCue.ShoreBoard
     ];
     private readonly SortedDictionary<string, int> _voices = new();
     private float _clock;

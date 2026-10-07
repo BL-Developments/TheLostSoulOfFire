@@ -10847,3 +10847,33 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/Effects/grasp_shadow.png
+
+#begin Audio/Sfx/foundry_bell_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/foundry_bell_1.wav
+
+#begin Audio/Sfx/foundry_bell_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/foundry_bell_2.wav
+
+#begin Audio/Sfx/shore_horn_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/shore_horn_1.wav
+
+#begin Audio/Sfx/shore_horn_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/shore_horn_2.wav
+
+#begin Audio/Sfx/shore_board_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/shore_board_1.wav
+
+#begin Audio/Sfx/shore_board_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/shore_board_2.wav

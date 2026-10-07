@@ -633,7 +633,15 @@ Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreati
   die alten Zeichen. Offen zur Owner-Abnahme: Lesbarkeit im Gedränge (der Schatten ist leiser als
   der Lichtbogen).
 
+- Klänge der Orte (Owner: Atmo kreativer): Über dem Bett spielen selten einzelne Klänge von einer
+  zufälligen Seite (`AudioDirector.PlaceEvents`, `recipes/ambient_events.py`): in der Gießhalle
+  die ferne Werksglocke (alle 26–48 s), am Ufer die Fallblattanzeige (14–26 s) und das Horn der
+  Fähre, die nie kommt (28–50 s; auch über dem Titel und leiser im Hafen). Nicht im Pausenmenü,
+  treten bei Gefahr zurück; Mix in Klasse `place` (−12…+2 LU) im Band. Rundgang zählt sie.
+
 **Verworfen (Durchgang 4):**
+- Hammerschläge, Ketten, ächzendes Dach und Murmeln der letzten Schicht als Ortsklänge: CLAP
+  hörte Piepton/Schritte/Glocke, Türknarren, Schiffshorn bzw. Monster-Knurren.
 - Raserei als schwebende Tremolo-Flächen: die volle Mischung kippte zu „calm cinematic“.
 - Schreie aus reiner Stimmlippenquelle durch Formanten, auch mit Biphonation: CLAP „horn“ und
   „synthesizer tone“ bis 0,57. Erst Luft durch die Formanten und tiefe Rauheit machen eine Kehle.

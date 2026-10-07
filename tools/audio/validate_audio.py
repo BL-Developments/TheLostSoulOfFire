@@ -165,6 +165,10 @@ AUTHORED_SFX_DURATIONS = {
     "burning_shriek_1.wav": 0.750, "burning_shriek_2.wav": 0.750,
     "devourer_growl_1.wav": 1.280, "devourer_growl_2.wav": 1.230, "devourer_growl_3.wav": 1.480,
     "devourer_hunger_1.wav": 1.600, "devourer_hunger_2.wav": 1.600,
+    # The places themselves, now and then (recipes/ambient_events.py).
+    "foundry_bell_1.wav": 6.500, "foundry_bell_2.wav": 6.500,
+    "shore_horn_1.wav": 5.000, "shore_horn_2.wav": 5.000,
+    "shore_board_1.wav": 1.800, "shore_board_2.wav": 1.800,
     # The Life Flame's fire after the last wave (tools/audio/recipes/ambiences.py), looped.
     "life_flame_loop.wav": 9.0,
 }

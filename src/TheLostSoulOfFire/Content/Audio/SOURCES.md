@@ -395,3 +395,16 @@ CLAP (je 10 s): Puls + Antrieb „intense action music with drums“ 0,61; alle 
 | `Audio/Music/combat_pulse.wav` | combat-pulse Seed 1 | 30.00 s, 2 Kanal/Kanäle, -20.0 LUFS, Spitze -9.9 dBFS |
 | `Audio/Music/combat_drive.wav` | combat-drive Seed 1 | 30.00 s, 2 Kanal/Kanäle, -21.0 LUFS, Spitze -9.9 dBFS |
 | `Audio/Music/combat_frenzy.wav` | combat-frenzy Seed 1 | 30.00 s, 2 Kanal/Kanäle, -22.0 LUFS, Spitze -11.8 dBFS |
+
+## Klänge der Orte (Durchgang 4, 07.10.2026)
+
+Owner: Atmosphäre, Spannung und Gefühl dürfen kreativer werden. Über dem gleichförmigen Bett jeder Zone spielen jetzt selten einzelne Klänge der Orte, von einer zufälligen Seite (`AudioDirector.PlaceEvents`). Rezepte in `tools/audio/recipes/ambient_events.py`. Gießhalle: die Werksglocke, die der Stadt den Takt gab, schlägt fern (CLAP „church bell“ 0,97/0,81). Ufer: die Fallblattanzeige blättert für eine Fähre, die nie kommt (mechanisches Klappern, CLAP „typewriter“ 0,91/0,75), und weit draußen tönt das Horn dieser Fähre, nie näher (CLAP „ship horn“ 0,93/0,95); das Horn auch über dem Titel und leiser im Hafen. Verworfen: Hammerschläge in der Halle (CLAP „electronic beep“, „footsteps“, dicht modal „church bell“), rasselnde Ketten („door creak“), ächzendes Dach („ship horn“), Murmeln der letzten Schicht („monster growling“).
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/foundry_bell_1.wav` | foundry-bell Seed 1 | 6.50 s, 1 Kanal/Kanäle, -29.0 LUFS, Spitze -15.7 dBFS |
+| `Audio/Sfx/foundry_bell_2.wav` | foundry-bell Seed 2 | 6.50 s, 1 Kanal/Kanäle, -29.0 LUFS, Spitze -14.3 dBFS |
+| `Audio/Sfx/shore_horn_1.wav` | shore-horn Seed 1 | 5.00 s, 1 Kanal/Kanäle, -30.0 LUFS, Spitze -18.1 dBFS |
+| `Audio/Sfx/shore_horn_2.wav` | shore-horn Seed 2 | 5.00 s, 1 Kanal/Kanäle, -30.0 LUFS, Spitze -16.7 dBFS |
+| `Audio/Sfx/shore_board_1.wav` | shore-board Seed 1 | 1.80 s, 1 Kanal/Kanäle, -30.2 LUFS, Spitze -3.0 dBFS |
+| `Audio/Sfx/shore_board_2.wav` | shore-board Seed 3 | 1.80 s, 1 Kanal/Kanäle, -30.0 LUFS, Spitze -3.8 dBFS |

@@ -57,6 +57,8 @@ BANDS = {
     "layer": (-6.0, 12.0),
     # Enemy calls between attacks (EnemyVoices): heard over the room, never over a warning.
     "call": (-4.0, 8.0),
+    # The place's own sounds now and then (AudioDirector.PlaceEvents): part of the room.
+    "place": (-12.0, 2.0),
 }
 
 CLASS = {
@@ -76,6 +78,7 @@ CLASS = {
     "HollowWindup": "danger", "DevourerWindup": "danger", "BurningRush": "danger",
     "HollowCall": "call", "BurningCackle": "call", "DevourerGrowl": "call",
     "HollowGrasp": "layer", "BurningShriek": "layer",
+    "FoundryBell": "place", "ShoreHorn": "place", "ShoreBoard": "place",
 }
 
 #: Menu sounds play over the paused beds (AudioDirector.PausedBedVolume).
@@ -145,6 +148,7 @@ INDIRECT = {
     "HitHollow": 0.78, "HitBurning": 0.78, "HitDevourer": 0.78, "HitDummy": 0.78,
     "DeathHollow": 0.66, "DeathBurning": 0.66, "DeathDevourer": 0.64,
     "HollowCall": 0.55, "BurningCackle": 0.6, "DevourerGrowl": 0.72,
+    "FoundryBell": 0.55, "ShoreHorn": 0.6, "ShoreBoard": 0.5,
 }
 
 
