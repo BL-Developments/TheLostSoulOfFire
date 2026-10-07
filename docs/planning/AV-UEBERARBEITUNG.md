@@ -625,6 +625,14 @@ Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreati
   bleiben Ring und Bahn. Verworfen: Funken aus der Staubtextur (zu schwach), dichte Kette aus
   elf Glutpunkten (verschmolz zu einem Strahl).
 
+- Hollow-Griff ohne hellen Bogen: Beim Ausholen kriecht der Schatten einer greifenden Hand mit
+  vier langen Fingern über den Boden (Reichweite wie der alte Bogen, 48 → 68), beim Griff
+  schnellt er auf die volle Reichweite (92) und verblasst (`ground_kit.py` `grasp_shadow`,
+  `GroundImpacts.Grasp`). Lore: der Hollow greift nach jemandem, der geht. Damit zeigen alle drei
+  Gegner ihre Angriffe über Boden, Schatten und Feuer statt über Zonen; ohne Texturen bleiben
+  die alten Zeichen. Offen zur Owner-Abnahme: Lesbarkeit im Gedränge (der Schatten ist leiser als
+  der Lichtbogen).
+
 **Verworfen (Durchgang 4):**
 - Raserei als schwebende Tremolo-Flächen: die volle Mischung kippte zu „calm cinematic“.
 - Schreie aus reiner Stimmlippenquelle durch Formanten, auch mit Biphonation: CLAP „horn“ und

@@ -31,6 +31,10 @@ public sealed class GroundImpacts
     private static Texture2D? _shatter;
     private static Texture2D? _fissures;
     private static Texture2D? _dust;
+    private static Texture2D? _grasp;
+
+    /// <summary>Pixels from the grasp texture's centre to the fingertips (ground_kit.GRASP_REACH).</summary>
+    private const float GraspReach = 116f;
 
     public static void Load(ContentManager content)
     {
@@ -39,6 +43,7 @@ public sealed class GroundImpacts
             _shatter = content.Load<Texture2D>("Textures/Effects/ground_shatter");
             _fissures = content.Load<Texture2D>("Textures/Effects/ground_fissures");
             _dust = content.Load<Texture2D>("Textures/Effects/dust_puffs");
+            _grasp = content.Load<Texture2D>("Textures/Effects/grasp_shadow");
         }
         catch (ContentLoadException)
         {
@@ -47,7 +52,7 @@ public sealed class GroundImpacts
     }
 
     /// <summary>Without the textures the old rings remain the telegraph.</summary>
-    public static bool Loaded => _shatter is not null && _fissures is not null && _dust is not null;
+    public static bool Loaded => _shatter is not null && _fissures is not null && _dust is not null && _grasp is not null;
 
     private sealed class Windup
     {
@@ -108,6 +113,21 @@ public sealed class GroundImpacts
         public float Size;
         public float Seed;
     }
+
+    /// <summary>A Hollow reaching for someone: the shadow of its hand on the floor.</summary>
+    private sealed class Grasping
+    {
+        public required object Key;
+        public Vector2 From;
+        public float Angle;
+        public float Reach;
+        public float Strength;
+        public float Visible;
+        public bool Seen;
+        public float Seed;
+    }
+
+    private readonly List<Grasping> _grasps = [];
 
     private const float ScorchLife = 2.6f;
     private const float ScorchSpacing = 12f;
@@ -174,6 +194,26 @@ public sealed class GroundImpacts
         kindling.Seen = true;
     }
 
+    /// <summary>
+    /// Called every frame a Hollow winds up or grabs: the shadow of its hand stretches over the
+    /// floor along <paramref name="facing"/>, its fingertips at <paramref name="reach"/> (it
+    /// replaces the arc of light). When it is no longer renewed it fades at once.
+    /// </summary>
+    public void Grasp(object key, Vector2 from, Vector2 facing, float reach, float strength)
+    {
+        Grasping? grasp = _grasps.Find(candidate => ReferenceEquals(candidate.Key, key));
+        if (grasp is null)
+        {
+            grasp = new Grasping { Key = key, Seed = (float)_random.NextDouble() * 10f };
+            _grasps.Add(grasp);
+        }
+        grasp.From = from;
+        grasp.Angle = MathF.Atan2(facing.Y, facing.X);
+        grasp.Reach = reach;
+        grasp.Strength = strength;
+        grasp.Seen = true;
+    }
+
     /// <summary>Called every frame a Burning rushes: it burns its path into the floor.</summary>
     public void Scorch(object key, Vector2 at)
     {
@@ -233,6 +273,17 @@ public sealed class GroundImpacts
             }
             kindling.Seen = false;
         }
+        for (int index = _grasps.Count - 1; index >= 0; index--)
+        {
+            Grasping grasp = _grasps[index];
+            grasp.Visible = grasp.Seen ? MathF.Min(1f, grasp.Visible + deltaTime * 12f) : grasp.Visible - deltaTime * 5f;
+            if (!grasp.Seen && grasp.Visible <= 0f)
+            {
+                _grasps.RemoveAt(index);
+                continue;
+            }
+            grasp.Seen = false;
+        }
         for (int index = _scorches.Count - 1; index >= 0; index--)
         {
             _scorches[index].Age += deltaTime;
@@ -283,6 +334,7 @@ public sealed class GroundImpacts
     public void Clear()
     {
         _kindlings.Clear();
+        _grasps.Clear();
         _scorches.Clear();
         _lastScorch.Clear();
         _windups.Clear();
@@ -326,6 +378,17 @@ public sealed class GroundImpacts
         foreach (Kindling kindling in _kindlings)
         {
             DrawKindling(batch, kindling, softSpot);
+        }
+
+        foreach (Grasping grasp in _grasps)
+        {
+            // The fingers flex while it reaches; the floor squashes the hand like any level shape.
+            float flex = 1f + 0.05f * MathF.Sin(_time * 11f + grasp.Seed);
+            float scale = grasp.Reach / GraspReach;
+            Texture2D hand = _grasp!;
+            batch.Draw(hand, grasp.From, null, Color.White * (grasp.Strength * grasp.Visible),
+                grasp.Angle + 0.04f * MathF.Sin(_time * 7f + grasp.Seed), new Vector2(hand.Width, hand.Height) * 0.5f,
+                new Vector2(scale * flex, scale), SpriteEffects.None, 0f);
         }
 
         foreach (Windup windup in _windups)

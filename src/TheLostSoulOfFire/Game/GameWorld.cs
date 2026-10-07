@@ -556,6 +556,20 @@ public sealed partial class GameWorld : IDisposable
             {
                 _audio.Play(AudioCue.DevourerWindup, 0.72f, 0f, PanOf(enemy.Position) * 0.6f);
             }
+            if (enemy is Hollow graspingHollow)
+            {
+                if (graspingHollow.State == HollowState.Telegraph)
+                {
+                    // The reach the old arc showed while it winds up (48 growing to 68), then the
+                    // full swipe range on the grab.
+                    float windup = graspingHollow.SwipeWindup;
+                    _groundImpacts.Grasp(graspingHollow, graspingHollow.Position, graspingHollow.FacingDirection, 48f + windup * 20f, 0.3f + windup * 0.35f);
+                }
+                else if (graspingHollow.State == HollowState.Swipe)
+                {
+                    _groundImpacts.Grasp(graspingHollow, graspingHollow.Position, graspingHollow.FacingDirection, GameBalance.HollowSwipeRange, 0.8f);
+                }
+            }
             if (enemy is Burning kindlingBurning)
             {
                 if (kindlingBurning.State == BurningState.Telegraph)

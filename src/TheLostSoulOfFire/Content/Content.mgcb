@@ -10835,3 +10835,15 @@
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /build:Audio/Music/combat_frenzy.wav
+
+#begin Textures/Effects/grasp_shadow.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=True
+/processorParam:PremultiplyAlpha=False
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/Effects/grasp_shadow.png

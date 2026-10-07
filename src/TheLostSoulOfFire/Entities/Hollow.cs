@@ -37,6 +37,9 @@ public sealed class Hollow : Enemy
 
     public override string StateLabel => State.ToString().ToUpperInvariant();
     public Vector2 FacingDirection => _facing;
+
+    /// <summary>How far the swipe's wind-up has run (0 to 1), for the presentation.</summary>
+    public float SwipeWindup => State == HollowState.Telegraph ? 1f - _stateTimer / GameBalance.HollowSwipeTelegraph : 0f;
     public override string VisualId => VisualIds.Hollow;
     /// <summary>
     /// The swipe clip has thirteen announce frames (notice, coil, trembling hold) and seven
@@ -222,7 +225,11 @@ public sealed class Hollow : Enemy
             batch.DrawLine(pixel, mask - right * 5f, mask + right * 5f, new Color(130, 124, 128), 1.5f);
         }
 
-        if (State == HollowState.Telegraph)
+        if (GroundImpacts.Loaded && State is HollowState.Telegraph or HollowState.Swipe)
+        {
+            // With the ground textures the reach is the shadow of its grasping hand (Rendering/GroundImpacts).
+        }
+        else if (State == HollowState.Telegraph)
         {
             float radius = 48f + telegraph * 20f;
             WorldMarks.Arc(batch, pixel, Position, radius, MathF.Atan2(_facing.Y, _facing.X), 1.6f, GameBalance.DeathFlame * (0.28f + telegraph * 0.5f));

@@ -13,6 +13,9 @@ Writes premultiplied RGBA (Content.mgcb imports them with PremultiplyAlpha=False
                         fissures and creeps out to the edge of its blow; the eighth lights every
                         crack for the moment the floor breaks. Tinted violet in game.
 - dust_puffs.png        four soft, ragged clouds of stone dust (2 x 2), pale; tinted in game.
+- grasp_shadow.png      the shadow of a Hollow's grasping hand on the floor, reaching along +X:
+                        a palm at the body and four long fingers fanning over 1.5 rad, their
+                        tips exactly at GRASP_REACH px (the swipe's reach), soft penumbra.
 
 The crack field is one seeded layout, so the fissures of the windup and the shattered floor are
 the same cracks. The blow's radius sits at EDGE px from the centre of a SIZE canvas; the game
@@ -287,6 +290,45 @@ def dust_puff(seed: int, size: int = 128) -> np.ndarray:
     return np.concatenate([rgb, density[..., None]], axis=-1)
 
 
+GRASP_SIZE = 256
+GRASP_REACH = 116.0  # px from the centre to the fingertips; the game scales by reach / this
+
+
+def grasp_shadow(rng) -> np.ndarray:
+    size = GRASP_SIZE
+    image = Image.new("L", (size * SS, size * SS), 0)
+    draw = ImageDraw.Draw(image)
+    c = size / 2
+
+    def px(x, y):
+        return ((c + x) * SS, (c + y) * SS)
+
+    # The palm: a soft lump just ahead of the body.
+    for k in range(14):
+        t = k / 13
+        x, y, r = 14 + 22 * t, 0.0, 15 - 4 * t
+        draw.ellipse([*px(x - r, y - r * 0.9), *px(x + r, y + r * 0.9)], fill=255)
+    # Four fingers fanning over 1.5 rad, long and thin, curling a little, tips at the reach.
+    for k, angle in enumerate((-0.6, -0.2, 0.2, 0.6)):
+        angle += rng.uniform(-0.05, 0.05)
+        curl = rng.uniform(-0.25, 0.25)
+        reach = GRASP_REACH * rng.uniform(0.96, 1.0)
+        steps = 40
+        for i in range(steps + 1):
+            t = i / steps
+            r = 26 + (reach - 26) * t
+            a = angle + curl * t * t
+            x, y = math.cos(a) * r, math.sin(a) * r
+            width = (7.0 - 5.0 * t) * (1.0 + 0.25 * math.sin(t * 9 + k))  # knuckles
+            draw.ellipse([*px(x - width, y - width), *px(x + width, y + width)], fill=255)
+    hand = np.asarray(image, dtype=float).reshape(size, SS, size, SS).mean(axis=(1, 3)) / 255
+    core = blur(hand, 1.5)
+    penumbra = blur(hand, 9.0)
+    alpha = np.clip(core * 0.85 + penumbra * 0.45, 0, 0.92)
+    rgb = np.zeros((size, size, 3))
+    return np.concatenate([rgb, alpha[..., None]], axis=-1)
+
+
 def tile(frames: list[np.ndarray], columns: int) -> np.ndarray:
     size = frames[0].shape[0]
     rows = math.ceil(len(frames) / columns)
@@ -336,6 +378,7 @@ def main() -> int:
     save(shatter_image, args.out / "ground_shatter.png")
     save(tile(fissures, 4), args.out / "ground_fissures.png")
     save(tile(puffs, 2), args.out / "dust_puffs.png")
+    save(grasp_shadow(np.random.default_rng(SEED + 20)), args.out / "grasp_shadow.png")
     if args.preview:
         preview(shatter_image, fissures, puffs, args.preview)
     return 0
