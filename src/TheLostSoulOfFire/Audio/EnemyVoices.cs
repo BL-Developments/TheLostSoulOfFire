@@ -24,7 +24,7 @@ public sealed class EnemyVoices
     private readonly Random _random = new(613);
     private float _sinceLast = 10f;
 
-    public void Update(float deltaTime, IReadOnlyList<Enemy> enemies, Vector2 listener, bool active, Action<AudioCue, float, Vector2> speak)
+    public void Update(float deltaTime, IReadOnlyList<Enemy> enemies, Vector2 listener, bool active, Action<AudioCue, float, Enemy> speak)
     {
         _sinceLast += deltaTime;
         if (!active)
@@ -90,7 +90,7 @@ public sealed class EnemyVoices
             }
 
             float nearness = MathHelper.Clamp(1f - Vector2.Distance(enemy.Position, listener) / Hearing, 0.2f, 1f);
-            speak(call, LoudnessOf(enemy) * (0.45f + 0.55f * nearness), enemy.Position);
+            speak(call, LoudnessOf(enemy) * (0.45f + 0.55f * nearness), enemy);
             _sinceLast = 0f;
             _next[enemy] = Interval(enemy) * crowd;
         }

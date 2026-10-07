@@ -570,6 +570,12 @@ public sealed class ArtAssets
             ? sizeScale / pixelsPerUnit
             : worldSize.X / clip.FrameWidth;
         (Vector2 impactScale, float lean, float flash) = figure.ImpactPose(_time);
+        if (TwitchOf(owner) is { } kind)
+        {
+            (Vector2 twitchScale, float twitchLean) = figure.TwitchPose(_time, kind, clipName is VisualClips.Idle or VisualClips.Move);
+            impactScale *= twitchScale;
+            lean += twitchLean;
+        }
         if (owner is Player)
         {
             // The player's own figure flashes less, so it never vanishes into white in a crowd.
@@ -583,6 +589,37 @@ public sealed class ArtAssets
             DrawSource(batch, previous.Clip, previous.Source, position, previous.Scale, previous.Tint * (fade * fade * 0.9f));
         }
         figure.RememberPose(clip, clip.GetSourceRectangle(elapsed), position, scale, tint);
+    }
+
+    /// <summary>How an enemy's body twitches between its actions (presentation only).</summary>
+    private enum TwitchKind
+    {
+        /// <summary>Hollow: a sudden jerk of the whole body, stuttering like its voice.</summary>
+        Jerk,
+        /// <summary>Burning: the unstable flame shudders through it; laughing, it shakes.</summary>
+        Flicker,
+        /// <summary>Devourer: the souls it holds push out, the body swells and it swallows.</summary>
+        Gulp
+    }
+
+    private static TwitchKind? TwitchOf(object owner) => owner switch
+    {
+        Hollow => TwitchKind.Jerk,
+        Burning => TwitchKind.Flicker,
+        Devourer => TwitchKind.Gulp,
+        _ => null
+    };
+
+    /// <summary>
+    /// An enemy calls out (EnemyVoices): its body twitches with the voice, the Hollow jerking and
+    /// stuttering, the Burning shaking with its laughter, the Devourer swelling as it growls.
+    /// </summary>
+    public void Twitch(object owner, bool calling)
+    {
+        if (_figures.TryGetValue(owner, out FigureState? figure))
+        {
+            figure.StartTwitch(_time, calling);
+        }
     }
 
     /// <summary>A figure that casts a shadow: who it is (its last drawn pose is used), where its feet are, how dark.</summary>
@@ -813,6 +850,93 @@ public sealed class ArtAssets
             float flash = t < 0.11f ? 0.82f * MathF.Pow(1f - t / 0.11f, 2f) * MathF.Min(1f, strength) : 0f;
             return (scale, lean, flash);
         }
+        private Random? _twitchRandom;
+        private float _twitchAt = float.NegativeInfinity;
+        private float _nextTwitch = float.NaN;
+        private float _twitchSign = 1f;
+        private bool _twitchCalling;
+
+        public void StartTwitch(float time, bool calling)
+        {
+            _twitchRandom ??= new Random(Individuality.Next());
+            _twitchAt = time;
+            _twitchCalling = calling;
+            _twitchSign = _twitchRandom.NextDouble() < 0.5 ? -1f : 1f;
+        }
+
+        /// <summary>
+        /// A twitch on top of the rest clip: now and then of its own accord (only while the figure
+        /// stands or walks), and on every call. Scale and a lean about the feet, like ImpactPose;
+        /// the feet never leave their place.
+        /// </summary>
+        public (Vector2 Scale, float Lean) TwitchPose(float time, TwitchKind kind, bool resting)
+        {
+            _twitchRandom ??= new Random(Individuality.Next());
+            (float least, float most) = kind switch
+            {
+                TwitchKind.Jerk => (2.2f, 5.5f),
+                TwitchKind.Flicker => (1.3f, 3.2f),
+                _ => (3.5f, 7f)
+            };
+            if (float.IsNaN(_nextTwitch))
+            {
+                _nextTwitch = time + least + (float)_twitchRandom.NextDouble() * (most - least);
+            }
+            if (resting && time >= _nextTwitch)
+            {
+                StartTwitch(time, calling: false);
+                _nextTwitch = time + least + (float)_twitchRandom.NextDouble() * (most - least);
+            }
+
+            float t = time - _twitchAt;
+            float length = _twitchCalling ? 1.1f : 0.6f;
+            if (!resting || t < 0f || t > length)
+            {
+                return (Vector2.One, 0f);
+            }
+
+            switch (kind)
+            {
+                case TwitchKind.Jerk:
+                {
+                    // One sharp jerk; calling, it catches twice more, sides alternating, like its voice.
+                    float lean = Jerk(t) * _twitchSign;
+                    if (_twitchCalling)
+                    {
+                        lean += -0.75f * _twitchSign * Jerk(t - 0.16f) + 0.5f * _twitchSign * Jerk(t - 0.31f);
+                    }
+                    float flinch = MathF.Abs(lean) / 0.055f;
+                    return (new Vector2(1f + 0.01f * flinch, 1f - 0.022f * flinch), lean);
+                }
+                case TwitchKind.Flicker:
+                {
+                    // A shudder of the unstable flame; laughing, the body bounces with the syllables.
+                    float envelope = _twitchCalling ? MathF.Sin(MathF.PI * MathF.Min(1f, t / 0.9f)) : MathF.Exp(-t / 0.14f);
+                    float bounce = MathF.Sin(MathHelper.TwoPi * (_twitchCalling ? 7f : 13f) * t) * envelope;
+                    float lean = 0.022f * _twitchSign * MathF.Sin(MathHelper.TwoPi * 11f * t + 0.7f) * envelope;
+                    return (new Vector2(1f - 0.014f * bounce, 1f + 0.03f * bounce), lean);
+                }
+                default:
+                {
+                    // The held souls push out: a slow swell and a swallow; growling, it trembles.
+                    float swell = t < 0.55f ? MathF.Sin(MathF.PI * t / 0.55f) : 0f;
+                    float tremble = _twitchCalling ? 0.012f * MathF.Sin(MathHelper.TwoPi * 9f * t) * MathF.Sin(MathF.PI * MathF.Min(1f, t / 1.1f)) : 0f;
+                    return (new Vector2(1f + 0.04f * swell, 1f - 0.022f * swell), tremble * _twitchSign);
+                }
+            }
+        }
+
+        /// <summary>A jerk: snaps over in 35 ms, then rocks back once and settles (radians).</summary>
+        private static float Jerk(float t)
+        {
+            if (t < 0f)
+            {
+                return 0f;
+            }
+            const float amount = 0.055f;
+            return t < 0.035f ? amount * t / 0.035f : amount * MathF.Exp(-(t - 0.035f) / 0.1f) * MathF.Cos((t - 0.035f) * 22f);
+        }
+
         public SpriteClip? LastClip { get; private set; }
         public Rectangle LastSource { get; private set; }
         public Vector2 LastPosition { get; private set; }

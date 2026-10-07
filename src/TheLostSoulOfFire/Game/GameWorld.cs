@@ -55,7 +55,7 @@ public sealed partial class GameWorld : IDisposable
     private readonly GroundImpacts _groundImpacts = new();
     private readonly EnemyVoices _enemyVoices = new();
     private readonly Narration _narration = new();
-    private Action<AudioCue, float, Vector2>? _speak;
+    private Action<AudioCue, float, Enemy>? _speak;
     private float _dangerHeat;
     private readonly List<SceneProp> _sceneProps = [];
     private readonly List<SceneProp> _arenaProps = Arena.Props
@@ -639,7 +639,12 @@ public sealed partial class GameWorld : IDisposable
         }
 
         UpdateBurningHandoff();
-        _speak ??= (cue, volume, at) => _audio.Play(cue, volume, 0f, PanOf(at));
+        _speak ??= (cue, volume, speaker) =>
+        {
+            _audio.Play(cue, volume, 0f, PanOf(speaker.Position));
+            // The voice shakes the body it comes from: the call is seen where it is heard.
+            _art.Twitch(speaker, calling: true);
+        };
         _enemyVoices.Update(deltaTime, _enemies, _player.Position, !_player.IsDead, _speak);
         Narrate(deltaTime);
 

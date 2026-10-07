@@ -662,6 +662,9 @@ internal sealed class TourVisualTest
         Shot("combat", () => _world.PlaceAutomatedPlayer(ArenaCentre),
             () => _world.LoopState == ArenaLoopState.Combat && _world.AutomatedEnemies.OfType<Devourer>().Any(enemy => enemy.IsAlive), 20f, 0.8f);
         Series("approach", 12, 10, () => { if (Nearest<Devourer>() is { } devourer) AimAt(devourer.Position); });
+        // Each kind twitches as it calls: the Hollow jerks, the Burning shakes with laughter, the Devourer swells.
+        Do("twitch", () => _world.TwitchAutomatedEnemies());
+        Series("twitch", 20, 3);
         Do("presence", () => Console.WriteLine($"TOUR_AUDIO station=arena_devourer presence {_world.AutomatedAudio.DescribePresence()}"));
         Shot("attack", ready: () => _world.AutomatedEnemies.OfType<Devourer>().Any(devourer => devourer.State == DevourerState.SlamTelegraph && devourer.IsAlive), timeout: 15f,
             everyFrame: () => { if (Nearest<Devourer>() is { } devourer) AimAt(devourer.Position); });

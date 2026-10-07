@@ -95,6 +95,15 @@ public sealed partial class GameWorld
         }
     }
 
+    /// <summary>Every living enemy twitches as if it called out (presentation only), for the tour's stills.</summary>
+    internal void TwitchAutomatedEnemies()
+    {
+        foreach (Enemy enemy in _enemies.Where(enemy => enemy.IsAlive))
+        {
+            _art.Twitch(enemy, calling: true);
+        }
+    }
+
     /// <summary>Defeats every living enemy that is not a <typeparamref name="T"/> (to show one enemy alone).</summary>
     internal void DefeatAutomatedEnemiesExcept<T>() where T : Enemy
     {
