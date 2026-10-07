@@ -64,10 +64,11 @@ public sealed class Narration
 
     public void Draw(SpriteBatch batch, Texture2D pixel, Viewport viewport)
     {
-        if (_line is not { } line)
+        if (_line is not { } spoken)
         {
             return;
         }
+        string line = PixelText.Prose(spoken);
 
         float alpha = MathHelper.Clamp(MathHelper.Min(_time / Fade, (Show - _time) / Fade), 0f, 1f);
         alpha = alpha * alpha * (3f - 2f * alpha);

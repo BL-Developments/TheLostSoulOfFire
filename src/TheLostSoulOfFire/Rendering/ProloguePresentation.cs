@@ -55,9 +55,10 @@ public static class ProloguePresentation
             UiKit.KeyLine(batch, pixel, left + moveWidth + 28f + attackWidth * 0.5f, 30f, "MOUSE", "ATTACK", hint, 1);
         }
 
-        (string story, float storyAlpha) = prologue.CurrentStory;
-        if (!string.IsNullOrEmpty(story) && storyAlpha > 0.001f)
+        (string told, float storyAlpha) = prologue.CurrentStory;
+        if (!string.IsNullOrEmpty(told) && storyAlpha > 0.001f)
         {
+            string story = PixelText.Prose(told);
             UiKit.CaptionBand(batch, pixel, new Rectangle(80, viewport.Height - 146, viewport.Width - 160, 64), 0.78f * storyAlpha);
             PixelText.DrawFace(batch, pixel, story, new Vector2(centerX - PixelText.MeasureFace(story, TextFace.Body, 15f) * 0.5f, viewport.Height - 123), TextFace.Body, 15f, GameBalance.SoulWhite * storyAlpha);
         }
@@ -80,8 +81,9 @@ public static class ProloguePresentation
     }
 
     /// <summary>The current goal, led by a small flame diamond.</summary>
-    private static void DrawObjective(SpriteBatch batch, Texture2D pixel, float centerX, float y, string objective, Color color)
+    private static void DrawObjective(SpriteBatch batch, Texture2D pixel, float centerX, float y, string goal, Color color)
     {
+        string objective = PixelText.Steps(goal);
         int width = PixelText.MeasureFace(objective, TextFace.Body, 10f, 0.8f);
         float left = centerX - (width + 16f) * 0.5f;
         UiKit.FillDiamond(batch, pixel, new Vector2(left + 3f, y + 5f), 4, GameBalance.DeathFlame * 0.7f);

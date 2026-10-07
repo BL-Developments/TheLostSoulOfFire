@@ -212,6 +212,17 @@ public static class PixelText
     }
 
     /// <summary>
+    /// The texts mark a pause between two statements with two spaces (the pixel font had no
+    /// punctuation). Set in a real face that read as a missing word ("TOO MUCH IS LEFT IN THESE
+    /// RAGE AND PANIC ..."): in prose it becomes a dash, in a row of instructions a middle dot.
+    /// Only with the typeset fonts; the pixel font keeps the gap.
+    /// </summary>
+    public static string Prose(string text) => UsesFonts ? text.Replace("  ", " \u2014 ", StringComparison.Ordinal) : text;
+
+    /// <inheritdoc cref="Prose"/>
+    public static string Steps(string text) => UsesFonts ? text.Replace("  ", "  \u00B7  ", StringComparison.Ordinal) : text;
+
+    /// <summary>
     /// Text in a chosen face at any cap height (logical pixels), with optional letter spacing:
     /// Cinzel for names and numbers that carry weight, Alegreya Sans for reading text. Without
     /// the typeset fonts it falls back to the nearest pixel-font size.
