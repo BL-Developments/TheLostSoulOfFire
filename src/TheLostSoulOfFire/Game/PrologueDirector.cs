@@ -202,7 +202,8 @@ public sealed class PrologueDirector
     /// line belongs to a stage and a window of its time; the stages' own timers are unchanged,
     /// lines in stages the player paces simply fade after their window. Who you are (dead, not
     /// crossed over), where (the Death Layer), what you carry (the Death Flame lets souls go),
-    /// what the enemies are (souls that held on too long), who is coming (the Wardens).
+    /// what the enemies are (souls that held on too long), who is coming (the Wardens), and what
+    /// the Soul Cannon is (07_SOUL_CANNON: it fires the player's own flame).
     /// </summary>
     private static readonly (PrologueStage Stage, float From, float To, string Text)[] Story =
     [
@@ -215,6 +216,7 @@ public sealed class PrologueDirector
         (PrologueStage.EmergenceThreat, 0.0f, 4.5f, "A SOUL THAT HOLDS ON TOO LONG HOLLOWS OUT  CUT IT DOWN AND SET IT FREE"),
         (PrologueStage.LeaveEmergence, 0.3f, 5.0f, "WHITE MARKS  WARDENS WERE HERE  SOMEONE IS SEARCHING FOR YOU"),
         (PrologueStage.SearchApproach, 0.3f, 5.0f, "WARDENS GUARD THE DEAD  THEY FIND THOSE WHO WAKE BURNING LIKE YOU"),
+        (PrologueStage.BurningLesson, 0.3f, 5.5f, "THE CANNON ON YOUR BACK FIRES YOUR OWN DEATH FLAME  FEED IT LONGER AND IT STRIKES HARDER"),
         (PrologueStage.DevourerPressure, 0.0f, 4.5f, "IT FEEDS ON SOULS  BREAK IT OPEN AND THE ONE IT SWALLOWED GOES FREE"),
         (PrologueStage.ReleaseWitness, 0.0f, 2.6f, "FREED  THE PERSON MOVES ON"),
         (PrologueStage.ReleaseWitness, 2.6f, 5.2f, "ONLY THE ECHO STAYS BEHIND"),

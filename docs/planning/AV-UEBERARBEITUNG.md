@@ -698,6 +698,12 @@ Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreati
   (D#–C#–H–G#, bleibt auf A# stehen). Jetzt läutet es im Antrieb in den Takten 8–9 über G# auf
   einer Glocke eine Oktave tiefer; Naht −52 dB, Mix im Band.
 
+- Kanone in der Story: In der Burning-Lektion sagt eine Zeile, was die Kanone ist („THE CANNON ON
+  YOUR BACK FIRES YOUR OWN DEATH FLAME  FEED IT LONGER AND IT STRIKES HARDER“), passend zur
+  sichtbaren Einspeisung vom Kern in die Kammer.
+- Offen zur Owner-Frage: Das Ende zeigt „PROTOTYPE COMPLETE“ unter dem Titel (ehrlicher Hinweis für
+  Tester, aber Entwicklerton im Schlussmoment); nicht geändert.
+
 **Verworfen (Durchgang 4):**
 - Zweite Hollow-Variante mit Lederschürze (Restspur der Gießhalle): rund 450 MB unkomprimierte
   Texturen zusätzlich; Masken, Bewegungsversatz und Stimmen geben bereits Individualität.
