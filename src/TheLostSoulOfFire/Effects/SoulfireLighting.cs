@@ -120,6 +120,18 @@ public static class SoulfireLighting
                 }
             }
 
+            if (enemy is Devourer prison && prison.State is not (DevourerState.Dying or DevourerState.Dead) &&
+                renderedEnemy?.Invoke(prison) == true)
+            {
+                // The prison in its chest glows through the maw: a hungry ember when empty, brighter
+                // and restless with every soul it holds (it heals and grows on them), hidden from behind.
+                float front = MathHelper.Clamp(0.7f + prison.VisualFacing.Y, 0f, 1f);
+                int held = prison.ConsumedSoulCount;
+                float restless = 0.75f + 0.25f * breathe * (held > 0 ? 1.4f : 1f);
+                Vector2 maw = prison.Position + new Vector2(prison.VisualFacing.X * 10f, prison.VisualFacing.Y * 6f - 86f * prison.VisualScale);
+                renderer.DrawGlow(batch, maw, 44f + held * 8f, GameBalance.DeathFlame, (0.3f + held * 0.12f) * restless * front);
+            }
+
             if (soulSenseAmount <= 0.001f)
             {
                 continue;

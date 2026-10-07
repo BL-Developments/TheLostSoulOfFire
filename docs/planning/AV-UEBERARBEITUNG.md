@@ -611,6 +611,12 @@ Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreati
   von dunkleren Rändern ab, Figuren und violette Flammen unverändert. Verworfen: noch
   kräftiger (Sättigung 0,65, Gamma 1,25, Kontrast 1,35) – dunkle Figuren sanken in den Boden.
 
+- Devourer: Ob er Seelen gefangen hält (er heilt und wächst daran), zeigte nur der Seelensinn.
+  Jetzt glimmt sein Rachen immer: leise Glut, wenn leer, heller und unruhiger mit jeder
+  gefangenen Seele, von hinten verdeckt (`SoulfireLighting`, Licht auf der Brust). Station
+  `arena_devour` zeigt das Aufglühen nach dem Verschlingen. Verworfen: Lichtstärke 0,07 (im
+  Lichtdurchgang unsichtbar).
+
 **Verworfen (Durchgang 4):**
 - Raserei als schwebende Tremolo-Flächen: die volle Mischung kippte zu „calm cinematic“.
 - Schreie aus reiner Stimmlippenquelle durch Formanten, auch mit Biphonation: CLAP „horn“ und
