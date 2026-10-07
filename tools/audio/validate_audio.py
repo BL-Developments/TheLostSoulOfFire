@@ -148,6 +148,23 @@ AUTHORED_SFX_DURATIONS = {
     "wave_gate_1.wav": 1.500, "wave_gate_2.wav": 1.500, "wave_gate_1_hall.wav": 2.975,
     "wave_ease_1.wav": 2.000, "wave_ease_2.wav": 2.000,
     "devourer_devour_1.wav": 1.250, "devourer_devour_2.wav": 1.250,
+    # Derived takes of cues that had one (tools/audio/derive_variants.py): slam, Soul Sense, abilities.
+    "devourer_slam_v2.wav": 0.622,
+    "devourer_slam_v3.wav": 0.681,
+    "soul_sense_on_v2.wav": 0.431,
+    "soul_sense_on_v3.wav": 0.471,
+    "soul_sense_off_v2.wav": 0.287,
+    "soul_sense_off_v3.wav": 0.314,
+    "ability_pierce_v2.wav": 0.574,
+    "ability_pierce_v3.wav": 0.628,
+    "ability_leap_v2.wav": 0.526,
+    "ability_leap_v3.wav": 0.576,
+    "ability_vortex_v2.wav": 1.148,
+    "ability_vortex_v3.wav": 1.257,
+    "ability_guard_v2.wav": 0.957,
+    "ability_guard_v3.wav": 1.047,
+    "ability_mark_v2.wav": 0.574,
+    "ability_mark_v3.wav": 0.628,
     # The title's confirmation as an ember catching (recipes/cues.py), in place of the Ludo glass tap.
     "title_ignite.wav": 0.600,
     # The soul breathing out as it is released (recipes/cues.py): no pitch, so crowds never beep.

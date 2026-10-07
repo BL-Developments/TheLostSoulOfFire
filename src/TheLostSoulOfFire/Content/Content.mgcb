@@ -11198,3 +11198,83 @@
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /build:Audio/Sfx/cannon_stow_2.wav
+
+#begin Audio/Sfx/devourer_slam_v2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/devourer_slam_v2.wav
+
+#begin Audio/Sfx/devourer_slam_v3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/devourer_slam_v3.wav
+
+#begin Audio/Sfx/soul_sense_on_v2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/soul_sense_on_v2.wav
+
+#begin Audio/Sfx/soul_sense_on_v3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/soul_sense_on_v3.wav
+
+#begin Audio/Sfx/soul_sense_off_v2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/soul_sense_off_v2.wav
+
+#begin Audio/Sfx/soul_sense_off_v3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/soul_sense_off_v3.wav
+
+#begin Audio/Sfx/ability_pierce_v2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/ability_pierce_v2.wav
+
+#begin Audio/Sfx/ability_pierce_v3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/ability_pierce_v3.wav
+
+#begin Audio/Sfx/ability_leap_v2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/ability_leap_v2.wav
+
+#begin Audio/Sfx/ability_leap_v3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/ability_leap_v3.wav
+
+#begin Audio/Sfx/ability_vortex_v2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/ability_vortex_v2.wav
+
+#begin Audio/Sfx/ability_vortex_v3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/ability_vortex_v3.wav
+
+#begin Audio/Sfx/ability_guard_v2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/ability_guard_v2.wav
+
+#begin Audio/Sfx/ability_guard_v3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/ability_guard_v3.wav
+
+#begin Audio/Sfx/ability_mark_v2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/ability_mark_v2.wav
+
+#begin Audio/Sfx/ability_mark_v3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/ability_mark_v3.wav

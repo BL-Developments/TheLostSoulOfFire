@@ -484,7 +484,9 @@ public sealed class AudioDirector : IDisposable
                 (AudioCue.Dash, "Audio/Sfx/dash"), (AudioCue.HollowSwipe, "Audio/Sfx/hollow_swipe"),
                 (AudioCue.SoulCleave, "Audio/Sfx/soul_cleave"),
                 (AudioCue.BurningDetonation, "Audio/Sfx/burning_detonation"),
-                (AudioCue.BurningCharge, "Audio/Sfx/burning_charge"), (AudioCue.PlayerHit, "Audio/Sfx/player_hit")
+                (AudioCue.BurningCharge, "Audio/Sfx/burning_charge"), (AudioCue.PlayerHit, "Audio/Sfx/player_hit"),
+                (AudioCue.DevourerSlam, "Audio/Sfx/devourer_slam"), (AudioCue.SoulSenseOn, "Audio/Sfx/soul_sense_on"),
+                (AudioCue.SoulSenseOff, "Audio/Sfx/soul_sense_off")
             })
             {
                 AddDerived(content, cue, asset, 2);
@@ -510,6 +512,15 @@ public sealed class AudioDirector : IDisposable
             Add(content, AudioCue.AbilityVortex, "Audio/Sfx/ability_vortex", 200f, 0.8f, 0.4f, 0.4f, rising: true);
             Add(content, AudioCue.AbilityGuard, "Audio/Sfx/ability_guard", 330f, 0.5f, 0.4f, 0.1f);
             Add(content, AudioCue.AbilityMark, "Audio/Sfx/ability_mark", 1661f, 0.3f, 0.3f, 0.3f);
+            foreach ((AudioCue cue, string asset) in new[]
+            {
+                (AudioCue.AbilityPierce, "Audio/Sfx/ability_pierce"), (AudioCue.AbilityLeap, "Audio/Sfx/ability_leap"),
+                (AudioCue.AbilityVortex, "Audio/Sfx/ability_vortex"), (AudioCue.AbilityGuard, "Audio/Sfx/ability_guard"),
+                (AudioCue.AbilityMark, "Audio/Sfx/ability_mark")
+            })
+            {
+                AddDerived(content, cue, asset, 2);
+            }
             Add(content, AudioCue.DoorAwaken, "Audio/Sfx/door_awaken", 104f, 1.2f, 0.5f, 0.3f);
             AddVariants(content, AudioCue.ScytheWeight1, "Audio/Sfx/scythe_weight_1", 2, 180f, 0.3f, 0.3f, 0.6f);
             AddVariants(content, AudioCue.ScytheWeight2, "Audio/Sfx/scythe_weight_2", 2, 160f, 0.35f, 0.3f, 0.6f);

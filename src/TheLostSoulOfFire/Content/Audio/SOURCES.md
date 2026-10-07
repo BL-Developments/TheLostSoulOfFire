@@ -493,3 +493,26 @@ Ziehen und Verstauen fallen bei jedem Kanonenschuss und hatten je nur einen Take
 | `Audio/Sfx/cannon_draw_2.wav` | cannon-draw Seed 4 | 0.42 s, 1 Kanal/Kanäle, -23.7 LUFS, Spitze -3.0 dBFS |
 | `Audio/Sfx/cannon_stow_1.wav` | cannon-stow Seed 1 | 0.36 s, 1 Kanal/Kanäle, -24.0 LUFS, Spitze -8.1 dBFS |
 | `Audio/Sfx/cannon_stow_2.wav` | cannon-stow Seed 3 | 0.36 s, 1 Kanal/Kanäle, -24.0 LUFS, Spitze -9.9 dBFS |
+
+## Abgeleitete Takes für einzeln gebliebene Klänge (Durchgang 5, 07.10.2026)
+
+Devourer-Schlag, Seelensinn an/aus und die Fähigkeiten Durchschlag, Rückstoßsprung, Sog, Vergeltung und Vorlage hatten je einen Take und wiederholten sich exakt. Je zwei Ableitungen mit `derive_variants.py` (Tonhöhe ±4,5 %, Klangneigung), wie bei den übrigen häufigen Klängen.
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/devourer_slam_v2.wav` | Ableitung von devourer_slam.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB), Spitze auf -1.2 dBFS gesenkt | 0.62 s, 1 Kanal, -13.2 LUFS, Spitze -1.2 dBFS |
+| `Audio/Sfx/devourer_slam_v3.wav` | Ableitung von devourer_slam.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB), Spitze auf -1.2 dBFS gesenkt | 0.68 s, 1 Kanal, -13.4 LUFS, Spitze -1.2 dBFS |
+| `Audio/Sfx/soul_sense_on_v2.wav` | Ableitung von soul_sense_on.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.43 s, 1 Kanal, -25.6 LUFS, Spitze -5.9 dBFS |
+| `Audio/Sfx/soul_sense_on_v3.wav` | Ableitung von soul_sense_on.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.47 s, 1 Kanal, -25.6 LUFS, Spitze -4.8 dBFS |
+| `Audio/Sfx/soul_sense_off_v2.wav` | Ableitung von soul_sense_off.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.29 s, 1 Kanal, -30.3 LUFS, Spitze -4.7 dBFS |
+| `Audio/Sfx/soul_sense_off_v3.wav` | Ableitung von soul_sense_off.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.31 s, 1 Kanal, -30.3 LUFS, Spitze -4.3 dBFS |
+| `Audio/Sfx/ability_pierce_v2.wav` | Ableitung von ability_pierce.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.57 s, 1 Kanal, -17.0 LUFS, Spitze -4.1 dBFS |
+| `Audio/Sfx/ability_pierce_v3.wav` | Ableitung von ability_pierce.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.63 s, 1 Kanal, -17.0 LUFS, Spitze -6.1 dBFS |
+| `Audio/Sfx/ability_leap_v2.wav` | Ableitung von ability_leap.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.53 s, 1 Kanal, -17.0 LUFS, Spitze -6.1 dBFS |
+| `Audio/Sfx/ability_leap_v3.wav` | Ableitung von ability_leap.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.58 s, 1 Kanal, -17.0 LUFS, Spitze -5.5 dBFS |
+| `Audio/Sfx/ability_vortex_v2.wav` | Ableitung von ability_vortex.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 1.15 s, 1 Kanal, -18.0 LUFS, Spitze -3.7 dBFS |
+| `Audio/Sfx/ability_vortex_v3.wav` | Ableitung von ability_vortex.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 1.26 s, 1 Kanal, -18.0 LUFS, Spitze -3.2 dBFS |
+| `Audio/Sfx/ability_guard_v2.wav` | Ableitung von ability_guard.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.96 s, 1 Kanal, -18.0 LUFS, Spitze -3.6 dBFS |
+| `Audio/Sfx/ability_guard_v3.wav` | Ableitung von ability_guard.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 1.05 s, 1 Kanal, -18.0 LUFS, Spitze -3.7 dBFS |
+| `Audio/Sfx/ability_mark_v2.wav` | Ableitung von ability_mark.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.57 s, 1 Kanal, -20.2 LUFS, Spitze -3.2 dBFS |
+| `Audio/Sfx/ability_mark_v3.wav` | Ableitung von ability_mark.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.63 s, 1 Kanal, -20.2 LUFS, Spitze -2.7 dBFS |

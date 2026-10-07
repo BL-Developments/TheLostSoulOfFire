@@ -897,3 +897,6 @@ aim_move* 12, wake 8, death 12).
 - Ziehen und Verstauen der Kanone in je zwei Takes (fielen bei jedem Schuss gleich); das
   Verstau-Rezept nutzte für Eisen und Schnalle noch Sinustöne (andere Seeds „chime“ bis 0,68,
   der bisherige Take 0,30) – jetzt Resonanzklicks, alle Seeds „heavy object put down on fabric“.
+- Wiederholung: Devourer-Schlag, Seelensinn an/aus und fünf Fähigkeiten hatten je einen Take;
+  je zwei Ableitungen (`derive_variants.py`, Tonhöhe ±4,5 %, Klangneigung), Spitze der Schlag-
+  Ableitungen auf −1,2 dBFS. `validate_audio.py` (235), Laufzeit- und Fähigkeiten-Bildtest grün.
