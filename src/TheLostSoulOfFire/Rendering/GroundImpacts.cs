@@ -260,6 +260,22 @@ public sealed class GroundImpacts
         _scorches.Add(new Burn { At = at, Size = Range(14f, 20f), Seed = (float)_random.NextDouble() * 100f });
     }
 
+    /// <summary>A heavy footfall: a little dust kicked up at the foot.</summary>
+    public void Stomp(Vector2 at)
+    {
+        if (!Loaded)
+        {
+            return;
+        }
+        for (int index = 0; index < 3; index++)
+        {
+            float angle = (float)(_random.NextDouble() * MathHelper.TwoPi);
+            Vector2 direction = new(MathF.Cos(angle), MathF.Sin(angle) * 0.5f);
+            AddPuff(at + direction * 6f, direction, Range(10f, 22f), 0.3f, new Vector2(0f, -Range(4f, 10f)), Range(0.6f, 0.9f),
+                Range(16f, 22f), Range(34f, 44f), 0.32f);
+        }
+    }
+
     /// <summary>The blow lands: the floor breaks under <paramref name="center"/> out to <paramref name="radius"/>.</summary>
     public void Slam(object key, Vector2 center, float radius, bool wooden = false)
     {

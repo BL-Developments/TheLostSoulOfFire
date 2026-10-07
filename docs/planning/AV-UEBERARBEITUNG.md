@@ -684,6 +684,10 @@ Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreati
   Fugen, kein Steinkrater). Gebaut und Unit-Tests grün, im Bild nicht geprüft: Im Rundgang
   schlägt dort kein Devourer zu.
 
+- Devourer-Schritte mit Gewicht: Auf jedem gezeichneten Fußaufsatz wirbelt etwas Staub am Fuß
+  auf, und nahe am Spieler (Nähe > 0,55) bebt die Kamera kurz (0,07 s). Protokolliert: Auslösungen
+  beim Herankommen mit wachsender Nähe 0,38 → 0,83. Der Staub ist in Standbildern dezent.
+
 **Verworfen (Durchgang 4):**
 - Zweite Hollow-Variante mit Lederschürze (Restspur der Gießhalle): rund 450 MB unkomprimierte
   Texturen zusätzlich; Masken, Bewegungsversatz und Stimmen geben bereits Individualität.

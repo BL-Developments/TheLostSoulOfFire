@@ -2315,6 +2315,15 @@ public sealed partial class GameWorld : IDisposable
                     {
                         _audio.Play(cue, loudness * nearness * nearness, 0f, PanOf(enemy.Position));
                     }
+                    if (enemy is Devourer)
+                    {
+                        // Its weight lands: dust kicks up at the foot, and close by the view trembles.
+                        _groundImpacts.Stomp(enemy.Position);
+                        if (nearness > 0.55f)
+                        {
+                            _screenEffects.AddShake(0.07f, 1.4f * (nearness - 0.45f));
+                        }
+                    }
                 }
                 continue;
             }
