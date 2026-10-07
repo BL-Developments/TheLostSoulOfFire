@@ -877,3 +877,9 @@ Render-Ablauf je Clip: `render_directions.py --resolution 480 --ortho-scale 4.8 
 `pack_sheets.py --fps <Clip-fps> --pixels-per-unit 1.5 [--progress-distance 180|150] --register`
 (fps: idle 16, move 24, Hiebe/Rückwege/Dash/Treffer/Rückstoß/Schuss/Ziehen/Halten 24, aim 6,
 aim_move* 12, wake 8, death 12).
+- Gegenprobe der Piep-Durchsicht mit reicheren CLAP-Etiketten (Feuer, Eisen, Trommel, Münzen,
+  Kehle …): die ersetzten Originale bleiben Piepen/Glöckchen/Laser (Wellenstart 0,91, Wellenende
+  0,58, Titel 0,75, Menü schließen 0,85, Marke 0,95, Münzen 0,90, Verschlingen 0,47).
+  Verworfen: Zündschicht unter dem Dash – der Ludo-Dash ist mit Feuer-Etiketten „flame igniting“
+  0,95 (die frühere „ui click“-Lesart lag an der Etikettenliste), die Schicht machte ihn zu
+  „impact“. Lehre: CLAP immer mit Etiketten der gemeinten Sache und der Fehllesart prüfen.
