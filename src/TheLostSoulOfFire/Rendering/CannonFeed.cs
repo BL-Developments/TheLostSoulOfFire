@@ -29,7 +29,9 @@ public static class CannonFeed
         return foot + new Vector2(level.X, level.Y * FigureHeights.LevelSquash - up);
     }
 
-    public static void Draw(SpriteBatch batch, Texture2D softSpot, Vector2 foot, Vector2 core, Vector2 facing, float charge, bool full, float time)
+    /// <param name="sinceNotch">Seconds since the chamber's latch took a notch (a charge stage, heard as a ratchet).</param>
+    public static void Draw(SpriteBatch batch, Texture2D softSpot, Vector2 foot, Vector2 core, Vector2 facing, float charge, bool full, float time,
+        float sinceNotch = float.PositiveInfinity)
     {
         Vector2 right = new(-facing.Y, facing.X);
         Vector2 shoulder = core + new Vector2(right.X * 10f, right.Y * 10f * FigureHeights.LevelSquash - 13f);
@@ -69,11 +71,19 @@ public static class CannonFeed
             batch.Draw(softSpot, at, null, hot, 0f, origin, size * 0.9f / softSpot.Width, SpriteEffects.None, 0f);
         }
 
-        // The chamber fills: its windows glow brighter with every mote, blazing when full.
-        float beat = full ? 0.85f + 0.15f * MathF.Sin(time * 22f) : 1f;
+        // The chamber fills: its windows glow brighter with every mote, blazing when full; when the
+        // latch takes a notch the flame behind the grilles flares up for a moment.
+        float notch = sinceNotch is >= 0f and < 0.22f ? MathF.Exp(-sinceNotch / 0.07f) : 0f;
+        float beat = (full ? 0.85f + 0.15f * MathF.Sin(time * 22f) : 1f) * (1f + 1.0f * notch);
         Color fill = flame * ((0.25f + 0.55f * charge) * beat * seen);
         fill.A = 0;
-        batch.Draw(softSpot, chamber, null, fill, 0f, origin, (8f + 5f * charge) * 2f / softSpot.Width, SpriteEffects.None, 0f);
+        batch.Draw(softSpot, chamber, null, fill, 0f, origin, (8f + 5f * charge + 4f * notch) * 2f / softSpot.Width, SpriteEffects.None, 0f);
+        if (notch > 0.01f)
+        {
+            Color flare = GameBalance.SoulWhite * (0.45f * notch * (1f - 0.5f * charge) * seen);
+            flare.A = 0;
+            batch.Draw(softSpot, chamber, null, flare, 0f, origin, 5f * 2f / softSpot.Width, SpriteEffects.None, 0f);
+        }
         if (charge > 0.5f)
         {
             Color white = GameBalance.SoulWhite * ((charge - 0.5f) * (full ? 0.9f : 0.6f) * beat * seen);

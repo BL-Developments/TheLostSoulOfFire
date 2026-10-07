@@ -111,6 +111,9 @@ public sealed partial class GameWorld : IDisposable
     private float _burningHandoffTimer;
     private int _burningCommittedLastFrame;
     private float _presentationTime;
+
+    /// <summary>When the cannon's chamber last took a notch (a charge stage), for its flare (presentation time).</summary>
+    private float _cannonNotchAt = float.NegativeInfinity;
     private float _fpsTimer;
     private int _fpsFrames;
     private int _fps = 60;
@@ -1466,7 +1469,8 @@ public sealed partial class GameWorld : IDisposable
             {
                 // The player's own flame runs from the core into the chamber: what the cannon fires.
                 CannonFeed.Draw(batch, _art.SoftSpot, _player.Position, _player.Position - new Vector2(0f, _player.DrawnCoreHeight),
-                    _player.FacingDirection, _player.Cannon.ChargeProgress, _player.Cannon.IsFullCharge, _presentationTime);
+                    _player.FacingDirection, _player.Cannon.ChargeProgress, _player.Cannon.IsFullCharge, _presentationTime,
+                    _presentationTime - _cannonNotchAt);
             }
         }
     }
@@ -3147,8 +3151,9 @@ public sealed partial class GameWorld : IDisposable
         if (_player.Cannon.State == SoulCannonState.Charging && previousCannonStage is 1 or 2 &&
             _player.Cannon.ChargeStage > previousCannonStage && !_player.Cannon.IsFullCharge)
         {
-            // The chamber's latch takes the next notch: the three stages are heard, not only seen.
+            // The chamber's latch takes the next notch: the three stages are heard, and the chamber flares.
             _audio.Play(AudioCue.CannonStage, _player.Cannon.ChargeStage == 3 ? 0.9f : 0.75f, _player.Cannon.ChargeStage == 3 ? 0.12f : 0f);
+            _cannonNotchAt = _presentationTime;
         }
         if (!wasCannonFull && _player.Cannon.IsFullCharge)
         {

@@ -900,3 +900,10 @@ aim_move* 12, wake 8, death 12).
 - Wiederholung: Devourer-Schlag, Seelensinn an/aus und fünf Fähigkeiten hatten je einen Take;
   je zwei Ableitungen (`derive_variants.py`, Tonhöhe ±4,5 %, Klangneigung), Spitze der Schlag-
   Ableitungen auf −1,2 dBFS. `validate_audio.py` (235), Laufzeit- und Fähigkeiten-Bildtest grün.
+- Bild zur Ratsche: Rastet die Kammer eine Ladestufe ein (Stufe 2 und 3), glüht sie für ~0,2 s auf
+  (`CannonFeed`, `sinceNotch`); gemessen an der Kammer 84,6 → 93,9 (Stufe 2). Erste Fassung bei
+  Stufe 3 ein weißer Fleck über der Kammer (gedämpft).
+- **Speicherplatz:** Am 07.10. lief der Datenträger voll (ENOSPC); `artifacts/tour/` belegte ~106 GB
+  (Rundgänge früherer Durchgänge). Teilläufe dieser Sitzung gelöscht (7,3 GB frei); Basislauf
+  20261007_101956 und voller Lauf 20261007_113146 behalten. Teilläufe nach dem Sichten löschen;
+  ältere Läufe kann der Owner entfernen.
