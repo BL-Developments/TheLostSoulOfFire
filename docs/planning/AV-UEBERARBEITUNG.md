@@ -926,3 +926,22 @@ aim_move* 12, wake 8, death 12).
   CPU im Mittel ≤ 0,52 ms.
   Nachgezogen: Der Ausholstaub ist jetzt Ruß (dunkel, Deckkraft 0,45) statt hellem Steinstaub; in
   den späten Ausholbildern liegen dunkle Schwaden an den Rissen um den Devourer. Dezent.
+
+**Stand Durchgang 5, Abschluss (07.10.2026, 13:05):** Nach den Owner-Punkten weitere Zyklen über
+alle Bereiche (Titel, Prolog I–III, Überfahrt, Schwelle, Vorhalle, Arena mit allen Gegnern, Truhe,
+Tod, Ende, Menüs, Sandbox, seltene Zustände wie Resonanz und Laden mit dem Rücken zur Kamera).
+Umgesetzt und geprüft: siehe Einträge oben (Kanone, Piep-Durchsicht samt Gegenprobe, Gegner-
+Zucken, Treffermaterie, Wogen und Bootsächzen, Türflüstern, Raststufen-Aufglühen, Staub,
+Satzzeichen, Varianten). Abschlussprüfung nach der letzten Änderung: 263 Unit-Tests;
+`validate_audio.py` (237); `mix_report.py` in Arena, Kampf, Ufer, Überfahrt, Vorhalle ohne
+Ausreißer; Audio-Laufzeit- (78 Töne, kein Ersatzklang), Gameplay- (10 Wellen) und Tod-Neustart-
+Test; Slice-, Fähigkeiten-, Währungs- und Vorhallen-Bildtest; voller Rundgang 12:51 (693
+Aufnahmen), danach je Änderung die betroffene Station.
+
+**Warum hier Schluss ist:** Die Durchsicht aller Stationen fand keine weiteren Fehler, die sich mit
+den vorhandenen Mitteln belegen lassen. Was offen bleibt, braucht ein Ohr oder eine Entscheidung
+des Owners: Hörabnahme aller neuen Klänge (CLAP ist nur ein Ersatz, siehe den Türklang, den es
+weder alt noch neu als Stein hört), ob die Kanone jetzt die richtige Größe hat, Stärke des
+Gegner-Zuckens, Deutlichkeit von Schattenhand und Schlagrand im Gedränge, die Inhaltsfragen
+(Sprache, „ENTER BIOME I“, „PROTOTYPE COMPLETE“) und ältere Rundgänge in `artifacts/tour/`
+(~100 GB, nur der Owner sollte sie löschen).
