@@ -11178,3 +11178,13 @@
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /build:Audio/Sfx/title_ignite.wav
+
+#begin Audio/Sfx/skiff_creak_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/skiff_creak_1.wav
+
+#begin Audio/Sfx/skiff_creak_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/skiff_creak_2.wav

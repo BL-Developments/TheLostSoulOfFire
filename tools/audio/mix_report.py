@@ -79,7 +79,7 @@ CLASS = {
     "HollowCall": "call", "BurningCackle": "call", "DevourerGrowl": "call",
     "HollowGrasp": "layer", "BurningShriek": "layer",
     "FoundryBell": "place", "ShoreHorn": "place", "ShoreBoard": "place",
-    "CannonStage": "action", "CannonBlast": "layer",
+    "CannonStage": "action", "CannonBlast": "layer", "SkiffCreak": "place",
 }
 
 #: Menu sounds play over the paused beds (AudioDirector.PausedBedVolume).
@@ -149,7 +149,7 @@ INDIRECT = {
     "HitHollow": 0.78, "HitBurning": 0.78, "HitDevourer": 0.78, "HitDummy": 0.78,
     "DeathHollow": 0.66, "DeathBurning": 0.66, "DeathDevourer": 0.64,
     "HollowCall": 0.55, "BurningCackle": 0.6, "DevourerGrowl": 0.72,
-    "FoundryBell": 0.55, "ShoreHorn": 0.6, "ShoreBoard": 0.5,
+    "FoundryBell": 0.55, "ShoreHorn": 0.6, "ShoreBoard": 0.5, "SkiffCreak": 0.55,
 }
 
 

@@ -888,3 +888,6 @@ aim_move* 12, wake 8, death 12).
   5,4 s, 1,5 bei 2,3 s; `PrologueEnvironment.Swell`), eine zweite Meerkopie schließt den Rand.
   Messung im Rundgang `prologue_transit`: senkrechte Verschiebung von wenigen Pixeln zwischen den
   Aufnahmen, wie berechnet.
+- Überfahrt hörbar: Zum Wogen ächzt das Boot selten in der Dünung (`skiff-creak`, Ortsklang alle
+  7–14 s von zufälliger Seite; CLAP „wooden boat creaking“ 0,53–0,65), Mix −1,5 LU zum Bett.
+  Rundgang zählt `prologue_transit:SkiffCreak=1`. Verworfen: lauterer Wasserschlag („drum“ 0,42).

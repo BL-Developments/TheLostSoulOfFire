@@ -162,7 +162,8 @@ internal sealed class TourVisualTest
     private static readonly HashSet<AudioCue> VoiceCues =
     [
         AudioCue.HollowCall, AudioCue.HollowGrasp, AudioCue.BurningCackle, AudioCue.BurningShriek,
-        AudioCue.DevourerGrowl, AudioCue.DevourerHunger, AudioCue.FoundryBell, AudioCue.ShoreHorn, AudioCue.ShoreBoard
+        AudioCue.DevourerGrowl, AudioCue.DevourerHunger, AudioCue.FoundryBell, AudioCue.ShoreHorn, AudioCue.ShoreBoard,
+        AudioCue.SkiffCreak
     ];
     private readonly SortedDictionary<string, int> _voices = new();
     private float _clock;
@@ -459,6 +460,8 @@ internal sealed class TourVisualTest
         Overview("overview");
         Shot("first_wave", ready: () => _world.AutomatedEnemies.Any(enemy => enemy.IsAlive), timeout: 8f, minWait: 0.6f);
         Series("ride", 6, 20);
+        // Long enough on the water for the skiff to groan in the swell (place event, 7-14 s).
+        Do("swell", () => { }, 7f);
     }
 
     private void BuildThreshold()

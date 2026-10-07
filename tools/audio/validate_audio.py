@@ -181,6 +181,7 @@ AUTHORED_SFX_DURATIONS = {
     "foundry_bell_1.wav": 6.500, "foundry_bell_2.wav": 6.500,
     "shore_horn_1.wav": 5.000, "shore_horn_2.wav": 5.000,
     "shore_board_1.wav": 1.800, "shore_board_2.wav": 1.800,
+    "skiff_creak_1.wav": 2.200, "skiff_creak_2.wav": 2.200,
     # The Life Flame's fire after the last wave (tools/audio/recipes/ambiences.py), looped.
     "life_flame_loop.wav": 9.0,
 }

@@ -81,3 +81,25 @@ def shore_horn(rng) -> np.ndarray:
     x = dsp.lowpass(tone, 900) * env
     x += dsp.bandpass(rng.standard_normal(n), 150, 800) * env * 0.05
     return _finish(_distant(x, rng, 3.5, 0.6, 1500, 1200), -30.0, fade_out=0.8)
+
+
+@recipe("skiff-creak", "Überfahrt: das Boot legt sich in die Dünung, seine Planken und Spanten ächzen langsam, Wasser schlägt dumpf gegen den Rumpf")
+def skiff_creak(rng) -> np.ndarray:
+    n = dsp.seconds(2.2)
+    t = dsp.time_axis(n)
+    # Wood under slow load: stick-slip friction, its pulse rate rising and falling with the
+    # strain, ringing the hull's low wooden modes (a slow groan, not a door's squeak).
+    pulses = np.zeros(n)
+    tt = 0.12
+    while tt < 1.6:
+        i = dsp.seconds(tt)
+        pulses[i] = rng.uniform(0.5, 1.0) * np.sin(np.pi * np.clip((tt - 0.1) / 1.5, 0, 1))
+        tt += 1.0 / (18 + 40 * np.sin(np.pi * np.clip((tt - 0.1) / 1.5, 0, 1)) + rng.uniform(-4, 4))
+    wood = sum(dsp.resonator(pulses, f * rng.uniform(0.93, 1.07), q) * g for f, q, g in ((140, 8, 1.0), (260, 9, 0.7), (430, 10, 0.4), (720, 12, 0.2)))
+    wood = wood / (np.max(np.abs(wood)) + 1e-9)
+    # The water answering: a dull slap against the hull and its wash.
+    slap_at = rng.uniform(1.2, 1.5)
+    slap = dsp.lowpass(_hit(rng, n, slap_at, 0.05, 80, 900), 700) * 0.9
+    wash = dsp.bandpass(rng.standard_normal(n), 300, 2500) * np.exp(-((t - slap_at - 0.15) / 0.18) ** 2) * 0.25
+    x = wood * 0.8 + slap + wash
+    return _finish(_distant(x, rng, 0.6, 0.15, 3000, 4000), -27.0, fade_out=0.3)

@@ -475,3 +475,12 @@ Der Hollow-Tod, der häufigste Gegnertod kurz vor dem Einsammeln der Seele, lie�
 | --- | --- | --- |
 | `Audio/Sfx/death_hollow_1.wav` | death-hollow Seed 1 | 0.90 s, 1 Kanal/Kanäle, -19.0 LUFS, Spitze -2.5 dBFS |
 | `Audio/Sfx/death_hollow_2.wav` | death-hollow Seed 3 | 0.90 s, 1 Kanal/Kanäle, -19.0 LUFS, Spitze -2.5 dBFS |
+
+## Das Boot der Überfahrt (Durchgang 5, 07.10.2026)
+
+Auf der Überfahrt wogt das Meer jetzt gegen das Deck (`PrologueEnvironment.Swell`); dazu ächzt das Boot selten in der Dünung (Ortsklang wie Werksglocke und Fährhorn, alle 7–14 s, von zufälliger Seite). Rezept `skiff-creak` in `recipes/ambient_events.py`: Haftgleiten im Holz, dessen Pulsrate mit der Last steigt und fällt, durch tiefe Rumpfmoden (140–720 Hz, kein Türquietschen), dann ein dumpfer Wasserschlag gegen den Rumpf. CLAP „wooden boat creaking“ 0,53–0,65, „door creaking“ 0,20, „drum“ höchstens 0,16 (mit lauterem Wasserschlag bis 0,42, verworfen).
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/skiff_creak_1.wav` | skiff-creak Seed 4 | 2.20 s, 1 Kanal/Kanäle, -27.0 LUFS, Spitze -7.0 dBFS |
+| `Audio/Sfx/skiff_creak_2.wav` | skiff-creak Seed 3 | 2.20 s, 1 Kanal/Kanäle, -27.0 LUFS, Spitze -8.3 dBFS |
