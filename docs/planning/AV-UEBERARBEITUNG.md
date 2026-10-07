@@ -747,3 +747,32 @@ Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreati
 - Gleichmäßig getaktetes Kichern: mechanisch; jetzt ungleiche Silben, fallender Atem, Kiekser.
 - Ausholrisse mit allen Verästelungen als scharfe Lichtlinien: wirkten wie violette Blitze.
   Jetzt nur die Hauptrisse als weiche Lichtnaht; alle Risse erst beim Bruch.
+
+## Arbeitsnotiz Durchgang 5 (ab 07.10.2026, 10:15)
+
+**Owner-Befund 07.10. (vormittags):** Die Soul Cannon ist jetzt viel zu groß; Aussehen, Klang
+und Animation müssen noch einmal überarbeitet werden. Der „Bleep“ beim Einsammeln der Seelen
+nervt und soll gegen andere Klänge getauscht werden.
+
+**Befund Kanone (Rundgang 20261007_044240/101956):** rund 1,2 m, Mündungstrichter 38 cm breit,
+wächst beim Laden um 30 % (voll so lang wie die Figur hoch ist); auf dem Rücken ein Rucksack mit
+Grammophontrichter über dem Kopf; der Rückstoß ist kaum zu sehen; voll geladen steht die Figur
+starr (der Clip `aim` hält das letzte Bild).
+
+**Prioritäten:**
+1. ☑ Seelen-Einsammeln ohne Piepen (siehe unten).
+2. ☐ Kanone kleiner und als Waffe lesbar (kein Trichter), Wachsen nur angedeutet.
+3. ☐ Kanonen-Animation: Ziehen, Anschlag mit Gewicht, Zittern bei voller Ladung, kräftiger
+   Rückstoß, Verstauen.
+4. ☐ Kanonen-Klang: Death Flame statt Elektro-Brummen beim Laden, Stufen hörbar, Schuss mit
+   Körper.
+
+**Erledigt und im Spiel geprüft:**
+- Seelen-Einsammeln: Auch die Glocke `soul-release-soft` war eine Summe reiner Töne (CLAP „soft
+  chime“ 0,61, „electronic beep“ 0,27). Neu `soul-release-breath`: geflüstertes Ausatmen durch
+  gleitende Vokalformanten ohne Stimmlippen (keine Tonhöhe), Aufflattern der Death Flame beim
+  Freigabe-Aufblitzen (0,85 s), leiser Luftzug beim Losfliegen (1,22 s); vier Takes mit
+  verschiedenen Vokalpaaren. CLAP „whispered breath“/„ghostly whisper“/„gentle exhale“, Piepen,
+  Glocke und Glockenspiel je unter 0,01. Mix +4,9 bis +6,5 LU über dem Bett (im Band),
+  Audio-Laufzeittest (74 Töne, kein Ersatzklang), `validate_audio.py` (199), Rundgang
+  `arena_wave1` protokolliert `TOUR_CUE cue=SoulRelease`.
