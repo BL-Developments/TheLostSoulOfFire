@@ -972,7 +972,10 @@ public sealed class ArtAssets
                 // Actions start at once (their first frame is the feedback); only the way back
                 // into standing or running blends, so a figure settles instead of snapping.
                 bool intoRest = name is VisualClips.Idle or VisualClips.Move;
-                if (intoRest && LastClip is not null && _clipName.Length > 0)
+                // Starting or stopping to walk while charging changes the stance under the cannon
+                // (the braced lunge or the walk): it settles over too, instead of snapping.
+                bool braceChange = IsBrace(_clipName) && IsBrace(name);
+                if ((intoRest || braceChange) && LastClip is not null && _clipName.Length > 0)
                 {
                     Settling = (LastClip, LastSource, LastScale, LastTint);
                     SettleRemaining = SettleDuration;
@@ -999,6 +1002,9 @@ public sealed class ArtAssets
         }
 
         private float _cycleLength;
+
+        private static bool IsBrace(string name) =>
+            name is VisualClips.Aim or VisualClips.AimFull or VisualClips.CannonDraw || name.StartsWith(VisualClips.AimMove, StringComparison.Ordinal);
 
         /// <summary>Clips that are one cycle drawn in variants (the charged walk): switching keeps the phase.</summary>
         private static bool SameCycle(string a, string b) =>
