@@ -973,3 +973,8 @@ Gegner-Zuckens, Deutlichkeit von Schattenhand und Schlagrand im Gedränge, die I
 - Verworfen: Burning auf nassem Pflaster – Zischen als Klang (CLAP hört kurze Rauschimpulse als
   „gunshot“ 0,52–0,68, auch mit weichem Einsatz) und Dampfwolken an seinen Schritten (ausgelöst,
   aber neben dem Hollow und auf dem Hafenpflaster selbst mit Deckkraft 0,5 kaum zu sehen).
+- Nachgeprüft: Ofen im Takt der Kampfmusik (Durchgang 4, im Standbild nie belegt). Neue Rundgang-
+  Serie `arena_wave1_furnace_beat` (Spieler vor der Nordwand, jedes 4. Bild, Kick-Phase im Protokoll
+  `TOUR_BEAT`): Helligkeit am Ofenmund springt genau im Kick-Abstand (56 Bilder = 0,93 s), aber nur
+  um 2,1 % – kaum wahrnehmbar. Stoß 0,28 → 0,75 (Abklingen exp −6): jetzt 5,8 %, im Vergleichsbild
+  leuchten Mund und Mauerkante auf dem Kick sichtbar auf.

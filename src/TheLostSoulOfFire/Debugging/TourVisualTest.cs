@@ -519,6 +519,11 @@ internal sealed class TourVisualTest
             () => _world.LoopState == ArenaLoopState.Combat && _world.AutomatedEnemies.Any(enemy => enemy.IsAlive), 20f, 0.5f);
         // The combat score has come in: the pulse at least, the drive with a few enemies.
         Do("score_combat", () => Console.WriteLine($"TOUR_AUDIO station=arena_wave1 combat {_world.AutomatedAudio.DescribePresence()}"), 2.5f);
+        // The furnace in the north wall stokes on the score's kick (every 0.94 s): one frame in four.
+        Do("place_furnace", () => _world.PlaceAutomatedPlayer(new Vector2(467f, 300f)), 0.4f);
+        Series("furnace_beat", 24, 4, () => Console.WriteLine(string.Create(System.Globalization.CultureInfo.InvariantCulture,
+            $"TOUR_BEAT frame={_frame} kick={_world.AutomatedAudio.CombatKickPhase:0.00}")));
+        Do("back_to_centre", () => _world.PlaceAutomatedPlayer(ArenaCentre), 0.3f);
         Shot("hollow_telegraph", ready: () => _world.AutomatedEnemies.OfType<Hollow>().Any(hollow => hollow.State == HollowState.Telegraph), timeout: 12f,
             everyFrame: () => { if (Nearest<Hollow>() is { } hollow) AimAt(hollow.Position); });
         Series("hollow_swipe", 12, 2);

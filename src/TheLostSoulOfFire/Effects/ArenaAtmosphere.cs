@@ -551,7 +551,7 @@ public sealed class ArenaAtmosphere
     private float GetFurnacePulse(int index)
     {
         FurnaceSource source = FurnaceSources[index];
-        float stoke = _beatPhase >= 0f ? _beatStrength * 0.28f * MathF.Exp(-_beatPhase * 7f) : 0f;
+        float stoke = _beatPhase >= 0f ? _beatStrength * 0.75f * MathF.Exp(-_beatPhase * 6f) : 0f;
         float slowPulse = 0.5f + 0.5f * MathF.Sin(_time * (0.72f + index * 0.08f) + source.Phase);
         float machineBreath = 0.5f + 0.5f * MathF.Sin(_time * 0.19f + source.Phase * 1.7f);
         float pulse = 0.72f + slowPulse * ArenaAtmosphereTuning.FurnacePulseStrength + machineBreath * 0.05f + stoke;
