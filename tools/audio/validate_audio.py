@@ -158,6 +158,13 @@ AUTHORED_SFX_DURATIONS = {
     # The floor breaking under a Devourer's slam (recipes/combat.py), under the Ludo blow.
     "ground_break_1.wav": 1.700,
     "ground_break_2.wav": 1.700,
+    # What is left of each enemy's voice (recipes/voices.py): calls and cries on attacks.
+    "hollow_call_1.wav": 1.100, "hollow_call_2.wav": 1.030, "hollow_call_3.wav": 1.230,
+    "hollow_grasp_1.wav": 0.420, "hollow_grasp_2.wav": 0.420,
+    "burning_cackle_1.wav": 1.200, "burning_cackle_2.wav": 1.220, "burning_cackle_3.wav": 1.320,
+    "burning_shriek_1.wav": 0.750, "burning_shriek_2.wav": 0.750,
+    "devourer_growl_1.wav": 1.280, "devourer_growl_2.wav": 1.230, "devourer_growl_3.wav": 1.480,
+    "devourer_hunger_1.wav": 1.600, "devourer_hunger_2.wav": 1.600,
     # The Life Flame's fire after the last wave (tools/audio/recipes/ambiences.py), looped.
     "life_flame_loop.wav": 9.0,
 }

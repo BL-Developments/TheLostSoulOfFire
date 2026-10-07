@@ -125,6 +125,7 @@ internal sealed class TourVisualTest
         _world = world;
         _input = input;
         _viewport = viewport;
+        _world.AutomatedAudio.CuePlayed += CountVoice;
         _only = (Environment.GetEnvironmentVariable("TOUR_ONLY") ?? string.Empty)
             .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         _directory = Path.Combine(ScreenshotCapture.RepositoryRoot(), "artifacts", "tour", DateTime.Now.ToString("yyyyMMdd_HHmmss"));
@@ -158,8 +159,35 @@ internal sealed class TourVisualTest
     public bool Finished { get; private set; }
     public int ExitCode { get; private set; }
 
+    private static readonly HashSet<AudioCue> VoiceCues =
+    [
+        AudioCue.HollowCall, AudioCue.HollowGrasp, AudioCue.BurningCackle, AudioCue.BurningShriek,
+        AudioCue.DevourerGrowl, AudioCue.DevourerHunger
+    ];
+    private readonly SortedDictionary<string, int> _voices = new();
+    private float _clock;
+    private float _lastCall = -10f;
+    private float _closestCalls = float.MaxValue;
+
+    /// <summary>Counts the enemies' voices per station, and how close two calls between attacks came.</summary>
+    private void CountVoice(AudioCue cue)
+    {
+        if (!VoiceCues.Contains(cue) || _index < 0 || _index >= _steps.Count)
+        {
+            return;
+        }
+        string key = $"{_steps[_index].Station}:{cue}";
+        _voices[key] = _voices.GetValueOrDefault(key) + 1;
+        if (cue is AudioCue.HollowCall or AudioCue.BurningCackle or AudioCue.DevourerGrowl)
+        {
+            _closestCalls = MathF.Min(_closestCalls, _clock - _lastCall);
+            _lastCall = _clock;
+        }
+    }
+
     public void Update(float deltaTime)
     {
+        _clock += deltaTime;
         if (Finished || PendingCapture is not null)
         {
             return;
@@ -236,6 +264,8 @@ internal sealed class TourVisualTest
             }
             Console.WriteLine("TOUR_AUDIO hall_tails=" + string.Join(",",
                 _world.AutomatedAudio.HallTailsPlayed.Select(pair => $"{pair.Key}:{pair.Value}")));
+            Console.WriteLine("TOUR_AUDIO voices=" + string.Join(",", _voices.Select(pair => $"{pair.Key}={pair.Value}")) +
+                string.Create(System.Globalization.CultureInfo.InvariantCulture, $" closest_calls_s={_closestCalls:0.00}"));
             Console.WriteLine($"TOUR_VISUAL_TEST_PASS captures={_captured} dir={_directory}");
             Finished = true;
             ExitCode = 0;

@@ -355,3 +355,27 @@ Owner: Der Devourer soll seinen Flächenschaden durch einen echten Bodenschlag z
 | --- | --- | --- |
 | `Audio/Sfx/ground_break_1.wav` | ground-break Seed 1 | 1.70 s, 1 Kanal/Kanäle, -21.7 LUFS, Spitze -2.0 dBFS |
 | `Audio/Sfx/ground_break_2.wav` | ground-break Seed 2 | 1.70 s, 1 Kanal/Kanäle, -23.0 LUFS, Spitze -2.0 dBFS |
+
+## Stimmen der Gegner (Durchgang 4, 07.10.2026)
+
+Owner: Die Stimmung soll actionreicher, spannender und etwas verrückt sein, mit Klangsignalen der Monster. Rezepte in `tools/audio/recipes/voices.py`: eine kleine Quelle-Filter-Stimme (Rosenberg-Stimmlippenpulse mit Jitter, Schimmer und Periodenverdopplung, Atem, gleitende Vokalformanten, Rauheit) und für Schreie ein eigener Baustein aus halb Stimme, halb Luft durch weite Formanten mit 75–110-Hz-Rauheit. Hollow: hauchiges, gebrochenes Klagen durch die Porzellanmaske, das hakt und stottert (Rufen nach jemandem, der geht); beim Griff ein scharfes Einatmen und ein abgerissener Schrei. Burning: irres, abgehacktes Kichern, das in Knistern zerbricht und in einem Kiekser endet; vor dem Anlauf ein ansteigender Schrei, der in Feuerfauchen übergeht. Devourer: tiefes Knurren mit Periodenverdopplung, darin dünn die gefangenen Seelen; beim Wittern einer Seele Schnüffeln, hungriges Stöhnen und aufschreiende Seelen.
+
+CLAP (ausgewählte Takes): hollow-call „zombie groan“/„ghostly moaning voice“/„scream“ (Stimme, nie Instrument); hollow-grasp „scream“ 0,63/0,65; burning-cackle „maniacal laughter“ 0,81/0,87/0,70; burning-shriek „scream“ 0,79/0,60; devourer-growl „monster growling“ 0,95/0,90/0,92; devourer-hunger „monster growling“ 0,94/0,90. Verworfen: Schreie aus reiner Stimmlippenquelle durch Formanten („horn“/„synthesizer tone“ bis 0,57), auch mit Biphonation; gleichmäßig getaktetes Kichern (mechanisch).
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/hollow_call_1.wav` | hollow-call Seed 1 | 1.10 s, 1 Kanal/Kanäle, -22.0 LUFS, Spitze -6.1 dBFS |
+| `Audio/Sfx/hollow_call_2.wav` | hollow-call Seed 2 | 1.03 s, 1 Kanal/Kanäle, -22.0 LUFS, Spitze -4.9 dBFS |
+| `Audio/Sfx/hollow_call_3.wav` | hollow-call Seed 4 | 1.23 s, 1 Kanal/Kanäle, -22.0 LUFS, Spitze -5.9 dBFS |
+| `Audio/Sfx/hollow_grasp_1.wav` | hollow-grasp Seed 1 | 0.42 s, 1 Kanal/Kanäle, -19.0 LUFS, Spitze -15.2 dBFS |
+| `Audio/Sfx/hollow_grasp_2.wav` | hollow-grasp Seed 4 | 0.42 s, 1 Kanal/Kanäle, -19.0 LUFS, Spitze -15.1 dBFS |
+| `Audio/Sfx/burning_cackle_1.wav` | burning-cackle Seed 1 | 1.20 s, 1 Kanal/Kanäle, -21.0 LUFS, Spitze -11.5 dBFS |
+| `Audio/Sfx/burning_cackle_2.wav` | burning-cackle Seed 2 | 1.22 s, 1 Kanal/Kanäle, -21.0 LUFS, Spitze -11.3 dBFS |
+| `Audio/Sfx/burning_cackle_3.wav` | burning-cackle Seed 4 | 1.32 s, 1 Kanal/Kanäle, -21.0 LUFS, Spitze -12.9 dBFS |
+| `Audio/Sfx/burning_shriek_1.wav` | burning-shriek Seed 2 | 0.75 s, 1 Kanal/Kanäle, -19.0 LUFS, Spitze -11.4 dBFS |
+| `Audio/Sfx/burning_shriek_2.wav` | burning-shriek Seed 3 | 0.75 s, 1 Kanal/Kanäle, -19.0 LUFS, Spitze -11.9 dBFS |
+| `Audio/Sfx/devourer_growl_1.wav` | devourer-growl Seed 2 | 1.28 s, 1 Kanal/Kanäle, -20.0 LUFS, Spitze -8.3 dBFS |
+| `Audio/Sfx/devourer_growl_2.wav` | devourer-growl Seed 3 | 1.23 s, 1 Kanal/Kanäle, -20.0 LUFS, Spitze -8.5 dBFS |
+| `Audio/Sfx/devourer_growl_3.wav` | devourer-growl Seed 4 | 1.48 s, 1 Kanal/Kanäle, -20.0 LUFS, Spitze -8.1 dBFS |
+| `Audio/Sfx/devourer_hunger_1.wav` | devourer-hunger Seed 1 | 1.60 s, 1 Kanal/Kanäle, -21.0 LUFS, Spitze -8.4 dBFS |
+| `Audio/Sfx/devourer_hunger_2.wav` | devourer-hunger Seed 2 | 1.60 s, 1 Kanal/Kanäle, -21.0 LUFS, Spitze -8.0 dBFS |

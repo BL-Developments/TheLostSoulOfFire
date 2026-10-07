@@ -53,6 +53,8 @@ public sealed partial class GameWorld : IDisposable
     private readonly ArtAssets _art;
     private readonly SpriteVfxSystem _spriteVfx;
     private readonly GroundImpacts _groundImpacts = new();
+    private readonly EnemyVoices _enemyVoices = new();
+    private Action<AudioCue, float, Vector2>? _speak;
     private readonly List<SceneProp> _sceneProps = [];
     private readonly List<SceneProp> _arenaProps = Arena.Props
         .Select(placement => new SceneProp(placement.VisualId, placement.Foot, placement.FallbackSize, placement.FallbackLayer))
@@ -557,12 +559,15 @@ public sealed partial class GameWorld : IDisposable
             }
             if (enemy is Hollow hollowAfter && previousHollowState != HollowState.Swipe && hollowAfter.State == HollowState.Swipe)
             {
-                // The grab is a danger signal: clearly above the room, below a hit.
+                // The grab is a danger signal: clearly above the room, below a hit. It cries out
+                // after the one who leaves as it grabs.
                 _audio.Play(AudioCue.HollowSwipe, 0.7f, 0f, PanOf(enemy.Position));
+                _audio.Play(AudioCue.HollowGrasp, 0.6f, 0f, PanOf(enemy.Position));
             }
             if (enemy is Burning burningAfter && previousBurningState != BurningState.Telegraph && burningAfter.State == BurningState.Telegraph)
             {
                 _audio.Play(AudioCue.BurningCharge, 0.85f, 0f, PanOf(enemy.Position));
+                _audio.Play(AudioCue.BurningShriek, 0.62f, 0f, PanOf(enemy.Position));
             }
             if (enemy is Devourer devourerAfter)
             {
@@ -574,6 +579,11 @@ public sealed partial class GameWorld : IDisposable
                 if (previousDevourerState != DevourerState.Devour && devourerAfter.State == DevourerState.Devour)
                 {
                     _audio.Play(AudioCue.DevourerDevour, 0.6f, 0f, PanOf(devourerAfter.Position));
+                }
+                if (previousDevourerState != DevourerState.ApproachSoul && devourerAfter.State == DevourerState.ApproachSoul)
+                {
+                    // It scents a soul: sniffing, a hungry moan, its prisoners cry out.
+                    _audio.Play(AudioCue.DevourerHunger, 0.7f, 0f, PanOf(devourerAfter.Position));
                 }
             }
             if (enemy.TryConsumeSoulSpawn(out Vector2 soulPosition))
@@ -597,6 +607,8 @@ public sealed partial class GameWorld : IDisposable
         }
 
         UpdateBurningHandoff();
+        _speak ??= (cue, volume, at) => _audio.Play(cue, volume, 0f, PanOf(at));
+        _enemyVoices.Update(deltaTime, _enemies, _player.Position, !_player.IsDead, _speak);
 
         _enemies.RemoveAll(enemy => enemy.IsFinished);
         foreach (Soul soul in _souls)
@@ -2336,6 +2348,7 @@ public sealed partial class GameWorld : IDisposable
         _particles.Clear();
         _spriteVfx.Clear();
         _groundImpacts.Clear();
+        _enemyVoices.Clear();
         _art.ClearTransient();
         _combatPresentation.Clear();
         _screenEffects.Clear();

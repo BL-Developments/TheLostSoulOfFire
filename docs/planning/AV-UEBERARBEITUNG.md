@@ -508,7 +508,7 @@ Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreati
 
 **Prioritäten (nach Wirkung):**
 1. ☑ Devourer-Schlag als Bodenbruch statt Kreis.
-2. ☐ Monster mit Stimme: Rufe beim Bemerken, Angriffsschreie, Schmerzlaute, verrückte
+2. ☑ Monster mit Stimme: Rufe beim Bemerken, Angriffsschreie, Schmerzlaute, verrückte
    Zwischenrufe, je Art eigen und lore-treu (Hollow: Greifen nach Gehenden; Burning: instabile
    Glut; Devourer: Hunger, gefangene Seelen).
 3. ☐ Kampfmusik treibender: Schichten, die mit der Kampflage anziehen (Gegnerzahl, Gefahr,
@@ -537,6 +537,25 @@ Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreati
   Geprüft: Rundgang `arena_devourer` (Serie vor und nach), 263 Unit-Tests, Audio-Laufzeittest
   (65 Töne, kein Ersatzklang), `validate_audio.py` (174), `mix_report.py --zone arena`.
 
+- Monster mit Stimme (Owner: „verrückt, mit Sound Cues von Monstern“): `tools/audio/recipes/voices.py`
+  baut eine Quelle-Filter-Stimme (Stimmlippenpulse mit Jitter, Schimmer, Periodenverdopplung,
+  Rauheit; Atem; gleitende Vokalformanten) und einen Schrei-Baustein (halb Stimme, halb Luft,
+  75–110-Hz-Rauheit, stark gesättigt). Zwischen den Angriffen rufen die Gegner
+  (`Audio/EnemyVoices.cs`): Hollow klagt hauchig durch die Maske und stottert, Burning kichert
+  irre und zerbricht in Knistern, Devourer knurrt mit den gefangenen Seelen darin. Jeder
+  Gegner hat einen eigenen Takt, neue rufen oft kurz nach dem Erscheinen, mehr Gegner rufen je
+  seltener, Abstand mindestens 0,55 s, eigene Stimmgruppe (höchstens zwei, sie nimmt Warnungen
+  keine Stimme), sie treten bei Gefahrensignalen zurück, leiser mit Abstand. An Angriffen: Hollow
+  schreit beim Griff auf, Burning schreit vor dem Anlauf, Devourer schnüffelt und stöhnt hungrig,
+  wenn es eine Seele wittert. CLAP: „monster growling“ 0,90–0,95, „maniacal laughter“ 0,70–0,87,
+  „scream“ 0,60–0,79, Hollow-Rufe „zombie groan“/„ghostly moaning voice“. Mix: alle in allen
+  Zonen im Band (`mix_report.py`, neue Klasse `call` −4…+8 LU). Rundgang protokolliert
+  `TOUR_AUDIO voices=…` je Station und den kürzesten Abstand zweier Rufe (0,62 s). Audio-
+  Laufzeit- (71 Töne), Gameplay- (10 Wellen) und Tod-Neustart-Test grün, 263 Unit-Tests.
+
 **Verworfen (Durchgang 4):**
+- Schreie aus reiner Stimmlippenquelle durch Formanten, auch mit Biphonation: CLAP „horn“ und
+  „synthesizer tone“ bis 0,57. Erst Luft durch die Formanten und tiefe Rauheit machen eine Kehle.
+- Gleichmäßig getaktetes Kichern: mechanisch; jetzt ungleiche Silben, fallender Atem, Kiekser.
 - Ausholrisse mit allen Verästelungen als scharfe Lichtlinien: wirkten wie violette Blitze.
   Jetzt nur die Hauptrisse als weiche Lichtnaht; alle Risse erst beim Bruch.

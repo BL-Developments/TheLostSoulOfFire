@@ -51,6 +51,8 @@ BANDS = {
     # Layers under another cue (material under a hit, a body blow under the hurt sound): they
     # colour and time the blow, the cue on top carries it.
     "layer": (-6.0, 12.0),
+    # Enemy calls between attacks (EnemyVoices): heard over the room, never over a warning.
+    "call": (-4.0, 8.0),
 }
 
 CLASS = {
@@ -68,6 +70,8 @@ CLASS = {
     "HitHollow": "layer", "HitBurning": "layer", "HitDevourer": "layer", "HitDummy": "layer", "HitHeavy": "layer",
     "BodyHit": "layer", "DeathHollow": "layer", "DeathBurning": "layer", "DeathDevourer": "layer",
     "HollowWindup": "danger", "DevourerWindup": "danger", "BurningRush": "danger",
+    "HollowCall": "call", "BurningCackle": "call", "DevourerGrowl": "call",
+    "HollowGrasp": "layer", "BurningShriek": "layer",
 }
 
 #: Menu sounds play over the paused beds (AudioDirector.PausedBedVolume).
@@ -134,6 +138,7 @@ INDIRECT = {
     "AbilityGuard": 0.72, "AbilityMark": 0.72,
     "HitHollow": 0.78, "HitBurning": 0.78, "HitDevourer": 0.78, "HitDummy": 0.78,
     "DeathHollow": 0.66, "DeathBurning": 0.66, "DeathDevourer": 0.64,
+    "HollowCall": 0.55, "BurningCackle": 0.6, "DevourerGrowl": 0.72,
 }
 
 

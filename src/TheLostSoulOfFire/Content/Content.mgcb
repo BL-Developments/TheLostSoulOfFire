@@ -10745,3 +10745,78 @@
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /build:Audio/Sfx/ground_break_2.wav
+
+#begin Audio/Sfx/hollow_call_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/hollow_call_1.wav
+
+#begin Audio/Sfx/hollow_call_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/hollow_call_2.wav
+
+#begin Audio/Sfx/hollow_call_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/hollow_call_3.wav
+
+#begin Audio/Sfx/hollow_grasp_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/hollow_grasp_1.wav
+
+#begin Audio/Sfx/hollow_grasp_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/hollow_grasp_2.wav
+
+#begin Audio/Sfx/burning_cackle_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/burning_cackle_1.wav
+
+#begin Audio/Sfx/burning_cackle_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/burning_cackle_2.wav
+
+#begin Audio/Sfx/burning_cackle_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/burning_cackle_3.wav
+
+#begin Audio/Sfx/burning_shriek_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/burning_shriek_1.wav
+
+#begin Audio/Sfx/burning_shriek_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/burning_shriek_2.wav
+
+#begin Audio/Sfx/devourer_growl_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/devourer_growl_1.wav
+
+#begin Audio/Sfx/devourer_growl_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/devourer_growl_2.wav
+
+#begin Audio/Sfx/devourer_growl_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/devourer_growl_3.wav
+
+#begin Audio/Sfx/devourer_hunger_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/devourer_hunger_1.wav
+
+#begin Audio/Sfx/devourer_hunger_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/devourer_hunger_2.wav

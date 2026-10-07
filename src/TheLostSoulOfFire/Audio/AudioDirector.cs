@@ -81,7 +81,17 @@ public enum AudioCue
     ScytheWeight3,
     SoulThrob,
     /// <summary>The floor breaking under a Devourer's slam, under the Ludo blow: cracks, grinding slabs, falling rubble.</summary>
-    GroundBreak
+    GroundBreak,
+    /// <summary>
+    /// What is left of each enemy's voice (tools/audio/recipes/voices.py): calls between attacks,
+    /// and cries layered on the attacks they announce.
+    /// </summary>
+    HollowCall,
+    HollowGrasp,
+    BurningCackle,
+    BurningShriek,
+    DevourerGrowl,
+    DevourerHunger
 }
 
 /// <summary>
@@ -118,13 +128,16 @@ public sealed class AudioDirector : IDisposable
 {
     private const int FallbackSampleRate = 22050;
     private const int EnemyVoiceLimit = 4;
+    private const int CallVoiceLimit = 2;
     private const float MusicGameplayVolume = 0.5f;
     private const float MusicCalmVolume = 0.26f;
 
     private enum CueGroup
     {
         General,
-        Enemy
+        Enemy,
+        /// <summary>Enemy calls between attacks: their own, smaller budget, so they never take a voice from a warning.</summary>
+        Voice
     }
 
     private readonly record struct CuePolicy(
@@ -200,7 +213,13 @@ public sealed class AudioDirector : IDisposable
         [AudioCue.ScytheWeight2] = new(0.05f, 2, 0.03f),
         [AudioCue.ScytheWeight3] = new(0.12f, 1, 0.02f),
         [AudioCue.SoulThrob] = new(0.4f, 1),
-        [AudioCue.GroundBreak] = new(0.18f, 2, 0.03f, CueGroup.Enemy)
+        [AudioCue.GroundBreak] = new(0.18f, 2, 0.03f, CueGroup.Enemy),
+        [AudioCue.HollowCall] = new(0.35f, 2, 0.06f, CueGroup.Voice),
+        [AudioCue.BurningCackle] = new(0.5f, 1, 0.05f, CueGroup.Voice),
+        [AudioCue.DevourerGrowl] = new(0.8f, 1, 0.04f, CueGroup.Voice),
+        [AudioCue.HollowGrasp] = new(0.08f, 2, 0.05f),
+        [AudioCue.BurningShriek] = new(0.15f, 2, 0.04f),
+        [AudioCue.DevourerHunger] = new(0.6f, 1, 0.03f)
     };
 
     /// <summary>
@@ -212,7 +231,8 @@ public sealed class AudioDirector : IDisposable
         AudioCue.ScytheSwing1, AudioCue.ScytheSwing2, AudioCue.SoulCleave, AudioCue.Dash, AudioCue.CannonCharge,
         AudioCue.Footstep, AudioCue.FootstepWood, AudioCue.HollowStep, AudioCue.BurningStep, AudioCue.DevourerStep,
         AudioCue.EnemyEmerge, AudioCue.SoulRelease, AudioCue.CannonDraw, AudioCue.CannonStow,
-        AudioCue.ScytheWeight1, AudioCue.ScytheWeight2, AudioCue.ScytheWeight3
+        AudioCue.ScytheWeight1, AudioCue.ScytheWeight2, AudioCue.ScytheWeight3,
+        AudioCue.HollowCall, AudioCue.BurningCackle, AudioCue.DevourerGrowl
     ];
 
     /// <summary>
@@ -436,6 +456,12 @@ public sealed class AudioDirector : IDisposable
             // The bound soul throbbing when health runs low, heard from within, dry.
             AddVariants(content, AudioCue.SoulThrob, "Audio/Sfx/soul_throb", 2, 46f, 0.3f, 0.3f, 0.1f);
             AddVariants(content, AudioCue.GroundBreak, "Audio/Sfx/ground_break", 2, 40f, 0.6f, 0.4f, 0.7f);
+            AddVariants(content, AudioCue.HollowCall, "Audio/Sfx/hollow_call", 3, 170f, 0.9f, 0.25f, 0.5f);
+            AddVariants(content, AudioCue.HollowGrasp, "Audio/Sfx/hollow_grasp", 2, 300f, 0.35f, 0.3f, 0.6f);
+            AddVariants(content, AudioCue.BurningCackle, "Audio/Sfx/burning_cackle", 3, 340f, 0.9f, 0.25f, 0.6f);
+            AddVariants(content, AudioCue.BurningShriek, "Audio/Sfx/burning_shriek", 2, 420f, 0.6f, 0.3f, 0.6f);
+            AddVariants(content, AudioCue.DevourerGrowl, "Audio/Sfx/devourer_growl", 3, 58f, 1.1f, 0.3f, 0.5f);
+            AddVariants(content, AudioCue.DevourerHunger, "Audio/Sfx/devourer_hunger", 2, 76f, 1.3f, 0.3f, 0.5f);
             Add(content, AudioCue.CannonDraw, "Audio/Sfx/cannon_draw", 140f, 0.3f, 0.3f, 0.4f);
             Add(content, AudioCue.CannonStow, "Audio/Sfx/cannon_stow", 120f, 0.3f, 0.3f, 0.4f);
             AddVariants(content, AudioCue.HitHollow, "Audio/Sfx/hit_hollow", 3, 180f, 0.1f, 0.3f, 0.7f);
@@ -662,7 +688,8 @@ public sealed class AudioDirector : IDisposable
         CleanupInstances(cue);
         List<SoundEffectInstance> instances = GetInstances(cue);
         if (instances.Count >= policy.Polyphony ||
-            policy.Group == CueGroup.Enemy && CountActiveEnemyVoices() >= EnemyVoiceLimit)
+            policy.Group == CueGroup.Enemy && CountActiveEnemyVoices() >= EnemyVoiceLimit ||
+            policy.Group == CueGroup.Voice && CountActiveVoices(CueGroup.Voice) >= CallVoiceLimit)
         {
             return;
         }
@@ -1257,12 +1284,14 @@ public sealed class AudioDirector : IDisposable
         return count;
     }
 
-    private int CountActiveEnemyVoices()
+    private int CountActiveEnemyVoices() => CountActiveVoices(CueGroup.Enemy);
+
+    private int CountActiveVoices(CueGroup group)
     {
         int count = 0;
         foreach ((AudioCue cue, List<SoundEffectInstance> instances) in _activeInstances)
         {
-            if (Policies[cue].Group == CueGroup.Enemy)
+            if (Policies[cue].Group == group)
             {
                 count += instances.Count;
             }
