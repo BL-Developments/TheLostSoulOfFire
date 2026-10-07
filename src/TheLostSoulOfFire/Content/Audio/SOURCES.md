@@ -260,7 +260,6 @@ Rezepte `cannon-draw` und `cannon-stow` in `tools/audio/recipes/cues.py`: Riemen
 
 | Datei | Quelle | Messung |
 | --- | --- | --- |
-| `Audio/Sfx/cannon_draw.wav` | cannon-draw Seed 1 | 0.42 s, 1 Kanal/Kanäle, -24.5 LUFS, Spitze -3.0 dBFS |
 | `Audio/Sfx/footstep_stone_1_hall_foundry.wav` | Hallfahne von footstep_stone_1.wav (Gießhalle, RT60 2.4 s) | 2.46 s, 1 Kanal, -34.0 LUFS, Spitze -15.3 dBFS |
 
 ## Präsenz der Gegner (Durchgang 3, 06.10.2026)
@@ -425,7 +424,6 @@ Die Ludo-Takes `cannon_charge.wav`, `cannon_full.wav` und `cannon_fire.wav` blei
 | `Audio/Sfx/cannon_shot_3.wav` | cannon-fire Seed 1 | 0.95 s, 1 Kanal/Kanäle, -16.6 LUFS, Spitze -1.5 dBFS |
 | `Audio/Sfx/cannon_blast_1.wav` | cannon-fire-full Seed 1 | 1.40 s, 1 Kanal/Kanäle, -18.5 LUFS, Spitze -2.0 dBFS |
 | `Audio/Sfx/cannon_blast_2.wav` | cannon-fire-full Seed 2 | 1.40 s, 1 Kanal/Kanäle, -18.6 LUFS, Spitze -2.0 dBFS |
-| `Audio/Sfx/cannon_stow.wav` | cannon-stow Seed 2 | 0.36 s, 1 Kanal/Kanäle, -24.0 LUFS, Spitze -9.3 dBFS |
 | `Audio/Sfx/cannon_shot_1_hall.wav` | Hallfahne von cannon_shot_1.wav (Gießhalle, RT60 2.4 s) | 2.53 s, 1 Kanal, -24.6 LUFS, Spitze -6.4 dBFS |
 
 ## Signale aus Eisen und Feuer statt Piepen (Durchgang 5, 07.10.2026)
@@ -484,3 +482,14 @@ Auf der Überfahrt wogt das Meer jetzt gegen das Deck (`PrologueEnvironment.Swel
 | --- | --- | --- |
 | `Audio/Sfx/skiff_creak_1.wav` | skiff-creak Seed 4 | 2.20 s, 1 Kanal/Kanäle, -27.0 LUFS, Spitze -7.0 dBFS |
 | `Audio/Sfx/skiff_creak_2.wav` | skiff-creak Seed 3 | 2.20 s, 1 Kanal/Kanäle, -27.0 LUFS, Spitze -8.3 dBFS |
+
+## Ziehen und Verstauen in zwei Takes (Durchgang 5, 07.10.2026)
+
+Ziehen und Verstauen fallen bei jedem Kanonenschuss und hatten je nur einen Take. Je zwei Takes aus denselben Rezepten (`cannon_draw.wav` ist jetzt `cannon_draw_1.wav`, bitgleich). Andere Seeds des Verstauens klangen nach „notification chime“ (0,52–0,68; auch der bisherige Take zu 0,30): Eisenklang und Schnalle waren noch Sinustöne. Jetzt kurze Resonanzklicks (`_tick`); alle Seeds „heavy object put down on fabric“ 0,84–0,94.
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/cannon_draw_1.wav` | cannon-draw Seed 1 | 0.42 s, 1 Kanal/Kanäle, -24.5 LUFS, Spitze -3.0 dBFS |
+| `Audio/Sfx/cannon_draw_2.wav` | cannon-draw Seed 4 | 0.42 s, 1 Kanal/Kanäle, -23.7 LUFS, Spitze -3.0 dBFS |
+| `Audio/Sfx/cannon_stow_1.wav` | cannon-stow Seed 1 | 0.36 s, 1 Kanal/Kanäle, -24.0 LUFS, Spitze -8.1 dBFS |
+| `Audio/Sfx/cannon_stow_2.wav` | cannon-stow Seed 3 | 0.36 s, 1 Kanal/Kanäle, -24.0 LUFS, Spitze -9.9 dBFS |

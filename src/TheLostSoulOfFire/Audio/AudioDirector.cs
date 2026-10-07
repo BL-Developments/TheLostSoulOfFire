@@ -527,8 +527,9 @@ public sealed class AudioDirector : IDisposable
             AddVariants(content, AudioCue.ShoreHorn, "Audio/Sfx/shore_horn", 2, 72f, 3f, 0.2f, 0.1f);
             AddVariants(content, AudioCue.ShoreBoard, "Audio/Sfx/shore_board", 2, 2400f, 0.8f, 0.15f, 0.9f);
             AddVariants(content, AudioCue.SkiffCreak, "Audio/Sfx/skiff_creak", 2, 140f, 1.2f, 0.15f, 0.6f);
-            Add(content, AudioCue.CannonDraw, "Audio/Sfx/cannon_draw", 140f, 0.3f, 0.3f, 0.4f);
-            Add(content, AudioCue.CannonStow, "Audio/Sfx/cannon_stow", 120f, 0.3f, 0.3f, 0.4f);
+            // Drawn and stowed with every shot: two takes each, so it never repeats exactly.
+            AddVariants(content, AudioCue.CannonDraw, "Audio/Sfx/cannon_draw", 2, 140f, 0.3f, 0.3f, 0.4f);
+            AddVariants(content, AudioCue.CannonStow, "Audio/Sfx/cannon_stow", 2, 120f, 0.3f, 0.3f, 0.4f);
             AddVariants(content, AudioCue.CannonStage, "Audio/Sfx/cannon_stage", 2, 3000f, 0.1f, 0.3f, 0.6f);
             AddVariants(content, AudioCue.CannonBlast, "Audio/Sfx/cannon_blast", 2, 40f, 0.8f, 0.6f, 0.6f);
             AddVariants(content, AudioCue.HitHollow, "Audio/Sfx/hit_hollow", 3, 180f, 0.1f, 0.3f, 0.7f);

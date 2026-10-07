@@ -382,17 +382,12 @@ def cannon_stow(rng) -> np.ndarray:
     local = np.maximum(t - at, 0)
     soft = np.clip((t - at) / 0.008, 0, 1)
     thud = dsp.lowpass(rng.standard_normal(n), 220) * soft * np.exp(-local / 0.045) * 0.9
-    base = rng.uniform(380, 440)
-    ring = sum(np.sin(2 * np.pi * base * r * local + rng.uniform(0, 6.3)) * a * np.exp(-local * d)
-               for r, a, d in ((1.0, 0.5, 18), (2.43, 0.3, 28))) * soft * 0.12
+    # The iron is heard only as a short, dull knock through the coat (a ringing sine read as a chime).
+    knock = _tick(rng, n, at + 0.004, rng.uniform(380, 440), 0.25, 6)
     rattle = np.zeros(n)
-    for k in range(3):  # the strap's buckle and the chamber bars settling
-        r_at = dsp.seconds(at + 0.04 + k * rng.uniform(0.025, 0.045))
-        m = dsp.seconds(0.06)
-        rt = dsp.time_axis(m)
-        f = rng.uniform(1700, 2900)
-        rattle[r_at:r_at + m] += (np.sin(2 * np.pi * f * rt) + 0.5 * np.sin(2 * np.pi * f * 2.7 * rt)) * np.exp(-rt / 0.01) * rng.uniform(0.08, 0.16)
-    x = thud + ring + rattle + _strap(rng, n, 0.0, 0.22, 0.7)
+    for k in range(3):  # the strap's buckle and the chamber bars settling: small dry ticks
+        rattle += _tick(rng, n, at + 0.04 + k * rng.uniform(0.025, 0.045), rng.uniform(1700, 2900), rng.uniform(0.05, 0.1), 7)
+    x = thud + knock + rattle + _strap(rng, n, 0.0, 0.22, 0.7)
     x = _room(x, rng, 0.35, 0.1)
     return _finish(x, -24.0, -5.0)
 

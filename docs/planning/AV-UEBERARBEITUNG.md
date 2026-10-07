@@ -894,3 +894,6 @@ aim_move* 12, wake 8, death 12).
 - Verworfen: Türerwachen der Vorhalle als Haftgleiten von Stein mit Grus statt Bandrauschen –
   CLAP hört dichtes Steinschaben wie das Original als „explosion“ (0,87–0,97, nur ein Seed
   „stone door“ 0,57); für ein Ereignis pro Arena-Eintritt bleibt der bestehende Klang.
+- Ziehen und Verstauen der Kanone in je zwei Takes (fielen bei jedem Schuss gleich); das
+  Verstau-Rezept nutzte für Eisen und Schnalle noch Sinustöne (andere Seeds „chime“ bis 0,68,
+  der bisherige Take 0,30) – jetzt Resonanzklicks, alle Seeds „heavy object put down on fabric“.

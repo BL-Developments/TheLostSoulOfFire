@@ -125,8 +125,8 @@ AUTHORED_SFX_DURATIONS = {
     "footstep_stone_1_hall.wav": 3.260,
     "footstep_stone_1_hall_foundry.wav": 2.462,
     # The heavy Soul Cannon drawn from the back and laid back (tools/audio/recipes/cues.py).
-    "cannon_draw.wav": 0.42,
-    "cannon_stow.wav": 0.36,
+    "cannon_draw_1.wav": 0.42, "cannon_draw_2.wav": 0.42,
+    "cannon_stow_1.wav": 0.36, "cannon_stow_2.wav": 0.36,
     # Enemy presence loops (recipes/ambiences.py): each enemy kind heard where it stands.
     "presence_burning.wav": 5.000,
     "presence_hollow.wav": 6.000,

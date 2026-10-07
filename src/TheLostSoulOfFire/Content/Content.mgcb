@@ -10388,16 +10388,6 @@
 /processorParam:TextureFormat=Color
 /build:Textures/Player/Animations/aim_move_3_normal/nw.png
 
-#begin Audio/Sfx/cannon_draw.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/build:Audio/Sfx/cannon_draw.wav
-
-#begin Audio/Sfx/cannon_stow.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/build:Audio/Sfx/cannon_stow.wav
-
 #begin Textures/Player/Animations/wake/n.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -11188,3 +11178,23 @@
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /build:Audio/Sfx/skiff_creak_2.wav
+
+#begin Audio/Sfx/cannon_draw_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/cannon_draw_1.wav
+
+#begin Audio/Sfx/cannon_draw_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/cannon_draw_2.wav
+
+#begin Audio/Sfx/cannon_stow_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/cannon_stow_1.wav
+
+#begin Audio/Sfx/cannon_stow_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/cannon_stow_2.wav
