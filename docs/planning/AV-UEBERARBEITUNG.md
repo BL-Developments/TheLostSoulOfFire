@@ -671,6 +671,11 @@ Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreati
   Das Erzählband liegt tiefer (122–180), unter den Fähigkeits-Rückmeldungen (85/102). Fähigkeiten-,
   Währungs- und Vorhallen-Bildtest grün.
 
+- Treffer mit Materie (Trefferfeedback war nur Licht): Jeder Sensentreffer schlägt etwas vom Ziel
+  ab, das zu Boden fällt, passend zur Material-Klangschicht: vom Hollow Stofffetzen und Asche, am
+  Kern oder mit der Seelenspaltung Porzellansplitter der Maske; vom Burning verkohlte Kruste; vom
+  Devourer schwere dunkle Brocken; mehr bei schwereren Hieben (`GameWorld.EmitHitMatter`).
+
 **Verworfen (Durchgang 4):**
 - Zweite Hollow-Variante mit Lederschürze (Restspur der Gießhalle): rund 450 MB unkomprimierte
   Texturen zusätzlich; Masken, Bewegungsversatz und Stimmen geben bereits Individualität.

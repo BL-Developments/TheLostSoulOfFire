@@ -1793,6 +1793,7 @@ public sealed partial class GameWorld : IDisposable
                 contactPosition,
                 targetDirection,
                 coreHit);
+            EmitHitMatter(enemy, contactPosition, strike.Step, coreHit);
             if (!hitAnything)
             {
                 firstContact = contactPosition;
@@ -2952,6 +2953,36 @@ public sealed partial class GameWorld : IDisposable
                 direction * GameBalance.BurningDetonationKnockback,
                 enemy.Position));
             _particles.EmitBurst(enemy.Position, direction, 18, GameBalance.DeathFlame, 260f, 8f);
+        }
+    }
+
+    /// <summary>
+    /// What a landed blow knocks off the target, as matter that falls to the floor (presentation
+    /// only, matching the material layer of the sound): cloth scraps and ash from a Hollow and,
+    /// on its core or the Soul Cleave, porcelain chips of its mask; charred crust from a Burning;
+    /// dark heavy lumps from a Devourer. Heavier swings throw more.
+    /// </summary>
+    private void EmitHitMatter(Enemy enemy, Vector2 contact, int step, bool coreHit)
+    {
+        int weight = step switch { 1 => 2, 2 => 3, _ => 5 };
+        // The contact is drawn at body height (the air pass); its floor lies that much lower.
+        float floor = contact.Y + FigureHeights.Air;
+        switch (enemy)
+        {
+            case Hollow:
+                _particles.EmitDebris(contact, floor, weight, new Color(44, 41, 52), 170f, 4.5f, 0.9f);
+                _particles.EmitDebris(contact, floor, weight + 1, new Color(92, 88, 96), 120f, 2.2f, 1.2f);
+                if (coreHit || step == 3)
+                {
+                    _particles.EmitDebris(contact, floor, 2, new Color(214, 208, 196), 200f, 3.2f, 0.8f);
+                }
+                break;
+            case Burning:
+                _particles.EmitDebris(contact, floor, weight + 1, new Color(30, 22, 30), 210f, 3.8f, 1.0f);
+                break;
+            case Devourer:
+                _particles.EmitDebris(contact, floor, weight, new Color(26, 22, 30), 150f, 6f, 0.8f);
+                break;
         }
     }
 
