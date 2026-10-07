@@ -1446,36 +1446,53 @@ public sealed partial class GameWorld : IDisposable
         {
             _player.Scythe.DrawBehindFigure(batch, _player.Position, _art);
         }
+        bool charging = IsCombatPhase && _player.Cannon.State == SoulCannonState.Charging;
+        // Aiming away from the camera, the muzzle is beyond the head: the gathering flame is drawn
+        // first, so head and shoulders cover it (on top it read as a glowing head).
+        bool muzzleBehind = rendered && _player.FacingDirection.Y < -0.35f;
+        if (charging && muzzleBehind)
+        {
+            DrawCannonChargeLoop(batch, rendered);
+        }
         _art.DrawPlayer(batch, _player);
         _player.Draw(batch, pixel, _art, _debugVisible, _soulSensePresentation.SoulEmergence);
-        if (IsCombatPhase && _player.Cannon.State == SoulCannonState.Charging)
+        if (charging)
         {
-            float charge = _player.Cannon.ChargeProgress;
-            Vector2 muzzle = rendered
-                ? FigureHeights.MuzzleOf(_player.Position, _player.FacingDirection, charge)
-                : _player.Position + _player.FacingDirection * 74f;
-            Color chargeColor = _player.Cannon.IsFullCharge
-                ? Color.White
-                : _player.Cannon.ChargeStage >= 3
-                    ? new Color(238, 219, 255)
-                    : _player.Cannon.ChargeStage == 2
-                        ? GameBalance.DeathFlameBright
-                        : new Color(155, 94, 220);
-            _art.DrawLoopingEffect(
-                batch,
-                _player.Cannon,
-                VisualIds.CannonChargeLoop,
-                muzzle,
-                0f,
-                _player.Cannon.IsFullCharge ? 0.52f : MathHelper.Lerp(0.24f, 0.46f, charge),
-                chargeColor);
+            if (!muzzleBehind)
+            {
+                DrawCannonChargeLoop(batch, rendered);
+            }
             if (rendered)
             {
                 // The player's own flame runs from the core into the chamber: what the cannon fires.
                 CannonFeed.Draw(batch, _art.SoftSpot, _player.Position, _player.Position - new Vector2(0f, _player.DrawnCoreHeight),
-                    _player.FacingDirection, charge, _player.Cannon.IsFullCharge, _presentationTime);
+                    _player.FacingDirection, _player.Cannon.ChargeProgress, _player.Cannon.IsFullCharge, _presentationTime);
             }
         }
+    }
+
+    /// <summary>The flame gathering at the muzzle while the Soul Cannon charges, brighter by stage.</summary>
+    private void DrawCannonChargeLoop(SpriteBatch batch, bool rendered)
+    {
+        float charge = _player.Cannon.ChargeProgress;
+        Vector2 muzzle = rendered
+            ? FigureHeights.MuzzleOf(_player.Position, _player.FacingDirection, charge)
+            : _player.Position + _player.FacingDirection * 74f;
+        Color chargeColor = _player.Cannon.IsFullCharge
+            ? Color.White
+            : _player.Cannon.ChargeStage >= 3
+                ? new Color(238, 219, 255)
+                : _player.Cannon.ChargeStage == 2
+                    ? GameBalance.DeathFlameBright
+                    : new Color(155, 94, 220);
+        _art.DrawLoopingEffect(
+            batch,
+            _player.Cannon,
+            VisualIds.CannonChargeLoop,
+            muzzle,
+            0f,
+            _player.Cannon.IsFullCharge ? 0.52f : MathHelper.Lerp(0.24f, 0.46f, charge),
+            chargeColor);
     }
 
     private void DrawSceneProps(SpriteBatch batch, Func<SceneLayer, bool> inBand)
