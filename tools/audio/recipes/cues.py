@@ -354,21 +354,43 @@ def cannon_hum(rng) -> np.ndarray:
     return dsp.normalise_loudness(x, -22.0, peak_ceiling_db=-4.0)
 
 
-@recipe("soul-release-soft", "Seele frei: ein ruhiger, warmer Seelenton, eine weiche tiefe Glocke, ein leises Ausatmen nach oben; nicht schrill, damit er im Gedränge nicht piept")
-def soul_release_soft(rng) -> np.ndarray:
-    n = dsp.seconds(1.1)
+@recipe("soul-release-breath", "Seele frei: die Seele atmet aus und lässt los, ein geflüstertes Seufzen ohne Tonhöhe, die Death Flame flackert kurz auf, wenn sie die Seele nimmt, ein leiser Luftzug, wenn sie zum Spieler fliegt; kein Glockenton, kein Piepen")
+def soul_release_breath(rng) -> np.ndarray:
+    """Timed to the release (Soul: 1.25 s, its flame burst at 68 %, then the flight). Only noise
+    through formants and flame bands: nothing in it has a pitch, so many at once never beep."""
+    from recipes.voices import VOWELS, GAINS, QS, _vowel_track
+    n = dsp.seconds(1.45)
     t = dsp.time_axis(n)
-    # A soft bell in G-sharp minor's colour (the music's key), struck gently: few, low partials.
-    base = rng.choice([311.1, 370.0, 415.3])  # D#4, F#4, G#4
-    bell = sum(np.sin(2 * np.pi * base * r * t + rng.uniform(0, 6.3)) * a * np.exp(-t * d)
-               for r, a, d in ((1.0, 1.0, 3.2), (2.0, 0.28, 5.0), (2.76, 0.12, 7.5), (0.5, 0.35, 2.4)))
-    bell *= np.clip(t / 0.012, 0, 1)
-    # The soul leaving: a breathy rise, quiet, filtered so it never hisses.
-    breath = dsp.bandpass(rng.standard_normal(n), 500, 2400) * np.exp(-((t - 0.35) / 0.22) ** 2) * 0.25
-    tone = np.sin(2 * np.pi * base * 2 * t * (1 + 0.04 * t)) * np.exp(-((t - 0.3) / 0.25) ** 2) * 0.12
-    x = _room(bell * 0.6 + breath + tone, rng, 1.2, 0.3, damping=3500)
-    x = dsp.lowpass(x, 5000)
-    return _finish(x, -22.0, -4.0)
+    # The sigh: whispered air through a mouth gliding from an open vowel to a closed one,
+    # swelling and sinking like a long exhale of relief. Formants a little high and varied per
+    # take, so it is a soul, not a man.
+    start, end = (("a", "u"), ("aw", "o"), ("e", "u"), ("a", "o"))[int(rng.integers(0, 4))]
+    shift = rng.uniform(1.05, 1.22)
+    vowels = _vowel_track(n, [(0.0, start), (0.35, start), (0.62, end), (1.0, end)], shift)
+    exhale = np.clip(t / rng.uniform(0.07, 0.12), 0, 1) ** 1.5 * np.exp(-np.maximum(t - 0.18, 0) / rng.uniform(0.2, 0.28))
+    air = dsp.highpass(rng.standard_normal(n), 250) * exhale
+    sigh = sum(dsp.swept_bandpass(air, centre, q=q * 0.75) * g for centre, g, q in zip(vowels, GAINS, QS))
+    sigh = sigh / (np.std(sigh[: dsp.seconds(0.6)]) + 1e-9)
+    # The Death Flame takes the soul (its burst at ~0.85 s): a soft flutter of flame, a few
+    # embers ticking; violet fire, so no woody snap.
+    at = 0.85 + rng.uniform(-0.03, 0.03)
+    swell = np.exp(-((t - at) / 0.11) ** 2) + 0.35 * np.exp(-np.maximum(t - at, 0) / 0.25) * (t > at)
+    lick = np.clip(0.45 + 0.55 * (dsp.smooth_random(n, 14.0, rng) - 0.5) * 2.4, 0.08, None)
+    flame = dsp.bandpass(dsp.brown(n, rng) + dsp.pink(n, rng) * 0.4, 140, 1100)
+    flame = flame / (np.std(flame) + 1e-9) * swell * lick
+    tongue = dsp.bandpass(dsp.pink(n, rng), 1200, 3400)
+    tongue = tongue / (np.std(tongue) + 1e-9) * swell ** 2 * lick ** 2
+    embers = np.zeros(n)
+    for _ in range(int(rng.integers(3, 7))):
+        burst = rng.standard_normal(dsp.seconds(0.02)) * np.exp(-np.arange(dsp.seconds(0.02)) / (dsp.RATE * rng.uniform(0.0008, 0.002)))
+        dsp.place(embers, dsp.bandpass(burst, 1500, 5000), dsp.seconds(at + rng.uniform(-0.05, 0.25)), rng.uniform(0.15, 0.4))
+    # What is left of it lifts off toward the player (end of the release): a soft rising draught.
+    lift_at = 1.22
+    draught = dsp.bandpass(rng.standard_normal(n), 500, 2200) * np.exp(-((t - lift_at) / 0.09) ** 2)
+    x = sigh * 0.55 + flame * 0.42 + tongue * 0.05 + embers * 0.5 + draught * 0.16
+    x = dsp.lowpass(x, 3600, order=4)
+    x = _room(x, rng, 0.9, 0.22, damping=3000)
+    return _finish(x, -23.0, -4.0)
 
 
 def _throb(t: np.ndarray, at: float, weight: float) -> np.ndarray:

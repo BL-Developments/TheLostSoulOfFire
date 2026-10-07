@@ -10640,21 +10640,6 @@
 /processor:SoundEffectProcessor
 /build:Audio/Sfx/cannon_hum.wav
 
-#begin Audio/Sfx/soul_release_soft_1.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/build:Audio/Sfx/soul_release_soft_1.wav
-
-#begin Audio/Sfx/soul_release_soft_2.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/build:Audio/Sfx/soul_release_soft_2.wav
-
-#begin Audio/Sfx/soul_release_soft_3.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/build:Audio/Sfx/soul_release_soft_3.wav
-
 #begin Audio/Sfx/scythe_weight_1_1.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
@@ -10901,3 +10886,23 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/Effects/grasp_tips.png
+
+#begin Audio/Sfx/soul_release_breath_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/soul_release_breath_1.wav
+
+#begin Audio/Sfx/soul_release_breath_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/soul_release_breath_2.wav
+
+#begin Audio/Sfx/soul_release_breath_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/soul_release_breath_3.wav
+
+#begin Audio/Sfx/soul_release_breath_4.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/build:Audio/Sfx/soul_release_breath_4.wav

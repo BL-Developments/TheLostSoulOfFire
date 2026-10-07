@@ -139,10 +139,11 @@ AUTHORED_SFX_DURATIONS = {
     "resonance_rumble.wav": 4.000,
     # The Soul Cannon's charge hum (recipes/cues.py), looped; the game raises its pitch with the charge.
     "cannon_hum.wav": 2.000,
-    # A soft soul release (recipes/cues.py) in place of the bright Ludo take, which beeped in crowds.
-    "soul_release_soft_1.wav": 1.100,
-    "soul_release_soft_2.wav": 1.100,
-    "soul_release_soft_3.wav": 1.100,
+    # The soul breathing out as it is released (recipes/cues.py): no pitch, so crowds never beep.
+    "soul_release_breath_1.wav": 1.450,
+    "soul_release_breath_2.wav": 1.450,
+    "soul_release_breath_3.wav": 1.450,
+    "soul_release_breath_4.wav": 1.450,
     # The Warden flames of the hall (recipes/ambiences.py), looped, heard where they burn.
     "warden_flame_loop.wav": 6.000,
     # The bound soul throbbing when health runs low (recipes/cues.py), one double beat per take.

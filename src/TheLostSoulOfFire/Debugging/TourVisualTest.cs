@@ -302,14 +302,18 @@ internal sealed class TourVisualTest
     private int _frame;
 
     /// <summary>
-    /// Cannon handling cues while the tour runs, with the cannon state at that moment, and the
-    /// bound soul's throb with the player's health.
+    /// Cannon handling cues while the tour runs, with the cannon state at that moment, the bound
+    /// soul's throb with the player's health, and each soul release.
     /// </summary>
     private void LogCannon(AudioCue cue)
     {
-        if (cue is AudioCue.CannonDraw or AudioCue.CannonStow or AudioCue.CannonCharge or AudioCue.CannonFire)
+        if (cue is AudioCue.CannonDraw or AudioCue.CannonStow or AudioCue.CannonCharge or AudioCue.CannonFire or AudioCue.CannonFull)
         {
             Console.WriteLine($"TOUR_CUE frame={_frame} cue={cue} state={_world.AutomatedPlayer.Cannon.State}");
+        }
+        else if (cue == AudioCue.SoulRelease)
+        {
+            Console.WriteLine($"TOUR_CUE frame={_frame} cue={cue}");
         }
         else if (cue == AudioCue.SoulThrob)
         {
@@ -523,9 +527,11 @@ internal sealed class TourVisualTest
         // A full cannon throws the Hollows back (1.15 s).
         Do("stagger", () => _world.StaggerAutomatedEnemies<Hollow>());
         Series("hollow_stagger", 10, 7);
+        Do("listen_release", () => _world.AutomatedAudio.CuePlayed += LogCannon);
         Do("defeat", () => _world.DefeatAutomatedEnemies());
         Series("hollow_death", 12, 3);
         Series("soul_release", 14, 9);
+        Do("stop_listening_release", () => _world.AutomatedAudio.CuePlayed -= LogCannon);
     }
 
     /// <summary>

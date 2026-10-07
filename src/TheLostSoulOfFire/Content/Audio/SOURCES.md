@@ -311,11 +311,18 @@ Rezept `cannon-hum` in `tools/audio/recipes/cues.py`: Brummen der Kammer (55–3
 
 Owner: Das Einsammeln der Seelen und die Piep-Töne werden in Kämpfen mit vielen Gegnern nervig. Der Ludo-Take `soul_release` (Klangschwerpunkt 8,4 kHz, CLAP „piercing electronic beep“ 0,64) wird durch das Rezept `soul-release-soft` ersetzt: weiche tiefe Glocke in der Tonart der Musik (D#4/F#4/G#4), leises Ausatmen, Tiefpass 5 kHz; Schwerpunkt 1,8 kHz, CLAP „bell“ 0,64 + „soft calm chime“ 0,17, „beep“ 0,09. Eine Höhenabsenkung des alten Takes allein half nicht (Grundton zu hoch; verworfen). Der alte Take bleibt im Bestand, wird aber nicht mehr gespielt.
 
+Die drei Glocken-Takes `soul_release_soft_1..3` sind seit Durchgang 5 entfernt (siehe unten).
+
+## Seelenfreigabe als Atem (Durchgang 5, 07.10.2026)
+
+Owner: Der „Bleep“ beim Einsammeln der Seelen nervt noch immer. Auch die weiche Glocke ist eine Summe reiner Töne; unter denselben Etiketten wie unten hörte CLAP sie als „soft chime“ 0,61 + „electronic beep“ 0,27. Rezept `soul-release-breath` hat keine Tonhöhe: geflüstertes Ausatmen durch gleitende Vokalformanten (je Take ein anderes Vokalpaar, Formanten 5–22 % höher als beim Mann), ein weiches Aufflattern der Death Flame beim Freigabe-Aufblitzen (0,85 s, wie `Soul.UpdateRelease`), ein leiser Luftzug beim Losfliegen (1,22 s); Tiefpass 3,6 kHz vierter Ordnung gegen Zischen. CLAP: „whispered breath“ 0,31–0,45 / „ghostly whisper“ 0,19–0,57 / „gentle exhale“ 0,07–0,26, „electronic beep“, „bell“, „soft chime“ jeweils unter 0,01. Das Rezept `soul-release-soft` ist entfernt.
+
 | Datei | Quelle | Messung |
 | --- | --- | --- |
-| `Audio/Sfx/soul_release_soft_1.wav` | soul-release-soft Seed 2 | 1.10 s, 1 Kanal/Kanäle, -22.0 LUFS, Spitze -9.0 dBFS |
-| `Audio/Sfx/soul_release_soft_2.wav` | soul-release-soft Seed 4 | 1.10 s, 1 Kanal/Kanäle, -22.0 LUFS, Spitze -6.9 dBFS |
-| `Audio/Sfx/soul_release_soft_3.wav` | soul-release-soft Seed 1 | 1.10 s, 1 Kanal/Kanäle, -22.0 LUFS, Spitze -7.8 dBFS |
+| `Audio/Sfx/soul_release_breath_1.wav` | soul-release-breath Seed 2 | 1.45 s, 1 Kanal/Kanäle, -23.0 LUFS, Spitze -5.7 dBFS |
+| `Audio/Sfx/soul_release_breath_2.wav` | soul-release-breath Seed 3 | 1.45 s, 1 Kanal/Kanäle, -23.0 LUFS, Spitze -7.8 dBFS |
+| `Audio/Sfx/soul_release_breath_3.wav` | soul-release-breath Seed 4 | 1.45 s, 1 Kanal/Kanäle, -23.0 LUFS, Spitze -5.8 dBFS |
+| `Audio/Sfx/soul_release_breath_4.wav` | soul-release-breath Seed 5 | 1.45 s, 1 Kanal/Kanäle, -23.0 LUFS, Spitze -5.9 dBFS |
 
 ## Warden-Flammen als Punktquellen (Durchgang 3, 07.10.2026)
 

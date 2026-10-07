@@ -441,8 +441,9 @@ public sealed class AudioDirector : IDisposable
             Add(content, AudioCue.BurningCharge, "Audio/Sfx/burning_charge", 145f, 0.23f, 0.5f, 0.24f, rising: true);
             Add(content, AudioCue.BurningDetonation, "Audio/Sfx/burning_detonation", 48f, 0.34f, 0.82f, 0.8f);
             Add(content, AudioCue.CoreHit, "Audio/Sfx/core_hit", 910f, 0.13f, 0.42f, 0.08f);
-            // A soft bell in place of the bright Ludo take, which beeped in crowded fights.
-            AddVariants(content, AudioCue.SoulRelease, "Audio/Sfx/soul_release_soft", 3, 415f, 0.9f, 0.25f, 0.05f);
+            // The soul breathes out and the Death Flame takes it: no pitch at all, since every
+            // tone (the bright Ludo take, then a soft bell) read as a beep in crowded fights.
+            AddVariants(content, AudioCue.SoulRelease, "Audio/Sfx/soul_release_breath", 4, 415f, 0.9f, 0.25f, 0.6f);
             Add(content, AudioCue.ResonanceReady, "Audio/Sfx/resonance_ready", 360f, 0.3f, 0.42f, 0.08f);
             Add(content, AudioCue.ResonanceActivate, "Audio/Sfx/resonance_activate", 55f, 0.5f, 0.88f, 0.5f, rising: true);
             Add(content, AudioCue.PlayerHit, "Audio/Sfx/player_hit", 96f, 0.12f, 0.62f, 0.56f);
