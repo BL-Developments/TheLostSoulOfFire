@@ -706,6 +706,9 @@ Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreati
 - Offen zur Owner-Frage: Das Ende zeigt „PROTOTYPE COMPLETE“ unter dem Titel (ehrlicher Hinweis für
   Tester, aber Entwicklerton im Schlussmoment); nicht geändert.
 
+- Hollows und Burnings haben je eine eigene Größe innerhalb ±6 % aus ihrem Seed (nur Darstellung,
+  Trefferkreis unverändert): eine Gruppe derselben Art wirkt nicht mehr wie Klone.
+
 **Verworfen (Durchgang 4):**
 - Zweite Hollow-Variante mit Lederschürze (Restspur der Gießhalle): rund 450 MB unkomprimierte
   Texturen zusätzlich; Masken, Bewegungsversatz und Stimmen geben bereits Individualität.

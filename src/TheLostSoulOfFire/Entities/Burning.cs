@@ -41,6 +41,7 @@ public sealed class Burning : Enemy
     public bool IsCharging => State == BurningState.Charge;
     public bool IsAggressionCommitted => State is BurningState.Telegraph or BurningState.Charge;
     public Vector2 FacingDirection => _facing;
+    public override float VisualScale => StatureOf(_movementSeed + 97);
 
     /// <summary>Where the rush will go, and how far its wind-up has run (0 to 1), for the presentation.</summary>
     public Vector2 ChargeDirection => _chargeDirection;

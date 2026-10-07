@@ -78,6 +78,16 @@ public abstract class Enemy
     /// <summary>Factor on the registry's world size, for example a Devourer swelling with Souls.</summary>
     public virtual float VisualScale => 1f;
 
+    /// <summary>
+    /// A figure's own size within ±6 % from its seed (presentation only; the hit circle is
+    /// unchanged), so a group of the same kind does not read as clones.
+    /// </summary>
+    protected static float StatureOf(int seed)
+    {
+        float hash = MathF.Sin(seed * 12.9898f + 4.1f) * 43758.5453f;
+        return 0.94f + 0.12f * (hash - MathF.Floor(hash));
+    }
+
     /// <summary>Glut credited once when this enemy is defeated; amount depends on the type.</summary>
     public abstract int GlutReward { get; }
 
