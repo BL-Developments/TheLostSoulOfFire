@@ -42,7 +42,8 @@ public static class ProloguePresentation
             alpha *= settle;
             float y = 70f + (1f - settle * settle * (3f - 2f * settle)) * 8f;
             UiKit.Divider(batch, pixel, centerX, y - 17f, 380f, GameBalance.DeathFlameBright * (0.5f * alpha));
-            PixelText.DrawCentered(batch, pixel, prologue.SectorTitle, centerX, y, 4, GameBalance.SoulWhite * (0.9f * alpha));
+            // "I  THE UNFINISHED SHORE": the numeral set off by a middle dot, not read as "I, the shore".
+            PixelText.DrawCentered(batch, pixel, PixelText.Steps(prologue.SectorTitle), centerX, y, 4, GameBalance.SoulWhite * (0.9f * alpha));
         }
 
         if (optionalHints && prologue.Stage is not (PrologueStage.Arrival or PrologueStage.Complete))

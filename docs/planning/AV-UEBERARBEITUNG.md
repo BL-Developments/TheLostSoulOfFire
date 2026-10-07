@@ -917,3 +917,4 @@ aim_move* 12, wake 8, death 12).
   22–60); auf dem hellen Hallenboden bleibt er dennoch kaum sichtbar, die Lesbarkeit des
   Wirkradius tragen die leuchtenden Risse. Dunklerer Staub wäre der nächste Schritt, falls der
   Owner den Rand deutlicher will.
+- Abschnittstitel des Prologs: Zahl und Name durch Mittelpunkt getrennt („I · THE UNFINISHED SHORE“ statt „I  THE …“, las sich als Satz).
