@@ -665,7 +665,15 @@ Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreati
 - Offen zur Owner-Frage: Der Türhinweis der Vorhalle lautet „E ENTER BIOME I“ (Entwicklerbegriff,
   in der archivierten Änderung `add-hub-biome-doors` so festgelegt) – nicht eigenmächtig geändert.
 
+- Kampf-HUD kompakter: Die zwei Fähigkeitskarten nahmen fast die halbe Bildbreite ein und
+  zeigten dauerhaft die Beschreibung. Jetzt 250 × 54 statt 344 × 74 (Taste, Name, Kosten, Status,
+  Ladebalken; die Beschreibung bleibt im Katalog unter Tab), zusammen etwa ein Viertel der Breite.
+  Das Erzählband liegt tiefer (122–180), unter den Fähigkeits-Rückmeldungen (85/102). Fähigkeiten-,
+  Währungs- und Vorhallen-Bildtest grün.
+
 **Verworfen (Durchgang 4):**
+- Zweite Hollow-Variante mit Lederschürze (Restspur der Gießhalle): rund 450 MB unkomprimierte
+  Texturen zusätzlich; Masken, Bewegungsversatz und Stimmen geben bereits Individualität.
 - Hammerschläge, Ketten, ächzendes Dach und Murmeln der letzten Schicht als Ortsklänge: CLAP
   hörte Piepton/Schritte/Glocke, Türknarren, Schiffshorn bzw. Monster-Knurren.
 - Raserei als schwebende Tremolo-Flächen: die volle Mischung kippte zu „calm cinematic“.

@@ -74,7 +74,8 @@ public sealed class Narration
         int width = PixelText.MeasureFace(line, TextFace.Body, 15f);
         float centerX = viewport.Width * 0.5f;
         int bandWidth = width + 120;
-        UiKit.CaptionBand(batch, pixel, new Rectangle((int)(centerX - bandWidth * 0.5f), 92, bandWidth, 60), 0.72f * alpha);
-        PixelText.DrawFace(batch, pixel, line, new Vector2(centerX - width * 0.5f, 112f), TextFace.Body, 15f, GameBalance.SoulWhite * alpha);
+        // Below the ability feedback lines (85 and 102), above the fight.
+        UiKit.CaptionBand(batch, pixel, new Rectangle((int)(centerX - bandWidth * 0.5f), 122, bandWidth, 58), 0.72f * alpha);
+        PixelText.DrawFace(batch, pixel, line, new Vector2(centerX - width * 0.5f, 141f), TextFace.Body, 15f, GameBalance.SoulWhite * alpha);
     }
 }

@@ -51,20 +51,24 @@ public static class AbilityPresentation
     public static Rectangle CatalogueBounds(Viewport viewport, int index) =>
         new(viewport.Width / 2 - 482 + index % 2 * 494, 195 + index / 2 * 142, 470, 128);
 
+    /// <summary>
+    /// The card in the combat HUD, compact (Durchgang 4: the two cards took half the picture's
+    /// width): key, name, cost, status and the cooldown bar; what the ability does stays in the
+    /// catalogue (Tab).
+    /// </summary>
     public static void DrawHud(SpriteBatch batch, Texture2D pixel, Viewport viewport, AbilityCard card, float time = 0f)
     {
-        Rectangle bounds = new(24 + card.Slot * 356, viewport.Height - 145, 344, 74);
+        Rectangle bounds = new(24 + card.Slot * 262, viewport.Height - 122, 250, 54);
         bool ready = card.ReadyFraction >= 0.999f && card.Status == "BEREIT";
         float breathe = 0.5f + 0.5f * MathF.Sin(time * 2.6f + card.Slot * 1.7f);
         UiKit.Panel(batch, pixel, bounds, card.Accent, ready ? 0.85f : 0.4f, 1f, ready ? 0.12f + breathe * 0.1f : 0f);
-        UiKit.Key(batch, pixel, new Vector2(bounds.X + 13, bounds.Y + 13), card.Slot == 0 ? "Z" : "X", card.Accent, 1f, 2, 26);
+        UiKit.Key(batch, pixel, new Vector2(bounds.X + 11, bounds.Y + 13), card.Slot == 0 ? "Z" : "X", card.Accent, 1f, 2, 26);
 
-        int textX = bounds.X + 52;
-        PixelText.DrawFace(batch, pixel, card.Definition.Name, new Vector2(textX, bounds.Y + 13), TextFace.Display, 13f, GameBalance.SoulWhite, 0.2f);
-        DrawCost(batch, pixel, card.CostText, bounds.Right - 16, bounds.Y + 15, card.FreeCast);
-        Body(batch, pixel, card.Summary, textX, bounds.Y + 33, GameBalance.SoulWhite * 0.74f);
-        Body(batch, pixel, card.Status, textX, bounds.Y + 48, ready ? card.Accent : Color.Lerp(card.Accent, GameBalance.SoulWhite, 0.3f) * 0.9f, 0.6f);
-        UiKit.Bar(batch, pixel, new Rectangle(textX + 6, bounds.Bottom - 11, bounds.Right - textX - 28, 4), card.ReadyFraction, card.Accent * 0.9f);
+        int textX = bounds.X + 48;
+        PixelText.DrawFace(batch, pixel, card.Definition.Name, new Vector2(textX, bounds.Y + 9), TextFace.Display, 12f, GameBalance.SoulWhite, 0.2f);
+        DrawCost(batch, pixel, card.CostText, bounds.Right - 12, bounds.Y + 11, card.FreeCast);
+        Body(batch, pixel, card.Status, textX, bounds.Y + 27, ready ? card.Accent : Color.Lerp(card.Accent, GameBalance.SoulWhite, 0.3f) * 0.9f, 0.6f);
+        UiKit.Bar(batch, pixel, new Rectangle(textX + 4, bounds.Bottom - 9, bounds.Right - textX - 18, 3), card.ReadyFraction, card.Accent * 0.9f);
     }
 
     /// <summary>Glut cost with its ember, right-aligned at <paramref name="right"/>.</summary>
