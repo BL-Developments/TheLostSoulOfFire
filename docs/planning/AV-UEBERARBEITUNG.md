@@ -961,3 +961,8 @@ Gegner-Zuckens, Deutlichkeit von Schattenhand und Schlagrand im Gedränge, die I
   Auch die gezeichneten Schritte der Gegner spritzen am Ufer und im Hafen (Hollow 3, Devourer 6 Tropfen); in `prologue_shore_hollow_spawn` an den Füßen zu sehen.
 - Dash-Absprung auf nassem Pflaster spritzt Wasser (9 Tropfen; Serie `prologue_shore_dash_wet`).
   Verworfen: Aschehauch beim Dash-Absprung in der Arena – vom Zündblitz völlig überdeckt.
+- Überfahrt: Gischt an der sichtbaren Wasserlinie des Rumpfs (unregelmäßige, überlappende weiche
+  Flecken, mit dem Meer nach hinten treibend und hinter dem Heck auffächernd) und am Bug
+  (`PrologueEnvironment.DrawWake`, Rumpf am Alpha der Deckplatte vermessen). Verworfen: gleichmäßig
+  verteilte Flecken (Perlenkette) und Gischt auf der fernen Seite (hinter dem Deck verdeckt, schwebte
+  über der Reling); zu schwach bemessen war die erste Fassung unsichtbar (mit Markierungen geprüft).

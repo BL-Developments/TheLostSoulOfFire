@@ -49,8 +49,46 @@ public static class PrologueEnvironment
         // The drowned town sinks into the night with distance: the far gables darkest and
         // coolest, the near masts a little less so.
         art.DrawEnvironmentScrolled(batch, VisualIds.PassingFar, swell, time * 34f, 1800f, new Color(118, 124, 150));
+        DrawWake(batch, art, time, swell);
         art.DrawEnvironment(batch, VisualIds.DeckFloor, Vector2.Zero);
         art.DrawEnvironmentScrolled(batch, VisualIds.PassingNear, 746f + swell, time * 190f, 1800f, new Color(170, 172, 190));
+    }
+
+    /// <summary>
+    /// The skiff cutting through the water: foam churned along the visible (near) side of the hull,
+    /// drifting back at the sea's speed and spreading into a wake behind the stern, and water
+    /// heaped at the bow. The far side is hidden behind the deck in this camera. The hull is
+    /// measured on the deck plate's alpha (world units): stern at x 387, bow tip at (1532, 525),
+    /// near waterline at y 851. Drawn on the sea, under the deck, rising and sinking with the swell.
+    /// </summary>
+    private static void DrawWake(SpriteBatch batch, ArtAssets art, float time, float swell)
+    {
+        const float Stern = 387f, BowX = 1532f, BowY = 525f, Near = 851f, Speed = 110f, Spacing = 17f;
+        const int Patches = 96;
+        Color foam = new(196, 206, 228);
+        for (int k = 0; k < Patches; k++)
+        {
+            // Each patch is born at the bow and drifts back past the stern into the wake; its own
+            // hash keeps size, offset and brightness irregular, so the foam reads as a churned streak.
+            float h1 = Hash(k * 1.7f), h2 = Hash(k * 3.1f + 5f), h3 = Hash(k * 5.3f + 11f);
+            float x = 1480f - ((k * Spacing + h1 * 9f + time * Speed) % (Patches * Spacing));
+            float behind = MathF.Max(0f, Stern - x);
+            float fade = MathHelper.Clamp((x - (Stern - 420f)) / 420f, 0f, 1f) * MathHelper.Clamp((1480f - x) / 80f, 0f, 1f);
+            float flicker = 0.55f + 0.45f * MathF.Sin(time * (2.2f + h3) + k * 2.3f);
+            float y = Near + 4f + h2 * 10f + behind * 0.18f * (0.4f + h3) + swell + MathF.Sin(time * 1.7f + k) * 2f;
+            Vector2 radii = new(16f + h1 * 14f + behind * 0.06f, 4f + h2 * 4f + behind * 0.02f);
+            art.DrawSoftSpot(batch, new Vector2(x, y), radii, foam * (0.26f * fade * flicker));
+        }
+        // The bow wave: the water heaped and thrown aside at the tip, breathing with the swell.
+        float heave = 0.75f + 0.25f * MathF.Sin(time * 2.4f);
+        art.DrawSoftSpot(batch, new Vector2(BowX + 10f, BowY + swell), new Vector2(26f, 40f), foam * (0.28f * heave));
+        art.DrawSoftSpot(batch, new Vector2(BowX - 30f, Near - 40f + swell), new Vector2(40f, 12f), foam * (0.3f * heave));
+    }
+
+    private static float Hash(float seed)
+    {
+        float value = MathF.Sin(seed * 12.9898f) * 43758.5453f;
+        return value - MathF.Floor(value);
     }
 
     /// <summary>Height of the sea plate (environment.sea), the world's height.</summary>
