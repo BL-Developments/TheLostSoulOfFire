@@ -100,6 +100,8 @@ public sealed class GroundImpacts
         public float Opacity;
         /// <summary>Thrown up into the air: drawn over the figures instead of under them.</summary>
         public bool Air;
+        /// <summary>Soot rather than pale stone dust: reads on the light foundry floor.</summary>
+        public bool Soot;
     }
 
     /// <summary>A Burning about to rush: embers catching along the floor ahead of it.</summary>
@@ -193,7 +195,7 @@ public sealed class GroundImpacts
                 float angle = (float)(_random.NextDouble() * MathHelper.TwoPi);
                 Vector2 direction = new(MathF.Cos(angle), MathF.Sin(angle));
                 AddPuff(center + direction * radius * Range(0.9f, 1.0f), direction, Range(2f, 8f), 0.5f,
-                    new Vector2(0f, -Range(8f, 18f)), Range(0.6f, 0.9f), Range(36f, 48f), Range(70f, 90f), 0.3f);
+                    new Vector2(0f, -Range(8f, 18f)), Range(0.6f, 0.9f), Range(36f, 48f), Range(70f, 90f), 0.45f, soot: true);
             }
         }
     }
@@ -668,7 +670,7 @@ public sealed class GroundImpacts
         // Pale stone dust with a darker underside, so it reads on the light floor.
         batch.Draw(dust, at + new Vector2(0f, size * 0.12f), SourceOf(puff.Variant), new Color(30, 26, 38) * (alpha * 0.35f), puff.Rotation,
             new Vector2(dust.Width / 4f), size / (dust.Width / 2f) * 0.95f, SpriteEffects.None, 0f);
-        batch.Draw(dust, at, SourceOf(puff.Variant), new Color(214, 204, 220) * alpha, puff.Rotation,
+        batch.Draw(dust, at, SourceOf(puff.Variant), (puff.Soot ? new Color(58, 50, 62) : new Color(214, 204, 220)) * alpha, puff.Rotation,
             new Vector2(dust.Width / 4f), size / (dust.Width / 2f), SpriteEffects.None, 0f);
     }
 
@@ -687,7 +689,7 @@ public sealed class GroundImpacts
     }
 
     private void AddPuff(Vector2 start, Vector2 direction, float travel, float travelTime, Vector2 drift, float life,
-        float startSize, float endSize, float opacity, bool air = false) =>
+        float startSize, float endSize, float opacity, bool air = false, bool soot = false) =>
         _puffs.Add(new Puff
         {
             Start = start,
@@ -702,7 +704,8 @@ public sealed class GroundImpacts
             Spin = Range(-0.6f, 0.6f),
             Variant = _random.Next(DustVariants),
             Opacity = opacity,
-            Air = air
+            Air = air,
+            Soot = soot
         });
 
     private float Range(float min, float max) => min + (float)_random.NextDouble() * (max - min);

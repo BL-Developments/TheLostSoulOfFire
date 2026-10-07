@@ -924,3 +924,5 @@ aim_move* 12, wake 8, death 12).
   dichte Silben, langer Hall („hiss“).
 - Voller Rundgang 20261007_125110 nach allen Änderungen bis 12:50: 693 Aufnahmen, kein Platzhalter,
   CPU im Mittel ≤ 0,52 ms.
+  Nachgezogen: Der Ausholstaub ist jetzt Ruß (dunkel, Deckkraft 0,45) statt hellem Steinstaub; in
+  den späten Ausholbildern liegen dunkle Schwaden an den Rissen um den Devourer. Dezent.
