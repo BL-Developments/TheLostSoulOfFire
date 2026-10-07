@@ -813,3 +813,13 @@ starr (der Clip `aim` hält das letzte Bild).
 - Verworfen: Ratsche aus Breitband-Klicks (CLAP „gunshot“ 0,55–0,92), mit Klangring („bell“) oder
   Auffauchen („gunshot“); Lade-Schleife aus glattem tiefem Rauschen („wind“ 0,29–0,40); Zittern
   mit wenigen Millimetern (im Spiel unter einem Pixel).
+- Gegner unruhiger (offene Priorität 4 aus Durchgang 4, „unruhige, zuckende Bewegungen“): Zwischen
+  ihren Aktionen zucken Gegner selten von selbst, jeder in eigenem Takt (Hollow ruckt 3° zur Seite
+  alle 2,2–5,5 s, Burning bebt alle 1,3–3,2 s, Devourer schwillt an und schluckt alle 3,5–7 s), als
+  Pose über dem Ruhe- oder Gangclip, Füße bleiben stehen (`ArtAssets.TwitchPose`). Ruft ein Gegner
+  (`EnemyVoices` übergibt jetzt den Sprecher), reagiert sein Körper auf die Stimme: Hollow ruckt und
+  stottert zweimal nach, Burning schüttelt sich mit dem Lachen (7 Hz), Devourer bebt beim Knurren.
+  Rundgang-Folge `arena_devourer_twitch` (Kamera fest): Ruck und Nachzucken des Hollow sichtbar.
+- Erzählzeilen: Die Texte trennen Aussagen mit zwei Leerzeichen (Erbe der Pixelschrift); in der
+  gesetzten Schrift las sich das wie ein fehlendes Wort. Erzähler und Prolog-Story setzen die Pause
+  als Gedankenstrich, Zielzeilen als Mittelpunkt (`PixelText.Prose`/`Steps`); Wortlaut unverändert.
