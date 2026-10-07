@@ -1397,6 +1397,12 @@ public sealed partial class GameWorld : IDisposable
                 0f,
                 _player.Cannon.IsFullCharge ? 0.68f : MathHelper.Lerp(0.28f, 0.61f, charge),
                 chargeColor);
+            if (rendered)
+            {
+                // The player's own flame runs from the core into the chamber: what the cannon fires.
+                CannonFeed.Draw(batch, _art.SoftSpot, _player.Position, _player.Position - new Vector2(0f, _player.DrawnCoreHeight),
+                    _player.FacingDirection, charge, _player.Cannon.IsFullCharge, _presentationTime);
+            }
         }
     }
 
@@ -2729,10 +2735,11 @@ public sealed partial class GameWorld : IDisposable
 
         Vector2 origin = _player.Position + request.Direction * 74f;
         _cannonShots.Add(new CannonShot(origin, request));
-        // The flash bursts from the drawn muzzle, which has grown with the charge (presentation
-        // only; the shot itself starts at its gameplay origin, inside the flash).
+        // The flash bursts from the drawn muzzle (presentation only; the shot itself starts at its
+        // gameplay origin, inside the flash). The recoil clip shows the cannon already discharged
+        // to its resting size, so the flash sits at that muzzle, not at the grown one.
         Vector2 flash = _art.HasClip(VisualIds.Player, VisualClips.Aim)
-            ? _player.Position + request.Direction * FigureHeights.MuzzleReach(request.Charge)
+            ? _player.Position + request.Direction * FigureHeights.MuzzleReach(0f)
             : origin;
         _combatPresentation.PresentCannonFire(flash, request);
         if (request.IsFullCharge)

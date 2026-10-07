@@ -408,6 +408,13 @@ public sealed class Player
         if (front > 0f)
         {
             float glow = (ResonanceActive || coreReady || SoulSenseActive ? 0.85f : 0.4f) * front;
+            // Feeding the cannon drains the core; after the shot it rekindles as the cannon goes back.
+            glow *= Cannon.State switch
+            {
+                SoulCannonState.Charging => 1f - 0.55f * Cannon.ChargeProgress,
+                SoulCannonState.Returning => 0.3f + 0.7f * Cannon.StateProgress,
+                _ => 1f
+            };
             float size = 7f + pulse * (coreReady ? 3f : 1f);
             art.DrawSoftSpot(batch, sternum, new Vector2(size), GameBalance.DeathFlame * (0.8f * glow));
             art.DrawSoftSpot(batch, sternum, new Vector2(size * 0.4f), GameBalance.SoulWhite * glow);

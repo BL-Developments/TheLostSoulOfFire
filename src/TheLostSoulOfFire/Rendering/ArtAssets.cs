@@ -1238,7 +1238,9 @@ public sealed class ArtAssets
     public void DrawCannonProjectile(SpriteBatch batch, CannonShot shot)
     {
         float rotation = MathF.Atan2(shot.Direction.Y, shot.Direction.X);
-        float scale = MathHelper.Lerp(0.34f, 0.72f, shot.Charge);
+        // The bolt's bright core is 20 px of its 128 px frame: sized from the shot's real radius it
+        // is about 70 % as thick as what it hits (a full shot is a heavy bolt, not a streak).
+        float scale = shot.Radius * 0.07f;
         Color color = shot.IsFullCharge ? Color.White : new Color(220, 190, 255);
         DrawLoopingEffect(batch, shot, VisualIds.CannonProjectileFull, shot.Position, rotation, scale, color);
     }

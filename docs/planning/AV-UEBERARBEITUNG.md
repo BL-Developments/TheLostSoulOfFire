@@ -515,7 +515,7 @@ Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreati
    wenig Leben); weniger Flächen, mehr Puls.
 4. ☐ Monster weniger monoton: Hollow-Maske lesbar, Unterschiede im Körperbau und im Gang;
    unruhige, zuckende Bewegungen.
-5. ☐ Soul Cannon verständlich: Die Flamme wandert sichtbar Kern → Schulter → Arm → Kanone
+5. ☑ Soul Cannon verständlich: Die Flamme wandert sichtbar Kern → Schulter → Arm → Kanone
    (07_SOUL_CANNON, Schritt 3), die Kammer füllt sich.
 6. ☐ Story verständlich: Prolog-Zeilen sagen klar, wer man ist, wo man ist und warum man
    kämpft (ohne neue Mechanik).
@@ -578,6 +578,18 @@ Kanonenklang sind gut; bei Atmosphäre, Spannung und Gefühl darf der Ton kreati
   im Tod fällt die neue Maske ab. Gegner einer Welle bewegten sich im Gleichtakt (jeder Ruhe-Loop
   begann bei Bild 0): jetzt eigene Startphase im ersten Ruhezyklus und eigenes Ruhetempo
   (±8 %, geseedet); nach Aktionen beginnt die Ruhe weiter auf dem Endbild der Aktion.
+
+- Soul Cannon (Owner: „macht noch nicht wirklich Sinn“): Beim Laden erschien nur eine Kugel an
+  der Mündung; dass der Spieler seine eigene Death Flame einspeist (07_SOUL_CANNON: CORE →
+  SHOULDER → ARM → CANNON), war nicht zu sehen. Jetzt laufen Lichtreste vom Brustkern über die
+  Schulter den Arm hinab in die Reliquienkammer (`Rendering/CannonFeed.cs`), schneller und
+  heller mit der Ladung; die Gitterfenster der Kammer glühen auf und lodern voll geladen; der
+  Kern wird beim Einspeisen schwächer und entzündet sich nach dem Schuss wieder, während die
+  Kanone zurückgeht. Das volle Geschoss war ein 14 px dünner Strich bei 50 Einheiten
+  Trefferdurchmesser: jetzt nach dem echten Radius bemessen (heller Kern ~70 % des
+  Durchmessers), schwach klein, voll ein schwerer Bolzen, in der Resonanz größer. Der
+  Mündungsblitz saß 19 Einheiten vor dem Rohr (an der geladenen Größe, der Rückstoß-Clip zeigt
+  die entladene): jetzt an der gezeichneten Mündung. Station `arena_player` (Laden, Schuss).
 
 **Verworfen (Durchgang 4):**
 - Raserei als schwebende Tremolo-Flächen: die volle Mischung kippte zu „calm cinematic“.
