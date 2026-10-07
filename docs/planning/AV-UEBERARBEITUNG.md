@@ -499,7 +499,7 @@ Taumeln und -Tod, Burning-Tod, Burning-Angriff, HUD, Seelensinn der Vorhalle.
 
 ## Arbeitsnotiz Durchgang 4 (ab 07.10.2026)
 
-**Stand (07.10.2026, 04:50, Abschlusslauf nach allen Änderungen grün):** Alle sechs Owner-Punkte haben umgesetzte Schritte, dazu Angriffe
+**Stand (07.10.2026, 05:15; Abschlusslauf 04:50 grün, danach je Änderung Rundgang-Station, Unit- und Gameplay-Audiotest grün):** Alle sechs Owner-Punkte haben umgesetzte Schritte, dazu Angriffe
 aller Gegner ohne Zonen, Kampfspuren auf dem Boden, Materie bei Treffern, kompaktes HUD,
 Ortsklänge, das Leitmotiv in der Kampfmusik. Geprüft (Gesamtlauf nach allen Änderungen): voller
 Rundgang (21 Stationen, 621 Aufnahmen, kein Platzhalter; CPU je Frame im Mittel ≤ 0,7 ms),
@@ -516,6 +516,11 @@ Lichtnähte) im Gedränge.
 **Owner-Fragen (Inhalt, nicht eigenmächtig geändert):** Sprache (Erzähltext englisch, HUD
 deutsch); Türhinweis „E ENTER BIOME I“ (archivierte Änderung `add-hub-biome-doors`); „PROTOTYPE
 COMPLETE“ im Endbild.
+
+**Warum hier Schluss ist:** Die offenen Punkte brauchen ein Ohr oder eine Inhaltsentscheidung.
+Ich kann Klang nicht hören (nur CLAP, Spektrogramm, Pegel); weitere Klangänderungen ohne
+Hörabnahme wären unüberprüfbar. Bild, Bewegung und Oberfläche aller Bereiche sind im Rundgang
+gesichtet; Prolog und Vorhalle (blau, außerhalb des Flammenschutzes) brauchen keine Nachstellung.
 
 **Nächste Schritte (nach Owner-Rückmeldung):** Klang nach Hörabnahme nachstellen (Stimmenpegel
 und -häufigkeit in `EnemyVoices`, Stem-Pegel `CombatStemGains`, Intensitätsgewichte in
