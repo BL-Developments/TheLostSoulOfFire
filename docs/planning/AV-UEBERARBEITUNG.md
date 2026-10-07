@@ -992,3 +992,10 @@ Rundgang 20261007_134939 (742 Aufnahmen, kein Platzhalter, CPU im Mittel ≤ 0,5
 `validate_audio.py` (241), Audio-Laufzeit- (79 Töne), Gameplay- (10 Wellen) und Tod-Neustart-Test,
 Slice-, Fähigkeiten-, Währungs- und Vorhallen-Bildtest. Behalten: Basislauf 20261007_101956 und
 dieser Lauf.
+- Geprüft, kein Mangel: Staubwalze des Devourer-Schlags auf dem hellen Hallenboden (weiche Wolke,
+  kein Ring), Ende mit Life Flame, Resonanz bereit/aktiv, Seelenfreigabe, Schwelle, Titel.
+
+**Warum hier Schluss ist (Durchgang 5, endgültig):** Alle Bereiche sind in mehreren Runden gesichtet,
+die zuletzt nachgeprüften früheren Wirkungen belegt oder korrigiert. Die letzten Versuche ergaben
+entweder „kein Mangel“ oder waren nicht belegbar (Burning-Dampf, Türklang) und wurden verworfen.
+Offen bleibt nur, was ein Ohr oder eine Entscheidung des Owners braucht (siehe „Owner-Abnahme offen“).
