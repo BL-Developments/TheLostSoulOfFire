@@ -471,6 +471,15 @@ internal sealed class TourVisualTest
         Series("ride", 6, 20);
         // Long enough on the water for the skiff to groan in the swell (place event, 7-14 s).
         Do("swell", () => { }, 7f);
+        // A Devourer's slam on the deck splinters planks instead of breaking stone.
+        Do("deck_devourer", () =>
+        {
+            _world.DefeatAutomatedEnemies();
+            _world.PlaceAutomatedPlayer(new Vector2(820f, 560f));
+            _world.SpawnAutomatedDevourer(new Vector2(1000f, 560f));
+        }, 0.1f);
+        Shot("deck_slam", ready: () => _world.AutomatedEnemies.OfType<Devourer>().Any(devourer => devourer.State == DevourerState.Slam), timeout: 12f);
+        Series("deck_slam_after", 8, 6);
     }
 
     private void BuildThreshold()

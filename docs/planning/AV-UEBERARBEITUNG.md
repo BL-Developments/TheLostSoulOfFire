@@ -978,3 +978,8 @@ Gegner-Zuckens, Deutlichkeit von Schattenhand und Schlagrand im Gedränge, die I
   `TOUR_BEAT`): Helligkeit am Ofenmund springt genau im Kick-Abstand (56 Bilder = 0,93 s), aber nur
   um 2,1 % – kaum wahrnehmbar. Stoß 0,28 → 0,75 (Abklingen exp −6): jetzt 5,8 %, im Vergleichsbild
   leuchten Mund und Mauerkante auf dem Kick sichtbar auf.
+- Nachgeprüft: Devourer-Schlag auf dem Fährdeck (Durchgang 4 nur gebaut, nie im Bild). Neue
+  Rundgang-Folge `prologue_transit_deck_slam` (Hilfe `SpawnAutomatedDevourer`): Holzsplitter und
+  aufflammende Fugen, kein Steinkrater – wie gedacht. Befund dabei: Die helle Staubwalze stand auf den
+  dunklen Planken als deutlicher Ring (vom Owner abgelehnte Form). Auf Holz jetzt eine dunkle,
+  unregelmäßige Staubwolke (Ruß, 18 Wolken mit zufälliger Weite), kein Ring mehr; Steinboden unverändert.

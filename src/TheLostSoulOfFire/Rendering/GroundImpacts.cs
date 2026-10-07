@@ -311,6 +311,21 @@ public sealed class GroundImpacts
             return;
         }
 
+        if (wooden)
+        {
+            // Planks throw no stone dust: a dark, broken cloud of grit and soot puffs out unevenly
+            // (pale stone dust on the dark deck stood as a bright ring).
+            for (int index = 0; index < 18; index++)
+            {
+                float angle = (float)(_random.NextDouble() * MathHelper.TwoPi);
+                Vector2 direction = new(MathF.Cos(angle), MathF.Sin(angle));
+                AddPuff(center + direction * radius * Range(0.1f, 0.3f), direction, radius * Range(0.25f, 0.6f), Range(0.3f, 0.45f),
+                    direction * Range(4f, 12f) + new Vector2(0f, -Range(6f, 16f)), Range(0.8f, 1.2f), Range(40f, 56f), Range(90f, 120f), 0.55f,
+                    soot: true);
+            }
+            return;
+        }
+
         // The dust wall: rolls out from the crater and stops at the edge of the blow.
         const int wall = 34;
         for (int index = 0; index < wall; index++)

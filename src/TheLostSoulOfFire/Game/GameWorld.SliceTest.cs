@@ -86,6 +86,14 @@ public sealed partial class GameWorld
         return hollow;
     }
 
+    /// <summary>A Devourer next to the player (the tour's deck slam: the crossing only meets one in its fifth wave).</summary>
+    internal Devourer SpawnAutomatedDevourer(Vector2 position)
+    {
+        Devourer devourer = new(position);
+        _enemies.Add(devourer);
+        return devourer;
+    }
+
     /// <summary>A full-cannon blow of one point on every living enemy of type <typeparamref name="T"/> (staggers them).</summary>
     internal void StaggerAutomatedEnemies<T>() where T : Enemy
     {
