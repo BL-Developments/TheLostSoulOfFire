@@ -7,6 +7,7 @@ using TheLostSoulOfFire.Combat;
 using TheLostSoulOfFire.Effects;
 using TheLostSoulOfFire.Game;
 using TheLostSoulOfFire.Rendering;
+using TheLostSoulOfFire.Rendering.Visuals;
 
 namespace TheLostSoulOfFire.Entities;
 
@@ -33,6 +34,7 @@ public sealed class Devourer : Enemy
     private bool _extractionEffectPending;
     private Soul _targetSoul;
     private Vector2 _facing = -Vector2.UnitY;
+    private float _staggerDuration = 1f;
 
     public DevourerState State { get; private set; } = DevourerState.ApproachPlayer;
     public override int GlutReward => GameBalance.DevourerGlut;
@@ -52,6 +54,60 @@ public sealed class Devourer : Enemy
         _consumedSouls.Add(soul);
     }
     public Vector2 FacingDirection => _facing;
+
+    /// <summary>How far the slam's windup has run (0 to 1), for the presentation.</summary>
+    public float SlamWindup => State == DevourerState.SlamTelegraph ? 1f - _stateTimer / GameBalance.DevourerSlamTelegraph : 0f;
+    public override string VisualId => VisualIds.Devourer;
+    /// <summary>
+    /// The slam clip has eighteen announce frames (inhale, arms rising, the hold at the top) and
+    /// six strike frames; the fists meet the floor in frame 20. The downswing plays in the last
+    /// <see cref="SlamDownswing"/> seconds of the windup, so the fists land on the frame the blow
+    /// is resolved (the start of <see cref="DevourerState.Slam"/>); the slam state shows the
+    /// contact and the fold over the fists. The death clip ends at three quarters of the dying
+    /// time and the dissolve takes the collapsed pose.
+    /// </summary>
+    private const int SlamFrames = 24;
+    private const int SlamAnnounceFrames = 18;
+    private const int SlamContactFrame = 20;
+    private const float SlamDownswing = 0.07f;
+    private const float DeathClipShare = 0.75f;
+
+    public override string? VisualClip => State switch
+    {
+        DevourerState.Dying when DeathProgress < DeathClipShare => VisualClips.Death,
+        DevourerState.Dying or DevourerState.Dead => null,
+        DevourerState.SlamTelegraph or DevourerState.Slam => VisualClips.Slam,
+        DevourerState.Recovery => VisualClips.Recover,
+        DevourerState.Devour => VisualClips.Devour,
+        DevourerState.Staggered => VisualClips.Stagger,
+        _ when HitFlashRemaining > 0f => VisualClips.Hit,
+        DevourerState.ApproachPlayer or DevourerState.ApproachSoul => VisualClips.Move,
+        _ => VisualClips.Idle
+    };
+
+    public override float? VisualProgress => State switch
+    {
+        DevourerState.Dying => DeathProgress / DeathClipShare,
+        DevourerState.SlamTelegraph => SlamWindupFrame / (SlamFrames - 1),
+        DevourerState.Slam => (SlamContactFrame + (1f - _stateTimer / GameBalance.DevourerSlamDuration) * (SlamFrames - 1 - SlamContactFrame)) / (SlamFrames - 1),
+        DevourerState.Recovery => 1f - _stateTimer / GameBalance.DevourerRecoveryDuration,
+        DevourerState.Devour => 1f - _stateTimer / GameBalance.DevourerDevourDuration,
+        DevourerState.Staggered => 1f - _stateTimer / _staggerDuration,
+        _ when HitFlashRemaining > 0f => HitFlashProgress,
+        _ => null
+    };
+
+    private float DeathProgress => 1f - _stateTimer / GameBalance.DevourerDeathDuration;
+
+    private float SlamWindupFrame => _stateTimer > SlamDownswing
+        ? (1f - (_stateTimer - SlamDownswing) / (GameBalance.DevourerSlamTelegraph - SlamDownswing)) * (SlamAnnounceFrames - 1)
+        : SlamAnnounceFrames - 1 + (1f - _stateTimer / SlamDownswing) * (SlamContactFrame - (SlamAnnounceFrames - 1));
+
+    /// <summary>Where the torso opening is drawn: in the rendered figure's chest (at shot height), else as gameplay keeps it.</summary>
+    public Vector2 DrawnTorso => DrawnAsFigure ? Position - new Vector2(0f, FigureHeights.Air) : TorsoPosition;
+    public override Vector2 VisualFacing => _facing;
+    public override float VisualScale => 1f + ConsumedSoulCount * 0.035f;
+    public override float TelegraphRadius => State is DevourerState.SlamTelegraph or DevourerState.Slam ? GameBalance.DevourerSlamRange : 0f;
     public Vector2 TorsoPosition => Position + new Vector2(0f, -8f);
 
     public Devourer(Vector2 position)
@@ -162,6 +218,7 @@ public sealed class Devourer : Enemy
             _targetSoul = null;
             State = DevourerState.Staggered;
             _stateTimer = 0.38f;
+            _staggerDuration = _stateTimer;
         }
 
         if (damage.IsFullCannon)
@@ -174,6 +231,7 @@ public sealed class Devourer : Enemy
 
             State = DevourerState.Staggered;
             _stateTimer = GameBalance.DevourerFullCannonStagger;
+            _staggerDuration = _stateTimer;
             ExpelOneSoul();
         }
     }
@@ -221,6 +279,19 @@ public sealed class Devourer : Enemy
         Color body = HitFlashRemaining > 0f ? GameBalance.SoulWhite : new Color(27, 25, 33);
         Vector2 right = new(-_facing.Y, _facing.X);
 
+        if (State == DevourerState.Dying && DrawnAsFigure)
+        {
+            // The prison cracking open, light breaking out of the rendered chest.
+            float burst = 1f - _stateTimer / GameBalance.DevourerDeathDuration;
+            for (int i = 0; i < 7; i++)
+            {
+                float angle = i * MathHelper.TwoPi / 7f + 0.3f;
+                Vector2 crack = new(MathF.Cos(angle), MathF.Sin(angle) * 0.8f);
+                WorldMarks.Beam(batch, pixel, DrawnTorso, DrawnTorso + crack * (10f + burst * 40f), 12f, GameBalance.DeathFlameBright * (0.8f * (1f - burst)));
+            }
+            return;
+        }
+
         if (State == DevourerState.Dying)
         {
             float progress = 1f - _stateTimer / GameBalance.DevourerDeathDuration;
@@ -229,7 +300,7 @@ public sealed class Devourer : Enemy
             {
                 float angle = i * MathHelper.TwoPi / 7f;
                 Vector2 crack = new(MathF.Cos(angle), MathF.Sin(angle));
-                batch.DrawLine(pixel, TorsoPosition, TorsoPosition + crack * (22f + progress * 45f), GameBalance.DeathFlameBright * (1f - progress), 4f);
+                WorldMarks.Beam(batch, pixel, TorsoPosition, TorsoPosition + crack * (22f + progress * 45f), 14f, GameBalance.DeathFlameBright * (1f - progress));
             }
             return;
         }
@@ -245,40 +316,69 @@ public sealed class Devourer : Enemy
             batch.FillCircle(pixel, Position + new Vector2(0f, -52f), 18f, new Color(20, 19, 26));
         }
 
-        batch.FillCircle(pixel, TorsoPosition, 28f, new Color(7, 5, 10));
-        batch.DrawCircle(pixel, TorsoPosition, 29f + pulse * 3f, GameBalance.DeepViolet * (0.55f + ConsumedSoulCount * 0.12f), 6f, 24);
-
-        if (State == DevourerState.ApproachSoul && _targetSoul is not null)
+        if (!DrawnAsFigure)
         {
-            batch.DrawLine(pixel, TorsoPosition, _targetSoul.Position, GameBalance.DeathFlame * 0.48f, 4f);
-            batch.DrawCircle(pixel, _targetSoul.Position, 31f + pulse * 8f, GameBalance.DeathFlameBright * 0.72f, 4f, 24);
+            batch.FillCircle(pixel, TorsoPosition, 28f, new Color(7, 5, 10));
+            batch.DrawCircle(pixel, TorsoPosition, 29f + pulse * 3f, GameBalance.DeepViolet * (0.55f + ConsumedSoulCount * 0.12f), 6f, 24);
+        }
+
+        if (DrawnAsFigure && LightSpot is { } light && _targetSoul is not null &&
+            State is DevourerState.ApproachSoul or DevourerState.Devour)
+        {
+            // The hunger as light: while it stalks a soul, the soul glimmers and a thin drift of
+            // its light already leans toward the chest; while it devours, the soul's light pours in.
+            float time = _visualTime + Position.X * 0.01f;
+            if (State == DevourerState.ApproachSoul)
+            {
+                WorldMarks.Glow(batch, light, _targetSoul.Position, 34f + pulse * 6f, GameBalance.DeathFlame * (0.22f + pulse * 0.12f));
+                WorldMarks.Stream(batch, light, _targetSoul.Position, DrawnTorso, time, 0.35f, GameBalance.DeathFlame, 70f, 26f);
+            }
+            else
+            {
+                float devoured = 1f - _stateTimer / GameBalance.DevourerDevourDuration;
+                WorldMarks.Stream(batch, light, _targetSoul.Position, DrawnTorso, time, 0.9f, GameBalance.DeathFlameBright, 190f, 9f);
+                WorldMarks.Glow(batch, light, DrawnTorso, 22f + devoured * 10f, GameBalance.DeathFlame * (0.18f + devoured * 0.22f));
+            }
+        }
+        else if (State == DevourerState.ApproachSoul && _targetSoul is not null)
+        {
+            WorldMarks.Beam(batch, pixel, DrawnTorso, _targetSoul.Position, 12f, GameBalance.DeathFlame * 0.48f);
+            WorldMarks.Ring(batch, pixel, _targetSoul.Position, 31f + pulse * 8f, GameBalance.DeathFlameBright * 0.72f);
         }
         else if (State == DevourerState.Devour && _targetSoul is not null)
         {
-            batch.DrawLine(pixel, TorsoPosition, _targetSoul.Position, GameBalance.DeepViolet * 0.9f, 15f);
-            batch.DrawLine(pixel, TorsoPosition, _targetSoul.Position, GameBalance.DeathFlameBright * 0.8f, 4f);
+            WorldMarks.Beam(batch, pixel, DrawnTorso, _targetSoul.Position, 30f, GameBalance.DeathFlame * 0.8f);
+            WorldMarks.Beam(batch, pixel, DrawnTorso, _targetSoul.Position, 12f, GameBalance.DeathFlameBright * 0.8f);
         }
 
         if (State == DevourerState.SlamTelegraph)
         {
-            float progress = 1f - _stateTimer / GameBalance.DevourerSlamTelegraph;
-            batch.DrawCircle(pixel, Position, GameBalance.DevourerSlamRange * progress, GameBalance.DeathFlame * (0.25f + progress * 0.5f), 6f, 32);
-            batch.DrawLine(pixel, Position - right * 38f, Position - right * 46f - Vector2.UnitY * (45f + progress * 30f), body, 26f);
-            batch.DrawLine(pixel, Position + right * 38f, Position + right * 46f - Vector2.UnitY * (45f + progress * 30f), body, 26f);
+            float progress = SlamWindup;
+            // With the ground textures the floor itself shows the blow (Rendering/GroundImpacts).
+            if (!GroundImpacts.Loaded)
+            {
+                WorldMarks.Ring(batch, pixel, Position, GameBalance.DevourerSlamRange * progress, GameBalance.DeathFlame * (0.25f + progress * 0.5f), progress > 0.7f, 6f);
+            }
+            if (!DrawnAsFigure)
+            {
+                batch.DrawLine(pixel, Position - right * 38f, Position - right * 46f - Vector2.UnitY * (45f + progress * 30f), body, 26f);
+                batch.DrawLine(pixel, Position + right * 38f, Position + right * 46f - Vector2.UnitY * (45f + progress * 30f), body, 26f);
+            }
         }
-        else if (State == DevourerState.Slam)
+        else if (State == DevourerState.Slam && !GroundImpacts.Loaded)
         {
-            batch.DrawCircle(pixel, Position, GameBalance.DevourerSlamRange, GameBalance.SoulWhite * 0.78f, 12f, 36);
+            WorldMarks.Ring(batch, pixel, Position, GameBalance.DevourerSlamRange, GameBalance.DeathFlame * 0.85f, true, 12f);
+            WorldMarks.Ring(batch, pixel, Position, GameBalance.DevourerSlamRange, GameBalance.SoulWhite * 0.78f, false, 12f);
         }
 
         if (soulSenseActive)
         {
-            batch.FillCircle(pixel, TorsoPosition, GameBalance.DevourerTorsoRadius, GameBalance.DeepViolet * 0.72f);
+            batch.FillCircle(pixel, DrawnTorso, GameBalance.DevourerTorsoRadius, GameBalance.DeepViolet * (DrawnAsFigure ? 0.4f : 0.72f));
             int visibleSouls = Math.Max(1, ConsumedSoulCount);
             for (int i = 0; i < visibleSouls; i++)
             {
                 float angle = _visualTime * (1.2f + i * 0.16f) + i * MathHelper.TwoPi / visibleSouls;
-                Vector2 trappedPosition = TorsoPosition + new Vector2(MathF.Cos(angle) * 13f, MathF.Sin(angle) * 10f);
+                Vector2 trappedPosition = DrawnTorso + new Vector2(MathF.Cos(angle) * 13f, MathF.Sin(angle) * 10f);
                 batch.FillCircle(pixel, trappedPosition, ConsumedSoulCount > 0 ? 5f : 3f, ConsumedSoulCount > 0 ? GameBalance.SoulWhite : GameBalance.DeathFlame * 0.45f);
             }
         }

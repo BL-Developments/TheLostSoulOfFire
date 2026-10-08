@@ -1,6 +1,6 @@
 # The Lost Soul of Fire — Final Audio Package
 
-**Status:** the approved pre-ElevenLabs authored bank was restored on 2026-08-30 after the replacement pass failed subjective quality review.
+**Status:** the approved pre-ElevenLabs authored bank was restored on 2026-08-30 after the replacement pass failed subjective quality review. On 2026-10-06 the bank was extended (not replaced) with zone ambiences, zone music and the missing cues, authored locally (see "Zones and authored extension" below).
 
 ## Shipped scope
 
@@ -97,3 +97,57 @@ dotnet run --no-build --project src/TheLostSoulOfFire/TheLostSoulOfFire.csproj -
 ```
 
 The long-loop runtime mode (`--audio-loop-runtime-test`) runs for 102 seconds, crossing the music boundary and multiple 20-second ambience boundaries.
+
+
+## Zones and authored extension (2026-10-06)
+
+The approved Ludo bank stays authoritative for every cue it covers; nothing of it was replaced.
+What the game had no sound for was added, authored locally from recipes (`tools/audio`, see
+`Content/Audio/SOURCES.md` for recipe, seed and levels of every file):
+
+- **Zones.** `AudioDirector.SetZone` follows what is on screen: Title, Shore, Harbour,
+  Causeway, Crossing (the skiff), Threshold, Hub, Arena. Each zone has its own ambience bed and
+  music; beds crossfade over 1.6 s, music fades out (1.4 s), switches and fades in (2.4 s).
+  The arena keeps its Ludo bed and loop and its calm/combat mix.
+- **Music.** Six beds share the arena music's key (G-sharp minor) and one motif, a falling
+  D#–C#–B–G# that stops on A#; the threshold lets it resolve to B. Bells, plucked strings,
+  slow string and choir pads, low drones, a skin drum on the causeway and the crossing; no
+  exposed synthetic lead. Exploration is quiet (0.26–0.34), fights fuller (0.4–0.46).
+- **Cues.** Footsteps on stone and on the skiff's planks (four takes each, chosen at random,
+  every 90 units of real movement, never during a dash), menu move/back/open/close, chest,
+  currency, one sound per ability, the hub door awakening.
+- **Mix review.** Effective levels (file loudness × in-game volume) were compared: a landed
+  scythe hit now sits above the swing that carried it, taking damage is clearly above the
+  player's own swings, and the Hollow's grab (a danger signal) above the room.
+- **Listening.** Candidates were judged by loudness, spectrogram, loop seam and a LAION-CLAP
+  ranking against text descriptions (`tools/audio/listen.py`); a final listening pass in the
+  game by a person is still open.
+
+## Mixprüfung ohne Gehör (ab 06.10.2026)
+
+`tools/audio/mix_report.py --zone arena|hub|shore|crossing` liest jede Abspielstelle mit ihrer
+Lautstärke aus dem Code, misst die lauteste Momentan-Lautheit (400 ms, K-gewichtet) jedes Assets
+und stellt sie dem Bett der Zone gegenüber (Atmosphäre und Musik mit ihren Spielpegeln;
+Menütöne gegen das pausierte Bett). Bänder in LU über dem Bett: Gefahr +6 … +20, Treffer
++4 … +18, Aktionen 0 … +14, Schritte −14 … +2, Menü −12 … +4, Seelensinn −12 … +6, Ereignisse
++2 … +18. Stand 06.10.: alle vier Zonen ohne Ausreißer (Überfahrt-Bett um 2,6 dB gesenkt, damit
+Gefahrensignale auf dem Deck nicht untergehen; Prolog-Kampfmusik etwas voller; Warn- und
+Schritt-Cues nachgezogen). Maskierung nach Frequenz und die Dynamik eines echten Kampfs bildet
+der Bericht nicht ab; die Hörabnahme im Spiel bleibt offen.
+
+## Kampfschichten und Vorrang (06.10.2026, abends)
+
+Die Ludo-Cues bleiben der Kern jeder Aktion. Darunter liegen lokal gebaute Schichten
+(`tools/audio/recipes/combat.py`, Quellen in `Content/Audio/SOURCES.md`): ein Kontakt-Transient
+auf Sample 0 mit dem Material des Ziels (Hollow: Stoff, hohler Körper, Porzellanknack; Burning:
+Krustenbruch, Glutknistern, Zischen; Devourer: Fleisch, Nachgeben, leeres Grollen;
+Übungspuppe: Holz und Stroh), ein Druckstoß unter Seelenspaltung und voller Kanone und ein
+Körpertreffer unter dem Spieler-Schmerzlaut. Neu sind Ausholwarnungen für Hollow und Devourer, das Fauchen des Burning
+beim Losstürmen und ein eigener Tod je Gegner zusätzlich zum gemeinsamen Todeslaut. Je Gruppe 2–3
+Takes, auf ±0,5 LU angeglichen, dazu die Tonhöhenstreuung der Cue-Regeln.
+
+`AudioDirector` gibt Gefahrensignalen (Ausholen, Anlauf, Spielertreffer, Griff, Schlag) Vorrang:
+Schwünge, Schritte und Ladegeräusche, die während der folgenden 0,4 s starten, kommen bis zu 40 %
+leiser. Laufen schon mehr als sechs Effekte, kommt jeder weitere nicht gefährliche leiser hinzu,
+damit ein voller Kampf nicht zu einer gleichmäßig lauten Wand wird. `mix_report.py` kennt die
+Klasse „layer“ (−6 … +12 LU über dem Bett) für Schichten unter einem anderen Cue.

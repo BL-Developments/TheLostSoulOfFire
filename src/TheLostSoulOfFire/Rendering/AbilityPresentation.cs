@@ -21,13 +21,13 @@ public readonly record struct AbilityCard(RunAbility Ability, int Slot, string C
         {
             RunAbility.SecondWind => ("HEILUNG", "HEILT 25 LEBEN", "SOFORTIGE HEILUNG BIS ZUM MAXIMALEN LEBEN", new Color(110, 240, 175)),
             RunAbility.PiercingShot => ("KAMPF", $"{player.Attributes.ScaleAbilityDamage(40)} SCHADEN / DURCHDRINGT GEGNER", "GERADES GESCHOSS IN BLICKRICHTUNG", GameBalance.DeathFlameBright),
-            RunAbility.Retreat => ("BEWEGUNG", "180 PX ZURUECK / STOSST GEGNER WEG", "KEINE UNVERWUNDBARKEIT / BOSSE UNBEWEGLICH", new Color(125, 195, 235)),
-            RunAbility.Vortex => ("KONTROLLE", "ZIEHT GEGNER FUER 2 S ZUSAMMEN", "MAUSZIEL / 350 PX REICHWEITE / KEINE BOSSE", new Color(180, 140, 240)),
-            RunAbility.Revenge => ("VERTEIDIGUNG", "2 S ABFANGEN / +24 FOLGESCHADEN", "NACH BLOCK: 5 S FUER DEN NAECHSTEN WAFFENTREFFER", new Color(240, 175, 100)),
-            _ => ("KOMBO", "MARKIERT / +25 BEIM FOLGETREFFER", "5 S ZUM MARKIEREN / MARKE HAELT 5 S", GameBalance.GlutBright)
+            RunAbility.Retreat => ("BEWEGUNG", "180 PX ZURÜCK / STÖSST GEGNER WEG", "KEINE UNVERWUNDBARKEIT / BOSSE UNBEWEGLICH", new Color(125, 195, 235)),
+            RunAbility.Vortex => ("KONTROLLE", "ZIEHT GEGNER FÜR 2 S ZUSAMMEN", "MAUSZIEL / 350 PX REICHWEITE / KEINE BOSSE", new Color(180, 140, 240)),
+            RunAbility.Revenge => ("VERTEIDIGUNG", "2 S ABFANGEN / +24 FOLGESCHADEN", "NACH BLOCK: 5 S FÜR DEN NÄCHSTEN WAFFENTREFFER", new Color(240, 175, 100)),
+            _ => ("KOMBO", "MARKIERT / +25 BEIM FOLGETREFFER", "5 S ZUM MARKIEREN / MARKE HÄLT 5 S", GameBalance.GlutBright)
         };
         float cooldown = abilities.Cooldown(ability);
-        string status = !combat ? "NUR IM KAMPF" : player.IsDead ? "NICHT HANDLUNGSFAEHIG" : cooldown > 0 ? $"ABKLINGZEIT {cooldown:0.0} S" :
+        string status = !combat ? "NUR IM KAMPF" : player.IsDead ? "NICHT HANDLUNGSFÄHIG" : cooldown > 0 ? $"ABKLINGZEIT {cooldown:0.0} S" :
             !freeCast && glut < definition.Cost ? $"{definition.Cost - glut} GLUT FEHLT" :
             ability == RunAbility.SecondWind && player.Health >= player.MaxHealth ? "LEBEN VOLL" :
             ability == RunAbility.Retreat && player.IsDashing ? "AUSWEICHEN AKTIV" : "BEREIT";
@@ -51,18 +51,35 @@ public static class AbilityPresentation
     public static Rectangle CatalogueBounds(Viewport viewport, int index) =>
         new(viewport.Width / 2 - 482 + index % 2 * 494, 195 + index / 2 * 142, 470, 128);
 
-    public static void DrawHud(SpriteBatch batch, Texture2D pixel, Viewport viewport, AbilityCard card)
+    /// <summary>
+    /// The card in the combat HUD, compact (Durchgang 4: the two cards took half the picture's
+    /// width): key, name, cost, status and the cooldown bar; what the ability does stays in the
+    /// catalogue (Tab).
+    /// </summary>
+    public static void DrawHud(SpriteBatch batch, Texture2D pixel, Viewport viewport, AbilityCard card, float time = 0f)
     {
-        Rectangle bounds = new(24 + card.Slot * 356, viewport.Height - 145, 344, 74);
-        Panel(batch, pixel, bounds, card.Accent, true);
-        Badge(batch, pixel, new(bounds.X + 10, bounds.Y + 10), card.Slot == 0 ? "Z" : "X", card.Accent);
-        Text(batch, pixel, card.Definition.Name, bounds.X + 46, bounds.Y + 11, 2, GameBalance.SoulWhite);
-        Text(batch, pixel, card.Summary, bounds.X + 12, bounds.Y + 34, 1, GameBalance.SoulWhite * 0.65f);
-        Text(batch, pixel, card.Status, bounds.X + 12, bounds.Y + 51, 1, card.Accent);
-        string cost = card.CostText;
-        Text(batch, pixel, cost, bounds.Right - PixelText.Measure(cost, 1) - 12, bounds.Y + 51, 1, GameBalance.GlutBright);
-        batch.FillRectangle(pixel, new Rectangle(bounds.X + 12, bounds.Bottom - 8, bounds.Width - 24, 3), new Color(40, 35, 48));
-        batch.FillRectangle(pixel, new Rectangle(bounds.X + 12, bounds.Bottom - 8, (int)((bounds.Width - 24) * card.ReadyFraction), 3), card.Accent * 0.8f);
+        Rectangle bounds = new(24 + card.Slot * 262, viewport.Height - 122, 250, 54);
+        bool ready = card.ReadyFraction >= 0.999f && card.Status == "BEREIT";
+        float breathe = 0.5f + 0.5f * MathF.Sin(time * 2.6f + card.Slot * 1.7f);
+        UiKit.Panel(batch, pixel, bounds, card.Accent, ready ? 0.85f : 0.4f, 1f, ready ? 0.12f + breathe * 0.1f : 0f);
+        UiKit.Key(batch, pixel, new Vector2(bounds.X + 11, bounds.Y + 13), card.Slot == 0 ? "Z" : "X", card.Accent, 1f, 2, 26);
+
+        int textX = bounds.X + 48;
+        PixelText.DrawFace(batch, pixel, card.Definition.Name, new Vector2(textX, bounds.Y + 9), TextFace.Display, 12f, GameBalance.SoulWhite, 0.2f);
+        DrawCost(batch, pixel, card.CostText, bounds.Right - 12, bounds.Y + 11, card.FreeCast);
+        Body(batch, pixel, card.Status, textX, bounds.Y + 27, ready ? card.Accent : Color.Lerp(card.Accent, GameBalance.SoulWhite, 0.3f) * 0.9f, 0.6f);
+        UiKit.Bar(batch, pixel, new Rectangle(textX + 4, bounds.Bottom - 9, bounds.Right - textX - 18, 3), card.ReadyFraction, card.Accent * 0.9f);
+    }
+
+    /// <summary>Glut cost with its ember, right-aligned at <paramref name="right"/>.</summary>
+    private static void DrawCost(SpriteBatch batch, Texture2D pixel, string cost, int right, int y, bool free)
+    {
+        int width = BodyWidth(cost);
+        Body(batch, pixel, cost, right - width, y, free ? GameBalance.SoulWhite * 0.7f : GameBalance.GlutBright);
+        if (!free)
+        {
+            UiKit.Icon(batch, pixel, UiIcon.Glut, new Vector2(right - width - 11, y + 4.5f), 0.65f);
+        }
     }
 
     public static void DrawCatalogue(SpriteBatch batch, Texture2D pixel, Viewport viewport,
@@ -77,9 +94,9 @@ public static class AbilityPresentation
             bool active = slot == selectedSlot;
             Color accent = (active ? GameBalance.GlutBright : GameBalance.SoulWhite * 0.45f) * alpha;
             Panel(batch, pixel, bounds, accent, active, alpha);
-            Text(batch, pixel, $"{(slot == 0 ? "Z" : "X")} / {name}", bounds.X + 14, bounds.Y + 11, 1, accent);
-            string label = active ? "ZIELSLOT" : "SLOT WAEHLEN";
-            Text(batch, pixel, label, bounds.Right - PixelText.Measure(label, 1) - 14, bounds.Y + 11, 1, accent);
+            Body(batch, pixel, $"{(slot == 0 ? "Z" : "X")} / {name}", bounds.X + 16, bounds.Y + 10, accent, 0.6f);
+            string label = active ? "ZIELSLOT" : "SLOT WÄHLEN";
+            Body(batch, pixel, label, bounds.Right - BodyWidth(label, 0.6f) - 16, bounds.Y + 10, accent, 0.6f);
         }
         for (int i = 0; i < cards.Count; i++)
         {
@@ -88,36 +105,32 @@ public static class AbilityPresentation
             bool equipped = card.Slot >= 0;
             Color accent = card.Accent * alpha;
             Panel(batch, pixel, b, accent, equipped, alpha);
-            Text(batch, pixel, $"{i + 1} / {card.Category}", b.X + 16, b.Y + 12, 1, accent);
-            string badge = equipped ? $"AUSGERUESTET / {(card.Slot == 0 ? "Z" : "X")}" : "NICHT AUSGERUESTET";
-            Text(batch, pixel, badge, b.Right - PixelText.Measure(badge, 1) - 16, b.Y + 12, 1,
-                (equipped ? card.Accent : GameBalance.SoulWhite * 0.35f) * alpha);
-            Text(batch, pixel, card.Definition.Name, b.X + 16, b.Y + 31, 2, GameBalance.SoulWhite * alpha);
-            Text(batch, pixel, card.Summary, b.X + 16, b.Y + 57, 1, GameBalance.SoulWhite * (0.85f * alpha));
-            Text(batch, pixel, card.Detail, b.X + 16, b.Y + 73, 1, GameBalance.SoulWhite * (0.5f * alpha));
-            batch.FillRectangle(pixel, new Rectangle(b.X + 16, b.Y + 92, b.Width - 32, 1), accent * 0.2f);
-            Text(batch, pixel, $"{card.CostText} / {card.Definition.Cooldown:0.#} S ABKLINGZEIT", b.X + 16, b.Y + 105, 1, accent);
-            Text(batch, pixel, card.Status, b.Right - PixelText.Measure(card.Status, 1) - 16, b.Y + 105, 1, GameBalance.SoulWhite * (0.7f * alpha));
+            Body(batch, pixel, $"{i + 1} / {card.Category}", b.X + 18, b.Y + 13, accent, 0.8f);
+            string badge = equipped ? $"AUSGERÜSTET / {(card.Slot == 0 ? "Z" : "X")}" : "NICHT AUSGERÜSTET";
+            Body(batch, pixel, badge, b.Right - BodyWidth(badge, 0.6f) - 18, b.Y + 13,
+                (equipped ? card.Accent : GameBalance.SoulWhite * 0.4f) * alpha, 0.6f);
+            PixelText.DrawFace(batch, pixel, card.Definition.Name, new Vector2(b.X + 18, b.Y + 32), TextFace.Display, 15f, GameBalance.SoulWhite * alpha, 0.3f);
+            Body(batch, pixel, card.Summary, b.X + 18, b.Y + 58, GameBalance.SoulWhite * (0.88f * alpha));
+            Body(batch, pixel, card.Detail, b.X + 18, b.Y + 75, GameBalance.SoulWhite * (0.55f * alpha));
+            UiKit.Divider(batch, pixel, b.Center.X, b.Y + 95, b.Width - 36, accent * 0.45f);
+            if (!card.FreeCast)
+            {
+                UiKit.Icon(batch, pixel, UiIcon.Glut, new Vector2(b.X + 24, b.Y + 110.5f), 0.65f, alpha);
+            }
+            Body(batch, pixel, $"{card.CostText} / {card.Definition.Cooldown:0.#} S ABKLINGZEIT", b.X + (card.FreeCast ? 18 : 36), b.Y + 106, accent);
+            Body(batch, pixel, card.Status, b.Right - BodyWidth(card.Status) - 18, b.Y + 106, GameBalance.SoulWhite * (0.75f * alpha));
         }
-        PixelText.DrawCentered(batch, pixel, canChoose ? "Z / X SLOT WAEHLEN / KARTE ANKLICKEN ODER 1-6 / TAB SCHLIESSEN" : "AUSWAHL GESPERRT / WECHSEL IM HUB ODER VOR / ZWISCHEN WELLEN", viewport.Width * 0.5f, 638, 1, GameBalance.SoulWhite * (0.6f * alpha));
+        PixelText.DrawCentered(batch, pixel, canChoose ? "Z / X SLOT WÄHLEN / KARTE ANKLICKEN ODER 1-6 / TAB SCHLIESSEN" : "AUSWAHL GESPERRT / WECHSEL IM HUB ODER VOR / ZWISCHEN WELLEN", viewport.Width * 0.5f, 638, 1, GameBalance.SoulWhite * (0.6f * alpha));
         if (feedback.Length > 0)
             PixelText.DrawCentered(batch, pixel, feedback, viewport.Width * 0.5f, 658, 1, GameBalance.GlutBright * alpha);
     }
 
-    private static void Text(SpriteBatch batch, Texture2D pixel, string text, float x, float y, int scale, Color color) =>
-        PixelText.Draw(batch, pixel, text, new Vector2(x, y), scale, color);
-    private static void Badge(SpriteBatch batch, Texture2D pixel, Vector2 position, string key, Color accent)
-    {
-        batch.FillRectangle(pixel, new Rectangle((int)position.X, (int)position.Y, 26, 22), accent * 0.16f);
-        Text(batch, pixel, key, position.X + 7, position.Y + 4, 2, accent);
-    }
-    private static void Panel(SpriteBatch batch, Texture2D pixel, Rectangle b, Color accent, bool selected, float alpha = 1)
-    {
-        batch.FillRectangle(pixel, b, new Color(10, 8, 17) * (0.95f * alpha));
-        batch.FillRectangle(pixel, new Rectangle(b.X, b.Y, 3, b.Height), accent * (selected ? 1 : 0.25f));
-        Color frame = accent * (selected ? 0.5f : 0.15f);
-        batch.FillRectangle(pixel, new Rectangle(b.X + 3, b.Y, b.Width - 3, 1), frame);
-        batch.FillRectangle(pixel, new Rectangle(b.X + 3, b.Bottom - 1, b.Width - 3, 1), frame);
-        batch.FillRectangle(pixel, new Rectangle(b.Right - 1, b.Y, 1, b.Height), frame);
-    }
+    private const float BodyCap = 9.5f;
+
+    private static void Body(SpriteBatch batch, Texture2D pixel, string text, float x, float y, Color color, float tracking = 0f) =>
+        PixelText.DrawFace(batch, pixel, text, new Vector2(x, y), TextFace.Body, BodyCap, color, tracking);
+
+    private static int BodyWidth(string text, float tracking = 0f) => PixelText.MeasureFace(text, TextFace.Body, BodyCap, tracking);
+    private static void Panel(SpriteBatch batch, Texture2D pixel, Rectangle b, Color accent, bool selected, float alpha = 1) =>
+        UiKit.Panel(batch, pixel, b, accent, selected ? 0.9f : 0.3f, alpha, selected ? 0.18f : 0f);
 }

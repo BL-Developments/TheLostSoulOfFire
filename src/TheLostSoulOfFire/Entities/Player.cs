@@ -8,6 +8,7 @@ using TheLostSoulOfFire.Effects;
 using TheLostSoulOfFire.Game;
 using TheLostSoulOfFire.Input;
 using TheLostSoulOfFire.Rendering;
+using TheLostSoulOfFire.Rendering.Visuals;
 
 namespace TheLostSoulOfFire.Entities;
 
@@ -46,8 +47,31 @@ public sealed class Player
     public float Radius => GameBalance.PlayerRadius;
     public float InvulnerabilityRemaining { get; private set; }
     public float HitFlashRemaining { get; private set; }
+
+    /// <summary>Presentation only: how far a backward leap (Rückstoßsprung) has run, 0..1, or null without one.</summary>
+    public float? LeapProgress { get; set; }
+
+    /// <summary>Presentation only: seconds since the player fell (set by the game each frame), 0 while alive.</summary>
+    public float SinceDeath { get; set; }
+
+    /// <summary>Presentation only: how far the waking at the start of the prologue has run, 0..1, or null.</summary>
+    public float? WakeProgress { get; set; }
+
+    /// <summary>
+    /// Height of the Death Flame core above the feet as drawn: standing, or close to the floor
+    /// while the figure lies and rises at the start of the prologue (wake clip in build_player.py).
+    /// </summary>
+    public float DrawnCoreHeight => WakeProgress is { } wake
+        ? MathHelper.Lerp(10f, FigureHeights.Core, MathHelper.SmoothStep(0f, 1f, (wake - 0.3f) / 0.6f))
+        : FigureHeights.Core;
+
+    /// <summary>Presentation only: the direction the last blow pushed the player (normalised).</summary>
+    public Vector2 LastHitDirection { get; private set; } = Vector2.UnitY;
     public float DashCooldownRemaining => _dashCooldownTimer;
     public bool IsDashing => _dashTimer > 0f;
+
+    /// <summary>Presentation only: how far the current dash has run (0..1).</summary>
+    public float DashProgress => MathHelper.Clamp(1f - _dashTimer / GameBalance.DashDuration, 0f, 1f);
     public bool IsInvulnerable => InvulnerabilityRemaining > 0f;
     public bool IsDead => Health <= 0;
     public float Resonance { get; private set; }
@@ -97,6 +121,19 @@ public sealed class Player
     {
         MaxHealth = Math.Max(1, maxHealth);
         Health = MaxHealth;
+    }
+
+    /// <summary>
+    /// Turns the figure toward <paramref name="point"/> after the last wave, when nothing is
+    /// steered any more (presentation only; a restart resets the facing).
+    /// </summary>
+    public void LookToward(Vector2 point)
+    {
+        Vector2 toward = point - Position;
+        if (toward.LengthSquared() > 1f)
+        {
+            FacingDirection = Vector2.Normalize(toward);
+        }
     }
 
     public void SettleForCompletion()
@@ -235,11 +272,19 @@ public sealed class Player
         }
     }
 
-    public void DrawAfterimages(SpriteBatch batch, Texture2D pixel)
+    public void DrawAfterimages(SpriteBatch batch, Texture2D pixel, ArtAssets? art = null)
     {
         foreach (Afterimage afterimage in _afterimages)
         {
             float alpha = afterimage.Remaining / afterimage.Lifetime;
+            // A rendered figure leaves a violet ghost of the very pose it had there.
+            Color ghost = new Color(120, 70, 210) * (alpha * alpha * 0.55f);
+            ghost.A = (byte)(ghost.A * 0.7f);
+            if (art is not null && art.DrawGhost(batch, this, afterimage.Position, afterimage.Lifetime - afterimage.Remaining, ghost))
+            {
+                continue;
+            }
+
             Vector2 right = new(-afterimage.Facing.Y, afterimage.Facing.X);
             Color silhouette = new Color(69, 28, 112) * (alpha * 0.48f);
             batch.DrawLine(pixel, afterimage.Position - afterimage.Facing * 15f, afterimage.Position + afterimage.Facing * 14f, silhouette, 28f);
@@ -251,6 +296,12 @@ public sealed class Player
 
     public void Draw(SpriteBatch batch, Texture2D pixel, ArtAssets art, bool debugVisible, float soulSenseAmount = 0f)
     {
+        if (IsDead && art.HasClip(VisualIds.Player, VisualClips.Death))
+        {
+            // The rendered figure plays its fall; the Death Flame accent belongs to the presentation.
+            return;
+        }
+
         if (IsDead)
         {
             float deathPulse = 0.5f + 0.5f * MathF.Sin(_visualTime * 5f);
@@ -261,18 +312,136 @@ public sealed class Player
 
         Vector2 right = new(-FacingDirection.Y, FacingDirection.X);
         float pulse = 0.5f + 0.5f * MathF.Sin(_visualTime * 4f);
+        // A rendered figure stands on Position and carries scythe and cannon in its frames; the
+        // overlays then sit on its body. The older flat art is drawn around Position instead.
+        bool rendered = art.HasClip(VisualIds.Player, VisualClips.Swing1);
+        Vector2 body = rendered ? Position - new Vector2(0f, DrawnCoreHeight) : Position;
 
         if (ResonanceActive)
         {
             float flare = 0.5f + 0.5f * MathF.Sin(_visualTime * 11f);
-            batch.DrawCircle(pixel, Position, 34f + flare * 6f, GameBalance.DeathFlame * 0.72f, 8f, 28);
-            batch.DrawLine(pixel, Position - right * 20f, Position - right * 32f - Vector2.UnitY * (30f + flare * 15f), GameBalance.DeathFlame * 0.62f, 8f);
-            batch.DrawLine(pixel, Position + right * 18f, Position + right * 29f - Vector2.UnitY * (37f + flare * 11f), GameBalance.DeathFlameBright * 0.7f, 6f);
+            if (rendered)
+            {
+                // Resonating, the figure burns: Death Flame climbs its body and rings its core.
+                art.DrawLoopingEffect(batch, this, VisualIds.DeathFlameLoop, Position - new Vector2(0f, FigureHeights.Core * 0.62f), 0f, 1.05f + flare * 0.06f, Color.White * 0.55f);
+                Color aura = GameBalance.DeathFlame * (0.35f + flare * 0.1f);
+                aura.A = 0;
+                art.DrawSoftSpot(batch, body, new Vector2(40f + flare * 6f), aura);
+            }
+            else
+            {
+                batch.DrawCircle(pixel, body, 34f + flare * 6f, GameBalance.DeathFlame * 0.72f, 8f, 28);
+                batch.DrawLine(pixel, body - right * 20f, body - right * 32f - Vector2.UnitY * (30f + flare * 15f), GameBalance.DeathFlame * 0.62f, 8f);
+                batch.DrawLine(pixel, body + right * 18f, body + right * 29f - Vector2.UnitY * (37f + flare * 11f), GameBalance.DeathFlameBright * 0.7f, 6f);
+            }
         }
 
-        Cannon.DrawBack(batch, pixel, art.SoulCannon, Position, FacingDirection);
-        Scythe.Draw(batch, pixel, art.PhysicalScythe, Position, FacingDirection, debugVisible);
+        if (!rendered)
+        {
+            Cannon.DrawBack(batch, pixel, art.GetSpriteTexture(VisualIds.SoulCannon), Position, FacingDirection);
+        }
+        Scythe.Draw(batch, pixel, art.GetSpriteTexture(VisualIds.Scythe), Position, FacingDirection, debugVisible, rendered, art);
 
+        if (rendered)
+        {
+            DrawBodyMarks(batch, pixel, art, body, pulse, soulSenseAmount);
+        }
+        else
+        {
+            DrawFlatMarks(batch, pixel, right, pulse, soulSenseAmount);
+            Cannon.DrawActive(batch, pixel, art.GetSpriteTexture(VisualIds.SoulCannon), Position, FacingDirection);
+        }
+
+        if (HitFlashRemaining > 0f)
+        {
+            // The blow as light bursting from the body (the sprite itself flashes in SpriteLit),
+            // widening as it fades: no ring.
+            float flash = MathHelper.Clamp(HitFlashRemaining / 0.14f, 0f, 1f);
+            Color burst = GameBalance.SoulWhite * (0.45f * flash);
+            burst.A = 0;
+            art.DrawSoftSpot(batch, body, new Vector2(22f + (1f - flash) * 26f), burst);
+            art.DrawSoftSpot(batch, body, new Vector2(12f), GameBalance.SoulWhite * (0.88f * flash));
+        }
+
+        if (IsDashing)
+        {
+            if (rendered)
+            {
+                // Death Flame streams off the body as soft light along the dash, thinning behind it
+                // (the ignition flipbook marks the start, afterimages carry the shape): no streaks.
+                for (int index = 0; index < 7; index++)
+                {
+                    float back = 14f + index * 9f;
+                    float fade = 1f - index / 7f;
+                    float sway = MathF.Sin(_visualTime * 18f + index * 1.7f) * 4f * (index / 7f);
+                    Vector2 at = body - _dashDirection * back + right * sway;
+                    Color flame = Color.Lerp(GameBalance.DeathFlameBright, GameBalance.DeathFlame, index / 7f) * (0.5f * fade);
+                    flame.A = 0;
+                    art.DrawSoftSpot(batch, at, new Vector2(16f - index * 1.4f, 13f - index * 1.2f), flame);
+                }
+            }
+            else
+            {
+                Vector2 ignitionOrigin = Position - _dashDirection * 15f;
+                batch.DrawLine(pixel, ignitionOrigin - right * 8f, ignitionOrigin - _dashDirection * 23f - right * 11f, GameBalance.DeathFlame, 7f);
+                batch.DrawLine(pixel, ignitionOrigin + right * 8f, ignitionOrigin - _dashDirection * 27f + right * 12f, GameBalance.DeathFlameBright, 5f);
+            }
+        }
+
+        if (debugVisible)
+        {
+            batch.DrawCircle(pixel, Position, Radius, new Color(80, 220, 210), 2f);
+            batch.DrawLine(pixel, Position, Position + FacingDirection * 70f, new Color(80, 220, 210) * 0.8f, 2f);
+        }
+    }
+
+    /// <summary>
+    /// Core and Soul Sense on a rendered figure: the core glows faintly under the sternum and
+    /// rings when Resonance is ready; under Soul Sense the eyes burn violet.
+    /// </summary>
+    private void DrawBodyMarks(SpriteBatch batch, Texture2D pixel, ArtAssets art, Vector2 core, float pulse, float soulSenseAmount)
+    {
+        bool coreReady = IsResonanceReady;
+        // Seen from behind, the core is hidden by the body; its readiness ring stays visible.
+        float front = MathHelper.Clamp(0.5f + FacingDirection.Y, 0f, 1f);
+        Vector2 sternum = core + new Vector2(FacingDirection.X * 6f, FacingDirection.Y * 4f);
+        if (front > 0f)
+        {
+            float glow = (ResonanceActive || coreReady || SoulSenseActive ? 0.85f : 0.4f) * front;
+            // Feeding the cannon drains the core; after the shot it rekindles as the cannon goes back.
+            glow *= Cannon.State switch
+            {
+                SoulCannonState.Charging => 1f - 0.55f * Cannon.ChargeProgress,
+                SoulCannonState.Returning => 0.3f + 0.7f * Cannon.StateProgress,
+                _ => 1f
+            };
+            float size = 7f + pulse * (coreReady ? 3f : 1f);
+            art.DrawSoftSpot(batch, sternum, new Vector2(size), GameBalance.DeathFlame * (0.8f * glow));
+            art.DrawSoftSpot(batch, sternum, new Vector2(size * 0.4f), GameBalance.SoulWhite * glow);
+        }
+        if (coreReady)
+        {
+            // Resonance ready: the core beats with light (no ring), visible from behind as well.
+            Color beat = GameBalance.DeathFlameBright * (0.4f + pulse * 0.3f);
+            beat.A = 0;
+            art.DrawSoftSpot(batch, core, new Vector2(16f + pulse * 6f), beat);
+        }
+
+        float sense = MathHelper.Clamp(soulSenseAmount, 0f, 1f);
+        if (sense > 0.001f && FacingDirection.Y > -0.35f)
+        {
+            Vector2 eyes = Position - new Vector2(0f, FigureHeights.Eyes) + new Vector2(FacingDirection.X * 6f, FacingDirection.Y * 3f);
+            Vector2 across = new(MathF.Abs(FacingDirection.Y) * 3.5f + 1f, 0f);
+            // The eyes glint violet (subtle, owner): no line from the core.
+            art.DrawSoftSpot(batch, eyes, new Vector2(8f, 6f), GameBalance.DeathFlame * (0.25f * sense));
+            art.DrawSoftSpot(batch, eyes - across, new Vector2(2f), GameBalance.DeathFlameBright * (0.7f * sense));
+            art.DrawSoftSpot(batch, eyes + across, new Vector2(2f), GameBalance.DeathFlameBright * (0.7f * sense));
+        }
+    }
+
+    /// <summary>Eye bar and core on the older flat, top-down art.</summary>
+    private void DrawFlatMarks(SpriteBatch batch, Texture2D pixel, Vector2 right, float pulse, float soulSenseAmount)
+    {
         Vector2 head = Position + FacingDirection * 18f;
 
         Vector2 eye = head + FacingDirection * 8f;
@@ -299,28 +468,6 @@ public sealed class Player
         {
             batch.DrawLine(pixel, Position + FacingDirection * 2f, Position - right * 14f - Vector2.UnitY * 15f, GameBalance.DeathFlameBright * 0.72f, 3f);
             batch.DrawLine(pixel, Position + FacingDirection * 2f, Position + right * 13f + Vector2.UnitY * 13f, GameBalance.DeathFlame * 0.72f, 3f);
-        }
-
-        Cannon.DrawActive(batch, pixel, art.SoulCannon, Position, FacingDirection);
-
-        if (HitFlashRemaining > 0f)
-        {
-            float flash = MathHelper.Clamp(HitFlashRemaining / 0.14f, 0f, 1f);
-            batch.DrawCircle(pixel, Position, 29f, GameBalance.SoulWhite * (0.72f * flash), 4f, 24);
-            batch.FillCircle(pixel, Position + FacingDirection * 2f, 7f, GameBalance.SoulWhite * (0.88f * flash));
-        }
-
-        if (IsDashing)
-        {
-            Vector2 ignitionOrigin = Position - _dashDirection * 15f;
-            batch.DrawLine(pixel, ignitionOrigin - right * 8f, ignitionOrigin - _dashDirection * 23f - right * 11f, GameBalance.DeathFlame, 7f);
-            batch.DrawLine(pixel, ignitionOrigin + right * 8f, ignitionOrigin - _dashDirection * 27f + right * 12f, GameBalance.DeathFlameBright, 5f);
-        }
-
-        if (debugVisible)
-        {
-            batch.DrawCircle(pixel, Position, Radius, new Color(80, 220, 210), 2f);
-            batch.DrawLine(pixel, Position, Position + FacingDirection * 70f, new Color(80, 220, 210) * 0.8f, 2f);
         }
     }
 
@@ -360,10 +507,19 @@ public sealed class Player
         if (IsDead) AbilityEffects.Clear();
         HitFlashRemaining = Health == 0 ? 0.24f : 0.14f;
         _damageKnockback += knockback;
+        if (knockback.LengthSquared() > 0.01f)
+        {
+            LastHitDirection = Vector2.Normalize(knockback);
+        }
         InvulnerabilityRemaining = 0.5f;
         screenEffects.BeginHitstop(Health == 0 ? 0.12f : 0.045f);
-        screenEffects.AddShake(Health == 0 ? 0.28f : 0.12f, Health == 0 ? 9f : 5f);
-        screenEffects.Flash(0.09f, Health == 0 ? 0.34f : 0.2f);
+        screenEffects.AddShake(Health == 0 ? 0.28f : 0.12f, Health == 0 ? 7f : 4f);
+        screenEffects.AddCameraKick(knockback, Health == 0 ? 6f : 4f);
+        if (Health == 0)
+        {
+            screenEffects.AddZoomPunch(0.02f);
+        }
+        screenEffects.FlashAt(Position - new Vector2(0f, FigureHeights.Core), 0.09f, Health == 0 ? 0.34f : 0.2f);
     }
 
     public void Heal(int amount)

@@ -83,3 +83,456 @@ Every entry uses the Ludo commercial-use license and verified metered API entitl
 - `--audio-gameplay-test` runs all four waves, ending reveal, completion, and restart.
 - `--audio-death-restart-test` verifies fatal damage, death cue/state, and restart.
 - Add `--expect-audio-fallback` after making one built SFX XNB unavailable; the test fails unless the synthesized emergency fallback was created.
+
+## Lokal synthetisierte Klänge (tools/audio, ab 2026-10-06)
+
+Für Bereiche und Aktionen, die bisher keinen eigenen Klang hatten, entstanden Atmosphären,
+Musikbetten und Cues lokal aus Rezepten in `tools/audio/recipes/*.py` (numpy/scipy, Seed
+festgehalten). Es gibt keine Samples, keine fremden Aufnahmen und keinen Netzdienst. Die
+Ergebnisse sind eigene Arbeit des Projekts.
+
+- **Werkzeuge:** `tools/audio/dsp.py` (Rauschen, Filter, Glocken, Zupf- und Streicherklänge,
+  Chor, synthetischer Raum), `author.py` (rendert ein Rezept mit Seed, Spektrogramm und
+  Bericht mit LUFS, Spitze und Naht), `install.py` (übernimmt die gewählte Aufnahme nach
+  `Content/Audio`).
+- **Musik:** sechs Stücke in der Tonart der Arena-Musik (gis-Moll) mit einem gemeinsamen
+  Motiv dis–cis–h–gis, das auf ais stehen bleibt. Erst an der Schwelle löst es sich nach H.
+  Kodiert als Ogg Vorbis q5 mit 48 kHz Stereo.
+- **Loops:** Der Raumhall läuft über die Loopgrenze zurück an den Anfang. An den Rändern
+  liegt eine Blende von 8 ms.
+- **Prüfung (Hören ersetzt):**
+  - Lautheit nach EBU R128 mit pyloudnorm und Spitzenpegel.
+  - Spektrogramme.
+  - Nahtprüfung (`validate_audio.py`).
+  - LAION-CLAP (`laion/clap-htsat-unfused`, Apache-2.0) über `tools/audio/listen.py`: Es ordnet
+    jeden Kandidaten gegen Textbeschreibungen ein, damit er nicht als Rauschen oder
+    Tanzmusik gelesen wird.
+  - Die endgültige Abnahme im Spiel durch Hören steht beim Owner aus.
+
+| Datei | Rezept und Seed | Eigenschaften |
+|---|---|---|
+| `Audio/Ambience/shore_ambience.wav` | ambience-shore Seed 2 | 40.00 s, 2 Kanal/Kanäle, -29.0 LUFS, Spitze -16.8 dBFS |
+| `Audio/Ambience/hub_ambience.wav` | ambience-hub Seed 2 (07.10.2026 ohne eingebackene Flammen) | 32.00 s, 2 Kanal/Kanäle, -30.0 LUFS, Spitze -11.9 dBFS |
+| `Audio/Ambience/harbour_ambience.wav` | ambience-harbour Seed 1 | 36.00 s, 2 Kanal/Kanäle, -29.0 LUFS, Spitze -15.0 dBFS |
+| `Audio/Ambience/causeway_ambience.wav` | ambience-causeway Seed 1 | 36.00 s, 2 Kanal/Kanäle, -27.0 LUFS, Spitze -14.4 dBFS |
+| `Audio/Ambience/crossing_ambience.wav` | ambience-crossing Seed 1, Naht 1,5 s überblendet | 22.50 s, 2 Kanal/Kanäle, -26.0 LUFS, Spitze -13.1 dBFS |
+| `Audio/Ambience/threshold_ambience.wav` | ambience-threshold Seed 5 | 32.00 s, 2 Kanal/Kanäle, -34.0 LUFS, Spitze -25.7 dBFS |
+| `Audio/Music/title_theme.ogg` | music-title Seed 1 | 58.18 s, 2 Kanal/Kanäle, -20.0 LUFS, Spitze -6.1 dBFS |
+| `Audio/Music/shore_theme.ogg` | music-shore Seed 1 | 68.57 s, 2 Kanal/Kanäle, -23.0 LUFS, Spitze -8.0 dBFS |
+| `Audio/Music/hub_theme.ogg` | music-hub Seed 1 | 64.00 s, 2 Kanal/Kanäle, -22.0 LUFS, Spitze -9.7 dBFS |
+| `Audio/Music/causeway_theme.ogg` | music-causeway Seed 4 | 53.33 s, 2 Kanal/Kanäle, -20.0 LUFS, Spitze -4.9 dBFS |
+| `Audio/Music/crossing_theme.ogg` | music-crossing Seed 3 | 55.38 s, 2 Kanal/Kanäle, -18.0 LUFS, Spitze -3.0 dBFS |
+| `Audio/Music/threshold_theme.ogg` | music-threshold Seed 1 | 49.66 s, 2 Kanal/Kanäle, -22.0 LUFS, Spitze -7.2 dBFS |
+| `Audio/Sfx/footstep_stone_1.wav` | footstep-stone Seed 1 | 0.30 s, 1 Kanal/Kanäle, -26.0 LUFS, Spitze -6.8 dBFS |
+| `Audio/Sfx/footstep_stone_2.wav` | footstep-stone Seed 2 | 0.30 s, 1 Kanal/Kanäle, -26.0 LUFS, Spitze -7.3 dBFS |
+| `Audio/Sfx/footstep_stone_3.wav` | footstep-stone Seed 3 | 0.30 s, 1 Kanal/Kanäle, -28.2 LUFS, Spitze -6.0 dBFS |
+| `Audio/Sfx/footstep_stone_4.wav` | footstep-stone Seed 4 | 0.30 s, 1 Kanal/Kanäle, -26.0 LUFS, Spitze -7.9 dBFS |
+| `Audio/Sfx/footstep_wood_1.wav` | footstep-wood Seed 1 | 0.34 s, 1 Kanal/Kanäle, -26.2 LUFS, Spitze -6.0 dBFS |
+| `Audio/Sfx/footstep_wood_2.wav` | footstep-wood Seed 2 | 0.34 s, 1 Kanal/Kanäle, -26.0 LUFS, Spitze -7.4 dBFS |
+| `Audio/Sfx/footstep_wood_3.wav` | footstep-wood Seed 3 | 0.34 s, 1 Kanal/Kanäle, -26.0 LUFS, Spitze -7.2 dBFS |
+| `Audio/Sfx/footstep_wood_4.wav` | footstep-wood Seed 4 | 0.34 s, 1 Kanal/Kanäle, -26.0 LUFS, Spitze -6.1 dBFS |
+| `Audio/Sfx/ability_heal.wav` | ability-heal Seed 1 | 1.10 s, 1 Kanal/Kanäle, -20.0 LUFS, Spitze -7.5 dBFS |
+| `Audio/Sfx/ability_pierce.wav` | ability-pierce Seed 1 | 0.60 s, 1 Kanal/Kanäle, -17.0 LUFS, Spitze -5.6 dBFS |
+| `Audio/Sfx/ability_leap.wav` | ability-leap Seed 1 | 0.55 s, 1 Kanal/Kanäle, -17.0 LUFS, Spitze -5.6 dBFS |
+| `Audio/Sfx/door_awaken.wav` | door-awaken Seed 1 | 1.80 s, 1 Kanal/Kanäle, -18.0 LUFS, Spitze -2.2 dBFS |
+| `Audio/Sfx/step_hollow_1.wav` | step-hollow Seed 1 | 0.42 s, 1 Kanal/Kanäle, -29.0 LUFS, Spitze -15.2 dBFS |
+| `Audio/Sfx/step_hollow_2.wav` | step-hollow Seed 2 | 0.42 s, 1 Kanal/Kanäle, -29.0 LUFS, Spitze -15.8 dBFS |
+| `Audio/Sfx/step_hollow_3.wav` | step-hollow Seed 3 | 0.42 s, 1 Kanal/Kanäle, -29.0 LUFS, Spitze -15.7 dBFS |
+| `Audio/Sfx/step_hollow_4.wav` | step-hollow Seed 4 | 0.42 s, 1 Kanal/Kanäle, -29.0 LUFS, Spitze -15.4 dBFS |
+| `Audio/Sfx/step_burning_1.wav` | step-burning Seed 1 | 0.26 s, 1 Kanal/Kanäle, -28.0 LUFS, Spitze -11.2 dBFS |
+| `Audio/Sfx/step_burning_2.wav` | step-burning Seed 2 | 0.26 s, 1 Kanal/Kanäle, -28.0 LUFS, Spitze -13.5 dBFS |
+| `Audio/Sfx/step_burning_3.wav` | step-burning Seed 3 | 0.26 s, 1 Kanal/Kanäle, -28.0 LUFS, Spitze -11.6 dBFS |
+| `Audio/Sfx/step_burning_4.wav` | step-burning Seed 4 | 0.26 s, 1 Kanal/Kanäle, -28.0 LUFS, Spitze -12.4 dBFS |
+| `Audio/Sfx/step_devourer_1.wav` | step-devourer Seed 1 | 0.70 s, 1 Kanal/Kanäle, -25.2 LUFS, Spitze -4.0 dBFS |
+| `Audio/Sfx/step_devourer_2.wav` | step-devourer Seed 2 | 0.70 s, 1 Kanal/Kanäle, -25.0 LUFS, Spitze -4.0 dBFS |
+| `Audio/Sfx/step_devourer_3.wav` | step-devourer Seed 3 | 0.70 s, 1 Kanal/Kanäle, -24.9 LUFS, Spitze -4.0 dBFS |
+| `Audio/Sfx/step_devourer_4.wav` | step-devourer Seed 4 | 0.70 s, 1 Kanal/Kanäle, -24.0 LUFS, Spitze -4.6 dBFS |
+| `Audio/Sfx/enemy_emerge.wav` | enemy-emerge Seed 1 | 0.90 s, 1 Kanal/Kanäle, -21.0 LUFS, Spitze -4.0 dBFS |
+| `Audio/Sfx/scythe_swing_1_v2.wav` | Ableitung von scythe_swing_1.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.17 s, 1 Kanal, -13.7 LUFS, Spitze -2.8 dBFS |
+| `Audio/Sfx/scythe_swing_1_v3.wav` | Ableitung von scythe_swing_1.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.19 s, 1 Kanal, -13.7 LUFS, Spitze -3.0 dBFS |
+| `Audio/Sfx/scythe_swing_2_v2.wav` | Ableitung von scythe_swing_2.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.23 s, 1 Kanal, -14.5 LUFS, Spitze -3.7 dBFS |
+| `Audio/Sfx/scythe_swing_2_v3.wav` | Ableitung von scythe_swing_2.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.25 s, 1 Kanal, -14.5 LUFS, Spitze -2.9 dBFS |
+| `Audio/Sfx/scythe_hit_v2.wav` | Ableitung von scythe_hit.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.14 s, 1 Kanal, -16.9 LUFS, Spitze -3.0 dBFS |
+| `Audio/Sfx/scythe_hit_v3.wav` | Ableitung von scythe_hit.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.16 s, 1 Kanal, -16.9 LUFS, Spitze -2.5 dBFS |
+| `Audio/Sfx/core_hit_v2.wav` | Ableitung von core_hit.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.17 s, 1 Kanal, -12.9 LUFS, Spitze -3.1 dBFS |
+| `Audio/Sfx/core_hit_v3.wav` | Ableitung von core_hit.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.19 s, 1 Kanal, -12.9 LUFS, Spitze -2.0 dBFS |
+| `Audio/Sfx/cannon_impact_v2.wav` | Ableitung von cannon_impact.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.31 s, 1 Kanal, -14.0 LUFS, Spitze -3.1 dBFS |
+| `Audio/Sfx/cannon_impact_v3.wav` | Ableitung von cannon_impact.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.34 s, 1 Kanal, -14.0 LUFS, Spitze -2.8 dBFS |
+| `Audio/Sfx/dash_v2.wav` | Ableitung von dash.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.24 s, 1 Kanal, -17.2 LUFS, Spitze -3.4 dBFS |
+| `Audio/Sfx/dash_v3.wav` | Ableitung von dash.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.26 s, 1 Kanal, -17.2 LUFS, Spitze -2.5 dBFS |
+| `Audio/Sfx/hollow_swipe_v2.wav` | Ableitung von hollow_swipe.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.31 s, 1 Kanal, -16.3 LUFS, Spitze -4.1 dBFS |
+| `Audio/Sfx/hollow_swipe_v3.wav` | Ableitung von hollow_swipe.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.34 s, 1 Kanal, -16.3 LUFS, Spitze -4.3 dBFS |
+| `Audio/Sfx/enemy_death_v2.wav` | Ableitung von enemy_death.wav (Tonhöhe ×1.025, Klangneigung +0.8/-0.6 dB) | 0.54 s, 1 Kanal, -14.3 LUFS, Spitze -4.4 dBFS |
+| `Audio/Sfx/enemy_death_v3.wav` | Ableitung von enemy_death.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.58 s, 1 Kanal, -14.3 LUFS, Spitze -3.9 dBFS |
+
+## Kampfschichten (Polish-Durchgang, 06.10.2026)
+
+Rezepte in `tools/audio/recipes/combat.py`. Sie ersetzen nichts aus der Ludo-Bank, sondern liegen
+darunter: ein Kontakt-Transient auf Sample 0 (der Ludo-Treffer setzt erst nach 40–55 ms ein), das
+Material des Ziels, Warnungen für die bisher stummen Ausholbewegungen von Hollow und Devourer, der
+Anlauf des Burning und ein eigener Tod je Gegner. Takes einer Gruppe auf ±0,5 LU angeglichen.
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/hit_hollow_1.wav` | hit-hollow Seed 1 | 0.32 s, 1 Kanal, -20.8 LUFS, Spitze -3.0 dBFS (Takes angeglichen) |
+| `Audio/Sfx/hit_hollow_2.wav` | hit-hollow Seed 2 | 0.32 s, 1 Kanal, -21.3 LUFS, Spitze -2.5 dBFS (Takes angeglichen) |
+| `Audio/Sfx/hit_hollow_3.wav` | hit-hollow Seed 3 | 0.32 s, 1 Kanal, -20.8 LUFS, Spitze -2.5 dBFS (Takes angeglichen) |
+| `Audio/Sfx/hit_burning_1.wav` | hit-burning Seed 1 | 0.42 s, 1 Kanal, -22.1 LUFS, Spitze -5.2 dBFS (Takes angeglichen) |
+| `Audio/Sfx/hit_burning_2.wav` | hit-burning Seed 2 | 0.42 s, 1 Kanal, -22.6 LUFS, Spitze -2.5 dBFS (Takes angeglichen) |
+| `Audio/Sfx/hit_burning_3.wav` | hit-burning Seed 3 | 0.42 s, 1 Kanal, -22.1 LUFS, Spitze -5.9 dBFS (Takes angeglichen) |
+| `Audio/Sfx/hit_devourer_1.wav` | hit-devourer Seed 1 | 0.55 s, 1 Kanal, -22.1 LUFS, Spitze -3.2 dBFS (Takes angeglichen) |
+| `Audio/Sfx/hit_devourer_2.wav` | hit-devourer Seed 2 | 0.55 s, 1 Kanal, -22.6 LUFS, Spitze -2.0 dBFS (Takes angeglichen) |
+| `Audio/Sfx/hit_devourer_3.wav` | hit-devourer Seed 3 | 0.55 s, 1 Kanal, -22.1 LUFS, Spitze -3.4 dBFS (Takes angeglichen) |
+| `Audio/Sfx/hit_dummy_1.wav` | hit-dummy Seed 1 | 0.36 s, 1 Kanal, -22.2 LUFS, Spitze -3.0 dBFS (Takes angeglichen) |
+| `Audio/Sfx/hit_dummy_2.wav` | hit-dummy Seed 2 | 0.36 s, 1 Kanal, -22.7 LUFS, Spitze -3.0 dBFS (Takes angeglichen) |
+| `Audio/Sfx/hit_dummy_3.wav` | hit-dummy Seed 3 | 0.36 s, 1 Kanal, -22.2 LUFS, Spitze -4.4 dBFS (Takes angeglichen) |
+| `Audio/Sfx/hit_heavy_1.wav` | hit-heavy Seed 1 | 0.40 s, 1 Kanal, -22.0 LUFS, Spitze -2.0 dBFS (Takes angeglichen) |
+| `Audio/Sfx/hit_heavy_2.wav` | hit-heavy Seed 2 | 0.40 s, 1 Kanal, -21.6 LUFS, Spitze -2.0 dBFS (Takes angeglichen) |
+| `Audio/Sfx/hit_heavy_3.wav` | hit-heavy Seed 3 | 0.40 s, 1 Kanal, -21.5 LUFS, Spitze -2.4 dBFS (Takes angeglichen) |
+| `Audio/Sfx/body_hit_1.wav` | body-hit Seed 1 | 0.24 s, 1 Kanal, -19.1 LUFS, Spitze -3.5 dBFS (Takes angeglichen) |
+| `Audio/Sfx/body_hit_2.wav` | body-hit Seed 2 | 0.24 s, 1 Kanal, -19.2 LUFS, Spitze -2.5 dBFS (Takes angeglichen) |
+| `Audio/Sfx/body_hit_3.wav` | body-hit Seed 3 | 0.24 s, 1 Kanal, -19.6 LUFS, Spitze -2.5 dBFS (Takes angeglichen) |
+| `Audio/Sfx/hollow_windup_1.wav` | hollow-windup Seed 1 | 0.44 s, 1 Kanal, -18.5 LUFS, Spitze -2.9 dBFS (Takes angeglichen, +3,5 dB nach Mixprüfung) |
+| `Audio/Sfx/hollow_windup_2.wav` | hollow-windup Seed 2 | 0.44 s, 1 Kanal, -18.5 LUFS, Spitze -2.8 dBFS (Takes angeglichen, +3,5 dB nach Mixprüfung) |
+| `Audio/Sfx/devourer_windup_1.wav` | devourer-windup Seed 1 | 0.86 s, 1 Kanal, -21.0 LUFS, Spitze -5.2 dBFS (Takes angeglichen) |
+| `Audio/Sfx/devourer_windup_2.wav` | devourer-windup Seed 2 | 0.86 s, 1 Kanal, -21.0 LUFS, Spitze -5.8 dBFS (Takes angeglichen) |
+| `Audio/Sfx/burning_rush_1.wav` | burning-rush Seed 1 | 0.62 s, 1 Kanal, -22.1 LUFS, Spitze -3.7 dBFS (Takes angeglichen) |
+| `Audio/Sfx/burning_rush_2.wav` | burning-rush Seed 2 | 0.62 s, 1 Kanal, -22.6 LUFS, Spitze -3.0 dBFS (Takes angeglichen) |
+| `Audio/Sfx/death_burning_1.wav` | death-burning Seed 1 | 0.90 s, 1 Kanal, -25.2 LUFS, Spitze -3.0 dBFS (Takes angeglichen) |
+| `Audio/Sfx/death_burning_2.wav` | death-burning Seed 2 | 0.90 s, 1 Kanal, -24.7 LUFS, Spitze -6.0 dBFS (Takes angeglichen) |
+| `Audio/Sfx/death_devourer_1.wav` | death-devourer Seed 1 | 1.40 s, 1 Kanal, -20.0 LUFS, Spitze -2.3 dBFS (Takes angeglichen) |
+| `Audio/Sfx/death_devourer_2.wav` | death-devourer Seed 2 | 1.40 s, 1 Kanal, -20.5 LUFS, Spitze -2.0 dBFS (Takes angeglichen) |
+| `Audio/Sfx/scythe_swing_1_lead.wav` | scythe_swing_1.wav, erste 30 ms gekürzt (Körper früher, Animation) | 0.15 s, 1 Kanal, -12.8 LUFS, Spitze -3.0 dBFS |
+| `Audio/Sfx/scythe_swing_1_lead_v2.wav` | scythe_swing_1_v2.wav, erste 30 ms gekürzt (Körper früher, Animation) | 0.14 s, 1 Kanal, -12.8 LUFS, Spitze -2.8 dBFS |
+| `Audio/Sfx/scythe_swing_1_lead_v3.wav` | scythe_swing_1_v3.wav, erste 30 ms gekürzt (Körper früher, Animation) | 0.16 s, 1 Kanal, -12.9 LUFS, Spitze -3.0 dBFS |
+
+## Ende (Durchgang 3, 06.10.2026)
+
+Rezept `life-flame` in `tools/audio/recipes/ambiences.py`: das Feuer der Life Flame im kalten Ofen
+nach der letzten Welle, eine nahtlose Mono-Schleife (das Spiel setzt sie in Richtung des Ofens und
+blendet sie mit der wachsenden Flamme ein). Tiefes, leises Brausen; Knistern in unregelmäßigen
+Büscheln mit wenigen lauten Pops (Holzkörper bei etwa einem Drittel), ein feines Zischbett. CLAP
+ordnet die Takes als „fireplace with burning wood“ (0,78) und „campfire crackling“ (0,18) ein; die
+erste Fassung mit stärkerem Brausen hörte es als Wind und wurde verworfen.
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/life_flame_loop.wav` | life-flame Seed 2 | 9.00 s, 1 Kanal, -27.7 LUFS, Spitze -4.0 dBFS, Naht -90 dBFS |
+
+## Varianten weiterer häufiger Töne (Durchgang 3, 06.10.2026)
+
+Abgeleitet mit `tools/audio/derive_variants.py` (Tonhöhe ±4,5 %, Klangneigung, Lautheit wie das Original). CLAP-Ähnlichkeit zum Original 0,86–0,99, zu anderen Tönen höchstens 0,60; zufällig gewählt wie die übrigen Varianten.
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/soul_cleave_v2.wav` | Ableitung von soul_cleave.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.43 s, 1 Kanal, -18.2 LUFS, Spitze -3.1 dBFS |
+| `Audio/Sfx/soul_cleave_v3.wav` | Ableitung von soul_cleave.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.47 s, 1 Kanal, -18.2 LUFS, Spitze -1.7 dBFS |
+| `Audio/Sfx/soul_release_v2.wav` | Ableitung von soul_release.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.86 s, 1 Kanal, -17.2 LUFS, Spitze -3.4 dBFS |
+| `Audio/Sfx/soul_release_v3.wav` | Ableitung von soul_release.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.94 s, 1 Kanal, -17.2 LUFS, Spitze -4.4 dBFS |
+| `Audio/Sfx/enemy_emerge_v2.wav` | Ableitung von enemy_emerge.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.86 s, 1 Kanal, -21.0 LUFS, Spitze -4.1 dBFS |
+| `Audio/Sfx/enemy_emerge_v3.wav` | Ableitung von enemy_emerge.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.94 s, 1 Kanal, -21.0 LUFS, Spitze -4.0 dBFS |
+| `Audio/Sfx/burning_detonation_v2.wav` | Ableitung von burning_detonation.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.67 s, 1 Kanal, -16.1 LUFS, Spitze -1.6 dBFS |
+| `Audio/Sfx/burning_detonation_v3.wav` | Ableitung von burning_detonation.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.73 s, 1 Kanal, -16.1 LUFS, Spitze -2.8 dBFS |
+| `Audio/Sfx/burning_charge_v2.wav` | Ableitung von burning_charge.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.53 s, 1 Kanal, -21.5 LUFS, Spitze -3.0 dBFS |
+| `Audio/Sfx/burning_charge_v3.wav` | Ableitung von burning_charge.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.58 s, 1 Kanal, -21.5 LUFS, Spitze -3.4 dBFS |
+| `Audio/Sfx/player_hit_v2.wav` | Ableitung von player_hit.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.19 s, 1 Kanal, -19.5 LUFS, Spitze -3.1 dBFS |
+| `Audio/Sfx/player_hit_v3.wav` | Ableitung von player_hit.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.21 s, 1 Kanal, -19.5 LUFS, Spitze -3.0 dBFS |
+
+## Hallfahnen (Durchgang 3, 06.10.2026)
+
+Mit `tools/audio/hall_tails.py`: der trockene Take gefaltet mit der Impulsantwort seiner Halle, nur der Hall, auf −8 LU unter dem Take gesetzt. Das Spiel spielt ihn nur in dieser Halle mit dem Ton zusammen (Anteil 0,3–0,4, `AudioDirector.HallSends`). CLAP: Trocken + Fahne bei 0,35 wird als „hit in a large reverberant stone hall“ eingeordnet (0,90–0,94, trocken 0,1–0,6), eine Folge von fünf Treffern im Abstand von 0,25 s nicht als „washy reverb“ (0,05).
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/scythe_hit_hall.wav` | Hallfahne von scythe_hit.wav (Gießhalle, RT60 2.4 s) | 2.51 s, 1 Kanal, -24.9 LUFS, Spitze -9.1 dBFS |
+| `Audio/Sfx/core_hit_hall.wav` | Hallfahne von core_hit.wav (Gießhalle, RT60 2.4 s) | 2.44 s, 1 Kanal, -20.9 LUFS, Spitze -4.4 dBFS |
+| `Audio/Sfx/cannon_impact_hall.wav` | Hallfahne von cannon_impact.wav (Gießhalle, RT60 2.4 s) | 2.62 s, 1 Kanal, -22.0 LUFS, Spitze -3.7 dBFS |
+| `Audio/Sfx/burning_detonation_hall.wav` | Hallfahne von burning_detonation.wav (Gießhalle, RT60 2.4 s) | 2.89 s, 1 Kanal, -24.1 LUFS, Spitze -7.0 dBFS |
+| `Audio/Sfx/devourer_slam_hall.wav` | Hallfahne von devourer_slam.wav (Gießhalle, RT60 2.4 s) | 2.71 s, 1 Kanal, -21.0 LUFS, Spitze -3.5 dBFS |
+| `Audio/Sfx/enemy_death_hall.wav` | Hallfahne von enemy_death.wav (Gießhalle, RT60 2.4 s) | 2.88 s, 1 Kanal, -22.3 LUFS, Spitze -4.6 dBFS |
+| `Audio/Sfx/soul_cleave_hall.wav` | Hallfahne von soul_cleave.wav (Gießhalle, RT60 2.4 s) | 2.64 s, 1 Kanal, -26.2 LUFS, Spitze -6.1 dBFS |
+| `Audio/Sfx/player_hit_hall.wav` | Hallfahne von player_hit.wav (Gießhalle, RT60 2.4 s) | 2.51 s, 1 Kanal, -27.5 LUFS, Spitze -11.8 dBFS |
+| `Audio/Sfx/footstep_stone_1_hall.wav` | Hallfahne von footstep_stone_1.wav (Vorhalle, RT60 3.2 s) | 3.26 s, 1 Kanal, -34.0 LUFS, Spitze -15.6 dBFS |
+
+## Seelenkanone ziehen und verstauen (Durchgang 3, 06.10.2026)
+
+Rezepte `cannon-draw` und `cannon-stow` in `tools/audio/recipes/cues.py`: Riemen, schweres Eisen, Kammerraste; beim Verstauen ohne harten Anschlag (die erste Fassung hörte CLAP als Schuss). CLAP: Ziehen „metal clank“ 0,66 + „heavy metal weapon“ 0,26; Verstauen „leather creaking“ 0,31 + „heavy metal weapon being put away“ 0,24.
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/footstep_stone_1_hall_foundry.wav` | Hallfahne von footstep_stone_1.wav (Gießhalle, RT60 2.4 s) | 2.46 s, 1 Kanal, -34.0 LUFS, Spitze -15.3 dBFS |
+
+## Präsenz der Gegner (Durchgang 3, 06.10.2026)
+
+Rezepte `presence-burning`, `presence-hollow`, `presence-devourer` in `tools/audio/recipes/ambiences.py`, nach 16_AUDIO_DIRECTION (Burning: Knistern, instabiles Flammengrollen; Hollow: leises Atmen, verzerrtes Flüstern; Devourer: verzerrte Seelenstimmen aus dem Rumpf). Nahtlose Mono-Schleifen; das Spiel setzt je Art eine Schleife in Richtung des nächsten Gegners und blendet sie nach Abstand. CLAP: Burning „fire crackling and roaring“ 0,66; Hollow „choir of ghostly voices“ 0,68; Devourer „deep monster growl“ 0,38 + „ghostly voices“ 0,27 (die rauschhafte erste Fassung hörte CLAP als Wind, verworfen).
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/presence_burning.wav` | presence-burning Seed 1 | 5.00 s, 1 Kanal/Kanäle, -24.0 LUFS, Spitze -4.8 dBFS |
+| `Audio/Sfx/presence_hollow.wav` | presence-hollow Seed 1 | 6.00 s, 1 Kanal/Kanäle, -26.0 LUFS, Spitze -8.5 dBFS |
+| `Audio/Sfx/presence_devourer.wav` | presence-devourer Seed 1 | 7.00 s, 1 Kanal/Kanäle, -25.0 LUFS, Spitze -8.0 dBFS |
+
+## Resonanz (Durchgang 3, 06.10.2026)
+
+Rezept `resonance-rumble`: die eigene Death Flame während der Resonanz (16_AUDIO_DIRECTION: dezentes Flammengrollen, keine Sirene). Tiefes Grollen mit zwei langsamen Schüben, leiser Herzschlag (60 bpm), wenige weiche Funken. CLAP „deep rumbling fire“ 0,78, „alarm siren“ 0,002. Verworfen: schnelles Flackern im Pegel (CLAP: „wind“ 0,6).
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/resonance_rumble.wav` | resonance-rumble Seed 2 | 4.00 s, 1 Kanal/Kanäle, -25.0 LUFS, Spitze -9.4 dBFS |
+
+## Ladebrummen der Seelenkanone (Durchgang 3, 06.10.2026)
+
+Rezept `cannon-hum` in `tools/audio/recipes/cues.py`: Brummen der Kammer (55–330 Hz), Seelenwimmern (880/1320 Hz mit Vibrato), Vibrieren (Tremolo 18 Hz); alle Frequenzen in ganzen Perioden über 2 s, also nahtlos. Das Spiel hebt Tonhöhe (−0,4 bis +0,2) und Pegel mit der Ladung (16_AUDIO_DIRECTION: hörbar ansteigende Ladung). CLAP „electric hum of a charging energy weapon“ 0,85.
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+
+## Sanfte Seelenfreigabe (Durchgang 3, 06.10.2026)
+
+Owner: Das Einsammeln der Seelen und die Piep-Töne werden in Kämpfen mit vielen Gegnern nervig. Der Ludo-Take `soul_release` (Klangschwerpunkt 8,4 kHz, CLAP „piercing electronic beep“ 0,64) wird durch das Rezept `soul-release-soft` ersetzt: weiche tiefe Glocke in der Tonart der Musik (D#4/F#4/G#4), leises Ausatmen, Tiefpass 5 kHz; Schwerpunkt 1,8 kHz, CLAP „bell“ 0,64 + „soft calm chime“ 0,17, „beep“ 0,09. Eine Höhenabsenkung des alten Takes allein half nicht (Grundton zu hoch; verworfen). Der alte Take bleibt im Bestand, wird aber nicht mehr gespielt.
+
+Die drei Glocken-Takes `soul_release_soft_1..3` sind seit Durchgang 5 entfernt (siehe unten).
+
+## Seelenfreigabe als Atem (Durchgang 5, 07.10.2026)
+
+Owner: Der „Bleep“ beim Einsammeln der Seelen nervt noch immer. Auch die weiche Glocke ist eine Summe reiner Töne; unter denselben Etiketten wie unten hörte CLAP sie als „soft chime“ 0,61 + „electronic beep“ 0,27. Rezept `soul-release-breath` hat keine Tonhöhe: geflüstertes Ausatmen durch gleitende Vokalformanten (je Take ein anderes Vokalpaar, Formanten 5–22 % höher als beim Mann), ein weiches Aufflattern der Death Flame beim Freigabe-Aufblitzen (0,85 s, wie `Soul.UpdateRelease`), ein leiser Luftzug beim Losfliegen (1,22 s); Tiefpass 3,6 kHz vierter Ordnung gegen Zischen. CLAP: „whispered breath“ 0,31–0,45 / „ghostly whisper“ 0,19–0,57 / „gentle exhale“ 0,07–0,26, „electronic beep“, „bell“, „soft chime“ jeweils unter 0,01. Das Rezept `soul-release-soft` ist entfernt.
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/soul_release_breath_1.wav` | soul-release-breath Seed 2 | 1.45 s, 1 Kanal/Kanäle, -23.0 LUFS, Spitze -5.7 dBFS |
+| `Audio/Sfx/soul_release_breath_2.wav` | soul-release-breath Seed 3 | 1.45 s, 1 Kanal/Kanäle, -23.0 LUFS, Spitze -7.8 dBFS |
+| `Audio/Sfx/soul_release_breath_3.wav` | soul-release-breath Seed 4 | 1.45 s, 1 Kanal/Kanäle, -23.0 LUFS, Spitze -5.8 dBFS |
+| `Audio/Sfx/soul_release_breath_4.wav` | soul-release-breath Seed 5 | 1.45 s, 1 Kanal/Kanäle, -23.0 LUFS, Spitze -5.9 dBFS |
+
+## Warden-Flammen als Punktquellen (Durchgang 3, 07.10.2026)
+
+Die Flammen der Vorhalle waren in die Atmosphäre eingebacken (links −0,35, rechts 0,3) und standen still, wo immer man ging. Rezept `warden-flame`: weiches, tiefes Brausen, das schnell flattert, wenig Luft darüber, ein leises Summen in Gis, selten ein weicher Glutknack; Mono-Schleife. Das Spiel spielt sie dort, wo Feuerschalen (voll) und Wandleuchter (schwächer) brennen, lauter im Vorbeigehen. CLAP: „torch flame burning“ 0,92, „wind“ 0,04, „rain“ 0,02. Erste Fassungen mit hellem Zischen und Ticken hörte CLAP als „rain“ (bis 0,57), mit langsamem Flattern als „wind“ (bis 0,52). `ambience-hub` neu ohne die eingebackene Flammenschicht (gleicher Seed, Zufallsstrom unverändert, damit alle übrigen Schichten gleich bleiben).
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/warden_flame_loop.wav` | warden-flame Seed 3 | 6.00 s, 1 Kanal/Kanäle, -26.0 LUFS, Spitze -10.5 dBFS |
+
+## Pochen der gebundenen Seele (Durchgang 3, 06.10.2026)
+
+Wenig Leben (30 % oder weniger) meldete nur die Lebensleiste in der Ecke. Rezept `soul-throb`: dumpfer, tiefer Doppelschlag (Gis1 fallend nach E1, weicher Einsatz, gedämpfter Stoß, Tiefpass 520 Hz), danach ein leises dunkles Glimmen. Das Spiel löst ihn je Schlag aus, schneller, je weniger Leben bleibt, und Bildrand und Lebensleiste pulsieren im selben Takt. CLAP (vier Schläge im langsamsten Takt): „slow heartbeat“ 0,68/0,65 + „muffled heartbeat“ 0,25/0,20, „bass synth note“ 0,02/0,07. Erste Fassungen mit längerem Sinuston hörte CLAP als „bass synth note“ (bis 0,62).
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/soul_throb_1.wav` | soul-throb Seed 3 | 0.62 s, 1 Kanal/Kanäle, -23.0 LUFS, Spitze -4.7 dBFS |
+| `Audio/Sfx/soul_throb_2.wav` | soul-throb Seed 4 | 0.62 s, 1 Kanal/Kanäle, -23.0 LUFS, Spitze -1.7 dBFS |
+
+## Wucht der Sensenhiebe (Durchgang 3, 06.10.2026)
+
+Owner: Der Klang beim Schlagen muss mächtiger werden. Rezepte `scythe-weight-1/2/3` in `tools/audio/recipes/combat.py` liegen unter den Ludo-Schwüngen: schwerer Luftstoß mit aufwärts gleitendem Band, am lautesten zur Kontaktzeit (0,062/0,085/0,155 s nach Hiebbeginn, gemessen 0,067/0,088/0,167 s), Auflodern der Death Flame zu Beginn des Durchziehens, kurzer dunkler Klingenklang; beim dritten Hieb ein tiefer Druckstoß. CLAP „heavy sword swing whoosh“ 0,99.
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/scythe_weight_1_1.wav` | scythe-weight-1 Seed 1 | 0.42 s, 1 Kanal/Kanäle, -19.8 LUFS, Spitze -2.0 dBFS |
+| `Audio/Sfx/scythe_weight_1_2.wav` | scythe-weight-1 Seed 2 | 0.42 s, 1 Kanal/Kanäle, -18.0 LUFS, Spitze -2.3 dBFS |
+| `Audio/Sfx/scythe_weight_2_1.wav` | scythe-weight-2 Seed 1 | 0.48 s, 1 Kanal/Kanäle, -18.9 LUFS, Spitze -2.0 dBFS |
+| `Audio/Sfx/scythe_weight_2_2.wav` | scythe-weight-2 Seed 2 | 0.48 s, 1 Kanal/Kanäle, -19.6 LUFS, Spitze -2.0 dBFS |
+| `Audio/Sfx/scythe_weight_3_1.wav` | scythe-weight-3 Seed 1 | 0.70 s, 1 Kanal/Kanäle, -19.3 LUFS, Spitze -2.0 dBFS |
+| `Audio/Sfx/scythe_weight_3_2.wav` | scythe-weight-3 Seed 2 | 0.70 s, 1 Kanal/Kanäle, -19.9 LUFS, Spitze -2.0 dBFS |
+
+## Bodenbruch unter dem Devourer-Schlag (Durchgang 4, 07.10.2026)
+
+Owner: Der Devourer soll seinen Flächenschaden durch einen echten Bodenschlag zeigen statt durch einen Kreis. Rezept `ground-break` in `tools/audio/recipes/combat.py` liegt unter dem Ludo-Schlag und spielt im selben Frame wie der Bodenbruch im Bild: tiefer fallender Einschlag, eine Kette scharfer Risse in den ersten 120 ms, mahlende Platten, Geröll und Grus prasseln eine Sekunde lang nieder; Rissspitzen weich begrenzt, damit das Gewicht trägt. CLAP: „heavy impact cracking a stone floor“ 0,73/0,83 (Seed 3 mit „gunshot“ 0,18 verworfen).
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/ground_break_1.wav` | ground-break Seed 1 | 1.70 s, 1 Kanal/Kanäle, -21.7 LUFS, Spitze -2.0 dBFS |
+| `Audio/Sfx/ground_break_2.wav` | ground-break Seed 2 | 1.70 s, 1 Kanal/Kanäle, -23.0 LUFS, Spitze -2.0 dBFS |
+
+## Stimmen der Gegner (Durchgang 4, 07.10.2026)
+
+Owner: Die Stimmung soll actionreicher, spannender und etwas verrückt sein, mit Klangsignalen der Monster. Rezepte in `tools/audio/recipes/voices.py`: eine kleine Quelle-Filter-Stimme (Rosenberg-Stimmlippenpulse mit Jitter, Schimmer und Periodenverdopplung, Atem, gleitende Vokalformanten, Rauheit) und für Schreie ein eigener Baustein aus halb Stimme, halb Luft durch weite Formanten mit 75–110-Hz-Rauheit. Hollow: hauchiges, gebrochenes Klagen durch die Porzellanmaske, das hakt und stottert (Rufen nach jemandem, der geht); beim Griff ein scharfes Einatmen und ein abgerissener Schrei. Burning: irres, abgehacktes Kichern, das in Knistern zerbricht und in einem Kiekser endet; vor dem Anlauf ein ansteigender Schrei, der in Feuerfauchen übergeht. Devourer: tiefes Knurren mit Periodenverdopplung, darin dünn die gefangenen Seelen; beim Wittern einer Seele Schnüffeln, hungriges Stöhnen und aufschreiende Seelen.
+
+CLAP (ausgewählte Takes): hollow-call „zombie groan“/„ghostly moaning voice“/„scream“ (Stimme, nie Instrument); hollow-grasp „scream“ 0,63/0,65; burning-cackle „maniacal laughter“ 0,81/0,87/0,70; burning-shriek „scream“ 0,79/0,60; devourer-growl „monster growling“ 0,95/0,90/0,92; devourer-hunger „monster growling“ 0,94/0,90. Verworfen: Schreie aus reiner Stimmlippenquelle durch Formanten („horn“/„synthesizer tone“ bis 0,57), auch mit Biphonation; gleichmäßig getaktetes Kichern (mechanisch).
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/hollow_call_1.wav` | hollow-call Seed 1 | 1.10 s, 1 Kanal/Kanäle, -22.0 LUFS, Spitze -6.1 dBFS |
+| `Audio/Sfx/hollow_call_2.wav` | hollow-call Seed 2 | 1.03 s, 1 Kanal/Kanäle, -22.0 LUFS, Spitze -4.9 dBFS |
+| `Audio/Sfx/hollow_call_3.wav` | hollow-call Seed 4 | 1.23 s, 1 Kanal/Kanäle, -22.0 LUFS, Spitze -5.9 dBFS |
+| `Audio/Sfx/hollow_grasp_1.wav` | hollow-grasp Seed 1 | 0.42 s, 1 Kanal/Kanäle, -19.0 LUFS, Spitze -15.2 dBFS |
+| `Audio/Sfx/hollow_grasp_2.wav` | hollow-grasp Seed 4 | 0.42 s, 1 Kanal/Kanäle, -19.0 LUFS, Spitze -15.1 dBFS |
+| `Audio/Sfx/burning_cackle_1.wav` | burning-cackle Seed 1 | 1.20 s, 1 Kanal/Kanäle, -21.0 LUFS, Spitze -11.5 dBFS |
+| `Audio/Sfx/burning_cackle_2.wav` | burning-cackle Seed 2 | 1.22 s, 1 Kanal/Kanäle, -21.0 LUFS, Spitze -11.3 dBFS |
+| `Audio/Sfx/burning_cackle_3.wav` | burning-cackle Seed 4 | 1.32 s, 1 Kanal/Kanäle, -21.0 LUFS, Spitze -12.9 dBFS |
+| `Audio/Sfx/burning_shriek_1.wav` | burning-shriek Seed 2 | 0.75 s, 1 Kanal/Kanäle, -19.0 LUFS, Spitze -11.4 dBFS |
+| `Audio/Sfx/burning_shriek_2.wav` | burning-shriek Seed 3 | 0.75 s, 1 Kanal/Kanäle, -19.0 LUFS, Spitze -11.9 dBFS |
+| `Audio/Sfx/devourer_growl_1.wav` | devourer-growl Seed 2 | 1.28 s, 1 Kanal/Kanäle, -20.0 LUFS, Spitze -8.3 dBFS |
+| `Audio/Sfx/devourer_growl_2.wav` | devourer-growl Seed 3 | 1.23 s, 1 Kanal/Kanäle, -20.0 LUFS, Spitze -8.5 dBFS |
+| `Audio/Sfx/devourer_growl_3.wav` | devourer-growl Seed 4 | 1.48 s, 1 Kanal/Kanäle, -20.0 LUFS, Spitze -8.1 dBFS |
+| `Audio/Sfx/devourer_hunger_1.wav` | devourer-hunger Seed 1 | 1.60 s, 1 Kanal/Kanäle, -21.0 LUFS, Spitze -8.4 dBFS |
+| `Audio/Sfx/devourer_hunger_2.wav` | devourer-hunger Seed 2 | 1.60 s, 1 Kanal/Kanäle, -21.0 LUFS, Spitze -8.0 dBFS |
+
+## Kampfmusik der Gießhalle (Durchgang 4, 07.10.2026)
+
+Owner: Die Stimmung ist zu filmisch und atmosphärisch, nicht actionreich und spannend genug. CLAP hört den Ludo-Arena-Loop als „calm cinematic music“ (0,57). Der Loop bleibt für Intro, Zwischenpausen und Sandbox; während einer Welle (und während Prolog-Kämpfen) übernimmt eine Partitur aus drei Stems, die das Spiel nach Kampflage schichtet (`AudioDirector.SetCombatIntensity`). Rezepte in `tools/audio/recipes/combat_music.py`, 128 bpm (ein Schlag genau 22 500 Samples, 16 Takte genau 30 s), G# phrygisch über einem Orgelpunkt (i–bII), alle drei aus derselben festen Partitur und deckungsgleich; Hall um die Schleifengrenze gefaltet, die Datei beginnt 1714 Samples vor dem Downbeat, wo alle drei weniger als −57 dBFS springen; installiert mit `--seamless` (ohne Randblende).
+
+- Puls: Taiko und Sub-Kick, galoppierender verzerrter Bass, Orgelpunkt des Ofens.
+- Antrieb: Ambosse und Hämmer der Gießhalle auf dem Backbeat, Eisen-Snare, gehämmerte Hats, Blechstöße in Quinten, Tom-Fills am Phrasenende; in den Takten 8–9 läutet eine Glocke das Leitmotiv des Spiels (D#–C#–H–G#, stehen bleibend auf A#), eine Oktave unter den Zonen-Themen (CLAP Motivabschnitt „intense action music with drums“ 0,93; Naht −52 dB).
+- Raserei: Spiccato-Ostinato über Grundton, kleiner Sekunde und Quinte, darunter leise Tremolo-Cluster, Chorschreie mit fallendem Glissando, ein zu schnelles Uhrwerk, verstimmte Spieluhr, Riser in die Phrasen.
+
+CLAP (je 10 s): Puls + Antrieb „intense action music with drums“ 0,61; alle drei „intense action music with drums“ 0,39 vor „calm cinematic“ 0,27; die Raserei allein „techno“ 0,86 (sie spielt nie allein). Mix (`mix_report.py --zone combat`, alle Stems voll): alle Warnsignale im Band (+6,3 bis +14 LU), zusätzlich duckt die Partitur kurz unter frischen Warnsignalen. Verworfen: Raserei als schwebende Tremolo-Flächen (die volle Mischung kippte zu „calm cinematic“ 0,35).
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Music/combat_pulse.wav` | combat-pulse Seed 1 | 30.00 s, 2 Kanal/Kanäle, -20.0 LUFS, Spitze -9.9 dBFS |
+| `Audio/Music/combat_drive.wav` | combat-drive Seed 1 | 30.00 s, 2 Kanal/Kanäle, -21.0 LUFS, Spitze -9.9 dBFS |
+| `Audio/Music/combat_frenzy.wav` | combat-frenzy Seed 1 | 30.00 s, 2 Kanal/Kanäle, -22.0 LUFS, Spitze -11.8 dBFS |
+
+## Klänge der Orte (Durchgang 4, 07.10.2026)
+
+Owner: Atmosphäre, Spannung und Gefühl dürfen kreativer werden. Über dem gleichförmigen Bett jeder Zone spielen jetzt selten einzelne Klänge der Orte, von einer zufälligen Seite (`AudioDirector.PlaceEvents`). Rezepte in `tools/audio/recipes/ambient_events.py`. Gießhalle: die Werksglocke, die der Stadt den Takt gab, schlägt fern (CLAP „church bell“ 0,97/0,81). Ufer: die Fallblattanzeige blättert für eine Fähre, die nie kommt (mechanisches Klappern, CLAP „typewriter“ 0,91/0,75), und weit draußen tönt das Horn dieser Fähre, nie näher (CLAP „ship horn“ 0,93/0,95); das Horn auch über dem Titel und leiser im Hafen. Verworfen: Hammerschläge in der Halle (CLAP „electronic beep“, „footsteps“, dicht modal „church bell“), rasselnde Ketten („door creak“), ächzendes Dach („ship horn“), Murmeln der letzten Schicht („monster growling“).
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/foundry_bell_1.wav` | foundry-bell Seed 1 | 6.50 s, 1 Kanal/Kanäle, -29.0 LUFS, Spitze -15.7 dBFS |
+| `Audio/Sfx/foundry_bell_2.wav` | foundry-bell Seed 2 | 6.50 s, 1 Kanal/Kanäle, -29.0 LUFS, Spitze -14.3 dBFS |
+| `Audio/Sfx/shore_horn_1.wav` | shore-horn Seed 1 | 5.00 s, 1 Kanal/Kanäle, -30.0 LUFS, Spitze -18.1 dBFS |
+| `Audio/Sfx/shore_horn_2.wav` | shore-horn Seed 2 | 5.00 s, 1 Kanal/Kanäle, -30.0 LUFS, Spitze -16.7 dBFS |
+| `Audio/Sfx/shore_board_1.wav` | shore-board Seed 1 | 1.80 s, 1 Kanal/Kanäle, -30.2 LUFS, Spitze -3.0 dBFS |
+| `Audio/Sfx/shore_board_2.wav` | shore-board Seed 3 | 1.80 s, 1 Kanal/Kanäle, -30.0 LUFS, Spitze -3.8 dBFS |
+
+## Seelenkanone aus Eisen und Feuer (Durchgang 5, 07.10.2026)
+
+Owner: Klang (und Aussehen) der Soul Cannon müssen noch einmal überarbeitet werden. CLAP hörte den Ludo-Ladeton `cannon_charge` als „sci-fi energy weapon charging“ 0,79 + „laser gun“ 0,12, das Ladebrummen `cannon_hum` als „bell“ 0,70 + „electric hum“ 0,23 und das Verstauen als „gunshot“ 0,24. 07_SOUL_CANNON beschreibt eine Death-Flame-Leitung aus geschwärztem Eisen, die die Flamme des Spielers nur hält und abfeuert. Rezepte in `tools/audio/recipes/cannon.py` (Grenzwert-Begrenzer, damit alle Takes eines Cues gleich laut sind):
+
+- `cannon-ignite` (Laden beginnt): die Flamme fängt in der Kammer, wird ansteigend hineingesogen, das Eisen tickt. CLAP „flame igniting“ 0,57–0,71.
+- `cannon-charge-loop` (ersetzt `cannon_hum`, nahtlos, das Spiel hebt Tonhöhe −0,35 → +0,18 und Pegel mit der Ladung): flackerndes Fauchen unter Druck mit Glutknistern, hohles Brausen des Kessels, tickendes Eisen. CLAP „blowtorch“ 0,55 + „flame igniting“ 0,15, „wind“ 0,09. Erste Fassung mit glattem tiefem Rauschen: „wind“ 0,29–0,40 (verworfen).
+- `cannon-stage` (neu, Ladestufe 2 und 3): die Raste rattert über einige Zähne (resonante Stahlklicks), das Eisen setzt sich dumpf. CLAP „mechanical latch click“ 0,68–0,85. Verworfen: Breitband-Klicks und Eisenschlag („gunshot“ 0,55–0,92), Klangring („bell“), Aufflammen („gunshot“).
+- `cannon-full` (ersetzt den Ludo-Take im Spiel): die Raste schlägt mit nachklingendem schwerem Eisen ein, die Flamme faucht hinter den Gittern auf und zittert. CLAP „heavy metal clank“ 0,51–0,70.
+- `cannon-fire` (Schuss, drei Takes): trockener Knall, schwerer tiefer Schlag, Flammenstoß, eiserner Rückschlag in die Hände, zischendes Abblasen der Kammer, Asche. CLAP „explosion“ 0,64–0,85 + „gunshot“ 0,10–0,27. Hallfahne der Gießhalle aus Take 1 (`hall_tails.py`).
+- `cannon-fire-full` (neu, nur unter dem vollen Schuss): gewaltiger tiefer Druckstoß und brüllend ausfahrende Flamme, die nachfaucht. CLAP „explosion“ 0,58–0,77 + „heavy cannon blast“ 0,13–0,27.
+- `cannon-stow` neu (in `recipes/cues.py`): weicher Einsatz statt harten Anschlags. CLAP „heavy object put down on fabric“ 0,65 (vorher „gunshot“ 0,24).
+
+Die Ludo-Takes `cannon_charge.wav`, `cannon_full.wav` und `cannon_fire.wav` bleiben im Bestand, werden aber nicht mehr gespielt; ihre Ableitungen `cannon_fire_v2/_v3`, die Hallfahne `cannon_fire_hall` und das Brummen `cannon_hum` (Rezept `cannon-hum`) sind entfernt. `cannon_impact` (Treffer am Ziel) bleibt.
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/cannon_ignite_1.wav` | cannon-ignite Seed 2 | 0.75 s, 1 Kanal/Kanäle, -21.0 LUFS, Spitze -4.2 dBFS |
+| `Audio/Sfx/cannon_ignite_2.wav` | cannon-ignite Seed 1 | 0.75 s, 1 Kanal/Kanäle, -21.0 LUFS, Spitze -3.9 dBFS |
+| `Audio/Sfx/cannon_charge_loop.wav` | cannon-charge-loop Seed 2 | 2.00 s, 1 Kanal/Kanäle, -22.0 LUFS, Spitze -6.6 dBFS |
+| `Audio/Sfx/cannon_stage_1.wav` | cannon-stage Seed 1 | 0.40 s, 1 Kanal/Kanäle, -24.0 LUFS, Spitze -3.0 dBFS |
+| `Audio/Sfx/cannon_stage_2.wav` | cannon-stage Seed 3 | 0.40 s, 1 Kanal/Kanäle, -23.5 LUFS, Spitze -3.0 dBFS |
+| `Audio/Sfx/cannon_full_1.wav` | cannon-full Seed 2 | 0.90 s, 1 Kanal/Kanäle, -18.5 LUFS, Spitze -2.0 dBFS |
+| `Audio/Sfx/cannon_full_2.wav` | cannon-full Seed 1 | 0.90 s, 1 Kanal/Kanäle, -18.5 LUFS, Spitze -2.0 dBFS |
+| `Audio/Sfx/cannon_shot_1.wav` | cannon-fire Seed 2 | 0.95 s, 1 Kanal/Kanäle, -16.6 LUFS, Spitze -1.5 dBFS |
+| `Audio/Sfx/cannon_shot_2.wav` | cannon-fire Seed 3 | 0.95 s, 1 Kanal/Kanäle, -17.0 LUFS, Spitze -1.5 dBFS |
+| `Audio/Sfx/cannon_shot_3.wav` | cannon-fire Seed 1 | 0.95 s, 1 Kanal/Kanäle, -16.6 LUFS, Spitze -1.5 dBFS |
+| `Audio/Sfx/cannon_blast_1.wav` | cannon-fire-full Seed 1 | 1.40 s, 1 Kanal/Kanäle, -18.5 LUFS, Spitze -2.0 dBFS |
+| `Audio/Sfx/cannon_blast_2.wav` | cannon-fire-full Seed 2 | 1.40 s, 1 Kanal/Kanäle, -18.6 LUFS, Spitze -2.0 dBFS |
+| `Audio/Sfx/cannon_shot_1_hall.wav` | Hallfahne von cannon_shot_1.wav (Gießhalle, RT60 2.4 s) | 2.53 s, 1 Kanal, -24.6 LUFS, Spitze -6.4 dBFS |
+
+## Signale aus Eisen und Feuer statt Piepen (Durchgang 5, 07.10.2026)
+
+Owner: Piepen nervt. Eine CLAP-Durchsicht aller Spielklänge („electronic beep“, „notification chime“, „bell“, „sci-fi laser“) fand die häufigsten Signale des Kampfs: den Ludo-Wellenstart `wave_start` (gedacht als Ofentor und Bronzeglocke, gehört „electronic beep“ 0,90), den Wellenabschluss `wave_clear` (Glas und Bronze, „electronic beep“ 0,66) und das Verschlingen des Devourer `devourer_devour` („sci-fi laser“ 0,56). Rezepte in `tools/audio/recipes/foundry.py`:
+
+- `wave-gate` (Welle beginnt): das Ofentor schlägt zu, Ketten laufen nach, der Ofen brüllt auf, eine Trommel der Gießerei antwortet. CLAP „drum hit“ 0,88–0,92, „notification chime“ höchstens 0,06. Hallfahne der Gießhalle aus Take 1.
+- `wave-ease` (Welle geschafft): die Flamme sinkt langsam fauchend in sich zusammen, Glut knistert aus, Asche rieselt, die Halle summt tief. CLAP „whoosh“ 0,99. Verworfen: mit Einsatz auf Sample 0 und tiefem Plattenklang („explosion“ 0,86–0,97), mit lauterem Knistern („explosion“ bis 0,64).
+- `devourer-devour`: ein langer Zug durch die Kehle (Vokal schließt sich von „aw“ zu „u“), das Flüstern der Seele wird hineingerissen, nasses Schlucken, die Rumpföffnung schnappt zu. CLAP „monster inhaling“ 0,69–0,89.
+
+Die Ludo-Takes `wave_start.wav`, `wave_clear.wav` und `devourer_devour.wav` bleiben im Bestand, werden aber nicht mehr gespielt; die Hallfahne `wave_start_hall` ist entfernt.
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/wave_gate_1.wav` | wave-gate Seed 3 | 1.50 s, 1 Kanal/Kanäle, -17.0 LUFS, Spitze -1.7 dBFS |
+| `Audio/Sfx/wave_gate_2.wav` | wave-gate Seed 2 | 1.50 s, 1 Kanal/Kanäle, -17.0 LUFS, Spitze -1.5 dBFS |
+| `Audio/Sfx/wave_ease_1.wav` | wave-ease Seed 3 | 2.00 s, 1 Kanal/Kanäle, -23.0 LUFS, Spitze -6.1 dBFS |
+| `Audio/Sfx/wave_ease_2.wav` | wave-ease Seed 1 | 2.00 s, 1 Kanal/Kanäle, -23.0 LUFS, Spitze -6.9 dBFS |
+| `Audio/Sfx/devourer_devour_1.wav` | devourer-devour Seed 1 | 1.25 s, 1 Kanal/Kanäle, -19.0 LUFS, Spitze -5.0 dBFS |
+| `Audio/Sfx/devourer_devour_2.wav` | devourer-devour Seed 3 | 1.25 s, 1 Kanal/Kanäle, -19.0 LUFS, Spitze -6.4 dBFS |
+| `Audio/Sfx/wave_gate_1_hall.wav` | Hallfahne von wave_gate_1.wav (Gießhalle, RT60 2.4 s) | 2.97 s, 1 Kanal, -24.7 LUFS, Spitze -8.7 dBFS |
+
+## Menü, Truhe, Münzen und Fähigkeiten ohne Glöckchen (Durchgang 5, 07.10.2026)
+
+Dieselbe CLAP-Durchsicht fand Sinustöne in Rezepten aus `recipes/cues.py`, die als Glöckchen oder Piepen gehört wurden: Menü schließen („electronic beep“ 0,85), Menü öffnen und bewegen („notification chime“ bis 0,37), Truhe („notification chime“ 0,66), Münzen (0,84), Marke (0,86), Vergeltung („bell“ 0,68), Sog („sci-fi laser“ 0,22) und die Ludo-Titelbestätigung („electronic beep“ 0,64). Neu gebaut ohne Sinustöne: Menü-Ticks als kurze resonante Eisenklicks (`_tick`), Öffnen und Schließen als Lederheft und Glut, Truhe mit weichem Riegel, knarrendem Deckel und erwachender Glut, Münzen aus angeschlagenem Metall mit Klappern, Marke als Einbrennen (Zischen, Glut, kleines Aufflammen), Vergeltung als Flammenwand mit dunklem Eisen (Resonatoren statt Sinus), Sog mit tiefem Brausen statt Sirenenton, die Titelbestätigung als zündende Glut mit Raste (`title-confirm` → `title_ignite.wav`; der Ludo-Take bleibt unbenutzt im Bestand). CLAP: Piep-/Glöckchen-Anteil je unter 0,1 (Münzen „coins clinking“ 0,65; Marke „flame igniting“ 0,82; Titel „flame igniting“ 0,42). `_spectral_whoosh`, das Heilung, Durchschlag und Rückstoßsprung aufrufen, war im Rezeptmodul nicht definiert und ist ergänzt (deren Dateien unverändert).
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/ui_move.wav` | ui-move Seed 1 | 0.12 s, 1 Kanal/Kanäle, -30.0 LUFS, Spitze -9.3 dBFS |
+| `Audio/Sfx/ui_back.wav` | ui-back Seed 1 | 0.14 s, 1 Kanal/Kanäle, -31.0 LUFS, Spitze -13.4 dBFS |
+| `Audio/Sfx/ui_open.wav` | ui-open Seed 1 | 0.45 s, 1 Kanal/Kanäle, -30.0 LUFS, Spitze -16.5 dBFS |
+| `Audio/Sfx/ui_close.wav` | ui-close Seed 1 | 0.32 s, 1 Kanal/Kanäle, -31.0 LUFS, Spitze -17.3 dBFS |
+| `Audio/Sfx/chest_open.wav` | chest-open Seed 2 | 0.90 s, 1 Kanal/Kanäle, -20.0 LUFS, Spitze -3.1 dBFS |
+| `Audio/Sfx/currency_gain.wav` | currency-gain Seed 2 | 0.50 s, 1 Kanal/Kanäle, -29.3 LUFS, Spitze -7.0 dBFS |
+| `Audio/Sfx/ability_vortex.wav` | ability-vortex Seed 1 | 1.20 s, 1 Kanal/Kanäle, -18.0 LUFS, Spitze -3.3 dBFS |
+| `Audio/Sfx/ability_guard.wav` | ability-guard Seed 1 | 1.00 s, 1 Kanal/Kanäle, -18.0 LUFS, Spitze -4.0 dBFS |
+| `Audio/Sfx/ability_mark.wav` | ability-mark Seed 1 | 0.60 s, 1 Kanal/Kanäle, -20.2 LUFS, Spitze -3.0 dBFS |
+| `Audio/Sfx/title_ignite.wav` | title-confirm Seed 2 | 0.60 s, 1 Kanal/Kanäle, -24.0 LUFS, Spitze -9.7 dBFS |
+| `Audio/Sfx/currency_gain_v2.wav` | Ableitung von currency_gain.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.48 s, 1 Kanal, -29.3 LUFS, Spitze -6.5 dBFS |
+| `Audio/Sfx/currency_gain_v3.wav` | Ableitung von currency_gain.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.52 s, 1 Kanal, -29.3 LUFS, Spitze -7.0 dBFS |
+
+## Hollow-Tod ohne Glöckchen (Durchgang 5, 07.10.2026)
+
+Der Hollow-Tod, der häufigste Gegnertod kurz vor dem Einsammeln der Seele, ließ die Porzellanmaske mit reinen Sinus-Teiltönen springen; CLAP hörte „notification chime“ 0,46–0,63. Jetzt knacken und splittern die Scherben (Resonatoren, von kurzem Rauschen angeregt, `_shard`), der Stoff fällt, Scherben klappern; mit Begrenzer auf −19 LUFS (`dsp.loud_and_limited`, jetzt gemeinsam für alle Rezepte). CLAP „impact“ 0,35–0,50, „notification chime“ höchstens 0,09.
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/death_hollow_1.wav` | death-hollow Seed 1 | 0.90 s, 1 Kanal/Kanäle, -19.0 LUFS, Spitze -2.5 dBFS |
+| `Audio/Sfx/death_hollow_2.wav` | death-hollow Seed 3 | 0.90 s, 1 Kanal/Kanäle, -19.0 LUFS, Spitze -2.5 dBFS |
+
+## Das Boot der Überfahrt (Durchgang 5, 07.10.2026)
+
+Auf der Überfahrt wogt das Meer jetzt gegen das Deck (`PrologueEnvironment.Swell`); dazu ächzt das Boot selten in der Dünung (Ortsklang wie Werksglocke und Fährhorn, alle 7–14 s, von zufälliger Seite). Rezept `skiff-creak` in `recipes/ambient_events.py`: Haftgleiten im Holz, dessen Pulsrate mit der Last steigt und fällt, durch tiefe Rumpfmoden (140–720 Hz, kein Türquietschen), dann ein dumpfer Wasserschlag gegen den Rumpf. CLAP „wooden boat creaking“ 0,53–0,65, „door creaking“ 0,20, „drum“ höchstens 0,16 (mit lauterem Wasserschlag bis 0,42, verworfen).
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/skiff_creak_1.wav` | skiff-creak Seed 4 | 2.20 s, 1 Kanal/Kanäle, -27.0 LUFS, Spitze -7.0 dBFS |
+| `Audio/Sfx/skiff_creak_2.wav` | skiff-creak Seed 3 | 2.20 s, 1 Kanal/Kanäle, -27.0 LUFS, Spitze -8.3 dBFS |
+
+## Ziehen und Verstauen in zwei Takes (Durchgang 5, 07.10.2026)
+
+Ziehen und Verstauen fallen bei jedem Kanonenschuss und hatten je nur einen Take. Je zwei Takes aus denselben Rezepten (`cannon_draw.wav` ist jetzt `cannon_draw_1.wav`, bitgleich). Andere Seeds des Verstauens klangen nach „notification chime“ (0,52–0,68; auch der bisherige Take zu 0,30): Eisenklang und Schnalle waren noch Sinustöne. Jetzt kurze Resonanzklicks (`_tick`); alle Seeds „heavy object put down on fabric“ 0,84–0,94.
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/cannon_draw_1.wav` | cannon-draw Seed 1 | 0.42 s, 1 Kanal/Kanäle, -24.5 LUFS, Spitze -3.0 dBFS |
+| `Audio/Sfx/cannon_draw_2.wav` | cannon-draw Seed 4 | 0.42 s, 1 Kanal/Kanäle, -23.7 LUFS, Spitze -3.0 dBFS |
+| `Audio/Sfx/cannon_stow_1.wav` | cannon-stow Seed 1 | 0.36 s, 1 Kanal/Kanäle, -24.0 LUFS, Spitze -8.1 dBFS |
+| `Audio/Sfx/cannon_stow_2.wav` | cannon-stow Seed 3 | 0.36 s, 1 Kanal/Kanäle, -24.0 LUFS, Spitze -9.9 dBFS |
+
+## Abgeleitete Takes für einzeln gebliebene Klänge (Durchgang 5, 07.10.2026)
+
+Devourer-Schlag, Seelensinn an/aus und die Fähigkeiten Durchschlag, Rückstoßsprung, Sog, Vergeltung und Vorlage hatten je einen Take und wiederholten sich exakt. Je zwei Ableitungen mit `derive_variants.py` (Tonhöhe ±4,5 %, Klangneigung), wie bei den übrigen häufigen Klängen.
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/devourer_slam_v2.wav` | Ableitung von devourer_slam.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB), Spitze auf -1.2 dBFS gesenkt | 0.62 s, 1 Kanal, -13.2 LUFS, Spitze -1.2 dBFS |
+| `Audio/Sfx/devourer_slam_v3.wav` | Ableitung von devourer_slam.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB), Spitze auf -1.2 dBFS gesenkt | 0.68 s, 1 Kanal, -13.4 LUFS, Spitze -1.2 dBFS |
+| `Audio/Sfx/soul_sense_on_v2.wav` | Ableitung von soul_sense_on.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.43 s, 1 Kanal, -25.6 LUFS, Spitze -5.9 dBFS |
+| `Audio/Sfx/soul_sense_on_v3.wav` | Ableitung von soul_sense_on.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.47 s, 1 Kanal, -25.6 LUFS, Spitze -4.8 dBFS |
+| `Audio/Sfx/soul_sense_off_v2.wav` | Ableitung von soul_sense_off.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.29 s, 1 Kanal, -30.3 LUFS, Spitze -4.7 dBFS |
+| `Audio/Sfx/soul_sense_off_v3.wav` | Ableitung von soul_sense_off.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.31 s, 1 Kanal, -30.3 LUFS, Spitze -4.3 dBFS |
+| `Audio/Sfx/ability_pierce_v2.wav` | Ableitung von ability_pierce.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.57 s, 1 Kanal, -17.0 LUFS, Spitze -4.1 dBFS |
+| `Audio/Sfx/ability_pierce_v3.wav` | Ableitung von ability_pierce.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.63 s, 1 Kanal, -17.0 LUFS, Spitze -6.1 dBFS |
+| `Audio/Sfx/ability_leap_v2.wav` | Ableitung von ability_leap.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.53 s, 1 Kanal, -17.0 LUFS, Spitze -6.1 dBFS |
+| `Audio/Sfx/ability_leap_v3.wav` | Ableitung von ability_leap.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.58 s, 1 Kanal, -17.0 LUFS, Spitze -5.5 dBFS |
+| `Audio/Sfx/ability_vortex_v2.wav` | Ableitung von ability_vortex.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 1.15 s, 1 Kanal, -18.0 LUFS, Spitze -3.7 dBFS |
+| `Audio/Sfx/ability_vortex_v3.wav` | Ableitung von ability_vortex.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 1.26 s, 1 Kanal, -18.0 LUFS, Spitze -3.2 dBFS |
+| `Audio/Sfx/ability_guard_v2.wav` | Ableitung von ability_guard.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.96 s, 1 Kanal, -18.0 LUFS, Spitze -3.6 dBFS |
+| `Audio/Sfx/ability_guard_v3.wav` | Ableitung von ability_guard.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 1.05 s, 1 Kanal, -18.0 LUFS, Spitze -3.7 dBFS |
+| `Audio/Sfx/ability_mark_v2.wav` | Ableitung von ability_mark.wav (Tonhöhe ×1.045, Klangneigung -1.0/+1.5 dB) | 0.57 s, 1 Kanal, -20.2 LUFS, Spitze -3.2 dBFS |
+| `Audio/Sfx/ability_mark_v3.wav` | Ableitung von ability_mark.wav (Tonhöhe ×0.955, Klangneigung +1.5/-1.2 dB) | 0.63 s, 1 Kanal, -20.2 LUFS, Spitze -2.7 dBFS |
+
+## Flüstern hinter den Türen der Vorhalle (Durchgang 5, 07.10.2026)
+
+Die Vorhalle hatte als einziger Ort keinen Ortsklang. Hinter einer der versiegelten Türen (sie führen in die Regionen, in denen Seelen warten) flüstern selten zwei, drei Stimmen ohne Worte nacheinander, alle 18–34 s von zufälliger Seite. Rezept `door-whispers` in `recipes/ambient_events.py`: gehauchte Ausatmer durch gleitende Vokalformanten (keine Tonhöhe), leicht gedämpft, kleiner Raum. CLAP „ghostly whispers“ 0,48, „hiss“ 0,37–0,42. Verworfen: stark gedämpft „durch Stein“ (Tiefpass 1,4 kHz: „monster growling“ bis 0,81), dichte Silben („growling“/„hiss“), langer Hall („hiss“ bis 0,60).
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/door_whispers_1.wav` | door-whispers Seed 1 | 3.20 s, 1 Kanal/Kanäle, -31.0 LUFS, Spitze -16.0 dBFS |
+| `Audio/Sfx/door_whispers_2.wav` | door-whispers Seed 5 | 3.20 s, 1 Kanal/Kanäle, -30.7 LUFS, Spitze -14.3 dBFS |
+
+## Nasse Schritte am Ufer und im Hafen (Durchgang 5, 07.10.2026)
+
+Bahnsteig und Hafenpflaster des Prologs sind nass (Pfützen, Seewasser in den Fugen), die Schritte klangen wie auf trockenem Stein. Rezept `footstep-wet`: Absatz auf Stein, kurzer Wasserschlag und Spritzer, die Sohle schmatzt beim Abrollen; Energie 300–1500 Hz 44–47 % statt 34 % beim Steinschritt, weniger Tiefe. Gespielt in den Sektoren Ufer und Suchgang. CLAP taugt für einzelne kurze Schritte nicht (auch der bestehende Steinschritt gilt als Folge als „gunshots“ 0,86, weichere Prototypen ebenso); Hörabnahme beim Owner.
+
+| Datei | Quelle | Messung |
+| --- | --- | --- |
+| `Audio/Sfx/footstep_wet_1.wav` | footstep-wet Seed 1 | 0.34 s, 1 Kanal/Kanäle, -27.2 LUFS, Spitze -6.0 dBFS |
+| `Audio/Sfx/footstep_wet_2.wav` | footstep-wet Seed 2 | 0.34 s, 1 Kanal/Kanäle, -26.0 LUFS, Spitze -6.3 dBFS |
+| `Audio/Sfx/footstep_wet_3.wav` | footstep-wet Seed 3 | 0.34 s, 1 Kanal/Kanäle, -26.0 LUFS, Spitze -7.0 dBFS |
+| `Audio/Sfx/footstep_wet_4.wav` | footstep-wet Seed 4 | 0.34 s, 1 Kanal/Kanäle, -26.5 LUFS, Spitze -6.0 dBFS |

@@ -13,6 +13,7 @@ using TheLostSoulOfFire.Entities;
 using TheLostSoulOfFire.Input;
 using TheLostSoulOfFire.Menu;
 using TheLostSoulOfFire.Rendering;
+using TheLostSoulOfFire.Rendering.Visuals;
 
 namespace TheLostSoulOfFire.Game;
 
@@ -46,10 +47,44 @@ public sealed partial class GameWorld : IDisposable
     private readonly ParticleSystem _particles = new();
     private readonly ArenaAtmosphere _arenaAtmosphere = new();
     private readonly HudRenderer _hud = new();
+    private readonly LowHealthPresentation _lowHealth = new();
     private readonly SoulSensePresentation _soulSensePresentation = new();
     private readonly CinematicPresentation _presentation = new();
     private readonly ArtAssets _art;
     private readonly SpriteVfxSystem _spriteVfx;
+    private readonly GroundImpacts _groundImpacts = new();
+    private readonly EnemyVoices _enemyVoices = new();
+    private readonly Narration _narration = new();
+    private Action<AudioCue, float, Enemy>? _speak;
+    private float _dangerHeat;
+    private readonly List<SceneProp> _sceneProps = [];
+    private readonly List<SceneProp> _arenaProps = Arena.Props
+        .Select(placement => new SceneProp(placement.VisualId, placement.Foot, placement.FallbackSize, placement.FallbackLayer))
+        .ToList();
+    private readonly List<SceneProp> _hubProps = SoulFurnaceAntechamber.BrazierFeet
+        .Select(foot => new SceneProp(VisualIds.HubBrazier, foot, new Vector2(48f, 76f), SceneLayer.HighProp))
+        .ToList();
+    private readonly List<SceneProp> _searchProps = PrologueDirector.SearchProps
+        .Select(placement => new SceneProp(placement.VisualId, placement.Foot, placement.FallbackSize, placement.FallbackLayer))
+        .ToList();
+    private readonly Dictionary<IReadOnlyList<PropPlacement>, List<SceneProp>> _placedProps = [];
+
+    /// <summary>Scene props for a placement list, created once and kept (they carry their occluder fade).</summary>
+    private List<SceneProp> PropsOf(IReadOnlyList<PropPlacement> placements)
+    {
+        if (!_placedProps.TryGetValue(placements, out List<SceneProp>? props))
+        {
+            props = placements.Select(placement => new SceneProp(placement.VisualId, placement.Foot, placement.FallbackSize, placement.FallbackLayer)).ToList();
+            _placedProps[placements] = props;
+        }
+        return props;
+    }
+
+    private readonly List<SceneProp> _shoreProps = PrologueDirector.ShoreProps
+        .Select(placement => new SceneProp(placement.VisualId, placement.Foot, placement.FallbackSize, placement.FallbackLayer))
+        .ToList();
+    private readonly List<DepthItem> _actorBand = [];
+    private readonly List<(RectangleF Bounds, float FootY)> _occlusionTargets = [];
     private readonly CombatPresentation _combatPresentation;
     private readonly MenuController _menu;
     private readonly MenuController _pauseMenu;
@@ -76,10 +111,14 @@ public sealed partial class GameWorld : IDisposable
     private float _burningHandoffTimer;
     private int _burningCommittedLastFrame;
     private float _presentationTime;
+
+    /// <summary>When the cannon's chamber last took a notch (a charge stage), for its flare (presentation time).</summary>
+    private float _cannonNotchAt = float.NegativeInfinity;
     private float _fpsTimer;
     private int _fpsFrames;
     private int _fps = 60;
     private bool _audioTestFatalDamageRequested;
+    private int _automatedDamageRequest;
     private bool _endingRevealPlayed;
     private bool _prologueEncounterArmed;
     private bool _prologueReleaseObserved;
@@ -94,6 +133,29 @@ public sealed partial class GameWorld : IDisposable
     /// <summary>Pause, character or dev menu is open; the world is frozen under each of them.</summary>
     private bool IsGamePaused => _pauseMenu.IsOpen || _characterMenu.IsOpen || _devMenu.IsOpen;
     private bool IsCombatPhase => _phase is GamePhase.Arena or GamePhase.Prologue;
+
+    /// <summary>The colour grade of the area being shown; areas without their own LUT fall back to neutral.</summary>
+    private string CurrentGradeId => _phase switch
+    {
+        GamePhase.Prologue when _prologue.Sector == PrologueSector.Emergence => VisualIds.GradeShore,
+        GamePhase.Arena => VisualIds.GradeArena,
+        _ => VisualIds.GradeNeutral
+    };
+    /// <summary>The ambience and music zone of what is on screen (presentation only).</summary>
+    private AudioZone CurrentAudioZone => _phase switch
+    {
+        GamePhase.Title => AudioZone.Title,
+        GamePhase.Antechamber or GamePhase.EnteringArena => AudioZone.Hub,
+        GamePhase.Prologue => _prologue.Sector switch
+        {
+            PrologueSector.Emergence => AudioZone.Shore,
+            PrologueSector.Search => AudioZone.Harbour,
+            PrologueSector.Escape => _prologue.IsVehicleRide ? AudioZone.Crossing : AudioZone.Causeway,
+            _ => AudioZone.Threshold
+        },
+        _ => AudioZone.Arena
+    };
+
     private Rectangle ActiveCombatBounds => _phase == GamePhase.Prologue ? _prologue.MovementBounds : _arena.CombatBounds;
     private Rectangle ActiveWorldBounds => _phase == GamePhase.Prologue ? PrologueDirector.WorldBounds : _arena.Bounds;
     private ArenaLoopState CameraLoopState => _phase == GamePhase.Prologue && _loopState == ArenaLoopState.Complete
@@ -119,12 +181,13 @@ public sealed partial class GameWorld : IDisposable
         _skipMainMenu = skipMainMenu;
         _skipPrologue = skipPrologue;
         _settings = settings ?? new GameSettings();
-        _menu = new MenuController(_settings);
+        _menu = new MenuController(_settings) { AnchorX = art.HasArt(VisualIds.TitleBackdrop) ? 0.74f : 0.5f };
         _pauseMenu = new MenuController(_settings);
         _settingsChanged = settingsChanged;
         _profileStore = profileStore ?? new PlayerProfileStore();
         _wallet.LoadSecured(_profileStore.Load());
         _art = art;
+        _presentation.Art = art;
         _audio = new AudioDirector(content);
         ApplyAudioSettings();
         _spriteVfx = new SpriteVfxSystem(art);
@@ -139,6 +202,20 @@ public sealed partial class GameWorld : IDisposable
     public void Update(GameTime gameTime, InputState input, Viewport viewport)
     {
         float deltaTime = MathF.Min((float)gameTime.ElapsedGameTime.TotalSeconds, 1f / 20f);
+        _audio.SetZone(CurrentAudioZone);
+        // After the last wave the Life Flame is heard from the furnace as it kindles, and the
+        // music turns to the theme in which the lost soul's motif resolves.
+        _player.SinceDeath = _player.IsDead ? _player.SinceDeath + deltaTime : 0f;
+        bool ending = _phase == GamePhase.Arena && _loopState == ArenaLoopState.Complete;
+        _audio.SetEnding(ending);
+        _audio.SetLifeFlame(ending ? _presentation.GetLifeFlameAlpha() * _presentation.GetLifeFlameKindle() : 0f,
+            PanOf(_presentation.GetLifeFlamePosition()) * 0.7f);
+        UpdateEnemyPresence(deltaTime);
+        UpdateCombatMusic(deltaTime);
+        UpdateWardenFlames(deltaTime);
+        _audio.SetResonanceRumble(IsCombatPhase && _player.ResonanceActive && !_player.IsDead, deltaTime);
+        _audio.SetCannonHum(IsCombatPhase && !_player.IsDead && _player.Cannon.State == SoulCannonState.Charging
+            ? _player.Cannon.ChargeProgress : null, deltaTime);
         if (_devMenu.IsOpen)
         {
             _audio.Update(deltaTime);
@@ -168,6 +245,7 @@ public sealed partial class GameWorld : IDisposable
         {
             _pauseMenu.Open(MenuPages.Pause);
             _audio.SetPaused(true);
+            _audio.Play(AudioCue.UiOpen, 0.45f);
             return;
         }
 
@@ -175,6 +253,7 @@ public sealed partial class GameWorld : IDisposable
         {
             _characterMenu.Open();
             _audio.SetPaused(true);
+            _audio.Play(AudioCue.UiOpen, 0.45f);
             return;
         }
 
@@ -194,6 +273,15 @@ public sealed partial class GameWorld : IDisposable
         };
         _phaseTime += deltaTime;
         _presentation.Update(deltaTime, _phase);
+        _hud.Update(deltaTime, _player);
+        // The bound soul throbs when it runs low, in fights only (not in the ending's calm).
+        _lowHealth.Update(deltaTime, _player.Health / (float)Math.Max(1, _player.MaxHealth),
+            IsCombatPhase && !_player.IsDead && !(_phase == GamePhase.Arena && _loopState == ArenaLoopState.Complete));
+        _hud.Throb = _lowHealth.Pulse;
+        if (_lowHealth.BeatStarted)
+        {
+            _audio.Play(AudioCue.SoulThrob, 0.6f * _lowHealth.Amount);
+        }
         _audio.Update(deltaTime);
         bool wasDashing = _player.IsDashing;
         bool wasResonanceActive = _player.ResonanceActive;
@@ -201,11 +289,15 @@ public sealed partial class GameWorld : IDisposable
         bool wasSoulSenseActive = _player.SoulSenseActive;
         bool wasCannonFull = _player.Cannon.IsFullCharge;
         SoulCannonState previousCannonState = _player.Cannon.State;
+        int previousCannonStage = _player.Cannon.ChargeStage;
         int previousHealth = _player.Health;
         _art.Update(deltaTime);
+        UpdateSceneProps(deltaTime);
         _spriteVfx.Update(deltaTime);
+        _groundImpacts.Update(deltaTime);
         UpdateFps(deltaTime);
         _screenEffects.Update(deltaTime);
+        _camera.ZoomPunch = _screenEffects.ZoomPunch;
         _combatPresentation.Update(deltaTime);
         if (_phase is GamePhase.Title or GamePhase.Arena)
         {
@@ -354,10 +446,18 @@ public sealed partial class GameWorld : IDisposable
                     return;
                 }
             }
-            else if (!_endingRevealPlayed && _presentation.StateTime >= CinematicPresentation.LifeFlameRevealTime)
+            else
             {
-                _endingRevealPlayed = true;
-                _audio.Play(AudioCue.EndingReveal, 0.72f);
+                if (!_endingRevealPlayed && _presentation.StateTime >= CinematicPresentation.LifeFlameRevealTime)
+                {
+                    _endingRevealPlayed = true;
+                    _audio.Play(AudioCue.EndingReveal, 0.72f);
+                }
+                // A beat after it kindles, the figure turns to the Life Flame.
+                if (_presentation.StateTime >= CinematicPresentation.LifeFlameRevealTime + 0.35f)
+                {
+                    _player.LookToward(_presentation.GetLifeFlamePosition());
+                }
             }
             UpdateLoop(deltaTime);
             _soulSensePresentation.Update(deltaTime, false);
@@ -391,7 +491,7 @@ public sealed partial class GameWorld : IDisposable
             return;
         }
 
-        _lastMouseWorld = _camera.ScreenToWorld(input.MouseVirtualPosition.ToPoint(), viewport);
+        _lastMouseWorld = AutomatedAimOr(_camera.ScreenToWorld(input.MouseVirtualPosition.ToPoint(), viewport));
 
         if (_screenEffects.IsHitStopped)
         {
@@ -400,14 +500,22 @@ public sealed partial class GameWorld : IDisposable
         }
 
         _player.Update(deltaTime, input, _lastMouseWorld, ActiveCombatBounds, _particles, _screenEffects, _forceSoulSense);
+        UpdateFootsteps();
+        UpdateEnemyFootsteps();
         _soulSensePresentation.Update(deltaTime, _player.SoulSenseActive);
         if (_audioTestFatalDamageRequested)
         {
             _audioTestFatalDamageRequested = false;
             _player.ApplyDamage(GameBalance.PlayerMaxHealth, Vector2.Zero, _screenEffects, ignoreArmor: true);
         }
+        if (_automatedDamageRequest > 0)
+        {
+            _player.ApplyDamage(_automatedDamageRequest, Vector2.Zero, _screenEffects, ignoreArmor: true);
+            _automatedDamageRequest = 0;
+        }
         if (_player.Scythe.StartedThisFrame)
         {
+            _combatPresentation.SlashRibbons = _art.CanDrawDeathFlame && _art.HasClip(VisualIds.Player, VisualClips.Aim);
             _combatPresentation.PresentScytheSwing(
                 _player.Scythe.ActiveStep,
                 _player.Position,
@@ -416,17 +524,18 @@ public sealed partial class GameWorld : IDisposable
         if (!wasDashing && _player.IsDashing)
         {
             _spriteVfx.Spawn(
-                "dash_ignition",
+                VisualIds.DashIgnition,
                 _player.Position - _player.DashDirection * 24f,
                 MathF.Atan2(_player.DashDirection.Y, _player.DashDirection.X),
                 0.72f);
+            KickOffGround();
         }
         if (!wasResonanceActive && _player.ResonanceActive)
         {
             _combatPresentation.BeginResonance(_player.Position);
             _arenaAtmosphere.ReactToResonance();
         }
-        PlayPlayerActionAudio(wasDashing, wasResonanceActive, wasSoulSenseActive, wasCannonFull, previousCannonState);
+        PlayPlayerActionAudio(wasDashing, wasResonanceActive, wasSoulSenseActive, wasCannonFull, previousCannonState, previousCannonStage);
         UpdateAbilities(deltaTime, input);
         SpawnCannonShot();
         ResolveScytheStrike();
@@ -439,23 +548,78 @@ public sealed partial class GameWorld : IDisposable
             BurningState? previousBurningState = enemy is Burning burningBefore ? burningBefore.State : null;
             DevourerState? previousDevourerState = enemy is Devourer devourerBefore ? devourerBefore.State : null;
             enemy.Update(deltaTime, _player, _souls, ActiveCombatBounds, _particles, _screenEffects);
+            if (enemy is Hollow windingHollow && previousHollowState != HollowState.Telegraph && windingHollow.State == HollowState.Telegraph)
+            {
+                // The mask creaks and it draws breath as the arm goes back: the swipe is coming.
+                _audio.Play(AudioCue.HollowWindup, 0.8f, 0f, PanOf(enemy.Position));
+            }
+            if (enemy is Burning rushingBurning && previousBurningState != BurningState.Charge && rushingBurning.State == BurningState.Charge)
+            {
+                _audio.Play(AudioCue.BurningRush, 0.86f, 0f, PanOf(enemy.Position));
+            }
+            if (enemy is Devourer liftingDevourer && previousDevourerState != DevourerState.SlamTelegraph && liftingDevourer.State == DevourerState.SlamTelegraph)
+            {
+                _audio.Play(AudioCue.DevourerWindup, 0.72f, 0f, PanOf(enemy.Position) * 0.6f);
+            }
+            if (enemy is Hollow graspingHollow)
+            {
+                if (graspingHollow.State == HollowState.Telegraph)
+                {
+                    // The reach the old arc showed while it winds up (48 growing to 68), then the
+                    // full swipe range on the grab.
+                    float windup = graspingHollow.SwipeWindup;
+                    float glint = MathHelper.Clamp((windup - 0.4f) / 0.6f, 0f, 1f);
+                    _groundImpacts.Grasp(graspingHollow, graspingHollow.Position, graspingHollow.FacingDirection, 48f + windup * 20f, 0.45f + windup * 0.4f, glint * glint);
+                }
+                else if (graspingHollow.State == HollowState.Swipe)
+                {
+                    _groundImpacts.Grasp(graspingHollow, graspingHollow.Position, graspingHollow.FacingDirection, GameBalance.HollowSwipeRange, 1f, 1f);
+                }
+            }
+            if (enemy is Burning kindlingBurning)
+            {
+                if (kindlingBurning.State == BurningState.Telegraph)
+                {
+                    // The lane the old chevrons showed: 90 growing to 170 units ahead.
+                    _groundImpacts.Kindle(kindlingBurning, kindlingBurning.Position, kindlingBurning.ChargeDirection,
+                        90f + kindlingBurning.ChargeWindup * 80f, kindlingBurning.ChargeWindup);
+                }
+                else if (kindlingBurning.State == BurningState.Charge)
+                {
+                    _groundImpacts.Scorch(kindlingBurning, kindlingBurning.Position);
+                }
+            }
+            if (enemy is Devourer gatheringDevourer && gatheringDevourer.State == DevourerState.SlamTelegraph)
+            {
+                _groundImpacts.WindUp(gatheringDevourer, gatheringDevourer.Position, GameBalance.DevourerSlamRange, gatheringDevourer.SlamWindup, deltaTime);
+            }
             if (enemy is Hollow hollowAfter && previousHollowState != HollowState.Swipe && hollowAfter.State == HollowState.Swipe)
             {
-                _audio.Play(AudioCue.HollowSwipe, 0.48f);
+                // The grab is a danger signal: clearly above the room, below a hit. It cries out
+                // after the one who leaves as it grabs.
+                _audio.Play(AudioCue.HollowSwipe, 0.7f, 0f, PanOf(enemy.Position));
+                _audio.Play(AudioCue.HollowGrasp, 0.6f, 0f, PanOf(enemy.Position));
             }
             if (enemy is Burning burningAfter && previousBurningState != BurningState.Telegraph && burningAfter.State == BurningState.Telegraph)
             {
-                _audio.Play(AudioCue.BurningCharge, 0.72f);
+                _audio.Play(AudioCue.BurningCharge, 0.85f, 0f, PanOf(enemy.Position));
+                _audio.Play(AudioCue.BurningShriek, 0.62f, 0f, PanOf(enemy.Position));
             }
             if (enemy is Devourer devourerAfter)
             {
                 if (previousDevourerState != DevourerState.Slam && devourerAfter.State == DevourerState.Slam)
                 {
-                    _audio.Play(AudioCue.DevourerSlam, 0.76f);
+                    _audio.Play(AudioCue.DevourerSlam, 0.76f, 0f, PanOf(devourerAfter.Position) * 0.6f);
+                    PresentDevourerSlam(devourerAfter);
                 }
                 if (previousDevourerState != DevourerState.Devour && devourerAfter.State == DevourerState.Devour)
                 {
-                    _audio.Play(AudioCue.DevourerDevour, 0.6f);
+                    _audio.Play(AudioCue.DevourerDevour, 0.6f, 0f, PanOf(devourerAfter.Position));
+                }
+                if (previousDevourerState != DevourerState.ApproachSoul && devourerAfter.State == DevourerState.ApproachSoul)
+                {
+                    // It scents a soul: sniffing, a hungry moan, its prisoners cry out.
+                    _audio.Play(AudioCue.DevourerHunger, 0.7f, 0f, PanOf(devourerAfter.Position));
                 }
             }
             if (enemy.TryConsumeSoulSpawn(out Vector2 soulPosition))
@@ -470,7 +634,7 @@ public sealed partial class GameWorld : IDisposable
 
             if (enemy is Devourer devourer && devourer.TryConsumeExtractionEffect(out Vector2 extractionPosition))
             {
-                _spriteVfx.Spawn("soul_release", extractionPosition, 0f, 0.72f);
+                _spriteVfx.Spawn(VisualIds.SoulRelease, extractionPosition, 0f, 0.72f);
                 _particles.EmitBurst(extractionPosition, Vector2.UnitY, 28, GameBalance.SoulWhite, 260f, 9f);
                 _particles.EmitDeathFlame(extractionPosition, 18, 1.25f);
                 _screenEffects.AddShake(0.18f, 8f);
@@ -479,6 +643,14 @@ public sealed partial class GameWorld : IDisposable
         }
 
         UpdateBurningHandoff();
+        _speak ??= (cue, volume, speaker) =>
+        {
+            _audio.Play(cue, volume, 0f, PanOf(speaker.Position));
+            // The voice shakes the body it comes from: the call is seen where it is heard.
+            _art.Twitch(speaker, calling: true);
+        };
+        _enemyVoices.Update(deltaTime, _enemies, _player.Position, !_player.IsDead, _speak);
+        Narrate(deltaTime);
 
         _enemies.RemoveAll(enemy => enemy.IsFinished);
         foreach (Soul soul in _souls)
@@ -487,8 +659,8 @@ public sealed partial class GameWorld : IDisposable
             soul.Update(deltaTime, _player, _particles);
             if (previousSoulState != SoulState.Releasing && soul.State == SoulState.Releasing)
             {
-                _spriteVfx.Spawn("soul_release", soul.Position, 0f, 0.62f);
-                _audio.Play(AudioCue.SoulRelease, 0.62f);
+                _spriteVfx.Spawn(VisualIds.SoulRelease, soul.Position, 0f, 0.62f);
+                _audio.Play(AudioCue.SoulRelease, 0.62f, 0f, PanOf(soul.Position) * 0.6f);
             }
         }
 
@@ -506,7 +678,10 @@ public sealed partial class GameWorld : IDisposable
                 _audio.SetSoulSense(false);
                 _presentation.BeginDeath();
             }
-            _audio.Play(_player.IsDead ? AudioCue.PlayerDeath : AudioCue.PlayerHit, _player.IsDead ? 0.78f : 0.6f);
+            // Taking damage must never hide under the player's own swings (mix review 06.10.2026).
+            _audio.Play(_player.IsDead ? AudioCue.PlayerDeath : AudioCue.PlayerHit, _player.IsDead ? 0.82f : 0.95f);
+            // The blow itself lands at once; the Ludo hurt sound swells in just after it.
+            _audio.Play(AudioCue.BodyHit, _player.IsDead ? 0.85f : 0.72f);
         }
         if (!wasResonanceReady && _player.IsResonanceReady)
         {
@@ -522,7 +697,49 @@ public sealed partial class GameWorld : IDisposable
             ActiveWorldBounds,
             ActiveCombatBounds,
             viewport,
-            deltaTime);
+            deltaTime,
+            CameraLead);
+    }
+
+    /// <summary>
+    /// How far the combat camera leads toward the aim and the running direction (world units),
+    /// and a little toward where the nearby enemies stand, so a crowd at one edge comes into view
+    /// (at most 46 units; presentation only, the aim maps through the same camera).
+    /// </summary>
+    private Vector2 CameraLead => _player.IsDead
+        ? Vector2.Zero
+        : _player.FacingDirection * 22f + _player.Velocity * 0.045f + ThreatBias;
+
+    private Vector2 ThreatBias
+    {
+        get
+        {
+            Vector2 sum = Vector2.Zero;
+            float weight = 0f;
+            foreach (Enemy enemy in _enemies)
+            {
+                if (!enemy.IsAlive)
+                {
+                    continue;
+                }
+                Vector2 offset = enemy.Position - _player.Position;
+                float distance = offset.Length();
+                if (distance > 700f)
+                {
+                    continue;
+                }
+                float w = 1f - distance / 700f;
+                sum += offset * w;
+                weight += w;
+            }
+            if (weight <= 0.001f)
+            {
+                return Vector2.Zero;
+            }
+            Vector2 bias = sum / weight * 0.2f;
+            float length = bias.Length();
+            return length > 46f ? bias / length * 46f : bias;
+        }
     }
 
     private void UpdateMenu(float deltaTime, InputState input, Viewport viewport)
@@ -561,6 +778,7 @@ public sealed partial class GameWorld : IDisposable
             case MenuActionResult.Resume:
                 _pauseMenu.Close();
                 _audio.SetPaused(false);
+                _audio.Play(AudioCue.UiClose, 0.45f);
                 break;
             case MenuActionResult.QuitToMainMenu:
                 _pauseMenu.Close();
@@ -583,11 +801,17 @@ public sealed partial class GameWorld : IDisposable
         {
             _characterMenu.Close();
             _audio.SetPaused(false);
+            _audio.Play(AudioCue.UiClose, 0.45f);
             return;
         }
 
+        CharacterMenuTab tabBefore = _characterMenu.SelectedTab;
         if (input.WasKeyPressed(Keys.Left) || input.WasKeyPressed(Keys.A)) _characterMenu.SelectPrevious();
         else if (input.WasKeyPressed(Keys.Right) || input.WasKeyPressed(Keys.D)) _characterMenu.SelectNext();
+        if (_characterMenu.SelectedTab != tabBefore)
+        {
+            _audio.Play(AudioCue.UiMove, 0.55f);
+        }
 
         if (input.WasLeftMousePressed)
         {
@@ -619,7 +843,25 @@ public sealed partial class GameWorld : IDisposable
     /// Shared mouse/keyboard handling for the title and pause menus. Navigation and value
     /// changes are applied here; results that leave the menu are returned to the caller.
     /// </summary>
+    /// <summary>Menu input plus its sounds: a tick when the selection or a value moves, a softer one back.</summary>
     private MenuActionResult UpdateMenuInput(MenuController menu, float deltaTime, InputState input, Viewport viewport)
+    {
+        MenuPage? pageBefore = menu.IsOpen ? menu.CurrentPage : null;
+        int indexBefore = menu.SelectedIndex;
+        MenuActionResult result = UpdateMenuInputCore(menu, deltaTime, input, viewport);
+        MenuPage? pageAfter = menu.IsOpen ? menu.CurrentPage : null;
+        if (pageAfter != pageBefore && pageBefore is not null)
+        {
+            _audio.Play(input.WasKeyPressed(Keys.Escape) ? AudioCue.UiBack : AudioCue.UiMove, 0.6f);
+        }
+        else if (pageAfter is not null && menu.SelectedIndex != indexBefore)
+        {
+            _audio.Play(AudioCue.UiMove, 0.5f);
+        }
+        return result;
+    }
+
+    private MenuActionResult UpdateMenuInputCore(MenuController menu, float deltaTime, InputState input, Viewport viewport)
     {
         menu.Tick(deltaTime);
         if (input.WasKeyPressed(Keys.Escape))
@@ -663,7 +905,11 @@ public sealed partial class GameWorld : IDisposable
         bool valueChanged = false;
         if (input.WasKeyPressed(Keys.Left) || input.WasKeyPressed(Keys.A)) valueChanged = menu.AdjustSelectedValue(-1);
         else if (input.WasKeyPressed(Keys.Right) || input.WasKeyPressed(Keys.D)) valueChanged = menu.AdjustSelectedValue(1);
-        if (valueChanged) ApplySettingsChanges();
+        if (valueChanged)
+        {
+            ApplySettingsChanges();
+            _audio.Play(AudioCue.UiMove, 0.45f, 0.1f);
+        }
 
         bool confirmedByKeyboard = input.WasKeyPressed(Keys.Enter);
         bool confirmedByMouse = false;
@@ -739,9 +985,16 @@ public sealed partial class GameWorld : IDisposable
 
     public void Draw(SpriteBatch batch, Texture2D pixel, Viewport viewport, SoulfireRenderer renderer, RenderTarget2D? rootTarget = null)
     {
+        ApplyAutomatedOverview(viewport);
         renderer.BeginScene(viewport);
-        DrawScene(batch, pixel, viewport);
-        renderer.PresentScene(batch, rootTarget, viewport, _soulSensePresentation.WorldSuppression);
+        DrawScene(batch, pixel, viewport, renderer.SceneLights);
+        renderer.PresentScene(
+            batch,
+            rootTarget,
+            viewport,
+            _soulSensePresentation.WorldSuppression,
+            _art.GetSpriteTexture(CurrentGradeId) ?? _art.GetSpriteTexture(VisualIds.GradeNeutral),
+            _art.GetSpriteTexture(VisualIds.GradeSoulSense));
         DrawSoulfireLighting(batch, renderer, viewport);
         _soulSensePresentation.DrawSoulLayer(
             batch,
@@ -750,7 +1003,8 @@ public sealed partial class GameWorld : IDisposable
             _player,
             _enemies,
             _souls,
-            _presentationTime);
+            _presentationTime,
+            _art);
         if (_phase is GamePhase.Antechamber or GamePhase.EnteringArena)
         {
             batch.Begin(
@@ -758,113 +1012,153 @@ public sealed partial class GameWorld : IDisposable
                 BlendState.Additive,
                 SamplerState.LinearClamp,
                 transformMatrix: RenderResolution.ToOutput(_camera.GetTransform(viewport, _screenEffects.ShakeOffset)));
-            _antechamber.DrawSoulSense(batch, pixel, _presentationTime, _soulSensePresentation.SoulEmergence);
+            _antechamber.DrawSoulSense(batch, pixel, _presentationTime, _soulSensePresentation.SoulEmergence, _art.SoftSpot);
             batch.End();
         }
         renderer.DrawVignette(batch, viewport, _soulSensePresentation.WorldSuppression, _player.ResonanceActive);
-        DrawScreenFeedback(batch, pixel, viewport);
+        DrawLowHealth(batch, renderer);
+        if (_automatedHideHud)
+        {
+            return;
+        }
+        DrawScreenFeedback(batch, pixel, viewport, renderer);
         DrawHud(batch, pixel, viewport);
     }
 
-    private void DrawScene(SpriteBatch batch, Texture2D pixel, Viewport viewport)
+    private void DrawScene(SpriteBatch batch, Texture2D pixel, Viewport viewport, IReadOnlyList<SceneLight> lights)
     {
+        Matrix sceneTransform = RenderResolution.ToOutput(_camera.GetTransform(viewport, _screenEffects.CameraOffset));
+        (Vector3 backLight, Vector2 backLightFrom) = BackLight;
+        _art.SetBackLight(backLight, backLightFrom);
         batch.Begin(
             SpriteSortMode.Deferred,
             BlendState.AlphaBlend,
             SamplerState.LinearClamp,
-            transformMatrix: RenderResolution.ToOutput(_camera.GetTransform(viewport, _screenEffects.CameraOffset)));
+            transformMatrix: sceneTransform);
+        _art.BeginLitScene(sceneTransform, lights);
 
-        if (_phase is GamePhase.Antechamber or GamePhase.EnteringArena)
+        bool inAntechamber = _phase is GamePhase.Antechamber or GamePhase.EnteringArena;
+        bool shouldDrawPlayer = inAntechamber ||
+            IsCombatPhase && _presentation.ShouldDrawPlayer(_loopState, _player.IsDead);
+
+        // Back to front, as in VISUAL-ART-DIRECTION §4: ground and low props, then actors and
+        // high props by foot point, then occluders and foreground, then emission and effects.
+        if (inAntechamber)
         {
             _antechamber.Draw(
                 batch,
                 pixel,
+                _art,
                 _presentationTime,
                 _soulSensePresentation.SoulEmergence,
                 DoorTransitionProgress,
                 _debugVisible);
-            _player.DrawAfterimages(batch, pixel);
         }
         else
         {
             if (_phase == GamePhase.Prologue)
             {
-                PrologueEnvironment.DrawGround(batch, pixel, _prologue, _presentationTime, _soulSensePresentation.WorldSuppression);
-                PrologueEnvironment.DrawProps(batch, pixel, _prologue, _presentationTime, _soulSensePresentation.WorldSuppression);
+                string? plate = PrologueEnvironment.PlateOf(_prologue);
+                bool painted = plate is not null && _art.HasArt(plate);
+                PrologueEnvironment.DrawGround(batch, pixel, _prologue, _presentationTime, _soulSensePresentation.WorldSuppression, painted);
+                if (painted && _prologue.IsVehicleRide)
+                {
+                    PrologueEnvironment.DrawCrossing(batch, _art, _prologue.StateTime);
+                }
+                else if (painted)
+                {
+                    _art.DrawEnvironment(batch, plate!, Vector2.Zero);
+                }
+                PrologueEnvironment.DrawProps(batch, pixel, _prologue, _presentationTime, _soulSensePresentation.WorldSuppression, painted, _art);
             }
             else
             {
-                _art.DrawArena(batch);
-                _arenaAtmosphere.DrawBackground(batch, pixel, _soulSensePresentation.WorldSuppression);
+                _art.DrawEnvironment(batch, VisualIds.ArenaWall, Arena.WallFoot);
+                _art.DrawEnvironment(batch, VisualIds.ArenaFloor, Arena.FloorTopLeft);
+                DrawArenaShading(batch);
+                _arenaAtmosphere.DrawBackground(batch, pixel, _soulSensePresentation.WorldSuppression, _art.HasArt(VisualIds.ArenaFloor) ? _art : null);
             }
-            if (IsCombatPhase)
+            DrawSceneProps(batch, layer => layer < SceneLayer.Actor);
+            DrawFloorDepth(batch, viewport);
+            _groundImpacts.DrawFloor(batch, _art.SoftSpot);
+            if (IsCombatPhase && _phase == GamePhase.Arena)
             {
-                if (_phase == GamePhase.Arena)
-                {
-                    DrawArenaLoop(batch, pixel);
-                    DrawCurrencyWorld(batch, pixel);
-                }
-                _player.DrawAfterimages(batch, pixel);
-                foreach (Enemy enemy in _enemies)
-                {
-                    _art.DrawEnemy(batch, enemy);
-                    enemy.Draw(batch, pixel, _debugVisible, false, true);
-                }
-                foreach (Soul soul in _souls)
-                {
-                    _art.DrawLostSoul(batch, soul);
-                    soul.Draw(batch, pixel, _player, false, true);
-                }
-                foreach (CannonShot shot in _cannonShots)
-                {
-                    shot.Draw(batch, pixel, true);
-                    _art.DrawCannonProjectile(batch, shot);
-                }
+                DrawArenaLoop(batch, pixel);
+                DrawCurrencyWorld(batch, pixel);
+            }
+        }
+
+        DrawGroundMist(batch);
+        DrawFigureShadows(batch, lights, shouldDrawPlayer && (inAntechamber || IsCombatPhase));
+        _player.DrawAfterimages(batch, pixel, _art);
+        if (IsCombatPhase)
+        {
+            _art.DrawDissolves(batch);
+        }
+        DrawActorBand(batch, pixel, shouldDrawPlayer && (inAntechamber || IsCombatPhase));
+        _groundImpacts.DrawAir(batch);
+        DrawAutomatedStaging(batch);
+
+        DrawSceneProps(batch, layer => layer is SceneLayer.Occluder or SceneLayer.Foreground);
+        if (inAntechamber)
+        {
+            _antechamber.DrawBrazierFlames(batch, _art, _presentationTime);
+        }
+        if (_phase == GamePhase.Prologue && PrologueEnvironment.PlateOf(_prologue) is { } dressed && _art.HasArt(dressed))
+        {
+            int index = 0;
+            foreach ((Vector2 flameBase, float height) in PrologueDirector.WardenFlames(_prologue.Sector, _prologue.IsVehicleRide))
+            {
+                _art.DrawWardenFlame(batch, flameBase, height, _presentationTime + index++ * 1.13f);
+            }
+        }
+        if (_phase == GamePhase.Prologue)
+        {
+            PrologueEnvironment.DrawShoreEchoes(batch, _art, _prologue, _presentationTime, _soulSensePresentation.WorldSuppression);
+            PrologueEnvironment.DrawForeground(batch, pixel, _prologue,
+                PrologueEnvironment.PlateOf(_prologue) is { } foregroundPlate && _art.HasArt(foregroundPlate));
+        }
+
+        if (IsCombatPhase)
+        {
+            foreach (Soul soul in _souls)
+            {
+                _art.DrawLostSoul(batch, soul, _player);
+                soul.Draw(batch, pixel, _player, false, true, _art.SoftSpot);
             }
         }
         DrawAbilityWorld(batch, pixel);
-        _particles.Draw(batch, pixel);
-        bool shouldDrawPlayer = _phase is GamePhase.Antechamber or GamePhase.EnteringArena ||
-            IsCombatPhase && _presentation.ShouldDrawPlayer(_loopState, _player.IsDead);
-        if (shouldDrawPlayer)
+
+        // What flies (shots, sparks, slashes) is drawn at body height above its gameplay
+        // position, because figures stand with their feet on their positions.
+        batch.End();
+        Matrix airTransform = Matrix.CreateTranslation(0f, -FigureHeights.Air, 0f) * sceneTransform;
+        batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, transformMatrix: airTransform);
+        _art.BeginLitScene(airTransform, lights);
+        if (IsCombatPhase)
         {
-            batch.FillCircle(pixel, _player.Position + new Vector2(3f, 8f), 24f, new Color(3, 3, 7) * 0.55f);
-            _art.DrawPlayer(batch, _player);
-            _player.Draw(batch, pixel, _art, _debugVisible, _soulSensePresentation.SoulEmergence);
-            if (IsCombatPhase && _player.Cannon.State == SoulCannonState.Charging)
+            foreach (CannonShot shot in _cannonShots)
             {
-                Vector2 muzzle = _player.Position + _player.FacingDirection * 74f;
-                float charge = _player.Cannon.ChargeProgress;
-                Color chargeColor = _player.Cannon.IsFullCharge
-                    ? Color.White
-                    : _player.Cannon.ChargeStage >= 3
-                        ? new Color(238, 219, 255)
-                        : _player.Cannon.ChargeStage == 2
-                            ? GameBalance.DeathFlameBright
-                            : new Color(155, 94, 220);
-                _art.DrawLoopingEffect(
-                    batch,
-                    _player.Cannon,
-                    "cannon_charge_loop",
-                    muzzle,
-                    0f,
-                    _player.Cannon.IsFullCharge ? 0.68f : MathHelper.Lerp(0.28f, 0.61f, charge),
-                    chargeColor);
+                shot.Draw(batch, pixel, true);
+                _art.DrawCannonProjectile(batch, shot);
             }
         }
-        _presentation.DrawWorldAccents(batch, pixel, _art, _phase, _loopState, _player.IsDead, _player, ActiveCombatBounds);
+        _particles.Draw(batch, pixel, _art.SoftSpot);
         _spriteVfx.Draw(batch);
+        batch.End();
+        batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, transformMatrix: sceneTransform);
+        _art.BeginLitScene(sceneTransform, lights);
 
-        if (_phase == GamePhase.Prologue)
+        DrawSceneProps(batch, layer => layer == SceneLayer.Atmosphere);
+        if (MotesLook is { } motes)
         {
-            PrologueEnvironment.DrawForeground(batch, pixel, _prologue);
+            ForegroundMotes.Draw(batch, _art, _camera, viewport, _presentationTime, motes, 53 + (int)_phase);
         }
+        _presentation.DrawWorldAccents(batch, pixel, _art, _phase, _loopState, _player.IsDead, _player, ActiveCombatBounds);
 
         if (IsCombatPhase && _presentation.ShouldDrawAim(_loopState, _player.IsDead))
         {
-            batch.DrawCircle(pixel, _lastMouseWorld, 9f, GameBalance.DeathFlameBright * 0.75f, 2f, 16);
-            batch.DrawLine(pixel, _lastMouseWorld - Vector2.UnitX * 13f, _lastMouseWorld + Vector2.UnitX * 13f, GameBalance.DeathFlame * 0.6f, 1f);
-            batch.DrawLine(pixel, _lastMouseWorld - Vector2.UnitY * 13f, _lastMouseWorld + Vector2.UnitY * 13f, GameBalance.DeathFlame * 0.6f, 1f);
+            HudRenderer.DrawReticle(batch, pixel, _lastMouseWorld, _player.Cannon, _presentationTime);
         }
 
         if (_debugVisible && IsCombatPhase)
@@ -875,7 +1169,388 @@ public sealed partial class GameWorld : IDisposable
             batch.DrawLine(pixel, center - Vector2.UnitY * 28f, center + Vector2.UnitY * 28f, new Color(80, 220, 210), 2f);
         }
 
+        _art.EndLitScene();
         batch.End();
+    }
+
+    /// <summary>
+    /// The room's back light on the figures (colour times strength, and the screen direction it
+    /// comes from): the furnace and Warden flames in the north walls of the foundry and the
+    /// antechamber, the cold sea light over the prologue. A thin rim, never a second key light.
+    /// </summary>
+    private (Vector3 Color, Vector2 From) BackLight => _phase switch
+    {
+        GamePhase.Antechamber or GamePhase.EnteringArena => (GameBalance.DeathFlame.ToVector3() * 0.26f, new Vector2(0f, -1f)),
+        GamePhase.Prologue => (new Vector3(0.42f, 0.52f, 0.72f) * 0.3f, new Vector2(-0.35f, -1f)),
+        _ => (GameBalance.DeathFlame.ToVector3() * 0.3f, new Vector2(0.15f, -1f))
+    };
+
+    /// <summary>
+    /// Painted shade over the evenly lit foundry floor (presentation only): the foot of the north
+    /// wall lies in its shadow, the sides and the south fall off into the dark, a few broad
+    /// blotches break the floor's even value; the middle, where the fights are, stays lit.
+    /// </summary>
+    private void DrawArenaShading(SpriteBatch batch)
+    {
+        if (!_art.HasArt(VisualIds.ArenaFloor))
+        {
+            return;
+        }
+
+        Color shade = new(4, 3, 9);
+        _art.DrawShade(batch, new Rectangle(0, (int)Arena.WallFoot.Y, 1800, 150), shade * 0.5f);
+        _art.DrawSoftSpot(batch, new Vector2(-40f, 520f), new Vector2(420f, 760f), shade * 0.55f);
+        _art.DrawSoftSpot(batch, new Vector2(1840f, 520f), new Vector2(420f, 760f), shade * 0.55f);
+        _art.DrawSoftSpot(batch, new Vector2(900f, 1080f), new Vector2(1150f, 300f), shade * 0.5f);
+        _art.DrawSoftSpot(batch, new Vector2(60f, 1000f), new Vector2(380f, 300f), shade * 0.4f);
+        _art.DrawSoftSpot(batch, new Vector2(1740f, 1000f), new Vector2(380f, 300f), shade * 0.4f);
+        foreach ((Vector2 at, Vector2 size) in ArenaBlotches)
+        {
+            _art.DrawSoftSpot(batch, at, size, shade * 0.14f);
+        }
+    }
+
+    /// <summary>
+    /// Depth on the floor, under every figure (presentation only). Aerial perspective: the part
+    /// of the floor farther from the camera (the top of the view) sits in a faint haze, the near
+    /// edge sinks into shadow. In the foundry, the rose window throws a pale pool of light onto
+    /// the middle of the hall, where the fights happen, with dust turning slowly in it.
+    /// </summary>
+    private void DrawFloorDepth(SpriteBatch batch, Viewport viewport)
+    {
+        bool arena = _phase == GamePhase.Arena && _art.HasArt(VisualIds.ArenaFloor);
+        bool prologue = _phase == GamePhase.Prologue && PrologueEnvironment.PlateOf(_prologue) is { } plate && _art.HasArt(plate);
+        if (!arena && !prologue)
+        {
+            return;
+        }
+
+        // The visible floor in world units.
+        float zoom = MathF.Max(0.1f, _camera.Zoom);
+        Vector2 half = new(viewport.Width * 0.5f / zoom, viewport.Height * 0.5f / zoom);
+        Rectangle view = new((int)(_camera.Position.X - half.X) - 40, (int)(_camera.Position.Y - half.Y) - 40,
+            (int)(half.X * 2f) + 80, (int)(half.Y * 2f) + 80);
+        Color haze = arena ? new Color(150, 140, 178) : new Color(120, 136, 170);
+        _art.DrawShade(batch, new Rectangle(view.X, view.Y, view.Width, (int)(view.Height * 0.42f)), haze * 0.07f);
+        Rectangle near = new(view.X, view.Y + (int)(view.Height * 0.62f), view.Width, (int)(view.Height * 0.38f) + 2);
+        DrawShadeUp(batch, near, new Color(4, 3, 9) * 0.16f);
+
+        if (!arena)
+        {
+            return;
+        }
+
+        batch.End();
+        batch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.LinearClamp, transformMatrix: _art.SceneTransform);
+        float breathe = 1f + 0.04f * MathF.Sin(_presentationTime * 0.21f);
+        Color window = new(205, 196, 236);
+        // The landmark's light: a clear island in the nave, brightest under the window, so the hall
+        // has a lit heart and darker aisles instead of one even value. (The additive blend weighs
+        // colour by alpha, so the strength goes into the colour at full alpha.)
+        _art.DrawSoftSpot(batch, RoseWindowPool, new Vector2(560f, 270f) * breathe, new Color(window.ToVector3() * 0.09f));
+        _art.DrawSoftSpot(batch, RoseWindowPool + new Vector2(-20f, -30f), new Vector2(300f, 140f) * breathe, new Color(window.ToVector3() * 0.07f));
+        // Dust turning slowly in the light: only where the pool is, fading in and out.
+        for (int index = 0; index < 16; index++)
+        {
+            float seed = index * 12.9898f;
+            float life = (_presentationTime * 0.05f + Fraction(MathF.Sin(seed) * 43758.5453f)) % 1f;
+            Vector2 at = RoseWindowPool + new Vector2(
+                (Fraction(MathF.Sin(seed * 1.7f) * 24634.6345f) - 0.5f) * 760f + MathF.Sin(_presentationTime * 0.13f + seed) * 30f,
+                (Fraction(MathF.Sin(seed * 2.3f) * 15731.743f) - 0.5f) * 340f - life * 60f);
+            Vector2 offset = (at - RoseWindowPool) / new Vector2(470f, 230f);
+            float inside = MathHelper.Clamp(1f - offset.Length(), 0f, 1f);
+            float fade = MathF.Sin(life * MathF.PI);
+            _art.DrawSoftSpot(batch, at - new Vector2(0f, 40f + 30f * Fraction(seed)), new Vector2(2.2f), window * (0.5f * inside * fade));
+        }
+        batch.End();
+        batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, transformMatrix: _art.SceneTransform);
+    }
+
+    /// <summary>What floats between camera and room: ash in the foundry and the antechamber, sea mist over the prologue.</summary>
+    private ForegroundMotes.Look? MotesLook => _phase switch
+    {
+        GamePhase.Arena when !_sandboxActive => new ForegroundMotes.Look(new Color(236, 226, 255), 0.34f, new Vector2(5f, 9f), 12),
+        GamePhase.Antechamber or GamePhase.EnteringArena => new ForegroundMotes.Look(new Color(226, 214, 250), 0.28f, new Vector2(3f, 7f), 9),
+        GamePhase.Prologue when _prologue.IsVehicleRide => new ForegroundMotes.Look(new Color(206, 222, 250), 0.26f, new Vector2(-46f, 4f), 10),
+        GamePhase.Prologue => new ForegroundMotes.Look(new Color(206, 222, 250), 0.24f, new Vector2(-9f, 3f), 10),
+        _ => null
+    };
+
+    /// <summary>Where the rose window's light falls on the foundry floor.</summary>
+    private static readonly Vector2 RoseWindowPool = new(930f, 420f);
+
+    private static float Fraction(float value) => value - MathF.Floor(value);
+
+    /// <summary>Like <see cref="ArtAssets.DrawShade"/>, but darkest at the bottom edge.</summary>
+    private void DrawShadeUp(SpriteBatch batch, Rectangle area, Color bottom) =>
+        batch.Draw(_art.ShadeTexture, area, null, bottom, 0f, Vector2.Zero, SpriteEffects.FlipVertically, 0f);
+
+    private static readonly (Vector2 At, Vector2 Size)[] ArenaBlotches =
+    [
+        (new Vector2(420f, 330f), new Vector2(260f, 150f)),
+        (new Vector2(1310f, 300f), new Vector2(300f, 140f)),
+        (new Vector2(760f, 760f), new Vector2(340f, 170f)),
+        (new Vector2(1420f, 690f), new Vector2(240f, 160f)),
+        (new Vector2(300f, 760f), new Vector2(220f, 150f))
+    ];
+
+    private static readonly Color SeaMist = new(150, 164, 200);
+    private static readonly Color AshHaze = new(138, 128, 160);
+
+    /// <summary>
+    /// Mist and haze drifting low over each room (presentation only): sea mist over the water of
+    /// the prologue, moving with the sea during the crossing; haze at the foot of the Warden wall;
+    /// ash in the antechamber; smoke under the foundry's north wall.
+    /// </summary>
+    private void DrawGroundMist(SpriteBatch batch)
+    {
+        float t = _presentationTime;
+        if (_phase is GamePhase.Antechamber or GamePhase.EnteringArena)
+        {
+            Atmosphere.Draw(batch, _art, -200f, 1700f, t, 31,
+                new Atmosphere.Band(330f, 430f, 7, 6f, AshHaze, 0.09f, 380f, 50f),
+                new Atmosphere.Band(450f, 860f, 6, 4f, AshHaze, 0.035f, 420f, 70f));
+            return;
+        }
+
+        if (_phase == GamePhase.Arena && !_sandboxActive)
+        {
+            Atmosphere.Draw(batch, _art, -200f, 2000f, t, 37,
+                new Atmosphere.Band(95f, 230f, 9, 7f, AshHaze, 0.13f, 400f, 60f),
+                new Atmosphere.Band(260f, 980f, 6, 5f, AshHaze, 0.04f, 480f, 80f));
+            return;
+        }
+
+        if (_phase != GamePhase.Prologue || PrologueEnvironment.PlateOf(_prologue) is not { } plate || !_art.HasArt(plate))
+        {
+            return;
+        }
+
+        switch (_prologue.Sector)
+        {
+            case PrologueSector.Escape when _prologue.IsVehicleRide:
+                // The mist moves with the sea, so the crossing reads as speed.
+                Atmosphere.Draw(batch, _art, -400f, 2200f, _prologue.StateTime, 41,
+                    new Atmosphere.Band(120f, 320f, 10, -120f, SeaMist, 0.18f, 380f, 55f),
+                    new Atmosphere.Band(730f, 1000f, 10, -150f, SeaMist, 0.2f, 380f, 55f));
+                break;
+            case PrologueSector.Threshold:
+                Atmosphere.Draw(batch, _art, -200f, 2000f, t, 43,
+                    new Atmosphere.Band(520f, 620f, 9, 5f, SeaMist, 0.16f, 400f, 55f),
+                    new Atmosphere.Band(640f, 960f, 6, 4f, SeaMist, 0.05f, 480f, 75f));
+                break;
+            default:
+                Atmosphere.Draw(batch, _art, -200f, 2000f, t, 47 + (int)_prologue.Sector,
+                    new Atmosphere.Band(0f, 125f, 10, 9f, SeaMist, 0.22f, 380f, 55f),
+                    new Atmosphere.Band(905f, 1010f, 10, 11f, SeaMist, 0.24f, 380f, 55f),
+                    new Atmosphere.Band(160f, 860f, 7, 6f, SeaMist, 0.05f, 480f, 75f));
+                break;
+        }
+    }
+
+    /// <summary>Props of the room being shown plus props staged by automated tests.</summary>
+    private IEnumerable<SceneProp> ActiveSceneProps => _phase switch
+    {
+        GamePhase.Antechamber or GamePhase.EnteringArena => _hubProps.Concat(_sceneProps),
+        GamePhase.Arena => _arenaProps.Concat(_sceneProps),
+        GamePhase.Prologue when _prologue.Sector == PrologueSector.Emergence => _shoreProps.Concat(_sceneProps),
+        GamePhase.Prologue when _prologue.Sector == PrologueSector.Search && _art.HasArt(VisualIds.SearchFloor) => _searchProps.Concat(_sceneProps),
+        GamePhase.Prologue when PrologueEnvironment.PlateOf(_prologue) is { } plate && _art.HasArt(plate) =>
+            PropsOf(PrologueDirector.SectorProps(_prologue.Sector, _prologue.IsVehicleRide)).Concat(_sceneProps),
+        _ => _sceneProps
+    };
+
+    private readonly List<ArtAssets.ShadowCaster> _shadowCasters = [];
+
+    /// <summary>Cast shadows of the player and the enemies on the floor, under every figure.</summary>
+    private void DrawFigureShadows(SpriteBatch batch, IReadOnlyList<SceneLight> lights, bool drawPlayer)
+    {
+        _shadowCasters.Clear();
+        if (drawPlayer && _art.IsRendered(VisualIds.Player) && !_player.IsDead)
+        {
+            _shadowCasters.Add(new ArtAssets.ShadowCaster(_player, _player.Position, 1f));
+        }
+        if (IsCombatPhase)
+        {
+            foreach (Enemy enemy in _enemies)
+            {
+                if (enemy.DrawnAsFigure && enemy.VisualClip is not null && enemy is not TrainingDummy)
+                {
+                    // A dying figure's shadow fades with it.
+                    _shadowCasters.Add(new ArtAssets.ShadowCaster(enemy, enemy.Position, enemy.IsAlive ? 1f : 0.6f));
+                }
+            }
+        }
+        (Vector2 direction, float strength) = KeyShadow;
+        _art.DrawCastShadows(batch, _shadowCasters, lights, direction, strength);
+    }
+
+    /// <summary>
+    /// The key light's shadow per area: where a point one unit above the floor lands (toward
+    /// the lower right, like the shadows baked into the props) and how dark it is.
+    /// </summary>
+    private (Vector2 Direction, float Strength) KeyShadow => _phase switch
+    {
+        GamePhase.Antechamber or GamePhase.EnteringArena => (new Vector2(0.5f, 0.28f), 0.5f),
+        GamePhase.Prologue => (new Vector2(0.62f, 0.32f), 0.55f),
+        _ => (new Vector2(0.58f, 0.3f), 0.55f)
+    };
+
+    /// <summary>Enemies, the player and high props, drawn back to front by foot point.</summary>
+    private void DrawActorBand(SpriteBatch batch, Texture2D pixel, bool drawPlayer)
+    {
+        _actorBand.Clear();
+        int order = 0;
+        if (IsCombatPhase)
+        {
+            foreach (Enemy enemy in _enemies)
+            {
+                Enemy current = enemy;
+                _actorBand.Add(new DepthItem(enemy.Position.Y + enemy.Radius, order++, () =>
+                {
+                    _art.DrawEnemy(batch, current);
+                    current.Draw(batch, pixel, _debugVisible, false, true);
+                }));
+            }
+        }
+        if (drawPlayer)
+        {
+            _actorBand.Add(new DepthItem(_player.Position.Y + GameBalance.PlayerRadius, order++, () => DrawPlayerActor(batch, pixel)));
+        }
+        foreach (SceneProp prop in ActiveSceneProps)
+        {
+            SceneProp current = prop;
+            SceneLayer layer = _art.LayerOf(prop.VisualId, prop.FallbackLayer);
+            if (layer is SceneLayer.Actor or SceneLayer.HighProp)
+            {
+                _actorBand.Add(new DepthItem(prop.Foot.Y, order++, () => _art.DrawProp(batch, current.VisualId, current.Foot, current.FallbackSize, current.Alpha)));
+            }
+        }
+
+        DepthSort.Sort(_actorBand);
+        foreach (DepthItem item in _actorBand)
+        {
+            item.Draw();
+        }
+    }
+
+    private void DrawPlayerActor(SpriteBatch batch, Texture2D pixel)
+    {
+        bool rendered = _art.HasClip(VisualIds.Player, VisualClips.Aim);
+        if (rendered)
+        {
+            // Contact shadow under the feet, cast toward the lower right (key light upper left).
+            _art.DrawSoftSpot(batch, _player.Position + new Vector2(8f, 2f), new Vector2(38f, 13f), new Color(3, 3, 7) * 0.7f);
+        }
+        else
+        {
+            batch.FillCircle(pixel, _player.Position + new Vector2(3f, 8f), 24f, new Color(3, 3, 7) * 0.55f);
+        }
+        if (rendered && !_player.IsDead)
+        {
+            _player.Scythe.DrawBehindFigure(batch, _player.Position, _art);
+        }
+        bool charging = IsCombatPhase && _player.Cannon.State == SoulCannonState.Charging;
+        // Aiming away from the camera, the muzzle is beyond the head: the gathering flame is drawn
+        // first, so head and shoulders cover it (on top it read as a glowing head).
+        bool muzzleBehind = rendered && _player.FacingDirection.Y < -0.35f;
+        if (charging && muzzleBehind)
+        {
+            DrawCannonChargeLoop(batch, rendered);
+        }
+        _art.DrawPlayer(batch, _player);
+        _player.Draw(batch, pixel, _art, _debugVisible, _soulSensePresentation.SoulEmergence);
+        if (charging)
+        {
+            if (!muzzleBehind)
+            {
+                DrawCannonChargeLoop(batch, rendered);
+            }
+            if (rendered)
+            {
+                // The player's own flame runs from the core into the chamber: what the cannon fires.
+                CannonFeed.Draw(batch, _art.SoftSpot, _player.Position, _player.Position - new Vector2(0f, _player.DrawnCoreHeight),
+                    _player.FacingDirection, _player.Cannon.ChargeProgress, _player.Cannon.IsFullCharge, _presentationTime,
+                    _presentationTime - _cannonNotchAt);
+            }
+        }
+    }
+
+    /// <summary>The flame gathering at the muzzle while the Soul Cannon charges, brighter by stage.</summary>
+    private void DrawCannonChargeLoop(SpriteBatch batch, bool rendered)
+    {
+        float charge = _player.Cannon.ChargeProgress;
+        Vector2 muzzle = rendered
+            ? FigureHeights.MuzzleOf(_player.Position, _player.FacingDirection, charge)
+            : _player.Position + _player.FacingDirection * 74f;
+        Color chargeColor = _player.Cannon.IsFullCharge
+            ? Color.White
+            : _player.Cannon.ChargeStage >= 3
+                ? new Color(238, 219, 255)
+                : _player.Cannon.ChargeStage == 2
+                    ? GameBalance.DeathFlameBright
+                    : new Color(155, 94, 220);
+        _art.DrawLoopingEffect(
+            batch,
+            _player.Cannon,
+            VisualIds.CannonChargeLoop,
+            muzzle,
+            0f,
+            _player.Cannon.IsFullCharge ? 0.52f : MathHelper.Lerp(0.24f, 0.46f, charge),
+            chargeColor);
+    }
+
+    private void DrawSceneProps(SpriteBatch batch, Func<SceneLayer, bool> inBand)
+    {
+        foreach (SceneProp prop in ActiveSceneProps)
+        {
+            if (inBand(_art.LayerOf(prop.VisualId, prop.FallbackLayer)))
+            {
+                _art.DrawProp(batch, prop.VisualId, prop.Foot, prop.FallbackSize, prop.Alpha);
+            }
+        }
+    }
+
+    /// <summary>Fades occluders while they hide the player, an enemy or a telegraph.</summary>
+    private void UpdateSceneProps(float deltaTime)
+    {
+        if (!ActiveSceneProps.Any())
+        {
+            return;
+        }
+
+        _occlusionTargets.Clear();
+        _occlusionTargets.Add((RectangleF.Around(_player.Position - new Vector2(0f, 20f), new Vector2(60f, 110f)), _player.Position.Y + GameBalance.PlayerRadius));
+        foreach (Enemy enemy in _enemies)
+        {
+            if (!enemy.IsAlive)
+            {
+                continue;
+            }
+            float size = enemy.Radius * 2.6f;
+            _occlusionTargets.Add((RectangleF.Around(enemy.Position, new Vector2(size)), enemy.Position.Y + enemy.Radius));
+            if (enemy.TelegraphRadius > 0f)
+            {
+                _occlusionTargets.Add((RectangleF.Around(enemy.Position, new Vector2(enemy.TelegraphRadius * 2f)), enemy.Position.Y + enemy.Radius));
+            }
+        }
+
+        foreach (SceneProp prop in ActiveSceneProps)
+        {
+            SceneLayer layer = _art.LayerOf(prop.VisualId, prop.FallbackLayer);
+            float target = layer is SceneLayer.HighProp or SceneLayer.Occluder or SceneLayer.Foreground
+                ? OccluderFade.TargetAlpha(_art.PropBounds(prop.VisualId, prop.Foot, prop.FallbackSize), prop.Foot.Y, layer, _occlusionTargets)
+                : 1f;
+            prop.Alpha = OccluderFade.Approach(prop.Alpha, target, deltaTime);
+        }
+    }
+
+    /// <summary>Test hook: stands an arena pillar (a dummy until it has graphics) on <paramref name="foot"/>.</summary>
+    internal SceneProp PlaceAutomatedOccluder(Vector2 foot)
+    {
+        SceneProp pillar = new(VisualIds.ArenaPillar, foot, new Vector2(120f, 330f), SceneLayer.HighProp);
+        _sceneProps.Add(pillar);
+        return pillar;
     }
 
     private void DrawSoulfireLighting(SpriteBatch batch, SoulfireRenderer renderer, Viewport viewport)
@@ -891,7 +1566,8 @@ public sealed partial class GameWorld : IDisposable
                 _antechamber,
                 _presentationTime,
                 _soulSensePresentation.SoulEmergence,
-                DoorTransitionProgress);
+                DoorTransitionProgress,
+                renderedPlayer: _art.HasClip(VisualIds.Player, VisualClips.Aim));
             return;
         }
 
@@ -908,32 +1584,117 @@ public sealed partial class GameWorld : IDisposable
             _presentationTime,
             _soulSensePresentation.SoulEmergence,
             _phase == GamePhase.Arena && _loopState == ArenaLoopState.Complete,
-            _presentation.GetLifeFlamePosition(_arena.CombatBounds),
-            _presentation.GetLifeFlameAlpha(),
-            drawArenaFurnaces: _phase != GamePhase.Prologue);
+            _presentation.GetLifeFlamePosition(),
+            _presentation.GetLifeFlameAlpha() * _presentation.GetLifeFlameKindle() * _presentation.GetLifeFlameBreath(),
+            drawArenaFurnaces: _phase != GamePhase.Prologue,
+            renderedPlayer: _art.HasClip(VisualIds.Player, VisualClips.Aim),
+            renderedEnemy: enemy => _art.IsRendered(enemy.VisualId));
+
+        renderer.BeginLighting(batch, RenderResolution.ToOutput(_camera.GetTransform(viewport, _screenEffects.CameraOffset)));
+        _groundImpacts.DrawLighting(batch, renderer);
+        if (_automatedLightSource is not null)
+        {
+            DrawAutomatedLights(renderer, batch);
+        }
+        batch.End();
     }
 
-    private void DrawScreenFeedback(SpriteBatch batch, Texture2D pixel, Viewport viewport)
+    /// <summary>
+    /// The Devourer's fists hit the floor: it breaks out to the edge of the blow, slabs and stones
+    /// fly, the view drops with the weight (<see cref="GroundImpacts"/>). The hit itself is
+    /// resolved by the Devourer and unchanged.
+    /// </summary>
+    private void PresentDevourerSlam(Devourer devourer)
+    {
+        Vector2 center = devourer.Position;
+        float radius = GameBalance.DevourerSlamRange;
+        // On the skiff's deck the planks splinter; everywhere else stone breaks.
+        bool deck = _phase == GamePhase.Prologue && _prologue.IsVehicleRide;
+        _groundImpacts.Slam(devourer, center, radius, deck);
+        _audio.Play(AudioCue.GroundBreak, 0.82f, 0f, PanOf(center) * 0.6f);
+
+        // Slabs from the crater and stones from all over the broken floor.
+        Color slab = deck ? new Color(74, 58, 50) : new Color(78, 71, 86);
+        Color chips = deck ? new Color(88, 70, 58) : new Color(70, 64, 78);
+        _particles.EmitDebris(center + new Vector2(0f, FigureHeights.Air), center.Y + FigureHeights.Air, 12, slab, 360f, 11f, 0.85f);
+        for (int chip = 0; chip < 12; chip++)
+        {
+            float angle = chip * MathHelper.TwoPi / 12f + 0.4f;
+            float reach = radius * (chip % 2 == 0 ? 0.45f : 0.8f);
+            Vector2 at = center + new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * reach;
+            _particles.EmitDebris(at + new Vector2(0f, FigureHeights.Air), at.Y + FigureHeights.Air, 3, chips, 210f, 4.5f, 0.6f);
+        }
+
+        // The weight lands in the view too, less the further away the player stands.
+        float near = MathHelper.Clamp(1.2f - Vector2.Distance(_player.Position, center) / 900f, 0.35f, 1f);
+        _screenEffects.AddShake(0.34f, 9f * near);
+        _screenEffects.AddCameraKick(Vector2.UnitY, 7f * near);
+        _screenEffects.AddZoomPunch(0.012f * near);
+    }
+
+    /// <summary>
+    /// The bound soul running low: the world's edges close in, and on each throb they glow
+    /// faintly with the Death Flame (<see cref="LowHealthPresentation"/>).
+    /// </summary>
+    private void DrawLowHealth(SpriteBatch batch, SoulfireRenderer renderer)
+    {
+        float amount = _lowHealth.Amount;
+        if (amount <= 0.001f)
+        {
+            return;
+        }
+
+        float pulse = _lowHealth.Pulse;
+        Color glow = GameBalance.DeathFlame;
+        glow.A = 0;
+        batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp);
+        batch.Draw(renderer.VignetteTexture, RenderResolution.OutputBounds, Color.White * (amount * (0.3f + 0.16f * pulse)));
+        batch.Draw(renderer.VignetteGlowTexture, RenderResolution.OutputBounds, glow * (amount * (0.05f + 0.16f * pulse)));
+        batch.End();
+    }
+
+    /// <summary>
+    /// Impact frames darken the picture toward its edges for an instant (the middle, where the
+    /// blow lands, stays readable); flashes burst as light from where they happened and only
+    /// lightly wash the rest.
+    /// </summary>
+    private void DrawScreenFeedback(SpriteBatch batch, Texture2D pixel, Viewport viewport, SoulfireRenderer renderer)
     {
         batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, transformMatrix: RenderResolution.ScaleMatrix);
+        Rectangle screen = new(0, 0, viewport.Width, viewport.Height);
 
         if (_screenEffects.ImpactFrameAlpha > 0f)
         {
-            batch.FillRectangle(pixel, new Rectangle(0, 0, viewport.Width, viewport.Height), Color.Black * (_screenEffects.ImpactFrameAlpha * 0.82f));
+            float impact = _screenEffects.ImpactFrameAlpha;
+            batch.FillRectangle(pixel, screen, Color.Black * (impact * 0.32f));
+            batch.Draw(renderer.VignetteTexture, screen, Color.White * MathHelper.Clamp(impact * 1.6f, 0f, 1f));
         }
 
-        if (_screenEffects.FlashAlpha > 0f)
+        float flash = _screenEffects.FlashAlpha;
+        if (flash > 0f && _screenEffects.FlashCenter is null)
         {
-            batch.FillRectangle(pixel, new Rectangle(0, 0, viewport.Width, viewport.Height), GameBalance.DeathFlameBright * _screenEffects.FlashAlpha);
+            batch.FillRectangle(pixel, screen, GameBalance.DeathFlameBright * flash);
         }
 
         if (_player.ResonanceActivationRemaining > 0f)
         {
             float activationFade = MathHelper.Clamp(_player.ResonanceActivationRemaining / 0.5f, 0f, 1f);
-            batch.FillRectangle(pixel, new Rectangle(0, 0, viewport.Width, viewport.Height), Color.Black * (activationFade * 0.38f));
+            batch.FillRectangle(pixel, screen, Color.Black * (activationFade * 0.38f));
         }
 
         batch.End();
+
+        if (flash > 0f && _screenEffects.FlashCenter is { } center)
+        {
+            Vector2 at = Vector2.Transform(center, _camera.GetTransform(viewport, _screenEffects.CameraOffset));
+            batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, transformMatrix: RenderResolution.ScaleMatrix);
+            batch.FillRectangle(pixel, screen, GameBalance.DeathFlameBright * (flash * 0.3f));
+            batch.End();
+            batch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.LinearClamp, transformMatrix: RenderResolution.ScaleMatrix);
+            _art.DrawSoftSpot(batch, at, new Vector2(viewport.Height * 0.62f), GameBalance.DeathFlameBright * (flash * 0.85f));
+            _art.DrawSoftSpot(batch, at, new Vector2(viewport.Height * 0.2f), GameBalance.SoulWhite * (flash * 0.7f));
+            batch.End();
+        }
     }
 
     private void DrawHud(SpriteBatch batch, Texture2D pixel, Viewport viewport)
@@ -951,7 +1712,7 @@ public sealed partial class GameWorld : IDisposable
 
             if (!IsGamePaused)
             {
-                ProloguePresentation.DrawOverlay(batch, pixel, viewport, _prologue, _player.IsDead, _settings.OptionalHints);
+                ProloguePresentation.DrawOverlay(batch, pixel, viewport, _prologue, _player.IsDead, _settings.OptionalHints, _presentation.StateTime);
             }
         }
         else
@@ -968,6 +1729,10 @@ public sealed partial class GameWorld : IDisposable
                 if (_waveNumber > 0)
                 {
                     HudRenderer.DrawWave(batch, pixel, viewport, _waveNumber, GameBalance.ArenaWaveCount, _waveRun.PushesReleased, ArenaWaves.Pushes(_waveNumber).Count);
+                }
+                if (!IsGamePaused)
+                {
+                    _narration.Draw(batch, pixel, viewport);
                 }
             }
 
@@ -1020,14 +1785,11 @@ public sealed partial class GameWorld : IDisposable
         float placeIn = Ease(_phaseTime / 0.45f);
         float placeOut = 1f - Ease((_phaseTime - 2.2f) / 0.55f);
         float placeAlpha = _phase == GamePhase.Antechamber ? placeIn * placeOut : 0f;
-        PixelText.DrawCentered(
-            batch,
-            pixel,
-            "ASHEN ANTECHAMBER",
-            centerX,
-            viewport.Height * 0.14f,
-            2,
-            GameBalance.SoulWhite * (0.7f * placeAlpha));
+        if (placeAlpha > 0f)
+        {
+            UiKit.Divider(batch, pixel, centerX, viewport.Height * 0.14f - 18f, 420f, GameBalance.DeathFlameBright * (0.55f * placeAlpha));
+            PixelText.DrawCentered(batch, pixel, "ASHEN ANTECHAMBER", centerX, viewport.Height * 0.14f, 4, GameBalance.SoulWhite * (0.85f * placeAlpha));
+        }
 
         if (_phase == GamePhase.Antechamber)
         {
@@ -1037,22 +1799,9 @@ public sealed partial class GameWorld : IDisposable
         HubDoor? nearbyDoor = _phase == GamePhase.Antechamber ? _antechamber.DoorAt(_player.Position) : null;
         if (nearbyDoor is not null)
         {
-            float pulse = 0.68f + MathF.Sin(_presentationTime * 4f) * 0.14f;
-            string prompt = nearbyDoor.Prompt;
-            int textScale = PixelText.Measure(prompt, 2) + 48 <= viewport.Width ? 2 : 1;
-            int promptWidth = PixelText.Measure(prompt, textScale) + 48;
-            Rectangle panel = new((viewport.Width - promptWidth) / 2, viewport.Height - 104, promptWidth, 48);
+            float pulse = nearbyDoor.IsSealed ? 0f : 0.5f + MathF.Sin(_presentationTime * 4f) * 0.5f;
             Color accent = nearbyDoor.IsSealed ? GameBalance.DeepViolet : GameBalance.DeathFlame;
-            batch.FillRectangle(pixel, panel, Color.Black * 0.72f);
-            batch.DrawRectangle(pixel, panel, accent * (0.52f * pulse), 2f);
-            PixelText.DrawCentered(
-                batch,
-                pixel,
-                prompt,
-                centerX,
-                panel.Y + 24f - textScale * 3.5f,
-                textScale,
-                GameBalance.SoulWhite * (nearbyDoor.IsSealed ? 0.72f : pulse));
+            UiKit.Prompt(batch, pixel, centerX, viewport.Height - 206, nearbyDoor.Prompt, accent, pulse, nearbyDoor.IsSealed ? 0.72f : 1f);
         }
 
         if (_phase != GamePhase.EnteringArena)
@@ -1065,7 +1814,8 @@ public sealed partial class GameWorld : IDisposable
         batch.FillRectangle(pixel, new Rectangle(0, 0, viewport.Width, barHeight), Color.Black * 0.9f);
         batch.FillRectangle(pixel, new Rectangle(0, viewport.Height - barHeight, viewport.Width, barHeight), Color.Black * 0.9f);
         float labelAlpha = Ease(progress / 0.35f) * (1f - Ease((progress - 0.68f) / 0.25f));
-        PixelText.DrawCentered(batch, pixel, "THE DOOR AWAKENS", centerX, viewport.Height * 0.78f, 2, GameBalance.DeathFlameBright * labelAlpha);
+        UiKit.Divider(batch, pixel, centerX, viewport.Height * 0.78f - 16f, 380f, GameBalance.DeathFlameBright * (0.5f * labelAlpha));
+        PixelText.DrawCentered(batch, pixel, "THE DOOR AWAKENS", centerX, viewport.Height * 0.78f, 3, GameBalance.DeathFlameBright * labelAlpha);
         float fade = Ease((progress - 0.72f) / 0.28f);
         batch.FillRectangle(pixel, viewport.Bounds, Color.Black * fade);
     }
@@ -1078,6 +1828,7 @@ public sealed partial class GameWorld : IDisposable
         }
 
         bool hitAnything = false;
+        Vector2 firstContact = _player.Position + strike.Direction * 60f;
         foreach (Enemy enemy in _enemies.Where(enemy => enemy.IsAlive))
         {
             Vector2 toTarget = enemy.Position - _player.Position;
@@ -1111,6 +1862,16 @@ public sealed partial class GameWorld : IDisposable
                 contactPosition,
                 targetDirection,
                 coreHit);
+            EmitHitMatter(enemy, contactPosition, strike.Step, coreHit);
+            if (!hitAnything)
+            {
+                firstContact = contactPosition;
+            }
+            PlayMaterialHit(enemy, strike.Step switch { 1 => 0.5f, 2 => 0.62f, _ => 0.78f }, strike.Step == 3 ? -0.06f : 0f);
+            if (coreHit)
+            {
+                _automatedCoreHits++;
+            }
             if (coreHit)
             {
                 _player.AddResonance(GameBalance.ResonancePerCoreHit);
@@ -1124,8 +1885,12 @@ public sealed partial class GameWorld : IDisposable
             return;
         }
 
-        _combatPresentation.PresentScytheImpact(strike.Step, strike.Direction);
-        _audio.Play(AudioCue.ScytheHit, strike.Step == 3 ? 0.72f : 0.48f, strike.Step == 2 ? 0.08f : 0f);
+        _combatPresentation.PresentScytheImpact(strike.Step, strike.Direction, firstContact);
+        // Every landed blow has body: the pressure stroke under the Soul Cleave, a lighter one under
+        // the first two swings.
+        _audio.Play(AudioCue.HitHeavy, strike.Step switch { 1 => 0.32f, 2 => 0.42f, _ => 0.62f }, 0f, PanOf(firstContact) * 0.5f);
+        // A landed hit sits above the swing that carried it.
+        _audio.Play(AudioCue.ScytheHit, strike.Step == 3 ? 0.95f : 0.82f, strike.Step == 2 ? 0.08f : 0f);
     }
 
     private void SpawnWave(int waveNumber)
@@ -1199,6 +1964,8 @@ public sealed partial class GameWorld : IDisposable
             int seed = _waveNumber * 100 + _reinforcementSeed++;
             _enemies.Add(CreateArenaEnemy(spawn.Kind, spawn.Position, ref seed));
             _particles.EmitDeathFlame(spawn.Position, 10, 0.7f);
+            // Death Flame gathers and lets a figure go: heard where it stands.
+            _audio.Play(AudioCue.EnemyEmerge, 0.6f, 0f, PanOf(spawn.Position));
         }
     }
 
@@ -1270,7 +2037,7 @@ public sealed partial class GameWorld : IDisposable
         bool wasDashing,
         bool wasSoulSenseActive)
     {
-        _lastMouseWorld = _camera.ScreenToWorld(input.MousePosition, viewport);
+        _lastMouseWorld = AutomatedAimOr(_camera.ScreenToWorld(input.MousePosition, viewport));
         _player.Update(
             deltaTime,
             input,
@@ -1280,6 +2047,7 @@ public sealed partial class GameWorld : IDisposable
             _screenEffects,
             _forceSoulSense,
             combatEnabled: false);
+        UpdateFootsteps();
 
         _soulSensePresentation.Update(deltaTime, _player.SoulSenseActive);
         _particles.Update(deltaTime);
@@ -1287,11 +2055,12 @@ public sealed partial class GameWorld : IDisposable
         if (!wasDashing && _player.IsDashing)
         {
             _spriteVfx.Spawn(
-                "dash_ignition",
+                VisualIds.DashIgnition,
                 _player.Position - _player.DashDirection * 24f,
                 MathF.Atan2(_player.DashDirection.Y, _player.DashDirection.X),
                 0.72f);
             _audio.Play(AudioCue.Dash, 0.5f);
+            KickOffGround();
         }
 
         if (wasSoulSenseActive != _player.SoulSenseActive)
@@ -1301,8 +2070,11 @@ public sealed partial class GameWorld : IDisposable
         }
 
         float smoothing = 1f - MathF.Exp(-deltaTime * 6.5f);
-        _camera.Zoom = MathHelper.Lerp(_camera.Zoom, 1f, smoothing);
-        Vector2 target = Vector2.Lerp(_player.Position, _antechamber.EntryDoorCenter, 0.11f) + new Vector2(0f, -40f);
+        // The hub frames the whole door wall: slightly wider than a combat room and held at the
+        // height of the doors, following the player mostly sideways.
+        _camera.Zoom = MathHelper.Lerp(_camera.Zoom, HubCameraZoom, smoothing);
+        Vector2 target = new(MathHelper.Lerp(_player.Position.X, _antechamber.EntryDoorCenter.X, 0.11f),
+            MathHelper.Lerp(HubCameraHeight, _player.Position.Y, 0.15f));
         _camera.Follow(target, _antechamber.Bounds, viewport, smoothing);
 
         HubDoor? door = _antechamber.DoorAt(_player.Position);
@@ -1311,6 +2083,408 @@ public sealed partial class GameWorld : IDisposable
             BeginDoorTransition();
         }
     }
+
+    /// <summary>World units per step: half the run cycle of the rendered figure (move clip, 180 per cycle).</summary>
+    private const float FootstepStride = 90f;
+    private Vector2 _footstepFrom;
+    private float _footstepDistance;
+
+    /// <summary>
+    /// Footsteps from the distance the player actually covers (never during a dash or while dead);
+    /// on the skiff's deck the planks answer.
+    /// </summary>
+    private float? _playerStepPhase;
+    private readonly Dictionary<Enemy, float> _enemyStepPhases = new();
+    private static readonly float[] Footfalls = [0.25f, 0.75f];
+    private static readonly float[] BurningFootfalls = [0.2f, 0.7f];
+
+    /// <summary>
+    /// True when a walk or run cycle passed one of its footfalls since the last check: the
+    /// rendered clips set a heel down at a quarter and three quarters of their cycle
+    /// (key_run/key_move in tools/visuals/blender/build_*.py; the Burning slightly earlier).
+    /// </summary>
+    private static bool CrossedFootfall(float? previous, float current, float[] footfalls)
+    {
+        if (previous is not { } before)
+        {
+            return false;
+        }
+
+        float travelled = current - before;
+        if (travelled < 0f)
+        {
+            travelled += 1f;
+        }
+        if (travelled <= 0f || travelled > 0.5f)
+        {
+            return false;
+        }
+
+        foreach (float contact in footfalls)
+        {
+            float ahead = contact - before;
+            if (ahead <= 0f)
+            {
+                ahead += 1f;
+            }
+            if (ahead <= travelled)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private float _playerStepSide = 1f;
+
+    /// <summary>
+    /// The dash pushes off hard: on the wet stone of the shore and the harbour water sprays back
+    /// from the feet (on dry floors the ignition flash carries the push-off).
+    /// </summary>
+    private void KickOffGround()
+    {
+        bool wet = _phase == GamePhase.Prologue && !_prologue.IsVehicleRide && _prologue.Sector is PrologueSector.Emergence or PrologueSector.Search;
+        if (wet)
+        {
+            _particles.EmitSplash(_player.Position + new Vector2(0f, FigureHeights.Air), -_player.DashDirection, 9);
+        }
+    }
+
+    /// <summary>Ash and stone dust underfoot: the foundry, the antechamber and the threshold (not the wet shore or the deck).</summary>
+    private bool OnDustyFloor => _phase is GamePhase.Arena or GamePhase.Antechamber or GamePhase.EnteringArena ||
+        (_phase == GamePhase.Prologue && _prologue.Sector == PrologueSector.Threshold);
+
+    private void UpdateFootsteps()
+    {
+        Vector2 position = _player.Position;
+        float moved = Vector2.Distance(position, _footstepFrom);
+        _footstepFrom = position;
+        bool wood = _phase == GamePhase.Prologue && _prologue.IsVehicleRide;
+        // The shore's platform and the harbour's cobbles are wet: puddles, a film of sea water.
+        bool wet = !wood && _phase == GamePhase.Prologue && _prologue.Sector is PrologueSector.Emergence or PrologueSector.Search;
+        AudioCue stepCue = wood ? AudioCue.FootstepWood : wet ? AudioCue.FootstepWet : AudioCue.Footstep;
+        if (!_player.IsDead && !_player.IsDashing && _art.CyclePhase(_player, VisualClips.Move) is { } phase)
+        {
+            // The rendered run: a step on every drawn footfall.
+            if (CrossedFootfall(_playerStepPhase, phase, Footfalls))
+            {
+                _audio.Play(stepCue, 0.42f);
+                if (wet)
+                {
+                    // The water in the joints splashes up from the heel, as it is heard.
+                    Vector2 back = _player.Velocity.LengthSquared() > 0.001f ? -Vector2.Normalize(_player.Velocity) : Vector2.Zero;
+                    // Particles are drawn at body height (the air pass); the heel is that much lower.
+                    _particles.EmitSplash(position + new Vector2(0f, FigureHeights.Air), back, 4);
+                }
+                if (OnDustyFloor)
+                {
+                    // The foot lands in the ash: a faint breath of it is kicked back from the heel,
+                    // left and right foot in turn.
+                    Vector2 heading = _player.Velocity;
+                    Vector2 side = heading.LengthSquared() > 0.001f ? Vector2.Normalize(new Vector2(-heading.Y, heading.X)) : Vector2.UnitX;
+                    _playerStepSide = -_playerStepSide;
+                    _groundImpacts.Scuff(position + side * (5f * _playerStepSide), heading);
+                }
+            }
+            _playerStepPhase = phase;
+            return;
+        }
+
+        _playerStepPhase = null;
+        if (_player.IsDead || _player.IsDashing || moved > 60f || _player.Velocity.LengthSquared() < 120f)
+        {
+            _footstepDistance = MathF.Min(_footstepDistance, FootstepStride * 0.6f);
+            return;
+        }
+        _footstepDistance += moved;
+        if (_footstepDistance >= FootstepStride)
+        {
+            _footstepDistance -= FootstepStride;
+            _audio.Play(stepCue, 0.42f);
+        }
+    }
+
+    /// <summary>Stereo position of a sound source left or right of the player (presentation only).</summary>
+    private float PanOf(Vector2 source) => MathHelper.Clamp((source.X - _player.Position.X) / 700f, -0.8f, 0.8f);
+
+    /// <summary>
+    /// The narrator's lines in the arena (<see cref="Narration"/>): why the foundry fights, what
+    /// the Burning and the Devourer are when they first appear, what the last wave means. Each
+    /// once per session; nothing in the sandbox or while dead.
+    /// </summary>
+    private void Narrate(float deltaTime)
+    {
+        if (_phase == GamePhase.Arena && !_sandboxActive && !_player.IsDead && _loopState == ArenaLoopState.Combat)
+        {
+            if (_waveNumber == 1)
+            {
+                _narration.SayOnce("foundry", "THE LAST SHIFT NEVER LEFT THIS FOUNDRY  THEY STILL FEED ITS FIRE");
+            }
+            if (_waveNumber >= GameBalance.ArenaWaveCount)
+            {
+                _narration.SayOnce("final", "THE LAST OF THEM  THEN THE FURNACE CAN FINALLY GO OUT");
+            }
+            foreach (Enemy enemy in _enemies)
+            {
+                if (enemy is Burning { IsAlive: true })
+                {
+                    _narration.SayOnce("burning", "TOO MUCH IS LEFT IN THESE  RAGE AND PANIC BURN THEM FROM WITHIN");
+                }
+                else if (enemy is Devourer { IsAlive: true })
+                {
+                    _narration.SayOnce("devourer", "THIS ONE LOVED UNTIL IT OWNED  NOW IT LETS NO SOUL LEAVE");
+                }
+            }
+        }
+        _narration.Update(deltaTime);
+    }
+
+    /// <summary>
+    /// How hot the fight runs, for the combat score (presentation only): a fight is on during an
+    /// arena wave or while enemies stand in the prologue. More enemies, a nearby wind-up (it keeps
+    /// the heat for a few seconds), little health, Resonance and later waves push it up; the
+    /// prologue's lessons stay below the frenzy.
+    /// </summary>
+    private void UpdateCombatMusic(float deltaTime)
+    {
+        bool arenaFight = _phase == GamePhase.Arena && !_sandboxActive && _loopState == ArenaLoopState.Combat;
+        int alive = 0;
+        bool danger = false;
+        foreach (Enemy enemy in _enemies)
+        {
+            if (!enemy.IsAlive)
+            {
+                continue;
+            }
+            alive++;
+            bool windingUp = enemy is Hollow { State: HollowState.Telegraph or HollowState.Swipe } ||
+                enemy is Burning { State: BurningState.Telegraph or BurningState.Charge } ||
+                enemy is Devourer { State: DevourerState.SlamTelegraph or DevourerState.Slam };
+            danger |= windingUp && Vector2.DistanceSquared(enemy.Position, _player.Position) < 650f * 650f;
+        }
+        bool prologueFight = _phase == GamePhase.Prologue && alive > 0;
+        bool active = (arenaFight || prologueFight) && !_player.IsDead;
+        _dangerHeat = danger ? 1f : MathF.Max(0f, _dangerHeat - deltaTime / 4f);
+        float intensity = 0.28f + 0.06f * Math.Min(alive, 6) + 0.15f * _dangerHeat +
+            (_player.Health <= _player.MaxHealth * 0.3f ? 0.22f : 0f) + (_player.ResonanceActive ? 0.12f : 0f) +
+            (arenaFight ? 0.025f * _waveNumber : 0f);
+        if (prologueFight)
+        {
+            intensity = MathF.Min(intensity, 0.6f);
+        }
+        _audio.SetCombatIntensity(active, MathHelper.Clamp(intensity, 0f, 1f), deltaTime);
+        _arenaAtmosphere.SetBeat(_audio.CombatKickPhase, _audio.CombatMusicLevel);
+    }
+
+    /// <summary>
+    /// Each enemy kind is heard where the nearest of its kind stands (presentation only): louder
+    /// the closer it is, a little fuller with more of them, a Burning flaring up as it winds up and
+    /// runs. Nothing while the player is dead or outside a fight.
+    /// </summary>
+    private void UpdateEnemyPresence(float deltaTime)
+    {
+        bool heard = IsCombatPhase && !_player.IsDead;
+        foreach (PresenceSource kind in PresenceKinds)
+        {
+            Enemy? nearest = null;
+            float best = float.MaxValue;
+            int count = 0;
+            if (heard)
+            {
+                foreach (Enemy enemy in _enemies)
+                {
+                    if (!enemy.IsAlive || PresenceOf(enemy) != kind)
+                    {
+                        continue;
+                    }
+                    count++;
+                    float distance = Vector2.DistanceSquared(enemy.Position, _player.Position);
+                    if (distance < best)
+                    {
+                        best = distance;
+                        nearest = enemy;
+                    }
+                }
+            }
+            float level = 0f;
+            if (nearest is not null)
+            {
+                float nearness = MathHelper.Clamp(1f - MathF.Sqrt(best) / 850f, 0f, 1f);
+                level = nearness * nearness * MathF.Min(1.3f, 1f + 0.1f * (count - 1));
+                if (nearest is Burning { IsAggressionCommitted: true })
+                {
+                    level *= 1.5f;
+                }
+            }
+            _audio.SetPresence(kind, MathHelper.Clamp(level, 0f, 1.5f), nearest is null ? 0f : PanOf(nearest.Position), deltaTime);
+        }
+    }
+
+    /// <summary>
+    /// The Warden flames are heard where they burn (presentation only): each louder the closer the
+    /// player walks by, the hall's sconces high on the pilasters fainter, larger flames of the
+    /// prologue fuller, the sum panned toward the nearer flames.
+    /// </summary>
+    private void UpdateWardenFlames(float deltaTime)
+    {
+        _flameLevel = 0f;
+        _flamePan = 0f;
+        if (_phase is GamePhase.Antechamber or GamePhase.EnteringArena)
+        {
+            foreach ((Vector2 flame, float weight) in SoulFurnaceAntechamber.HeardFlames)
+            {
+                HearFlame(flame, weight);
+            }
+        }
+        else if (_phase == GamePhase.Prologue && PrologueEnvironment.PlateOf(_prologue) is { } dressed && _art.HasArt(dressed))
+        {
+            foreach ((Vector2 flameBase, float height) in PrologueDirector.WardenFlames(_prologue.Sector, _prologue.IsVehicleRide))
+            {
+                HearFlame(flameBase, MathHelper.Clamp(height / 40f, 0.3f, 1.2f));
+            }
+        }
+        _audio.SetPresence(PresenceSource.WardenFlames, MathHelper.Clamp(_flameLevel, 0f, 1.2f),
+            _flameLevel > 0.001f ? _flamePan / _flameLevel : 0f, deltaTime);
+
+        // The furnace in the north wall of the foundry, louder toward the wall; in the ending the
+        // Life Flame burns there instead.
+        float furnace = 0f;
+        if (_phase == GamePhase.Arena && _loopState != ArenaLoopState.Complete)
+        {
+            float nearness = MathHelper.Clamp(1f - Vector2.Distance(Arena.FurnaceHearth, _player.Position) / 1000f, 0f, 1f);
+            furnace = 0.15f + 0.85f * nearness * nearness;
+        }
+        _audio.SetPresence(PresenceSource.Furnace, furnace, PanOf(Arena.FurnaceHearth) * 0.8f, deltaTime);
+    }
+
+    private float _flameLevel;
+    private float _flamePan;
+
+    private void HearFlame(Vector2 flame, float weight)
+    {
+        float nearness = MathHelper.Clamp(1f - Vector2.Distance(flame, _player.Position) / 620f, 0f, 1f);
+        float share = weight * nearness * nearness;
+        _flameLevel += share;
+        _flamePan += share * PanOf(flame);
+    }
+
+    private static readonly PresenceSource[] PresenceKinds = [PresenceSource.Hollow, PresenceSource.Burning, PresenceSource.Devourer];
+
+    private static PresenceSource? PresenceOf(Enemy enemy) => enemy switch
+    {
+        Hollow => PresenceSource.Hollow,
+        Burning => PresenceSource.Burning,
+        Devourer => PresenceSource.Devourer,
+        _ => null
+    };
+
+    private readonly Dictionary<Enemy, (Vector2 From, float Distance)> _enemySteps = new();
+    private readonly List<Enemy> _goneStepEnemies = [];
+
+    /// <summary>
+    /// Enemies are heard walking (presentation only): each kind has its own step every stride of
+    /// ground covered, quieter with distance from the player and placed left or right of them.
+    /// </summary>
+    private void UpdateEnemyFootsteps()
+    {
+        if (!IsCombatPhase)
+        {
+            _enemySteps.Clear();
+            _enemyStepPhases.Clear();
+            return;
+        }
+
+        foreach (Enemy enemy in _enemies)
+        {
+            (AudioCue cue, float stride, float loudness) = enemy switch
+            {
+                Devourer => (AudioCue.DevourerStep, 105f, 0.5f),
+                Burning => (AudioCue.BurningStep, 70f, 0.4f),
+                Hollow => (AudioCue.HollowStep, 72f, 0.4f),
+                _ => (AudioCue.Footstep, 0f, 0f)
+            };
+            if (stride <= 0f || !enemy.IsAlive)
+            {
+                continue;
+            }
+
+            if (enemy.DrawnAsFigure && _art.CyclePhase(enemy, VisualClips.Move) is { } enemyPhase)
+            {
+                // A rendered walk: the step lands on the drawn footfall.
+                float? lastPhase = _enemyStepPhases.TryGetValue(enemy, out float last) ? last : null;
+                _enemyStepPhases[enemy] = enemyPhase;
+                if (CrossedFootfall(lastPhase, enemyPhase, enemy is Burning ? BurningFootfalls : Footfalls))
+                {
+                    float nearness = MathHelper.Clamp(1f - Vector2.Distance(enemy.Position, _player.Position) / 900f, 0f, 1f);
+                    if (nearness > 0.05f)
+                    {
+                        _audio.Play(cue, loudness * nearness * nearness, 0f, PanOf(enemy.Position));
+                    }
+                    if (_phase == GamePhase.Prologue && !_prologue.IsVehicleRide && _prologue.Sector is PrologueSector.Emergence or PrologueSector.Search)
+                    {
+                        // The same wet stone as under the player's feet: a little water splashes up.
+                        Vector2 back = enemy.VisualFacing.LengthSquared() > 0.001f ? -Vector2.Normalize(enemy.VisualFacing) : Vector2.Zero;
+                        _particles.EmitSplash(enemy.Position + new Vector2(0f, FigureHeights.Air), back, enemy is Devourer ? 6 : 3);
+                    }
+                    if (enemy is Devourer)
+                    {
+                        // Its weight lands: dust kicks up at the foot, and close by the view trembles.
+                        _groundImpacts.Stomp(enemy.Position);
+                        if (nearness > 0.55f)
+                        {
+                            _screenEffects.AddShake(0.07f, 1.4f * (nearness - 0.45f));
+                        }
+                    }
+                }
+                continue;
+            }
+            _enemyStepPhases.Remove(enemy);
+
+            if (!_enemySteps.TryGetValue(enemy, out (Vector2 From, float Distance) step))
+            {
+                _enemySteps[enemy] = (enemy.Position, stride * 0.5f);
+                continue;
+            }
+
+            float moved = Vector2.Distance(enemy.Position, step.From);
+            float distance = moved > 40f ? stride * 0.5f : step.Distance + moved;
+            if (distance >= stride)
+            {
+                distance -= stride;
+                Vector2 offset = enemy.Position - _player.Position;
+                float near = MathHelper.Clamp(1f - offset.Length() / 900f, 0f, 1f);
+                if (near > 0.05f)
+                {
+                    _audio.Play(cue, loudness * near * near, 0f, PanOf(enemy.Position));
+                }
+            }
+            _enemySteps[enemy] = (enemy.Position, distance);
+        }
+
+        _goneStepEnemies.Clear();
+        foreach (Enemy known in _enemySteps.Keys)
+        {
+            if (!known.IsAlive || !_enemies.Contains(known))
+            {
+                _goneStepEnemies.Add(known);
+            }
+        }
+        foreach (Enemy known in _enemyStepPhases.Keys)
+        {
+            if (!known.IsAlive || !_enemies.Contains(known))
+            {
+                _goneStepEnemies.Add(known);
+            }
+        }
+        foreach (Enemy gone in _goneStepEnemies)
+        {
+            _enemySteps.Remove(gone);
+            _enemyStepPhases.Remove(gone);
+        }
+    }
+
+    private const float HubCameraZoom = 0.88f;
+    private const float HubCameraHeight = 470f;
 
     private void BeginDoorTransition()
     {
@@ -1321,7 +2495,7 @@ public sealed partial class GameWorld : IDisposable
         _audio.SetSoulSense(false);
         _audio.SetCalm(false);
         _audio.SetArenaActive(true);
-        _audio.Play(AudioCue.TitleConfirm, 0.48f, -0.14f);
+        _audio.Play(AudioCue.DoorAwaken, 0.85f);
     }
 
     private void UpdateDoorTransition(float deltaTime, Viewport viewport)
@@ -1331,7 +2505,7 @@ public sealed partial class GameWorld : IDisposable
 
         float eased = Ease(DoorTransitionProgress);
         float smoothing = 1f - MathF.Exp(-deltaTime * 7f);
-        _camera.Zoom = MathHelper.Lerp(_camera.Zoom, MathHelper.Lerp(1f, 0.88f, eased), smoothing);
+        _camera.Zoom = MathHelper.Lerp(_camera.Zoom, MathHelper.Lerp(HubCameraZoom, 0.8f, eased), smoothing);
         _camera.Follow(
             Vector2.Lerp(_player.Position, _antechamber.EntryDoorCenter + new Vector2(0f, 90f), eased),
             _antechamber.Bounds,
@@ -1404,8 +2578,13 @@ public sealed partial class GameWorld : IDisposable
         _cannonShots.Clear();
         _chests.Clear();
         _glutSparks.Clear();
+        _openedChests.Clear();
         _particles.Clear();
         _spriteVfx.Clear();
+        _groundImpacts.Clear();
+        _enemyVoices.Clear();
+        _narration.Clear();
+        _art.ClearTransient();
         _combatPresentation.Clear();
         _screenEffects.Clear();
         _arenaAtmosphere.Reset();
@@ -1535,24 +2714,42 @@ public sealed partial class GameWorld : IDisposable
         {
             float pulse = 0.5f + 0.5f * MathF.Sin(_presentationTime * 3f);
             Vector2 center = _arena.CombatBounds.Center.ToVector2();
-            batch.DrawCircle(pixel, center, GameBalance.WaveTriggerRadius, GameBalance.DeathFlameBright * (0.22f + pulse * 0.22f), 4f, 48);
-            batch.DrawCircle(pixel, center, GameBalance.WaveTriggerRadius * 0.55f, GameBalance.DeathFlame * (0.14f + pulse * 0.14f), 3f, 36);
+            // A breathing pool of Death Flame light where the next wave is called (the prompt
+            // appears inside it); no edge line.
+            Color pool = GameBalance.DeathFlame * (0.16f + pulse * 0.08f);
+            pool.A = 0;
+            _art.DrawSoftSpot(batch, center, new Vector2(GameBalance.WaveTriggerRadius * 1.15f), pool);
+            _art.DrawSoftSpot(batch, center, new Vector2(GameBalance.WaveTriggerRadius * 0.5f), GameBalance.DeathFlame * (0.05f + pulse * 0.04f));
         }
 
         foreach (PendingArenaSpawn spawn in _pendingSpawns)
         {
-            // Gathering death flame: the ring closes in while the enemy is about to appear.
+            // Gathering Death Flame: light is drawn in from all around the place where the enemy is
+            // about to appear and pools there, tighter and brighter as it comes; no ring.
             float progress = 1f - spawn.Remaining / GameBalance.ArenaSpawnTelegraphDuration;
             float pulse = 0.5f + 0.5f * MathF.Sin(_presentationTime * 14f);
             float radius = MathHelper.Lerp(62f, 26f, progress);
-            batch.DrawCircle(pixel, spawn.Position, radius, GameBalance.DeathFlameBright * (0.25f + progress * 0.45f), 4f, 32);
-            batch.DrawCircle(pixel, spawn.Position, radius * 0.55f + pulse * 4f, GameBalance.DeathFlame * (0.2f + progress * 0.4f), 3f, 24);
+            for (int strand = 0; strand < 6; strand++)
+            {
+                float angle = strand * MathHelper.TwoPi / 6f + _presentationTime * 0.7f + spawn.Position.X * 0.01f;
+                Vector2 from = spawn.Position + new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * (radius * 1.5f);
+                WorldMarks.Stream(batch, _art.SoftSpot, from, spawn.Position, _presentationTime, 0.35f + progress * 0.5f,
+                    GameBalance.DeathFlameBright, 80f + progress * 120f, 11f, strand);
+            }
+            Color pool = GameBalance.DeathFlame * (0.14f + progress * 0.26f);
+            pool.A = 0;
+            _art.DrawSoftSpot(batch, spawn.Position, new Vector2(radius * 1.1f), pool);
+            _art.DrawSoftSpot(batch, spawn.Position, new Vector2(6f + progress * 8f + pulse * 2f), GameBalance.SoulWhite * (0.15f + progress * 0.35f));
         }
 
         if (_loopState is ArenaLoopState.Intro or ArenaLoopState.Transition)
         {
+            // The Death Flame gathers in the middle of the hall as the wave arrives: soft light
+            // breathing on the floor, no ring.
             float pulse = 0.5f + 0.5f * MathF.Sin(_presentation.StateTime * 8f);
-            batch.DrawCircle(pixel, _arena.CombatBounds.Center.ToVector2(), 118f + pulse * 14f, GameBalance.DeathFlame * (0.18f + pulse * 0.18f), 5f, 40);
+            Color gather = GameBalance.DeathFlame * (0.1f + pulse * 0.06f);
+            gather.A = 0;
+            _art.DrawSoftSpot(batch, _arena.CombatBounds.Center.ToVector2(), new Vector2(150f + pulse * 14f, 90f + pulse * 8f), gather);
         }
     }
 
@@ -1560,8 +2757,14 @@ public sealed partial class GameWorld : IDisposable
     {
         int x = viewport.Width - 324;
         int y = 24;
-        batch.FillRectangle(pixel, new Rectangle(x - 14, y - 12, 308, 216), new Color(5, 5, 9) * 0.9f);
-        batch.DrawRectangle(pixel, new Rectangle(x - 14, y - 12, 308, 216), new Color(80, 220, 210) * 0.72f, 2f);
+        IReadOnlyList<string> missingVisuals = _art.MissingVisuals;
+        const int maxMissingLines = 12;
+        int missingLines = missingVisuals.Count == 0 && _art.RegistryError is null
+            ? 0
+            : 1 + Math.Min(missingVisuals.Count, maxMissingLines) + (missingVisuals.Count > maxMissingLines ? 1 : 0);
+        int panelHeight = 216 + missingLines * 16;
+        batch.FillRectangle(pixel, new Rectangle(x - 14, y - 12, 308, panelHeight), new Color(5, 5, 9) * 0.9f);
+        batch.DrawRectangle(pixel, new Rectangle(x - 14, y - 12, 308, panelHeight), new Color(80, 220, 210) * 0.72f, 2f);
 
         Color label = new(189, 231, 226);
         PixelText.Draw(batch, pixel, $"FPS: {_fps}", new Vector2(x, y), 2, label);
@@ -1575,6 +2778,25 @@ public sealed partial class GameWorld : IDisposable
         PixelText.Draw(batch, pixel, $"SOULS: {_souls.Count}", new Vector2(x, y + 120), 2, label);
         PixelText.Draw(batch, pixel, $"PLAYER: {GetPlayerState()}", new Vector2(x, y + 144), 2, label);
         PixelText.Draw(batch, pixel, $"SENSE FORCE: {(_forceSoulSense ? "ON" : "OFF")}", new Vector2(x, y + 168), 2, label);
+
+        if (missingLines == 0)
+        {
+            return;
+        }
+
+        // Each missing Visual-ID or clip is listed once, in the order it was first drawn.
+        Color warning = new(232, 72, 196);
+        int lineY = y + 200;
+        PixelText.Draw(batch, pixel, _art.RegistryError is null ? $"GRAFIK FEHLT: {missingVisuals.Count}" : "REGISTRY FEHLERHAFT", new Vector2(x, lineY), 1, warning);
+        for (int index = 0; index < Math.Min(missingVisuals.Count, maxMissingLines); index++)
+        {
+            lineY += 16;
+            PixelText.Draw(batch, pixel, missingVisuals[index], new Vector2(x, lineY), 1, label);
+        }
+        if (missingVisuals.Count > maxMissingLines)
+        {
+            PixelText.Draw(batch, pixel, $"+{missingVisuals.Count - maxMissingLines} WEITERE", new Vector2(x, lineY + 16), 1, label);
+        }
     }
 
     private void UpdateFps(float deltaTime)
@@ -1704,12 +2926,27 @@ public sealed partial class GameWorld : IDisposable
 
         Vector2 origin = _player.Position + request.Direction * 74f;
         _cannonShots.Add(new CannonShot(origin, request));
-        _combatPresentation.PresentCannonFire(origin, request);
+        // The flash bursts from the drawn muzzle (presentation only; the shot itself starts at its
+        // gameplay origin, inside the flash). The recoil clip shows the cannon already discharged
+        // to its resting size, so the flash sits at that muzzle, not at the grown one.
+        bool drawnMuzzle = _art.HasClip(VisualIds.Player, VisualClips.Aim);
+        Vector2 flash = drawnMuzzle
+            ? _player.Position + request.Direction * FigureHeights.MuzzleReach(0f)
+            : origin;
+        // The recoil shoves the player back (a full shot about 40 units in the flash's 0.1 s); the
+        // flash rides on the muzzle instead of hanging in the air where the shot left.
+        Vector2 muzzleOffset = flash - _player.Position;
+        _combatPresentation.PresentCannonFire(flash, request, drawnMuzzle ? () => _player.Position + muzzleOffset : null);
         if (request.IsFullCharge)
         {
             _arenaAtmosphere.ReactToForce(origin, 460f, 135f);
         }
-        _audio.Play(AudioCue.CannonFire, request.IsFullCharge ? 0.9f : 0.58f, request.IsFullCharge ? -0.08f : 0.08f);
+        _audio.Play(AudioCue.CannonFire, request.IsFullCharge ? 0.72f : 0.55f, request.IsFullCharge ? -0.06f : 0.06f);
+        if (request.IsFullCharge)
+        {
+            // A full shot empties the whole chamber: the deep blow and the roar of the flame leaving.
+            _audio.Play(AudioCue.CannonBlast, 0.62f);
+        }
         _player.ApplyCannonRecoil(request.Direction, request.Charge);
     }
 
@@ -1753,11 +2990,23 @@ public sealed partial class GameWorld : IDisposable
                     shot.IsFullCharge));
 
                 Vector2 impactPosition = coreHit ? weakPoint : enemy.Position;
+                PlayMaterialHit(enemy, shot.IsFullCharge ? 0.75f : 0.5f, shot.IsFullCharge ? -0.05f : 0.03f);
+                // The bolt tears matter off what it hits, like a blade does: a full shot as much as the Soul Cleave.
+                EmitHitMatter(enemy, impactPosition, shot.IsFullCharge ? 3 : 1, coreHit);
+                if (shot.IsFullCharge)
+                {
+                    _audio.Play(AudioCue.HitHeavy, 0.6f, -0.04f, PanOf(impactPosition) * 0.5f);
+                }
                 _combatPresentation.PresentCannonImpact(
                     impactPosition,
                     shot.Direction,
                     shot.IsFullCharge,
                     coreHit);
+                if (shot.IsFullCharge)
+                {
+                    // The heavy bolt scorches the floor under what it hit.
+                    _groundImpacts.Blast(enemy.Position, shot.Radius * 1.4f);
+                }
                 if (coreHit)
                 {
                     _player.AddResonance(GameBalance.ResonancePerCoreHit * (shot.IsFullCharge ? 2f : 1f));
@@ -1765,7 +3014,7 @@ public sealed partial class GameWorld : IDisposable
                 }
                 else
                 {
-                    _audio.Play(AudioCue.CannonImpact, shot.IsFullCharge ? 0.72f : 0.48f);
+                    _audio.Play(AudioCue.CannonImpact, shot.IsFullCharge ? 0.72f : 0.48f, 0f, PanOf(shot.Position) * 0.7f);
                 }
 
                 shot.MarkHit();
@@ -1820,8 +3069,9 @@ public sealed partial class GameWorld : IDisposable
     private void ResolveBurningDetonation(Burning source, Vector2 position)
     {
         _combatPresentation.PresentBurningDetonation(position);
+        _groundImpacts.Blast(position, GameBalance.BurningDetonationRadius * 0.6f);
         _arenaAtmosphere.ReactToForce(position, 560f, 190f);
-        _audio.Play(AudioCue.BurningDetonation, 0.9f);
+        _audio.Play(AudioCue.BurningDetonation, 0.9f, 0f, PanOf(position) * 0.6f);
 
         foreach (Enemy enemy in _enemies.Where(enemy => enemy != source && enemy.IsAlive))
         {
@@ -1838,6 +3088,53 @@ public sealed partial class GameWorld : IDisposable
                 direction * GameBalance.BurningDetonationKnockback,
                 enemy.Position));
             _particles.EmitBurst(enemy.Position, direction, 18, GameBalance.DeathFlame, 260f, 8f);
+        }
+    }
+
+    /// <summary>
+    /// What a landed blow knocks off the target, as matter that falls to the floor (presentation
+    /// only, matching the material layer of the sound): cloth scraps and ash from a Hollow and,
+    /// on its core or the Soul Cleave, porcelain chips of its mask; charred crust from a Burning;
+    /// dark heavy lumps from a Devourer. Heavier swings throw more.
+    /// </summary>
+    private void EmitHitMatter(Enemy enemy, Vector2 contact, int step, bool coreHit)
+    {
+        int weight = step switch { 1 => 2, 2 => 3, _ => 5 };
+        // The contact is drawn at body height (the air pass); its floor lies that much lower.
+        float floor = contact.Y + FigureHeights.Air;
+        switch (enemy)
+        {
+            case Hollow:
+                _particles.EmitDebris(contact, floor, weight, new Color(44, 41, 52), 170f, 4.5f, 0.9f);
+                _particles.EmitDebris(contact, floor, weight + 1, new Color(92, 88, 96), 120f, 2.2f, 1.2f);
+                if (coreHit || step == 3)
+                {
+                    _particles.EmitDebris(contact, floor, 2, new Color(214, 208, 196), 200f, 3.2f, 0.8f);
+                }
+                break;
+            case Burning:
+                _particles.EmitDebris(contact, floor, weight + 1, new Color(30, 22, 30), 210f, 3.8f, 1.0f);
+                break;
+            case Devourer:
+                _particles.EmitDebris(contact, floor, weight, new Color(26, 22, 30), 150f, 6f, 0.8f);
+                break;
+        }
+    }
+
+    /// <summary>The target's material under a landed blow: cloth and porcelain, ember crust, flesh, wood.</summary>
+    private void PlayMaterialHit(Enemy enemy, float volume, float pitch)
+    {
+        AudioCue? cue = enemy switch
+        {
+            Hollow => AudioCue.HitHollow,
+            Burning => AudioCue.HitBurning,
+            Devourer => AudioCue.HitDevourer,
+            TrainingDummy => AudioCue.HitDummy,
+            _ => null
+        };
+        if (cue is { } material)
+        {
+            _audio.Play(material, volume, pitch, PanOf(enemy.Position) * 0.7f);
         }
     }
 
@@ -1859,7 +3156,8 @@ public sealed partial class GameWorld : IDisposable
         bool wasResonanceActive,
         bool wasSoulSenseActive,
         bool wasCannonFull,
-        SoulCannonState previousCannonState)
+        SoulCannonState previousCannonState,
+        int previousCannonStage)
     {
         if (_player.Scythe.StartedThisFrame)
         {
@@ -1869,16 +3167,39 @@ public sealed partial class GameWorld : IDisposable
                 3 => AudioCue.SoulCleave,
                 _ => AudioCue.ScytheSwing1
             };
-            _audio.Play(cue, _player.Scythe.ActiveStep == 3 ? 0.78f : 0.5f);
+            _audio.Play(cue, _player.Scythe.ActiveStep == 3 ? 0.72f : 0.42f);
+            // The weight of the big blade under the light Ludo whoosh, peaking at contact.
+            (AudioCue weight, float level) = _player.Scythe.ActiveStep switch
+            {
+                2 => (AudioCue.ScytheWeight2, 0.58f),
+                3 => (AudioCue.ScytheWeight3, 0.6f),
+                _ => (AudioCue.ScytheWeight1, 0.64f)
+            };
+            _audio.Play(weight, level);
         }
 
         if (!wasDashing && _player.IsDashing)
         {
             _audio.Play(AudioCue.Dash, 0.62f);
         }
+        if (previousCannonState == SoulCannonState.Stored && _player.Cannon.State == SoulCannonState.Drawing)
+        {
+            _audio.Play(AudioCue.CannonDraw, 0.9f);
+        }
+        else if (previousCannonState == SoulCannonState.Returning && _player.Cannon.State == SoulCannonState.Stored)
+        {
+            _audio.Play(AudioCue.CannonStow, 0.78f);
+        }
         if (previousCannonState != SoulCannonState.Charging && _player.Cannon.State == SoulCannonState.Charging)
         {
             _audio.Play(AudioCue.CannonCharge, 0.42f);
+        }
+        if (_player.Cannon.State == SoulCannonState.Charging && previousCannonStage is 1 or 2 &&
+            _player.Cannon.ChargeStage > previousCannonStage && !_player.Cannon.IsFullCharge)
+        {
+            // The chamber's latch takes the next notch: the three stages are heard, and the chamber flares.
+            _audio.Play(AudioCue.CannonStage, _player.Cannon.ChargeStage == 3 ? 0.9f : 0.75f, _player.Cannon.ChargeStage == 3 ? 0.12f : 0f);
+            _cannonNotchAt = _presentationTime;
         }
         if (!wasCannonFull && _player.Cannon.IsFullCharge)
         {
@@ -1894,7 +3215,7 @@ public sealed partial class GameWorld : IDisposable
         }
         else if (wasSoulSenseActive && !_player.SoulSenseActive)
         {
-            _audio.Play(AudioCue.SoulSenseOff, 0.3f);
+            _audio.Play(AudioCue.SoulSenseOff, 0.5f);
         }
 
         if (wasSoulSenseActive != _player.SoulSenseActive)
@@ -1915,9 +3236,27 @@ public sealed partial class GameWorld : IDisposable
         enemy.ApplyDamage(damage);
         if (wasAlive && !enemy.IsAlive)
         {
+            if (enemy is Hollow && _art.IsRendered(enemy.VisualId))
+            {
+                // The porcelain mask cracks: shards break off at head height and fall around the
+                // body. Particles live in the air pass, 70 units above the floor they land on.
+                Vector2 head = enemy.Position - new Vector2(0f, 98f - FigureHeights.Air);
+                _particles.EmitDebris(head, enemy.Position.Y + FigureHeights.Air + 6f, 9, new Color(214, 208, 198), 170f, 4.5f);
+            }
             CreditDefeatedEnemy(enemy);
-            float volume = enemy is Devourer ? 0.72f : 0.52f;
-            _audio.Play(AudioCue.EnemyDeath, volume);
+            float volume = enemy is Devourer ? 0.62f : 0.42f;
+            _audio.Play(AudioCue.EnemyDeath, volume, 0f, PanOf(enemy.Position) * 0.7f);
+            AudioCue? death = enemy switch
+            {
+                Hollow => AudioCue.DeathHollow,
+                Burning => AudioCue.DeathBurning,
+                Devourer => AudioCue.DeathDevourer,
+                _ => null
+            };
+            if (death is { } layer)
+            {
+                _audio.Play(layer, enemy is Devourer ? 0.64f : 0.66f, 0f, PanOf(enemy.Position) * 0.7f);
+            }
         }
     }
 }

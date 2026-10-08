@@ -41,6 +41,14 @@ public sealed class SoulCannon
     public float ChargeProgress => MathHelper.Clamp(_chargeTime / GetFullChargeTime(), 0f, 1f);
     public bool IsFullCharge => ChargeProgress >= 1f;
     public bool IsHandling => State != SoulCannonState.Stored;
+
+    /// <summary>Presentation only: how far the timed Drawing or Returning state has run (0..1).</summary>
+    public float StateProgress => State switch
+    {
+        SoulCannonState.Drawing => MathHelper.Clamp(1f - _stateTimer / GameBalance.CannonDrawDuration, 0f, 1f),
+        SoulCannonState.Returning => MathHelper.Clamp(1f - _stateTimer / GameBalance.CannonReturnDuration, 0f, 1f),
+        _ => 1f
+    };
     public bool CanUseScythe => State == SoulCannonState.Stored;
     public int ChargeStage => State is SoulCannonState.Stored or SoulCannonState.Returning
         ? 0
@@ -113,7 +121,7 @@ public sealed class SoulCannon
                 if (IsFullCharge && !_fullCueCreated)
                 {
                     _fullCueCreated = true;
-                    Vector2 muzzle = playerPosition + _aimDirection * 68f;
+                    Vector2 muzzle = playerPosition + _aimDirection * FigureHeights.MuzzleReach(1f);
                     particles.EmitConvergence(muzzle, 18, 82f, GameBalance.SoulWhite, 0.2f, 5.5f);
                     particles.EmitBurst(muzzle, -_aimDirection, 7, GameBalance.SoulWhite, 105f, 5f);
                 }
@@ -158,7 +166,7 @@ public sealed class SoulCannon
     public void DrawBack(
         SpriteBatch batch,
         Texture2D pixel,
-        Texture2D weaponTexture,
+        Texture2D? weaponTexture,
         Vector2 playerPosition,
         Vector2 facingDirection)
     {
@@ -176,7 +184,7 @@ public sealed class SoulCannon
     public void DrawActive(
         SpriteBatch batch,
         Texture2D pixel,
-        Texture2D weaponTexture,
+        Texture2D? weaponTexture,
         Vector2 playerPosition,
         Vector2 facingDirection)
     {
@@ -251,7 +259,7 @@ public sealed class SoulCannon
             2 => 0.075f,
             _ => IsFullCharge ? 0.045f : 0.055f
         };
-        Vector2 muzzle = playerPosition + _aimDirection * 68f;
+        Vector2 muzzle = playerPosition + _aimDirection * FigureHeights.MuzzleReach(ChargeProgress);
         int particleCount = ChargeStage switch { 1 => 1, 2 => 2, _ => 3 };
         float convergenceRadius = ChargeStage switch { 1 => 38f, 2 => 56f, _ => 72f };
         Color color = IsFullCharge
@@ -275,7 +283,7 @@ public sealed class SoulCannon
     private static void DrawWeapon(
         SpriteBatch batch,
         Texture2D pixel,
-        Texture2D weaponTexture,
+        Texture2D? weaponTexture,
         Vector2 stock,
         Vector2 barrel,
         float charge,
@@ -285,16 +293,8 @@ public sealed class SoulCannon
         Vector2 direction = Vector2.Normalize(barrel - stock);
         float rotation = MathF.Atan2(direction.Y, direction.X) + MathF.PI;
         float displayLength = Vector2.Distance(stock, barrel) + 36f;
-        batch.Draw(
-            weaponTexture,
-            Vector2.Lerp(stock, barrel, 0.52f),
-            null,
-            Color.White,
-            rotation,
-            new Vector2(weaponTexture.Width, weaponTexture.Height) * 0.5f,
-            displayLength / weaponTexture.Width,
-            SpriteEffects.None,
-            0f);
+        float width = weaponTexture?.Width ?? 256f;
+        batch.DrawSpriteOrDummy(pixel, weaponTexture, Vector2.Lerp(stock, barrel, 0.52f), rotation, displayLength / width, width);
 
         if (charge <= 0f)
         {

@@ -43,6 +43,180 @@ SFX_DURATIONS = {
     "ending_reveal.wav": 1.6,
 }
 
+#: Cues authored locally with tools/audio (recipes and seeds in Content/Audio/SOURCES.md).
+AUTHORED_SFX_DURATIONS = {
+    **{f"footstep_stone_{index}.wav": 0.30 for index in range(1, 5)},
+    **{f"footstep_wood_{index}.wav": 0.34 for index in range(1, 5)},
+    **{f"step_hollow_{index}.wav": 0.42 for index in range(1, 5)},
+    **{f"step_burning_{index}.wav": 0.26 for index in range(1, 5)},
+    **{f"step_devourer_{index}.wav": 0.7 for index in range(1, 5)},
+    "ui_move.wav": 0.12,
+    "ui_back.wav": 0.14,
+    "ui_open.wav": 0.45,
+    "ui_close.wav": 0.32,
+    "chest_open.wav": 0.9,
+    "currency_gain.wav": 0.5,
+    "ability_heal.wav": 1.1,
+    "ability_pierce.wav": 0.6,
+    "ability_leap.wav": 0.55,
+    "ability_vortex.wav": 1.2,
+    "ability_guard.wav": 1.0,
+    "ability_mark.wav": 0.6,
+    "door_awaken.wav": 1.8,
+    "enemy_emerge.wav": 0.9,
+    # Variants derived from the Ludo takes (tools/audio/derive_variants.py).
+    "cannon_impact_v2.wav": 0.31,
+    "cannon_impact_v3.wav": 0.34,
+    "core_hit_v2.wav": 0.17,
+    "core_hit_v3.wav": 0.19,
+    "dash_v2.wav": 0.24,
+    "dash_v3.wav": 0.26,
+    "enemy_death_v2.wav": 0.54,
+    "enemy_death_v3.wav": 0.58,
+    "hollow_swipe_v2.wav": 0.31,
+    "hollow_swipe_v3.wav": 0.34,
+    "scythe_hit_v2.wav": 0.14,
+    "scythe_hit_v3.wav": 0.16,
+    "scythe_swing_1_v2.wav": 0.17,
+    "scythe_swing_1_v3.wav": 0.19,
+    "scythe_swing_2_v2.wav": 0.23,
+    "scythe_swing_2_v3.wav": 0.25,
+    # The light swing with its slow start trimmed (tools/audio/retime.py), so it is full at contact.
+    "scythe_swing_1_lead.wav": 0.15,
+    "scythe_swing_1_lead_v2.wav": 0.14,
+    "scythe_swing_1_lead_v3.wav": 0.16,
+    # Combat layers (tools/audio/recipes/combat.py): material, wind-ups, deaths.
+    **{f"hit_hollow_{index}.wav": 0.32 for index in range(1, 4)},
+    **{f"hit_burning_{index}.wav": 0.42 for index in range(1, 4)},
+    **{f"hit_devourer_{index}.wav": 0.55 for index in range(1, 4)},
+    **{f"hit_dummy_{index}.wav": 0.36 for index in range(1, 4)},
+    **{f"hit_heavy_{index}.wav": 0.4 for index in range(1, 4)},
+    **{f"body_hit_{index}.wav": 0.24 for index in range(1, 4)},
+    **{f"hollow_windup_{index}.wav": 0.44 for index in range(1, 3)},
+    **{f"devourer_windup_{index}.wav": 0.86 for index in range(1, 3)},
+    **{f"burning_rush_{index}.wav": 0.62 for index in range(1, 3)},
+    **{f"death_hollow_{index}.wav": 0.9 for index in range(1, 3)},
+    **{f"death_burning_{index}.wav": 0.9 for index in range(1, 3)},
+    **{f"death_devourer_{index}.wav": 1.4 for index in range(1, 3)},
+    # Variants of further frequent cues (tools/audio/derive_variants.py, Durchgang 3).
+    "soul_cleave_v2.wav": 0.431,
+    "soul_cleave_v3.wav": 0.471,
+    "soul_release_v2.wav": 0.861,
+    "soul_release_v3.wav": 0.942,
+    "enemy_emerge_v2.wav": 0.861,
+    "enemy_emerge_v3.wav": 0.942,
+    "burning_detonation_v2.wav": 0.670,
+    "burning_detonation_v3.wav": 0.733,
+    "burning_charge_v2.wav": 0.526,
+    "burning_charge_v3.wav": 0.576,
+    "player_hit_v2.wav": 0.191,
+    "player_hit_v3.wav": 0.209,
+    "currency_gain_v2.wav": 0.478,
+    "currency_gain_v3.wav": 0.524,
+    # Hall tails (tools/audio/hall_tails.py): wet-only reverberation of the foundry and the antechamber.
+    "scythe_hit_hall.wav": 2.507,
+    "core_hit_hall.wav": 2.443,
+    "cannon_impact_hall.wav": 2.618,
+    "burning_detonation_hall.wav": 2.888,
+    "devourer_slam_hall.wav": 2.706,
+    "enemy_death_hall.wav": 2.878,
+    "soul_cleave_hall.wav": 2.635,
+    "player_hit_hall.wav": 2.511,
+    "footstep_stone_1_hall.wav": 3.260,
+    "footstep_stone_1_hall_foundry.wav": 2.462,
+    # The heavy Soul Cannon drawn from the back and laid back (tools/audio/recipes/cues.py).
+    "cannon_draw_1.wav": 0.42, "cannon_draw_2.wav": 0.42,
+    "cannon_stow_1.wav": 0.36, "cannon_stow_2.wav": 0.36,
+    # Enemy presence loops (recipes/ambiences.py): each enemy kind heard where it stands.
+    "presence_burning.wav": 5.000,
+    "presence_hollow.wav": 6.000,
+    "presence_devourer.wav": 7.000,
+    # The player's own Death Flame burning during Resonance (recipes/ambiences.py), looped.
+    "resonance_rumble.wav": 4.000,
+    # The Soul Cannon as iron and fire (recipes/cannon.py): ignition, the charge loop (the game raises
+    # its pitch with the charge), the latch at each stage, full charge, the shot (with its foundry
+    # tail) and the blow under a full shot.
+    "cannon_ignite_1.wav": 0.750, "cannon_ignite_2.wav": 0.750,
+    "cannon_charge_loop.wav": 2.000,
+    "cannon_stage_1.wav": 0.400, "cannon_stage_2.wav": 0.400,
+    "cannon_full_1.wav": 0.900, "cannon_full_2.wav": 0.900,
+    "cannon_shot_1.wav": 0.950, "cannon_shot_2.wav": 0.950, "cannon_shot_3.wav": 0.950,
+    "cannon_shot_1_hall.wav": 2.525,
+    "cannon_blast_1.wav": 1.400, "cannon_blast_2.wav": 1.400,
+    # The fight's signals as iron and fire (recipes/foundry.py): a wave begins (with its foundry
+    # tail), a wave is won, the Devourer drinks a soul.
+    "wave_gate_1.wav": 1.500, "wave_gate_2.wav": 1.500, "wave_gate_1_hall.wav": 2.975,
+    "wave_ease_1.wav": 2.000, "wave_ease_2.wav": 2.000,
+    "devourer_devour_1.wav": 1.250, "devourer_devour_2.wav": 1.250,
+    # Derived takes of cues that had one (tools/audio/derive_variants.py): slam, Soul Sense, abilities.
+    "devourer_slam_v2.wav": 0.622,
+    "devourer_slam_v3.wav": 0.681,
+    "soul_sense_on_v2.wav": 0.431,
+    "soul_sense_on_v3.wav": 0.471,
+    "soul_sense_off_v2.wav": 0.287,
+    "soul_sense_off_v3.wav": 0.314,
+    "ability_pierce_v2.wav": 0.574,
+    "ability_pierce_v3.wav": 0.628,
+    "ability_leap_v2.wav": 0.526,
+    "ability_leap_v3.wav": 0.576,
+    "ability_vortex_v2.wav": 1.148,
+    "ability_vortex_v3.wav": 1.257,
+    "ability_guard_v2.wav": 0.957,
+    "ability_guard_v3.wav": 1.047,
+    "ability_mark_v2.wav": 0.574,
+    "ability_mark_v3.wav": 0.628,
+    # The title's confirmation as an ember catching (recipes/cues.py), in place of the Ludo glass tap.
+    "title_ignite.wav": 0.600,
+    # The soul breathing out as it is released (recipes/cues.py): no pitch, so crowds never beep.
+    "soul_release_breath_1.wav": 1.450,
+    "soul_release_breath_2.wav": 1.450,
+    "soul_release_breath_3.wav": 1.450,
+    "soul_release_breath_4.wav": 1.450,
+    # The Warden flames of the hall (recipes/ambiences.py), looped, heard where they burn.
+    "warden_flame_loop.wav": 6.000,
+    # The bound soul throbbing when health runs low (recipes/cues.py), one double beat per take.
+    "soul_throb_1.wav": 0.620,
+    "soul_throb_2.wav": 0.620,
+    # Weight under the scythe swings (recipes/combat.py), peaking at the strike's contact.
+    "scythe_weight_1_1.wav": 0.420,
+    "scythe_weight_1_2.wav": 0.420,
+    "scythe_weight_2_1.wav": 0.480,
+    "scythe_weight_2_2.wav": 0.480,
+    "scythe_weight_3_1.wav": 0.700,
+    "scythe_weight_3_2.wav": 0.700,
+    # The floor breaking under a Devourer's slam (recipes/combat.py), under the Ludo blow.
+    "ground_break_1.wav": 1.700,
+    "ground_break_2.wav": 1.700,
+    # What is left of each enemy's voice (recipes/voices.py): calls and cries on attacks.
+    "hollow_call_1.wav": 1.100, "hollow_call_2.wav": 1.030, "hollow_call_3.wav": 1.230,
+    "hollow_grasp_1.wav": 0.420, "hollow_grasp_2.wav": 0.420,
+    "burning_cackle_1.wav": 1.200, "burning_cackle_2.wav": 1.220, "burning_cackle_3.wav": 1.320,
+    "burning_shriek_1.wav": 0.750, "burning_shriek_2.wav": 0.750,
+    "devourer_growl_1.wav": 1.280, "devourer_growl_2.wav": 1.230, "devourer_growl_3.wav": 1.480,
+    "devourer_hunger_1.wav": 1.600, "devourer_hunger_2.wav": 1.600,
+    # The places themselves, now and then (recipes/ambient_events.py).
+    "foundry_bell_1.wav": 6.500, "foundry_bell_2.wav": 6.500,
+    "shore_horn_1.wav": 5.000, "shore_horn_2.wav": 5.000,
+    "shore_board_1.wav": 1.800, "shore_board_2.wav": 1.800,
+    "skiff_creak_1.wav": 2.200, "skiff_creak_2.wav": 2.200,
+    # The player's step on the wet stone of the shore and the harbour (recipes/cues.py).
+    "footstep_wet_1.wav": 0.340, "footstep_wet_2.wav": 0.340, "footstep_wet_3.wav": 0.340, "footstep_wet_4.wav": 0.340,
+    "door_whispers_1.wav": 3.2, "door_whispers_2.wav": 3.2,
+    # The Life Flame's fire after the last wave (tools/audio/recipes/ambiences.py), looped.
+    "life_flame_loop.wav": 9.0,
+}
+
+#: Looping point sources: mono (the game pans them) and seamless like the beds.
+POINT_LOOPS = {"warden_flame_loop.wav", "life_flame_loop.wav", "presence_burning.wav", "presence_hollow.wav", "presence_devourer.wav", "resonance_rumble.wav", "cannon_charge_loop.wav"}
+
+#: Ambience beds and music per zone (AudioDirector.AmbienceAssets / MusicAssets).
+ZONE_AMBIENCES = ["shore_ambience.wav", "hub_ambience.wav", "harbour_ambience.wav", "causeway_ambience.wav",
+                  "crossing_ambience.wav", "threshold_ambience.wav"]
+#: The combat score (recipes/combat_music.py): three stems of one loop, exactly 30 s at 128 bpm.
+COMBAT_STEMS = ["combat_pulse.wav", "combat_drive.wav", "combat_frenzy.wav"]
+ZONE_MUSIC = ["title_theme.ogg", "shore_theme.ogg", "hub_theme.ogg", "causeway_theme.ogg", "crossing_theme.ogg",
+              "threshold_theme.ogg"]
+
 GAMEPLAY_CUES = {
     "ScytheSwing1", "ScytheSwing2", "SoulCleave", "ScytheHit", "Dash",
     "CannonCharge", "CannonFull", "CannonFire", "BurningCharge",
@@ -138,6 +312,11 @@ def main() -> int:
             (args.content_root / "Audio" / "Music" / "arena_loop.ogg", "SongProcessor", None),
         )
     )
+    expected_paths.extend((sfx_root / filename, "SoundEffectProcessor", duration) for filename, duration in AUTHORED_SFX_DURATIONS.items())
+    expected_paths.extend((args.content_root / "Audio" / "Ambience" / name, "SoundEffectProcessor", None) for name in ZONE_AMBIENCES)
+    expected_paths.extend((args.content_root / "Audio" / "Music" / name, "SongProcessor", None) for name in ZONE_MUSIC)
+    expected_paths.extend((args.content_root / "Audio" / "Music" / name, "SoundEffectProcessor", 30.0) for name in COMBAT_STEMS)
+    loops = {"arena_ambience.wav", "arena_loop.ogg", *ZONE_AMBIENCES, *ZONE_MUSIC, *COMBAT_STEMS}
 
     manifest_path = args.content_root / "Content.mgcb"
     sources_path = args.content_root / "Audio" / "SOURCES.md"
@@ -172,7 +351,7 @@ def main() -> int:
             failures.append(f"{relative}: expected 16-bit PCM after decode")
         if path.parent == sfx_root and metrics["channels"] != 1:
             failures.append(f"{relative}: effects must be mono")
-        if path.name in {"arena_ambience.wav", "arena_loop.ogg"} and metrics["channels"] != 2:
+        if path.name in loops and metrics["channels"] != 2:
             failures.append(f"{relative}: loop must be stereo")
         if metrics["peak_db"] >= -1.0:
             failures.append(f"{relative}: peak {metrics['peak_db']:.2f} dBFS is not below -1 dBFS")
@@ -184,7 +363,11 @@ def main() -> int:
             failures.append(f"{relative}: ambience duration must be 20–30s")
         if path.name == "arena_loop.ogg" and not 90.0 <= metrics["duration"] <= 150.0:
             failures.append(f"{relative}: music duration must be 90–150s")
-        if path.name in {"arena_ambience.wav", "arena_loop.ogg"} and metrics["seam_db"] > -45.0:
+        if path.name in ZONE_AMBIENCES and not 20.0 <= metrics["duration"] <= 45.0:
+            failures.append(f"{relative}: ambience duration must be 20–45s")
+        if path.name in ZONE_MUSIC and not 45.0 <= metrics["duration"] <= 150.0:
+            failures.append(f"{relative}: music duration must be 45–150s")
+        if (path.name in loops or path.name in POINT_LOOPS) and metrics["seam_db"] > -45.0:
             failures.append(f"{relative}: endpoint discontinuity is {metrics['seam_db']:.1f} dBFS")
 
         block = expected_manifest_block(relative, processor)
@@ -203,7 +386,7 @@ def main() -> int:
         if f"AudioCue.{cue}" not in game_world:
             failures.append(f"gameplay has no event wiring for AudioCue.{cue}")
 
-    expected_sfx = set(SFX_DURATIONS)
+    expected_sfx = set(SFX_DURATIONS) | set(AUTHORED_SFX_DURATIONS)
     actual_sfx = {path.name for path in sfx_root.glob("*.wav")}
     for filename in sorted(actual_sfx - expected_sfx):
         failures.append(f"unexpected shipped SFX candidate: Audio/Sfx/{filename}")

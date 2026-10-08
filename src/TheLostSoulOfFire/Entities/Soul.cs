@@ -115,7 +115,8 @@ public sealed class Soul
         Texture2D pixel,
         Player player,
         bool soulSenseActive,
-        bool useSpriteArt)
+        bool useSpriteArt,
+        Texture2D? softSpot = null)
     {
         if (State is SoulState.Released or SoulState.Consumed)
         {
@@ -124,8 +125,16 @@ public sealed class Soul
 
         if (State == SoulState.Residue)
         {
-            batch.DrawLine(pixel, Position - new Vector2(7f, 0f), Position + new Vector2(7f, 0f), GameBalance.DeathFlameBright * 0.8f, 3f);
-            batch.FillCircle(pixel, Position, 4f, GameBalance.SoulWhite);
+            if (softSpot is not null)
+            {
+                // The rendered game draws the released piece as a small soul (ArtAssets.DrawLostSoul).
+                return;
+            }
+            Vector2 target = player.Position + player.FacingDirection * 2f;
+            float arriving = useSpriteArt ? MathHelper.Clamp(1f - Vector2.Distance(Position, target) / 160f, 0f, 1f) : 0f;
+            Vector2 drawn = Position - new Vector2(0f, FigureHeights.Core * arriving);
+            WorldMarks.Beam(batch, pixel, drawn - new Vector2(9f, 0f), drawn + new Vector2(9f, 0f), 12f, GameBalance.DeathFlameBright * 0.8f);
+            WorldMarks.Ring(batch, pixel, drawn, 6f, GameBalance.SoulWhite, true, 3f);
             return;
         }
 
@@ -145,15 +154,30 @@ public sealed class Soul
 
         if (State == SoulState.BeingDevoured)
         {
-            batch.DrawCircle(pixel, Position, 25f + pulse * 5f, GameBalance.DeathFlameBright * 0.85f, 4f, 22);
+            if (softSpot is not null)
+            {
+                // Pulled away, the soul flickers in its own light; no ring (the Devourer draws its light pouring in).
+                float struggle = 0.5f + 0.5f * MathF.Sin(_visualTime * 17f);
+                WorldMarks.Glow(batch, softSpot, Position, 22f + struggle * 6f, GameBalance.DeathFlameBright * (0.3f + struggle * 0.2f));
+            }
+            else
+            {
+                WorldMarks.Ring(batch, pixel, Position, 25f + pulse * 5f, GameBalance.DeathFlameBright * 0.85f, true, 4f);
+            }
         }
 
         if (State == SoulState.Releasing)
         {
-            Vector2 playerCore = player.Position + player.FacingDirection * 2f;
-            batch.DrawLine(pixel, playerCore, Position, GameBalance.DeepViolet * (0.42f + releaseProgress * 0.3f), 5f);
-            batch.DrawLine(pixel, playerCore, Position, GameBalance.DeathFlameBright * (0.45f + releaseProgress * 0.4f), 1.5f);
-            batch.DrawCircle(pixel, Position, 22f + releaseProgress * 18f, glow * (1f - releaseProgress) * 0.7f, 3f, 24);
+            Vector2 playerCore = player.Position + player.FacingDirection * 2f - (useSpriteArt ? new Vector2(0f, FigureHeights.Core) : Vector2.Zero);
+            if (softSpot is not null)
+            {
+                // The soul lets go where it is (release flipbook, glow); what remains of it then
+                // flies to the player as a small soul. No tether, no ring.
+                return;
+            }
+            WorldMarks.Beam(batch, pixel, playerCore, Position, 18f, GameBalance.DeathFlame * (0.42f + releaseProgress * 0.3f));
+            WorldMarks.Beam(batch, pixel, playerCore, Position, 7f, GameBalance.DeathFlameBright * (0.45f + releaseProgress * 0.4f));
+            WorldMarks.Ring(batch, pixel, Position, 22f + releaseProgress * 18f, glow * (1f - releaseProgress) * 0.7f, false, 3f);
         }
     }
 

@@ -1,0 +1,6 @@
+# Python environment of the production scripts (tools/visuals/README.md).
+# mflux and rembg run as separate uv tools; Blender scripts run inside Blender.
+numpy>=2.1
+pillow>=11.0
+huggingface_hub>=0.34
+gradio_client>=1.11

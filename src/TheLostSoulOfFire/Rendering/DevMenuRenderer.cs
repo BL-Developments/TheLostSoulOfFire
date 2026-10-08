@@ -50,8 +50,7 @@ public static class DevMenuRenderer
         IReadOnlyList<Row> rows = Layout(menu, out float hintsY);
         float bottom = hintsY + 7 * 1 + Padding;
         Rectangle panel = new(PanelX, PanelY, PanelWidth, (int)(bottom - PanelY));
-        batch.FillRectangle(pixel, panel, new Color(6, 5, 10) * (0.88f * reveal));
-        batch.DrawRectangle(pixel, panel, GameBalance.DeathFlame * (0.55f * reveal), 2f);
+        UiKit.Panel(batch, pixel, panel, GameBalance.DeathFlame, 0.6f * reveal, reveal);
 
         float left = PanelX + Padding;
         float right = PanelX + PanelWidth - Padding;
@@ -66,7 +65,7 @@ public static class DevMenuRenderer
             {
                 PixelText.Draw(batch, pixel, DevMenu.GetLabel(row.Section), new Vector2(left, row.Y), TextScale, dim);
                 float ruleY = row.Y + 7 * TextScale + 6f;
-                batch.DrawLine(pixel, new Vector2(left, ruleY), new Vector2(right, ruleY), GameBalance.DeathFlame * (0.32f * reveal), 1f);
+                UiKit.Divider(batch, pixel, (left + right) * 0.5f, ruleY, right - left, GameBalance.DeathFlameBright * (0.4f * reveal));
                 continue;
             }
 
@@ -82,9 +81,10 @@ public static class DevMenuRenderer
             Color color = (selected ? selectedColor : label) * breathe;
             if (selected)
             {
-                Vector2 marker = new(left + 4f, row.Y + 7f);
-                batch.DrawLine(pixel, marker + new Vector2(-5f, -5f), marker + new Vector2(3f, 0f), selectedColor, 2f);
-                batch.DrawLine(pixel, marker + new Vector2(3f, 0f), marker + new Vector2(-5f, 5f), selectedColor, 2f);
+                batch.FillRectangle(pixel, new Rectangle((int)left - 6, (int)row.Y - 7, (int)(right - left) + 12, (int)RowHeight - 2), GameBalance.DeathFlame * (0.12f * reveal));
+                Vector2 marker = new(left + 3f, row.Y + 6f);
+                UiKit.FillDiamond(batch, pixel, marker, 5, selectedColor * 0.45f);
+                UiKit.FillDiamond(batch, pixel, marker, 3, selectedColor);
             }
             PixelText.Draw(batch, pixel, entry.Label, new Vector2(left + 16f, row.Y), TextScale, color);
             string? value = valueOf(entry);

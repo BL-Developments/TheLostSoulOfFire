@@ -27,6 +27,13 @@ public abstract class Enemy
     public bool IsAlive => Health > 0;
     public bool IsFinished { get; protected set; }
     public float HitFlashRemaining { get; private set; }
+    private float _hitFlashDuration = 0.1f;
+
+    /// <summary>Presentation only: the direction the last blow came from (its knockback, normalised).</summary>
+    public Vector2 LastHitDirection { get; private set; } = Vector2.UnitY;
+
+    /// <summary>Presentation only: how far the current hit flash has run (0..1; 1 without one).</summary>
+    public float HitFlashProgress => HitFlashRemaining > 0f ? 1f - HitFlashRemaining / _hitFlashDuration : 1f;
 
     public float AbilityMarkRemaining { get; private set; }
     public void MarkForFollowup() => AbilityMarkRemaining = 5f;
@@ -41,6 +48,45 @@ public abstract class Enemy
         if (IsAlive) Position = RunAbilities.Clamp(Position + offset, bounds, Radius);
     }
     public abstract string StateLabel { get; }
+
+    /// <summary>
+    /// Presentation only: set by the art layer when this enemy is drawn as a rendered figure
+    /// standing on its position, so overlays (cores, fractures, held souls) sit on its body.
+    /// </summary>
+    public bool DrawnAsFigure { get; set; }
+
+    /// <summary>Presentation only: the soft light texture for overlays drawn as light, set by the art layer.</summary>
+    public Texture2D? LightSpot { get; set; }
+
+    /// <summary>Visual-ID this enemy is drawn with, or <c>null</c> when it draws itself.</summary>
+    public virtual string? VisualId => null;
+
+    /// <summary>Clip for the current state, or <c>null</c> while no sprite is shown.</summary>
+    public virtual string? VisualClip => null;
+
+    /// <summary>
+    /// Presentation only: where a one-shot clip stands (0..1) when it follows a gameplay timer, or
+    /// <c>null</c> when the clip simply plays at its own frame rate.
+    /// </summary>
+    public virtual float? VisualProgress => null;
+
+    public virtual Vector2 VisualFacing => Vector2.UnitY;
+
+    /// <summary>Reach of a telegraphed attack while it is being announced or delivered, else 0.</summary>
+    public virtual float TelegraphRadius => 0f;
+
+    /// <summary>Factor on the registry's world size, for example a Devourer swelling with Souls.</summary>
+    public virtual float VisualScale => 1f;
+
+    /// <summary>
+    /// A figure's own size within ±6 % from its seed (presentation only; the hit circle is
+    /// unchanged), so a group of the same kind does not read as clones.
+    /// </summary>
+    protected static float StatureOf(int seed)
+    {
+        float hash = MathF.Sin(seed * 12.9898f + 4.1f) * 43758.5453f;
+        return 0.94f + 0.12f * (hash - MathF.Floor(hash));
+    }
 
     /// <summary>Glut credited once when this enemy is defeated; amount depends on the type.</summary>
     public abstract int GlutReward { get; }
@@ -89,7 +135,12 @@ public abstract class Enemy
 
         Health = Math.Max(0, Health - damage.Damage);
         _knockbackVelocity += damage.Knockback;
+        if (damage.Knockback.LengthSquared() > 0.01f)
+        {
+            LastHitDirection = Vector2.Normalize(damage.Knockback);
+        }
         HitFlashRemaining = damage.IsSoulCoreHit ? 0.16f : 0.1f;
+        _hitFlashDuration = HitFlashRemaining;
 
         if (Health == 0)
         {

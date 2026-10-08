@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -9,12 +10,19 @@ public sealed class SpriteVfxSystem
 {
     private sealed class Instance
     {
-        public required SpriteClip Clip;
+        public required string VisualId;
+        public required SpriteClip? Clip;
         public required Vector2 Position;
         public float Rotation;
         public float Scale;
         public Color Color = Color.White;
         public float Elapsed;
+
+        /// <summary>Where the effect is held each frame (a muzzle that moves with its owner), or null to stay put.</summary>
+        public Func<Vector2>? Anchor;
+
+        public bool Loops => Clip?.Loop ?? false;
+        public float Duration => Clip?.Duration ?? ArtAssets.EffectDummyLifetime;
     }
 
     private readonly ArtAssets _art;
@@ -26,19 +34,22 @@ public sealed class SpriteVfxSystem
     }
 
     public void Spawn(
-        string effectKey,
+        string visualId,
         Vector2 position,
         float rotation = 0f,
         float scale = 1f,
-        Color? color = null)
+        Color? color = null,
+        Func<Vector2>? anchor = null)
     {
         _instances.Add(new Instance
         {
-            Clip = _art.GetEffect(effectKey),
+            VisualId = visualId,
+            Clip = _art.GetEffect(visualId),
             Position = position,
             Rotation = rotation,
             Scale = scale,
-            Color = color ?? Color.White
+            Color = color ?? Color.White,
+            Anchor = anchor
         });
     }
 
@@ -48,7 +59,11 @@ public sealed class SpriteVfxSystem
         {
             Instance instance = _instances[index];
             instance.Elapsed += deltaTime;
-            if (!instance.Clip.Loop && instance.Elapsed >= instance.Clip.Duration)
+            if (instance.Anchor is not null)
+            {
+                instance.Position = instance.Anchor();
+            }
+            if (!instance.Loops && instance.Elapsed >= instance.Duration)
             {
                 _instances.RemoveAt(index);
             }
@@ -59,13 +74,19 @@ public sealed class SpriteVfxSystem
     {
         foreach (Instance instance in _instances)
         {
+            if (instance.Clip is null)
+            {
+                _art.DrawEffectDummy(batch, instance.VisualId, instance.Position, instance.Rotation, instance.Scale, instance.Elapsed / instance.Duration);
+                continue;
+            }
+
             ArtAssets.DrawClip(
                 batch,
                 instance.Clip,
                 instance.Elapsed,
                 instance.Position,
                 instance.Rotation,
-                instance.Scale,
+                instance.Scale * _art.WorldSizeOf(instance.VisualId, new Vector2(instance.Clip.FrameWidth)).X / instance.Clip.FrameWidth,
                 instance.Color);
         }
     }

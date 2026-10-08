@@ -69,12 +69,12 @@ public sealed class ArenaAtmosphere
     private const int MaximumSmoke = 6;
     private const int MaximumEmbers = 5;
 
-    // Dark furnace mouths and damaged exhausts visible in arena_base_1800x1000.
+    // The soul furnace in the painted north wall (Arena.FurnaceHearth): its mouth burns with the
+    // Death Flame, throws that violet light onto the floor before it and breathes out sparks. It
+    // cools after the last wave, when the Life Flame kindles in it.
     private static readonly FurnaceSource[] FurnaceSources =
     [
-        new(new Vector2(919f, 187f), 54f, 0.1f, 1f, false),
-        new(new Vector2(1167f, 158f), 44f, 2.15f, 0.72f, false),
-        new(new Vector2(263f, 867f), 34f, 4.2f, 0.46f, true)
+        new(Arena.FurnaceHearth + new Vector2(0f, -14f), 54f, 0.1f, 1f, false)
     ];
 
     // These remain outside the central combat basin and move at different rates.
@@ -103,6 +103,7 @@ public sealed class ArenaAtmosphere
 
     private readonly AmbientParticle[] _particles = new AmbientParticle[ParticleCapacity];
     private readonly Random _random = new(4129);
+    private ArtAssets? _art;
     private float _time;
     private float _activity = 1f;
     private float _ashSpawnTimer;
@@ -251,16 +252,26 @@ public sealed class ArenaAtmosphere
         _forcePressure = MathF.Max(_forcePressure, MathHelper.Clamp(strength / 190f, 0f, 1f));
     }
 
+    /// <summary>
+    /// Haze, furnace mouths and ambient particles. With <paramref name="art"/> (the painted foundry)
+    /// the haze and smoke are soft light, embers glow as points, and the furnace mouths are left to
+    /// the painting, which has its own.
+    /// </summary>
     public void DrawBackground(
         SpriteBatch batch,
         Texture2D pixel,
-        float soulSenseAmount)
+        float soulSenseAmount,
+        ArtAssets? art = null)
     {
         float sense = MathHelper.Clamp(soulSenseAmount, 0f, 1f);
         float physicalVisibility = MathHelper.Lerp(1f, 0.32f, sense);
+        _art = art;
 
         DrawHaze(batch, pixel, physicalVisibility);
-        DrawFurnaceFaces(batch, pixel, physicalVisibility);
+        if (art is null)
+        {
+            DrawFurnaceFaces(batch, pixel, physicalVisibility);
+        }
 
         for (int i = 0; i < _particles.Length; i++)
         {
@@ -286,19 +297,14 @@ public sealed class ArenaAtmosphere
         for (int i = 0; i < FurnaceSources.Length; i++)
         {
             FurnaceSource source = FurnaceSources[i];
-            float pulse = GetFurnacePulse(i);
-            float intensity = (0.035f + pulse * 0.028f) *
+            float level = GetFurnacePulse(i) *
                 source.Strength *
-                ArenaAtmosphereTuning.AmbientIntensity *
                 physicalVisibility *
                 resonanceSuppression *
-                MathHelper.Lerp(0.45f, 1f, _activity);
-            renderer.DrawGlow(
-                batch,
-                source.Position,
-                source.Radius,
-                new Color(181, 76, 34),
-                intensity);
+                MathHelper.Lerp(0.1f, 1f, (_activity - ArenaAtmosphereTuning.CompletionCalm) / (1f - ArenaAtmosphereTuning.CompletionCalm));
+            // The mouth itself, and the spill across the floor in front of the wall.
+            renderer.DrawGlow(batch, source.Position, 84f, GameBalance.DeathFlame, 0.22f * level);
+            renderer.DrawGlow(batch, source.Position + new Vector2(0f, 100f), 250f, GameBalance.DeathFlame, 0.11f * level);
         }
 
         for (int i = 0; i < _particles.Length; i++)
@@ -400,6 +406,20 @@ public sealed class ArenaAtmosphere
                 physicalVisibility *
                 calmOpacity *
                 breathe;
+            if (_art is not null)
+            {
+                // A bank of soft puffs along the band instead of a hard-edged strip.
+                for (int puff = 0; puff < 5; puff++)
+                {
+                    float along = (puff + 0.5f) / 5f;
+                    Vector2 at = Vector2.Lerp(band.Start, band.End, along) + drift;
+                    float swell = 0.8f + 0.2f * MathF.Sin(_time * 0.3f + band.Phase + puff * 1.3f);
+                    Vector2 radii = new(Vector2.Distance(band.Start, band.End) * 0.28f, band.Width * 0.75f * pressure * swell);
+                    _art.DrawSoftSpot(batch, at, radii, outer * (opacity * 0.7f));
+                    _art.DrawSoftSpot(batch, at, radii * 0.5f, inner * (opacity * 0.4f));
+                }
+                continue;
+            }
             batch.DrawLine(pixel, band.Start + drift, band.End + drift, outer * (opacity * 0.55f), band.Width * pressure);
             batch.DrawLine(pixel, band.Start + drift, band.End + drift, inner * (opacity * 0.35f), band.Width * 0.42f * pressure);
         }
@@ -460,6 +480,22 @@ public sealed class ArenaAtmosphere
                     MathF.Max(1f, particle.Depth * 1.35f));
                 break;
 
+            case AmbientParticleKind.Smoke when _art is not null:
+                _art.DrawSoftSpot(batch, particle.Position, new Vector2(size * 1.3f), new Color(62, 59, 69) * (commonAlpha * physicalVisibility * 0.5f));
+                break;
+
+            case AmbientParticleKind.Ember when _art is not null:
+                // Sparks of the Death Flame from the furnace, violet like its mouth.
+                _art.DrawSoftSpot(batch, particle.Position, new Vector2(MathF.Max(2f, size * 2.2f)), GameBalance.DeathFlame * (commonAlpha * physicalVisibility * 0.6f));
+                _art.DrawSoftSpot(batch, particle.Position, new Vector2(MathF.Max(1f, size * 0.8f)), GameBalance.DeathFlameBright * (commonAlpha * physicalVisibility));
+                break;
+
+            case AmbientParticleKind.SoulMote when _art is not null:
+                float moteVisibility = MathHelper.Lerp(0.32f, 0.82f, soulSenseAmount);
+                _art.DrawSoftSpot(batch, particle.Position, new Vector2(MathF.Max(3f, size * 2.6f)), GameBalance.DeathFlame * (commonAlpha * moteVisibility * 0.7f));
+                _art.DrawSoftSpot(batch, particle.Position, new Vector2(MathF.Max(1.2f, size * 0.9f)), GameBalance.DeathFlameBright * (commonAlpha * moteVisibility));
+                break;
+
             case AmbientParticleKind.Smoke:
                 batch.FillCircle(
                     pixel,
@@ -499,15 +535,29 @@ public sealed class ArenaAtmosphere
         }
     }
 
+    private float _beatPhase = -1f;
+    private float _beatStrength;
+
+    /// <summary>
+    /// The combat score's kick (phase 0..1, -1 without score) and how loud its pulse plays: the
+    /// furnace flares on each kick, as if the last shift stoked it in time with the fight.
+    /// </summary>
+    public void SetBeat(float phase, float strength)
+    {
+        _beatPhase = phase;
+        _beatStrength = MathHelper.Clamp(strength, 0f, 1f);
+    }
+
     private float GetFurnacePulse(int index)
     {
         FurnaceSource source = FurnaceSources[index];
+        float stoke = _beatPhase >= 0f ? _beatStrength * 0.75f * MathF.Exp(-_beatPhase * 6f) : 0f;
         float slowPulse = 0.5f + 0.5f * MathF.Sin(_time * (0.72f + index * 0.08f) + source.Phase);
         float machineBreath = 0.5f + 0.5f * MathF.Sin(_time * 0.19f + source.Phase * 1.7f);
-        float pulse = 0.72f + slowPulse * ArenaAtmosphereTuning.FurnacePulseStrength + machineBreath * 0.05f;
+        float pulse = 0.72f + slowPulse * ArenaAtmosphereTuning.FurnacePulseStrength + machineBreath * 0.05f + stoke;
 
-        // Only the damaged right-hand furnace faults, in a short authored cadence.
-        if (index == 1 && _machineFaultRemaining > 0f)
+        // Now and then the furnace stutters, in a short authored cadence.
+        if (index == 0 && _machineFaultRemaining > 0f)
         {
             float elapsed = 0.24f - _machineFaultRemaining;
             float faultMultiplier = elapsed < 0.055f
@@ -596,8 +646,8 @@ public sealed class ArenaAtmosphere
         {
             Active = true,
             Kind = AmbientParticleKind.Ember,
-            Position = source.Position + new Vector2(RandomRange(-12f, 12f), RandomRange(-5f, 7f)),
-            Velocity = new Vector2(RandomRange(-7f, 7f), RandomRange(-25f, -13f)),
+            Position = source.Position + new Vector2(RandomRange(-18f, 18f), RandomRange(-6f, 8f)),
+            Velocity = new Vector2(RandomRange(-9f, 9f), RandomRange(-30f, -15f)),
             Lifetime = lifetime,
             Remaining = priming ? lifetime * RandomRange(0.3f, 0.9f) : lifetime,
             StartSize = RandomRange(1.1f, 1.8f),

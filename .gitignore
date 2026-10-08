@@ -11,3 +11,16 @@ obj/
 TestResults/
 artifacts/
 
+
+# Visual production: secrets and unaccepted candidates stay local
+.env
+.env.*
+art/production/candidates/
+tools/visuals/.venv/
+__pycache__/
+tools/audio/.venv/
+
+# Local agent tooling: graphify knowledge graph and personal Claude config
+graphify-out/
+CLAUDE.local.md
+.claude/settings.local.json

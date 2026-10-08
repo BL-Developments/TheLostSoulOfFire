@@ -48,6 +48,31 @@ public static class ScreenshotCapture
         }
     }
 
+    /// <summary>Saves the virtual target to an exact path (tour captures).</summary>
+    public static bool TrySaveVirtualTargetTo(RenderTarget2D virtualTarget, string path, out string error)
+    {
+        try
+        {
+            int width = virtualTarget.Width;
+            int height = virtualTarget.Height;
+            Color[] pixels = new Color[width * height];
+            virtualTarget.GetData(pixels);
+            using Texture2D screenshot = new(virtualTarget.GraphicsDevice, width, height);
+            screenshot.SetData(pixels);
+            using FileStream stream = File.Create(path);
+            screenshot.SaveAsPng(stream, width, height);
+            error = string.Empty;
+            return true;
+        }
+        catch (Exception exception)
+        {
+            error = exception.Message;
+            return false;
+        }
+    }
+
+    public static string RepositoryRoot() => FindRepositoryRoot() ?? Directory.GetCurrentDirectory();
+
     private static string FindRepositoryRoot()
     {
         return FindRepositoryRoot(Directory.GetCurrentDirectory()) ??
