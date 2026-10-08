@@ -10,7 +10,7 @@ Konsolidiert am 04.10.2026 aus der Konzeptaufnahme und dem Entscheidungslog. Die
 | Niederlage | Kampfunfähigkeit; andere Wardens bergen vor endgültiger Zerstörung. Die Run-Bestände von Geld und Glut gehen verloren, gesicherte bleiben. Endgültiger Warden-Tod führt weiterhin ins wahre Jenseits. | Beschluss 29.09., 04.10.; #7, #14, #52 |
 | Biome | Der vorherige Biom-Boss schaltet das nächste Biom frei; Meta-Level ersetzt dies nicht. | Aufnahme; #27 |
 | Ressourcen | Geld (Arbeitsname) aus Kisten und NPC-Prämien für Waffen und Schmied; Glut (mystische Ressource, Arbeitsname) genau einmal je besiegtem Monster, für Fähigkeiten im Run und Skilltrees aus dem gesicherten Bestand. Erlösung schreibt nichts gut; die Seele geht weiter und ist keine Verbrauchswährung. | Beschluss 04.10.; #7, #52 |
-| Risiko | Reisepunkte ermöglichen Teilsicherung mit Weiterreise oder vollständige Extraktion. Mystische Ressource steht zwischen Einsatzkosten im Run und dauerhaftem Fortschritt. | Aufnahme; #18, #21 |
+| Risiko | Reisepunkte am Ende von Level 1 und 2 bieten Teilsichern (je 50 % beider Run-Bestände, abgerundet, einmal je Reisepunkt), Weiter ohne Sichern oder Extrahieren (alles sichern, Run endet). Kein Limit pro Sicherung. Mystische Ressource steht zwischen Einsatzkosten im Run und dauerhaftem Fortschritt. Regeln und Rechenbeispiele: [ECONOMY.md](ECONOMY.md). | Aufnahme; Beschluss 06.10.; #18, #21, #53 |
 | Waffen | Eine Hauptwaffe vor regulärem Run; Nah- oder Fernkampf. Sense als Startwaffe. | Aufnahme; #8, #15 |
 | Fähigkeiten | Drei Angebote, daraus zwei auswählen. Aktive Fähigkeiten und Ultimate sind gewünscht; Ultimate-Modell ist offen. | Aufnahme; #16, #13, #24 |
 | Fortschritt | NPC-Begegnungen öffnen Homebase-Dienste; Händler, Schmied und getrennte Waffen-/Fähigkeitsbäume. | Aufnahme; #20, #22, #25 |
@@ -27,7 +27,7 @@ Konsolidiert am 04.10.2026 aus der Konzeptaufnahme und dem Entscheidungslog. Die
 
 ## Beispielwerte
 
-50 % Sicherung, 1.000 Einheiten, drei Startwaffen und drei/fünf Levels sind Gesprächsbeispiele. Drei Fähigkeitsangebote mit zwei Auswahlen ist dagegen das konkret besprochene Startmodell. Keine endgültigen Namen, Quoten, Kurven oder Limits aus Beispielen ableiten.
+50 % Sicherung ist seit dem 06.10. ein beschlossener Arbeitswert (#53). 1.000 Einheiten, drei Startwaffen und drei/fünf Levels sind Gesprächsbeispiele. Drei Fähigkeitsangebote mit zwei Auswahlen ist dagegen das konkret besprochene Startmodell. Keine endgültigen Namen, Quoten, Kurven oder Limits aus Beispielen ableiten.
 
 ## Bestand und Referenzbranch
 

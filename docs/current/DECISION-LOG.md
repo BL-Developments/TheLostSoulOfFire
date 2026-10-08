@@ -7,6 +7,23 @@ The entries from 2026-09-06 and earlier describe implementation work on the
 `tools/visual-max/`, `SoftShapes.cs`, Team Resonance, Severance) are not
 necessarily present on `main`.
 
+## 2026-10-06 — Teilsicherung, Extraktion und Niederlage (#53)
+
+- Reisepunkte stehen am Ende von Level 1 und 2. Sie bieten Teilsichern und
+  weiter, Weiter ohne Sichern oder Extrahieren.
+- Teilsichern überträgt eine feste Quote von 50 % (Arbeitswert) beider
+  Run-Bestände, Geld und Glut, in den gesicherten Bestand. Der Spieler wählt
+  keinen Betrag.
+- Höchstens eine Teilsicherung je Reisepunkt. Der gesicherte Anteil wird je
+  Währung abgerundet; der Rest bleibt im Run. Keine Obergrenze pro Sicherung.
+- Extrahieren sichert beide Run-Bestände vollständig und beendet den Run.
+  Nach dem Bosssieg werden beide Run-Bestände in der Homebase vollständig
+  gesichert.
+- Bei Niederlage gehen beide Run-Bestände verloren (bestätigt aus #52).
+- Regeln und Rechenbeispiele stehen in [ECONOMY.md](ECONOMY.md).
+
+Nachweis: ausdrücklich bestätigte Produktentscheidung des Owners zu #53.
+
 ## 2026-10-05 — Freigabe 0: Lore-Grundlage der visuellen Scheibe
 
 Der Owner gibt die Lore-Grundlage des Changes `add-visual-vertical-slice` mit
