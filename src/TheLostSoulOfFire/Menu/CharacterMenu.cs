@@ -46,10 +46,10 @@ public sealed class CharacterMenu
         }
         if (!abilities.Equip(SelectedSkillSlot, ability))
         {
-            SkillFeedback = "BEREITS IM ANDEREN SLOT AUSGERUESTET";
+            SkillFeedback = "BEREITS IM ANDEREN SLOT AUSGERÜSTET";
             return false;
         }
-        SkillFeedback = $"{RunAbilities.Definitions[(int)ability].Name} AUF {(SelectedSkillSlot == 0 ? "Z" : "X")} AUSGERUESTET";
+        SkillFeedback = $"{RunAbilities.Definitions[(int)ability].Name} AUF {(SelectedSkillSlot == 0 ? "Z" : "X")} AUSGERÜSTET";
         return true;
     }
 

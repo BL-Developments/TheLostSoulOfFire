@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using TheLostSoulOfFire.Core;
 using TheLostSoulOfFire.Game;
@@ -50,16 +52,21 @@ public sealed class SoulfireRenderer : IDisposable
 {
     private readonly GraphicsDevice _graphicsDevice;
     private readonly BlendState _lightBlend;
+    private readonly Effect? _sceneGrade;
+    private List<SceneLight> _recordedLights = [];
+    private List<SceneLight> _lastFrameLights = [];
     private RenderTarget2D _sceneTarget;
     private Texture2D _solidTexture;
     private Texture2D _glowTexture;
     private Texture2D _vignetteTexture;
+    private Texture2D _vignetteGlowTexture;
     private int _targetWidth;
     private int _targetHeight;
 
-    public SoulfireRenderer(GraphicsDevice graphicsDevice)
+    public SoulfireRenderer(GraphicsDevice graphicsDevice, ContentManager? content = null)
     {
         _graphicsDevice = graphicsDevice;
+        _sceneGrade = TryLoadEffect(content, "Effects/SceneGrade");
         _lightBlend = new BlendState
         {
             ColorSourceBlend = Blend.One,
@@ -73,6 +80,7 @@ public sealed class SoulfireRenderer : IDisposable
         _solidTexture.SetData([Color.White]);
         _glowTexture = CreateGlowTexture(graphicsDevice);
         _vignetteTexture = CreateVignetteTexture(graphicsDevice);
+        _vignetteGlowTexture = CreateVignetteTexture(graphicsDevice, glow: true);
     }
 
     /// <summary>
@@ -81,12 +89,26 @@ public sealed class SoulfireRenderer : IDisposable
     /// </summary>
     public void BeginScene(Viewport viewport)
     {
+        // Glows recorded by the previous frame's lighting pass light this frame's figures.
+        (_lastFrameLights, _recordedLights) = (_recordedLights, _lastFrameLights);
+        _recordedLights.Clear();
         EnsureSceneTarget(RenderResolution.OutputWidth, RenderResolution.OutputHeight);
         _graphicsDevice.SetRenderTarget(_sceneTarget);
         _graphicsDevice.Clear(GameBalance.VoidColor);
     }
 
-    public void PresentScene(SpriteBatch batch, RenderTarget2D? rootTarget, Viewport viewport, float soulSenseWorldSuppression = 0f)
+    /// <summary>
+    /// Composites the scene target with the area grade (<paramref name="areaLut"/>) blended toward
+    /// the Soul Sense grade by <paramref name="soulSenseWorldSuppression"/>. HUD and menus are drawn
+    /// afterwards and stay ungraded. Without LUTs or shader the scene is drawn as before.
+    /// </summary>
+    public void PresentScene(
+        SpriteBatch batch,
+        RenderTarget2D? rootTarget,
+        Viewport viewport,
+        float soulSenseWorldSuppression = 0f,
+        Texture2D? areaLut = null,
+        Texture2D? soulSenseLut = null)
     {
         _graphicsDevice.SetRenderTarget(rootTarget);
         _graphicsDevice.Clear(GameBalance.VoidColor);
@@ -97,7 +119,14 @@ public sealed class SoulfireRenderer : IDisposable
             SoulfireRenderSettings.SceneGrade,
             GameBalance.SoulSenseWorldGrade,
             suppression);
-        batch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp);
+        Effect? grade = _sceneGrade is not null && areaLut is not null ? _sceneGrade : null;
+        if (grade is not null)
+        {
+            grade.Parameters["AreaLut"].SetValue(areaLut);
+            grade.Parameters["SoulSenseLut"].SetValue(soulSenseLut ?? areaLut);
+            grade.Parameters["SoulSense"].SetValue(soulSenseLut is null ? 0f : suppression);
+        }
+        batch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp, effect: grade);
         batch.Draw(_sceneTarget, destination, sceneGrade);
         batch.End();
 
@@ -123,8 +152,22 @@ public sealed class SoulfireRenderer : IDisposable
             SamplerState.LinearClamp,
             transformMatrix: worldTransform);
 
+    /// <summary>
+    /// Every glow of the previous frame's lighting pass, in world units. Figures with normal maps
+    /// use these as their Soulfire point lights (see <see cref="SpriteLighting"/>).
+    /// </summary>
+    public IReadOnlyList<SceneLight> SceneLights => _lastFrameLights;
+
+    /// <summary>
+    /// Added to every glow while set: glows of things in the air (shots, sparks) sit at body
+    /// height, like their sprites (<see cref="FigureHeights.Air"/>).
+    /// </summary>
+    public Vector2 GlowOffset { get; set; }
+
     public void DrawGlow(SpriteBatch batch, Vector2 position, float radius, Color color, float intensity)
     {
+        position += GlowOffset;
+        _recordedLights.Add(new SceneLight(position, radius, color, MathHelper.Clamp(intensity, 0f, 1f)));
         float diameter = MathF.Max(1f, radius * 2f);
         batch.Draw(
             _glowTexture,
@@ -137,6 +180,12 @@ public sealed class SoulfireRenderer : IDisposable
             SpriteEffects.None,
             0f);
     }
+
+    /// <summary>The soft dark frame of the vignette (premultiplied black toward the edges).</summary>
+    public Texture2D VignetteTexture => _vignetteTexture;
+
+    /// <summary>Light along the picture's edges (premultiplied white), tinted when drawn.</summary>
+    public Texture2D VignetteGlowTexture => _vignetteGlowTexture;
 
     public void DrawVignette(SpriteBatch batch, Viewport viewport, float soulSenseAmount, bool resonanceActive)
     {
@@ -155,12 +204,31 @@ public sealed class SoulfireRenderer : IDisposable
         batch.End();
     }
 
+    private static Effect? TryLoadEffect(ContentManager? content, string path)
+    {
+        if (content is null)
+        {
+            return null;
+        }
+
+        try
+        {
+            return content.Load<Effect>(path);
+        }
+        catch (Exception exception) when (exception is ContentLoadException or NoSuitableGraphicsDeviceException or InvalidOperationException)
+        {
+            Console.Error.WriteLine($"Shader {path} nicht geladen: {exception.Message}");
+            return null;
+        }
+    }
+
     public void Dispose()
     {
         _sceneTarget?.Dispose();
         _solidTexture.Dispose();
         _glowTexture.Dispose();
         _vignetteTexture.Dispose();
+        _vignetteGlowTexture.Dispose();
         _lightBlend.Dispose();
         GC.SuppressFinalize(this);
     }
@@ -210,7 +278,7 @@ public sealed class SoulfireRenderer : IDisposable
         return texture;
     }
 
-    private static Texture2D CreateVignetteTexture(GraphicsDevice graphicsDevice)
+    private static Texture2D CreateVignetteTexture(GraphicsDevice graphicsDevice, bool glow = false)
     {
         int width = SoulfireRenderSettings.VignetteTextureWidth;
         int height = SoulfireRenderSettings.VignetteTextureHeight;
@@ -224,9 +292,10 @@ public sealed class SoulfireRenderer : IDisposable
             {
                 float normalizedX = (x + 0.5f) / width * 2f - 1f;
                 float distance = MathF.Sqrt(normalizedX * normalizedX + normalizedY * normalizedY * 0.82f);
-                float edge = SmoothStep(0.48f, 1.24f, distance);
-                byte alpha = (byte)MathF.Round(edge * 255f);
-                data[y * width + x] = new Color(0, 0, 0, (int)alpha);
+                // The glow hugs the edges more closely than the darkening.
+                float edge = glow ? SmoothStep(0.7f, 1.32f, distance) : SmoothStep(0.48f, 1.24f, distance);
+                int alpha = (int)MathF.Round(edge * 255f);
+                data[y * width + x] = glow ? new Color(alpha, alpha, alpha, alpha) : new Color(0, 0, 0, alpha);
             }
         }
 

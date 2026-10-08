@@ -7,77 +7,119 @@ using TheLostSoulOfFire.Game;
 
 namespace TheLostSoulOfFire.Rendering;
 
+/// <summary>
+/// The combat HUD in Warden iron (see <see cref="UiKit"/>): the soul medallion with the health
+/// bar, dash and run currencies top left, the wave plaque top right, resonance bottom centre.
+/// Presentation only: every value comes straight from the player and the run.
+/// </summary>
 public sealed class HudRenderer
 {
-    private static readonly Color Panel = new Color(7, 6, 12) * 0.82f;
-    private static readonly Color Frame = new(74, 66, 88);
-    private static readonly Color Empty = new(31, 28, 40);
     private static readonly Color BoundSoul = new(207, 207, 201);
     private static readonly Color BoundSoulDim = new(126, 127, 126);
+    private static readonly Color Label = new(176, 168, 188);
+    private static readonly Color Muted = new(92, 84, 106);
+
+    private const float TrailHold = 0.35f;
+    private const float TrailDrain = 0.9f;
+
+    private const int HealthTrackX = 84;
+    private const int HealthTrackY = 33;
+    private const int HealthTrackWidth = 176;
+    private const int HealthTrackHeight = 8;
+
+    private float _trail = 1f;
+    private float _trailHold;
+    private float _time;
+
+    /// <summary>The bound soul's throb when health runs low (0–1), so the bar beats with it.</summary>
+    public float Throb { get; set; }
+
+    /// <summary>Recent damage stays visible as a pale trail that drains after a short hold.</summary>
+    public void Update(float deltaTime, Player player)
+    {
+        _time += deltaTime;
+        float health = HealthFraction(player);
+        if (health >= _trail)
+        {
+            _trail = health;
+            _trailHold = 0f;
+            return;
+        }
+
+        if (_trailHold <= 0f && _trail - health > 0.001f && _trailHold > -0.5f)
+        {
+            _trailHold = TrailHold;
+        }
+
+        _trailHold -= deltaTime;
+        if (_trailHold <= 0f)
+        {
+            _trail = MathF.Max(health, _trail - TrailDrain * deltaTime);
+            _trailHold = -1f;
+        }
+    }
 
     public void Draw(SpriteBatch batch, Texture2D pixel, Viewport viewport, Player player)
     {
         DrawHealth(batch, pixel, player);
         DrawDash(batch, pixel, player);
         DrawResonance(batch, pixel, viewport, player);
-
-        if (player.Cannon.State == SoulCannonState.Charging)
-        {
-            DrawCannonCharge(batch, pixel, viewport, player);
-        }
     }
 
-    private static void DrawHealth(SpriteBatch batch, Texture2D pixel, Player player)
+    private static float HealthFraction(Player player) =>
+        MathHelper.Clamp(player.Health / (float)Math.Max(1, player.MaxHealth), 0f, 1f);
+
+    private void DrawHealth(SpriteBatch batch, Texture2D pixel, Player player)
     {
-        const int x = 24;
-        const int y = 24;
-        const int trackX = x + 37;
-        const int trackY = y + 12;
-        const int trackWidth = 140;
-        const int trackHeight = 7;
+        float health = HealthFraction(player);
+        bool low = health <= 0.3f && health > 0f;
+        float lowPulse = low ? Throb : 0f;
 
-        const int healthTextX = trackX + trackWidth + 8;
-        // The panel grows with the measured width of the largest health value.
-        int panelRight = healthTextX + PixelText.Measure(player.MaxHealth.ToString(), 1) + 3;
-        Rectangle panelBounds = new(x + 13, y + 4, panelRight - (x + 13), 23);
-        batch.FillRectangle(pixel, panelBounds, Panel);
-        DrawCornerFrame(batch, pixel, panelBounds, Frame);
+        Rectangle track = new(HealthTrackX, HealthTrackY, HealthTrackWidth, HealthTrackHeight);
+        Color fill = low ? Color.Lerp(BoundSoul, GameBalance.DeathFlameBright, 0.35f + lowPulse * 0.25f) : BoundSoul;
+        UiKit.Bar(batch, pixel, track, health, fill, 1f, _trail, GameBalance.DeathFlame * 0.55f);
 
-        Vector2 soulCenter = new(x + 14, y + 15);
-        DrawDiamond(batch, pixel, soulCenter, 10, BoundSoulDim);
-        DrawDiamond(batch, pixel, soulCenter, 5, BoundSoul);
-        batch.DrawLine(pixel, soulCenter - new Vector2(13f, 0f), soulCenter + new Vector2(13f, 0f), new Color(25, 23, 31), 2f);
-        batch.FillRectangle(pixel, new Rectangle(trackX, trackY, trackWidth, trackHeight), Empty);
-
-        float healthFill = MathHelper.Clamp(player.Health / (float)player.MaxHealth, 0f, 1f);
-        int fillWidth = (int)MathF.Round(trackWidth * healthFill);
-        if (fillWidth > 0)
-        {
-            batch.FillRectangle(pixel, new Rectangle(trackX, trackY, fillWidth, trackHeight), BoundSoul);
-            batch.FillRectangle(pixel, new Rectangle(trackX, trackY + trackHeight - 2, fillWidth, 2), BoundSoulDim);
-        }
-
+        // Five links, as on the old chain: a dark notch every fifth of the track.
         for (int link = 1; link < 5; link++)
         {
-            int linkX = trackX + link * trackWidth / 5;
-            batch.FillRectangle(pixel, new Rectangle(linkX - 1, trackY - 1, 2, trackHeight + 2), new Color(15, 13, 20));
+            int linkX = track.X + link * track.Width / 5;
+            batch.FillRectangle(pixel, new Rectangle(linkX - 1, track.Y, 2, track.Height), new Color(9, 8, 13) * 0.85f);
         }
 
-        PixelText.Draw(batch, pixel, player.Health.ToString(), new Vector2(healthTextX, y + 12), 1, BoundSoul);
+        // The bound soul in its medallion dims with health and flickers when it runs low.
+        Color core = Color.Lerp(BoundSoulDim * 0.7f, BoundSoul, 0.35f + health * 0.65f);
+        if (low)
+        {
+            core = Color.Lerp(core, GameBalance.DeathFlameBright, lowPulse * 0.45f);
+        }
+        UiKit.Gem(batch, pixel, new Vector2(46, 37), core);
+
+        string value = player.Health.ToString();
+        PixelText.DrawFace(batch, pixel, value, new Vector2(track.Right + 18, track.Y - 3), TextFace.Display, 14f, BoundSoul);
     }
 
     /// <summary>Run balances under the dash bar; a credited line glows briefly.</summary>
     public static void DrawCurrencies(SpriteBatch batch, Texture2D pixel, int geld, int glut, float geldPulse, float glutPulse)
     {
-        const int x = 61;
-        const int y = 72;
-        DrawCurrencyLine(batch, pixel, "GELD", geld, new Vector2(x, y), GameBalance.Geld, geldPulse);
-        DrawCurrencyLine(batch, pixel, "GLUT", glut, new Vector2(x, y + 16), GameBalance.Glut, glutPulse);
+        const int x = 80;
+        const int y = 80;
+        DrawCurrencyLine(batch, pixel, UiIcon.Geld, "GELD", geld, new Vector2(x, y), GameBalance.Geld, geldPulse);
+        DrawCurrencyLine(batch, pixel, UiIcon.Glut, "GLUT", glut, new Vector2(x, y + 22), GameBalance.Glut, glutPulse);
+    }
+
+    private static void DrawCurrencyLine(SpriteBatch batch, Texture2D pixel, UiIcon icon, string label, int amount, Vector2 position, Color accent, float pulse)
+    {
+        pulse = MathHelper.Clamp(pulse, 0f, 1f);
+        UiKit.Icon(batch, pixel, icon, position + new Vector2(0f, 4f), 0.75f + pulse * 0.25f);
+        Vector2 labelAt = position + new Vector2(14f, 0f);
+        PixelText.DrawFace(batch, pixel, label, labelAt, TextFace.Body, 9.5f, Color.Lerp(Label, accent, 0.3f + pulse * 0.7f), 1f);
+        int valueX = (int)labelAt.X + PixelText.MeasureFace("GELD", TextFace.Body, 9.5f, 1f) + 10;
+        PixelText.DrawFace(batch, pixel, amount.ToString(), new Vector2(valueX, position.Y - 1f), TextFace.Display, 11f, Color.Lerp(BoundSoul, Color.White, pulse));
     }
 
     /// <summary>
-    /// Wave counter in the top right corner. Waves with reinforcements show one diamond per
-    /// push below the counter: filled once the push has entered the arena.
+    /// Wave plaque in the top right corner. Waves with reinforcements show one diamond per
+    /// push below the counter: lit once the push has entered the arena. The last wave burns.
     /// </summary>
     public static void DrawWave(SpriteBatch batch, Texture2D pixel, Viewport viewport, int wave, int waveCount, int pushesReleased, int pushCount)
     {
@@ -86,81 +128,68 @@ public sealed class HudRenderer
             return;
         }
 
-        string label = "WELLE";
+        const string label = "WELLE";
         string value = $"{wave}/{waveCount}";
         bool lastWave = wave >= waveCount;
-        int labelWidth = PixelText.Measure(label, 1);
-        int valueWidth = PixelText.Measure(value, 1);
-        int right = viewport.Width - 24;
-        int width = labelWidth + valueWidth + 30;
-        int height = pushCount > 1 ? 34 : 23;
-        Rectangle panelBounds = new(right - width, 28, width, height);
-        batch.FillRectangle(pixel, panelBounds, Panel);
-        DrawCornerFrame(batch, pixel, panelBounds, lastWave ? GameBalance.DeathFlame : Frame);
+        int labelWidth = PixelText.MeasureFace(label, TextFace.Body, 10f, 1.4f);
+        int valueWidth = PixelText.MeasureFace(value, TextFace.Display, 16f);
+        int width = Math.Max(labelWidth + valueWidth + 44, pushCount > 1 ? pushCount * 14 + 34 : 0);
+        int height = pushCount > 1 ? 50 : 36;
+        Rectangle panel = new(viewport.Width - 24 - width, 24, width, height);
+        Color accent = lastWave ? GameBalance.DeathFlame : Muted;
+        UiKit.Panel(batch, pixel, panel, accent, lastWave ? 0.9f : 0.5f, 1f, lastWave ? 0.35f : 0f);
 
-        int textX = panelBounds.X + 11;
-        int textY = panelBounds.Y + 8;
-        PixelText.Draw(batch, pixel, label, new Vector2(textX, textY), 1, lastWave ? GameBalance.DeathFlameBright : BoundSoulDim);
-        PixelText.Draw(batch, pixel, value, new Vector2(textX + labelWidth + 8, textY), 1, BoundSoul);
+        int contentX = panel.X + (width - labelWidth - valueWidth - 10) / 2;
+        int baseline = panel.Y + 12;
+        PixelText.DrawFace(batch, pixel, label, new Vector2(contentX, baseline + 3), TextFace.Body, 10f,
+            lastWave ? GameBalance.DeathFlameBright : Label, 1.4f);
+        PixelText.DrawFace(batch, pixel, value, new Vector2(contentX + labelWidth + 10, baseline - 3), TextFace.Display, 16f, BoundSoul);
 
         if (pushCount > 1)
         {
-            const int spacing = 12;
-            int startX = panelBounds.Center.X - (pushCount - 1) * spacing / 2;
+            const int spacing = 14;
+            int startX = panel.Center.X - (pushCount - 1) * spacing / 2;
             for (int push = 0; push < pushCount; push++)
             {
-                Vector2 center = new(startX + push * spacing, panelBounds.Bottom - 8);
+                Vector2 center = new(startX + push * spacing, panel.Bottom - 12);
                 bool released = push < pushesReleased;
-                DrawDiamond(batch, pixel, center, 4, released ? GameBalance.DeathFlame : Frame);
-                if (released)
-                {
-                    DrawDiamond(batch, pixel, center, 2, GameBalance.DeathFlameBright);
-                }
+                UiKit.FillDiamond(batch, pixel, center, 4, released ? GameBalance.DeathFlame : new Color(32, 28, 40));
+                UiKit.FillDiamond(batch, pixel, center, 2, released ? GameBalance.DeathFlameBright : Muted * 0.8f);
             }
         }
     }
 
-    private static void DrawCurrencyLine(SpriteBatch batch, Texture2D pixel, string label, int amount, Vector2 position, Color accent, float pulse)
-    {
-        pulse = MathHelper.Clamp(pulse, 0f, 1f);
-        DrawDiamond(batch, pixel, position + new Vector2(-9f, 4f), 3 + (int)MathF.Round(pulse * 2f), accent);
-        PixelText.Draw(batch, pixel, label, position, 1, Color.Lerp(BoundSoulDim, accent, 0.45f + pulse * 0.55f));
-        int valueX = (int)position.X + PixelText.Measure("GELD", 1) + 8;
-        PixelText.Draw(batch, pixel, amount.ToString(), new Vector2(valueX, position.Y), 1, Color.Lerp(BoundSoul, Color.White, pulse));
-    }
-
     private static void DrawDash(SpriteBatch batch, Texture2D pixel, Player player)
     {
-        const int x = 61;
-        const int y = 54;
-        const int width = 48;
+        const int x = 84;
+        const int y = 56;
         float ready = 1f - MathHelper.Clamp(player.DashCooldownRemaining / GameBalance.DashCooldown, 0f, 1f);
-        Color dashColor = ready >= 0.999f ? GameBalance.DeathFlameBright : GameBalance.DeathFlame * 0.62f;
+        bool full = ready >= 0.999f;
+        Color dashColor = full ? GameBalance.DeathFlameBright : GameBalance.DeathFlame * 0.7f;
 
-        // The bar follows the label's measured width, which depends on the output pixel grid.
-        int barX = x + PixelText.Measure("DASH", 1) + 5;
-        PixelText.Draw(batch, pixel, "DASH", new Vector2(x, y), 1, ready >= 0.999f ? BoundSoulDim : Frame);
-        batch.FillRectangle(pixel, new Rectangle(barX, y + 3, width, 2), Empty);
-        batch.FillRectangle(pixel, new Rectangle(barX, y + 3, (int)MathF.Round(width * ready), 2), dashColor);
+        PixelText.DrawFace(batch, pixel, "DASH", new Vector2(x, y), TextFace.Body, 9.5f, full ? Label : Muted, 1.2f);
+        int barX = x + PixelText.MeasureFace("DASH", TextFace.Body, 9.5f, 1.2f) + 16;
+        UiKit.Bar(batch, pixel, new Rectangle(barX, y + 2, 56, 5), ready, dashColor);
 
-        Vector2 marker = new(barX + width + 7, y + 4);
-        if (ready >= 0.999f)
+        Vector2 marker = new(barX + 56 + 16, y + 4);
+        if (full)
         {
-            DrawDiamond(batch, pixel, marker, 3, GameBalance.DeathFlameBright);
+            UiKit.FillDiamond(batch, pixel, marker, 4, GameBalance.DeathFlame * 0.6f);
+            UiKit.FillDiamond(batch, pixel, marker, 2, GameBalance.DeathFlameBright);
         }
         else
         {
-            batch.FillRectangle(pixel, new Rectangle((int)marker.X - 1, (int)marker.Y - 1, 2, 2), Frame);
+            UiKit.FillDiamond(batch, pixel, marker, 2, Muted);
         }
     }
 
-    private static void DrawResonance(SpriteBatch batch, Texture2D pixel, Viewport viewport, Player player)
+    private void DrawResonance(SpriteBatch batch, Texture2D pixel, Viewport viewport, Player player)
     {
-        const int trackWidth = 224;
-        const int trackHeight = 5;
+        const int trackWidth = 236;
+        const int trackHeight = 6;
         int centerX = viewport.Width / 2;
         int trackX = centerX - trackWidth / 2;
-        int trackY = viewport.Height - 34;
+        int trackY = viewport.Height - 32;
         bool ready = player.IsResonanceReady;
         bool active = player.ResonanceActive;
         float fill = active
@@ -168,77 +197,86 @@ public sealed class HudRenderer
             : player.Resonance / GameBalance.ResonanceRequired;
         fill = MathHelper.Clamp(fill, 0f, 1f);
 
-        string label = ready ? "R RESONATE" : "RESONANCE";
-        Color labelColor = ready || active ? GameBalance.SoulWhite : new Color(142, 119, 171);
-        PixelText.DrawCentered(batch, pixel, label, centerX, trackY - 13, 1, labelColor);
-
-        batch.FillRectangle(pixel, new Rectangle(trackX, trackY, trackWidth, trackHeight), Panel);
-        batch.FillRectangle(pixel, new Rectangle(trackX + 2, trackY + 2, trackWidth - 4, 1), Empty);
-
+        float breathe = 0.5f + 0.5f * MathF.Sin(_time * 3.2f);
         Color resonanceColor = ready || active
             ? GameBalance.SoulWhite
             : Color.Lerp(GameBalance.DeepViolet, GameBalance.DeathFlame, 0.62f);
-        int fillWidth = (int)MathF.Round((trackWidth - 4) * fill);
-        if (fillWidth > 0)
-        {
-            batch.FillRectangle(pixel, new Rectangle(trackX + 2, trackY + 1, fillWidth, 3), resonanceColor);
-        }
-
-        Color frameColor = ready ? GameBalance.SoulWhite * 0.82f : active ? GameBalance.DeathFlameBright * 0.74f : Frame;
-        batch.DrawLine(pixel, new Vector2(trackX, trackY), new Vector2(trackX + 16, trackY), frameColor, 1f);
-        batch.DrawLine(pixel, new Vector2(trackX + trackWidth - 16, trackY), new Vector2(trackX + trackWidth, trackY), frameColor, 1f);
-        batch.DrawLine(pixel, new Vector2(trackX, trackY + trackHeight), new Vector2(trackX + 16, trackY + trackHeight), frameColor, 1f);
-        batch.DrawLine(pixel, new Vector2(trackX + trackWidth - 16, trackY + trackHeight), new Vector2(trackX + trackWidth, trackY + trackHeight), frameColor, 1f);
-        DrawDiamond(batch, pixel, new Vector2(trackX - 7, trackY + 2), ready ? 5 : 3, frameColor);
-        DrawDiamond(batch, pixel, new Vector2(trackX + trackWidth + 7, trackY + 2), ready ? 5 : 3, frameColor);
+        // A plate keeps label and bar readable over props at the bottom edge; a ready
+        // resonance breathes so it can be noticed without reading the label.
+        Rectangle plate = new(trackX - 28, trackY - 27, trackWidth + 56, trackHeight + 38);
+        UiKit.Panel(batch, pixel, plate, ready ? GameBalance.SoulWhite : active ? GameBalance.DeathFlameBright : Muted,
+            ready || active ? 0.8f : 0.35f, 0.92f, ready ? 0.2f + breathe * 0.25f : 0f);
+        UiKit.Bar(batch, pixel, new Rectangle(trackX, trackY, trackWidth, trackHeight), fill, resonanceColor);
 
         if (ready)
         {
-            DrawDiamond(batch, pixel, new Vector2(centerX, trackY + 2), 4, GameBalance.SoulWhite);
-            batch.DrawLine(pixel, new Vector2(centerX - 7, trackY - 5), new Vector2(centerX, trackY - 9), GameBalance.DeathFlameBright * 0.52f, 1f);
-            batch.DrawLine(pixel, new Vector2(centerX, trackY - 9), new Vector2(centerX + 7, trackY - 5), GameBalance.DeathFlameBright * 0.52f, 1f);
+            const string key = "R";
+            const string word = "RESONANZ";
+            int keyWidth = UiKit.KeyWidth(key, 1);
+            int wordWidth = PixelText.MeasureFace(word, TextFace.Display, 10f, 1.5f);
+            int left = centerX - (keyWidth + 8 + wordWidth) / 2;
+            UiKit.Key(batch, pixel, new Vector2(left, trackY - 22), key, GameBalance.SoulWhite, 1f, 1, 15);
+            PixelText.DrawFace(batch, pixel, word, new Vector2(left + keyWidth + 8, trackY - 19.5f), TextFace.Display, 10f,
+                Color.Lerp(GameBalance.SoulWhite, GameBalance.DeathFlameBright, breathe * 0.35f), 1.5f);
+        }
+        else
+        {
+            Color labelColor = active ? GameBalance.DeathFlameBright : new Color(142, 119, 171);
+            int width = PixelText.MeasureFace("RESONANZ", TextFace.Display, 10f, 1.5f);
+            PixelText.DrawFace(batch, pixel, "RESONANZ", new Vector2(centerX - width / 2f, trackY - 18), TextFace.Display, 10f, labelColor, 1.5f);
         }
     }
 
-    private static void DrawCannonCharge(SpriteBatch batch, Texture2D pixel, Viewport viewport, Player player)
+    /// <summary>
+    /// The aim reticle in the world: a ring with four ticks. While the Soul Cannon charges, three
+    /// arcs around it fill stage by stage (formerly a separate HUD readout) and the full charge
+    /// closes them into a white ring.
+    /// </summary>
+    public static void DrawReticle(SpriteBatch batch, Texture2D pixel, Vector2 at, SoulCannon cannon, float time)
     {
-        int x = viewport.Width - 43;
-        const int y = 28;
-        PixelText.DrawCentered(batch, pixel, "CANNON", x, y, 1, Frame);
+        bool charging = cannon.State == SoulCannonState.Charging;
+        Color ring = GameBalance.DeathFlameBright * (charging ? 0.85f : 0.7f);
+        batch.DrawCircle(pixel, at, 8f, ring, 1.5f, 20);
+        for (int tick = 0; tick < 4; tick++)
+        {
+            Vector2 direction = new(MathF.Cos(tick * MathHelper.PiOver2), MathF.Sin(tick * MathHelper.PiOver2));
+            batch.DrawLine(pixel, at + direction * 11f, at + direction * 16f, GameBalance.DeathFlame * 0.7f, 1.5f);
+        }
+        batch.FillRectangle(pixel, new Rectangle((int)at.X - 1, (int)at.Y - 1, 2, 2), GameBalance.SoulWhite * 0.85f);
 
+        if (!charging)
+        {
+            return;
+        }
+
+        const float radius = 21f;
+        const float gap = 0.32f;
+        float span = MathHelper.TwoPi / 3f - gap;
+        bool full = cannon.IsFullCharge;
+        float pulse = 0.5f + 0.5f * MathF.Sin(time * 14f);
         for (int stage = 0; stage < 3; stage++)
         {
-            bool filled = player.Cannon.ChargeStage > stage;
-            bool full = stage == 2 && player.Cannon.IsFullCharge;
+            bool filled = cannon.ChargeStage > stage;
             Color color = full
-                ? GameBalance.SoulWhite
+                ? GameBalance.SoulWhite * (0.75f + pulse * 0.25f)
                 : filled
                     ? GameBalance.DeathFlameBright
-                    : Empty;
-            DrawDiamond(batch, pixel, new Vector2(x - 14 + stage * 14, y + 15), full ? 5 : 4, color);
+                    : new Color(60, 48, 78) * 0.8f;
+            float start = -MathHelper.PiOver2 + gap / 2f + stage * MathHelper.TwoPi / 3f;
+            DrawArc(batch, pixel, at, radius, start, full ? MathHelper.TwoPi / 3f : span, color, filled || full ? 3f : 2f);
         }
     }
 
-    private static void DrawCornerFrame(SpriteBatch batch, Texture2D pixel, Rectangle bounds, Color color)
+    private static void DrawArc(SpriteBatch batch, Texture2D pixel, Vector2 center, float radius, float start, float sweep, Color color, float thickness)
     {
-        const int corner = 8;
-        batch.DrawLine(pixel, new Vector2(bounds.Left, bounds.Top + corner), new Vector2(bounds.Left + corner, bounds.Top), color, 1f);
-        batch.DrawLine(pixel, new Vector2(bounds.Left + corner, bounds.Top), new Vector2(bounds.Right - corner, bounds.Top), color, 1f);
-        batch.DrawLine(pixel, new Vector2(bounds.Right - corner, bounds.Top), new Vector2(bounds.Right, bounds.Top + corner), color, 1f);
-        batch.DrawLine(pixel, new Vector2(bounds.Right, bounds.Bottom - corner), new Vector2(bounds.Right - corner, bounds.Bottom), color, 1f);
-        batch.DrawLine(pixel, new Vector2(bounds.Right - corner, bounds.Bottom), new Vector2(bounds.Left + corner, bounds.Bottom), color, 1f);
-        batch.DrawLine(pixel, new Vector2(bounds.Left + corner, bounds.Bottom), new Vector2(bounds.Left, bounds.Bottom - corner), color, 1f);
-    }
-
-    private static void DrawDiamond(SpriteBatch batch, Texture2D pixel, Vector2 center, int radius, Color color)
-    {
-        for (int offset = -radius; offset <= radius; offset++)
+        const int segments = 10;
+        Vector2 previous = center + new Vector2(MathF.Cos(start), MathF.Sin(start)) * radius;
+        for (int i = 1; i <= segments; i++)
         {
-            int halfWidth = radius - Math.Abs(offset);
-            batch.FillRectangle(
-                pixel,
-                new Rectangle((int)center.X - halfWidth, (int)center.Y + offset, halfWidth * 2 + 1, 1),
-                color);
+            float angle = start + sweep * i / segments;
+            Vector2 next = center + new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * radius;
+            batch.DrawLine(pixel, previous, next, color, thickness);
+            previous = next;
         }
     }
 }

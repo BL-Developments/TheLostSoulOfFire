@@ -2,9 +2,11 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using TheLostSoulOfFire.Audio;
 using TheLostSoulOfFire.Combat;
 using TheLostSoulOfFire.Input;
 using TheLostSoulOfFire.Rendering;
+using TheLostSoulOfFire.Rendering.Visuals;
 
 namespace TheLostSoulOfFire.Game;
 
@@ -99,52 +101,116 @@ public sealed partial class GameWorld
         _abilities.Update(dt, _player, ActiveCombatBounds, _enemies, _particles, ApplyEnemyDamage);
         if (!CombatActionsEnabled || _player.IsDead) return;
         // The sandbox has no Glut; casting there is free, cooldowns still apply.
-        if (input.WasKeyPressed(Keys.Z)) _abilities.TryCast(_abilities.Slots[0], _player, _wallet,
-            _lastMouseWorld, ActiveCombatBounds, _enemies, _particles, chargeCost: !_sandboxActive);
-        if (input.WasKeyPressed(Keys.X)) _abilities.TryCast(_abilities.Slots[1], _player, _wallet,
-            _lastMouseWorld, ActiveCombatBounds, _enemies, _particles, chargeCost: !_sandboxActive);
+        if (input.WasKeyPressed(Keys.Z) && _abilities.TryCast(_abilities.Slots[0], _player, _wallet,
+            _lastMouseWorld, ActiveCombatBounds, _enemies, _particles, chargeCost: !_sandboxActive))
+            PlayAbilityCue(_abilities.Slots[0]);
+        if (input.WasKeyPressed(Keys.X) && _abilities.TryCast(_abilities.Slots[1], _player, _wallet,
+            _lastMouseWorld, ActiveCombatBounds, _enemies, _particles, chargeCost: !_sandboxActive))
+            PlayAbilityCue(_abilities.Slots[1]);
+    }
+
+    /// <summary>Each ability has its own sound when it is actually cast (presentation only).</summary>
+    private void PlayAbilityCue(RunAbility ability)
+    {
+        AudioCue cue = ability switch
+        {
+            RunAbility.SecondWind => AudioCue.AbilityHeal,
+            RunAbility.PiercingShot => AudioCue.AbilityPierce,
+            RunAbility.Retreat => AudioCue.AbilityLeap,
+            RunAbility.Vortex => AudioCue.AbilityVortex,
+            RunAbility.Revenge => AudioCue.AbilityGuard,
+            _ => AudioCue.AbilityMark
+        };
+        _audio.Play(cue, 0.72f);
     }
 
     private void DrawAbilityWorld(SpriteBatch batch, Texture2D pixel)
     {
         if (_phase != GamePhase.Arena) return;
+        bool rendered = _art.HasClip(VisualIds.Player, VisualClips.Aim);
         foreach (AbilityProjectile projectile in _abilities.Projectiles)
         {
-            batch.FillCircle(pixel, projectile.Position, 15, GameBalance.DeathFlame * 0.25f);
-            batch.FillCircle(pixel, projectile.Position, 6, GameBalance.SoulWhite * 0.9f);
+            // The piercing shot flies at body height like the cannon's shots: a soul-fire bolt.
+            Vector2 travel = projectile.Position - projectile.PreviousPosition;
+            float angle = travel.LengthSquared() > 0.01f ? MathF.Atan2(travel.Y, travel.X) : 0f;
+            Vector2 drawn = rendered ? projectile.Position - new Vector2(0f, FigureHeights.Air) : projectile.Position;
+            _art.DrawSoftSpot(batch, drawn, new Vector2(30f), GameBalance.DeathFlame * 0.35f);
+            _art.DrawLoopingEffect(batch, projectile, VisualIds.CannonProjectileFull, drawn, angle, 0.62f, Color.White);
         }
         if (_abilities.VortexRemaining > 0)
         {
-            batch.FillCircle(pixel, _abilities.VortexCenter, 155, GameBalance.DeepViolet * 0.13f);
-            for (int i = 0; i < 12; i++)
+            // The vortex: a slowly turning well of Death Flame drawing motes inward.
+            Vector2 center = _abilities.VortexCenter;
+            float strength = MathHelper.Clamp(_abilities.VortexRemaining / 0.3f, 0f, 1f);
+            _art.DrawSoftSpot(batch, center, new Vector2(155f, 155f), GameBalance.DeepViolet * (0.22f * strength));
+            // Its reach glows softly instead of being outlined; the motes show the pull.
+            Color well = GameBalance.DeathFlame * (0.16f * strength);
+            well.A = 0;
+            _art.DrawSoftSpot(batch, center, new Vector2(150f), well);
+            Color eye = GameBalance.DeathFlameBright * ((0.14f + MathF.Sin(_presentationTime * 5f) * 0.04f) * strength);
+            eye.A = 0;
+            _art.DrawSoftSpot(batch, center, new Vector2(64f), eye);
+            for (int i = 0; i < 18; i++)
             {
-                float angle = i * MathF.Tau / 12 + _presentationTime * 3;
-                float radius = 30 + (i % 4) * 30;
-                Vector2 point = _abilities.VortexCenter + new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * radius;
-                batch.FillCircle(pixel, point, 7, GameBalance.DeathFlameBright * 0.35f);
+                float local = (_presentationTime * 0.8f + i / 18f) % 1f;
+                float radius = MathHelper.Lerp(150f, 18f, local * local);
+                float angle = i * 2.4f + _presentationTime * 3f + local * 4f;
+                Vector2 point = center + new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * radius;
+                float glow = MathF.Sin(local * MathF.PI) * strength;
+                _art.DrawSoftSpot(batch, point, new Vector2(9f), GameBalance.DeathFlame * (0.6f * glow));
+                _art.DrawSoftSpot(batch, point, new Vector2(3.5f), GameBalance.SoulWhite * (0.8f * glow));
             }
+            _art.DrawSoftSpot(batch, center, new Vector2(22f), GameBalance.SoulWhite * (0.35f * strength));
         }
         foreach (var enemy in _enemies)
             if (enemy.IsAlive && enemy.AbilityMarkRemaining > 0)
-                batch.FillCircle(pixel, enemy.Position - Vector2.UnitY * (enemy.Radius + 20), 6, GameBalance.GlutBright);
+            {
+                // A Glut mark burning above the head of a marked enemy.
+                Vector2 mark = enemy.DrawnAsFigure ? enemy.Position - new Vector2(0f, 122f) : enemy.Position - Vector2.UnitY * (enemy.Radius + 20);
+                float pulse = 0.5f + 0.5f * MathF.Sin(_presentationTime * 6f);
+                _art.DrawSoftSpot(batch, mark, new Vector2(16f + pulse * 3f), GameBalance.Glut * 0.45f);
+                UiKit.FillDiamond(batch, pixel, mark, 6, GameBalance.Glut);
+                UiKit.FillDiamond(batch, pixel, mark, 3, GameBalance.GlutBright);
+            }
         if (_player.AbilityEffects.GuardRemaining > 0 || _player.AbilityEffects.RevengeRemaining > 0)
-            batch.FillCircle(pixel, _player.Position, 32, GameBalance.DeathFlameBright * 0.16f);
+        {
+            // Guard and the stored counter: a ward of Death Flame around the body.
+            Vector2 body = rendered ? _player.Position - new Vector2(0f, FigureHeights.Core) : _player.Position;
+            float pulse = 0.5f + 0.5f * MathF.Sin(_presentationTime * 4f);
+            bool guard = _player.AbilityEffects.GuardRemaining > 0;
+            _art.DrawSoftSpot(batch, body, new Vector2(42f), GameBalance.DeathFlameBright * (guard ? 0.18f : 0.1f));
+            // A breathing aura of light around the body, brighter while the guard holds; no ring.
+            Color ward = GameBalance.DeathFlameBright * ((guard ? 0.34f : 0.2f) + pulse * 0.1f);
+            ward.A = 0;
+            _art.DrawSoftSpot(batch, body, new Vector2(50f + pulse * 4f), ward);
+        }
     }
 
     private void DrawAbilityHud(SpriteBatch batch, Texture2D pixel, Viewport viewport)
     {
-        if (_characterMenu.IsOpen || _player.IsDead) return;
+        if (_characterMenu.IsOpen || _pauseMenu.IsOpen || _devMenu.IsOpen || _player.IsDead) return;
         if (_phase != GamePhase.Arena && _phase != GamePhase.Antechamber) return;
         if (_phase == GamePhase.Arena && _loopState == ArenaLoopState.Complete) return;
+        // The cards arrive with the rest of the combat HUD, not over the black of the intro.
+        if (_phase == GamePhase.Arena && !_sandboxActive && !_presentation.ShouldDrawCombatHud(_loopState, _player.IsDead)) return;
         var cards = CurrentAbilityCards();
         for (int slot = 0; slot < 2; slot++)
-            AbilityPresentation.DrawHud(batch, pixel, viewport, cards[(int)_abilities.Slots[slot]]);
-        PixelText.Draw(batch, pixel, "TAB  FÄHIGKEITEN UND CHARAKTER", new Vector2(24, viewport.Height - 57), 1, GameBalance.SoulWhite * 0.55f);
+            AbilityPresentation.DrawHud(batch, pixel, viewport, cards[(int)_abilities.Slots[slot]], _presentationTime);
+        float hintX = DrawKeyHint(batch, pixel, new Vector2(24, viewport.Height - 62), "TAB", "FÄHIGKEITEN UND CHARAKTER", GameBalance.SoulWhite * 0.72f);
         if (CanChooseAbilities)
-            PixelText.Draw(batch, pixel, "C  FAEHIGKEITEN WAEHLEN", new Vector2(380, viewport.Height - 57), 1, GameBalance.DeathFlameBright);
+            DrawKeyHint(batch, pixel, new Vector2(hintX + 28, viewport.Height - 62), "C", "FÄHIGKEITEN WÄHLEN", GameBalance.DeathFlameBright);
         if (_abilities.FeedbackRemaining > 0)
             PixelText.DrawCentered(batch, pixel, _abilities.Feedback, viewport.Width * 0.5f, 85, 1, GameBalance.GlutBright);
         if (_player.AbilityEffects.SetupRemaining > 0 || _player.AbilityEffects.RevengeRemaining > 0)
-            PixelText.DrawCentered(batch, pixel, "NAECHSTER TREFFER VERSTAERKT", viewport.Width * 0.5f, 102, 1, GameBalance.DeathFlameBright);
+            PixelText.DrawCentered(batch, pixel, "NÄCHSTER TREFFER VERSTÄRKT", viewport.Width * 0.5f, 102, 1, GameBalance.DeathFlameBright);
+    }
+
+    /// <summary>A keycap followed by its label; returns the right edge.</summary>
+    private static float DrawKeyHint(SpriteBatch batch, Texture2D pixel, Vector2 position, string key, string label, Color color)
+    {
+        UiKit.Key(batch, pixel, position, key, color, 1f, 1, 17);
+        float labelX = position.X + UiKit.KeyWidth(key, 1) + 8;
+        PixelText.DrawFace(batch, pixel, label, new Vector2(labelX, position.Y + 4f), TextFace.Body, 9.5f, color, 0.5f);
+        return labelX + PixelText.MeasureFace(label, TextFace.Body, 9.5f, 0.5f);
     }
 }

@@ -21,7 +21,8 @@ Der Name ist nur beschreibend und noch kein finaler Eigenname.
 | Story | Wardens suchen und bergen den unvorhersehbar erschienenen neuen Warden; Begegnung mit seinem bereits zum Warden gewordenen Bruder |
 | Frühes Setpiece | möglicher Transport zur Homebase auf einem Death-Flame-Gefährt; Abwehr von Verfolgern mit Soul Cannons |
 | Lore-Aufgabe | natürliche Todeslogik, Hollowing und Existenz der Wardens spielerisch zeigen, bevor sie erklärt werden |
-| Offen | Eigenname, menschliche Herkunft des Landschaftsresiduums, Kartenanzahl, Boss, Fahrzeugdesign und genauer Verlauf der Bergung |
+| Region-Vertrag | [Das unvollendete Ufer](regions/prologue.md) — WORKING CANON seit Freigabe 0 (05.10.2026): Seebahnhof, Abendfähre, Warten |
+| Offen | endgültiger Eigenname, Kartenanzahl, Boss bzw. Begegnung mit der Fahrdienstleiterin beim Wiederbesuch, Fahrzeugdesign und genauer Verlauf der Bergung |
 
 ## 0. Industrial Cathedral — ESTABLISHED SEED
 
@@ -32,7 +33,8 @@ Der Name ist nur beschreibend und noch kein finaler Eigenname.
 | Kern | Monumentalität, tote Maschinen, Übergang als Ritual |
 | Visueller Hook | Gotik + schwere Industrie + violett-weiße Death Flame |
 | Gameplay-Hook | Referenz für Raumtiefe, Kampflesbarkeit und spätere Room Grammar |
-| Offen | Ereignis, zentrale Lost Soul, emotionaler Widerspruch, Release |
+| Region-Vertrag | [Die Gießhalle](regions/industrial-cathedral.md) — WORKING CANON seit Freigabe 0 (05.10.2026): Hüttenwerk, verweigertes Ausblasen, Arena hinter Tür I als Gold-Standard-Raum |
+| Offen | Biom-Zuordnung (#10), Bossform des Ersten Schmelzers, weitere Räume |
 
 ## 1. Poisoned Industrial District — ESTABLISHED SEED
 

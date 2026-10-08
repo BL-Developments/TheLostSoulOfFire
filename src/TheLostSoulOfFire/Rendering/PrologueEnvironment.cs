@@ -2,6 +2,7 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TheLostSoulOfFire.Game;
+using TheLostSoulOfFire.Rendering.Visuals;
 
 namespace TheLostSoulOfFire.Rendering;
 
@@ -23,18 +24,97 @@ public static class PrologueEnvironment
     private static readonly Color IronLight = new(92, 88, 103);
     private static readonly Color Memory = new(93, 82, 112);
 
+    /// <summary>The rendered plate of the sector on screen, or null where the shapes below still stand in.</summary>
+    public static string? PlateOf(PrologueDirector prologue) => prologue.Sector switch
+    {
+        PrologueSector.Emergence => VisualIds.ShoreFloor,
+        PrologueSector.Search => VisualIds.SearchFloor,
+        PrologueSector.Escape => prologue.IsVehicleRide ? VisualIds.DeckFloor : VisualIds.CausewayFloor,
+        PrologueSector.Threshold => VisualIds.ThresholdFloor,
+        _ => null
+    };
+
+    /// <summary>
+    /// The crossing: the sea and the drowned town slide past the skiff (far gables slowly, near
+    /// mast stumps fast) while the deck stays still, so motion reads without moving the floor.
+    /// The skiff also rides the swell: everything outside the deck rises and sinks a few units
+    /// against it, slow and uneven (the deck is where the camera stands).
+    /// </summary>
+    public static void DrawCrossing(SpriteBatch batch, ArtAssets art, float time)
+    {
+        float swell = Swell(time);
+        art.DrawEnvironmentScrolled(batch, VisualIds.DeckSea, swell, time * 110f, 1800f);
+        // The sea plate is exactly the world's height; a second copy closes the strip the swell opens.
+        art.DrawEnvironmentScrolled(batch, VisualIds.DeckSea, swell + (swell > 0f ? -SeaHeight : SeaHeight), time * 110f, 1800f);
+        // The drowned town sinks into the night with distance: the far gables darkest and
+        // coolest, the near masts a little less so.
+        art.DrawEnvironmentScrolled(batch, VisualIds.PassingFar, swell, time * 34f, 1800f, new Color(118, 124, 150));
+        DrawWake(batch, art, time, swell);
+        art.DrawEnvironment(batch, VisualIds.DeckFloor, Vector2.Zero);
+        art.DrawEnvironmentScrolled(batch, VisualIds.PassingNear, 746f + swell, time * 190f, 1800f, new Color(170, 172, 190));
+    }
+
+    /// <summary>
+    /// The skiff cutting through the water: foam churned along the visible (near) side of the hull,
+    /// drifting back at the sea's speed and spreading into a wake behind the stern, and water
+    /// heaped at the bow. The far side is hidden behind the deck in this camera. The hull is
+    /// measured on the deck plate's alpha (world units): stern at x 387, bow tip at (1532, 525),
+    /// near waterline at y 851. Drawn on the sea, under the deck, rising and sinking with the swell.
+    /// </summary>
+    private static void DrawWake(SpriteBatch batch, ArtAssets art, float time, float swell)
+    {
+        const float Stern = 387f, BowX = 1532f, BowY = 525f, Near = 851f, Speed = 110f, Spacing = 17f;
+        const int Patches = 96;
+        Color foam = new(196, 206, 228);
+        for (int k = 0; k < Patches; k++)
+        {
+            // Each patch is born at the bow and drifts back past the stern into the wake; its own
+            // hash keeps size, offset and brightness irregular, so the foam reads as a churned streak.
+            float h1 = Hash(k * 1.7f), h2 = Hash(k * 3.1f + 5f), h3 = Hash(k * 5.3f + 11f);
+            float x = 1480f - ((k * Spacing + h1 * 9f + time * Speed) % (Patches * Spacing));
+            float behind = MathF.Max(0f, Stern - x);
+            float fade = MathHelper.Clamp((x - (Stern - 420f)) / 420f, 0f, 1f) * MathHelper.Clamp((1480f - x) / 80f, 0f, 1f);
+            float flicker = 0.55f + 0.45f * MathF.Sin(time * (2.2f + h3) + k * 2.3f);
+            float y = Near + 4f + h2 * 10f + behind * 0.18f * (0.4f + h3) + swell + MathF.Sin(time * 1.7f + k) * 2f;
+            Vector2 radii = new(16f + h1 * 14f + behind * 0.06f, 4f + h2 * 4f + behind * 0.02f);
+            art.DrawSoftSpot(batch, new Vector2(x, y), radii, foam * (0.26f * fade * flicker));
+        }
+        // The bow wave: the water heaped and thrown aside at the tip, breathing with the swell.
+        float heave = 0.75f + 0.25f * MathF.Sin(time * 2.4f);
+        art.DrawSoftSpot(batch, new Vector2(BowX + 10f, BowY + swell), new Vector2(26f, 40f), foam * (0.28f * heave));
+        art.DrawSoftSpot(batch, new Vector2(BowX - 30f, Near - 40f + swell), new Vector2(40f, 12f), foam * (0.3f * heave));
+    }
+
+    private static float Hash(float seed)
+    {
+        float value = MathF.Sin(seed * 12.9898f) * 43758.5453f;
+        return value - MathF.Floor(value);
+    }
+
+    /// <summary>Height of the sea plate (environment.sea), the world's height.</summary>
+    private const float SeaHeight = 1000f;
+
+    /// <summary>How far the world outside the skiff has risen (negative) or sunk against its deck.</summary>
+    public static float Swell(float time) =>
+        5f * MathF.Sin(time * MathHelper.TwoPi / 5.4f) + 1.5f * MathF.Sin(time * MathHelper.TwoPi / 2.3f + 1.1f);
+
     public static void DrawGround(
         SpriteBatch batch,
         Texture2D pixel,
         PrologueDirector prologue,
         float time,
-        float soulSense)
+        float soulSense,
+        bool painted = false)
     {
         batch.FillRectangle(pixel, PrologueDirector.WorldBounds, Void);
+        if (painted)
+        {
+            return;
+        }
         switch (prologue.Sector)
         {
             case PrologueSector.Emergence:
-                DrawEmergenceGround(batch, pixel, time, soulSense);
+                // Painted shore plate: Visual-ID environment.shore, drawn from the registry.
                 break;
             case PrologueSector.Search:
                 DrawSearchGround(batch, pixel, time);
@@ -53,14 +133,18 @@ public static class PrologueEnvironment
         Texture2D pixel,
         PrologueDirector prologue,
         float time,
-        float soulSense)
+        float soulSense,
+        bool painted = false,
+        ArtAssets? art = null)
     {
+        if (painted && prologue.Sector != PrologueSector.Emergence)
+        {
+            return;
+        }
         switch (prologue.Sector)
         {
             case PrologueSector.Emergence:
-                DrawMemoryPlatform(batch, pixel, soulSense);
-                DrawBrokenRib(batch, pixel, new Vector2(1378f, 236f), 1f);
-                DrawWardenMarker(batch, pixel, new Vector2(1535f, 515f), time, 0.62f);
+                DrawShoreGuides(batch, pixel, time, soulSense, painted, art);
                 break;
             case PrologueSector.Search:
                 DrawSearchTower(batch, pixel);
@@ -85,8 +169,34 @@ public static class PrologueEnvironment
         }
     }
 
-    public static void DrawForeground(SpriteBatch batch, Texture2D pixel, PrologueDirector prologue)
+    /// <summary>
+    /// The waiting still sit on the shore's bench as echoes under Soul Sense: wavering figures of
+    /// light without faces, drawn after the props so they sit on the bench, not behind it.
+    /// </summary>
+    public static void DrawShoreEchoes(SpriteBatch batch, ArtAssets art, PrologueDirector prologue, float time, float sense)
     {
+        if (prologue.Sector != PrologueSector.Emergence || sense <= 0.04f)
+        {
+            return;
+        }
+
+        for (int i = 0; i < 4; i++)
+        {
+            float waver = MathF.Sin(time * 1.3f + i * 1.9f);
+            Vector2 seated = new(740f + i * 34f + waver * 1.5f, 466f - (i % 2) * 3f);
+            Color echo = GameBalance.SoulSenseTrace * (sense * (0.32f + 0.08f * waver));
+            art.DrawSoftSpot(batch, seated - new Vector2(0f, 46f), new Vector2(7f, 8f), echo);
+            art.DrawSoftSpot(batch, seated - new Vector2(0f, 24f), new Vector2(9f, 18f), echo * 0.85f);
+            art.DrawSoftSpot(batch, seated - new Vector2(-6f, 6f), new Vector2(10f, 6f), echo * 0.6f);
+        }
+    }
+
+    public static void DrawForeground(SpriteBatch batch, Texture2D pixel, PrologueDirector prologue, bool painted = false)
+    {
+        if (painted)
+        {
+            return;
+        }
         Color near = new Color(5, 4, 9) * 0.96f;
         Color edge = new Color(33, 30, 42) * 0.82f;
         batch.FillRectangle(pixel, new Rectangle(0, 0, 1800, 30), near);
@@ -95,10 +205,10 @@ public static class PrologueEnvironment
 
         if (prologue.Sector == PrologueSector.Emergence)
         {
-            batch.DrawLine(pixel, new Vector2(0f, 940f), new Vector2(245f, 842f), near, 54f);
-            batch.DrawLine(pixel, new Vector2(1640f, 948f), new Vector2(1800f, 865f), near, 48f);
+            return;
         }
-        else if (prologue.Sector == PrologueSector.Search)
+
+        if (prologue.Sector == PrologueSector.Search)
         {
             batch.DrawLine(pixel, new Vector2(70f, 990f), new Vector2(278f, 902f), near, 46f);
             batch.DrawLine(pixel, new Vector2(1525f, 950f), new Vector2(1775f, 910f), near, 52f);
@@ -110,28 +220,6 @@ public static class PrologueEnvironment
         }
     }
 
-    private static void DrawEmergenceGround(SpriteBatch batch, Texture2D pixel, float time, float sense)
-    {
-        batch.FillRectangle(pixel, new Rectangle(72, 128, 1656, 752), Deep);
-        batch.FillRectangle(pixel, new Rectangle(112, 164, 1576, 674), Floor);
-        batch.FillRectangle(pixel, new Rectangle(112, 164, 1576, 22), Stone);
-        batch.FillRectangle(pixel, new Rectangle(112, 816, 1576, 22), new Color(9, 8, 14));
-
-        DrawFloorSlabs(batch, pixel, new Rectangle(130, 190, 1540, 610), 7, 4,
-            new Color(27, 26, 35), new Color(55, 52, 65));
-
-        // Broad value blocks, not a grid of micro-detail.
-        batch.FillRectangle(pixel, new Rectangle(180, 250, 390, 220), FloorLight * 0.42f);
-        batch.FillRectangle(pixel, new Rectangle(690, 430, 430, 310), FloorLight * 0.36f);
-        batch.FillRectangle(pixel, new Rectangle(1250, 225, 320, 260), FloorLight * 0.3f);
-        DrawBrokenSeam(batch, pixel, new Vector2(420f, 210f), new Vector2(690f, 520f));
-        DrawBrokenSeam(batch, pixel, new Vector2(1090f, 770f), new Vector2(1390f, 540f));
-        DrawRubbleCluster(batch, pixel, new Vector2(210f, 760f), 0.9f);
-        DrawRubbleCluster(batch, pixel, new Vector2(1510f, 250f), 0.72f);
-
-        float flicker = 0.5f + 0.5f * MathF.Sin(time * 1.7f);
-        batch.FillEllipse(pixel, new Vector2(805f, 560f), 112f, 36f, GameBalance.DeepViolet * ((0.05f + flicker * 0.025f) * (1f + sense)));
-    }
 
     private static void DrawSearchGround(SpriteBatch batch, Texture2D pixel, float time)
     {
@@ -205,38 +293,39 @@ public static class PrologueEnvironment
         }
     }
 
-    private static void DrawMemoryPlatform(SpriteBatch batch, Texture2D pixel, float sense)
-    {
-        float physical = 1f - sense * 0.35f;
-        // One human place surviving as clean, legible chunks: station edge,
-        // bench, departure board and a single abandoned case.
-        batch.FillRectangle(pixel, new Rectangle(612, 452, 382, 21), Stone * physical);
-        batch.FillRectangle(pixel, new Rectangle(612, 473, 382, 11), new Color(10, 9, 15) * physical);
-        DrawBench(batch, pixel, new Vector2(760f, 555f), physical);
-        batch.FillRectangle(pixel, new Rectangle(892, 308, 172, 91), new Color(20, 20, 27) * physical);
-        batch.DrawRectangle(pixel, new Rectangle(892, 308, 172, 91), Iron * physical, 6f);
-        batch.FillRectangle(pixel, new Rectangle(912, 330, 132, 12), Memory * (0.28f * physical));
-        batch.FillRectangle(pixel, new Rectangle(912, 354, 88, 8), Memory * (0.2f * physical));
-        DrawHumanLuggage(batch, pixel, new Vector2(860f, 590f));
 
-        if (sense <= 0.04f) return;
-        Color echo = GameBalance.DeathFlameBright * (0.13f * sense);
-        for (int i = 0; i < 4; i++)
+
+    /// <summary>
+    /// What the painted shore cannot show by itself: the Soul Sense trace, the waiting dead on
+    /// the bench (only with Soul Sense) and the Warden mark at the eastern exit.
+    /// </summary>
+    private static void DrawShoreGuides(SpriteBatch batch, Texture2D pixel, float time, float sense, bool painted, ArtAssets? art)
+    {
+        float flicker = 0.5f + 0.5f * MathF.Sin(time * 1.7f);
+        if (art is not null)
         {
-            Vector2 seated = new(704f + i * 55f, 516f - (i % 2) * 4f);
-            batch.FillCircle(pixel, seated - new Vector2(0f, 28f), 8f, echo);
-            batch.DrawLine(pixel, seated - new Vector2(0f, 18f), seated + new Vector2(0f, 16f), echo, 7f);
+            art.DrawSoftSpot(batch, PrologueDirector.SoulTrace + new Vector2(0f, 40f), new Vector2(130f, 44f), GameBalance.DeepViolet * ((0.1f + flicker * 0.05f) * (1f + sense)));
         }
-    }
+        else
+        {
+            batch.FillEllipse(pixel, PrologueDirector.SoulTrace + new Vector2(0f, 40f), 112f, 36f, GameBalance.DeepViolet * ((0.05f + flicker * 0.025f) * (1f + sense)));
+        }
+        if (sense > 0.04f && art is null)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                Vector2 seated = new(740f + i * 34f, 466f - (i % 2) * 3f);
+                Color echo = GameBalance.SoulSenseTrace * (sense * 0.32f);
+                batch.FillCircle(pixel, seated - new Vector2(0f, 46f), 8f, echo);
+                batch.DrawLine(pixel, seated - new Vector2(0f, 36f), seated, echo, 7f);
+            }
+        }
 
-    private static void DrawBench(SpriteBatch batch, Texture2D pixel, Vector2 p, float alpha)
-    {
-        Color body = new Color(62, 49, 48) * alpha;
-        Color edge = new Color(98, 73, 65) * alpha;
-        batch.FillRectangle(pixel, new Rectangle((int)p.X - 96, (int)p.Y - 22, 192, 18), body);
-        batch.DrawLine(pixel, p + new Vector2(-91f, -21f), p + new Vector2(91f, -21f), edge, 3f);
-        batch.DrawLine(pixel, p + new Vector2(-70f, -4f), p + new Vector2(-76f, 24f), Iron, 8f);
-        batch.DrawLine(pixel, p + new Vector2(70f, -4f), p + new Vector2(76f, 24f), Iron, 8f);
+        if (!painted)
+        {
+            // The rendered shore carries the mark as a prop with its flame.
+            DrawWardenMarker(batch, pixel, new Vector2(1535f, 515f), time, 0.62f);
+        }
     }
 
     private static void DrawHumanLuggage(SpriteBatch batch, Texture2D pixel, Vector2 p)

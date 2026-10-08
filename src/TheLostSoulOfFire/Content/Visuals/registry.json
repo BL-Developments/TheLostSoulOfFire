@@ -1,0 +1,1451 @@
+{
+  "version": 1,
+  "visuals": [
+    {
+      "id": "player",
+      "kind": "character",
+      "palette": "world",
+      "worldSize": [100, 100],
+      "origin": [0.5, 0.5],
+      "fallbackClip": "idle",
+      "clips": {
+        "idle": {
+          "path": "Textures/Player/Animations/idle/{dir}",
+          "frameSize": [382, 279],
+          "frames": 24,
+          "fps": 16.0,
+          "loop": true,
+          "normalMap": "Textures/Player/Animations/idle_normal/{dir}",
+          "origin": [0.5, 0.762]
+        },
+        "move": {
+          "path": "Textures/Player/Animations/move/{dir}",
+          "frameSize": [374, 279],
+          "frames": 24,
+          "fps": 24.0,
+          "loop": true,
+          "normalMap": "Textures/Player/Animations/move_normal/{dir}",
+          "progress": "distance",
+          "cycleDistance": 180.0,
+          "origin": [0.5, 0.7513]
+        },
+        "swing1": {
+          "path": "Textures/Player/Animations/swing1/{dir}",
+          "frameSize": [396, 287],
+          "frames": 14,
+          "fps": 24.0,
+          "loop": true,
+          "normalMap": "Textures/Player/Animations/swing1_normal/{dir}",
+          "origin": [0.5, 0.7826]
+        },
+        "swing2": {
+          "path": "Textures/Player/Animations/swing2/{dir}",
+          "frameSize": [398, 356],
+          "frames": 16,
+          "fps": 24.0,
+          "loop": true,
+          "normalMap": "Textures/Player/Animations/swing2_normal/{dir}",
+          "origin": [0.5, 0.7629]
+        },
+        "swing3": {
+          "path": "Textures/Player/Animations/swing3/{dir}",
+          "frameSize": [392, 397],
+          "frames": 26,
+          "fps": 24.0,
+          "loop": true,
+          "normalMap": "Textures/Player/Animations/swing3_normal/{dir}",
+          "origin": [0.5, 0.7496]
+        },
+        "aim": {
+          "path": "Textures/Player/Animations/aim/{dir}",
+          "frameSize": [282, 227],
+          "frames": 9,
+          "fps": 6.0,
+          "loop": true,
+          "normalMap": "Textures/Player/Animations/aim_normal/{dir}",
+          "origin": [0.5, 0.7251]
+        },
+        "cannon_draw": {
+          "path": "Textures/Player/Animations/cannon_draw/{dir}",
+          "frameSize": [382, 290],
+          "frames": 8,
+          "fps": 24.0,
+          "loop": true,
+          "normalMap": "Textures/Player/Animations/cannon_draw_normal/{dir}",
+          "origin": [0.5, 0.7331]
+        },
+        "cannon_fire": {
+          "path": "Textures/Player/Animations/cannon_fire/{dir}",
+          "frameSize": [382, 289],
+          "frames": 16,
+          "fps": 24.0,
+          "loop": true,
+          "normalMap": "Textures/Player/Animations/cannon_fire_normal/{dir}",
+          "origin": [0.5, 0.7356]
+        },
+        "dash": {
+          "path": "Textures/Player/Animations/dash/{dir}",
+          "frameSize": [342, 265],
+          "frames": 8,
+          "fps": 24.0,
+          "loop": true,
+          "normalMap": "Textures/Player/Animations/dash_normal/{dir}",
+          "origin": [0.5, 0.7343]
+        },
+        "hit": {
+          "path": "Textures/Player/Animations/hit/{dir}",
+          "frameSize": [382, 298],
+          "frames": 6,
+          "fps": 24.0,
+          "loop": true,
+          "normalMap": "Textures/Player/Animations/hit_normal/{dir}",
+          "origin": [0.5, 0.7805]
+        },
+        "death": {
+          "path": "Textures/Player/Animations/death/{dir}",
+          "frameSize": [434, 338],
+          "frames": 16,
+          "fps": 12.0,
+          "loop": true,
+          "normalMap": "Textures/Player/Animations/death_normal/{dir}",
+          "origin": [0.5, 0.629]
+        },
+        "swing1_return": {
+          "path": "Textures/Player/Animations/swing1_return/{dir}",
+          "frameSize": [382, 288],
+          "frames": 8,
+          "fps": 24.0,
+          "loop": true,
+          "normalMap": "Textures/Player/Animations/swing1_return_normal/{dir}",
+          "origin": [0.5, 0.7382]
+        },
+        "swing2_return": {
+          "path": "Textures/Player/Animations/swing2_return/{dir}",
+          "frameSize": [382, 317],
+          "frames": 8,
+          "fps": 24.0,
+          "loop": true,
+          "normalMap": "Textures/Player/Animations/swing2_return_normal/{dir}",
+          "origin": [0.5, 0.7937]
+        },
+        "swing3_return": {
+          "path": "Textures/Player/Animations/swing3_return/{dir}",
+          "frameSize": [382, 303],
+          "frames": 10,
+          "fps": 24.0,
+          "loop": true,
+          "normalMap": "Textures/Player/Animations/swing3_return_normal/{dir}",
+          "origin": [0.5, 0.7017]
+        },
+        "retreat": {
+          "path": "Textures/Player/Animations/retreat/{dir}",
+          "frameSize": [382, 313],
+          "frames": 8,
+          "fps": 24.0,
+          "loop": true,
+          "normalMap": "Textures/Player/Animations/retreat_normal/{dir}",
+          "origin": [0.5, 0.7911]
+        },
+        "aim_move": {
+          "path": "Textures/Player/Animations/aim_move/{dir}",
+          "frameSize": [282, 234],
+          "frames": 12,
+          "fps": 12.0,
+          "loop": true,
+          "normalMap": "Textures/Player/Animations/aim_move_normal/{dir}",
+          "progress": "distance",
+          "cycleDistance": 150.0,
+          "origin": [0.5, 0.7162]
+        },
+        "aim_move_2": {
+          "path": "Textures/Player/Animations/aim_move_2/{dir}",
+          "frameSize": [282, 234],
+          "frames": 12,
+          "fps": 12.0,
+          "loop": true,
+          "normalMap": "Textures/Player/Animations/aim_move_2_normal/{dir}",
+          "progress": "distance",
+          "cycleDistance": 150.0,
+          "origin": [0.5, 0.7162]
+        },
+        "aim_move_3": {
+          "path": "Textures/Player/Animations/aim_move_3/{dir}",
+          "frameSize": [282, 234],
+          "frames": 12,
+          "fps": 12.0,
+          "loop": true,
+          "normalMap": "Textures/Player/Animations/aim_move_3_normal/{dir}",
+          "progress": "distance",
+          "cycleDistance": 150.0,
+          "origin": [0.5, 0.7162]
+        },
+        "wake": {
+          "path": "Textures/Player/Animations/wake/{dir}",
+          "frameSize": [412, 331],
+          "frames": 30,
+          "fps": 8.0,
+          "loop": true,
+          "normalMap": "Textures/Player/Animations/wake_normal/{dir}",
+          "origin": [0.5, 0.6423]
+        },
+        "aim_full": {
+          "path": "Textures/Player/Animations/aim_full/{dir}",
+          "frameSize": [282, 227],
+          "frames": 12,
+          "fps": 24.0,
+          "loop": true,
+          "normalMap": "Textures/Player/Animations/aim_full_normal/{dir}",
+          "origin": [0.5, 0.7251]
+        }
+      },
+      "pixelsPerUnit": 1.5
+    },
+    {
+      "id": "enemy.hollow",
+      "kind": "character",
+      "palette": "world",
+      "worldSize": [112, 112],
+      "origin": [0.5, 0.5],
+      "fallbackClip": "idle",
+      "clips": {
+        "idle": {
+          "path": "Textures/Enemies/Hollow/Animations/idle/{dir}",
+          "frameSize": [108, 237],
+          "frames": 24,
+          "fps": 12.0,
+          "loop": true,
+          "normalMap": "Textures/Enemies/Hollow/Animations/idle_normal/{dir}",
+          "origin": [0.5, 0.8945]
+        },
+        "move": {
+          "path": "Textures/Enemies/Hollow/Animations/move/{dir}",
+          "frameSize": [162, 250],
+          "frames": 24,
+          "fps": 24.0,
+          "loop": true,
+          "normalMap": "Textures/Enemies/Hollow/Animations/move_normal/{dir}",
+          "progress": "distance",
+          "cycleDistance": 92.0,
+          "origin": [0.5, 0.86]
+        },
+        "swipe": {
+          "path": "Textures/Enemies/Hollow/Animations/swipe/{dir}",
+          "frameSize": [290, 248],
+          "frames": 20,
+          "fps": 24.0,
+          "loop": false,
+          "normalMap": "Textures/Enemies/Hollow/Animations/swipe_normal/{dir}",
+          "origin": [0.5, 0.8589]
+        },
+        "hit": {
+          "path": "Textures/Enemies/Hollow/Animations/hit/{dir}",
+          "frameSize": [144, 241],
+          "frames": 6,
+          "fps": 24.0,
+          "loop": false,
+          "normalMap": "Textures/Enemies/Hollow/Animations/hit_normal/{dir}",
+          "origin": [0.5, 0.8797]
+        },
+        "recover": {
+          "path": "Textures/Enemies/Hollow/Animations/recover/{dir}",
+          "frameSize": [292, 249],
+          "frames": 10,
+          "fps": 24.0,
+          "loop": false,
+          "normalMap": "Textures/Enemies/Hollow/Animations/recover_normal/{dir}",
+          "origin": [0.5, 0.8554]
+        },
+        "stagger": {
+          "path": "Textures/Enemies/Hollow/Animations/stagger/{dir}",
+          "frameSize": [204, 234],
+          "frames": 16,
+          "fps": 14.0,
+          "loop": true,
+          "normalMap": "Textures/Enemies/Hollow/Animations/stagger_normal/{dir}",
+          "origin": [0.5, 0.8932]
+        },
+        "death": {
+          "path": "Textures/Enemies/Hollow/Animations/death/{dir}",
+          "frameSize": [226, 275],
+          "frames": 9,
+          "fps": 12.0,
+          "loop": false,
+          "normalMap": "Textures/Enemies/Hollow/Animations/death_normal/{dir}",
+          "origin": [0.5, 0.7673]
+        }
+      },
+      "dissolve": {
+        "duration": 0.9
+      },
+      "pixelsPerUnit": 1.5
+    },
+    {
+      "id": "enemy.burning",
+      "kind": "character",
+      "palette": "world",
+      "worldSize": [104, 104],
+      "origin": [0.5, 0.5],
+      "fallbackClip": "idle",
+      "clips": {
+        "idle": {
+          "path": "Textures/Enemies/Burning/Rendered/idle/{dir}",
+          "frameSize": [112, 180],
+          "frames": 16,
+          "fps": 20.0,
+          "loop": true,
+          "normalMap": "Textures/Enemies/Burning/Rendered/idle_normal/{dir}",
+          "origin": [0.5, 0.8611]
+        },
+        "move": {
+          "path": "Textures/Enemies/Burning/Rendered/move/{dir}",
+          "frameSize": [138, 175],
+          "frames": 20,
+          "fps": 20.0,
+          "loop": true,
+          "normalMap": "Textures/Enemies/Burning/Rendered/move_normal/{dir}",
+          "progress": "distance",
+          "cycleDistance": 90.0,
+          "origin": [0.5, 0.8457]
+        },
+        "charge": {
+          "path": "Textures/Enemies/Burning/Rendered/charge/{dir}",
+          "frameSize": [202, 186],
+          "frames": 10,
+          "fps": 30.0,
+          "loop": true,
+          "normalMap": "Textures/Enemies/Burning/Rendered/charge_normal/{dir}",
+          "origin": [0.5, 0.871]
+        },
+        "telegraph": {
+          "path": "Textures/Enemies/Burning/Rendered/telegraph/{dir}",
+          "frameSize": [176, 194],
+          "frames": 14,
+          "fps": 24.0,
+          "loop": false,
+          "normalMap": "Textures/Enemies/Burning/Rendered/telegraph_normal/{dir}",
+          "origin": [0.5, 0.8918]
+        },
+        "recover": {
+          "path": "Textures/Enemies/Burning/Rendered/recover/{dir}",
+          "frameSize": [148, 188],
+          "frames": 12,
+          "fps": 24.0,
+          "loop": false,
+          "normalMap": "Textures/Enemies/Burning/Rendered/recover_normal/{dir}",
+          "origin": [0.5, 0.8617]
+        },
+        "hit": {
+          "path": "Textures/Enemies/Burning/Rendered/hit/{dir}",
+          "frameSize": [136, 196],
+          "frames": 6,
+          "fps": 24.0,
+          "loop": false,
+          "normalMap": "Textures/Enemies/Burning/Rendered/hit_normal/{dir}",
+          "origin": [0.5, 0.8776]
+        },
+        "death": {
+          "path": "Textures/Enemies/Burning/Rendered/death/{dir}",
+          "frameSize": [122, 179],
+          "frames": 8,
+          "fps": 12.0,
+          "loop": false,
+          "normalMap": "Textures/Enemies/Burning/Rendered/death_normal/{dir}",
+          "origin": [0.5, 0.8324]
+        }
+      },
+      "pixelsPerUnit": 1.5
+    },
+    {
+      "id": "enemy.devourer",
+      "kind": "character",
+      "palette": "world",
+      "worldSize": [174, 174],
+      "origin": [0.5, 0.5],
+      "fallbackClip": "idle",
+      "clips": {
+        "idle": {
+          "path": "Textures/Enemies/Devourer/Rendered/idle/{dir}",
+          "frameSize": [190, 236],
+          "frames": 20,
+          "fps": 16.0,
+          "loop": true,
+          "normalMap": "Textures/Enemies/Devourer/Rendered/idle_normal/{dir}",
+          "origin": [0.5, 0.8737]
+        },
+        "move": {
+          "path": "Textures/Enemies/Devourer/Rendered/move/{dir}",
+          "frameSize": [193, 253],
+          "frames": 20,
+          "fps": 16.0,
+          "loop": true,
+          "normalMap": "Textures/Enemies/Devourer/Rendered/move_normal/{dir}",
+          "progress": "distance",
+          "cycleDistance": 110.0,
+          "origin": [0.5026, 0.8229]
+        },
+        "slam": {
+          "path": "Textures/Enemies/Devourer/Rendered/slam/{dir}",
+          "frameSize": [266, 294],
+          "frames": 24,
+          "fps": 24.0,
+          "loop": false,
+          "normalMap": "Textures/Enemies/Devourer/Rendered/slam_normal/{dir}",
+          "origin": [0.5, 0.8878]
+        },
+        "devour": {
+          "path": "Textures/Enemies/Devourer/Rendered/devour/{dir}",
+          "frameSize": [210, 245],
+          "frames": 10,
+          "fps": 9.0,
+          "loop": false,
+          "normalMap": "Textures/Enemies/Devourer/Rendered/devour_normal/{dir}",
+          "origin": [0.5, 0.8294]
+        },
+        "recover": {
+          "path": "Textures/Enemies/Devourer/Rendered/recover/{dir}",
+          "frameSize": [256, 237],
+          "frames": 12,
+          "fps": 24.0,
+          "loop": false,
+          "normalMap": "Textures/Enemies/Devourer/Rendered/recover_normal/{dir}",
+          "origin": [0.5, 0.8608]
+        },
+        "stagger": {
+          "path": "Textures/Enemies/Devourer/Rendered/stagger/{dir}",
+          "frameSize": [266, 266],
+          "frames": 18,
+          "fps": 13.0,
+          "loop": true,
+          "normalMap": "Textures/Enemies/Devourer/Rendered/stagger_normal/{dir}",
+          "origin": [0.5, 0.8835]
+        },
+        "hit": {
+          "path": "Textures/Enemies/Devourer/Rendered/hit/{dir}",
+          "frameSize": [182, 236],
+          "frames": 6,
+          "fps": 24.0,
+          "loop": false,
+          "normalMap": "Textures/Enemies/Devourer/Rendered/hit_normal/{dir}",
+          "origin": [0.5, 0.8729]
+        },
+        "death": {
+          "path": "Textures/Enemies/Devourer/Rendered/death/{dir}",
+          "frameSize": [318, 346],
+          "frames": 14,
+          "fps": 23.0,
+          "loop": true,
+          "normalMap": "Textures/Enemies/Devourer/Rendered/death_normal/{dir}",
+          "origin": [0.5, 0.7746]
+        }
+      },
+      "pixelsPerUnit": 1.5
+    },
+    {
+      "id": "environment.arena",
+      "kind": "environment",
+      "palette": "world",
+      "worldSize": [1800, 910],
+      "origin": [0.0, 0.0],
+      "clips": {
+        "default": {
+          "path": "Textures/Environment/Arena/floor_{tile}",
+          "frameSize": [1350, 1365],
+          "frames": 1,
+          "fps": 1,
+          "loop": true,
+          "tiles": [2, 1]
+        }
+      },
+      "layer": "ground"
+    },
+    {
+      "id": "weapon.scythe",
+      "kind": "sprite",
+      "palette": "world",
+      "worldSize": [256, 256],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Weapons/scythe_physical_256",
+          "frameSize": [256, 256],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "weapon.soul-cannon",
+      "kind": "sprite",
+      "palette": "world",
+      "worldSize": [256, 256],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Weapons/soul_cannon_256",
+          "frameSize": [256, 256],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "pickup.lost-soul",
+      "kind": "sprite",
+      "palette": "death-flame",
+      "worldSize": [72, 72],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Pickups/lost_soul",
+          "frameSize": [128, 128],
+          "frames": 12,
+          "fps": 12,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "ending.life-flame",
+      "kind": "sprite",
+      "palette": "life-flame",
+      "worldSize": [128, 128],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Ending/life_flame",
+          "frameSize": [128, 128],
+          "frames": 16,
+          "fps": 16,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "fx.scythe-slash-01",
+      "kind": "effect",
+      "palette": "death-flame",
+      "worldSize": [256, 256],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Effects/fx_scythe_slash_01",
+          "frameSize": [256, 256],
+          "frames": 9,
+          "fps": 24,
+          "loop": false
+        }
+      }
+    },
+    {
+      "id": "fx.scythe-slash-02",
+      "kind": "effect",
+      "palette": "death-flame",
+      "worldSize": [256, 256],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Effects/fx_scythe_slash_02",
+          "frameSize": [256, 256],
+          "frames": 9,
+          "fps": 24,
+          "loop": false
+        }
+      }
+    },
+    {
+      "id": "fx.scythe-cleave",
+      "kind": "effect",
+      "palette": "death-flame",
+      "worldSize": [256, 256],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Effects/fx_scythe_cleave",
+          "frameSize": [256, 256],
+          "frames": 9,
+          "fps": 22,
+          "loop": false
+        }
+      }
+    },
+    {
+      "id": "fx.core-hit",
+      "kind": "effect",
+      "palette": "death-flame",
+      "worldSize": [128, 128],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Effects/fx_core_hit",
+          "frameSize": [128, 128],
+          "frames": 9,
+          "fps": 30,
+          "loop": false
+        }
+      }
+    },
+    {
+      "id": "fx.dash-ignition",
+      "kind": "effect",
+      "palette": "death-flame",
+      "worldSize": [128, 128],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Effects/fx_dash_ignition",
+          "frameSize": [128, 128],
+          "frames": 9,
+          "fps": 30,
+          "loop": false
+        }
+      }
+    },
+    {
+      "id": "fx.cannon-charge-loop",
+      "kind": "effect",
+      "palette": "death-flame",
+      "worldSize": [128, 128],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Effects/fx_cannon_charge_loop",
+          "frameSize": [128, 128],
+          "frames": 9,
+          "fps": 12,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "fx.cannon-muzzle-full",
+      "kind": "effect",
+      "palette": "death-flame",
+      "worldSize": [256, 256],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Effects/fx_cannon_muzzle_full",
+          "frameSize": [256, 256],
+          "frames": 9,
+          "fps": 24,
+          "loop": false
+        }
+      }
+    },
+    {
+      "id": "fx.cannon-projectile-full",
+      "kind": "effect",
+      "palette": "death-flame",
+      "worldSize": [128, 128],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Effects/fx_cannon_projectile_full",
+          "frameSize": [128, 128],
+          "frames": 9,
+          "fps": 18,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "fx.burning-detonation",
+      "kind": "effect",
+      "palette": "death-flame",
+      "worldSize": [256, 256],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Effects/fx_burning_detonation",
+          "frameSize": [256, 256],
+          "frames": 16,
+          "fps": 24,
+          "loop": false
+        }
+      }
+    },
+    {
+      "id": "fx.soul-release",
+      "kind": "effect",
+      "palette": "death-flame",
+      "worldSize": [128, 128],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Effects/fx_soul_release",
+          "frameSize": [128, 128],
+          "frames": 16,
+          "fps": 12,
+          "loop": false
+        }
+      }
+    },
+    {
+      "id": "fx.resonance-activate",
+      "kind": "effect",
+      "palette": "death-flame",
+      "worldSize": [256, 256],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Effects/fx_resonance_activate",
+          "frameSize": [256, 256],
+          "frames": 16,
+          "fps": 24,
+          "loop": false
+        }
+      }
+    },
+    {
+      "id": "fx.death-flame-loop",
+      "kind": "effect",
+      "palette": "death-flame",
+      "worldSize": [128, 128],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "default": {
+          "path": "Textures/Effects/fx_death_flame_loop",
+          "frameSize": [128, 128],
+          "frames": 16,
+          "fps": 16,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "grade.neutral",
+      "kind": "grade",
+      "palette": "world",
+      "worldSize": [1024, 32],
+      "origin": [0, 0],
+      "clips": {
+        "default": {
+          "path": "Textures/Grading/lut_neutral",
+          "frameSize": [1024, 32],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "grade.soul-sense",
+      "kind": "grade",
+      "palette": "world",
+      "worldSize": [1024, 32],
+      "origin": [0, 0],
+      "clips": {
+        "default": {
+          "path": "Textures/Grading/lut_soul_sense",
+          "frameSize": [1024, 32],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "test.lit-figure",
+      "kind": "sprite",
+      "palette": "world",
+      "worldSize": [112, 112],
+      "origin": [0.5, 0.5],
+      "clips": {
+        "flat": {
+          "path": "Textures/Test/lit_figure",
+          "frameSize": [128, 128],
+          "frames": 1,
+          "fps": 1,
+          "loop": true,
+          "normalMap": "Textures/Test/lit_figure_normal_flat"
+        },
+        "tilted": {
+          "path": "Textures/Test/lit_figure",
+          "frameSize": [128, 128],
+          "frames": 1,
+          "fps": 1,
+          "loop": true,
+          "normalMap": "Textures/Test/lit_figure_normal_tilted"
+        }
+      }
+    },
+    {
+      "id": "test.blender-figure",
+      "kind": "character",
+      "palette": "world",
+      "worldSize": [112, 112],
+      "origin": [0.5, 0.8352],
+      "fallbackClip": "idle",
+      "clips": {
+        "idle": {
+          "path": "Textures/Test/BlenderFigure/Animations/idle/{dir}",
+          "frameSize": [104, 160],
+          "frames": 8,
+          "fps": 8.0,
+          "loop": true,
+          "normalMap": "Textures/Test/BlenderFigure/Animations/idle_normal/{dir}"
+        }
+      }
+    },
+    {
+      "id": "environment.arena-wall",
+      "kind": "environment",
+      "palette": "world",
+      "worldSize": [1800, 454],
+      "origin": [0.0, 1.0],
+      "layer": "background",
+      "clips": {
+        "default": {
+          "path": "Textures/Environment/Arena/north_wall_{tile}",
+          "frameSize": [1350, 681],
+          "frames": 1,
+          "fps": 1,
+          "loop": true,
+          "tiles": [2, 1]
+        }
+      }
+    },
+    {
+      "id": "prop.arena-pillar",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [90.0, 348.0],
+      "origin": [0.5, 0.9559],
+      "layer": "high-prop",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Arena/column",
+          "frameSize": [135, 522],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "prop.arena-lockers",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [174.0, 154.0],
+      "origin": [0.5, 0.9264],
+      "layer": "high-prop",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Arena/lockers",
+          "frameSize": [261, 231],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "prop.arena-workbench",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [107.3, 98.0],
+      "origin": [0.5, 0.8639],
+      "layer": "high-prop",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Arena/workbench",
+          "frameSize": [161, 147],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "prop.arena-toolrack",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [162.7, 152.7],
+      "origin": [0.5, 0.9345],
+      "layer": "high-prop",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Arena/toolrack",
+          "frameSize": [244, 229],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "prop.arena-slag",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [94.0, 66.0],
+      "origin": [0.5, 0.9192],
+      "layer": "low-prop",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Arena/slag",
+          "frameSize": [141, 99],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "prop.arena-chains",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [64.0, 50.7],
+      "origin": [0.5, 0.9211],
+      "layer": "low-prop",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Arena/chains",
+          "frameSize": [96, 76],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "prop.arena-gate",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [306.0, 164.7],
+      "origin": [0.5, 0.9271],
+      "layer": "occluder",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Arena/gate",
+          "frameSize": [459, 247],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "grade.shore",
+      "kind": "grade",
+      "palette": "world",
+      "worldSize": [1024, 32],
+      "origin": [0, 0],
+      "clips": {
+        "default": {
+          "path": "Textures/Grading/lut_shore",
+          "frameSize": [1024, 32],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "prop.shore-bench",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [130.67, 77.33],
+      "origin": [0.5, 0.819],
+      "layer": "high-prop",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Shore/bench",
+          "frameSize": [196, 116],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "prop.shore-suitcase",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [53.33, 50.0],
+      "origin": [0.5, 0.7333],
+      "layer": "high-prop",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Shore/suitcase",
+          "frameSize": [80, 75],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "prop.shore-board",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [226.67, 172.0],
+      "origin": [0.4088, 0.938],
+      "layer": "occluder",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Shore/board",
+          "frameSize": [340, 258],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "prop.shore-canopy-post",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [36.0, 256.67],
+      "origin": [0.5, 0.9506],
+      "layer": "high-prop",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Shore/canopypost",
+          "frameSize": [54, 385],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "prop.shore-lamp",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [38.67, 198.67],
+      "origin": [0.5, 0.9413],
+      "layer": "high-prop",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Shore/lamp",
+          "frameSize": [58, 298],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "prop.shore-bollard",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [40.0, 69.33],
+      "origin": [0.5, 0.8269],
+      "layer": "high-prop",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Shore/bollard",
+          "frameSize": [60, 104],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "environment.shore",
+      "kind": "environment",
+      "palette": "world",
+      "worldSize": [1800, 1000],
+      "origin": [0.0, 0.0],
+      "layer": "ground",
+      "clips": {
+        "default": {
+          "path": "Textures/Environment/Shore/plate_{tile}",
+          "frameSize": [1350, 1500],
+          "frames": 1,
+          "fps": 1,
+          "loop": true,
+          "tiles": [2, 1]
+        }
+      }
+    },
+    {
+      "id": "environment.hub",
+      "kind": "environment",
+      "palette": "world",
+      "worldSize": [1500, 900],
+      "origin": [0.0, 0.0],
+      "layer": "ground",
+      "clips": {
+        "default": {
+          "path": "Textures/Environment/Hub/plate_{tile}",
+          "frameSize": [1125, 1350],
+          "frames": 1,
+          "fps": 1,
+          "loop": true,
+          "tiles": [2, 1]
+        }
+      }
+    },
+    {
+      "id": "prop.hub-brazier",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [59.33, 106.0],
+      "origin": [0.5056, 0.8679],
+      "layer": "high-prop",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Hub/brazier",
+          "frameSize": [89, 159],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "environment.hub-leaves",
+      "kind": "environment",
+      "palette": "world",
+      "worldSize": [130.0, 215.33],
+      "origin": [0.5026, 0.9845],
+      "layer": "ground",
+      "clips": {
+        "default": {
+          "path": "Textures/Environment/Hub/leaves",
+          "frameSize": [195, 323],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "environment.hub-leaves-final",
+      "kind": "environment",
+      "palette": "world",
+      "worldSize": [229.33, 305.33],
+      "origin": [0.5, 0.9891],
+      "layer": "ground",
+      "clips": {
+        "default": {
+          "path": "Textures/Environment/Hub/leaves_final",
+          "frameSize": [344, 458],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "environment.hub-seal",
+      "kind": "environment",
+      "palette": "world",
+      "worldSize": [165.33, 138.0],
+      "origin": [0.5, 0.9758],
+      "layer": "ground",
+      "clips": {
+        "default": {
+          "path": "Textures/Environment/Hub/seal",
+          "frameSize": [248, 207],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "environment.hub-seal-final",
+      "kind": "environment",
+      "palette": "world",
+      "worldSize": [264.0, 201.33],
+      "origin": [0.5, 0.9834],
+      "layer": "ground",
+      "clips": {
+        "default": {
+          "path": "Textures/Environment/Hub/seal_final",
+          "frameSize": [396, 302],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "environment.search",
+      "kind": "environment",
+      "palette": "world",
+      "worldSize": [1800, 1000],
+      "origin": [0.0, 0.0],
+      "layer": "ground",
+      "clips": {
+        "default": {
+          "path": "Textures/Environment/Search/plate_{tile}",
+          "frameSize": [1350, 1500],
+          "frames": 1,
+          "fps": 1,
+          "loop": true,
+          "tiles": [2, 1]
+        }
+      }
+    },
+    {
+      "id": "prop.search-luggage",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [118.67, 85.33],
+      "origin": [0.514, 0.7539],
+      "layer": "high-prop",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Search/luggage",
+          "frameSize": [178, 128],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "prop.warden-marker",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [44.67, 112.67],
+      "origin": [0.4925, 0.8639],
+      "layer": "high-prop",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Warden/marker",
+          "frameSize": [67, 169],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "prop.search-mast",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [118.67, 538.67],
+      "origin": [0.5, 0.9356],
+      "layer": "occluder",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Search/mast",
+          "frameSize": [178, 808],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "environment.causeway",
+      "kind": "environment",
+      "palette": "world",
+      "worldSize": [1800, 1000],
+      "origin": [0.0, 0.0],
+      "layer": "ground",
+      "clips": {
+        "default": {
+          "path": "Textures/Environment/Causeway/plate_{tile}",
+          "frameSize": [1350, 1500],
+          "frames": 1,
+          "fps": 1,
+          "loop": true,
+          "tiles": [2, 1]
+        }
+      }
+    },
+    {
+      "id": "environment.deck",
+      "kind": "environment",
+      "palette": "world",
+      "worldSize": [1800, 1000],
+      "origin": [0.0, 0.0],
+      "layer": "ground",
+      "clips": {
+        "default": {
+          "path": "Textures/Environment/Deck/plate_{tile}",
+          "frameSize": [1350, 1500],
+          "frames": 1,
+          "fps": 1,
+          "loop": true,
+          "tiles": [2, 1]
+        }
+      }
+    },
+    {
+      "id": "environment.sea",
+      "kind": "environment",
+      "palette": "world",
+      "worldSize": [1200, 1000],
+      "origin": [0.0, 0.0],
+      "layer": "ground",
+      "clips": {
+        "default": {
+          "path": "Textures/Environment/Deck/sea",
+          "frameSize": [1800, 1500],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "environment.passing-far",
+      "kind": "environment",
+      "palette": "world",
+      "worldSize": [1200, 306],
+      "origin": [0.0, 0.0],
+      "layer": "background",
+      "clips": {
+        "default": {
+          "path": "Textures/Environment/Deck/passing_far",
+          "frameSize": [1800, 459],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "environment.passing-near",
+      "kind": "environment",
+      "palette": "world",
+      "worldSize": [1200, 254],
+      "origin": [0.0, 0.0],
+      "layer": "ground",
+      "clips": {
+        "default": {
+          "path": "Textures/Environment/Deck/passing_near",
+          "frameSize": [1800, 381],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "environment.threshold",
+      "kind": "environment",
+      "palette": "world",
+      "worldSize": [1800, 1000],
+      "origin": [0.0, 0.0],
+      "layer": "ground",
+      "clips": {
+        "default": {
+          "path": "Textures/Environment/Threshold/plate_{tile}",
+          "frameSize": [1350, 1500],
+          "frames": 1,
+          "fps": 1,
+          "loop": true,
+          "tiles": [2, 1]
+        }
+      }
+    },
+    {
+      "id": "prop.deck-rail",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [993.33, 65.33],
+      "origin": [0.5, 0.8929],
+      "layer": "foreground",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Deck/rail",
+          "frameSize": [1490, 98],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "prop.threshold-gate",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [292.0, 707.33],
+      "origin": [0.5, 0.9793],
+      "layer": "high-prop",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Threshold/gate",
+          "frameSize": [438, 1061],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "environment.title",
+      "kind": "environment",
+      "palette": "world",
+      "worldSize": [1280, 720],
+      "origin": [0.0, 0.0],
+      "layer": "background",
+      "clips": {
+        "default": {
+          "path": "Textures/Title/backdrop",
+          "frameSize": [1920, 1080],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "prop.arena-chest",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [61.33, 78.67],
+      "origin": [0.5, 0.8305],
+      "layer": "low-prop",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Arena/chest_closed",
+          "frameSize": [92, 118],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        },
+        "open": {
+          "path": "Textures/Props/Arena/chest",
+          "frameSize": [92, 118],
+          "frames": 10,
+          "fps": 20,
+          "loop": false
+        }
+      }
+    },
+    {
+      "id": "prop.training-dummy",
+      "kind": "prop",
+      "palette": "world",
+      "worldSize": [78.67, 130.67],
+      "origin": [0.5, 0.8673],
+      "layer": "high-prop",
+      "clips": {
+        "default": {
+          "path": "Textures/Props/Sandbox/dummy",
+          "frameSize": [118, 196],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "grade.arena",
+      "kind": "grade",
+      "palette": "world",
+      "worldSize": [1024, 32],
+      "origin": [0, 0],
+      "clips": {
+        "default": {
+          "path": "Textures/Grading/lut_arena",
+          "frameSize": [1024, 32],
+          "frames": 1,
+          "fps": 1,
+          "loop": true
+        }
+      }
+    }
+  ]
+}

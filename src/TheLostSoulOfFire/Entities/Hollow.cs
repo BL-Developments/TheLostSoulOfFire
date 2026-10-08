@@ -6,6 +6,7 @@ using TheLostSoulOfFire.Combat;
 using TheLostSoulOfFire.Effects;
 using TheLostSoulOfFire.Game;
 using TheLostSoulOfFire.Rendering;
+using TheLostSoulOfFire.Rendering.Visuals;
 
 namespace TheLostSoulOfFire.Entities;
 
@@ -36,7 +37,47 @@ public sealed class Hollow : Enemy
 
     public override string StateLabel => State.ToString().ToUpperInvariant();
     public Vector2 FacingDirection => _facing;
+
+    /// <summary>How far the swipe's wind-up has run (0 to 1), for the presentation.</summary>
+    public float SwipeWindup => State == HollowState.Telegraph ? 1f - _stateTimer / GameBalance.HollowSwipeTelegraph : 0f;
+    public override string VisualId => VisualIds.Hollow;
+    /// <summary>
+    /// The swipe clip has thirteen announce frames (notice, coil, trembling hold) and seven
+    /// strike frames (step in, grab across); the death clip ends at a quarter of the dying time
+    /// so the dissolve takes the collapsed pose.
+    /// </summary>
+    private const int SwipeFrames = 20;
+    private const int SwipeTelegraphFrames = 13;
+    private const float DeathClipShare = 0.75f;
+
+    public override string? VisualClip => State switch
+    {
+        HollowState.Dying when DeathProgress < DeathClipShare => VisualClips.Death,
+        HollowState.Dying or HollowState.Dead => null,
+        HollowState.Telegraph or HollowState.Swipe => VisualClips.Swipe,
+        HollowState.Staggered => VisualClips.Stagger,
+        HollowState.Recovery => VisualClips.Recover,
+        _ when HitFlashRemaining > 0f => VisualClips.Hit,
+        HollowState.Approach => VisualClips.Move,
+        _ => VisualClips.Idle
+    };
+
+    public override float? VisualProgress => State switch
+    {
+        HollowState.Dying => DeathProgress / DeathClipShare,
+        HollowState.Telegraph => (1f - _stateTimer / GameBalance.HollowSwipeTelegraph) * (SwipeTelegraphFrames - 1) / (SwipeFrames - 1),
+        HollowState.Swipe => (SwipeTelegraphFrames + (1f - _stateTimer / GameBalance.HollowSwipeDuration) * (SwipeFrames - SwipeTelegraphFrames - 1)) / (SwipeFrames - 1),
+        HollowState.Staggered => 1f - _stateTimer / GameBalance.HollowFullCannonStagger,
+        HollowState.Recovery => 1f - _stateTimer / GameBalance.HollowRecoveryDuration,
+        _ when HitFlashRemaining > 0f => HitFlashProgress,
+        _ => null
+    };
+
+    private float DeathProgress => 1f - _deathTimer / GameBalance.HollowDeathDuration;
+    public override Vector2 VisualFacing => _facing;
+    public override float TelegraphRadius => State is HollowState.Telegraph or HollowState.Swipe ? GameBalance.HollowSwipeRange : 0f;
     public Vector2 CorePosition => Position + new Vector2(0f, -5f);
+    public override float VisualScale => StatureOf(_movementSeed);
 
     public Hollow(Vector2 position, int movementSeed)
         : base(position, GameBalance.HollowMaxHealth, GameBalance.HollowRadius)
@@ -153,7 +194,11 @@ public sealed class Hollow : Enemy
 
         if (State == HollowState.Dying)
         {
-            DrawDying(batch, pixel);
+            // Sprite art plays its own death clip and dissolve.
+            if (!useSpriteArt)
+            {
+                DrawDying(batch, pixel);
+            }
             return;
         }
 
@@ -181,14 +226,20 @@ public sealed class Hollow : Enemy
             batch.DrawLine(pixel, mask - right * 5f, mask + right * 5f, new Color(130, 124, 128), 1.5f);
         }
 
-        if (State == HollowState.Telegraph)
+        if (GroundImpacts.Loaded && State is HollowState.Telegraph or HollowState.Swipe)
+        {
+            // With the ground textures the reach is the shadow of its grasping hand (Rendering/GroundImpacts).
+        }
+        else if (State == HollowState.Telegraph)
         {
             float radius = 48f + telegraph * 20f;
-            batch.DrawArc(pixel, Position, radius, MathF.Atan2(_facing.Y, _facing.X) - 0.8f, 1.6f, GameBalance.DeathFlame * (0.28f + telegraph * 0.5f), 4f, 18);
+            WorldMarks.Arc(batch, pixel, Position, radius, MathF.Atan2(_facing.Y, _facing.X), 1.6f, GameBalance.DeathFlame * (0.28f + telegraph * 0.5f));
         }
         else if (State == HollowState.Swipe)
         {
-            batch.DrawArc(pixel, Position, GameBalance.HollowSwipeRange, MathF.Atan2(_facing.Y, _facing.X) - 0.75f, 1.5f, GameBalance.SoulWhite * 0.72f, 9f, 20);
+            float facing = MathF.Atan2(_facing.Y, _facing.X);
+            WorldMarks.Arc(batch, pixel, Position, GameBalance.HollowSwipeRange, facing, 1.5f, GameBalance.DeathFlame * 0.7f, 9f);
+            WorldMarks.Arc(batch, pixel, Position, GameBalance.HollowSwipeRange, facing, 1.5f, GameBalance.SoulWhite * 0.72f, 9f);
         }
 
         if (soulSenseActive)

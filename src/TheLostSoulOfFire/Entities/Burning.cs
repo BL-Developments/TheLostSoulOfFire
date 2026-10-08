@@ -6,6 +6,7 @@ using TheLostSoulOfFire.Combat;
 using TheLostSoulOfFire.Effects;
 using TheLostSoulOfFire.Game;
 using TheLostSoulOfFire.Rendering;
+using TheLostSoulOfFire.Rendering.Visuals;
 
 namespace TheLostSoulOfFire.Entities;
 
@@ -40,6 +41,51 @@ public sealed class Burning : Enemy
     public bool IsCharging => State == BurningState.Charge;
     public bool IsAggressionCommitted => State is BurningState.Telegraph or BurningState.Charge;
     public Vector2 FacingDirection => _facing;
+    public override float VisualScale => StatureOf(_movementSeed + 97);
+
+    /// <summary>Where the rush will go, and how far its wind-up has run (0 to 1), for the presentation.</summary>
+    public Vector2 ChargeDirection => _chargeDirection;
+    public float ChargeWindup => State == BurningState.Telegraph ? 1f - _stateTimer / GameBalance.BurningChargeTelegraph : 0f;
+    public override string VisualId => VisualIds.Burning;
+    /// <summary>The death clip ends at three quarters of the dying time; the dissolve takes the rest.</summary>
+    private const float DeathClipShare = 0.75f;
+
+    public override string? VisualClip => State switch
+    {
+        BurningState.Dying when DeathProgress < DeathClipShare => VisualClips.Death,
+        BurningState.Dying or BurningState.Detonating or BurningState.Dead => null,
+        BurningState.Telegraph => VisualClips.Telegraph,
+        BurningState.Charge => VisualClips.Charge,
+        BurningState.Recovery => VisualClips.Recover,
+        _ when HitFlashRemaining > 0f => VisualClips.Hit,
+        BurningState.Approach => VisualClips.Move,
+        _ => VisualClips.Idle
+    };
+
+    public override float? VisualProgress => State switch
+    {
+        BurningState.Dying => DeathProgress / DeathClipShare,
+        BurningState.Telegraph => 1f - _stateTimer / GameBalance.BurningChargeTelegraph,
+        BurningState.Recovery => 1f - _stateTimer / GameBalance.BurningRecoveryDuration,
+        BurningState.Charge => null,
+        _ when HitFlashRemaining > 0f => HitFlashProgress,
+        _ => null
+    };
+
+    private float DeathProgress => 1f - _stateTimer / GameBalance.BurningDeathDuration;
+
+    /// <summary>
+    /// Where a breaking point is drawn: on the rendered figure's chest (closer together), or
+    /// where gameplay keeps it for the flat art. Hits always use <see cref="GetFracturePositions"/>.
+    /// </summary>
+    public Vector2 DrawnFracture(Vector2 fracture) => DrawnAsFigure
+        ? Position + (fracture - Position) * 0.7f - new Vector2(0f, FigureHeights.BurningChest)
+        : fracture;
+
+    /// <summary>Centre of the body as drawn (the detonation and its light gather here).</summary>
+    public Vector2 DrawnCore => DrawnAsFigure ? Position - new Vector2(0f, FigureHeights.BurningChest) : Position;
+    public override Vector2 VisualFacing => _facing;
+    public override float TelegraphRadius => State is BurningState.Telegraph or BurningState.Charge ? Radius * 4f : 0f;
 
     public Burning(Vector2 position, int movementSeed)
         : base(position, GameBalance.BurningMaxHealth, GameBalance.BurningRadius)
@@ -208,19 +254,42 @@ public sealed class Burning : Enemy
                     1f);
                 float instability = 0.5f + 0.5f * MathF.Sin(_visualTime * 42f);
                 float outerRadius = MathHelper.Lerp(62f, 18f, compression);
-                batch.FillCircle(pixel, Position, outerRadius, GameBalance.DeepViolet * (0.18f + compression * 0.35f));
-                batch.DrawCircle(pixel, Position, outerRadius + instability * 5f, GameBalance.DeathFlameBright * (0.58f + compression * 0.36f), 4f + compression * 5f, 30);
-                batch.FillCircle(pixel, Position, 6f + compression * 8f, GameBalance.SoulWhite * (0.62f + compression * 0.38f));
+                if (DrawnAsFigure && LightSpot is { } gathering)
+                {
+                    // The Death Flame gathers into the core: its glow draws in and burns brighter,
+                    // the cracks pour their light into it and the core flickers, unstable.
+                    WorldMarks.Glow(batch, gathering, DrawnCore, outerRadius + instability * 5f, GameBalance.DeathFlame * (0.22f + compression * 0.3f));
+                    WorldMarks.Glow(batch, gathering, DrawnCore, (8f + compression * 12f) * (0.9f + instability * 0.2f), GameBalance.SoulWhite * (0.45f + compression * 0.5f));
+                    int crack = 0;
+                    foreach (Vector2 fracture in GetFracturePositions())
+                    {
+                        WorldMarks.Stream(batch, gathering, DrawnFracture(fracture), DrawnCore, _visualTime, 0.8f, GameBalance.DeathFlameBright,
+                            100f + compression * 140f, 7f, crack++);
+                    }
+                    return;
+                }
+                batch.FillCircle(pixel, DrawnCore, outerRadius, GameBalance.DeepViolet * (0.18f + compression * 0.35f));
+                WorldMarks.Ring(batch, pixel, DrawnCore, outerRadius + instability * 5f, GameBalance.DeathFlameBright * (0.58f + compression * 0.36f), compression > 0.5f, 4f + compression * 5f);
+                batch.FillCircle(pixel, DrawnCore, 6f + compression * 8f, GameBalance.SoulWhite * (0.62f + compression * 0.38f));
                 foreach (Vector2 fracture in GetFracturePositions())
                 {
-                    batch.DrawLine(pixel, fracture, Vector2.Lerp(fracture, Position, compression), GameBalance.DeathFlameBright * 0.82f, 3f + compression * 2f);
+                    WorldMarks.Beam(batch, pixel, DrawnFracture(fracture), Vector2.Lerp(DrawnFracture(fracture), DrawnCore, compression), 10f + compression * 6f, GameBalance.DeathFlameBright * 0.82f);
                 }
                 return;
             }
 
             float progress = 1f - MathHelper.Clamp(_stateTimer / releaseRemaining, 0f, 1f);
-            batch.FillCircle(pixel, Position, 28f + progress * 118f, GameBalance.DeepViolet * (0.62f * (1f - progress)));
-            batch.DrawCircle(pixel, Position, 40f + progress * 132f, GameBalance.DeathFlameBright * (1f - progress), 8f, 30);
+            if (DrawnAsFigure && LightSpot is { } flash)
+            {
+                // The blast's light washes out to its reach and fades; the flipbook carries the fireball.
+                float fade = (1f - progress) * (1f - progress);
+                WorldMarks.Glow(batch, flash, DrawnCore, 40f + progress * 132f, GameBalance.DeathFlame * (0.5f * fade));
+                WorldMarks.Glow(batch, flash, DrawnCore, (40f + progress * 132f) * 0.5f, GameBalance.DeathFlameBright * (0.4f * fade * (1f - progress)));
+                return;
+            }
+            // The blast's reach races out as a ring of light; the flipbook carries the fireball.
+            WorldMarks.Ring(batch, pixel, DrawnCore, 40f + progress * 132f, GameBalance.DeathFlame * (0.9f * (1f - progress)), true, 8f);
+            WorldMarks.Ring(batch, pixel, DrawnCore, 40f + progress * 132f, GameBalance.DeathFlameBright * (0.7f * (1f - progress) * (1f - progress)), false, 8f);
             return;
         }
 
@@ -233,28 +302,39 @@ public sealed class Burning : Enemy
             batch.FillCircle(pixel, Position + new Vector2(0f, -37f), 12f, new Color(24, 20, 27));
         }
 
-        foreach (Vector2 fracture in GetFracturePositions())
+        if (!DrawnAsFigure)
         {
-            batch.DrawLine(pixel, fracture - right * 7f, fracture + right * 7f + _facing * 5f, GameBalance.DeathFlame * (0.42f + pulse * 0.38f), 3f);
+            // The rendered figure carries its own glowing cracks.
+            foreach (Vector2 fracture in GetFracturePositions())
+            {
+                batch.DrawLine(pixel, fracture - right * 7f, fracture + right * 7f + _facing * 5f, GameBalance.DeathFlame * (0.42f + pulse * 0.38f), 3f);
+            }
         }
 
-        if (State == BurningState.Telegraph)
+        if (State == BurningState.Telegraph && !GroundImpacts.Loaded)
         {
-            batch.DrawCircle(pixel, Position, 42f + telegraph * 30f, GameBalance.DeathFlame * (0.35f + telegraph * 0.55f), 5f + telegraph * 5f, 26);
-            batch.DrawLine(pixel, Position, Position + _chargeDirection * (90f + telegraph * 80f), GameBalance.DeathFlameBright * (0.3f + telegraph * 0.5f), 4f);
+            // With the ground textures the floor itself kindles along the rush (Rendering/GroundImpacts).
+            WorldMarks.Ring(batch, pixel, Position, 42f + telegraph * 30f, GameBalance.DeathFlame * (0.35f + telegraph * 0.55f), telegraph > 0.6f, 5f + telegraph * 5f);
+            WorldMarks.Lane(batch, pixel, Position, _chargeDirection, 90f + telegraph * 80f, 30f, GameBalance.DeathFlameBright * (0.3f + telegraph * 0.5f));
+        }
+        else if (State == BurningState.Charge && DrawnAsFigure && LightSpot is { } wake)
+        {
+            // A wake of embers shed behind the rush instead of a beam.
+            WorldMarks.Glow(batch, wake, DrawnCore - _chargeDirection * 16f, 30f, GameBalance.DeathFlame * 0.22f);
+            WorldMarks.Stream(batch, wake, DrawnCore, DrawnCore - _chargeDirection * 96f, _visualTime, 0.85f, GameBalance.DeathFlame, 260f, 9f);
         }
         else if (State == BurningState.Charge)
         {
-            batch.DrawLine(pixel, Position - _chargeDirection * 78f, Position, GameBalance.DeepViolet * 0.82f, 28f);
-            batch.DrawLine(pixel, Position - _chargeDirection * 58f, Position, GameBalance.DeathFlameBright * 0.72f, 8f);
+            WorldMarks.Beam(batch, pixel, Position - _chargeDirection * 78f, Position, 40f, GameBalance.DeathFlame * 0.7f);
+            WorldMarks.Beam(batch, pixel, Position - _chargeDirection * 58f, Position, 16f, GameBalance.DeathFlameBright * 0.72f);
         }
 
         if (soulSenseActive)
         {
             foreach (Vector2 fracture in GetFracturePositions())
             {
-                batch.FillCircle(pixel, fracture, 10f, GameBalance.DeepViolet * 0.78f);
-                batch.FillCircle(pixel, fracture, 5f, GameBalance.SoulWhite);
+                batch.FillCircle(pixel, DrawnFracture(fracture), 10f, GameBalance.DeepViolet * 0.78f);
+                batch.FillCircle(pixel, DrawnFracture(fracture), 5f, GameBalance.SoulWhite);
             }
         }
 

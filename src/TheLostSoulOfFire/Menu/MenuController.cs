@@ -42,6 +42,9 @@ public sealed class MenuController
 
     public MenuController(GameSettings? settings = null) => Settings = settings ?? new GameSettings();
 
+    /// <summary>Horizontal centre of the entry list as a share of the screen width (presentation).</summary>
+    public float AnchorX { get; set; } = 0.5f;
+
     public bool IsOpen => _pages.Count > 0;
     public MenuPage CurrentPage => _pages.Peek();
     public int SelectedIndex => _selectedIndex;
@@ -162,6 +165,15 @@ public sealed class MenuController
         }
     }
 
+    /// <summary>The volume (0–100) an entry shows, for drawing it as a bar; null for other entries.</summary>
+    public int? VolumeOf(MenuEntry entry) => entry.Id switch
+    {
+        MenuEntryId.MasterVolume => Settings.MasterVolume,
+        MenuEntryId.MusicVolume => Settings.MusicVolume,
+        MenuEntryId.EffectsVolume => Settings.EffectsVolume,
+        _ => null
+    };
+
     public bool IsSettingsPage => IsOpen && CurrentPage.Id.StartsWith("settings", System.StringComparison.Ordinal);
 
     public bool GoBack()
@@ -194,7 +206,12 @@ public sealed class MenuController
     {
         MenuEntryId.OptionalHints => $"OPTIONALE HINWEISE: {(Settings.OptionalHints ? "AN" : "AUS")}",
         MenuEntryId.Fullscreen => $"VOLLBILD: {(Settings.Fullscreen ? "AN" : "AUS")}",
-        MenuEntryId.CameraMotion => $"BILDBEWEGUNG: {Settings.CameraMotion.ToString().ToUpperInvariant()}",
+        MenuEntryId.CameraMotion => $"BILDBEWEGUNG: {Settings.CameraMotion switch
+        {
+            CameraMotionLevel.Reduced => "REDUZIERT",
+            CameraMotionLevel.Off => "AUS",
+            _ => "NORMAL"
+        }}",
         MenuEntryId.MasterVolume => $"GESAMTLAUTSTÄRKE: {Settings.MasterVolume}%",
         MenuEntryId.MusicVolume => $"MUSIK: {Settings.MusicVolume}%",
         MenuEntryId.EffectsVolume => $"EFFEKTE: {Settings.EffectsVolume}%",

@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using TheLostSoulOfFire.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using TheLostSoulOfFire.Entities;
 using TheLostSoulOfFire.Input;
 using TheLostSoulOfFire.Rendering;
+using TheLostSoulOfFire.Rendering.Visuals;
 
 namespace TheLostSoulOfFire.Game;
 
@@ -34,7 +36,8 @@ public sealed partial class GameWorld
     {
         if (_phase == GamePhase.Arena && _chests.Count > 0)
         {
-            _player.Reset(_chests[^1].Position + new Vector2(0f, 40f));
+            // Beside the chest, inside its reach, so captures show the chest and not the figure in front of it.
+            _player.Reset(_chests[^1].Position + new Vector2(56f, 22f));
         }
     }
 
@@ -43,6 +46,7 @@ public sealed partial class GameWorld
         _wallet.BeginRun(GameBalance.GlutStarterStock);
         _chests.Clear();
         _glutSparks.Clear();
+        _openedChests.Clear();
         _geldPulse = 0f;
         _glutPulse = 0f;
         _lastSecured = (0, 0);
@@ -73,6 +77,7 @@ public sealed partial class GameWorld
         _lastSecured = _wallet.SecureAllRun();
         _chests.Clear();
         _glutSparks.Clear();
+        _openedChests.Clear();
         _profileStore.Save(_wallet.ToProfile());
     }
 
@@ -133,6 +138,8 @@ public sealed partial class GameWorld
             {
                 if (chest.TryOpen())
                 {
+                    _audio.Play(AudioCue.ChestOpen, 0.7f);
+                    _audio.Play(AudioCue.CurrencyGain, 0.5f);
                     _wallet.Credit(Currency.Geld, GameBalance.ChestGeld);
                     _geldPulse = CurrencyPulseDuration;
                     _particles.EmitBurst(chest.Position, -Vector2.UnitY, 18, GameBalance.Geld, 180f, 5f);
@@ -145,7 +152,16 @@ public sealed partial class GameWorld
         }
 
         foreach (ArenaChest arenaChest in _chests) arenaChest.Update(deltaTime);
+        // An emptied chest leaves the game at once; its open lid lingers a moment as an image.
+        foreach (ArenaChest gone in _chests)
+            if (gone.IsGone) _openedChests.Add(new OpenedChest(gone.Position));
         _chests.RemoveAll(arenaChest => arenaChest.IsGone);
+        for (int index = _openedChests.Count - 1; index >= 0; index--)
+        {
+            OpenedChest opened = _openedChests[index] with { Age = _openedChests[index].Age + deltaTime };
+            if (opened.Age >= OpenedChestLinger) _openedChests.RemoveAt(index);
+            else _openedChests[index] = opened;
+        }
 
         for (int index = _glutSparks.Count - 1; index >= 0; index--)
         {
@@ -155,10 +171,54 @@ public sealed partial class GameWorld
         }
     }
 
+    private const float OpenedChestLinger = 1.6f;
+    private readonly List<OpenedChest> _openedChests = [];
+
+    /// <summary>Presentation only: where an emptied chest stood and for how long it has been open.</summary>
+    private readonly record struct OpenedChest(Vector2 Position, float Age = 0f);
+
+    /// <summary>The rendered chest stands this far below its gameplay position (floor centre of the box).</summary>
+    private static readonly Vector2 ChestFoot = new(0f, 8f);
+
     private void DrawCurrencyWorld(SpriteBatch batch, Texture2D pixel)
     {
+        bool rendered = _art.HasArt(VisualIds.ArenaChest);
+        foreach (OpenedChest opened in _openedChests)
+        {
+            float fade = 1f - MathHelper.SmoothStep(0f, 1f, (opened.Age - 0.5f) / (OpenedChestLinger - 0.5f));
+            if (rendered)
+            {
+                _art.DrawSoftSpot(batch, opened.Position + ChestFoot + new Vector2(4f, 2f), new Vector2(40f, 14f), new Color(3, 3, 7) * (0.6f * fade));
+                _art.DrawPropFrame(batch, VisualIds.ArenaChest, "open", opened.Position + ChestFoot, 1f, Color.White * fade);
+                _art.DrawSoftSpot(batch, opened.Position - new Vector2(0f, 12f), new Vector2(34f, 22f), GameBalance.Geld * (0.25f * fade * fade));
+            }
+        }
+
         foreach (ArenaChest chest in _chests)
         {
+            if (rendered)
+            {
+                Vector2 foot = chest.Position + ChestFoot;
+                float open = chest.OpenProgress;
+                _art.DrawSoftSpot(batch, foot + new Vector2(4f, 2f), new Vector2(40f, 14f), new Color(3, 3, 7) * 0.6f);
+                if (chest.IsOpened)
+                {
+                    _art.DrawPropFrame(batch, VisualIds.ArenaChest, "open", foot, open, Color.White);
+                    _art.DrawSoftSpot(batch, chest.Position - new Vector2(0f, 12f + open * 6f), new Vector2(30f + open * 16f, 20f + open * 10f), GameBalance.Geld * (0.4f * open));
+                }
+                else
+                {
+                    // The unopened chest glows gold on the floor around it, breathing: no ring.
+                    float glow = 0.35f + MathF.Sin(_presentationTime * 3f) * 0.12f;
+                    Color gold = GameBalance.Geld * (glow * 1.5f);
+                    gold.A = 0;
+                    _art.DrawSoftSpot(batch, chest.Position + new Vector2(0f, 6f), new Vector2(62f, 36f), gold);
+                    _art.DrawSoftSpot(batch, chest.Position, new Vector2(46f, 30f), GameBalance.Geld * (glow * 0.3f));
+                    _art.DrawPropFrame(batch, VisualIds.ArenaChest, VisualClips.Default, foot, 0f, Color.White);
+                }
+                continue;
+            }
+
             float fade = 1f - chest.OpenProgress;
             float lift = chest.OpenProgress * 14f;
             Vector2 position = chest.Position;
@@ -173,15 +233,22 @@ public sealed partial class GameWorld
             if (!chest.IsOpened)
             {
                 float glow = 0.35f + MathF.Sin(_presentationTime * 3f) * 0.12f;
-                batch.DrawCircle(pixel, position, 40f, GameBalance.Geld * glow, 2f, 28);
+                _art.DrawSoftSpot(batch, position, new Vector2(46f, 30f), GameBalance.Geld * (glow * 0.3f));
+                WorldMarks.Ring(batch, pixel, position, 40f, GameBalance.Geld * glow);
             }
         }
 
         foreach (GlutSpark spark in _glutSparks)
         {
+            // An ember flying home: a warm glow, a hot point and a short tail of fading glows.
             Vector2 position = spark.PositionToward(_player.Position);
-            batch.FillCircle(pixel, position, 9f, GameBalance.Glut * 0.35f);
-            batch.FillCircle(pixel, position, 4.5f, GameBalance.GlutBright);
+            for (int echo = 3; echo >= 1; echo--)
+            {
+                GlutSpark earlier = spark with { Elapsed = MathF.Max(0f, spark.Elapsed - 0.018f * echo) };
+                _art.DrawSoftSpot(batch, earlier.PositionToward(_player.Position), new Vector2(9f - echo * 1.5f), GameBalance.Glut * (0.45f - echo * 0.11f));
+            }
+            _art.DrawSoftSpot(batch, position, new Vector2(13f), GameBalance.Glut * 0.5f);
+            _art.DrawSoftSpot(batch, position, new Vector2(4.5f), GameBalance.GlutBright);
         }
     }
 
@@ -203,21 +270,13 @@ public sealed partial class GameWorld
         }
     }
 
-    private void DrawSecuredSummary(SpriteBatch batch, Texture2D pixel, Viewport viewport, string prefix, int geld, int glut, float alpha)
-    {
-        string text = $"{prefix} · GELD {geld} · GLUT {glut}";
-        PixelText.DrawCentered(batch, pixel, text, viewport.Width * 0.5f, viewport.Height - 30f, 1, GameBalance.Geld * (0.8f * alpha));
-    }
+    private void DrawSecuredSummary(SpriteBatch batch, Texture2D pixel, Viewport viewport, string prefix, int geld, int glut, float alpha) =>
+        UiKit.Balances(batch, pixel, viewport.Width * 0.5f, viewport.Height - 30f, prefix, geld, glut, alpha);
 
     private void DrawCenteredPrompt(SpriteBatch batch, Texture2D pixel, Viewport viewport, string prompt, Color accent)
     {
-        float pulse = 0.68f + MathF.Sin(_presentationTime * 4f) * 0.14f;
-        int textScale = PixelText.Measure(prompt, 2) + 48 <= viewport.Width ? 2 : 1;
-        int promptWidth = PixelText.Measure(prompt, textScale) + 48;
-        Rectangle panel = new((viewport.Width - promptWidth) / 2, viewport.Height - 150, promptWidth, 48);
-        batch.FillRectangle(pixel, panel, Color.Black * 0.72f);
-        batch.DrawRectangle(pixel, panel, accent * (0.52f * pulse), 2f);
-        PixelText.DrawCentered(batch, pixel, prompt, viewport.Width * 0.5f, panel.Y + 24f - textScale * 3.5f, textScale, GameBalance.SoulWhite * pulse);
+        float pulse = 0.5f + MathF.Sin(_presentationTime * 4f) * 0.5f;
+        UiKit.Prompt(batch, pixel, viewport.Width * 0.5f, viewport.Height - 206, prompt, accent, pulse);
     }
 
     /// <summary>Purely visual: the Glut is already credited when the spark starts.</summary>

@@ -24,6 +24,59 @@ necessarily present on `main`.
 
 Nachweis: ausdrücklich bestätigte Produktentscheidung des Owners zu #53.
 
+## 2026-10-05 — Freigabe 0: Lore-Grundlage der visuellen Scheibe
+
+Der Owner gibt die Lore-Grundlage des Changes `add-visual-vertical-slice` mit
+Korrekturen frei. Sie ist damit WORKING CANON:
+
+- Region-Verträge [Prolog „Das unvollendete Ufer“](regions/prologue.md)
+  (Seebahnhof, Fähre, Warten) und
+  [Industrial Cathedral „Die Gießhalle“](regions/industrial-cathedral.md).
+  Das Ufer und der Seed „The Drowned Line“ bestehen nebeneinander.
+- Figurenblätter unter [`characters/`](characters/): Protagonist, Hollow,
+  Burning, Devourer, Bruder und Vaelor.
+- Düsternis-Charta, Symbolsatz und Epochenregel in
+  [VISUAL-ART-DIRECTION.md](VISUAL-ART-DIRECTION.md) §10–§12; §5 „wie Diablo“
+  umfasst jetzt auch die Stimmung.
+
+Korrekturen gegenüber dem Entwurf:
+
+- Der Protagonist ist Mitte zwanzig und trägt keine Kapuze. Er trägt **keinen
+  Schal**; der rostrote Schal aus Session 3 (06.09.2026) ist damit ersetzt.
+  Sein einziges persönliches Stück aus dem Leben ist ein **Kompass**; was er
+  bedeutet, bleibt offen (Anchor UNRESOLVED).
+- Der Bruder ist **nicht grün**. Sein Unterscheidungsmerkmal neben Kapuze und
+  Schultermantel ist ein **aufgerolltes Bergungsseil** über der Schulter; er ist
+  der, der Verlorene herauszieht. Woran er festhält, bleibt offen.
+- Ob persönliche Gegenstände wie Kompass oder Seil eine Wirkung im Spiel haben,
+  wird später eigens entschieden. Die Figurenblätter legen nur das Aussehen fest;
+  Spielregeln ändern sich nicht.
+
+## 2026-10-05 — Produktionsweg der gemalten Grafik
+
+Der Owner gibt den Change
+[`add-visual-vertical-slice`](../../openspec/changes/add-visual-vertical-slice/proposal.md)
+frei. Damit gilt:
+
+- **Figuren entstehen über 3D und Sprite-Rendering.** Konzept, 3D-Modell, ein
+  Rig und Blender-Rendering liefern alle acht Richtungen aus einem Modell
+  (§5b in `VISUAL-ART-DIRECTION.md`). Reine 2D-Generierung pro Frame, Spine und
+  Laufzeit-3D sind verworfen.
+- **Ein trainierter Hausstil** (LoRA auf einem frei lizenzierten Basismodell)
+  trägt alle Umgebungs- und Konzeptbilder, statt den Stil in jedem Prompt neu
+  zu beschreiben. Keine Bilder anderer Spiele als Trainings- oder
+  Referenzeingabe, kein Spielname im Prompt.
+- **Die Stilbasis umfasst den ganzen Prolog und die Arena:** Ufer, Suchgang,
+  Überfahrt, Schwelle und Arena bekommen Stil-Frames, Farbskript und gesperrte
+  Key-Arts. Fertig im Spiel sind in der Scheibe nur Ufer und Arena (Welle 1).
+- **Vier Owner-Freigaben:** Lore-Grundlage (0), Stil-Frames mit Basismodell (1),
+  3D-Modell des Spielers vor der Animation (2), Abnahme der Scheibe im Spiel (3).
+  Dazwischen arbeiten Agenten ohne Rückfrage.
+- **Kostenlose Werkzeuge zuerst.** Nur frei lokal ausführbare Modelle und
+  Werkzeuge mit Lizenzen, die ein kommerzielles Spiel erlauben
+  (`art/production/LICENSES.md`). Bezahlte Dienste sind ein Notweg, den nur der
+  Owner nach einer Freigabe öffnet; bis dahin steht `VISUALS_BUDGET_EUR` auf 0.
+
 ## 2026-10-04 — Arena mit zehn Wellen
 
 - Die Arena hat zehn Wellen statt vier (Change `extend-arena-waves`). Die
