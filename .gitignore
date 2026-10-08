@@ -11,3 +11,4 @@ obj/
 TestResults/
 artifacts/
 
+.DS_Store
