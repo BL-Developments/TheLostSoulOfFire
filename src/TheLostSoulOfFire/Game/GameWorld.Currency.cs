@@ -122,6 +122,7 @@ public sealed partial class GameWorld
     private void StartNextWaveFromIntermission()
     {
         _loopState = ArenaLoopState.Transition;
+        ClearTravelPoint();
         _presentation.BeginWaveTransition();
         _particles.EmitDeathFlame(_arena.CombatBounds.Center.ToVector2(), 18, 1f);
     }
@@ -145,8 +146,13 @@ public sealed partial class GameWorld
                     _particles.EmitBurst(chest.Position, -Vector2.UnitY, 18, GameBalance.Geld, 180f, 5f);
                 }
             }
+            else if (TravelPointInReach() is not null)
+            {
+                OpenTravelMenu();
+            }
             else if (PlayerAtWaveTrigger)
             {
+                // Starting the wave past an undecided travel point is the same as continuing without securing.
                 StartNextWaveFromIntermission();
             }
         }
@@ -259,6 +265,10 @@ public sealed partial class GameWorld
         if (ChestInReach() is not null && CombatActionsEnabled)
         {
             DrawCenteredPrompt(batch, pixel, viewport, "E  KISTE ÖFFNEN", GameBalance.Geld);
+        }
+        else if (TravelPointInReach() is not null && CombatActionsEnabled)
+        {
+            DrawTravelPointPrompt(batch, pixel, viewport);
         }
         else if (PlayerAtWaveTrigger && CombatActionsEnabled)
         {

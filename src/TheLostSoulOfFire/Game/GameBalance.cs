@@ -112,6 +112,12 @@ public static class GameBalance
     public const float GlutSparkTravelTime = 0.6f;
     public const float WaveTriggerRadius = 110f;
 
+    // Travel point (#53, #74). The share is the decided working value; the arena wave stands in
+    // for the end of level 1 until real levels exist.
+    public const int TravelPointSecurePercent = 50;
+    public const int TravelPointWave = 5;
+    public const float TravelPointInteractRadius = 80f;
+
     // Working values for the ten arena waves (change extend-arena-waves); balancing is still open.
     // One row per wave, one entry per push. H = Hollow, B = Burning, D = Devourer.
     public static readonly ArenaPush[][] ArenaWaves =

@@ -24,5 +24,9 @@ public static class GameFlowRules
 
     public static GamePhase RestartAfterCompletion() => GamePhase.Title;
 
+    /// <summary>Extraction at a travel point ends the run and returns to the hub.</summary>
+    public static GamePhase ExtractToHub(GamePhase phase) =>
+        phase == GamePhase.Arena ? GamePhase.Antechamber : phase;
+
     public static bool AllowsCombat(GamePhase phase) => phase is GamePhase.Prologue or GamePhase.Arena;
 }
