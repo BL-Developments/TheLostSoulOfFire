@@ -7,6 +7,21 @@ The entries from 2026-09-06 and earlier describe implementation work on the
 `tools/visual-max/`, `SoftShapes.cs`, Team Resonance, Severance) are not
 necessarily present on `main`.
 
+## 2026-10-09 — Zufällige Raumfolge der Level
+
+- Die Räume eines Levels werden zufällig erzeugt, grob linear, mit
+  gelegentlichen parallelen Wegen zum Levelende.
+- Man betritt die Räume einzeln wie bei Hades; ein Weg ist die Wahl zwischen
+  den Ausgängen eines geräumten Raums.
+- Räume bleiben vorerst wie die Arena aufgebaut. Die Wellen wachsen mit dem
+  Raumfortschritt.
+- Tür I führt nach der Umsetzung in den Biom-I-Run mit Graubox-Leveln; die
+  Arena ist nur noch per `--dev --start arena` erreichbar.
+- Anzahl der Kampfstufen und Gabelungswahrscheinlichkeit sind Arbeitswerte in
+  `GameBalance`.
+
+Nachweis: Entscheidungen des Owners im Projekt-Thread am 09.10.2026.
+
 ## 2026-10-06 — Teilsicherung, Extraktion und Niederlage (#53)
 
 - Reisepunkte stehen am Ende von Level 1 und 2. Sie bieten Teilsichern und
