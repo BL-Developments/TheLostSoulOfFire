@@ -122,6 +122,10 @@ public static class GameBalance
     public const int LevelCombatStagesMin = 4;
     public const int LevelCombatStagesMax = 6;
     public const float LevelForkChance = 0.35f;
+    public static readonly ArenaPush LevelPlaceholderPush = new(2, 2, 0);
+    public const float RoomExitInteractRadius = 70f;
+    public const float RoomTransitionDuration = 0.6f;
+    public const float LevelDefeatDelay = 2.5f;
 
     // Working values for the ten arena waves (change extend-arena-waves); balancing is still open.
     // One row per wave, one entry per push. H = Hollow, B = Burning, D = Devourer.

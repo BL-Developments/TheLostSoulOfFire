@@ -423,6 +423,12 @@ public sealed partial class GameWorld : IDisposable
 
         if (_player.IsDead)
         {
+            if (InLevel && _player.SinceDeath >= GameBalance.LevelDefeatDelay)
+            {
+                ReturnLevelToHubAfterDefeat(viewport);
+                return;
+            }
+
             _soulSensePresentation.Update(deltaTime, false);
             _particles.Update(deltaTime);
             _presentation.UpdateCamera(
@@ -666,7 +672,7 @@ public sealed partial class GameWorld : IDisposable
         }
 
         _souls.RemoveAll(soul => soul.IsFinished);
-        UpdateCurrency(deltaTime, input);
+        UpdateCurrency(deltaTime, input, viewport);
         UpdateLoop(deltaTime);
         if (_loopState == ArenaLoopState.Complete) _abilities.Clear(_player);
         if (previousHealth > _player.Health)
@@ -1728,7 +1734,11 @@ public sealed partial class GameWorld : IDisposable
             {
                 _hud.Draw(batch, pixel, viewport, _player);
                 DrawCurrencyHud(batch, pixel, viewport);
-                if (_waveNumber > 0)
+                if (InLevel)
+                {
+                    DrawLevelRoomHud(batch, pixel, viewport);
+                }
+                else if (_waveNumber > 0)
                 {
                     HudRenderer.DrawWave(batch, pixel, viewport, _waveNumber, GameBalance.ArenaWaveCount, _waveRun.PushesReleased, ArenaWaves.Pushes(_waveNumber).Count);
                 }
@@ -1740,7 +1750,7 @@ public sealed partial class GameWorld : IDisposable
 
             if (!IsGamePaused)
             {
-                _presentation.DrawOverlay(batch, pixel, viewport, _phase, _loopState, _player.IsDead, _waveNumber, _menu);
+                _presentation.DrawOverlay(batch, pixel, viewport, _phase, _loopState, _player.IsDead, _waveNumber, _menu, InLevel);
                 if (_phase == GamePhase.Arena && _loopState == ArenaLoopState.Complete && !_player.IsDead)
                 {
                     float reveal = MathHelper.Clamp((_presentation.StateTime - 0.8f) / 0.6f, 0f, 1f);
@@ -1993,6 +2003,12 @@ public sealed partial class GameWorld : IDisposable
 
     private void RetryCurrentEncounter(Viewport viewport)
     {
+        // A level has no encounter retry: a defeat ends the run and returns to the hub.
+        if (InLevel)
+        {
+            return;
+        }
+
         if (_phase == GamePhase.Prologue)
         {
             RestartPrologueSector(viewport);
@@ -2606,6 +2622,8 @@ public sealed partial class GameWorld : IDisposable
             RestoreSandboxStartValues();
         }
         _sandboxActive = stayInSandbox;
+        _levelRun = null;
+        _roomTransitionElapsed = 0f;
     }
 
     private void ConfigureBurningAggression(float deltaTime)
@@ -2662,12 +2680,27 @@ public sealed partial class GameWorld : IDisposable
             case ArenaLoopState.Intro:
                 if (_presentation.TransitionComplete)
                 {
-                    SpawnWave(_waveNumber + 1);
+                    if (InLevel)
+                    {
+                        AfterLevelRoomIntro();
+                    }
+                    else
+                    {
+                        SpawnWave(_waveNumber + 1);
+                    }
                 }
                 break;
 
             case ArenaLoopState.Transition:
-                if (_presentation.WaveTransitionComplete)
+                if (InLevel)
+                {
+                    _roomTransitionElapsed += deltaTime;
+                    if (_roomTransitionElapsed >= GameBalance.RoomTransitionDuration)
+                    {
+                        EnterCurrentLevelRoom();
+                    }
+                }
+                else if (_presentation.WaveTransitionComplete)
                 {
                     SpawnWave(_waveNumber + 1);
                 }
@@ -2677,6 +2710,12 @@ public sealed partial class GameWorld : IDisposable
                 UpdateReinforcements(deltaTime);
                 if (_enemies.Count == 0 && _souls.Count == 0 && _waveRun.AllPushesReleased && _pendingSpawns.Count == 0)
                 {
+                    if (InLevel)
+                    {
+                        ClearLevelRoomEncounter();
+                        break;
+                    }
+
                     bool lastWave = _waveNumber >= GameBalance.ArenaWaveCount;
                     _audio.Play(AudioCue.WaveClear, lastWave ? 0.74f : 0.62f);
                     if (lastWave)
@@ -2715,7 +2754,12 @@ public sealed partial class GameWorld : IDisposable
             }
         }
 
-        if (_loopState == ArenaLoopState.Intermission)
+        if (InLevel)
+        {
+            DrawRoomExits(batch, pixel);
+        }
+
+        if (_loopState == ArenaLoopState.Intermission && !InLevel)
         {
             float pulse = 0.5f + 0.5f * MathF.Sin(_presentationTime * 3f);
             Vector2 center = _arena.CombatBounds.Center.ToVector2();

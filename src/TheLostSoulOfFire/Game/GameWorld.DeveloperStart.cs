@@ -56,6 +56,10 @@ public sealed partial class GameWorld
             case DeveloperStartArea.Sandbox:
                 BeginSandbox(viewport);
                 return;
+
+            case DeveloperStartArea.Level:
+                StartLevel(options.Seed, viewport);
+                return;
         }
     }
 

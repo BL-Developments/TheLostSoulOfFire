@@ -18,11 +18,12 @@ bool abilityVisualTest = Array.Exists(args, argument => argument == "--ability-v
 bool sliceVisualTest = Array.Exists(args, argument => argument == "--slice-visual-test");
 bool tourVisualTest = Array.Exists(args, argument => argument == "--tour-visual-test");
 bool travelVisualTest = Array.Exists(args, argument => argument == "--travel-visual-test");
+bool levelVisualTest = Array.Exists(args, argument => argument == "--level-visual-test");
 bool expectAudioFallback = Array.Exists(args, argument => argument == "--expect-audio-fallback");
 
 using (Microsoft.Xna.Framework.Game game = audioRuntimeTest || audioLoopRuntimeTest
     ? new AudioRuntimeTestGame(expectAudioFallback, audioLoopRuntimeTest)
-    : new TheLostSoulOfFire.Game1(audioGameplayTest, audioDeathRestartTest, antechamberVisualTest, developerStart, currencyVisualTest, abilityVisualTest, sliceVisualTest, tourVisualTest, travelVisualTest))
+    : new TheLostSoulOfFire.Game1(audioGameplayTest, audioDeathRestartTest, antechamberVisualTest, developerStart, currencyVisualTest, abilityVisualTest, sliceVisualTest, tourVisualTest, travelVisualTest, levelVisualTest))
 {
     game.Run();
 }

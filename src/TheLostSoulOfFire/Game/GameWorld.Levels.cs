@@ -1,0 +1,229 @@
+using System;
+using System.Collections.Generic;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using TheLostSoulOfFire.Audio;
+using TheLostSoulOfFire.Game.Levels;
+using TheLostSoulOfFire.Rendering;
+
+namespace TheLostSoulOfFire.Game;
+
+/// <summary>
+/// Level (change <c>add-level-rooms</c>): a run through rooms that are each built like the arena.
+/// A level runs in <see cref="GamePhase.Arena"/> while a <see cref="LevelRun"/> is active, so the
+/// arena's own loop, camera, currencies and abilities apply unchanged; the few places that differ
+/// check <see cref="InLevel"/>.
+/// </summary>
+public sealed partial class GameWorld
+{
+    private LevelRun? _levelRun;
+    private float _roomTransitionElapsed;
+
+    internal bool InLevel => _levelRun is not null;
+
+    internal int PlayerHealth => _player.Health;
+
+    internal int LevelRoomProgress => _levelRun?.Current.Progress ?? 0;
+
+    internal LevelRoomKind? CurrentLevelRoomKind => _levelRun?.Current.Kind;
+
+    /// <summary>Automated runs: stands the player at an exit of the current room (clamped to the exits it has).</summary>
+    internal void PlaceAutomatedPlayerAtLevelExit(int exitIndex)
+    {
+        if (_levelRun is not { } run)
+        {
+            return;
+        }
+
+        int count = ExitCount(run.Current);
+        _player.PlaceAt(RoomExit.Position(_arena.CombatBounds, count, Math.Min(exitIndex, count - 1)));
+    }
+
+    private Vector2 SouthGate => new(_arena.CombatBounds.Center.X, _arena.CombatBounds.Bottom - 90f);
+
+    private static int ExitCount(LevelRoom room) => room.Kind == LevelRoomKind.LevelEnd ? 1 : room.Exits.Count;
+
+    private void StartLevel(int? seed, Viewport viewport)
+    {
+        ClearRunState();
+        int levelSeed = seed ?? Environment.TickCount;
+        Console.WriteLine($"LEVEL_SEED {levelSeed}");
+        _levelRun = new LevelRun(LevelLayoutGenerator.Generate(levelSeed, LevelLayoutSettings.Default));
+        _phase = GamePhase.Arena;
+        BeginArenaIntro(viewport);
+        _player.PlaceAt(SouthGate);
+    }
+
+    /// <summary>Removes the fight's leftovers when the player leaves a room; the player, abilities and balances stay.</summary>
+    private void ClearRoomState()
+    {
+        _enemies.Clear();
+        _souls.Clear();
+        _cannonShots.Clear();
+        _pendingSpawns.Clear();
+        _particles.Clear();
+        _spriteVfx.Clear();
+        _groundImpacts.Clear();
+        _waveRun = ArenaWaveRun.Empty;
+        _burningHandoffTimer = 0f;
+        _burningCommittedLastFrame = 0;
+    }
+
+    private void EnterCurrentLevelRoom()
+    {
+        ClearRoomState();
+        _player.PlaceAt(SouthGate);
+        _roomTransitionElapsed = 0f;
+        _loopState = ArenaLoopState.Intro;
+        _presentation.BeginIntro(true);
+    }
+
+    private void AfterLevelRoomIntro()
+    {
+        if (_levelRun is not { } run)
+        {
+            return;
+        }
+
+        if (run.HasEncounter)
+        {
+            SpawnRoomWave(run.Current.Progress);
+        }
+        else
+        {
+            _loopState = ArenaLoopState.Intermission;
+        }
+    }
+
+    /// <summary>The room's encounter: one placeholder push, the arena's second wave in composition.</summary>
+    private void SpawnRoomWave(int progress)
+    {
+        Vector2 center = _arena.CombatBounds.Center.ToVector2();
+        _waveRun = new ArenaWaveRun([GameBalance.LevelPlaceholderPush]);
+        _pendingSpawns.Clear();
+        _reinforcementSeed = 0;
+        ArenaPush push = _waveRun.TakeFirst();
+        List<Vector2> positions = ArenaWaves.ChooseSpawnPositions(_arena.CombatBounds, _player.Position, push.Total);
+        int seed = progress * 10;
+        int index = 0;
+        foreach (ArenaEnemyKind kind in push.Kinds())
+        {
+            _enemies.Add(CreateArenaEnemy(kind, positions[index++], ref seed));
+        }
+
+        _loopState = ArenaLoopState.Combat;
+        _burningHandoffTimer = 0f;
+        _burningCommittedLastFrame = 0;
+        _particles.EmitDeathFlame(center, 18 + progress * 5, 1f + progress * 0.12f);
+        _screenEffects.AddShake(0.16f, 4f + progress);
+        _screenEffects.Flash(0.08f, 0.12f + progress * 0.035f);
+        _audio.SetCalm(false);
+        _audio.Play(AudioCue.WaveStart, 0.62f);
+    }
+
+    private void ClearLevelRoomEncounter()
+    {
+        _levelRun?.MarkCleared();
+        _loopState = ArenaLoopState.Intermission;
+        _particles.EmitDeathFlame(_arena.CombatBounds.Center.ToVector2(), 12, 0.8f);
+    }
+
+    /// <summary>The exit the player stands at, while the room is open for leaving.</summary>
+    private int? LevelExitInReach()
+    {
+        if (_levelRun is not { } run || _loopState != ArenaLoopState.Intermission)
+        {
+            return null;
+        }
+
+        return RoomExit.InReach(_arena.CombatBounds, ExitCount(run.Current), _player.Position);
+    }
+
+    private void TakeLevelExit(int exitIndex, Viewport viewport)
+    {
+        if (_levelRun is not { } run)
+        {
+            return;
+        }
+
+        if (run.Current.Kind == LevelRoomKind.LevelEnd)
+        {
+            FinishLevel(viewport);
+            return;
+        }
+
+        if (!run.TryTakeExit(exitIndex, out _))
+        {
+            return;
+        }
+
+        _roomTransitionElapsed = 0f;
+        _loopState = ArenaLoopState.Transition;
+        _presentation.BeginWaveTransition();
+        _audio.Play(AudioCue.UiOpen, 0.45f);
+    }
+
+    /// <summary>Until reward points exist, the level end secures the whole run, as the arena's completion does.</summary>
+    private void FinishLevel(Viewport viewport)
+    {
+        SecureRunCurrencies();
+        _phase = GameFlowRules.ExtractToHub(_phase);
+        BeginAntechamber(viewport);
+        _extractedAt = _presentationTime;
+    }
+
+    /// <summary>A defeat in a level ends the run; the balances were already lost at the moment of death.</summary>
+    private void ReturnLevelToHubAfterDefeat(Viewport viewport)
+    {
+        _phase = GameFlowRules.ReturnToHubAfterDefeat(_phase);
+        BeginAntechamber(viewport);
+    }
+
+    private void DrawRoomExits(SpriteBatch batch, Texture2D pixel)
+    {
+        if (_levelRun is not { } run)
+        {
+            return;
+        }
+
+        int count = ExitCount(run.Current);
+        float pulse = 0.5f + 0.5f * MathF.Sin(_presentationTime * 3f);
+        for (int index = 0; index < count; index++)
+        {
+            Vector2 at = RoomExit.Position(_arena.CombatBounds, count, index);
+            Rectangle gate = new((int)at.X - 26, (int)at.Y - 12, 52, 24);
+            if (run.IsCleared)
+            {
+                // An open exit: a cold light in the doorway.
+                Color light = GameBalance.SoulSenseTrace;
+                _art.DrawSoftSpot(batch, at, new Vector2(54f + pulse * 6f), light * (0.2f + pulse * 0.1f));
+                batch.FillRectangle(pixel, gate, new Color(20, 28, 34));
+                batch.DrawRectangle(pixel, gate, light, 2f);
+            }
+            else
+            {
+                // A closed exit: a dark grille.
+                batch.FillRectangle(pixel, gate, new Color(12, 10, 16));
+                batch.DrawRectangle(pixel, gate, GameBalance.MetalColor, 3f);
+                for (int x = gate.Left + 6; x < gate.Right; x += 10)
+                {
+                    batch.DrawLine(pixel, new Vector2(x, gate.Top), new Vector2(x, gate.Bottom), GameBalance.StoneColor, 2f);
+                }
+            }
+        }
+    }
+
+    private void DrawLevelRoomHud(SpriteBatch batch, Texture2D pixel, Viewport viewport)
+    {
+        if (_levelRun is not { } run)
+        {
+            return;
+        }
+
+        HudRenderer.DrawRoom(batch, pixel, viewport, run.Current.Progress);
+        if (run.Current.Kind == LevelRoomKind.LevelEnd)
+        {
+            PixelText.DrawCentered(batch, pixel, "LEVEL GESCHAFFT", viewport.Width * 0.5f, 120f, 4, GameBalance.SoulWhite);
+        }
+    }
+}

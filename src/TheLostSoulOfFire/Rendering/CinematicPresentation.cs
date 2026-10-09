@@ -219,7 +219,8 @@ public sealed class CinematicPresentation
         ArenaLoopState loopState,
         bool playerDead,
         int waveNumber,
-        MenuController menu)
+        MenuController menu,
+        bool levelRoom = false)
     {
         if (gamePhase == GamePhase.Title)
         {
@@ -239,7 +240,7 @@ public sealed class CinematicPresentation
         }
         else if (loopState == ArenaLoopState.Transition)
         {
-            DrawWaveTransition(batch, pixel, viewport, waveNumber + 1);
+            DrawWaveTransition(batch, pixel, viewport, waveNumber + 1, levelRoom);
         }
         else if (loopState == ArenaLoopState.Complete)
         {
@@ -665,12 +666,18 @@ public sealed class CinematicPresentation
     /// HUD's language (its plaque and prompt read WELLE), over a light veil; no letterbox, the
     /// fight goes on (Durchgang 4: less cinematic, more punch). Timing unchanged.
     /// </summary>
-    private void DrawWaveTransition(SpriteBatch batch, Texture2D pixel, Viewport viewport, int nextWave)
+    private void DrawWaveTransition(SpriteBatch batch, Texture2D pixel, Viewport viewport, int nextWave, bool levelRoom)
     {
         float open = Ease(_stateTime / 0.08f);
         float close = 1f - Ease((_stateTime - 0.82f) / 0.23f);
         float alpha = open * close;
         batch.FillRectangle(pixel, viewport.Bounds, Color.Black * (0.1f * alpha));
+
+        // A room change in a level fades the same way but names no wave.
+        if (levelRoom)
+        {
+            return;
+        }
 
         bool final = nextWave >= GameBalance.ArenaWaveCount;
         string label = final ? "LETZTE WELLE" : $"WELLE {ToRoman(nextWave)}";

@@ -121,6 +121,28 @@ public sealed class HudRenderer
     /// Wave plaque in the top right corner. Waves with reinforcements show one diamond per
     /// push below the counter: lit once the push has entered the arena. The last wave burns.
     /// </summary>
+    /// <summary>Room counter of a level; the start room (progress 0) shows none.</summary>
+    public static void DrawRoom(SpriteBatch batch, Texture2D pixel, Viewport viewport, int progress)
+    {
+        if (progress <= 0)
+        {
+            return;
+        }
+
+        const string label = "RAUM";
+        string value = progress.ToString();
+        int labelWidth = PixelText.MeasureFace(label, TextFace.Body, 10f, 1.4f);
+        int valueWidth = PixelText.MeasureFace(value, TextFace.Display, 16f);
+        int width = labelWidth + valueWidth + 44;
+        Rectangle panel = new(viewport.Width - 24 - width, 24, width, 36);
+        UiKit.Panel(batch, pixel, panel, Muted, 0.5f, 1f, 0f);
+
+        int contentX = panel.X + (width - labelWidth - valueWidth - 10) / 2;
+        int baseline = panel.Y + 12;
+        PixelText.DrawFace(batch, pixel, label, new Vector2(contentX, baseline + 3), TextFace.Body, 10f, Label, 1.4f);
+        PixelText.DrawFace(batch, pixel, value, new Vector2(contentX + labelWidth + 10, baseline - 3), TextFace.Display, 16f, BoundSoul);
+    }
+
     public static void DrawWave(SpriteBatch batch, Texture2D pixel, Viewport viewport, int wave, int waveCount, int pushesReleased, int pushCount)
     {
         if (wave <= 0)
