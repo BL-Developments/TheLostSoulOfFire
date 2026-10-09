@@ -117,6 +117,15 @@ public static class MenuPages
         new MenuEntry(MenuEntryId.RefuseBestMan, "NEIN")
     }, prompt: "LEO, MÖCHTEST DU MEIN TRAUZEUGE SEIN?");
 
+    /// <summary>Lines the game answers each refusal attempt with, in order; the last one stays.</summary>
+    public static readonly string[] BestManRefusalRemarks =
+    {
+        "BIST DU SICHER?",
+        "DIE SEELE DES FEUERS SAGT JA.",
+        "NEIN IST GERADE AUSVERKAUFT.",
+        "DIESE OPTION IST IN DEINER REGION NICHT VERFÜGBAR."
+    };
+
     public static readonly MenuPage BestManThanks = new("best_man_thanks", new[]
     {
         new MenuEntry(MenuEntryId.Back, "ZURÜCK")

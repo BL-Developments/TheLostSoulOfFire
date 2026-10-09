@@ -64,6 +64,32 @@ public sealed class MenuControllerTests
     }
 
     [TestMethod]
+    public void Confirm_RepeatedBestManNo_AdvancesRemarksAndKeepsTheLast()
+    {
+        MenuController menu = OpenBestManQuestion();
+        Assert.IsNull(menu.RefusalRemark);
+
+        for (int i = 0; i < MenuPages.BestManRefusalRemarks.Length + 2; i++)
+        {
+            menu.SetHoverIndex(1);
+            menu.Confirm();
+        }
+
+        Assert.AreEqual(MenuPages.BestManRefusalRemarks[^1], menu.RefusalRemark);
+    }
+
+    [TestMethod]
+    public void Tick_SnapBackFromBestManNo_CountsAsRefusal()
+    {
+        MenuController menu = OpenBestManQuestion();
+        menu.MoveSelection(1);
+
+        menu.Tick(MenuController.RefusalSnapBackDelay);
+
+        Assert.AreEqual(MenuPages.BestManRefusalRemarks[0], menu.RefusalRemark);
+    }
+
+    [TestMethod]
     public void Confirm_BestManNo_StaysOnQuestion()
     {
         MenuController menu = OpenBestManQuestion();

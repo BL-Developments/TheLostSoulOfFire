@@ -41,6 +41,7 @@ public sealed class MenuController
     private int _selectedIndex;
     private float _openTimer;
     private float _refusalTimer;
+    private int _refusalCount;
 
     public GameSettings Settings { get; }
 
@@ -54,6 +55,11 @@ public sealed class MenuController
     public int SelectedIndex => _selectedIndex;
     public float OpenTimer => _openTimer;
     public bool AcceptsInput => _openTimer >= RevealDuration;
+
+    /// <summary>The game's answer to the latest refusal of the best-man question; null before the first one.</summary>
+    public string? RefusalRemark => _refusalCount == 0
+        ? null
+        : MenuPages.BestManRefusalRemarks[System.Math.Min(_refusalCount, MenuPages.BestManRefusalRemarks.Length) - 1];
 
     public MenuPage? RootPage { get; private set; }
 
@@ -111,6 +117,12 @@ public sealed class MenuController
         }
         _refusalTimer += deltaTime;
         if (_refusalTimer < RefusalSnapBackDelay) return;
+        RegisterRefusal();
+    }
+
+    private void RegisterRefusal()
+    {
+        _refusalCount++;
         _selectedIndex = 0;
         _refusalTimer = 0f;
     }
@@ -150,7 +162,11 @@ public sealed class MenuController
                 Push(MenuPages.Audio);
                 return MenuActionResult.None;
             case MenuEntryId.BestManQuestion:
+                _refusalCount = 0;
                 Push(MenuPages.BestManQuestion);
+                return MenuActionResult.None;
+            case MenuEntryId.RefuseBestMan:
+                RegisterRefusal();
                 return MenuActionResult.None;
             case MenuEntryId.AcceptBestMan:
                 // Replaces the question so going back returns to the settings, not to the question.

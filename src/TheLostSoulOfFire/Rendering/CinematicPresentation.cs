@@ -365,6 +365,7 @@ public sealed class CinematicPresentation
     private const float MenuHitPaddingX = 24f;
     private const float MenuHitPaddingY = 6f;
     private const float MenuPromptOffset = 44f;
+    private const float MenuRemarkOffset = 34f;
 
     /// <summary>
     /// Hit-testable bounds for each entry of <paramref name="page"/>, laid out
@@ -582,6 +583,17 @@ public sealed class CinematicPresentation
                 viewport.Height * MenuStartYFraction - MenuPromptOffset - 8f,
                 3,
                 GameBalance.DeathFlameBright * (0.85f * reveal));
+            if (menu.CurrentPage == MenuPages.BestManQuestion && menu.RefusalRemark is { } remark)
+            {
+                PixelText.DrawCentered(
+                    batch,
+                    pixel,
+                    remark,
+                    centerX,
+                    viewport.Height * MenuStartYFraction - MenuPromptOffset - 8f - MenuRemarkOffset,
+                    2,
+                    GameBalance.SoulWhite * (0.75f * reveal));
+            }
             if (menu.CurrentPage == MenuPages.BestManThanks)
             {
                 DrawCelebrationSparks(batch, pixel, new Vector2(centerX, viewport.Height * MenuStartYFraction - MenuPromptOffset), reveal, time);
