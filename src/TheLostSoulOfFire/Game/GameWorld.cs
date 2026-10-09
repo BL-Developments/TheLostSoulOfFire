@@ -111,6 +111,7 @@ public sealed partial class GameWorld : IDisposable
     private float _burningHandoffTimer;
     private int _burningCommittedLastFrame;
     private float _presentationTime;
+    private bool _doorLeadsToArena;
 
     /// <summary>When the cannon's chamber last took a notch (a charge stage), for its flare (presentation time).</summary>
     private float _cannonNotchAt = float.NegativeInfinity;
@@ -440,6 +441,14 @@ public sealed partial class GameWorld : IDisposable
                 ActiveCombatBounds,
                 viewport,
                 deltaTime);
+            return;
+        }
+
+        if (BiomeCompletionShown)
+        {
+            // The biome's summary has been shown; the hub follows without the extraction summary.
+            _phase = GameFlowRules.ExtractToHub(_phase);
+            BeginAntechamber(viewport);
             return;
         }
 
@@ -988,6 +997,16 @@ public sealed partial class GameWorld : IDisposable
         {
             BeginDoorTransition();
         }
+    }
+
+    /// <summary>
+    /// The arena-based visual tests keep their door: it leads to the arena, as it did before Tür I started
+    /// biome I. The player's own route through Tür I always starts the biome run.
+    /// </summary>
+    internal void RequestAutomatedArenaDoorEntry()
+    {
+        _doorLeadsToArena = true;
+        RequestAutomatedDoorEntry();
     }
 
     public void Draw(SpriteBatch batch, Texture2D pixel, Viewport viewport, SoulfireRenderer renderer, RenderTarget2D? rootTarget = null)
@@ -1761,6 +1780,7 @@ public sealed partial class GameWorld : IDisposable
 
         DrawAbilityHud(batch, pixel, viewport);
         DrawTravelPointOverlay(batch, pixel, viewport);
+        DrawBiomeCompleteOverlay(batch, pixel, viewport);
 
         // Story, prompt and cinematic text would compete with the pause menu's type;
         // the paused world and HUD stay visible under the veil.
@@ -2531,9 +2551,18 @@ public sealed partial class GameWorld : IDisposable
             viewport,
             smoothing);
 
-        if (_phaseTime >= DoorTransitionDuration)
+        if (_phaseTime < DoorTransitionDuration)
+        {
+            return;
+        }
+
+        if (_doorLeadsToArena)
         {
             EnterArena(viewport);
+        }
+        else
+        {
+            StartBiomeRun(seed: null, level: 1, viewport);
         }
     }
 
@@ -2624,6 +2653,8 @@ public sealed partial class GameWorld : IDisposable
         _sandboxActive = stayInSandbox;
         _levelRun = null;
         _roomTransitionElapsed = 0f;
+        _biomeRun = null;
+        _biomeRoomLabel = null;
     }
 
     private void ConfigureBurningAggression(float deltaTime)

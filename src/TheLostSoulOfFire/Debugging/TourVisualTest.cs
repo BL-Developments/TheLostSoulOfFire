@@ -507,7 +507,7 @@ internal sealed class TourVisualTest
         Shot("door_sealed", () => _world.PlaceAutomatedPlayerAtDoor(1), minWait: 0.8f);
         // Long enough in the hall for the souls behind a sealed door to whisper (place event, 18-34 s).
         Do("whispers", () => { }, 14f);
-        Do("door_enter", () => _world.RequestAutomatedDoorEntry());
+        Do("door_enter", () => _world.RequestAutomatedArenaDoorEntry());
         Series("door_transition", 8, 10);
     }
 

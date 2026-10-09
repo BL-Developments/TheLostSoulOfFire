@@ -16,7 +16,8 @@ public enum DeveloperStartArea
     Hub,
     Arena,
     Sandbox,
-    Level
+    Level,
+    Biome
 }
 
 /// <summary>
@@ -27,10 +28,12 @@ public enum DeveloperStartArea
 /// Kept free of MonoGame so the command-line rules
 /// are testable on their own.
 /// </summary>
-public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, PlayerAttributes? AttributeOverride = null, int? Seed = null)
+public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, PlayerAttributes? AttributeOverride = null, int? Seed = null, int Level = 1)
 {
     public const int MinWave = 1;
     public static int MaxWave => Game.GameBalance.ArenaWaveCount;
+    public const int MinLevel = 1;
+    public static int MaxLevel => Game.Levels.BiomeCatalog.One.LevelCount;
 
     private static readonly (string Name, DeveloperStartArea Area)[] Areas =
     [
@@ -43,7 +46,8 @@ public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, Pl
         ("hub", DeveloperStartArea.Hub),
         ("arena", DeveloperStartArea.Arena),
         ("sandbox", DeveloperStartArea.Sandbox),
-        ("level", DeveloperStartArea.Level)
+        ("level", DeveloperStartArea.Level),
+        ("biome:1", DeveloperStartArea.Biome)
     ];
 
     private static readonly string[] AutomatedTestFlags =
@@ -59,6 +63,7 @@ public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, Pl
         "--tour-visual-test",
         "--travel-visual-test",
         "--level-visual-test",
+        "--biome-visual-test",
         "--expect-audio-fallback"
     ];
 
@@ -70,7 +75,8 @@ public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, Pl
         "Usage: dotnet run --project src/TheLostSoulOfFire -- --dev [--start <area>] [--wave <1-10>] [--strength <n>] [--ability-power <n>] [--armor <n>] [--seed <n>]" + Environment.NewLine +
         $"Areas: {string.Join(", ", AreaNames)}" + Environment.NewLine +
         "--wave is only valid with --start arena." + Environment.NewLine +
-        "--seed <integer> is only valid with --start level." + Environment.NewLine +
+        "--level <1-3> is only valid with --start biome:1." + Environment.NewLine +
+        "--seed <integer> is only valid with --start level or biome:1." + Environment.NewLine +
         $"Attributes range from {PlayerAttributes.MinValue} to {PlayerAttributes.MaxValue}; unset ones keep {PlayerAttributes.Baseline}.";
 
     private static readonly string[] AttributeFlags = ["--strength", "--ability-power", "--armor"];
@@ -82,6 +88,8 @@ public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, Pl
         {
             DeveloperStartArea.Arena => $"DEV_START area={AreaName} wave={Wave}",
             DeveloperStartArea.Level when Seed is { } seed => $"DEV_START area={AreaName} seed={seed}",
+            DeveloperStartArea.Biome when Seed is { } seed => $"DEV_START area={AreaName} level={Level} seed={seed}",
+            DeveloperStartArea.Biome => $"DEV_START area={AreaName} level={Level}",
             _ => $"DEV_START area={AreaName}"
         };
         return AttributeOverride is { } attributes
@@ -103,6 +111,7 @@ public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, Pl
         string? startValue = null;
         string? waveValue = null;
         string? seedValue = null;
+        string? levelValue = null;
         string?[] attributeValues = new string?[AttributeFlags.Length];
 
         for (int i = 0; i < args.Length; i++)
@@ -140,6 +149,15 @@ public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, Pl
                     waveValue = args[++i];
                     break;
 
+                case "--level":
+                    if (i + 1 >= args.Length || args[i + 1].StartsWith("--", StringComparison.Ordinal))
+                    {
+                        error = "--level needs a number.";
+                        return false;
+                    }
+                    levelValue = args[++i];
+                    break;
+
                 default:
                     int attributeIndex = Array.IndexOf(AttributeFlags, args[i]);
                     if (attributeIndex < 0)
@@ -158,9 +176,9 @@ public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, Pl
 
         if (!dev)
         {
-            if (startValue is not null || waveValue is not null || seedValue is not null || attributeValues.Any(value => value is not null))
+            if (startValue is not null || waveValue is not null || seedValue is not null || levelValue is not null || attributeValues.Any(value => value is not null))
             {
-                error = "--start, --wave, --seed and attribute flags require --dev.";
+                error = "--start, --wave, --seed, --level and attribute flags require --dev.";
                 return false;
             }
             return true;
@@ -201,12 +219,28 @@ public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, Pl
             }
         }
 
+        int level = MinLevel;
+        if (levelValue is not null)
+        {
+            if (area != DeveloperStartArea.Biome)
+            {
+                error = "--level is only valid with --start biome:1.";
+                return false;
+            }
+
+            if (!int.TryParse(levelValue, out level) || level < MinLevel || level > MaxLevel)
+            {
+                error = $"--level must be between {MinLevel} and {MaxLevel}, got '{levelValue}'.";
+                return false;
+            }
+        }
+
         int? seed = null;
         if (seedValue is not null)
         {
-            if (area != DeveloperStartArea.Level)
+            if (area is not (DeveloperStartArea.Level or DeveloperStartArea.Biome))
             {
-                error = "--seed is only valid with --start level.";
+                error = "--seed is only valid with --start level or biome:1.";
                 return false;
             }
 
@@ -239,7 +273,7 @@ public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, Pl
             ? new PlayerAttributes(attributes[0], attributes[1], attributes[2])
             : null;
 
-        options = new DeveloperStartOptions(area, wave, attributeOverride, seed);
+        options = new DeveloperStartOptions(area, wave, attributeOverride, seed, level);
         return true;
     }
 }

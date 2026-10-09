@@ -63,8 +63,13 @@ public sealed partial class GameWorld
         ClearRunState();
         int levelSeed = seed ?? Environment.TickCount;
         Console.WriteLine($"LEVEL_SEED {levelSeed}");
-        _levelRun = new LevelRun(LevelLayoutGenerator.Generate(levelSeed, LevelLayoutSettings.Default));
-        // Drops the encounter a previous level may have left behind; the start room has none.
+        BeginLevel(new LevelRun(LevelLayoutGenerator.Generate(levelSeed, LevelLayoutSettings.Default)), viewport);
+    }
+
+    /// <summary>Starts <paramref name="run"/> at its start room with a fresh currency run; the arena intro plays first.</summary>
+    private void BeginLevel(LevelRun run, Viewport viewport)
+    {
+        _levelRun = run;
         PrepareRoomEncounter();
         _phase = GamePhase.Arena;
         BeginArenaIntro(viewport);
@@ -101,13 +106,31 @@ public sealed partial class GameWorld
     {
         _roomWaveIndex = 0;
         _roomWavePause = 0f;
-        if (_levelRun is not { } run || !run.HasEncounter)
+        ClearTravelPoint();
+        if (_levelRun is not { } run)
         {
             _roomPlan = null;
             return;
         }
 
-        _roomPlan = RoomEncounterPlan.For(run.CombatRoomsEntered, run.RoomSeed);
+        _roomPlan = run.HasEncounter ? CreateRoomEncounter(run) : null;
+        if (run.Current.Kind == LevelRoomKind.LevelEnd && !run.IsGuardianRoom)
+        {
+            PlaceLevelEndTravelPoint(run);
+        }
+    }
+
+    /// <summary>The guardian room of a biome's last level is a harder combat room with extra waves (change <c>add-biome-run-flow</c>).</summary>
+    private static RoomEncounterPlan CreateRoomEncounter(LevelRun run) =>
+        run.IsGuardianRoom
+            ? RoomEncounterPlan.For(run.CombatRoomsEntered + GameBalance.GuardianProgressBonus, run.RoomSeed, GameBalance.GuardianExtraWaves)
+            : RoomEncounterPlan.For(run.CombatRoomsEntered, run.RoomSeed);
+
+    /// <summary>The level end of levels 1 and 2 in a biome is a travel point where the exit used to stand.</summary>
+    private void PlaceLevelEndTravelPoint(LevelRun run)
+    {
+        _travelPoint = new TravelPoint(RoomExit.Position(_arena.CombatBounds, 1, 0));
+        _biomeRun?.ReachLevelEnd(run.CombatRoomsEntered);
     }
 
     private void AfterLevelRoomIntro()
@@ -186,16 +209,22 @@ public sealed partial class GameWorld
 
     private void ClearLevelRoomEncounter()
     {
+        bool guardian = _levelRun is { IsGuardianRoom: true };
         _levelRun?.MarkCleared();
         _audio.Play(AudioCue.WaveClear, 0.62f);
         _loopState = ArenaLoopState.Intermission;
         _particles.EmitDeathFlame(_arena.CombatBounds.Center.ToVector2(), 12, 0.8f);
+        if (guardian)
+        {
+            CompleteBiomeRun();
+        }
     }
 
     /// <summary>The exit the player stands at, while the room is open for leaving.</summary>
     private int? LevelExitInReach()
     {
-        if (_levelRun is not { } run || _loopState != ArenaLoopState.Intermission)
+        // A level end has no exit: its travel point or the guardian takes over.
+        if (_levelRun is not { } run || _loopState != ArenaLoopState.Intermission || run.Current.Kind == LevelRoomKind.LevelEnd)
         {
             return null;
         }
@@ -210,12 +239,6 @@ public sealed partial class GameWorld
             return;
         }
 
-        if (run.Current.Kind == LevelRoomKind.LevelEnd)
-        {
-            FinishLevel(viewport);
-            return;
-        }
-
         if (!run.TryTakeExit(exitIndex, out _))
         {
             return;
@@ -227,25 +250,26 @@ public sealed partial class GameWorld
         _audio.Play(AudioCue.UiOpen, 0.45f);
     }
 
-    /// <summary>Until reward points exist, the level end secures the whole run, as the arena's completion does.</summary>
-    private void FinishLevel(Viewport viewport)
+    /// <summary>A defeat in a level ends the run; the balances were already lost at the moment of death.</summary>
+    private void ReturnLevelToHubAfterDefeat(Viewport viewport)
     {
-        SecureRunCurrencies();
+        _biomeRun?.Defeat();
+        _phase = GameFlowRules.ReturnToHubAfterDefeat(_phase);
+        BeginAntechamber(viewport);
+    }
+
+    /// <summary>Leaves the level for the hub with the balances that the travel choice secured.</summary>
+    private void ReturnLevelToHub(Viewport viewport, (int Geld, int Glut) secured)
+    {
+        _lastSecured = secured;
         _phase = GameFlowRules.ExtractToHub(_phase);
         BeginAntechamber(viewport);
         _extractedAt = _presentationTime;
     }
 
-    /// <summary>A defeat in a level ends the run; the balances were already lost at the moment of death.</summary>
-    private void ReturnLevelToHubAfterDefeat(Viewport viewport)
-    {
-        _phase = GameFlowRules.ReturnToHubAfterDefeat(_phase);
-        BeginAntechamber(viewport);
-    }
-
     private void DrawRoomExits(SpriteBatch batch, Texture2D pixel)
     {
-        if (_levelRun is not { } run)
+        if (_levelRun is not { } run || run.Current.Kind == LevelRoomKind.LevelEnd)
         {
             return;
         }
@@ -285,7 +309,9 @@ public sealed partial class GameWorld
         }
 
         int waveCount = _roomPlan?.Waves.Count ?? 0;
-        HudRenderer.DrawRoom(batch, pixel, viewport, run.Current.Progress, waveCount, LevelRoomWavesStarted);
+        // A biome run counts the progress of the whole run, not of the current level's stages.
+        int progress = _biomeRoomLabel is null ? run.Current.Progress : run.CombatRoomsEntered;
+        HudRenderer.DrawRoom(batch, pixel, viewport, progress, waveCount, LevelRoomWavesStarted, _biomeRoomLabel);
         if (run.Current.Kind == LevelRoomKind.LevelEnd)
         {
             PixelText.DrawCentered(batch, pixel, "LEVEL GESCHAFFT", viewport.Width * 0.5f, 120f, 4, GameBalance.SoulWhite);

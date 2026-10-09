@@ -277,7 +277,7 @@ public sealed partial class GameWorld
         }
         else if (LevelExitInReach() is not null && CombatActionsEnabled)
         {
-            DrawCenteredPrompt(batch, pixel, viewport, _levelRun is { Current.Kind: LevelRoomKind.LevelEnd } ? "E  ZURÜCK IN DEN HUB" : "E  WEITER", GameBalance.DeathFlame);
+            DrawCenteredPrompt(batch, pixel, viewport, "E  WEITER", GameBalance.DeathFlame);
         }
         else if (PlayerAtWaveTrigger && CombatActionsEnabled)
         {

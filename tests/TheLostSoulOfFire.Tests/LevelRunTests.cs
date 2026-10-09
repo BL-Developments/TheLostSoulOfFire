@@ -103,6 +103,35 @@ public sealed class LevelRunTests
     }
 
     [TestMethod]
+    public void CombatRoomsEntered_CarriesIntoNextLevel()
+    {
+        LevelRun run = new(LevelLayoutGenerator.Generate(ForkSeed(), LevelLayoutSettings.Default), combatRoomsEntered: 5);
+
+        Assert.IsTrue(run.TryTakeExit(0, out LevelRoom next));
+
+        Assert.AreEqual(LevelRoomKind.Combat, next.Kind);
+        Assert.AreEqual(1, next.Progress);
+        Assert.AreEqual(6, run.CombatRoomsEntered);
+    }
+
+    [TestMethod]
+    public void GuardianRoom_HasEncounterAndStaysClosedUntilCleared()
+    {
+        LevelLayout layout = LevelLayoutGenerator.Generate(ForkSeed(), LevelLayoutSettings.Default);
+        LevelRun run = new(layout, guardianAtEnd: true);
+
+        while (run.Current.Kind != LevelRoomKind.LevelEnd)
+        {
+            run.MarkCleared();
+            Assert.IsTrue(run.TryTakeExit(0, out _));
+        }
+
+        Assert.IsTrue(run.IsGuardianRoom);
+        Assert.IsTrue(run.HasEncounter);
+        Assert.IsFalse(run.IsCleared);
+    }
+
+    [TestMethod]
     public void Position_TwoExits_LeftAndRightOfCentre()
     {
         Rectangle bounds = new(0, 0, 1000, 500);
