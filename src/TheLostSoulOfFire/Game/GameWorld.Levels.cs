@@ -124,6 +124,7 @@ public sealed partial class GameWorld
     private void ClearLevelRoomEncounter()
     {
         _levelRun?.MarkCleared();
+        _audio.Play(AudioCue.WaveClear, 0.62f);
         _loopState = ArenaLoopState.Intermission;
         _particles.EmitDeathFlame(_arena.CombatBounds.Center.ToVector2(), 12, 0.8f);
     }

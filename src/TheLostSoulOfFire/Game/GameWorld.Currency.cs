@@ -287,6 +287,11 @@ public sealed partial class GameWorld
         {
             PixelText.DrawCentered(batch, pixel, "WELLE GELEERT · IN DER MITTE GEHT ES WEITER", viewport.Width * 0.5f, viewport.Height - 130f, 1, GameBalance.DeathFlameBright * 0.7f);
         }
+        else if (_loopState == ArenaLoopState.Intermission && CombatActionsEnabled && _levelRun is { Current.Kind: not LevelRoomKind.LevelEnd })
+        {
+            // The exits sit on the north wall, out of view from the south gate, so the hint says where to go.
+            PixelText.DrawCentered(batch, pixel, "DIE AUSGÄNGE IM NORDEN SIND OFFEN", viewport.Width * 0.5f, viewport.Height - 130f, 1, GameBalance.SoulSenseTrace * 0.8f);
+        }
     }
 
     private void DrawSecuredSummary(SpriteBatch batch, Texture2D pixel, Viewport viewport, string prefix, int geld, int glut, float alpha) =>

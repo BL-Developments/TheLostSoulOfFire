@@ -121,6 +121,9 @@ public sealed class HudRenderer
     /// Wave plaque in the top right corner. Waves with reinforcements show one diamond per
     /// push below the counter: lit once the push has entered the arena. The last wave burns.
     /// </summary>
+    // Cached so the room counter allocates no string per frame.
+    private static readonly string[] RoomNumbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+
     /// <summary>Room counter of a level; the start room (progress 0) shows none.</summary>
     public static void DrawRoom(SpriteBatch batch, Texture2D pixel, Viewport viewport, int progress)
     {
@@ -130,7 +133,7 @@ public sealed class HudRenderer
         }
 
         const string label = "RAUM";
-        string value = progress.ToString();
+        string value = progress < RoomNumbers.Length ? RoomNumbers[progress] : progress.ToString();
         int labelWidth = PixelText.MeasureFace(label, TextFace.Body, 10f, 1.4f);
         int valueWidth = PixelText.MeasureFace(value, TextFace.Display, 16f);
         int width = labelWidth + valueWidth + 44;

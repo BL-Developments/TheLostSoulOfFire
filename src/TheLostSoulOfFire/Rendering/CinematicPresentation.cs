@@ -668,16 +668,17 @@ public sealed class CinematicPresentation
     /// </summary>
     private void DrawWaveTransition(SpriteBatch batch, Texture2D pixel, Viewport viewport, int nextWave, bool levelRoom)
     {
+        // A room change fades fully to black; the next room's quick intro fades in from there.
+        if (levelRoom)
+        {
+            batch.FillRectangle(pixel, viewport.Bounds, Color.Black * Ease(_stateTime / GameBalance.RoomTransitionDuration));
+            return;
+        }
+
         float open = Ease(_stateTime / 0.08f);
         float close = 1f - Ease((_stateTime - 0.82f) / 0.23f);
         float alpha = open * close;
         batch.FillRectangle(pixel, viewport.Bounds, Color.Black * (0.1f * alpha));
-
-        // A room change in a level fades the same way but names no wave.
-        if (levelRoom)
-        {
-            return;
-        }
 
         bool final = nextWave >= GameBalance.ArenaWaveCount;
         string label = final ? "LETZTE WELLE" : $"WELLE {ToRoman(nextWave)}";
