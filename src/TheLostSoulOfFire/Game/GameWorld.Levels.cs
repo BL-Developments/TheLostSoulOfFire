@@ -312,7 +312,8 @@ public sealed partial class GameWorld
         // A biome run counts the progress of the whole run, not of the current level's stages.
         int progress = _biomeRoomLabel is null ? run.Current.Progress : run.CombatRoomsEntered;
         HudRenderer.DrawRoom(batch, pixel, viewport, progress, waveCount, LevelRoomWavesStarted, _biomeRoomLabel);
-        if (run.Current.Kind == LevelRoomKind.LevelEnd)
+        // The guardian room is a level end too, but the level is only done once the biome is.
+        if (run.Current.Kind == LevelRoomKind.LevelEnd && !run.IsGuardianRoom)
         {
             PixelText.DrawCentered(batch, pixel, "LEVEL GESCHAFFT", viewport.Width * 0.5f, 120f, 4, GameBalance.SoulWhite);
         }

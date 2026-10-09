@@ -111,7 +111,6 @@ public sealed partial class GameWorld : IDisposable
     private float _burningHandoffTimer;
     private int _burningCommittedLastFrame;
     private float _presentationTime;
-    private bool _doorLeadsToArena;
 
     /// <summary>When the cannon's chamber last took a notch (a charge stage), for its flare (presentation time).</summary>
     private float _cannonNotchAt = float.NegativeInfinity;
@@ -997,16 +996,6 @@ public sealed partial class GameWorld : IDisposable
         {
             BeginDoorTransition();
         }
-    }
-
-    /// <summary>
-    /// The arena-based visual tests keep their door: it leads to the arena, as it did before Tür I started
-    /// biome I. The player's own route through Tür I always starts the biome run.
-    /// </summary>
-    internal void RequestAutomatedArenaDoorEntry()
-    {
-        _doorLeadsToArena = true;
-        RequestAutomatedDoorEntry();
     }
 
     public void Draw(SpriteBatch batch, Texture2D pixel, Viewport viewport, SoulfireRenderer renderer, RenderTarget2D? rootTarget = null)
@@ -2551,26 +2540,10 @@ public sealed partial class GameWorld : IDisposable
             viewport,
             smoothing);
 
-        if (_phaseTime < DoorTransitionDuration)
-        {
-            return;
-        }
-
-        if (_doorLeadsToArena)
-        {
-            EnterArena(viewport);
-        }
-        else
+        if (_phaseTime >= DoorTransitionDuration)
         {
             StartBiomeRun(seed: null, level: 1, viewport);
         }
-    }
-
-    private void EnterArena(Viewport viewport)
-    {
-        ClearRunState();
-        _phase = GameFlowRules.FinishDoorTransition(_phase);
-        BeginArenaIntro(viewport);
     }
 
     private void BeginArenaIntro(Viewport viewport)

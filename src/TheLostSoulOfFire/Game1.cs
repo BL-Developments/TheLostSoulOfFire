@@ -494,9 +494,10 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
             return;
         }
 
+        // Tür I starts biome I; the arena is reached through the developer start, as for a player.
         if (_world.Phase == GamePhase.Antechamber)
         {
-            _world.RequestAutomatedArenaDoorEntry();
+            _world.ApplyDeveloperStart(new DeveloperStartOptions(DeveloperStartArea.Arena, 1), VirtualViewport);
             return;
         }
 
@@ -606,7 +607,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
             (4.6f, () => _screenshotRequested = true),
             (4.7f, () => _world.PlaceAutomatedPlayerAtDoor(0)),
             (5.3f, () => _screenshotRequested = true),
-            (5.4f, () => _world.RequestAutomatedArenaDoorEntry()),
+            (5.4f, () => _world.RequestAutomatedDoorEntry()),
         ];
 
         if (_antechamberVisualStage < steps.Length && _audioTestTotalTime >= steps[_antechamberVisualStage].At)
@@ -662,7 +663,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
                 }
                 else if (_currencyTestStateTime >= 0.4f)
                 {
-                    _world.RequestAutomatedArenaDoorEntry();
+                    _world.ApplyDeveloperStart(new DeveloperStartOptions(DeveloperStartArea.Arena, 1), VirtualViewport);
                 }
                 return;
             case GamePhase.Arena:
@@ -771,7 +772,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
                 }
                 else if (_currencyTestStateTime >= 0.4f)
                 {
-                    _world.RequestAutomatedArenaDoorEntry();
+                    _world.ApplyDeveloperStart(new DeveloperStartOptions(DeveloperStartArea.Arena, 1), VirtualViewport);
                 }
                 return;
             case GamePhase.Arena:

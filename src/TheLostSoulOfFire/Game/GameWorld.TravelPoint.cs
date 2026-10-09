@@ -9,8 +9,8 @@ using TheLostSoulOfFire.Rendering;
 namespace TheLostSoulOfFire.Game;
 
 /// <summary>
-/// Travel point (#53, #74, change <c>add-arena-travel-point</c>). Until real levels exist the arena
-/// stands in for a biome: one travel point appears in the pause after wave 5. <c>E</c> opens a menu
+/// Travel point (#53, #74, change <c>add-arena-travel-point</c>). The arena shows one in the pause after
+/// wave 5; a level shows one at its level end (change <c>add-biome-run-flow</c>). <c>E</c> opens a menu
 /// with the three decisions; the world stays frozen while it is open.
 /// </summary>
 public sealed partial class GameWorld

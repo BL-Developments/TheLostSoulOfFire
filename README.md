@@ -45,7 +45,7 @@ dotnet run --project src/TheLostSoulOfFire -- --dev --start arena --wave 3
 | `prologue:devourer` | Prolog, Devourer-Abschnitt |
 | `prologue:transit` | Prolog, Fahrt auf dem Skiff |
 | `hub` | Aschenvorhalle mit den Biom-Türen |
-| `arena` | Arena hinter Tür I; `--wave 1` bis `--wave 10` wählt die erste Welle |
+| `arena` | Arena, nur über `--dev` erreichbar (Tür I führt in Biom I); `--wave 1` bis `--wave 10` wählt die erste Welle |
 | `sandbox` | Sandbox: Arena ohne Wellen, Truhen und Währungen, nur über `--dev` erreichbar |
 | `level` | Ein neu erzeugtes Level, Raum für Raum; `--seed <n>` legt die Raumfolge fest, der Seed steht in der Konsole (`LEVEL_SEED`) |
 | `biome:1` | Ein neuer Run von Biom I, drei Level bis zum Wächterraum; `--level 1` bis `--level 3` wählt das Startlevel, `--seed <n>` den Run-Seed (`BIOME_SEED`) |
