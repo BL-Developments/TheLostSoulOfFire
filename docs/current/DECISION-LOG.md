@@ -17,8 +17,6 @@ necessarily present on `main`.
   Raumfortschritt.
 - Tür I führt nach der Umsetzung in den Biom-I-Run mit Graubox-Leveln; die
   Arena ist nur noch per `--dev --start arena` erreichbar.
-- Anzahl der Kampfstufen und Gabelungswahrscheinlichkeit sind Arbeitswerte in
-  `GameBalance`.
 
 Nachweis: Entscheidungen des Owners im Projekt-Thread am 09.10.2026.
 
