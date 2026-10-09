@@ -34,7 +34,7 @@ Die Konstanten in `VisualIds` heißen `Biome1Room`, `Biome1RoomWall`, `Biome1Exi
 3. Südtor;
 4. Ausgänge, geschlossen als Gitter und offen als Lichtspalt.
 
-`ArtAssets` fragt je Slot `HasTexture(id)` ab und zeichnet bei vorhandener Grafik das Bild, sonst ruft es die Graubox für dieses Bauteil auf. So lassen sich die Slots einzeln austauschen.
+`GameWorld` fragt je Slot `_art.HasArt(id)` ab und zeichnet bei vorhandener Grafik das Bild, sonst ruft es die Graubox für dieses Bauteil auf. So lassen sich die Slots einzeln austauschen.
 
 ### Platzhalterpalette
 
@@ -52,7 +52,7 @@ Die Werte sind Arbeitswerte. Sie werden an einer Aufnahme neben dem Hub geprüft
 
 ### Grading
 
-`CurrentGradeId` liefert in der Phase `Level` die Grading-ID des Bioms. Ohne LUT fällt sie wie bisher auf `grade.neutral` zurück.
+`CurrentGradeId` liefert bei `InLevel` die Grading-ID des Bioms (ein Level läuft in der Phase `Arena`, siehe `add-level-rooms`). Ohne LUT fällt sie wie bisher auf `grade.neutral` zurück.
 
 ## Risks / Trade-offs
 

@@ -71,6 +71,6 @@ Das System SHALL beim Tod des Spielers in einem Raum regulären Kampfinput stopp
 ### Requirement: Das HUD zeigt den Raumfortschritt
 Das System SHALL im Kampf-HUD eines Levels `RAUM <n>` mit dem Fortschritt des aktuellen Raums anzeigen.
 
-#### Scenario: Dritte Stufe
-- **WHEN** der Spieler in einem Raum der dritten Stufe steht
+#### Scenario: Dritter Kampfraum
+- **WHEN** der Spieler im Kampfraum der dritten Kampfstufe steht
 - **THEN** zeigt das HUD `RAUM 3`

@@ -36,6 +36,6 @@ Mit `add-level-rooms` und `add-room-wave-scaling` ist ein einzelnes Level spielb
 ## Impact
 
 - **Neuer Code:** `BiomeRun` (reine Zustandslogik) und `BiomeDefinition` mit dem Eintrag für Biom I unter `Game/Levels/`; `GameWorld.BiomeRun.cs`.
-- **Geänderte Stellen:** `GameFlowRules` und `GameWorld.Levels.cs` (Levelende je nach Level). `GameWorld.TravelPoint.cs` stellt den Reisepunkt auch im Levelende auf. Die Eintrittssequenz von Tür I führt in den Biom-Run, und das HUD zeigt die neue Zeile.
+- **Geänderte Stellen:** `GameWorld.Levels.cs` (Levelende je nach Level). `GameWorld.TravelPoint.cs` stellt den Reisepunkt auch im Levelende auf. `EnterArena` am Ende der Eintrittssequenz von Tür I führt in den Biom-Run, und das HUD zeigt die neue Zeile.
 - **Nicht enthalten:** Boss und Soul-Release-Phase (#92), Freischaltung von Tür II (#93), Biomwahl (#62), Speichern des Run-Fortschritts (#64), Kisten in Räumen.
 - **Abhängig von:** `add-level-rooms` und `add-room-wave-scaling`.

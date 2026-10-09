@@ -21,7 +21,7 @@ Björn hat am 09.10.2026 entschieden:
 
 ### Stufenmodell statt freiem Graphen
 
-`LevelLayout` besteht aus Stufen (`IReadOnlyList<IReadOnlyList<LevelRoom>>`). `LevelRoom` hat `Id`, `Kind` (Start, Combat, LevelEnd), `Progress` (Stufennummer) und `Exits` (Ids der nächsten Stufe).
+`LevelLayout` besteht aus Stufen (`IReadOnlyList<IReadOnlyList<LevelRoom>>`). `LevelRoom` hat `Id`, `Kind` (Start, Combat, LevelEnd), `Progress` (Stufenindex: Start 0, erste Kampfstufe 1) und `Exits` (Ids der nächsten Stufe, links vor rechts).
 - Jeder Raum verbindet zu allen Räumen der nächsten Stufe. Bei höchstens zwei Räumen je Stufe gibt es damit höchstens zwei Ausgänge.
 - Gabeln und Zusammenführen ergeben sich von selbst, Sackgassen und unerreichbare Räume sind ausgeschlossen.
 

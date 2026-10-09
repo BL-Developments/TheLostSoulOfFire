@@ -51,7 +51,7 @@ Der Bereich `level` (einzelnes Level ohne Biom) behält das vorläufige Levelend
 
 ### Tür I und Phasen
 
-Die Eintrittssequenz von Tür I endet in `StartBiomeRun(1)` statt in `EnterArena`. `GamePhase.EnteringArena` heißt künftig `EnteringBiome`.
+Die Eintrittssequenz von Tür I endet in `StartBiomeRun(seed: null, level: 1)` statt in `EnterArena`. `GamePhase.EnteringArena` behält seinen Namen, weil ein Level weiter in der Phase `Arena` läuft (siehe `add-level-rooms`); eine Umbenennung wäre nur Rauschen.
 
 Die Arena wird nur noch über den Developer-Start (`DeveloperStartArea.Arena`) erreicht. Ihr Ablauf, auch ihr Reisepunkt nach Welle 5, bleibt unverändert.
 

@@ -46,20 +46,36 @@ Unterscheidbar wird ein Raum erst durch `add-level-visual-slots`. Bis dahin ist 
 - Ein geschlossener Ausgang wird als dunkles Gitter gezeichnet, ein offener mit kaltem Licht. Beides sind Platzhalterformen.
 - `E` in `GameBalance.RoomExitInteractRadius` startet die Blende. Die Reihenfolge der Interaktion bleibt: Kiste, Reisepunkt, Ausgang.
 
-### Phase und Übergänge
+### Ein Level läuft in der Phase `Arena`
 
-`GamePhase.Level` kommt neu dazu. `GameFlowRules` bekommt drei Übergänge:
-- `StartLevel`: Hub oder Dev-Start → Level;
-- `LeaveLevelToHub`: Level → Antechamber;
-- `DefeatInLevel`: Level → Antechamber.
+Ein Level bekommt keine eigene `GamePhase`. Es läuft in `GamePhase.Arena`, solange ein `LevelRun` aktiv ist; die Eigenschaft heißt `InLevel => _levelRun is not null`.
 
-`AllowsCombat` umfasst `Level`. `ActiveCombatBounds` und `ActiveWorldBounds` liefern im Level die Arena-Grenzen.
+So bleibt alles, was die Arena schon kann, ohne Änderung erhalten: Grenzen, Kamera, Glutgutschrift, Fähigkeiten, Kampf-HUD, Musik und Todeszustand. In `GameWorld` gibt es über 60 Abfragen auf `GamePhase.Arena`; eine neue Phase müsste jede davon anfassen.
 
-Glutgutschrift, Fähigkeiten und HUD fragen eine kleine Eigenschaft `IsRunPhase` ab (Arena oder Level).
+Der Arena-Ablauf (`ArenaLoopState`) wird im Level so genutzt:
+
+| Zustand | Arena heute | Im Level |
+|---|---|---|
+| `Intro` | Arena-Intro, danach `SpawnWave(1)` | Raum betreten (kurzes Intro mit `BeginIntro(true)`), danach `SpawnRoomWave()`; Start- und Levelende-Raum gehen direkt nach `Intermission` |
+| `Combat` | Welle läuft, Nachschub über `UpdateReinforcements` | gleich |
+| `Combat` geräumt | `Intermission` mit Kiste, Reisepunkt, Auslösezone | `MarkCleared()` und `Intermission` mit offenen Ausgängen, ohne Kiste, Reisepunkt und Auslösezone |
+| `Intermission` | `E` in der Mitte startet die nächste Welle | `E` an einem Ausgang startet den Raumwechsel |
+| `Transition` | Wellenübergang | Blende des Raumwechsels; danach `EnterRoom(next)` und `Intro` |
+| `Complete` | Abschluss nach Welle 10 | wird im Level nicht genutzt |
+
+Die Weichen sitzen an vier Stellen:
+- `UpdateArenaLoop` (Fall „geräumt“ und die Fälle `Intro` und `Transition`);
+- `UpdateCurrency` (`E`-Reihenfolge Kiste, Reisepunkt, Ausgang statt Auslösezone);
+- `DrawArenaLoop` (Ausgänge statt Auslösezone zeichnen);
+- `HudRenderer.DrawWave` (im Level stattdessen `RAUM <n>`).
+
+`ClearRunState` setzt `_levelRun = null`. Für den Raumwechsel gibt es ein eigenes `ClearRoomState()`, das nur Gegner, Seelen, Geschosse, Effekte und `_waveRun` leert und Spielerzustand, Fähigkeiten und Bestände behält.
+
+`GameFlowRules` bekommt nur `ReturnToHubAfterDefeat(GamePhase)` (Arena → Antechamber). Für das Levelende wird das vorhandene `ExtractToHub` genutzt.
 
 ### Niederlage
 
-Der vorhandene Todeszustand läuft ab. Danach geht es ohne `R`-Neuversuch nach `GameBalance.LevelDefeatDelay` in den Hub, und `LoseRunCurrencies` wird aufgerufen.
+Der vorhandene Todeszustand läuft ab. Im Level ignoriert `RetryCurrentEncounter` die Taste `R` (früh zurückkehren, wenn `InLevel`). Nach `GameBalance.LevelDefeatDelay` Sekunden Todeszustand wird `LoseRunCurrencies` aufgerufen; danach folgen `_phase = GameFlowRules.ReturnToHubAfterDefeat(_phase)` und `BeginAntechamber(viewport)`.
 
 Die Bergungsinszenierung bleibt offen (#68). `add-biome-run-flow` kann sie später ergänzen.
 
@@ -72,5 +88,5 @@ Die Bergungsinszenierung bleibt offen (#68). `add-biome-run-flow` kann sie spät
 ## Risks / Trade-offs
 
 - **Räume sehen alle gleich aus:** Das ist bewusst so, bis `add-level-visual-slots` kommt. Wegwahl ist darum vorerst nur über den HUD-Fortschritt und die Gegner spürbar.
-- **Mehr Phasenabfragen in `GameWorld`:** Eine gemeinsame Eigenschaft `IsRunPhase` hält das klein; die neue Logik liegt in `GameWorld.Levels.cs`.
+- **Level und Arena teilen eine Phase:** Jede Weiche im Arena-Ablauf muss `InLevel` beachten, sonst erscheinen im Level Kisten, Reisepunkt oder Auslösezone der Arena. Die Weichen sind auf die vier Stellen oben begrenzt, und `--level-visual-test` prüft, dass im Level keine Auslösezone erscheint.
 - **Levelende sichert alles:** Das ist ein Platzhalter für den Reisepunkt. Er wird mit `add-biome-run-flow` ersetzt, damit sich niemand an „Level = Extraktion“ gewöhnt.

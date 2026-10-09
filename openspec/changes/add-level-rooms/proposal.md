@@ -40,7 +40,7 @@
 ## Impact
 
 - **Neuer Code:** `GameWorld.Levels.cs`, `LevelRun` (reiner Zustand: aktueller Raum, geräumt, gewählter Ausgang) und `RoomExit` unter `Game/Levels/`.
-- **Geänderte Stellen:** `GamePhase` bekommt `Level`, `GameFlowRules` bekommt passende Übergänge. Phasenabfragen in `GameWorld.cs`, `GameWorld.Currency.cs` und `GameWorld.Abilities.cs` gelten für Arena und Level.
+- **Geänderte Stellen:** Ein Level läuft in der vorhandenen Phase `Arena` mit aktivem `LevelRun`. Geändert werden nur die Weichen im Arena-Ablauf (`UpdateArenaLoop`, `UpdateCurrency`, `DrawArenaLoop`, Wellenanzeige im HUD), `RetryCurrentEncounter` und `GameFlowRules.ReturnToHubAfterDefeat`.
 - **Wiederverwendet:** `Arena` (Geometrie und Zeichnen) und `ArenaWaveRun`.
 - **Developer-Start:** `DeveloperStartOptions` und README.
 - **Abhängig von:** `add-level-room-generation`.
