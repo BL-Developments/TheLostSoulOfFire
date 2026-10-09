@@ -22,6 +22,12 @@ public sealed class LevelRun
 
     public int Seed => Layout.Seed;
 
+    /// <summary>Combat rooms entered in this run, including the current one: the progress that scales their encounters.</summary>
+    public int CombatRoomsEntered { get; private set; }
+
+    /// <summary>Seed of the current room's encounter; the same room in the same level always gets the same seed.</summary>
+    public int RoomSeed => unchecked(Layout.Seed * 31 + Current.Id);
+
     public bool HasEncounter => Current.Kind == LevelRoomKind.Combat;
 
     public void MarkCleared() => IsCleared = true;
@@ -38,6 +44,11 @@ public sealed class LevelRun
         next = Layout.Room(Current.Exits[exitIndex]);
         Current = next;
         IsCleared = !HasEncounter;
+        if (HasEncounter)
+        {
+            CombatRoomsEntered++;
+        }
+
         return true;
     }
 }

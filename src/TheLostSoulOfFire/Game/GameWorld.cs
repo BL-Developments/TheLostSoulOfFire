@@ -2707,12 +2707,26 @@ public sealed partial class GameWorld : IDisposable
                 break;
 
             case ArenaLoopState.Combat:
+                if (InLevel && _roomWavePause > 0f)
+                {
+                    UpdateRoomWavePause(deltaTime);
+                    break;
+                }
+
                 UpdateReinforcements(deltaTime);
                 if (_enemies.Count == 0 && _souls.Count == 0 && _waveRun.AllPushesReleased && _pendingSpawns.Count == 0)
                 {
                     if (InLevel)
                     {
-                        ClearLevelRoomEncounter();
+                        if (HasNextRoomWave)
+                        {
+                            BeginNextRoomWavePause();
+                        }
+                        else
+                        {
+                            ClearLevelRoomEncounter();
+                        }
+
                         break;
                     }
 

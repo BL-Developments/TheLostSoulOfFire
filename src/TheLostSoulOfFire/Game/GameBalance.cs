@@ -122,7 +122,17 @@ public static class GameBalance
     public const int LevelCombatStagesMin = 4;
     public const int LevelCombatStagesMax = 6;
     public const float LevelForkChance = 0.35f;
-    public static readonly ArenaPush LevelPlaceholderPush = new(2, 2, 0);
+    // Room encounters (change add-room-wave-scaling). Working values; see design.md for the formula.
+    public const int RoomWavesMax = 4;
+    public const int RoomStagesPerExtraWave = 3;
+    public const int RoomEnemiesPerWaveBase = 3;
+    public const float RoomEnemiesPerWaveGrowth = 0.5f;
+    public const int RoomEnemiesPerWaveMax = 8;
+    public const int RoomBurningFromProgress = 2;
+    public const int RoomHeavyPerProgress = 1;
+    public const int RoomDevourerFromProgress = 4;
+    public const float RoomDevourerShare = 0.25f;
+    public const float RoomWavePause = 1.2f;
     public const float RoomExitInteractRadius = 70f;
     public const float RoomTransitionDuration = 0.6f;
     public const float LevelDefeatDelay = 2.5f;

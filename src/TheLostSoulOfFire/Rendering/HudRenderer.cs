@@ -124,8 +124,11 @@ public sealed class HudRenderer
     // Cached so the room counter allocates no string per frame.
     private static readonly string[] RoomNumbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 
-    /// <summary>Room counter of a level; the start room (progress 0) shows none.</summary>
-    public static void DrawRoom(SpriteBatch batch, Texture2D pixel, Viewport viewport, int progress)
+    /// <summary>
+    /// Room counter of a level; the start room (progress 0) shows none. A combat room shows one diamond
+    /// per wave below the counter, lit for the waves that have started (change <c>add-room-wave-scaling</c>).
+    /// </summary>
+    public static void DrawRoom(SpriteBatch batch, Texture2D pixel, Viewport viewport, int progress, int waveCount, int wavesStarted)
     {
         if (progress <= 0)
         {
@@ -136,14 +139,28 @@ public sealed class HudRenderer
         string value = progress < RoomNumbers.Length ? RoomNumbers[progress] : progress.ToString();
         int labelWidth = PixelText.MeasureFace(label, TextFace.Body, 10f, 1.4f);
         int valueWidth = PixelText.MeasureFace(value, TextFace.Display, 16f);
-        int width = labelWidth + valueWidth + 44;
-        Rectangle panel = new(viewport.Width - 24 - width, 24, width, 36);
+        int width = Math.Max(labelWidth + valueWidth + 44, waveCount > 1 ? waveCount * 14 + 34 : 0);
+        int height = waveCount > 1 ? 50 : 36;
+        Rectangle panel = new(viewport.Width - 24 - width, 24, width, height);
         UiKit.Panel(batch, pixel, panel, Muted, 0.5f, 1f, 0f);
 
         int contentX = panel.X + (width - labelWidth - valueWidth - 10) / 2;
         int baseline = panel.Y + 12;
         PixelText.DrawFace(batch, pixel, label, new Vector2(contentX, baseline + 3), TextFace.Body, 10f, Label, 1.4f);
         PixelText.DrawFace(batch, pixel, value, new Vector2(contentX + labelWidth + 10, baseline - 3), TextFace.Display, 16f, BoundSoul);
+
+        if (waveCount > 1)
+        {
+            const int spacing = 14;
+            int startX = panel.Center.X - (waveCount - 1) * spacing / 2;
+            for (int wave = 0; wave < waveCount; wave++)
+            {
+                Vector2 center = new(startX + wave * spacing, panel.Bottom - 12);
+                bool started = wave < wavesStarted;
+                UiKit.FillDiamond(batch, pixel, center, 4, started ? GameBalance.DeathFlame : new Color(32, 28, 40));
+                UiKit.FillDiamond(batch, pixel, center, 2, started ? GameBalance.DeathFlameBright : Muted * 0.8f);
+            }
+        }
     }
 
     public static void DrawWave(SpriteBatch batch, Texture2D pixel, Viewport viewport, int wave, int waveCount, int pushesReleased, int pushCount)
