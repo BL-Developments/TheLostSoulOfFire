@@ -18,7 +18,7 @@ Das System SHALL in der Interaktionszone von Tür I eine Aufforderung zur Intera
 
 #### Scenario: Eintrittssequenz endet
 - **WHEN** die Eintrittssequenz durch Tür I endet
-- **THEN** steht der Spieler im Eingangsraum von Level 1 in Biom I
+- **THEN** steht der Spieler im Startraum von Level 1 in Biom I
 
 #### Scenario: Spieler drückt E außerhalb jeder Türzone
 - **WHEN** der Spieler `E` außerhalb aller Interaktionszonen drückt
