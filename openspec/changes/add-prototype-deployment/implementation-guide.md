@@ -1,6 +1,6 @@
 # Implementierungsleitfaden
 
-Dieser Leitfaden konkretisiert `design.md` und `specs/prototype-distribution/spec.md`. Arbeite `tasks.md` in Reihenfolge ab. Alle Pfade sind relativ zur Repository-Wurzel. Dieser Change ist noch nicht implementiert; Befehle und Ausgabeformate hier sind Soll-Vorgaben, keine bereits geprüften Ergebnisse.
+Dieser Leitfaden konkretisiert `design.md` und `specs/prototype-distribution/spec.md`. Arbeite `tasks.md` in Reihenfolge ab. Alle Pfade sind relativ zur Repository-Wurzel. Befehle und Ausgabeformate hier sind Soll-Vorgaben. Tatsächlich geprüfte Ergebnisse und offene Betreiberaufgaben stehen in `tasks.md`.
 
 ## A. Umfang und Einstieg
 

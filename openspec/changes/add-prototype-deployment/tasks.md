@@ -3,8 +3,8 @@
 Vor Beginn `implementation-guide.md` vollständig lesen. Referenzen A–H beziehen sich auf dessen Abschnitte. Ein Task gilt erst nach seinem angegebenen Nachweis als erledigt; nicht ausgeführte Betriebsaufgaben offen lassen.
 
 - [x] 1.1 `tools/deployment/Test-PrototypePackage.ps1` gemäß C anlegen. Nachweis: Pflichtdateien, Registry-/Metadaten-JSON, Runtimeconfig und Windows-x64-Native-Pfade werden geprüft; kein Spielstart.
-- [ ] 1.2 `tools/deployment/Package-Prototype.ps1` gemäß B anlegen: Version validieren, vorhandenes Ziel ablehnen, Clean-Tree/Commit ermitteln, Publish mit allen festgelegten Flags ausführen. Nachweis: native Fehlercodes werden übernommen und keine früheren Builds überschrieben.
-- [ ] 1.3 Paketierung vervollständigen: Metadaten, SDK-/Paketnachweis, Testerdatei, Prüferaufruf, ZIP ohne Zusatzordner und SHA-256-Datei. Nachweis: Ausgabe entspricht exakt B; Erfolg erst nach vollständig erzeugtem Paket.
+- [x] 1.2 `tools/deployment/Package-Prototype.ps1` gemäß B anlegen: Version validieren, vorhandenes Ziel ablehnen, Clean-Tree/Commit ermitteln, Publish mit allen festgelegten Flags ausführen. Nachweis: native Fehlercodes werden übernommen und keine früheren Builds überschrieben.
+- [x] 1.3 Paketierung vervollständigen: Metadaten, SDK-/Paketnachweis, Testerdatei, Prüferaufruf, ZIP ohne Zusatzordner und SHA-256-Datei. Nachweis: Ausgabe entspricht exakt B; Erfolg erst nach vollständig erzeugtem Paket.
 - [x] 1.4 `docs/deployment/TESTER-README.md` schreiben und in Paketierung einbinden. Nachweis: Start, aktuelle Steuerung, bekannte Probleme, Version aus build-info.json und Feedback an Testlink-Absender vorhanden; keine erfundenen Kontaktdaten.
 - [x] 1.5 `tools/deployment/Test-DeploymentScripts.ps1` für die Paketfälle aus F erstellen und ausführen. Nachweis: fehlende Runtime/Shader, kaputtes JSON, falsche Architektur, ungültige Version und vorhandener Zielordner werden korrekt abgewiesen.
 
@@ -12,7 +12,9 @@ Vor Beginn `implementation-guide.md` vollständig lesen. Referenzen A–H bezieh
 
 - [x] 2.1 `.github/workflows/prototype-build.yml` genau nach D anlegen. Nachweis: manueller Versionseingang, Windows/pwsh, vorhandene Action-Majors, .NET 9, Skripttests und dotnet test vor Paketierung, Artefakt nur bei Erfolg.
 - [x] 2.2 `docs/deployment/README.md` um lokale Befehle, Clean-Tree-Voraussetzung, Ausgaben, 30-Tage-Aufbewahrung und Default-Branch-Voraussetzung für workflow_dispatch ergänzen; im Projekt-README verlinken.
-- [ ] 2.3 Lokale Skripttests, bestehende Tests und reale Windows-Paketierung an einem sauberen Commit ausführen. ZIP neu entpacken und Paketprüfer darauf anwenden. Nachweis: Befehle/Exitcodes, Version/Commit und tatsächliche Prüfergebnisse dokumentiert; dies ersetzt nicht die Zweitrechner-Abnahme.
+- [x] 2.3 Lokale Skripttests, bestehende Tests und reale Windows-Paketierung an einem sauberen Commit ausführen. ZIP neu entpacken und Paketprüfer darauf anwenden. Nachweis: Befehle/Exitcodes, Version/Commit und tatsächliche Prüfergebnisse dokumentiert; dies ersetzt nicht die Zweitrechner-Abnahme.
+
+Lokaler Nachweis am 2026-10-10 (Windows x64, PowerShell 7.6.5): `Test-DeploymentScripts.ps1` bestand mit 27 Assertions und Exitcode 0 auch unter dem GitHub-pwsh-Exitcode-Wrapper. `dotnet test tests/TheLostSoulOfFire.Tests/TheLostSoulOfFire.Tests.csproj --configuration Release` bestand mit 312/312 Tests und Exitcode 0. `Package-Prototype.ps1 -Version 0.1.0-prototype.1` lief am sauberen Commit `19dc99449a77d6983aa3077f8ec70d992f000453` erfolgreich (Exitcode 0); das ZIP `TheLostSoulOfFire-0.1.0-prototype.1-win-x64.zip` hat SHA-256 `390cd6408dcce4f910b66aea3ff3841f56a303cc03649c26578d7fde83c6234f`. Das ZIP wurde separat entpackt; `Test-PrototypePackage.ps1` bestand am entpackten Verzeichnis, `TheLostSoulOfFire.exe` lag direkt an der Wurzel, und interne/externe Metadaten sowie `.sha256` stimmten überein. Ein zuvor absichtlich bestehender Versionsordner wurde vom Paketierungsskript abgewiesen; ein fehlgeschlagener `dotnet publish` gab Exitcode 1 weiter. Kein Spielstart oder Zweitrechner-Test ist durch diesen Nachweis abgedeckt.
 
 ## 3. Upload-Implementierung
 
