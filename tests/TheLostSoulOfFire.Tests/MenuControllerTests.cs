@@ -51,46 +51,7 @@ public sealed class MenuControllerTests
     }
 
     [TestMethod]
-    public void Tick_SelectionOnBestManNo_SlidesBackToYesAfterDelay()
-    {
-        MenuController menu = OpenBestManQuestion();
-        menu.MoveSelection(1);
-        menu.Tick(MenuController.RefusalSnapBackDelay * 0.5f);
-        Assert.AreEqual(1, menu.SelectedIndex);
-
-        menu.Tick(MenuController.RefusalSnapBackDelay);
-
-        Assert.AreEqual(0, menu.SelectedIndex);
-    }
-
-    [TestMethod]
-    public void Confirm_RepeatedBestManNo_AdvancesRemarksAndKeepsTheLast()
-    {
-        MenuController menu = OpenBestManQuestion();
-        Assert.IsNull(menu.RefusalRemark);
-
-        for (int i = 0; i < MenuPages.BestManRefusalRemarks.Length + 2; i++)
-        {
-            menu.SetHoverIndex(1);
-            menu.Confirm();
-        }
-
-        Assert.AreEqual(MenuPages.BestManRefusalRemarks[^1], menu.RefusalRemark);
-    }
-
-    [TestMethod]
-    public void Tick_SnapBackFromBestManNo_CountsAsRefusal()
-    {
-        MenuController menu = OpenBestManQuestion();
-        menu.MoveSelection(1);
-
-        menu.Tick(MenuController.RefusalSnapBackDelay);
-
-        Assert.AreEqual(MenuPages.BestManRefusalRemarks[0], menu.RefusalRemark);
-    }
-
-    [TestMethod]
-    public void Confirm_BestManNo_StaysOnQuestion()
+    public void Confirm_BestManNo_StartsBurningAndStaysOnQuestion()
     {
         MenuController menu = OpenBestManQuestion();
         menu.SetHoverIndex(1);
@@ -99,6 +60,35 @@ public sealed class MenuControllerTests
 
         Assert.AreEqual(MenuActionResult.None, result);
         Assert.AreEqual(MenuPages.BestManQuestion.Id, menu.CurrentPage.Id);
+        menu.Tick(MenuController.RefusalBurnDuration * 0.5f);
+        Assert.AreEqual(0.5f, menu.RefusalBurnProgress, 0.001f);
+        Assert.AreEqual("NEIN", menu.GetLabel(menu.CurrentPage.Entries[1]));
+    }
+
+    [TestMethod]
+    public void Confirm_BurntBestManNo_ActsAsSecondYes()
+    {
+        MenuController menu = OpenBestManQuestion();
+        menu.SetHoverIndex(1);
+        menu.Confirm();
+        menu.Tick(MenuController.RefusalBurnDuration);
+        Assert.AreEqual("JA", menu.GetLabel(menu.CurrentPage.Entries[1]));
+
+        menu.Confirm();
+
+        Assert.AreEqual(MenuPages.BestManThanks.Id, menu.CurrentPage.Id);
+    }
+
+    [TestMethod]
+    public void MoveSelection_OntoBestManNo_KeepsSelection()
+    {
+        MenuController menu = OpenBestManQuestion();
+
+        menu.MoveSelection(1);
+
+        menu.Tick(1f);
+        Assert.AreEqual(1, menu.SelectedIndex);
+        Assert.AreEqual(0f, menu.RefusalBurnProgress);
     }
 
     private static MenuController OpenBestManQuestion()

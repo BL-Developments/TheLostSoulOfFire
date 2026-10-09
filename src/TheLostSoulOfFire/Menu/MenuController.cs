@@ -34,14 +34,14 @@ public sealed class MenuController
     /// </summary>
     public const float RevealDuration = 0.35f;
 
-    /// <summary>Seconds the selection may rest on NEIN of the best-man question before it slides back to JA.</summary>
-    public const float RefusalSnapBackDelay = 0.3f;
+    /// <summary>Seconds NEIN of the best-man question takes to burn down before it turns into a second JA.</summary>
+    public const float RefusalBurnDuration = 1.6f;
 
     private readonly Stack<MenuPage> _pages = new();
     private int _selectedIndex;
     private float _openTimer;
-    private float _refusalTimer;
-    private int _refusalCount;
+    private bool _refusalBurning;
+    private float _refusalBurnTime;
 
     public GameSettings Settings { get; }
 
@@ -56,10 +56,10 @@ public sealed class MenuController
     public float OpenTimer => _openTimer;
     public bool AcceptsInput => _openTimer >= RevealDuration;
 
-    /// <summary>The game's answer to the latest refusal of the best-man question; null before the first one.</summary>
-    public string? RefusalRemark => _refusalCount == 0
-        ? null
-        : MenuPages.BestManRefusalRemarks[System.Math.Min(_refusalCount, MenuPages.BestManRefusalRemarks.Length) - 1];
+    /// <summary>How far NEIN of the best-man question has burnt down, from 0 (untouched) to 1 (gone).</summary>
+    public float RefusalBurnProgress => _refusalBurning ? System.Math.Min(_refusalBurnTime / RefusalBurnDuration, 1f) : 0f;
+
+    public bool IsRefusalBurnt => RefusalBurnProgress >= 1f;
 
     public MenuPage? RootPage { get; private set; }
 
@@ -105,26 +105,10 @@ public sealed class MenuController
     {
         if (!IsOpen) return;
         _openTimer += deltaTime;
-        SnapBackFromRefusal(deltaTime);
-    }
-
-    private void SnapBackFromRefusal(float deltaTime)
-    {
-        if (CurrentPage.Entries[_selectedIndex].Id != MenuEntryId.RefuseBestMan)
+        if (_refusalBurning)
         {
-            _refusalTimer = 0f;
-            return;
+            _refusalBurnTime += deltaTime;
         }
-        _refusalTimer += deltaTime;
-        if (_refusalTimer < RefusalSnapBackDelay) return;
-        RegisterRefusal();
-    }
-
-    private void RegisterRefusal()
-    {
-        _refusalCount++;
-        _selectedIndex = 0;
-        _refusalTimer = 0f;
     }
 
     public void MoveSelection(int delta)
@@ -162,16 +146,22 @@ public sealed class MenuController
                 Push(MenuPages.Audio);
                 return MenuActionResult.None;
             case MenuEntryId.BestManQuestion:
-                _refusalCount = 0;
+                _refusalBurning = false;
+                _refusalBurnTime = 0f;
                 Push(MenuPages.BestManQuestion);
                 return MenuActionResult.None;
             case MenuEntryId.RefuseBestMan:
-                RegisterRefusal();
+                if (IsRefusalBurnt)
+                {
+                    ShowBestManThanks();
+                }
+                else
+                {
+                    _refusalBurning = true;
+                }
                 return MenuActionResult.None;
             case MenuEntryId.AcceptBestMan:
-                // Replaces the question so going back returns to the settings, not to the question.
-                _pages.Pop();
-                Push(MenuPages.BestManThanks);
+                ShowBestManThanks();
                 return MenuActionResult.None;
             case MenuEntryId.Back:
             case MenuEntryId.CancelQuit:
@@ -255,8 +245,16 @@ public sealed class MenuController
         MenuEntryId.MasterVolume => $"GESAMTLAUTSTÄRKE: {Settings.MasterVolume}%",
         MenuEntryId.MusicVolume => $"MUSIK: {Settings.MusicVolume}%",
         MenuEntryId.EffectsVolume => $"EFFEKTE: {Settings.EffectsVolume}%",
+        MenuEntryId.RefuseBestMan when IsRefusalBurnt => "JA",
         _ => entry.Label
     };
+
+    private void ShowBestManThanks()
+    {
+        // Replaces the question so going back returns to the settings, not to the question.
+        _pages.Pop();
+        Push(MenuPages.BestManThanks);
+    }
 
     private void Push(MenuPage page)
     {

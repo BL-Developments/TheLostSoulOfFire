@@ -365,7 +365,6 @@ public sealed class CinematicPresentation
     private const float MenuHitPaddingX = 24f;
     private const float MenuHitPaddingY = 6f;
     private const float MenuPromptOffset = 44f;
-    private const float MenuRemarkOffset = 34f;
 
     /// <summary>
     /// Hit-testable bounds for each entry of <paramref name="page"/>, laid out
@@ -583,17 +582,6 @@ public sealed class CinematicPresentation
                 viewport.Height * MenuStartYFraction - MenuPromptOffset - 8f,
                 3,
                 GameBalance.DeathFlameBright * (0.85f * reveal));
-            if (menu.CurrentPage == MenuPages.BestManQuestion && menu.RefusalRemark is { } remark)
-            {
-                PixelText.DrawCentered(
-                    batch,
-                    pixel,
-                    remark,
-                    centerX,
-                    viewport.Height * MenuStartYFraction - MenuPromptOffset - 8f - MenuRemarkOffset,
-                    2,
-                    GameBalance.SoulWhite * (0.75f * reveal));
-            }
             if (menu.CurrentPage == MenuPages.BestManThanks)
             {
                 DrawCelebrationSparks(batch, pixel, new Vector2(centerX, viewport.Height * MenuStartYFraction - MenuPromptOffset), reveal, time);
@@ -610,6 +598,12 @@ public sealed class CinematicPresentation
             {
                 int width = PixelText.Measure(menu.GetLabel(entries[i]), MenuEntryScale);
                 DrawSelection(batch, pixel, centerX, y, width, 17, reveal);
+            }
+            float burn = entries[i].Id == MenuEntryId.RefuseBestMan ? menu.RefusalBurnProgress : 0f;
+            if (burn > 0f && burn < 1f)
+            {
+                DrawBurningEntry(batch, pixel, menu.GetLabel(entries[i]), centerX, y, color, burn, reveal, time);
+                continue;
             }
             DrawEntryLabel(batch, pixel, menu.GetLabel(entries[i]), centerX, y, color * (reveal * breathe), reveal);
             if (menu.VolumeOf(entries[i]) is { } volume)
@@ -635,6 +629,30 @@ public sealed class CinematicPresentation
             Vector2 position = center + new Vector2(MathF.Cos(angle) * CelebrationRadiusX, MathF.Sin(angle) * CelebrationRadiusY);
             int size = 2 + (int)(flicker * 3f);
             UiKit.FillDiamond(batch, pixel, position, size, Color.Lerp(GameBalance.DeathFlame, GameBalance.DeathFlameBright, flicker) * reveal);
+        }
+    }
+
+    private const int BurnFlameCount = 14;
+    private const float BurnFlameRise = 40f;
+
+    /// <summary>NEIN of the best-man question burning down: the label glows, fades, and flames rise off it.</summary>
+    private void DrawBurningEntry(SpriteBatch batch, Texture2D pixel, string label, float centerX, float y, Color color, float burn, float reveal, float time)
+    {
+        int width = PixelText.Measure(label, MenuEntryScale);
+        float intensity = MathF.Sin(burn * MathHelper.Pi);
+        Color glowing = Color.Lerp(color, GameBalance.DeathFlameBright, MathF.Min(1f, burn * 3f));
+        PixelText.DrawCentered(batch, pixel, label, centerX, y, MenuEntryScale, glowing * ((1f - burn) * reveal));
+        Art?.DrawSoftSpot(batch, new Vector2(centerX, y + 10f), new Vector2(width * 0.5f + 40f, 30f), GameBalance.DeathFlame * (0.35f * intensity * reveal));
+
+        for (int k = 0; k < BurnFlameCount; k++)
+        {
+            float phase = time * 1.6f + k * 0.37f;
+            phase -= MathF.Floor(phase);
+            float x = centerX - width * 0.5f + width * (k + 0.5f) / BurnFlameCount + MathF.Sin(time * 5f + k) * 3f;
+            float flameY = y + 17f - phase * BurnFlameRise * (0.5f + burn);
+            int size = 1 + (int)((1f - phase) * 5f * intensity);
+            Color flame = Color.Lerp(GameBalance.DeathFlame, GameBalance.DeathFlameBright, 1f - phase);
+            UiKit.FillDiamond(batch, pixel, new Vector2(x, flameY), size, flame * ((1f - phase) * intensity * reveal));
         }
     }
 

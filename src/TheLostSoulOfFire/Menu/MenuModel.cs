@@ -110,21 +110,12 @@ public static class MenuPages
         new MenuEntry(MenuEntryId.Back, "ZURÜCK")
     });
 
-    // NEIN only exists to be dodged: the selection slides back to JA (see MenuController).
+    // Confirming NEIN burns it down into a second JA (see MenuController).
     public static readonly MenuPage BestManQuestion = new("best_man_question", new[]
     {
         new MenuEntry(MenuEntryId.AcceptBestMan, "JA"),
         new MenuEntry(MenuEntryId.RefuseBestMan, "NEIN")
     }, prompt: "LEO, MÖCHTEST DU MEIN TRAUZEUGE SEIN?");
-
-    /// <summary>Lines the game answers each refusal attempt with, in order; the last one stays.</summary>
-    public static readonly string[] BestManRefusalRemarks =
-    {
-        "BIST DU SICHER?",
-        "DIE SEELE DES FEUERS SAGT JA.",
-        "NEIN IST GERADE AUSVERKAUFT.",
-        "DIESE OPTION IST IN DEINER REGION NICHT VERFÜGBAR."
-    };
 
     public static readonly MenuPage BestManThanks = new("best_man_thanks", new[]
     {
