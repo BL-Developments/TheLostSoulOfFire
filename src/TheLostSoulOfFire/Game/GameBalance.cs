@@ -118,6 +118,11 @@ public static class GameBalance
     public const int TravelPointWave = 5;
     public const float TravelPointInteractRadius = 80f;
 
+    // Levels (add-level-room-generation). Working values; balancing is still open.
+    public const int LevelCombatStagesMin = 4;
+    public const int LevelCombatStagesMax = 6;
+    public const float LevelForkChance = 0.35f;
+
     // Working values for the ten arena waves (change extend-arena-waves); balancing is still open.
     // One row per wave, one entry per push. H = Hollow, B = Burning, D = Devourer.
     public static readonly ArenaPush[][] ArenaWaves =
