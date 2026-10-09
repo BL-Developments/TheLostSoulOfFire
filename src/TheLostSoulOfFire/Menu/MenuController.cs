@@ -133,6 +133,14 @@ public sealed class MenuController
             case MenuEntryId.Audio:
                 Push(MenuPages.Audio);
                 return MenuActionResult.None;
+            case MenuEntryId.BestManQuestion:
+                Push(MenuPages.BestManQuestion);
+                return MenuActionResult.None;
+            case MenuEntryId.AcceptBestMan:
+                // Replaces the question so going back returns to the settings, not to the question.
+                _pages.Pop();
+                Push(MenuPages.BestManThanks);
+                return MenuActionResult.None;
             case MenuEntryId.Back:
             case MenuEntryId.CancelQuit:
                 GoBack();

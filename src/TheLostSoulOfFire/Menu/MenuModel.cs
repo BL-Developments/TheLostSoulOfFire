@@ -32,7 +32,9 @@ public enum MenuEntryId
     QuitToMainMenu,
     QuitToDesktop,
     ConfirmQuit,
-    CancelQuit
+    CancelQuit,
+    BestManQuestion,
+    AcceptBestMan
 }
 
 /// <summary>
@@ -103,8 +105,21 @@ public static class MenuPages
         new MenuEntry(MenuEntryId.Audio, "AUDIO"),
         new MenuEntry(MenuEntryId.Controls, "STEUERUNG", isPlaceholder: true),
         new MenuEntry(MenuEntryId.Accessibility, "BARRIEREFREIHEIT", isPlaceholder: true),
+        new MenuEntry(MenuEntryId.BestManQuestion, "EINE FRAGE AN LEO"),
         new MenuEntry(MenuEntryId.Back, "ZURÜCK")
     });
+
+    // Both answers accept on purpose: the question is a personal one from Björn to Leo.
+    public static readonly MenuPage BestManQuestion = new("best_man_question", new[]
+    {
+        new MenuEntry(MenuEntryId.AcceptBestMan, "JA"),
+        new MenuEntry(MenuEntryId.AcceptBestMan, "NATÜRLICH JA")
+    }, prompt: "LEO, MÖCHTEST DU MEIN TRAUZEUGE SEIN?");
+
+    public static readonly MenuPage BestManThanks = new("best_man_thanks", new[]
+    {
+        new MenuEntry(MenuEntryId.Back, "ZURÜCK")
+    }, prompt: "DANKE, LEO! ICH FREUE MICH RIESIG. - BJÖRN");
 
     public static readonly MenuPage Gameplay = new("settings_gameplay", new[]
     {

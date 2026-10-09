@@ -416,6 +416,8 @@ public sealed class CinematicPresentation
         "settings_graphics" => "GRAFIK",
         "settings_audio" => "AUDIO",
         "pause_quit" => "BEENDEN",
+        "best_man_question" => "EINE FRAGE",
+        "best_man_thanks" => "TRAUZEUGE",
         _ => "PAUSIERT"
     };
 
@@ -580,6 +582,10 @@ public sealed class CinematicPresentation
                 viewport.Height * MenuStartYFraction - MenuPromptOffset - 8f,
                 3,
                 GameBalance.DeathFlameBright * (0.85f * reveal));
+            if (menu.CurrentPage == MenuPages.BestManThanks)
+            {
+                DrawCelebrationSparks(batch, pixel, new Vector2(centerX, viewport.Height * MenuStartYFraction - MenuPromptOffset), reveal, time);
+            }
         }
         for (int i = 0; i < entries.Count; i++)
         {
@@ -600,6 +606,23 @@ public sealed class CinematicPresentation
                 Rectangle track = new((int)(centerX - 70f), (int)y + 21, 140, 3);
                 UiKit.Bar(batch, pixel, track, volume / 100f, (selected ? GameBalance.DeathFlameBright : GameBalance.SoulWhite * 0.6f) * reveal, reveal);
             }
+        }
+    }
+
+    private const int CelebrationSparkCount = 18;
+    private const float CelebrationRadiusX = 420f;
+    private const float CelebrationRadiusY = 70f;
+
+    /// <summary>Flame diamonds circling the thank-you line once Leo said yes.</summary>
+    private static void DrawCelebrationSparks(SpriteBatch batch, Texture2D pixel, Vector2 center, float reveal, float time)
+    {
+        for (int i = 0; i < CelebrationSparkCount; i++)
+        {
+            float angle = i * MathHelper.TwoPi / CelebrationSparkCount + time * 0.4f;
+            float flicker = 0.5f + 0.5f * MathF.Sin(time * 4f + i * 1.7f);
+            Vector2 position = center + new Vector2(MathF.Cos(angle) * CelebrationRadiusX, MathF.Sin(angle) * CelebrationRadiusY);
+            int size = 2 + (int)(flicker * 3f);
+            UiKit.FillDiamond(batch, pixel, position, size, Color.Lerp(GameBalance.DeathFlame, GameBalance.DeathFlameBright, flicker) * reveal);
         }
     }
 

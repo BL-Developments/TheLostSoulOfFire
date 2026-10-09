@@ -27,7 +27,7 @@ public sealed class MenuControllerTests
         menu.MoveSelection(2);
         menu.Confirm();
         Assert.AreEqual(MenuPages.Settings.Id, menu.CurrentPage.Id);
-        Assert.AreEqual(6, menu.CurrentPage.Entries.Count);
+        Assert.AreEqual(7, menu.CurrentPage.Entries.Count);
         menu.SetHoverIndex(3);
         menu.Confirm();
         Assert.AreEqual(MenuPages.Settings.Id, menu.CurrentPage.Id);
@@ -36,6 +36,28 @@ public sealed class MenuControllerTests
         Assert.AreEqual(MenuPages.Graphics.Id, menu.CurrentPage.Id);
         Assert.IsTrue(menu.GoBack());
         Assert.AreEqual(MenuPages.Settings.Id, menu.CurrentPage.Id);
+    }
+
+    [TestMethod]
+    public void Confirm_EitherBestManAnswer_ShowsThanksAndBackReturnsToSettings()
+    {
+        foreach (int answer in new[] { 0, 1 })
+        {
+            MenuController menu = new();
+            menu.Open();
+            menu.SetHoverIndex(2);
+            menu.Confirm();
+            menu.SetHoverIndex(5);
+            menu.Confirm();
+            Assert.AreEqual(MenuPages.BestManQuestion.Id, menu.CurrentPage.Id);
+            menu.SetHoverIndex(answer);
+
+            menu.Confirm();
+
+            Assert.AreEqual(MenuPages.BestManThanks.Id, menu.CurrentPage.Id);
+            menu.Confirm();
+            Assert.AreEqual(MenuPages.Settings.Id, menu.CurrentPage.Id);
+        }
     }
 
     [TestMethod]
