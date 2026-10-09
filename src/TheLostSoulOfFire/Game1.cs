@@ -984,9 +984,11 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
                     }
 
                     Console.WriteLine($"LEVEL_ROOM_WAVES progress={progress} waves={plan.Waves.Count} started={waves} heavy={plan.HeavyEnemies} devourers={plan.Devourers}");
-                    _screenshotRequested = true;
                 }
-                if (Once($"kill-{progress}-{waves}", 0.65f)) _input.InjectKeyPress(Keys.F6);
+                // The wave enters far from the south gate; walking to the closed north exit brings it into view.
+                if (progress == 4 && Once($"deep-walk-{waves}", 0.2f)) _world.PlaceAutomatedPlayerAtLevelExit(0);
+                if (progress == 4 && Once($"deep-shot-{waves}", 1.0f)) _screenshotRequested = true;
+                if (Once($"kill-{progress}-{waves}", progress == 4 ? 1.3f : 0.65f)) _input.InjectKeyPress(Keys.F6);
                 break;
             case ArenaLoopState.Intermission when progress == 0:
                 // The start room: a cleared room with two exits. Run 1 takes the right one to test the

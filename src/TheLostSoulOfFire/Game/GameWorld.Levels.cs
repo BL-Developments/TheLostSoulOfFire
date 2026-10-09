@@ -63,6 +63,8 @@ public sealed partial class GameWorld
         int levelSeed = seed ?? Environment.TickCount;
         Console.WriteLine($"LEVEL_SEED {levelSeed}");
         _levelRun = new LevelRun(LevelLayoutGenerator.Generate(levelSeed, LevelLayoutSettings.Default));
+        // Drops the encounter a previous level may have left behind; the start room has none.
+        PrepareRoomEncounter();
         _phase = GamePhase.Arena;
         BeginArenaIntro(viewport);
         _player.PlaceAt(SouthGate);

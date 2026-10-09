@@ -44,6 +44,7 @@ public sealed class RoomEncounterPlanTests
             RoomEncounterPlan current = RoomEncounterPlan.For(progress, 4711);
 
             Assert.IsTrue(current.Waves.Count >= previous.Waves.Count, $"waves at progress {progress}");
+            Assert.IsTrue(current.Waves[0].Total >= previous.Waves[0].Total, $"enemies per wave at progress {progress}");
             Assert.IsTrue(current.TotalEnemies >= previous.TotalEnemies, $"enemies at progress {progress}");
             Assert.IsTrue(current.HeavyEnemies >= previous.HeavyEnemies, $"heavy enemies at progress {progress}");
             previous = current;
