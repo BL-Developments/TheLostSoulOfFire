@@ -53,6 +53,40 @@ public sealed class LevelRunTests
     }
 
     [TestMethod]
+    public void CombatRoomsEntered_CountsOnlyCombatRooms()
+    {
+        LevelRun run = new(LevelLayoutGenerator.Generate(ForkSeed(), LevelLayoutSettings.Default));
+        int expected = 0;
+
+        while (run.Current.Kind != LevelRoomKind.LevelEnd)
+        {
+            run.MarkCleared();
+            Assert.IsTrue(run.TryTakeExit(0, out LevelRoom next));
+            if (next.Kind == LevelRoomKind.Combat)
+            {
+                expected++;
+            }
+        }
+
+        Assert.IsTrue(expected > 0);
+        Assert.AreEqual(expected, run.CombatRoomsEntered);
+    }
+
+    [TestMethod]
+    public void CombatRoomsEntered_ForkChoice_SameProgress()
+    {
+        LevelLayout layout = LevelLayoutGenerator.Generate(ForkSeed(), LevelLayoutSettings.Default);
+        LevelRun left = new(layout);
+        LevelRun right = new(layout);
+
+        Assert.IsTrue(left.TryTakeExit(0, out _));
+        Assert.IsTrue(right.TryTakeExit(1, out _));
+
+        Assert.AreEqual(1, left.CombatRoomsEntered);
+        Assert.AreEqual(right.CombatRoomsEntered, left.CombatRoomsEntered);
+    }
+
+    [TestMethod]
     public void StartAndLevelEnd_AreClearedOnEntry()
     {
         LevelRun run = new(LevelLayoutGenerator.Generate(ForkSeed(), LevelLayoutSettings.Default));

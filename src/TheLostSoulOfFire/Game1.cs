@@ -875,7 +875,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         bool secondRun = _currencyTestDone.Contains("run2");
         int run = secondRun ? 2 : 1;
         int progress = _world.LevelRoomProgress;
-        string state = $"{_world.Phase}-{_world.LoopState}-{progress}-{_world.PlayerDead}-{run}";
+        string state = $"{_world.Phase}-{_world.LoopState}-{progress}-{_world.PlayerDead}-{run}-{_world.LevelRoomWavesStarted}";
         if (state != _currencyTestState)
         {
             _currencyTestState = state;
@@ -965,8 +965,30 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
                 if (progress == 1 && Once("die", 0.5f)) _world.RequestAudioTestFatalDamage();
                 break;
             case ArenaLoopState.Combat:
+                // A combat room's exits stay shut until its last wave is cleared, pauses included.
+                if (_world.LevelExitsOpen)
+                {
+                    Fail($"exits open during the combat of room progress={progress}");
+                    return;
+                }
+
+                int waves = _world.LevelRoomWavesStarted;
                 if (progress == 1 && Once("combat-shot", 0.3f)) _screenshotRequested = true;
-                if (Once($"kill-{progress}", 0.65f)) _input.InjectKeyPress(Keys.F6);
+                if (progress == 4 && _world.LevelRoomEncounter is { } plan && Once($"deep-room-{waves}", 0.1f))
+                {
+                    // Progress 4 is the first room with two waves and a Devourer.
+                    if (plan.Waves.Count < 2 || plan.Devourers == 0)
+                    {
+                        Fail($"progress 4 room has waves={plan.Waves.Count} devourers={plan.Devourers}");
+                        return;
+                    }
+
+                    Console.WriteLine($"LEVEL_ROOM_WAVES progress={progress} waves={plan.Waves.Count} started={waves} heavy={plan.HeavyEnemies} devourers={plan.Devourers}");
+                }
+                // The wave enters far from the south gate; walking to the closed north exit brings it into view.
+                if (progress == 4 && Once($"deep-walk-{waves}", 0.2f)) _world.PlaceAutomatedPlayerAtLevelExit(0);
+                if (progress == 4 && Once($"deep-shot-{waves}", 1.0f)) _screenshotRequested = true;
+                if (Once($"kill-{progress}-{waves}", progress == 4 ? 1.3f : 0.65f)) _input.InjectKeyPress(Keys.F6);
                 break;
             case ArenaLoopState.Intermission when progress == 0:
                 // The start room: a cleared room with two exits. Run 1 takes the right one to test the

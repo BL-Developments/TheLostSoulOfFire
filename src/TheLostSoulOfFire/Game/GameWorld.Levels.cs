@@ -18,6 +18,10 @@ public sealed partial class GameWorld
 {
     private LevelRun? _levelRun;
     private float _roomTransitionElapsed;
+    private RoomEncounterPlan? _roomPlan;
+    private int _roomWaveIndex;
+    private float _roomWavePause;
+    private readonly List<ArenaEnemyKind> _roomSpawnOrder = [];
 
     internal bool InLevel => _levelRun is not null;
 
@@ -26,6 +30,17 @@ public sealed partial class GameWorld
     internal int LevelRoomProgress => _levelRun?.Current.Progress ?? 0;
 
     internal LevelRoomKind? CurrentLevelRoomKind => _levelRun?.Current.Kind;
+
+    /// <summary>The waves of the current combat room, or null in rooms without an encounter.</summary>
+    internal RoomEncounterPlan? LevelRoomEncounter => _roomPlan;
+
+    /// <summary>Waves of the current room that have started; the pause before the next one does not count.</summary>
+    internal int LevelRoomWavesStarted =>
+        _roomPlan is null || _loopState is ArenaLoopState.Intro or ArenaLoopState.Transition
+            ? 0
+            : _roomWavePause > 0f ? _roomWaveIndex : _roomWaveIndex + 1;
+
+    internal bool LevelExitsOpen => _levelRun?.IsCleared ?? false;
 
     /// <summary>Automated runs: stands the player at an exit of the current room (clamped to the exits it has).</summary>
     internal void PlaceAutomatedPlayerAtLevelExit(int exitIndex)
@@ -49,6 +64,8 @@ public sealed partial class GameWorld
         int levelSeed = seed ?? Environment.TickCount;
         Console.WriteLine($"LEVEL_SEED {levelSeed}");
         _levelRun = new LevelRun(LevelLayoutGenerator.Generate(levelSeed, LevelLayoutSettings.Default));
+        // Drops the encounter a previous level may have left behind; the start room has none.
+        PrepareRoomEncounter();
         _phase = GamePhase.Arena;
         BeginArenaIntro(viewport);
         _player.PlaceAt(SouthGate);
@@ -74,8 +91,23 @@ public sealed partial class GameWorld
         ClearRoomState();
         _player.PlaceAt(SouthGate);
         _roomTransitionElapsed = 0f;
+        PrepareRoomEncounter();
         _loopState = ArenaLoopState.Intro;
         _presentation.BeginIntro(true);
+    }
+
+    /// <summary>Builds the waves of a combat room when the player enters it; other rooms have none.</summary>
+    private void PrepareRoomEncounter()
+    {
+        _roomWaveIndex = 0;
+        _roomWavePause = 0f;
+        if (_levelRun is not { } run || !run.HasEncounter)
+        {
+            _roomPlan = null;
+            return;
+        }
+
+        _roomPlan = RoomEncounterPlan.For(run.CombatRoomsEntered, run.RoomSeed);
     }
 
     private void AfterLevelRoomIntro()
@@ -95,20 +127,26 @@ public sealed partial class GameWorld
         }
     }
 
-    /// <summary>The room's encounter: one placeholder push, the arena's second wave in composition.</summary>
+    /// <summary>Starts the current wave of the room: its single push appears at once, as a wave of the arena does.</summary>
     private void SpawnRoomWave(int progress)
     {
+        if (_roomPlan is not { } plan)
+        {
+            return;
+        }
+
         Vector2 center = _arena.CombatBounds.Center.ToVector2();
-        _waveRun = new ArenaWaveRun([GameBalance.LevelPlaceholderPush]);
+        _waveRun = new ArenaWaveRun([plan.Waves[_roomWaveIndex]]);
         _pendingSpawns.Clear();
         _reinforcementSeed = 0;
         ArenaPush push = _waveRun.TakeFirst();
         List<Vector2> positions = ArenaWaves.ChooseSpawnPositions(_arena.CombatBounds, _player.Position, push.Total);
+        int roomSeed = _levelRun?.RoomSeed ?? 0;
+        RoomEncounterPlan.FillSpawnOrder(push, unchecked(roomSeed * 31 + _roomWaveIndex), _roomSpawnOrder);
         int seed = progress * 10;
-        int index = 0;
-        foreach (ArenaEnemyKind kind in push.Kinds())
+        for (int index = 0; index < _roomSpawnOrder.Count; index++)
         {
-            _enemies.Add(CreateArenaEnemy(kind, positions[index++], ref seed));
+            _enemies.Add(CreateArenaEnemy(_roomSpawnOrder[index], positions[index], ref seed));
         }
 
         _loopState = ArenaLoopState.Combat;
@@ -119,6 +157,31 @@ public sealed partial class GameWorld
         _screenEffects.Flash(0.08f, 0.12f + progress * 0.035f);
         _audio.SetCalm(false);
         _audio.Play(AudioCue.WaveStart, 0.62f);
+    }
+
+    /// <summary>After a wave of a combat room: the next wave comes after a short pause, the last one clears the room.</summary>
+    private bool HasNextRoomWave => _roomPlan is { } plan && _roomWaveIndex + 1 < plan.Waves.Count;
+
+    private void BeginNextRoomWavePause()
+    {
+        _roomWaveIndex++;
+        _roomWavePause = GameBalance.RoomWavePause;
+        _audio.Play(AudioCue.WaveClear, 0.45f);
+    }
+
+    private void UpdateRoomWavePause(float deltaTime)
+    {
+        _roomWavePause -= deltaTime;
+        if (_roomWavePause > 0f)
+        {
+            return;
+        }
+
+        _roomWavePause = 0f;
+        if (_levelRun is { } run)
+        {
+            SpawnRoomWave(run.Current.Progress);
+        }
     }
 
     private void ClearLevelRoomEncounter()
@@ -221,7 +284,8 @@ public sealed partial class GameWorld
             return;
         }
 
-        HudRenderer.DrawRoom(batch, pixel, viewport, run.Current.Progress);
+        int waveCount = _roomPlan?.Waves.Count ?? 0;
+        HudRenderer.DrawRoom(batch, pixel, viewport, run.Current.Progress, waveCount, LevelRoomWavesStarted);
         if (run.Current.Kind == LevelRoomKind.LevelEnd)
         {
             PixelText.DrawCentered(batch, pixel, "LEVEL GESCHAFFT", viewport.Width * 0.5f, 120f, 4, GameBalance.SoulWhite);
