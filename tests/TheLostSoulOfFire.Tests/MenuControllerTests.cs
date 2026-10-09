@@ -39,25 +39,51 @@ public sealed class MenuControllerTests
     }
 
     [TestMethod]
-    public void Confirm_EitherBestManAnswer_ShowsThanksAndBackReturnsToSettings()
+    public void Confirm_BestManYes_ShowsThanksAndBackReturnsToSettings()
     {
-        foreach (int answer in new[] { 0, 1 })
-        {
-            MenuController menu = new();
-            menu.Open();
-            menu.SetHoverIndex(2);
-            menu.Confirm();
-            menu.SetHoverIndex(5);
-            menu.Confirm();
-            Assert.AreEqual(MenuPages.BestManQuestion.Id, menu.CurrentPage.Id);
-            menu.SetHoverIndex(answer);
+        MenuController menu = OpenBestManQuestion();
 
-            menu.Confirm();
+        menu.Confirm();
 
-            Assert.AreEqual(MenuPages.BestManThanks.Id, menu.CurrentPage.Id);
-            menu.Confirm();
-            Assert.AreEqual(MenuPages.Settings.Id, menu.CurrentPage.Id);
-        }
+        Assert.AreEqual(MenuPages.BestManThanks.Id, menu.CurrentPage.Id);
+        menu.Confirm();
+        Assert.AreEqual(MenuPages.Settings.Id, menu.CurrentPage.Id);
+    }
+
+    [TestMethod]
+    public void Tick_SelectionOnBestManNo_SlidesBackToYesAfterDelay()
+    {
+        MenuController menu = OpenBestManQuestion();
+        menu.MoveSelection(1);
+        menu.Tick(MenuController.RefusalSnapBackDelay * 0.5f);
+        Assert.AreEqual(1, menu.SelectedIndex);
+
+        menu.Tick(MenuController.RefusalSnapBackDelay);
+
+        Assert.AreEqual(0, menu.SelectedIndex);
+    }
+
+    [TestMethod]
+    public void Confirm_BestManNo_StaysOnQuestion()
+    {
+        MenuController menu = OpenBestManQuestion();
+        menu.SetHoverIndex(1);
+
+        MenuActionResult result = menu.Confirm();
+
+        Assert.AreEqual(MenuActionResult.None, result);
+        Assert.AreEqual(MenuPages.BestManQuestion.Id, menu.CurrentPage.Id);
+    }
+
+    private static MenuController OpenBestManQuestion()
+    {
+        MenuController menu = new();
+        menu.Open();
+        menu.SetHoverIndex(2);
+        menu.Confirm();
+        menu.SetHoverIndex(5);
+        menu.Confirm();
+        return menu;
     }
 
     [TestMethod]

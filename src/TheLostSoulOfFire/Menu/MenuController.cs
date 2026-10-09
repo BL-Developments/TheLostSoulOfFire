@@ -34,9 +34,13 @@ public sealed class MenuController
     /// </summary>
     public const float RevealDuration = 0.35f;
 
+    /// <summary>Seconds the selection may rest on NEIN of the best-man question before it slides back to JA.</summary>
+    public const float RefusalSnapBackDelay = 0.3f;
+
     private readonly Stack<MenuPage> _pages = new();
     private int _selectedIndex;
     private float _openTimer;
+    private float _refusalTimer;
 
     public GameSettings Settings { get; }
 
@@ -93,10 +97,22 @@ public sealed class MenuController
 
     public void Tick(float deltaTime)
     {
-        if (IsOpen)
+        if (!IsOpen) return;
+        _openTimer += deltaTime;
+        SnapBackFromRefusal(deltaTime);
+    }
+
+    private void SnapBackFromRefusal(float deltaTime)
+    {
+        if (CurrentPage.Entries[_selectedIndex].Id != MenuEntryId.RefuseBestMan)
         {
-            _openTimer += deltaTime;
+            _refusalTimer = 0f;
+            return;
         }
+        _refusalTimer += deltaTime;
+        if (_refusalTimer < RefusalSnapBackDelay) return;
+        _selectedIndex = 0;
+        _refusalTimer = 0f;
     }
 
     public void MoveSelection(int delta)

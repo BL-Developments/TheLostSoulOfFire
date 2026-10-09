@@ -34,7 +34,8 @@ public enum MenuEntryId
     ConfirmQuit,
     CancelQuit,
     BestManQuestion,
-    AcceptBestMan
+    AcceptBestMan,
+    RefuseBestMan
 }
 
 /// <summary>
@@ -109,11 +110,11 @@ public static class MenuPages
         new MenuEntry(MenuEntryId.Back, "ZURÜCK")
     });
 
-    // Both answers accept on purpose: the question is a personal one from Björn to Leo.
+    // NEIN only exists to be dodged: the selection slides back to JA (see MenuController).
     public static readonly MenuPage BestManQuestion = new("best_man_question", new[]
     {
         new MenuEntry(MenuEntryId.AcceptBestMan, "JA"),
-        new MenuEntry(MenuEntryId.AcceptBestMan, "NATÜRLICH JA")
+        new MenuEntry(MenuEntryId.RefuseBestMan, "NEIN")
     }, prompt: "LEO, MÖCHTEST DU MEIN TRAUZEUGE SEIN?");
 
     public static readonly MenuPage BestManThanks = new("best_man_thanks", new[]
