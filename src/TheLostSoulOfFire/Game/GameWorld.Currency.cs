@@ -5,6 +5,7 @@ using TheLostSoulOfFire.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using TheLostSoulOfFire.Entities;
+using TheLostSoulOfFire.Game.Levels;
 using TheLostSoulOfFire.Input;
 using TheLostSoulOfFire.Rendering;
 using TheLostSoulOfFire.Rendering.Visuals;
@@ -100,7 +101,7 @@ public sealed partial class GameWorld
     }
 
     private bool PlayerAtWaveTrigger =>
-        _loopState == ArenaLoopState.Intermission &&
+        !InLevel && _loopState == ArenaLoopState.Intermission &&
         Vector2.DistanceSquared(_player.Position, _arena.CombatBounds.Center.ToVector2()) <= GameBalance.WaveTriggerRadius * GameBalance.WaveTriggerRadius;
 
     internal void PlaceAutomatedPlayerAtWaveTrigger()
@@ -127,7 +128,7 @@ public sealed partial class GameWorld
         _particles.EmitDeathFlame(_arena.CombatBounds.Center.ToVector2(), 18, 1f);
     }
 
-    private void UpdateCurrency(float deltaTime, InputState input)
+    private void UpdateCurrency(float deltaTime, InputState input, Viewport viewport)
     {
         _geldPulse = MathF.Max(0f, _geldPulse - deltaTime);
         _glutPulse = MathF.Max(0f, _glutPulse - deltaTime);
@@ -149,6 +150,10 @@ public sealed partial class GameWorld
             else if (TravelPointInReach() is not null)
             {
                 OpenTravelMenu();
+            }
+            else if (LevelExitInReach() is { } exitIndex)
+            {
+                TakeLevelExit(exitIndex, viewport);
             }
             else if (PlayerAtWaveTrigger)
             {
@@ -270,13 +275,22 @@ public sealed partial class GameWorld
         {
             DrawTravelPointPrompt(batch, pixel, viewport);
         }
+        else if (LevelExitInReach() is not null && CombatActionsEnabled)
+        {
+            DrawCenteredPrompt(batch, pixel, viewport, _levelRun is { Current.Kind: LevelRoomKind.LevelEnd } ? "E  ZURÜCK IN DEN HUB" : "E  WEITER", GameBalance.DeathFlame);
+        }
         else if (PlayerAtWaveTrigger && CombatActionsEnabled)
         {
             DrawCenteredPrompt(batch, pixel, viewport, _waveNumber + 1 >= GameBalance.ArenaWaveCount ? "E  LETZTE WELLE STARTEN" : $"E  WELLE {CinematicPresentation.ToRoman(_waveNumber + 1)} STARTEN", GameBalance.DeathFlame);
         }
-        else if (_loopState == ArenaLoopState.Intermission && CombatActionsEnabled)
+        else if (_loopState == ArenaLoopState.Intermission && CombatActionsEnabled && !InLevel)
         {
             PixelText.DrawCentered(batch, pixel, "WELLE GELEERT · IN DER MITTE GEHT ES WEITER", viewport.Width * 0.5f, viewport.Height - 130f, 1, GameBalance.DeathFlameBright * 0.7f);
+        }
+        else if (_loopState == ArenaLoopState.Intermission && CombatActionsEnabled && _levelRun is { Current.Kind: not LevelRoomKind.LevelEnd })
+        {
+            // The exits sit on the north wall, out of view from the south gate, so the hint says where to go.
+            PixelText.DrawCentered(batch, pixel, "DIE AUSGÄNGE IM NORDEN SIND OFFEN", viewport.Width * 0.5f, viewport.Height - 130f, 1, GameBalance.SoulSenseTrace * 0.8f);
         }
     }
 

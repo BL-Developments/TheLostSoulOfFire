@@ -15,7 +15,8 @@ public enum DeveloperStartArea
     PrologueTransit,
     Hub,
     Arena,
-    Sandbox
+    Sandbox,
+    Level
 }
 
 /// <summary>
@@ -26,7 +27,7 @@ public enum DeveloperStartArea
 /// Kept free of MonoGame so the command-line rules
 /// are testable on their own.
 /// </summary>
-public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, PlayerAttributes? AttributeOverride = null)
+public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, PlayerAttributes? AttributeOverride = null, int? Seed = null)
 {
     public const int MinWave = 1;
     public static int MaxWave => Game.GameBalance.ArenaWaveCount;
@@ -41,7 +42,8 @@ public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, Pl
         ("prologue:transit", DeveloperStartArea.PrologueTransit),
         ("hub", DeveloperStartArea.Hub),
         ("arena", DeveloperStartArea.Arena),
-        ("sandbox", DeveloperStartArea.Sandbox)
+        ("sandbox", DeveloperStartArea.Sandbox),
+        ("level", DeveloperStartArea.Level)
     ];
 
     private static readonly string[] AutomatedTestFlags =
@@ -56,6 +58,7 @@ public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, Pl
         "--slice-visual-test",
         "--tour-visual-test",
         "--travel-visual-test",
+        "--level-visual-test",
         "--expect-audio-fallback"
     ];
 
@@ -64,9 +67,10 @@ public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, Pl
     public string AreaName => Areas.First(entry => entry.Area == Area).Name;
 
     public static string Usage =>
-        "Usage: dotnet run --project src/TheLostSoulOfFire -- --dev [--start <area>] [--wave <1-10>] [--strength <n>] [--ability-power <n>] [--armor <n>]" + Environment.NewLine +
+        "Usage: dotnet run --project src/TheLostSoulOfFire -- --dev [--start <area>] [--wave <1-10>] [--strength <n>] [--ability-power <n>] [--armor <n>] [--seed <n>]" + Environment.NewLine +
         $"Areas: {string.Join(", ", AreaNames)}" + Environment.NewLine +
         "--wave is only valid with --start arena." + Environment.NewLine +
+        "--seed <integer> is only valid with --start level." + Environment.NewLine +
         $"Attributes range from {PlayerAttributes.MinValue} to {PlayerAttributes.MaxValue}; unset ones keep {PlayerAttributes.Baseline}.";
 
     private static readonly string[] AttributeFlags = ["--strength", "--ability-power", "--armor"];
@@ -74,9 +78,12 @@ public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, Pl
     /// <summary>The console line written when a developer start takes effect.</summary>
     public string Describe()
     {
-        string line = Area == DeveloperStartArea.Arena
-            ? $"DEV_START area={AreaName} wave={Wave}"
-            : $"DEV_START area={AreaName}";
+        string line = Area switch
+        {
+            DeveloperStartArea.Arena => $"DEV_START area={AreaName} wave={Wave}",
+            DeveloperStartArea.Level when Seed is { } seed => $"DEV_START area={AreaName} seed={seed}",
+            _ => $"DEV_START area={AreaName}"
+        };
         return AttributeOverride is { } attributes
             ? $"{line} strength={attributes.Strength} ability-power={attributes.AbilityPower} armor={attributes.Armor}"
             : line;
@@ -95,6 +102,7 @@ public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, Pl
         bool dev = false;
         string? startValue = null;
         string? waveValue = null;
+        string? seedValue = null;
         string?[] attributeValues = new string?[AttributeFlags.Length];
 
         for (int i = 0; i < args.Length; i++)
@@ -112,6 +120,15 @@ public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, Pl
                         return false;
                     }
                     startValue = args[++i];
+                    break;
+
+                case "--seed":
+                    if (i + 1 >= args.Length || args[i + 1].StartsWith("--", StringComparison.Ordinal))
+                    {
+                        error = "--seed needs a number.";
+                        return false;
+                    }
+                    seedValue = args[++i];
                     break;
 
                 case "--wave":
@@ -141,9 +158,9 @@ public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, Pl
 
         if (!dev)
         {
-            if (startValue is not null || waveValue is not null || attributeValues.Any(value => value is not null))
+            if (startValue is not null || waveValue is not null || seedValue is not null || attributeValues.Any(value => value is not null))
             {
-                error = "--start, --wave and attribute flags require --dev.";
+                error = "--start, --wave, --seed and attribute flags require --dev.";
                 return false;
             }
             return true;
@@ -184,6 +201,24 @@ public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, Pl
             }
         }
 
+        int? seed = null;
+        if (seedValue is not null)
+        {
+            if (area != DeveloperStartArea.Level)
+            {
+                error = "--seed is only valid with --start level.";
+                return false;
+            }
+
+            if (!int.TryParse(seedValue, out int parsedSeed))
+            {
+                error = $"--seed must be a whole number, got '{seedValue}'.";
+                return false;
+            }
+
+            seed = parsedSeed;
+        }
+
         int[] attributes = [PlayerAttributes.Baseline, PlayerAttributes.Baseline, PlayerAttributes.Baseline];
         for (int i = 0; i < AttributeFlags.Length; i++)
         {
@@ -204,7 +239,7 @@ public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, Pl
             ? new PlayerAttributes(attributes[0], attributes[1], attributes[2])
             : null;
 
-        options = new DeveloperStartOptions(area, wave, attributeOverride);
+        options = new DeveloperStartOptions(area, wave, attributeOverride, seed);
         return true;
     }
 }

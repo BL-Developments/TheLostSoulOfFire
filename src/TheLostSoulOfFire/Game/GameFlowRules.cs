@@ -28,5 +28,9 @@ public static class GameFlowRules
     public static GamePhase ExtractToHub(GamePhase phase) =>
         phase == GamePhase.Arena ? GamePhase.Antechamber : phase;
 
+    /// <summary>A defeat in a level returns to the hub; the arena-only encounter retry does not apply.</summary>
+    public static GamePhase ReturnToHubAfterDefeat(GamePhase phase) =>
+        phase == GamePhase.Arena ? GamePhase.Antechamber : phase;
+
     public static bool AllowsCombat(GamePhase phase) => phase is GamePhase.Prologue or GamePhase.Arena;
 }

@@ -116,6 +116,23 @@ public sealed class Player
         Cannon.Reset();
     }
 
+    /// <summary>
+    /// Moves the player to <paramref name="position"/> and drops movement and attack state, but keeps
+    /// health, resonance and abilities. Used where a run continues in another room.
+    /// </summary>
+    public void PlaceAt(Vector2 position)
+    {
+        Position = position;
+        Velocity = Vector2.Zero;
+        _dashTimer = 0f;
+        _dashCooldownTimer = 0f;
+        _attackImpulse = Vector2.Zero;
+        _damageKnockback = Vector2.Zero;
+        _afterimages.Clear();
+        Scythe.Reset();
+        Cannon.Reset();
+    }
+
     /// <summary>Sets maximum health and fills the player up to it.</summary>
     public void SetMaxHealth(int maxHealth)
     {

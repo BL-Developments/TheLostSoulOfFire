@@ -81,11 +81,30 @@ public sealed class DeveloperStartOptionsTests
     [DataRow("--start", "arena")]
     [DataRow("--wave", "2")]
     [DataRow("--dev", "--audio-gameplay-test")]
+    [DataRow("--dev", "--start", "arena", "--seed", "3")]
+    [DataRow("--dev", "--start", "level", "--seed", "abc")]
+    [DataRow("--dev", "--start", "level", "--seed")]
+    [DataRow("--dev", "--seed", "3")]
+    [DataRow("--start", "level", "--seed", "3")]
+    [DataRow("--dev", "--start", "level", "--level-visual-test")]
     public void InvalidArguments_AreRejectedWithMessage(params string[] args)
     {
         Assert.IsFalse(DeveloperStartOptions.TryParse(args, out DeveloperStartOptions? options, out string? error));
         Assert.IsNull(options);
         Assert.IsFalse(string.IsNullOrWhiteSpace(error));
+    }
+
+    [TestMethod]
+    public void Level_AcceptsOptionalSeed_AndDescribesIt()
+    {
+        Assert.IsTrue(DeveloperStartOptions.TryParse(["--dev", "--start", "level"], out DeveloperStartOptions? options, out _));
+        Assert.AreEqual(DeveloperStartArea.Level, options!.Area);
+        Assert.IsNull(options.Seed);
+        Assert.AreEqual("DEV_START area=level", options.Describe());
+
+        Assert.IsTrue(DeveloperStartOptions.TryParse(["--dev", "--start", "level", "--seed", "4711"], out options, out _));
+        Assert.AreEqual(4711, options!.Seed);
+        Assert.AreEqual("DEV_START area=level seed=4711", options.Describe());
     }
 
     [TestMethod]

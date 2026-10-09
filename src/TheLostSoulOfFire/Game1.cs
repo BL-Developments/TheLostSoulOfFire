@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Input;
 using TheLostSoulOfFire.Core;
 using TheLostSoulOfFire.Debugging;
 using TheLostSoulOfFire.Game;
+using TheLostSoulOfFire.Game.Levels;
 using TheLostSoulOfFire.Input;
 using TheLostSoulOfFire.Rendering;
 
@@ -37,6 +38,12 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     private readonly bool _antechamberVisualTest;
     private readonly bool _currencyVisualTest;
     private readonly bool _travelVisualTest;
+    private readonly bool _levelVisualTest;
+    private int _levelTestSeed;
+    private bool _levelHealthPending;
+    private int _levelHealthAtExit;
+    private (int Geld, int Glut) _levelTestSecured;
+    private bool _levelDefeatKept;
     private (int Geld, int Glut) _travelTestPartial;
     private readonly bool _abilityVisualTest;
     private readonly bool _sliceVisualTest;
@@ -137,13 +144,15 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         bool abilityVisualTest = false,
         bool sliceVisualTest = false,
         bool tourVisualTest = false,
-        bool travelVisualTest = false)
+        bool travelVisualTest = false,
+        bool levelVisualTest = false)
     {
         _tourVisualTest = tourVisualTest;
         _sliceVisualTest = sliceVisualTest;
         // The travel point test shares the currency test's setup: temporary profile, no prologue.
         _travelVisualTest = travelVisualTest;
-        _currencyVisualTest = currencyVisualTest || travelVisualTest;
+        _levelVisualTest = levelVisualTest;
+        _currencyVisualTest = currencyVisualTest || travelVisualTest || levelVisualTest;
         _abilityVisualTest = abilityVisualTest;
 
         _audioGameplayTest = audioGameplayTest;
@@ -221,6 +230,11 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
             settingsChanged: _settingsStore.Save,
             profileStore: CreateProfileStore());
         if (_abilityVisualTest) _world.ApplyDeveloperStart(new DeveloperStartOptions(DeveloperStartArea.Arena, 1), VirtualViewport);
+        if (_levelVisualTest)
+        {
+            _levelTestSeed = FindForkSeed();
+            _world.ApplyDeveloperStart(new DeveloperStartOptions(DeveloperStartArea.Level, 1, null, _levelTestSeed), VirtualViewport);
+        }
         if (_sliceVisualTest) _sliceTest = new SliceVisualTest(_world, _input, VirtualViewport);
         if (_tourVisualTest)
         {
@@ -278,6 +292,10 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         else if (_audioGameplayTest || _audioDeathRestartTest)
         {
             ConfigureAutomatedTest((float)gameTime.ElapsedGameTime.TotalSeconds);
+        }
+        else if (_levelVisualTest)
+        {
+            ConfigureLevelVisualTest((float)gameTime.ElapsedGameTime.TotalSeconds);
         }
         else if (_travelVisualTest)
         {
@@ -830,6 +848,152 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
                 if (Once("partial-shot", 0.2f)) _screenshotRequested = true;
                 break;
         }
+    }
+
+    /// <summary>The first seed whose layout has a fork in its first combat stage, so the test can pick either exit.</summary>
+    private static int FindForkSeed()
+    {
+        for (int seed = 0; ; seed++)
+        {
+            if (LevelLayoutGenerator.Generate(seed, LevelLayoutSettings.Default).Stages[1].Count == 2)
+            {
+                return seed;
+            }
+        }
+    }
+
+    /// <summary>
+    /// <c>--level-visual-test</c>: run 1 plays the level from the start room to the level end, takes the
+    /// right exit of the start room, keeps health across a room change and secures the run in the hub.
+    /// Run 2 starts the same level again and dies in the first combat room, so the hub must keep what
+    /// run 1 secured and the run balances must be empty. Captures the cleared room, the level end and
+    /// the death. Uses a temporary profile.
+    /// </summary>
+    private void ConfigureLevelVisualTest(float deltaTime)
+    {
+        _audioTestTotalTime += deltaTime;
+        bool secondRun = _currencyTestDone.Contains("run2");
+        int run = secondRun ? 2 : 1;
+        int progress = _world.LevelRoomProgress;
+        string state = $"{_world.Phase}-{_world.LoopState}-{progress}-{_world.PlayerDead}-{run}";
+        if (state != _currencyTestState)
+        {
+            _currencyTestState = state;
+            _currencyTestStateTime = 0f;
+        }
+        _currencyTestStateTime += deltaTime;
+
+        bool Once(string key, float at) => _currencyTestStateTime >= at && _currencyTestDone.Add($"{key}:{run}");
+
+        void Fail(string reason)
+        {
+            Console.WriteLine($"LEVEL_VISUAL_TEST_FAIL {reason}");
+            Environment.ExitCode = 1;
+            Exit();
+        }
+
+        if (_audioTestTotalTime >= 240f)
+        {
+            Fail($"timeout state={state}");
+            return;
+        }
+
+        CurrencyWallet wallet = _world.Wallet;
+        if (_world.Phase == GamePhase.Antechamber)
+        {
+            if (!secondRun)
+            {
+                if (Once("hub-shot", 0.8f)) _screenshotRequested = true;
+                if (_currencyTestStateTime >= 1.2f && _currencyTestDone.Add("run2"))
+                {
+                    bool secured = wallet.Run(Currency.Glut) == 0 && wallet.Secured(Currency.Glut) >= GameBalance.GlutStarterStock;
+                    Console.WriteLine($"LEVEL_RUN_1 secured geld={wallet.Secured(Currency.Geld)} glut={wallet.Secured(Currency.Glut)} kept={secured}");
+                    if (!secured)
+                    {
+                        Fail("level end did not secure the run");
+                        return;
+                    }
+
+                    _levelTestSecured = (wallet.Secured(Currency.Geld), wallet.Secured(Currency.Glut));
+                    _world.ApplyDeveloperStart(new DeveloperStartOptions(DeveloperStartArea.Level, 1, null, _levelTestSeed), VirtualViewport);
+                }
+            }
+            else
+            {
+                if (Once("hub-check", 0.6f))
+                {
+                    _levelDefeatKept = wallet.Run(Currency.Geld) == 0 && wallet.Run(Currency.Glut) == 0 &&
+                        wallet.Secured(Currency.Geld) == _levelTestSecured.Geld && wallet.Secured(Currency.Glut) == _levelTestSecured.Glut;
+                    Console.WriteLine($"LEVEL_DEFEAT secured=({_levelTestSecured.Geld},{_levelTestSecured.Glut}) kept={_levelDefeatKept}");
+                }
+                if (Once("hub-shot-2", 0.9f)) _screenshotRequested = true;
+                if (_currencyTestDone.Contains("hub-check:2") && _currencyTestStateTime >= 1.3f)
+                {
+                    Console.WriteLine($"LEVEL_VISUAL_TEST_{(_levelDefeatKept ? "PASS" : "FAIL")} secondRunDefeatKeptSecured={_levelDefeatKept}");
+                    Environment.ExitCode = _levelDefeatKept ? 0 : 1;
+                    Exit();
+                }
+            }
+            return;
+        }
+
+        if (_world.Phase != GamePhase.Arena || !_world.InLevel)
+        {
+            return;
+        }
+
+        if (_world.PlayerDead)
+        {
+            if (secondRun && Once("dead-shot", 1.0f)) _screenshotRequested = true;
+            return;
+        }
+
+        if (_levelHealthPending && _world.LoopState == ArenaLoopState.Intro)
+        {
+            _levelHealthPending = false;
+            if (_world.PlayerHealth != _levelHealthAtExit)
+            {
+                Fail($"health changed across the room change {_levelHealthAtExit} -> {_world.PlayerHealth}");
+                return;
+            }
+            Console.WriteLine($"LEVEL_ROOM_CHANGE progress={progress} health={_world.PlayerHealth} kept=true");
+        }
+
+        switch (_world.LoopState)
+        {
+            case ArenaLoopState.Combat when secondRun:
+                if (progress == 1 && Once("die", 0.5f)) _world.RequestAudioTestFatalDamage();
+                break;
+            case ArenaLoopState.Combat:
+                if (progress == 1 && Once("combat-shot", 0.3f)) _screenshotRequested = true;
+                if (Once($"kill-{progress}", 0.65f)) _input.InjectKeyPress(Keys.F6);
+                break;
+            case ArenaLoopState.Intermission when progress == 0:
+                // The start room: a cleared room with two exits. Run 1 takes the right one to test the
+                // fork; run 2 takes the left one to reach the first combat room.
+                if (!secondRun && Once("start-shot", 0.3f)) _screenshotRequested = true;
+                if (Once("walk-start", 0.6f)) _world.PlaceAutomatedPlayerAtLevelExit(secondRun ? 0 : 1);
+                if (Once("take-start", 0.9f)) TakeLevelExitForTest();
+                break;
+            case ArenaLoopState.Intermission when !secondRun && _world.CurrentLevelRoomKind == LevelRoomKind.LevelEnd:
+                if (Once("end-shot", 0.5f)) _screenshotRequested = true;
+                if (Once("walk-end", 0.8f)) _world.PlaceAutomatedPlayerAtLevelExit(0);
+                if (Once("take-end", 1.1f)) _input.InjectKeyPress(Keys.E);
+                break;
+            case ArenaLoopState.Intermission when !secondRun:
+                if (Once($"hurt-{progress}", 0.2f)) _world.RequestAutomatedDamage(20);
+                if (Once($"walk-{progress}", 0.6f)) _world.PlaceAutomatedPlayerAtLevelExit(0);
+                if (Once($"take-{progress}", 0.9f)) TakeLevelExitForTest();
+                break;
+        }
+    }
+
+    /// <summary>Records the health the player takes into the next room, then presses E at the exit.</summary>
+    private void TakeLevelExitForTest()
+    {
+        _levelHealthAtExit = _world.PlayerHealth;
+        _levelHealthPending = true;
+        _input.InjectKeyPress(Keys.E);
     }
 
     private void FinishAutomatedTestFrame()
