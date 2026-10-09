@@ -87,3 +87,7 @@ verarbeitet.
 Die sechs ausgewaehlten Faehigkeiten sind als Solo-Arena-Prototyp spielbar. C oeffnet die Auswahl in der Homebase oder vor/zwischen Wellen; links/rechts waehlt den Slot, 1-6 ruestet aus, Enter schliesst. Z/X setzt die beiden Faehigkeiten im Kampf ein. Werte sind vorlaeufig.
 
 Details und Testbefehle: [Faehigkeiten-Prototyp](docs/current/ABILITY-PROTOTYPE.md).
+
+## Deployment
+
+Der spielbare Windows-Prototyp wird als selbstständiges ZIP über GitHub Actions gebaut und nach manueller Freigabe auf eine eingeschränkte itch.io-Seite geladen. Setup, Testeranleitung und Prüfliste stehen unter [docs/deployment](docs/deployment/README.md).
