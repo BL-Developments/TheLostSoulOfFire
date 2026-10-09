@@ -57,6 +57,22 @@ public sealed record RoomEncounterPlan(IReadOnlyList<ArenaPush> Waves)
         return new RoomEncounterPlan(waves);
     }
 
+    /// <summary>
+    /// Fills <paramref name="order"/> with the enemies of <paramref name="wave"/> in an order rolled from
+    /// <paramref name="seed"/>, so which kind takes which spawn point varies between rooms.
+    /// </summary>
+    public static void FillSpawnOrder(ArenaPush wave, int seed, List<ArenaEnemyKind> order)
+    {
+        order.Clear();
+        order.AddRange(wave.Kinds());
+        Random random = new(seed);
+        for (int i = order.Count - 1; i > 0; i--)
+        {
+            int j = random.Next(i + 1);
+            (order[i], order[j]) = (order[j], order[i]);
+        }
+    }
+
     private static int WaveCount(int progress) =>
         Math.Min(GameBalance.RoomWavesMax, 1 + (progress - 1) / GameBalance.RoomStagesPerExtraWave);
 

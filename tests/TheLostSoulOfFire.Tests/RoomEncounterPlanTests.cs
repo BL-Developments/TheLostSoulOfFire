@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using TheLostSoulOfFire.Game;
 using TheLostSoulOfFire.Game.Levels;
@@ -93,6 +94,49 @@ public sealed class RoomEncounterPlanTests
                 Assert.IsTrue(plan.Waves.All(wave => wave.Hollow >= 1), $"progress {progress}, seed {seed}");
             }
         }
+    }
+
+    [TestMethod]
+    public void FillSpawnOrder_SameSeed_SameOrder()
+    {
+        ArenaPush wave = new(3, 2, 1);
+        List<ArenaEnemyKind> first = [];
+        List<ArenaEnemyKind> second = [];
+
+        RoomEncounterPlan.FillSpawnOrder(wave, 4711, first);
+        RoomEncounterPlan.FillSpawnOrder(wave, 4711, second);
+
+        CollectionAssert.AreEqual(first, second);
+    }
+
+    [TestMethod]
+    public void FillSpawnOrder_AnySeed_KeepsCountsPerKind()
+    {
+        ArenaPush wave = new(3, 2, 1);
+        List<ArenaEnemyKind> order = [];
+
+        RoomEncounterPlan.FillSpawnOrder(wave, 11, order);
+
+        Assert.AreEqual(wave.Hollow, order.Count(kind => kind == ArenaEnemyKind.Hollow));
+        Assert.AreEqual(wave.Burning, order.Count(kind => kind == ArenaEnemyKind.Burning));
+        Assert.AreEqual(wave.Devourer, order.Count(kind => kind == ArenaEnemyKind.Devourer));
+    }
+
+    [TestMethod]
+    public void FillSpawnOrder_DifferentSeeds_VaryOrder()
+    {
+        ArenaPush wave = new(3, 2, 1);
+        List<ArenaEnemyKind> fixedOrder = wave.Kinds().ToList();
+        List<ArenaEnemyKind> order = [];
+        bool varied = false;
+
+        for (int seed = 0; seed < 20 && !varied; seed++)
+        {
+            RoomEncounterPlan.FillSpawnOrder(wave, seed, order);
+            varied = !order.SequenceEqual(fixedOrder);
+        }
+
+        Assert.IsTrue(varied);
     }
 
     [TestMethod]

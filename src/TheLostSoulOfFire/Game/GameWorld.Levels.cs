@@ -21,6 +21,7 @@ public sealed partial class GameWorld
     private RoomEncounterPlan? _roomPlan;
     private int _roomWaveIndex;
     private float _roomWavePause;
+    private readonly List<ArenaEnemyKind> _roomSpawnOrder = [];
 
     internal bool InLevel => _levelRun is not null;
 
@@ -140,11 +141,12 @@ public sealed partial class GameWorld
         _reinforcementSeed = 0;
         ArenaPush push = _waveRun.TakeFirst();
         List<Vector2> positions = ArenaWaves.ChooseSpawnPositions(_arena.CombatBounds, _player.Position, push.Total);
+        int roomSeed = _levelRun?.RoomSeed ?? 0;
+        RoomEncounterPlan.FillSpawnOrder(push, unchecked(roomSeed * 31 + _roomWaveIndex), _roomSpawnOrder);
         int seed = progress * 10;
-        int index = 0;
-        foreach (ArenaEnemyKind kind in push.Kinds())
+        for (int index = 0; index < _roomSpawnOrder.Count; index++)
         {
-            _enemies.Add(CreateArenaEnemy(kind, positions[index++], ref seed));
+            _enemies.Add(CreateArenaEnemy(_roomSpawnOrder[index], positions[index], ref seed));
         }
 
         _loopState = ArenaLoopState.Combat;
