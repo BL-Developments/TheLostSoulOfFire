@@ -53,13 +53,6 @@ Das System SHALL beim Raumwechsel Gesundheit, Run-Bestände, gewählte Fähigkei
 - **WHEN** der Spieler mit halber Gesundheit und 40 Glut im Run den Raum wechselt
 - **THEN** hat er im nächsten Raum halbe Gesundheit und 40 Glut im Run
 
-### Requirement: Das Levelende führt vorläufig in den Hub
-Das System SHALL im Levelende `LEVEL GESCHAFFT` zeigen. `E` an seinem Ausgang SHALL beide Run-Bestände vollständig sichern, das Profil speichern und in den Hub wechseln. Diese Regel gilt, bis Reisepunkte am Levelende stehen.
-
-#### Scenario: Spieler verlässt das Levelende
-- **WHEN** der Spieler im Levelende am Ausgang `E` drückt
-- **THEN** steht er im Hub, die Run-Bestände sind null, und die gesicherten Bestände sind um die vorherigen Run-Bestände gestiegen
-
 ### Requirement: Niederlage im Level führt in den Hub
 Das System SHALL beim Tod des Spielers in einem Raum regulären Kampfinput stoppen, den Todeszustand zeigen und danach in den Hub wechseln. Beide Run-Bestände SHALL verloren gehen. Ein Neuversuch im selben Raum MUST NOT angeboten werden.
 
