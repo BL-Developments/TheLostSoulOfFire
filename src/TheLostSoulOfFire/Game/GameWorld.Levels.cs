@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using TheLostSoulOfFire.Audio;
 using TheLostSoulOfFire.Game.Levels;
 using TheLostSoulOfFire.Rendering;
+using TheLostSoulOfFire.Rendering.Visuals;
 
 namespace TheLostSoulOfFire.Game;
 
@@ -267,6 +268,36 @@ public sealed partial class GameWorld
         _extractedAt = _presentationTime;
     }
 
+    private BiomeDefinition CurrentBiome => _biomeRun?.Biome ?? BiomeCatalog.One;
+
+    /// <summary>
+    /// Wall and floor of a level room (change <c>add-level-visual-slots</c>). Each slot shows its painted
+    /// plate once the registry has one and the biome's grey box until then, so slots swap one by one.
+    /// </summary>
+    private void DrawLevelEnvironment(SpriteBatch batch, Texture2D pixel)
+    {
+        BiomeDefinition biome = CurrentBiome;
+        if (HasSlotArt(biome.WallId))
+        {
+            _art.DrawEnvironment(batch, biome.WallId, Arena.WallFoot);
+        }
+        else
+        {
+            LevelGreyboxRenderer.DrawWall(batch, pixel, _arena.Bounds, _arena.CombatBounds, biome.Palette);
+        }
+
+        if (HasSlotArt(biome.RoomId))
+        {
+            _art.DrawEnvironment(batch, biome.RoomId, Arena.FloorTopLeft);
+        }
+        else
+        {
+            LevelGreyboxRenderer.DrawRoom(batch, pixel, _arena.CombatBounds, biome.Palette);
+        }
+    }
+
+    private bool HasSlotArt(string id) => LevelVisualSlots.IsAssigned(_art.Registry, id) && _art.HasArt(id);
+
     private void DrawRoomExits(SpriteBatch batch, Texture2D pixel)
     {
         if (_levelRun is not { } run || run.Current.Kind == LevelRoomKind.LevelEnd)
@@ -274,30 +305,24 @@ public sealed partial class GameWorld
             return;
         }
 
+        BiomeDefinition biome = CurrentBiome;
         int count = ExitCount(run.Current);
         float pulse = 0.5f + 0.5f * MathF.Sin(_presentationTime * 3f);
         for (int index = 0; index < count; index++)
         {
             Vector2 at = RoomExit.Position(_arena.CombatBounds, count, index);
-            Rectangle gate = new((int)at.X - 26, (int)at.Y - 12, 52, 24);
+            string clip = run.IsCleared ? LevelExitClips.Open : LevelExitClips.Closed;
+            if (LevelVisualSlots.IsAssigned(_art.Registry, biome.ExitId) && _art.DrawPropFrame(batch, biome.ExitId, clip, at, 0f, Color.White))
+            {
+                continue;
+            }
+
             if (run.IsCleared)
             {
-                // An open exit: a cold light in the doorway.
-                Color light = GameBalance.SoulSenseTrace;
-                _art.DrawSoftSpot(batch, at, new Vector2(54f + pulse * 6f), light * (0.2f + pulse * 0.1f));
-                batch.FillRectangle(pixel, gate, new Color(20, 28, 34));
-                batch.DrawRectangle(pixel, gate, light, 2f);
+                _art.DrawSoftSpot(batch, at, new Vector2(54f + pulse * 6f), biome.Palette.ExitLight * (0.2f + pulse * 0.1f));
             }
-            else
-            {
-                // A closed exit: a dark grille.
-                batch.FillRectangle(pixel, gate, new Color(12, 10, 16));
-                batch.DrawRectangle(pixel, gate, GameBalance.MetalColor, 3f);
-                for (int x = gate.Left + 6; x < gate.Right; x += 10)
-                {
-                    batch.DrawLine(pixel, new Vector2(x, gate.Top), new Vector2(x, gate.Bottom), GameBalance.StoneColor, 2f);
-                }
-            }
+
+            LevelGreyboxRenderer.DrawExit(batch, pixel, at, run.IsCleared, pulse, biome.Palette);
         }
     }
 

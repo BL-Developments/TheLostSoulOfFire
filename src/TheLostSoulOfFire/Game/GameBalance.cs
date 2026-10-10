@@ -137,6 +137,9 @@ public static class GameBalance
     public const float RoomTransitionDuration = 0.6f;
     public const float LevelDefeatDelay = 2.5f;
 
+    /// <summary>Width of the south gate in the wall of a room.</summary>
+    public const int RoomSouthGateWidth = 184;
+
     // Biome run (change add-biome-run-flow). Working values; balancing is still open.
     public const int GuardianProgressBonus = 2;
     public const int GuardianExtraWaves = 1;
