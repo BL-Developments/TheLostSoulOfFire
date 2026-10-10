@@ -94,4 +94,10 @@ Zielbranch ist festgelegt. Als Nächstes #6, #7 und #9 als kurze, widerspruchsfr
 
 ## Pflege seit der Bereinigung
 
+Ergänzung vom 10.10.2026: [Zehn neue Gegner-Archetypen](ENEMY-ARCHETYPES.md)
+liegen als biomunabhängiger Entwurf vor. Die Auswahl erfolgt in
+[#126](https://github.com/BL-Developments/TheLostSoulOfFire/issues/126),
+die spätere Biom-Ausgestaltung in #10 und die Integration in #84. Die zehn
+Ideen sind weder bestätigte Spielregeln noch ein verpflichtender Produktionsumfang.
+
 [Projektwissen](../current/README.md), [offene Entscheidungen](../current/OPEN-QUESTIONS.md) und [Pflegeregeln](WORKFLOW.md) sind die Einstiege. Keine Statuszahlen aus diesem Dokument als Live-Stand behandeln. Die Reihenfolge bezeichnet Ziele; ausführbare Einheiten sind die verknüpften Unter-Issues. Vor Umsetzung deren konkrete Geschwister-Abhängigkeiten prüfen.
