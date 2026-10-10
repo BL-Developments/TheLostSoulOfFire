@@ -6,11 +6,15 @@ Die Buildversion und der Quellstand stehen in build-info.json. Das ist ein früh
 
 ## Steuerung
 
-- Bewegung: WASD oder Pfeiltasten.
+- Bewegung: WASD.
 - Zielen: Maus.
-- Angriff: linke Maustaste; zum Angriff gedrückt halten.
+- Angriff: linke Maustaste; erneutes Klicken während eines Schlags setzt die Kombo fort.
 - Fähigkeiten: Z und X.
-- Seelenkanone laden und abfeuern: rechte Maustaste gedrückt halten, zum Abfeuern loslassen.\n- Seelenkanone laden und abfeuern: rechte Maustaste gedrückt halten, zum Abfeuern loslassen.
+- Seelenkanone laden und abfeuern: rechte Maustaste gedrückt halten, zum Abfeuern loslassen.
+- Ausweichen (Dash): Leertaste.
+- Interagieren (Türen, Truhen, Reisepunkt): E.
+- SoulSense: Q gedrückt halten.
+- Resonanz auslösen, sobald sie geladen ist: R. Nach einer Niederlage startet R neu.
 - Fähigkeitsauswahl: C.
 - Charaktermenü: Tab.
 - Pause/Zurück: Escape; im Pausenmenü damit schließen oder über die Menüauswahl fortfahren.
