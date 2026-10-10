@@ -1,0 +1,66 @@
+name: Prototype build
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release candidate version (for example 0.1.0-prototype.1)
+        required: true
+        type: string
+        default: 0.1.0-prototype.1
+
+permissions:
+  contents: read
+
+concurrency:
+  group: prototype-build-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  package-windows:
+    name: Test and package Windows x64 candidate
+    runs-on: windows-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: true
+      RELEASE_VERSION: ${{ inputs.version }}
+    steps:
+      - name: Check out selected source revision
+        uses: actions/checkout@v7
+
+      - name: Set up .NET 9
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Test deployment scripts
+        run: ./tools/deployment/Test-DeploymentScripts.ps1
+
+      - name: Test game
+        run: dotnet test tests/TheLostSoulOfFire.Tests/TheLostSoulOfFire.Tests.csproj --configuration Release
+
+      - name: Create and validate release package
+        run: ./tools/deployment/Package-Prototype.ps1 -Version $env:RELEASE_VERSION
+
+      - name: Upload candidate artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: prototype-win-x64
+          path: artifacts/prototype/${{ inputs.version }}/release/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Summarize candidate
+        run: |
+          @"
+          ## Windows prototype candidate
+
+          - Version: $env:RELEASE_VERSION
+          - Source commit: $env:GITHUB_SHA
+          - Build run: $env:GITHUB_RUN_ID
+          - Status: candidate only; not published or smoke-tested on a second computer
+          "@ >> $env:GITHUB_STEP_SUMMARY

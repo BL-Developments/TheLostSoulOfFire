@@ -1,0 +1,116 @@
+name: Prototype upload
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_run_id:
+        description: Successful Prototype build run ID from main
+        required: true
+        type: string
+      zip_sha256:
+        description: SHA-256 recorded after the approved second-computer smoke test
+        required: true
+        type: string
+      smoke_test_passed:
+        description: The exact ZIP hash and build passed docs/deployment/SMOKE-TEST.md
+        required: true
+        type: boolean
+        default: false
+      restricted_access_confirmed:
+        description: itch.io project is Restricted and test access was verified
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: prototype-itch-upload
+  cancel-in-progress: false
+
+jobs:
+  upload-tested-candidate:
+    name: Verify and upload selected candidate
+    runs-on: windows-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: true
+      BUILD_RUN_ID: ${{ inputs.build_run_id }}
+      EXPECTED_ZIP_SHA256: ${{ inputs.zip_sha256 }}
+      SMOKE_TEST_PASSED: ${{ inputs.smoke_test_passed }}
+      RESTRICTED_ACCESS_CONFIRMED: ${{ inputs.restricted_access_confirmed }}
+      ITCH_PROJECT: ${{ vars.ITCH_PROJECT }}
+      BUTLER_VERSION: ${{ vars.BUTLER_VERSION }}
+      BUTLER_SHA256: ${{ vars.BUTLER_SHA256 }}
+    steps:
+      - name: Require dispatch from main
+        run: |
+          if ($env:GITHUB_REF -cne 'refs/heads/main') { throw 'Prototype upload must be started from main.' }
+
+      - name: Check out upload scripts from main
+        uses: actions/checkout@v7
+
+      - name: Validate operator confirmation and configuration
+        run: |
+          if ($env:BUILD_RUN_ID -cnotmatch '\A[0-9]+\z') { throw 'build_run_id must contain only digits.' }
+          if ($env:EXPECTED_ZIP_SHA256 -cnotmatch '\A[0-9a-fA-F]{64}\z') { throw 'zip_sha256 must contain exactly 64 hexadecimal characters.' }
+          if ($env:SMOKE_TEST_PASSED -cne 'true') { throw 'The verified smoke_test_passed confirmation is required.' }
+          if ($env:RESTRICTED_ACCESS_CONFIRMED -cne 'true') { throw 'The restricted_access_confirmed verification is required.' }
+          if ($env:ITCH_PROJECT -cnotmatch '\A[a-z0-9][a-z0-9-]*/[a-z0-9][a-z0-9-]*\z') { throw 'Set repository variable ITCH_PROJECT to lowercase owner/slug.' }
+          if ($env:BUTLER_VERSION -cnotmatch '\A[0-9]+\.[0-9]+\.[0-9]+\z') { throw 'Set repository variable BUTLER_VERSION to a verified stable x.y.z version.' }
+          if ($env:BUTLER_SHA256 -cnotmatch '\A[0-9a-fA-F]{64}\z') { throw 'Set repository variable BUTLER_SHA256 to the official Windows archive hash.' }
+
+      - name: Inspect selected build run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh --version
+          if ($LASTEXITCODE -ne 0) { throw 'GitHub CLI is unavailable.' }
+          $runJsonPath = Join-Path $env:RUNNER_TEMP 'prototype-build-run.json'
+          gh api "repos/$env:GITHUB_REPOSITORY/actions/runs/$env:BUILD_RUN_ID" | Set-Content -LiteralPath $runJsonPath -Encoding utf8
+          if ($LASTEXITCODE -ne 0) { throw 'Could not load the requested GitHub Actions run.' }
+          $sourceCommit = & ./tools/deployment/Test-PrototypeBuildRun.ps1 -RunJsonPath $runJsonPath -ExpectedRepository $env:GITHUB_REPOSITORY
+          if ($LASTEXITCODE -ne 0 -or $sourceCommit -notmatch '\A[0-9a-f]{40}\z') { throw 'The selected GitHub Actions run did not pass provenance checks.' }
+          "SOURCE_COMMIT=$sourceCommit" >> $env:GITHUB_ENV
+
+      - name: Download selected build artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $artifactPath = Join-Path $env:RUNNER_TEMP 'prototype-win-x64'
+          New-Item -ItemType Directory -Path $artifactPath | Out-Null
+          gh run download $env:BUILD_RUN_ID --repo $env:GITHUB_REPOSITORY --name prototype-win-x64 --dir $artifactPath
+          if ($LASTEXITCODE -ne 0) { throw 'Could not download prototype-win-x64 from the selected run.' }
+          "ARTIFACT_PATH=$artifactPath" >> $env:GITHUB_ENV
+
+      - name: Download and verify pinned butler
+        run: |
+          $archivePath = Join-Path $env:RUNNER_TEMP "butler-$env:BUTLER_VERSION-windows-amd64.zip"
+          $archiveUrl = "https://broth.itch.zone/butler/windows-amd64/$env:BUTLER_VERSION/archive/default"
+          Invoke-WebRequest -Uri $archiveUrl -OutFile $archivePath
+          $actualButlerHash = (Get-FileHash -LiteralPath $archivePath -Algorithm SHA256).Hash
+          if ($actualButlerHash -ine $env:BUTLER_SHA256) { throw 'Official butler archive SHA-256 does not match BUTLER_SHA256.' }
+          $butlerDirectory = Join-Path $env:RUNNER_TEMP 'butler-verified'
+          Expand-Archive -LiteralPath $archivePath -DestinationPath $butlerDirectory
+          $butlerFiles = @(Get-ChildItem -LiteralPath $butlerDirectory -Filter butler.exe -File -Recurse)
+          if ($butlerFiles.Count -ne 1) { throw "Expected one butler.exe in the verified archive; found $($butlerFiles.Count)." }
+          & $butlerFiles[0].FullName version
+          if ($LASTEXITCODE -ne 0) { throw 'The verified butler executable failed its version check.' }
+          "BUTLER_PATH=$($butlerFiles[0].FullName)" >> $env:GITHUB_ENV
+
+      - name: Verify package and upload the exact tested ZIP
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+        run: |
+          ./tools/deployment/Upload-Prototype.ps1 `
+            -ArtifactDirectory $env:ARTIFACT_PATH `
+            -ExpectedSourceCommit $env:SOURCE_COMMIT `
+            -ExpectedZipSha256 $env:EXPECTED_ZIP_SHA256 `
+            -ItchProject $env:ITCH_PROJECT `
+            -ButlerPath $env:BUTLER_PATH
