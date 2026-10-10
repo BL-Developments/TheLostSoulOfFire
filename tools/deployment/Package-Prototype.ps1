@@ -83,6 +83,7 @@ $packageListing | Set-Content -LiteralPath $packagesPath -Encoding utf8
 Copy-Item -LiteralPath $metadataPath -Destination (Join-Path $releasePath 'build-info.json')
 
 $zipPath = Join-Path $releasePath $zipName
+Add-Type -AssemblyName System.IO.Compression.FileSystem
 [System.IO.Compression.ZipFile]::CreateFromDirectory($stagingPath, $zipPath, [System.IO.Compression.CompressionLevel]::Optimal, $false)
 $hash = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash.ToLowerInvariant()
 Set-Content -LiteralPath "$zipPath.sha256" -Value "$hash  $zipName" -Encoding ascii
