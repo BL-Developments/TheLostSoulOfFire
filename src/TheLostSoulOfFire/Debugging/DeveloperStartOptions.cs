@@ -23,8 +23,9 @@ public enum DeveloperStartArea
 /// <summary>
 /// Parses the developer start parameters (<c>--dev --start &lt;area&gt; [--wave n]</c>) that let a
 /// feature be reached directly instead of playing through title, prologue and hub. The optional
-/// <c>--strength</c>, <c>--ability-power</c> and <c>--armor</c> flags override the player's
-/// attributes so their scaling can be tried out. The sandbox area is reachable only from here.
+/// <c>--strength</c>, <c>--ability-power</c>, <c>--armor</c> and the flags of the later attributes
+/// (<c>--attack-speed</c>, <c>--luck</c> and so on) override the player's attributes so their
+/// scaling can be tried out. The sandbox area is reachable only from here.
 /// Kept free of MonoGame so the command-line rules
 /// are testable on their own.
 /// </summary>
@@ -73,13 +74,18 @@ public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, Pl
 
     public static string Usage =>
         "Usage: dotnet run --project src/TheLostSoulOfFire -- --dev [--start <area>] [--wave <1-10>] [--strength <n>] [--ability-power <n>] [--armor <n>] [--seed <n>]" + Environment.NewLine +
+        "Further attributes: --attack-speed, --luck, --core-sharpness, --attunement, --agility, --focus, --steadiness <n>" + Environment.NewLine +
         $"Areas: {string.Join(", ", AreaNames)}" + Environment.NewLine +
         "--wave is only valid with --start arena." + Environment.NewLine +
         "--level <1-3> is only valid with --start biome:1." + Environment.NewLine +
         "--seed <integer> is only valid with --start level or biome:1." + Environment.NewLine +
         $"Attributes range from {PlayerAttributes.MinValue} to {PlayerAttributes.MaxValue}; unset ones keep {PlayerAttributes.Baseline}.";
 
-    private static readonly string[] AttributeFlags = ["--strength", "--ability-power", "--armor"];
+    private static readonly string[] AttributeFlags =
+    [
+        "--strength", "--ability-power", "--armor",
+        "--attack-speed", "--luck", "--core-sharpness", "--attunement", "--agility", "--focus", "--steadiness"
+    ];
 
     /// <summary>The console line written when a developer start takes effect.</summary>
     public string Describe()
@@ -93,8 +99,27 @@ public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, Pl
             _ => $"DEV_START area={AreaName}"
         };
         return AttributeOverride is { } attributes
-            ? $"{line} strength={attributes.Strength} ability-power={attributes.AbilityPower} armor={attributes.Armor}"
+            ? $"{line} strength={attributes.Strength} ability-power={attributes.AbilityPower} armor={attributes.Armor}{DescribeLaterAttributes(attributes)}"
             : line;
+    }
+
+    /// <summary>The later attributes, only those set away from the baseline, so the familiar line stays short.</summary>
+    private static string DescribeLaterAttributes(PlayerAttributes attributes)
+    {
+        int[] values =
+        [
+            attributes.AttackSpeed, attributes.Luck, attributes.CoreSharpness, attributes.Attunement,
+            attributes.Agility, attributes.Focus, attributes.Steadiness
+        ];
+        string description = "";
+        for (int i = 0; i < values.Length; i++)
+        {
+            if (values[i] != PlayerAttributes.Baseline)
+            {
+                description += $" {AttributeFlags[i + 3][2..]}={values[i]}";
+            }
+        }
+        return description;
     }
 
     /// <summary>
@@ -253,7 +278,7 @@ public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, Pl
             seed = parsedSeed;
         }
 
-        int[] attributes = [PlayerAttributes.Baseline, PlayerAttributes.Baseline, PlayerAttributes.Baseline];
+        int[] attributes = Enumerable.Repeat(PlayerAttributes.Baseline, AttributeFlags.Length).ToArray();
         for (int i = 0; i < AttributeFlags.Length; i++)
         {
             string? value = attributeValues[i];
@@ -271,6 +296,15 @@ public sealed record DeveloperStartOptions(DeveloperStartArea Area, int Wave, Pl
 
         PlayerAttributes? attributeOverride = attributeValues.Any(value => value is not null)
             ? new PlayerAttributes(attributes[0], attributes[1], attributes[2])
+            {
+                AttackSpeed = attributes[3],
+                Luck = attributes[4],
+                CoreSharpness = attributes[5],
+                Attunement = attributes[6],
+                Agility = attributes[7],
+                Focus = attributes[8],
+                Steadiness = attributes[9]
+            }
             : null;
 
         options = new DeveloperStartOptions(area, wave, attributeOverride, seed, level);

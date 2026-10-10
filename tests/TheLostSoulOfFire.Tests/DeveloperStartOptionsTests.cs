@@ -135,6 +135,17 @@ public sealed class DeveloperStartOptionsTests
     }
 
     [TestMethod]
+    public void LaterAttributeFlags_OverrideTheirAttributes_AndAppearInTheLine()
+    {
+        Assert.IsTrue(DeveloperStartOptions.TryParse(
+            ["--dev", "--start", "arena", "--luck", "30", "--attack-speed", "20", "--steadiness", "0"],
+            out DeveloperStartOptions? options, out string? error), error);
+
+        Assert.AreEqual(PlayerAttributes.Default with { Luck = 30, AttackSpeed = 20, Steadiness = 0 }, options!.AttributeOverride);
+        Assert.AreEqual("DEV_START area=arena wave=1 strength=10 ability-power=10 armor=10 attack-speed=20 luck=30 steadiness=0", options.Describe());
+    }
+
+    [TestMethod]
     public void WithoutAttributeFlags_KeepsCharacterAttributes()
     {
         Assert.IsTrue(DeveloperStartOptions.TryParse(["--dev", "--start", "hub"], out DeveloperStartOptions? options, out _));
@@ -146,6 +157,8 @@ public sealed class DeveloperStartOptionsTests
     [DataRow("--strength", "-1")]
     [DataRow("--ability-power", "100")]
     [DataRow("--armor", "viel")]
+    [DataRow("--luck", "100")]
+    [DataRow("--focus", "-1")]
     public void AttributeFlags_RejectValuesOutsideTheRange(string flag, string value)
     {
         Assert.IsFalse(DeveloperStartOptions.TryParse(["--dev", flag, value], out DeveloperStartOptions? options, out string? error));

@@ -25,6 +25,8 @@ public sealed partial class GameWorld
     private readonly PlayerProfileStore _profileStore;
     private readonly List<ArenaChest> _chests = [];
     private readonly List<GlutSpark> _glutSparks = [];
+    /// <summary>Rolls the fractional part of luck-scaled rewards (<see cref="Combat.PlayerAttributes.ScaleReward"/>).</summary>
+    private readonly Random _rewardRandom = new();
     private float _geldPulse;
     private float _glutPulse;
     private (int Geld, int Glut) _lastSecured;
@@ -60,7 +62,7 @@ public sealed partial class GameWorld
             return;
         }
 
-        _wallet.Credit(Currency.Glut, glut);
+        _wallet.Credit(Currency.Glut, _player.Attributes.ScaleReward(glut, _rewardRandom.NextDouble()));
         _glutPulse = CurrencyPulseDuration;
         _glutSparks.Add(new GlutSpark(enemy.Position));
     }
@@ -142,7 +144,7 @@ public sealed partial class GameWorld
                 {
                     _audio.Play(AudioCue.ChestOpen, 0.7f);
                     _audio.Play(AudioCue.CurrencyGain, 0.5f);
-                    _wallet.Credit(Currency.Geld, GameBalance.ChestGeld);
+                    _wallet.Credit(Currency.Geld, _player.Attributes.ScaleReward(GameBalance.ChestGeld, _rewardRandom.NextDouble()));
                     _geldPulse = CurrencyPulseDuration;
                     _particles.EmitBurst(chest.Position, -Vector2.UnitY, 18, GameBalance.Geld, 180f, 5f);
                 }

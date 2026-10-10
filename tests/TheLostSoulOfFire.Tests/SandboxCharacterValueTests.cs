@@ -52,7 +52,11 @@ public sealed class SandboxCharacterValueTests
     public void CharacterEntries_ComeFirst_InSheetOrder()
     {
         CollectionAssert.AreEqual(
-            new[] { "LEBEN", "STÄRKE", "FÄHIGKEITSSTÄRKE", "RÜSTUNG", "ZURÜCKSETZEN" },
+            new[]
+            {
+                "LEBEN", "STÄRKE", "FÄHIGKEITSSTÄRKE", "RÜSTUNG", "TEMPO", "KERNSCHÄRFE", "FOKUS",
+                "STANDFESTIGKEIT", "GEWANDTHEIT", "EINKLANG", "GLÜCK", "ZURÜCKSETZEN"
+            },
             SandboxDevMenuEntries.All.Where(entry => entry.Section == DevMenuSection.Character).Select(entry => entry.Label).ToArray());
         Assert.AreEqual(DevMenuEntryKind.Action, SandboxDevMenuEntries.All.Single(entry => entry.Id == SandboxDevMenuEntries.ResetCharacter).Kind);
     }

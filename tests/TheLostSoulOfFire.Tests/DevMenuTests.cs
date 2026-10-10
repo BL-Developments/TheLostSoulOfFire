@@ -1,3 +1,4 @@
+using TheLostSoulOfFire.Core;
 using TheLostSoulOfFire.Menu;
 using TheLostSoulOfFire.Rendering;
 
@@ -96,6 +97,17 @@ public sealed class DevMenuTests
         {
             Assert.IsTrue(bounds[i].Top >= bounds[i - 1].Bottom, $"row {i} overlaps");
         }
+    }
+
+    [TestMethod]
+    public void SandboxEntries_FitTheVirtualScreen()
+    {
+        DevMenu menu = new(SandboxDevMenuEntries.All);
+
+        var bounds = DevMenuRenderer.GetEntryBounds(menu);
+
+        // The key hints and the panel padding follow the last row.
+        Assert.IsTrue(bounds[^1].Bottom + 40 <= RenderResolution.LogicalHeight, $"last row ends at {bounds[^1].Bottom}");
     }
 
     [TestMethod]
