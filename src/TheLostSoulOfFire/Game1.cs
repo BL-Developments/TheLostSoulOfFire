@@ -39,6 +39,9 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     private readonly bool _currencyVisualTest;
     private readonly bool _travelVisualTest;
     private readonly bool _levelVisualTest;
+    private readonly bool _biomeVisualTest;
+    private int _biomeTestStage;
+    private (int Geld, int Glut) _biomeTestSecured;
     private int _levelTestSeed;
     private bool _levelHealthPending;
     private int _levelHealthAtExit;
@@ -145,14 +148,16 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         bool sliceVisualTest = false,
         bool tourVisualTest = false,
         bool travelVisualTest = false,
-        bool levelVisualTest = false)
+        bool levelVisualTest = false,
+        bool biomeVisualTest = false)
     {
         _tourVisualTest = tourVisualTest;
         _sliceVisualTest = sliceVisualTest;
         // The travel point test shares the currency test's setup: temporary profile, no prologue.
         _travelVisualTest = travelVisualTest;
         _levelVisualTest = levelVisualTest;
-        _currencyVisualTest = currencyVisualTest || travelVisualTest || levelVisualTest;
+        _biomeVisualTest = biomeVisualTest;
+        _currencyVisualTest = currencyVisualTest || travelVisualTest || levelVisualTest || biomeVisualTest;
         _abilityVisualTest = abilityVisualTest;
 
         _audioGameplayTest = audioGameplayTest;
@@ -296,6 +301,10 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         else if (_levelVisualTest)
         {
             ConfigureLevelVisualTest((float)gameTime.ElapsedGameTime.TotalSeconds);
+        }
+        else if (_biomeVisualTest)
+        {
+            ConfigureBiomeVisualTest((float)gameTime.ElapsedGameTime.TotalSeconds);
         }
         else if (_travelVisualTest)
         {
@@ -485,9 +494,10 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
             return;
         }
 
+        // Tür I starts biome I; the arena is reached through the developer start, as for a player.
         if (_world.Phase == GamePhase.Antechamber)
         {
-            _world.RequestAutomatedDoorEntry();
+            _world.ApplyDeveloperStart(new DeveloperStartOptions(DeveloperStartArea.Arena, 1), VirtualViewport);
             return;
         }
 
@@ -653,7 +663,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
                 }
                 else if (_currencyTestStateTime >= 0.4f)
                 {
-                    _world.RequestAutomatedDoorEntry();
+                    _world.ApplyDeveloperStart(new DeveloperStartOptions(DeveloperStartArea.Arena, 1), VirtualViewport);
                 }
                 return;
             case GamePhase.Arena:
@@ -762,7 +772,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
                 }
                 else if (_currencyTestStateTime >= 0.4f)
                 {
-                    _world.RequestAutomatedDoorEntry();
+                    _world.ApplyDeveloperStart(new DeveloperStartOptions(DeveloperStartArea.Arena, 1), VirtualViewport);
                 }
                 return;
             case GamePhase.Arena:
@@ -998,14 +1008,195 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
                 if (Once("take-start", 0.9f)) TakeLevelExitForTest();
                 break;
             case ArenaLoopState.Intermission when !secondRun && _world.CurrentLevelRoomKind == LevelRoomKind.LevelEnd:
+                // The level end is a travel point; extracting secures the whole run and returns to the hub.
                 if (Once("end-shot", 0.5f)) _screenshotRequested = true;
-                if (Once("walk-end", 0.8f)) _world.PlaceAutomatedPlayerAtLevelExit(0);
+                if (Once("walk-end", 0.8f)) _world.PlaceAutomatedPlayerAtTravelPoint();
                 if (Once("take-end", 1.1f)) _input.InjectKeyPress(Keys.E);
+                if (Once("extract-end", 1.5f)) _input.InjectKeyPress(Keys.D3);
                 break;
             case ArenaLoopState.Intermission when !secondRun:
                 if (Once($"hurt-{progress}", 0.2f)) _world.RequestAutomatedDamage(20);
                 if (Once($"walk-{progress}", 0.6f)) _world.PlaceAutomatedPlayerAtLevelExit(0);
                 if (Once($"take-{progress}", 0.9f)) TakeLevelExitForTest();
+                break;
+        }
+    }
+
+    /// <summary>
+    /// <c>--biome-visual-test</c>: stage 1 starts biome I through Tür I, takes the travel points of levels 1 and 2
+    /// (secure and continue, then continue without securing) and completes the biome in the guardian room, which
+    /// returns to the hub. Stage 3 starts again, secures at the first travel point and is defeated in level 2; the
+    /// hub must keep what was secured, and Tür I must start level 1 again. Uses a temporary profile.
+    /// </summary>
+    private void ConfigureBiomeVisualTest(float deltaTime)
+    {
+        _audioTestTotalTime += deltaTime;
+        int stage = _biomeTestStage;
+        string state = $"{_world.Phase}-{_world.LoopState}-{stage}-{_world.BiomeLevel}-{_world.LevelRoomProgress}-{_world.PlayerDead}-{_world.TravelMenuOpen}";
+        if (state != _currencyTestState)
+        {
+            _currencyTestState = state;
+            _currencyTestStateTime = 0f;
+        }
+        _currencyTestStateTime += deltaTime;
+
+        bool Once(string key, float at) => _currencyTestStateTime >= at && _currencyTestDone.Add($"{key}:{stage}");
+
+        void Fail(string reason)
+        {
+            Console.WriteLine($"BIOME_VISUAL_TEST_FAIL {reason}");
+            Environment.ExitCode = 1;
+            Exit();
+        }
+
+        if (_audioTestTotalTime >= 420f)
+        {
+            Fail($"timeout state={state} exitsOpen={_world.LevelExitsOpen} player={_world.AutomatedPlayer.Position} kind={_world.CurrentLevelRoomKind}");
+            return;
+        }
+
+        CurrencyWallet wallet = _world.Wallet;
+        switch (_world.Phase)
+        {
+            case GamePhase.Title:
+                if (_currencyTestStateTime >= 0.3f) _input.InjectKeyPress(Keys.Space);
+                return;
+
+            case GamePhase.Antechamber:
+                if (stage == 0 && _currencyTestStateTime >= 0.4f)
+                {
+                    _biomeTestStage = 1;
+                    _world.RequestAutomatedDoorEntry();
+                }
+                else if (stage == 1)
+                {
+                    // Run 1 ended in the hub: the guardian was cleared, so the whole run is secured.
+                    _biomeTestStage = 2;
+                }
+                else if (stage == 2 && Once("hub-complete", 1.0f))
+                {
+                    bool kept = wallet.Run(Currency.Geld) == 0 && wallet.Run(Currency.Glut) == 0 && wallet.Secured(Currency.Glut) >= GameBalance.GlutStarterStock;
+                    Console.WriteLine($"BIOME_COMPLETE secured geld={wallet.Secured(Currency.Geld)} glut={wallet.Secured(Currency.Glut)} kept={kept}");
+                    if (!kept)
+                    {
+                        Fail("biome completion did not secure the run");
+                        return;
+                    }
+                    _screenshotRequested = true;
+                }
+                else if (stage == 2 && _currencyTestStateTime >= 1.6f)
+                {
+                    _biomeTestStage = 3;
+                    _world.RequestAutomatedDoorEntry();
+                }
+                else if (stage == 3)
+                {
+                    // Run 2 was defeated in level 2: the hub keeps the secured balances and the run balances are empty.
+                    _biomeTestStage = 4;
+                }
+                else if (stage == 4 && Once("hub-defeat", 1.0f))
+                {
+                    bool kept = wallet.Run(Currency.Geld) == 0 && wallet.Run(Currency.Glut) == 0 &&
+                        wallet.Secured(Currency.Geld) == _biomeTestSecured.Geld && wallet.Secured(Currency.Glut) == _biomeTestSecured.Glut;
+                    Console.WriteLine($"BIOME_DEFEAT secured=({_biomeTestSecured.Geld},{_biomeTestSecured.Glut}) kept={kept}");
+                    if (!kept)
+                    {
+                        Fail("defeat did not keep the secured balances");
+                        return;
+                    }
+                    _screenshotRequested = true;
+                }
+                else if (stage == 4 && _currencyTestStateTime >= 1.5f)
+                {
+                    _biomeTestStage = 5;
+                    _world.RequestAutomatedDoorEntry();
+                }
+                return;
+
+            case GamePhase.Arena:
+                break;
+
+            default:
+                return;
+        }
+
+        if (!_world.InBiomeRun)
+        {
+            return;
+        }
+
+        if (_world.PlayerDead)
+        {
+            if (stage == 3 && Once("dead-shot", 1.0f)) _screenshotRequested = true;
+            return;
+        }
+
+        if (stage == 5)
+        {
+            if (Once("start-again", 0.6f))
+            {
+                bool pass = _world.BiomeLevel == 1 && _world.LevelRoomProgress == 0;
+                Console.WriteLine($"BIOME_VISUAL_TEST_{(pass ? "PASS" : "FAIL")} restartLevel={_world.BiomeLevel} progress={_world.LevelRoomProgress}");
+                Environment.ExitCode = pass ? 0 : 1;
+                Exit();
+            }
+            return;
+        }
+
+        if (_levelHealthPending && _world.LoopState == ArenaLoopState.Intro)
+        {
+            _levelHealthPending = false;
+            if (_world.PlayerHealth != _levelHealthAtExit)
+            {
+                Fail($"health changed across the level change {_levelHealthAtExit} -> {_world.PlayerHealth}");
+                return;
+            }
+            Console.WriteLine($"BIOME_LEVEL_CHANGE level={_world.BiomeLevel} progress={_world.LevelRoomProgress} health={_world.PlayerHealth} kept=true");
+        }
+
+        int progress = _world.LevelRoomProgress;
+        switch (_world.LoopState)
+        {
+            case ArenaLoopState.Combat when stage == 3 && _world.BiomeLevel == 2:
+                // The first travel point secured the balances; the defeat must keep exactly these.
+                if (Once("store-secured", 0.2f)) _biomeTestSecured = (wallet.Secured(Currency.Geld), wallet.Secured(Currency.Glut));
+                if (Once("die", 0.5f)) _world.RequestAudioTestFatalDamage();
+                break;
+
+            case ArenaLoopState.Combat:
+                if (_world.BiomeLevel == 3 && _world.LevelRoomEncounter is { } guardian && Once("guardian-plan", 0.2f))
+                {
+                    Console.WriteLine($"BIOME_GUARDIAN waves={guardian.Waves.Count} heavy={guardian.HeavyEnemies} devourers={guardian.Devourers}");
+                }
+                int waves = _world.LevelRoomWavesStarted;
+                if (progress == 1 && Once($"combat-shot-{_world.BiomeLevel}", 0.3f)) _screenshotRequested = true;
+                if (Once($"kill-{_world.BiomeLevel}-{progress}-{waves}", 0.65f)) _input.InjectKeyPress(Keys.F6);
+                break;
+
+            case ArenaLoopState.Intermission when _world.CurrentLevelRoomKind == LevelRoomKind.LevelEnd:
+                if (_world.ActiveTravelPoint is { IsDecided: false })
+                {
+                    // Levels 1 and 2 end in a travel point. Run 1 secures on level 1 and continues on level 2.
+                    bool secureAndContinue = _world.BiomeLevel == 1;
+                    if (Once($"walk-travel-{_world.BiomeLevel}", 0.6f)) _world.PlaceAutomatedPlayerAtTravelPoint();
+                    if (Once($"open-travel-{_world.BiomeLevel}", 0.9f)) _input.InjectKeyPress(Keys.E);
+                    if (Once($"travel-shot-{_world.BiomeLevel}", 1.2f) && secureAndContinue) _screenshotRequested = true;
+                    if (Once($"choose-travel-{_world.BiomeLevel}", 1.5f))
+                    {
+                        _levelHealthAtExit = _world.PlayerHealth;
+                        _levelHealthPending = true;
+                        _input.InjectKeyPress(secureAndContinue ? Keys.D1 : Keys.D2);
+                    }
+                }
+                else if (_world.ActiveTravelPoint is null && Once($"guardian-cleared-{_world.BiomeLevel}", 0.3f))
+                {
+                    Console.WriteLine($"BIOME_GUARDIAN_CLEARED state={_world.BiomeState}");
+                }
+                break;
+
+            case ArenaLoopState.Intermission:
+                if (Once($"walk-{_world.BiomeLevel}-{progress}", 0.6f)) _world.PlaceAutomatedPlayerAtLevelExit(0);
+                if (Once($"take-{_world.BiomeLevel}-{progress}", 0.9f)) TakeLevelExitForTest();
                 break;
         }
     }

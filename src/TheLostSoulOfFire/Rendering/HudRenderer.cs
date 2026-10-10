@@ -125,17 +125,18 @@ public sealed class HudRenderer
     private static readonly string[] RoomNumbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 
     /// <summary>
-    /// Room counter of a level; the start room (progress 0) shows none. A combat room shows one diamond
+    /// Room counter of a level; the start room (progress 0) shows none, unless a <paramref name="runLabel"/>
+    /// names the counter of a biome run (change <c>add-biome-run-flow</c>). A combat room shows one diamond
     /// per wave below the counter, lit for the waves that have started (change <c>add-room-wave-scaling</c>).
     /// </summary>
-    public static void DrawRoom(SpriteBatch batch, Texture2D pixel, Viewport viewport, int progress, int waveCount, int wavesStarted)
+    public static void DrawRoom(SpriteBatch batch, Texture2D pixel, Viewport viewport, int progress, int waveCount, int wavesStarted, string? runLabel = null)
     {
-        if (progress <= 0)
+        if (progress <= 0 && runLabel is null)
         {
             return;
         }
 
-        const string label = "RAUM";
+        string label = runLabel ?? "RAUM";
         string value = progress < RoomNumbers.Length ? RoomNumbers[progress] : progress.ToString();
         int labelWidth = PixelText.MeasureFace(label, TextFace.Body, 10f, 1.4f);
         int valueWidth = PixelText.MeasureFace(value, TextFace.Display, 16f);

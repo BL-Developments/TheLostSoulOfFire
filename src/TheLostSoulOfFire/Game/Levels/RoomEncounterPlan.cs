@@ -17,12 +17,16 @@ public sealed record RoomEncounterPlan(IReadOnlyList<ArenaPush> Waves)
 
     public int Devourers => Waves.Sum(wave => wave.Devourer);
 
-    /// <summary>The plan for a room at <paramref name="progress"/> (1 for the first combat room of a run).</summary>
-    public static RoomEncounterPlan For(int progress, int seed)
+    /// <summary>
+    /// The plan for a room at <paramref name="progress"/> (1 for the first combat room of a run).
+    /// <paramref name="extraWaves"/> adds waves beyond the scaling cap, as the guardian room of a biome does.
+    /// </summary>
+    public static RoomEncounterPlan For(int progress, int seed, int extraWaves = 0)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(progress, 1);
+        ArgumentOutOfRangeException.ThrowIfNegative(extraWaves);
 
-        int waveCount = WaveCount(progress);
+        int waveCount = WaveCount(progress) + extraWaves;
         int enemiesPerWave = EnemiesPerWave(progress);
         int heavy = HeavyCount(progress, waveCount, enemiesPerWave);
         int devourers = DevourerCount(progress, heavy);

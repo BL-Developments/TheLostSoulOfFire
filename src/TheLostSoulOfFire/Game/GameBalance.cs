@@ -137,6 +137,11 @@ public static class GameBalance
     public const float RoomTransitionDuration = 0.6f;
     public const float LevelDefeatDelay = 2.5f;
 
+    // Biome run (change add-biome-run-flow). Working values; balancing is still open.
+    public const int GuardianProgressBonus = 2;
+    public const int GuardianExtraWaves = 1;
+    public const float BiomeCompleteDuration = 4.5f;
+
     // Working values for the ten arena waves (change extend-arena-waves); balancing is still open.
     // One row per wave, one entry per push. H = Hollow, B = Burning, D = Devourer.
     public static readonly ArenaPush[][] ArenaWaves =

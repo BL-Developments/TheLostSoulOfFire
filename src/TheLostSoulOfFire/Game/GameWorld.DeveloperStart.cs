@@ -60,6 +60,10 @@ public sealed partial class GameWorld
             case DeveloperStartArea.Level:
                 StartLevel(options.Seed, viewport);
                 return;
+
+            case DeveloperStartArea.Biome:
+                StartBiomeRun(options.Seed, options.Level, viewport);
+                return;
         }
     }
 

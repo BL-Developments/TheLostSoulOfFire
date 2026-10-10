@@ -6,10 +6,16 @@ namespace TheLostSoulOfFire.Game.Levels;
 /// </summary>
 public sealed class LevelRun
 {
-    public LevelRun(LevelLayout layout)
+    private readonly bool _guardianAtEnd;
+
+    /// <param name="guardianAtEnd">The level end is the guardian room of a biome (change <c>add-biome-run-flow</c>), not a travel point.</param>
+    /// <param name="combatRoomsEntered">Progress carried over from earlier levels of the same run.</param>
+    public LevelRun(LevelLayout layout, bool guardianAtEnd = false, int combatRoomsEntered = 0)
     {
         Layout = layout;
         Current = layout.Start;
+        _guardianAtEnd = guardianAtEnd;
+        CombatRoomsEntered = combatRoomsEntered;
         IsCleared = !HasEncounter;
     }
 
@@ -28,7 +34,10 @@ public sealed class LevelRun
     /// <summary>Seed of the current room's encounter; the same room in the same level always gets the same seed.</summary>
     public int RoomSeed => unchecked(Layout.Seed * 31 + Current.Id);
 
-    public bool HasEncounter => Current.Kind == LevelRoomKind.Combat;
+    /// <summary>The guardian room ends the biome: its encounter has to be cleared before the run completes.</summary>
+    public bool IsGuardianRoom => Current.Kind == LevelRoomKind.LevelEnd && _guardianAtEnd;
+
+    public bool HasEncounter => Current.Kind == LevelRoomKind.Combat || IsGuardianRoom;
 
     public void MarkCleared() => IsCleared = true;
 

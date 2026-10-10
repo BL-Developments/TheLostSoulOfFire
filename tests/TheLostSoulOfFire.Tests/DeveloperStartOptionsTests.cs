@@ -87,6 +87,13 @@ public sealed class DeveloperStartOptionsTests
     [DataRow("--dev", "--seed", "3")]
     [DataRow("--start", "level", "--seed", "3")]
     [DataRow("--dev", "--start", "level", "--level-visual-test")]
+    [DataRow("--dev", "--start", "biome:1", "--level", "0")]
+    [DataRow("--dev", "--start", "biome:1", "--level", "4")]
+    [DataRow("--dev", "--start", "biome:1", "--level", "two")]
+    [DataRow("--dev", "--start", "level", "--level", "2")]
+    [DataRow("--dev", "--start", "biome:2")]
+    [DataRow("--dev", "--start", "biome:1", "--seed", "abc")]
+    [DataRow("--start", "biome:1", "--level", "2")]
     public void InvalidArguments_AreRejectedWithMessage(params string[] args)
     {
         Assert.IsFalse(DeveloperStartOptions.TryParse(args, out DeveloperStartOptions? options, out string? error));
@@ -161,6 +168,20 @@ public sealed class DeveloperStartOptionsTests
 
         Assert.IsTrue(DeveloperStartOptions.TryParse(["--dev", "--start", "sandbox", "--armor", "0"], out options, out _));
         Assert.AreEqual("DEV_START area=sandbox strength=10 ability-power=10 armor=0", options!.Describe());
+    }
+
+    [TestMethod]
+    public void Biome_AcceptsLevelAndSeed_AndDescribesIt()
+    {
+        Assert.IsTrue(DeveloperStartOptions.TryParse(["--dev", "--start", "biome:1"], out DeveloperStartOptions? options, out _));
+        Assert.AreEqual(DeveloperStartArea.Biome, options!.Area);
+        Assert.AreEqual(1, options.Level);
+        Assert.AreEqual("DEV_START area=biome:1 level=1", options.Describe());
+
+        Assert.IsTrue(DeveloperStartOptions.TryParse(["--dev", "--start", "biome:1", "--level", "3", "--seed", "4711"], out options, out _));
+        Assert.AreEqual(3, options!.Level);
+        Assert.AreEqual(4711, options.Seed);
+        Assert.AreEqual("DEV_START area=biome:1 level=3 seed=4711", options.Describe());
     }
 
     [TestMethod]

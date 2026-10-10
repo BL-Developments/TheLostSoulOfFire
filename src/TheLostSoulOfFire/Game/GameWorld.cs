@@ -443,6 +443,14 @@ public sealed partial class GameWorld : IDisposable
             return;
         }
 
+        if (BiomeCompletionShown)
+        {
+            // The biome's summary has been shown; the hub follows without the extraction summary.
+            _phase = GameFlowRules.ExtractToHub(_phase);
+            BeginAntechamber(viewport);
+            return;
+        }
+
         if (_loopState == ArenaLoopState.Complete)
         {
             if (_phase == GamePhase.Prologue)
@@ -1761,6 +1769,7 @@ public sealed partial class GameWorld : IDisposable
 
         DrawAbilityHud(batch, pixel, viewport);
         DrawTravelPointOverlay(batch, pixel, viewport);
+        DrawBiomeCompleteOverlay(batch, pixel, viewport);
 
         // Story, prompt and cinematic text would compete with the pause menu's type;
         // the paused world and HUD stay visible under the veil.
@@ -2533,15 +2542,8 @@ public sealed partial class GameWorld : IDisposable
 
         if (_phaseTime >= DoorTransitionDuration)
         {
-            EnterArena(viewport);
+            StartBiomeRun(seed: null, level: 1, viewport);
         }
-    }
-
-    private void EnterArena(Viewport viewport)
-    {
-        ClearRunState();
-        _phase = GameFlowRules.FinishDoorTransition(_phase);
-        BeginArenaIntro(viewport);
     }
 
     private void BeginArenaIntro(Viewport viewport)
@@ -2624,6 +2626,8 @@ public sealed partial class GameWorld : IDisposable
         _sandboxActive = stayInSandbox;
         _levelRun = null;
         _roomTransitionElapsed = 0f;
+        _biomeRun = null;
+        _biomeRoomLabel = null;
     }
 
     private void ConfigureBurningAggression(float deltaTime)

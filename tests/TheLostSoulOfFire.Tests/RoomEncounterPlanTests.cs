@@ -53,6 +53,35 @@ public sealed class RoomEncounterPlanTests
     }
 
     [TestMethod]
+    public void For_ExtraWaves_AddsWavesBeyondTheCap()
+    {
+        RoomEncounterPlan capped = RoomEncounterPlan.For(HighestProgress, 4711);
+
+        RoomEncounterPlan guardian = RoomEncounterPlan.For(HighestProgress, 4711, GameBalance.GuardianExtraWaves);
+
+        Assert.AreEqual(capped.Waves.Count + GameBalance.GuardianExtraWaves, guardian.Waves.Count);
+        Assert.IsTrue(guardian.HeavyEnemies >= capped.HeavyEnemies);
+    }
+
+    [TestMethod]
+    public void For_GuardianProgress_IsHarderThanPreviousRoom()
+    {
+        int previousProgress = 6;
+        RoomEncounterPlan previous = RoomEncounterPlan.For(previousProgress, 4711);
+
+        RoomEncounterPlan guardian = RoomEncounterPlan.For(previousProgress + GameBalance.GuardianProgressBonus, 4711, GameBalance.GuardianExtraWaves);
+
+        Assert.IsTrue(guardian.Waves.Count > previous.Waves.Count);
+        Assert.IsTrue(guardian.HeavyEnemies > previous.HeavyEnemies);
+    }
+
+    [TestMethod]
+    public void For_NegativeExtraWaves_Throws()
+    {
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => RoomEncounterPlan.For(1, 4711, -1));
+    }
+
+    [TestMethod]
     public void For_HighProgress_RespectsMaxima()
     {
         RoomEncounterPlan plan = RoomEncounterPlan.For(HighestProgress, 4711);

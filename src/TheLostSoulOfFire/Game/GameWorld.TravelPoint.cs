@@ -9,8 +9,8 @@ using TheLostSoulOfFire.Rendering;
 namespace TheLostSoulOfFire.Game;
 
 /// <summary>
-/// Travel point (#53, #74, change <c>add-arena-travel-point</c>). Until real levels exist the arena
-/// stands in for a biome: one travel point appears in the pause after wave 5. <c>E</c> opens a menu
+/// Travel point (#53, #74, change <c>add-arena-travel-point</c>). The arena shows one in the pause after
+/// wave 5; a level shows one at its level end (change <c>add-biome-run-flow</c>). <c>E</c> opens a menu
 /// with the three decisions; the world stays frozen while it is open.
 /// </summary>
 public sealed partial class GameWorld
@@ -129,17 +129,32 @@ public sealed partial class GameWorld
                 _geldPulse = CurrencyPulseDuration;
                 _glutPulse = CurrencyPulseDuration;
                 _particles.EmitBurst(point.Position, -Vector2.UnitY, 22, GameBalance.Glut, 200f, 5f);
-                StartNextWaveFromIntermission();
+                ContinueFromTravelPoint(secured, viewport);
                 break;
             case TravelChoice.Continue:
-                StartNextWaveFromIntermission();
+                ContinueFromTravelPoint(secured, viewport);
                 break;
             case TravelChoice.Extract:
-                _lastSecured = secured;
-                _phase = GameFlowRules.ExtractToHub(_phase);
-                BeginAntechamber(viewport);
-                _extractedAt = _presentationTime;
+                _biomeRun?.Extract();
+                ReturnLevelToHub(viewport, secured);
                 break;
+        }
+    }
+
+    /// <summary>In the arena the next wave follows; in a level the next level of the biome, or the hub when no biome run is active.</summary>
+    private void ContinueFromTravelPoint((int Geld, int Glut) secured, Viewport viewport)
+    {
+        if (!InLevel)
+        {
+            StartNextWaveFromIntermission();
+        }
+        else if (InBiomeRun)
+        {
+            TravelToNextBiomeLevel();
+        }
+        else
+        {
+            ReturnLevelToHub(viewport, secured);
         }
     }
 
