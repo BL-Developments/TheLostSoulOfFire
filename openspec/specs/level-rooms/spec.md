@@ -15,7 +15,7 @@ Das System SHALL beim Start eines Levels einen Seed festlegen, daraus die Raumfo
 - **THEN** werden zwei Seeds gewürfelt und in der Konsole genannt
 
 ### Requirement: Räume sind wie die Arena aufgebaut
-Das System SHALL jeden Raum mit den Grenzen, der Kampffläche und dem Aussehen der Arena darstellen. Der Spieler SHALL einen Raum am Südtor betreten.
+Das System SHALL jeden Raum mit den Grenzen und der Kampffläche der Arena aufbauen und ihn über die Grafik-Slots seines Bioms zeichnen, nicht mit den gemalten Ebenen der Arena. Der Spieler SHALL einen Raum am Südtor betreten.
 
 #### Scenario: Spieler betritt einen Raum
 - **WHEN** der Spieler einen Raum betritt
