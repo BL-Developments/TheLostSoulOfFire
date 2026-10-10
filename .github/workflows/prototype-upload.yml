@@ -32,7 +32,6 @@ concurrency:
 
 jobs:
   upload-tested-candidate:
-    if: github.ref == 'refs/heads/main'
     name: Verify and upload selected candidate
     runs-on: windows-latest
     timeout-minutes: 20
@@ -50,6 +49,10 @@ jobs:
       BUTLER_VERSION: ${{ vars.BUTLER_VERSION }}
       BUTLER_SHA256: ${{ vars.BUTLER_SHA256 }}
     steps:
+      - name: Require dispatch from main
+        run: |
+          if ($env:GITHUB_REF -cne 'refs/heads/main') { throw 'Prototype upload must be started from main.' }
+
       - name: Check out upload scripts from main
         uses: actions/checkout@v7
 
