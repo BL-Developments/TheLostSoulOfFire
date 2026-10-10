@@ -138,6 +138,7 @@ public sealed partial class GameWorld : IDisposable
     private string CurrentGradeId => _phase switch
     {
         GamePhase.Prologue when _prologue.Sector == PrologueSector.Emergence => VisualIds.GradeShore,
+        GamePhase.Arena when InLevel => CurrentBiome.GradeId,
         GamePhase.Arena => VisualIds.GradeArena,
         _ => VisualIds.GradeNeutral
     };
@@ -1086,6 +1087,10 @@ public sealed partial class GameWorld : IDisposable
                 }
                 PrologueEnvironment.DrawProps(batch, pixel, _prologue, _presentationTime, _soulSensePresentation.WorldSuppression, painted, _art);
             }
+            else if (InLevel)
+            {
+                DrawLevelEnvironment(batch, pixel);
+            }
             else
             {
                 _art.DrawEnvironment(batch, VisualIds.ArenaWall, Arena.WallFoot);
@@ -1234,7 +1239,7 @@ public sealed partial class GameWorld : IDisposable
     /// </summary>
     private void DrawFloorDepth(SpriteBatch batch, Viewport viewport)
     {
-        bool arena = _phase == GamePhase.Arena && _art.HasArt(VisualIds.ArenaFloor);
+        bool arena = _phase == GamePhase.Arena && !InLevel && _art.HasArt(VisualIds.ArenaFloor);
         bool prologue = _phase == GamePhase.Prologue && PrologueEnvironment.PlateOf(_prologue) is { } plate && _art.HasArt(plate);
         if (!arena && !prologue)
         {
@@ -1368,6 +1373,7 @@ public sealed partial class GameWorld : IDisposable
     private IEnumerable<SceneProp> ActiveSceneProps => _phase switch
     {
         GamePhase.Antechamber or GamePhase.EnteringArena => _hubProps.Concat(_sceneProps),
+        GamePhase.Arena when InLevel => _sceneProps,
         GamePhase.Arena => _arenaProps.Concat(_sceneProps),
         GamePhase.Prologue when _prologue.Sector == PrologueSector.Emergence => _shoreProps.Concat(_sceneProps),
         GamePhase.Prologue when _prologue.Sector == PrologueSector.Search && _art.HasArt(VisualIds.SearchFloor) => _searchProps.Concat(_sceneProps),
@@ -2763,7 +2769,7 @@ public sealed partial class GameWorld : IDisposable
     {
         if (_loopState != ArenaLoopState.Complete)
         {
-            Rectangle gate = new(_arena.CombatBounds.Center.X - 92, _arena.CombatBounds.Bottom - 14, 184, 20);
+            Rectangle gate = new(_arena.CombatBounds.Center.X - GameBalance.RoomSouthGateWidth / 2, _arena.CombatBounds.Bottom - 14, GameBalance.RoomSouthGateWidth, 20);
             batch.FillRectangle(pixel, gate, new Color(24, 22, 30));
             batch.DrawRectangle(pixel, gate, GameBalance.MetalColor, 5f);
             for (int x = gate.Left + 18; x < gate.Right; x += 24)

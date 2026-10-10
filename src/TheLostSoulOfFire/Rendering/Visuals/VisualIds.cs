@@ -26,6 +26,9 @@ public static class VisualIds
     public const string ArenaChains = "prop.arena-chains";
     public const string ArenaGate = "prop.arena-gate";
     public const string ArenaChest = "prop.arena-chest";
+    public const string Biome1Room = "environment.biome1-room";
+    public const string Biome1RoomWall = "environment.biome1-room-wall";
+    public const string Biome1Exit = "prop.biome1-exit";
     public const string TrainingDummy = "prop.training-dummy";
     public const string ShoreFloor = "environment.shore";
     public const string ShoreBench = "prop.shore-bench";
@@ -77,6 +80,7 @@ public static class VisualIds
     public const string GradeSoulSense = "grade.soul-sense";
     public const string GradeShore = "grade.shore";
     public const string GradeArena = "grade.arena";
+    public const string GradeBiome1 = "grade.biome1";
 
     /// <summary>Test figure for the lighting pass: clips "flat" and "tilted" differ only in their normal map.</summary>
     public const string TestLitFigure = "test.lit-figure";
@@ -90,6 +94,13 @@ public static class VisualIds
         .Where(field => field.IsLiteral && field.FieldType == typeof(string))
         .Select(field => (string)field.GetRawConstantValue()!)
         .ToArray();
+}
+
+/// <summary>Clips of a biome's exit prop; <c>closed</c> is its fallback clip in the registry.</summary>
+public static class LevelExitClips
+{
+    public const string Closed = "closed";
+    public const string Open = "open";
 }
 
 /// <summary>Clip names the game code asks for. A registry entry may lack any of them; see <see cref="VisualResolver"/>.</summary>
