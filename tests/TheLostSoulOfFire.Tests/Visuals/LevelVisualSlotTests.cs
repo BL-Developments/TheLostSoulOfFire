@@ -37,4 +37,39 @@ public sealed class LevelVisualSlotTests
         Assert.IsTrue(wall.IsDummy);
         Assert.IsTrue(exit.IsDummy);
     }
+
+    [TestMethod]
+    public void GradeOf_WithoutBiomeGradeInTheRegistry_IsNeutral()
+    {
+        string grade = LevelVisualSlots.GradeOf(RoomOnlyRegistry, BiomeCatalog.One);
+
+        Assert.AreEqual(VisualIds.GradeNeutral, grade);
+    }
+
+    [TestMethod]
+    public void GradeOf_WithBiomeGradeInTheRegistry_IsTheBiomeGrade()
+    {
+        VisualRegistry registry = VisualRegistry.Parse("""
+            { "version": 1, "visuals": [
+              { "id": "grade.biome1", "kind": "grade", "palette": "world", "worldSize": [1024, 32],
+                "clips": { "default": { "path": "G/lut", "frameSize": [1024, 32], "frames": 1, "fps": 1, "loop": true } } }
+            ] }
+            """);
+
+        string grade = LevelVisualSlots.GradeOf(registry, BiomeCatalog.One);
+
+        Assert.AreEqual(VisualIds.GradeBiome1, grade);
+    }
+
+    [TestMethod]
+    public void IsAssigned_OnlyForSlotsTheRegistryNames()
+    {
+        BiomeDefinition biome = BiomeCatalog.One;
+
+        bool room = LevelVisualSlots.IsAssigned(RoomOnlyRegistry, biome.RoomId);
+        bool wall = LevelVisualSlots.IsAssigned(RoomOnlyRegistry, biome.WallId);
+
+        Assert.IsTrue(room);
+        Assert.IsFalse(wall);
+    }
 }

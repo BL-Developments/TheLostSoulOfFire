@@ -277,7 +277,7 @@ public sealed partial class GameWorld
     private void DrawLevelEnvironment(SpriteBatch batch, Texture2D pixel)
     {
         BiomeDefinition biome = CurrentBiome;
-        if (_art.HasArt(biome.WallId))
+        if (HasSlotArt(biome.WallId))
         {
             _art.DrawEnvironment(batch, biome.WallId, Arena.WallFoot);
         }
@@ -286,7 +286,7 @@ public sealed partial class GameWorld
             LevelGreyboxRenderer.DrawWall(batch, pixel, _arena.Bounds, _arena.CombatBounds, biome.Palette);
         }
 
-        if (_art.HasArt(biome.RoomId))
+        if (HasSlotArt(biome.RoomId))
         {
             _art.DrawEnvironment(batch, biome.RoomId, Arena.FloorTopLeft);
         }
@@ -295,6 +295,8 @@ public sealed partial class GameWorld
             LevelGreyboxRenderer.DrawRoom(batch, pixel, _arena.CombatBounds, biome.Palette);
         }
     }
+
+    private bool HasSlotArt(string id) => LevelVisualSlots.IsAssigned(_art.Registry, id) && _art.HasArt(id);
 
     private void DrawRoomExits(SpriteBatch batch, Texture2D pixel)
     {
@@ -310,7 +312,7 @@ public sealed partial class GameWorld
         {
             Vector2 at = RoomExit.Position(_arena.CombatBounds, count, index);
             string clip = run.IsCleared ? LevelExitClips.Open : LevelExitClips.Closed;
-            if (_art.DrawPropFrame(batch, biome.ExitId, clip, at, 0f, Color.White))
+            if (LevelVisualSlots.IsAssigned(_art.Registry, biome.ExitId) && _art.DrawPropFrame(batch, biome.ExitId, clip, at, 0f, Color.White))
             {
                 continue;
             }

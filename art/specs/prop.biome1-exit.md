@@ -9,7 +9,7 @@ Lore: [Art Direction, Flammenfarben und Biom-Platzhalter](../../docs/current/VIS
 
 ## Merkmale
 - Ausgang eines Raums an der Nordwand: geschlossen ein Gitter, offen ein Lichtspalt.
-- Ebene: Occluder; nach Fußpunkt mit den Figuren sortiert, ohne Kollision.
+- Ebene: Boden; wird vor den Figuren gezeichnet, die immer südlich der Nordwand stehen. Ohne Kollision.
 - Thema von Biom I ist offen (#10); bis zur gemalten Grafik zeichnet das Spiel eine Graubox in der Platzhalterpalette des Bioms (`BiomeCatalog.One.Palette`).
 - Death-Flame-Violett und Life-Flame-Orange bleiben den Flammen vorbehalten.
 

@@ -10,6 +10,7 @@ using TheLostSoulOfFire.Combat;
 using TheLostSoulOfFire.Core;
 using TheLostSoulOfFire.Effects;
 using TheLostSoulOfFire.Entities;
+using TheLostSoulOfFire.Game.Levels;
 using TheLostSoulOfFire.Input;
 using TheLostSoulOfFire.Menu;
 using TheLostSoulOfFire.Rendering;
@@ -138,7 +139,7 @@ public sealed partial class GameWorld : IDisposable
     private string CurrentGradeId => _phase switch
     {
         GamePhase.Prologue when _prologue.Sector == PrologueSector.Emergence => VisualIds.GradeShore,
-        GamePhase.Arena when InLevel => CurrentBiome.GradeId,
+        GamePhase.Arena when InLevel => LevelVisualSlots.GradeOf(_art.Registry, CurrentBiome),
         GamePhase.Arena => VisualIds.GradeArena,
         _ => VisualIds.GradeNeutral
     };
