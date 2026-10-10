@@ -263,6 +263,7 @@ public sealed class Player
             float movementMultiplier = SoulSenseActive && !ResonanceActive ? GameBalance.SoulSenseMovementMultiplier : 1f;
             movementMultiplier *= ResonanceActive ? GameBalance.ResonanceMovementMultiplier : 1f;
             movementMultiplier *= Cannon.GetMovementMultiplier();
+            movementMultiplier *= Attributes.MoveSpeedMultiplier;
             Velocity = movement * GameBalance.PlayerMoveSpeed * movementMultiplier + _attackImpulse + _damageKnockback;
             _attackImpulse *= MathF.Pow(0.002f, deltaTime);
             _damageKnockback *= MathF.Pow(0.012f, deltaTime);
@@ -493,7 +494,7 @@ public sealed class Player
         _dashDirection = movement.LengthSquared() > 0.001f ? Vector2.Normalize(movement) : FacingDirection;
         _dashTimer = GameBalance.DashDuration;
         _activeDashDistance = GameBalance.DashDistance * (ResonanceActive ? GameBalance.ResonanceDashDistanceMultiplier : 1f);
-        _dashCooldownTimer = GameBalance.DashCooldown * (ResonanceActive ? GameBalance.ResonanceDashCooldownMultiplier : 1f);
+        _dashCooldownTimer = GameBalance.DashCooldown * (ResonanceActive ? GameBalance.ResonanceDashCooldownMultiplier : 1f) / Attributes.AgilityMultiplier;
         InvulnerabilityRemaining = GameBalance.DashInvulnerability;
         _dashTrailTimer = 0f;
         _afterimageTimer = 0f;
@@ -520,6 +521,7 @@ public sealed class Player
             return;
         }
         int taken = ignoreArmor ? damage : Attributes.MitigateIncomingDamage(damage);
+        knockback *= Attributes.KnockbackTaken;
         Health = Math.Max(0, Health - taken);
         if (IsDead) AbilityEffects.Clear();
         HitFlashRemaining = Health == 0 ? 0.24f : 0.14f;
@@ -552,7 +554,7 @@ public sealed class Player
 
     public void AddResonance(float amount)
     {
-        Resonance = MathHelper.Clamp(Resonance + amount, 0f, GameBalance.ResonanceRequired);
+        Resonance = MathHelper.Clamp(Resonance + amount * Attributes.AttunementMultiplier, 0f, GameBalance.ResonanceRequired);
     }
 
     public void FillResonance()

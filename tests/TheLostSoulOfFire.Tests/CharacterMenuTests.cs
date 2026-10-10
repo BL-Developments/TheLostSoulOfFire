@@ -72,6 +72,32 @@ public sealed class CharacterMenuTests
         Assert.AreEqual("WAFFENSCHADEN +0 %", sheet.WeaponDamageText);
         Assert.AreEqual("FÄHIGKEITSSCHADEN +0 %", sheet.AbilityDamageText);
         Assert.AreEqual("SCHADENSVERRINGERUNG 17 %", sheet.ArmorReductionText);
+        Assert.AreEqual("ANGRIFFSTEMPO +0 %", sheet.AttackSpeedText);
+        Assert.AreEqual("KERNSCHADEN +0 %", sheet.CoreDamageText);
+        Assert.AreEqual("ABKLINGTEMPO +0 %", sheet.FocusText);
+        Assert.AreEqual("RÜCKSTOSS +0 %", sheet.KnockbackText);
+        Assert.AreEqual("AUSWEICHEN +0 % / LAUFEN +0 %", sheet.AgilityText);
+        Assert.AreEqual("RESONANZAUFBAU +0 %", sheet.AttunementText);
+        Assert.AreEqual("BEUTE +0 %", sheet.LuckText);
+    }
+
+    [TestMethod]
+    public void Sheet_NewAttributeEffects()
+    {
+        PlayerAttributes attributes = PlayerAttributes.Default with
+        {
+            AttackSpeed = 20, CoreSharpness = 14, Focus = 6, Steadiness = 20, Agility = 20, Attunement = 30, Luck = 0
+        };
+
+        CharacterSheet sheet = new(100, 100, attributes, false, 0, 0, 0, 0);
+
+        Assert.AreEqual("ANGRIFFSTEMPO +50 %", sheet.AttackSpeedText);
+        Assert.AreEqual("KERNSCHADEN +20 %", sheet.CoreDamageText);
+        Assert.AreEqual("ABKLINGTEMPO -20 %", sheet.FocusText);
+        Assert.AreEqual("RÜCKSTOSS -33 %", sheet.KnockbackText);
+        Assert.AreEqual("AUSWEICHEN +50 % / LAUFEN +10 %", sheet.AgilityText);
+        Assert.AreEqual("RESONANZAUFBAU +100 %", sheet.AttunementText);
+        Assert.AreEqual("BEUTE -50 %", sheet.LuckText);
     }
 
     [TestMethod]
@@ -107,6 +133,8 @@ public sealed class CharacterMenuTests
         string[] texts =
         [
             sheet.HealthText, sheet.WeaponDamageText, sheet.AbilityDamageText, sheet.ArmorReductionText,
+            sheet.AttackSpeedText, sheet.CoreDamageText, sheet.FocusText, sheet.KnockbackText, sheet.AgilityText,
+            sheet.AttunementText, sheet.LuckText, "TEMPO", "KERNSCHÄRFE", "FOKUS", "STANDFESTIGKEIT", "GEWANDTHEIT", "EINKLANG", "GLÜCK",
             sheet.GeldRunText!, sheet.GeldSecuredText, sheet.GlutRunText!, sheet.GlutSecuredText, "LEBEN", "STÄRKE", "FÄHIGKEITSSTÄRKE", "RÜSTUNG", "WÄHRUNGEN",
             "NOCH NICHT VERFÜGBAR", "CHARAKTER", "MAP", "SKILLS", "FÄHIGKEITEN"
         ];

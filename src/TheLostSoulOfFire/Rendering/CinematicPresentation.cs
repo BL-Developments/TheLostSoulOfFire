@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using TheLostSoulOfFire.Combat;
 using TheLostSoulOfFire.Entities;
 using TheLostSoulOfFire.Game;
 using TheLostSoulOfFire.Menu;
@@ -437,12 +438,14 @@ public sealed class CinematicPresentation
     private const float CharacterTabY = 92f;
     private const float CharacterTabSpacing = 220f;
     private const float CharacterRuleY = 146f;
-    private const float CharacterRowsY = 190f;
-    private const float CharacterRowSpacing = 46f;
-    private const float CharacterLabelOffsetX = -380f;
-    private const float CharacterValueRightOffsetX = 20f;
-    private const float CharacterEffectOffsetX = 64f;
-    private const float CharacterSecuredColumnOffsetX = 210f;
+    private const float CharacterRowsY = 184f;
+    private const float CharacterRowSpacing = 56f;
+    private const int CharacterLeftColumnRows = 6;
+    private const float CharacterColumnOuterX = 520f;
+    private const float CharacterColumnInnerX = 40f;
+    private const float CharacterEffectOffsetY = 28f;
+    private const float CharacterCurrencyTextOffsetX = 130f;
+    private const float CharacterSecuredColumnOffsetX = 170f;
 
     /// <summary>
     /// Hit-testable bounds of the character menu's tabs, laid out with the same constants
@@ -480,8 +483,8 @@ public sealed class CinematicPresentation
         if (menu.SelectedTab == CharacterMenuTab.Character)
         {
             float centerX = viewport.Width * 0.5f;
-            Rectangle page = new((int)(centerX + CharacterLabelOffsetX - 36f), (int)CharacterRowsY - 34,
-                (int)(-CharacterLabelOffsetX * 2f + 72f), (int)(CharacterRowSpacing * 6f + 90f));
+            Rectangle page = new((int)(centerX - CharacterColumnOuterX - 36f), (int)CharacterRowsY - 30,
+                (int)(CharacterColumnOuterX * 2f + 72f), (int)(CharacterRowSpacing * CharacterLeftColumnRows + 130f));
             UiKit.Panel(batch, pixel, page, GameBalance.DeathFlame, 0.35f * reveal, 0.94f * reveal);
             DrawCharacterPage(batch, pixel, viewport, sheet, reveal);
         }
@@ -521,44 +524,62 @@ public sealed class CinematicPresentation
         }
     }
 
+    /// <summary>
+    /// Two columns of attributes: health and the damage attributes on the left, defence,
+    /// movement, Resonance and luck on the right; the currencies share one line below.
+    /// </summary>
     private static void DrawCharacterPage(SpriteBatch batch, Texture2D pixel, Viewport viewport, CharacterSheet sheet, float reveal)
     {
         float centerX = viewport.Width * 0.5f;
+        float leftX = centerX - CharacterColumnOuterX;
+        float leftRight = centerX - CharacterColumnInnerX;
+        float rightX = centerX + CharacterColumnInnerX;
+        float rightRight = centerX + CharacterColumnOuterX;
         Color label = GameBalance.SoulWhite * (0.72f * reveal);
         Color value = GameBalance.SoulWhite * reveal;
         Color effect = GameBalance.SoulWhite * (0.42f * reveal);
+        PlayerAttributes attributes = sheet.Attributes;
 
-        DrawCharacterRow(batch, pixel, centerX, CharacterRowsY, "LEBEN", sheet.HealthText, null, label, value, effect);
-        DrawCharacterRow(batch, pixel, centerX, CharacterRowsY + CharacterRowSpacing, "STÄRKE", sheet.Attributes.Strength.ToString(), sheet.WeaponDamageText, label, value, effect);
-        DrawCharacterRow(batch, pixel, centerX, CharacterRowsY + CharacterRowSpacing * 2f, "FÄHIGKEITSSTÄRKE", sheet.Attributes.AbilityPower.ToString(), sheet.AbilityDamageText, label, value, effect);
-        DrawCharacterRow(batch, pixel, centerX, CharacterRowsY + CharacterRowSpacing * 3f, "RÜSTUNG", sheet.Attributes.Armor.ToString(), sheet.ArmorReductionText, label, value, effect);
+        DrawCharacterRow(batch, pixel, leftX, leftRight, RowY(0), "LEBEN", sheet.HealthText, null, label, value, effect);
+        DrawCharacterRow(batch, pixel, leftX, leftRight, RowY(1), "STÄRKE", attributes.Strength.ToString(), sheet.WeaponDamageText, label, value, effect);
+        DrawCharacterRow(batch, pixel, leftX, leftRight, RowY(2), "FÄHIGKEITSSTÄRKE", attributes.AbilityPower.ToString(), sheet.AbilityDamageText, label, value, effect);
+        DrawCharacterRow(batch, pixel, leftX, leftRight, RowY(3), "TEMPO", attributes.AttackSpeed.ToString(), sheet.AttackSpeedText, label, value, effect);
+        DrawCharacterRow(batch, pixel, leftX, leftRight, RowY(4), "KERNSCHÄRFE", attributes.CoreSharpness.ToString(), sheet.CoreDamageText, label, value, effect);
+        DrawCharacterRow(batch, pixel, leftX, leftRight, RowY(5), "FOKUS", attributes.Focus.ToString(), sheet.FocusText, label, value, effect);
 
-        float currencyY = CharacterRowsY + CharacterRowSpacing * 4f + 26f;
-        PixelText.Draw(batch, pixel, "WÄHRUNGEN", new Vector2(centerX + CharacterLabelOffsetX, currencyY), 2, effect);
+        DrawCharacterRow(batch, pixel, rightX, rightRight, RowY(0), "RÜSTUNG", attributes.Armor.ToString(), sheet.ArmorReductionText, label, value, effect);
+        DrawCharacterRow(batch, pixel, rightX, rightRight, RowY(1), "STANDFESTIGKEIT", attributes.Steadiness.ToString(), sheet.KnockbackText, label, value, effect);
+        DrawCharacterRow(batch, pixel, rightX, rightRight, RowY(2), "GEWANDTHEIT", attributes.Agility.ToString(), sheet.AgilityText, label, value, effect);
+        DrawCharacterRow(batch, pixel, rightX, rightRight, RowY(3), "EINKLANG", attributes.Attunement.ToString(), sheet.AttunementText, label, value, effect);
+        DrawCharacterRow(batch, pixel, rightX, rightRight, RowY(4), "GLÜCK", attributes.Luck.ToString(), sheet.LuckText, label, value, effect);
+
+        float currencyY = RowY(CharacterLeftColumnRows) + 4f;
+        PixelText.Draw(batch, pixel, "WÄHRUNGEN", new Vector2(leftX, currencyY), 2, effect);
         float ruleY = currencyY + 7 * 2 + 8f;
-        UiKit.Divider(batch, pixel, centerX, ruleY, -CharacterLabelOffsetX * 2f, GameBalance.DeathFlameBright * (0.45f * reveal));
-        DrawCurrencyRow(batch, pixel, centerX, ruleY + 20f, "GELD", sheet.GeldRunText, sheet.GeldSecuredText, GameBalance.Geld * reveal, value);
-        DrawCurrencyRow(batch, pixel, centerX, ruleY + 20f + CharacterRowSpacing, "GLUT", sheet.GlutRunText, sheet.GlutSecuredText, GameBalance.Glut * reveal, value);
+        UiKit.Divider(batch, pixel, centerX, ruleY, CharacterColumnOuterX * 2f, GameBalance.DeathFlameBright * (0.45f * reveal));
+        DrawCurrencyRow(batch, pixel, leftX, ruleY + 20f, "GELD", sheet.GeldRunText, sheet.GeldSecuredText, GameBalance.Geld * reveal, value);
+        DrawCurrencyRow(batch, pixel, rightX, ruleY + 20f, "GLUT", sheet.GlutRunText, sheet.GlutSecuredText, GameBalance.Glut * reveal, value);
     }
 
-    private static void DrawCharacterRow(SpriteBatch batch, Texture2D pixel, float centerX, float y, string label, string value, string? effect, Color labelColor, Color valueColor, Color effectColor)
+    private static float RowY(int row) => CharacterRowsY + CharacterRowSpacing * row;
+
+    private static void DrawCharacterRow(SpriteBatch batch, Texture2D pixel, float left, float right, float y, string label, string value, string? effect, Color labelColor, Color valueColor, Color effectColor)
     {
-        PixelText.Draw(batch, pixel, label, new Vector2(centerX + CharacterLabelOffsetX, y), MenuEntryScale, labelColor);
-        batch.FillRectangle(pixel, new Rectangle((int)(centerX + CharacterLabelOffsetX), (int)y + 32, (int)(-CharacterLabelOffsetX * 2f), 1), effectColor * 0.2f);
+        PixelText.Draw(batch, pixel, label, new Vector2(left, y), MenuEntryScale, labelColor);
         int valueWidth = PixelText.Measure(value, MenuEntryScale);
-        PixelText.Draw(batch, pixel, value, new Vector2(centerX + CharacterValueRightOffsetX - valueWidth, y), MenuEntryScale, valueColor);
+        PixelText.Draw(batch, pixel, value, new Vector2(right - valueWidth, y), MenuEntryScale, valueColor);
         if (effect is not null)
         {
-            // Scale 2 text sits on the scale 3 baseline.
-            PixelText.Draw(batch, pixel, effect, new Vector2(centerX + CharacterEffectOffsetX, y + 7f), 2, effectColor);
+            PixelText.Draw(batch, pixel, effect, new Vector2(left, y + CharacterEffectOffsetY), 2, effectColor);
         }
+        batch.FillRectangle(pixel, new Rectangle((int)left, (int)(y + CharacterRowSpacing - 8f), (int)(right - left), 1), effectColor * 0.2f);
     }
 
-    private static void DrawCurrencyRow(SpriteBatch batch, Texture2D pixel, float centerX, float y, string label, string? runText, string securedText, Color labelColor, Color valueColor)
+    private static void DrawCurrencyRow(SpriteBatch batch, Texture2D pixel, float left, float y, string label, string? runText, string securedText, Color labelColor, Color valueColor)
     {
-        UiKit.Icon(batch, pixel, label == "GELD" ? UiIcon.Geld : UiIcon.Glut, new Vector2(centerX + CharacterLabelOffsetX - 17f, y + 8.5f), 0.8f, valueColor.A / 255f);
-        PixelText.Draw(batch, pixel, label, new Vector2(centerX + CharacterLabelOffsetX, y), MenuEntryScale, labelColor);
-        float x = centerX + CharacterEffectOffsetX;
+        UiKit.Icon(batch, pixel, label == "GELD" ? UiIcon.Geld : UiIcon.Glut, new Vector2(left - 17f, y + 8.5f), 0.8f, valueColor.A / 255f);
+        PixelText.Draw(batch, pixel, label, new Vector2(left, y), MenuEntryScale, labelColor);
+        float x = left + CharacterCurrencyTextOffsetX;
         if (runText is not null)
         {
             PixelText.Draw(batch, pixel, runText, new Vector2(x, y + 7f), 2, valueColor);

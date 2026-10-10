@@ -1876,7 +1876,7 @@ public sealed partial class GameWorld : IDisposable
             Vector2 weakPoint = FindStrikeWeakPoint(enemy, strike);
             bool coreHit = _player.SoulSenseActive && weakPoint != Vector2.Zero;
             int damage = coreHit
-                ? (int)MathF.Round(strike.Damage * GameBalance.SoulSenseCoreDamageMultiplier)
+                ? _player.Attributes.ScaleCoreDamage(strike.Damage, GameBalance.SoulSenseCoreDamageMultiplier)
                 : strike.Damage;
             ApplyWeaponDamage(enemy, new DamageInfo(
                 damage,
@@ -3053,7 +3053,7 @@ public sealed partial class GameWorld : IDisposable
                 Vector2 weakPoint = FindCannonWeakPoint(enemy, shot);
                 bool coreHit = weakPoint != Vector2.Zero;
                 int damage = coreHit
-                    ? (int)MathF.Round(shot.Damage * GameBalance.CannonCoreDamageMultiplier)
+                    ? _player.Attributes.ScaleCoreDamage(shot.Damage, GameBalance.CannonCoreDamageMultiplier)
                     : shot.Damage;
                 float knockback = MathHelper.Lerp(330f, 760f, shot.Charge);
                 ApplyWeaponDamage(enemy, new DamageInfo(

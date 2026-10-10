@@ -97,7 +97,7 @@ public sealed class ScytheCombat
             _queuedAttack = true;
         }
 
-        _attackElapsed += deltaTime;
+        _attackElapsed += deltaTime * attributes.AttackSpeedMultiplier;
         if (_ignitionPending && NormalizedProgress >= StrokeStart(ActiveStep))
         {
             EmitIgnition(playerPosition, particles);

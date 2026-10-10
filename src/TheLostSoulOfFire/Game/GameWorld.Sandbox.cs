@@ -125,6 +125,27 @@ public sealed partial class GameWorld
             case SandboxDevMenuEntries.Armor:
                 _player.Attributes = attributes with { Armor = attribute.Adjust(attributes.Armor, direction, largeStep) };
                 break;
+            case SandboxDevMenuEntries.AttackSpeed:
+                _player.Attributes = attributes with { AttackSpeed = attribute.Adjust(attributes.AttackSpeed, direction, largeStep) };
+                break;
+            case SandboxDevMenuEntries.CoreSharpness:
+                _player.Attributes = attributes with { CoreSharpness = attribute.Adjust(attributes.CoreSharpness, direction, largeStep) };
+                break;
+            case SandboxDevMenuEntries.Focus:
+                _player.Attributes = attributes with { Focus = attribute.Adjust(attributes.Focus, direction, largeStep) };
+                break;
+            case SandboxDevMenuEntries.Steadiness:
+                _player.Attributes = attributes with { Steadiness = attribute.Adjust(attributes.Steadiness, direction, largeStep) };
+                break;
+            case SandboxDevMenuEntries.Agility:
+                _player.Attributes = attributes with { Agility = attribute.Adjust(attributes.Agility, direction, largeStep) };
+                break;
+            case SandboxDevMenuEntries.Attunement:
+                _player.Attributes = attributes with { Attunement = attribute.Adjust(attributes.Attunement, direction, largeStep) };
+                break;
+            case SandboxDevMenuEntries.Luck:
+                _player.Attributes = attributes with { Luck = attribute.Adjust(attributes.Luck, direction, largeStep) };
+                break;
         }
     }
 
@@ -175,6 +196,13 @@ public sealed partial class GameWorld
         SandboxDevMenuEntries.Strength => _player.Attributes.Strength.ToString(),
         SandboxDevMenuEntries.AbilityPower => _player.Attributes.AbilityPower.ToString(),
         SandboxDevMenuEntries.Armor => _player.Attributes.Armor.ToString(),
+        SandboxDevMenuEntries.AttackSpeed => _player.Attributes.AttackSpeed.ToString(),
+        SandboxDevMenuEntries.CoreSharpness => _player.Attributes.CoreSharpness.ToString(),
+        SandboxDevMenuEntries.Focus => _player.Attributes.Focus.ToString(),
+        SandboxDevMenuEntries.Steadiness => _player.Attributes.Steadiness.ToString(),
+        SandboxDevMenuEntries.Agility => _player.Attributes.Agility.ToString(),
+        SandboxDevMenuEntries.Attunement => _player.Attributes.Attunement.ToString(),
+        SandboxDevMenuEntries.Luck => _player.Attributes.Luck.ToString(),
         SandboxDevMenuEntries.RemoveEnemies => _enemies.Count(enemy => enemy.IsAlive).ToString(),
         _ when SandboxDevMenuEntries.SpawnKind(entry) is { } kind => _enemies.Count(enemy => enemy.IsAlive && SandboxSpawner.IsKind(enemy, kind)).ToString(),
         _ => null

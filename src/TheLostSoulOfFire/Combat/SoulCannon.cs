@@ -277,8 +277,8 @@ public sealed class SoulCannon
     }
 
     private float GetFullChargeTime() => _resonanceActive
-        ? GameBalance.CannonFullChargeTime / GameBalance.ResonanceCannonChargeSpeedMultiplier
-        : GameBalance.CannonFullChargeTime;
+        ? GameBalance.CannonFullChargeTime / GameBalance.ResonanceCannonChargeSpeedMultiplier / _attributes.AttackSpeedMultiplier
+        : GameBalance.CannonFullChargeTime / _attributes.AttackSpeedMultiplier;
 
     private static void DrawWeapon(
         SpriteBatch batch,

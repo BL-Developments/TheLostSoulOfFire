@@ -25,6 +25,21 @@ public readonly record struct CharacterSheet(
 
     public string ArmorReductionText => $"SCHADENSVERRINGERUNG {ToPercent(Attributes.ArmorReduction)} %";
 
+    public string AttackSpeedText => $"ANGRIFFSTEMPO {FormatSignedPercent(Attributes.AttackSpeedMultiplier - 1f)}";
+
+    public string CoreDamageText => $"KERNSCHADEN {FormatSignedPercent(Attributes.CoreSharpnessMultiplier - 1f)}";
+
+    public string FocusText => $"ABKLINGTEMPO {FormatSignedPercent(Attributes.FocusMultiplier - 1f)}";
+
+    public string KnockbackText => $"RÜCKSTOSS {FormatSignedPercent(Attributes.KnockbackTaken - 1f)}";
+
+    public string AgilityText =>
+        $"AUSWEICHEN {FormatSignedPercent(Attributes.AgilityMultiplier - 1f)} / LAUFEN {FormatSignedPercent(Attributes.MoveSpeedMultiplier - 1f)}";
+
+    public string AttunementText => $"RESONANZAUFBAU {FormatSignedPercent(Attributes.AttunementMultiplier - 1f)}";
+
+    public string LuckText => $"BEUTE {FormatSignedPercent(Attributes.LuckMultiplier - 1f)}";
+
     /// <summary>Run balance, only shown in the arena; outside it there is no run.</summary>
     public string? GeldRunText => InRun ? $"IM LAUF {RunGeld}" : null;
 
