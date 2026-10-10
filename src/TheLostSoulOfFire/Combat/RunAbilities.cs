@@ -108,7 +108,8 @@ public sealed class RunAbilities
     public void Update(float dt, Player player, Rectangle bounds, IReadOnlyList<Enemy> enemies,
         ParticleSystem particles, Action<Enemy, DamageInfo> damage)
     {
-        for (int i = 0; i < _cooldowns.Length; i++) _cooldowns[i] = MathF.Max(0, _cooldowns[i] - dt);
+        float cooldownStep = dt * player.Attributes.FocusMultiplier;
+        for (int i = 0; i < _cooldowns.Length; i++) _cooldowns[i] = MathF.Max(0, _cooldowns[i] - cooldownStep);
         FeedbackRemaining = MathF.Max(0, FeedbackRemaining - dt);
         if (player.IsDead) { Clear(player); return; }
         if (RetreatRemaining > 0)

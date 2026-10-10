@@ -19,9 +19,9 @@ public static class DevMenuRenderer
     private const int Padding = 24;
     private const int TitleScale = 3;
     private const int TextScale = 2;
-    private const float SectionGap = 22f;
+    private const float SectionGap = 16f;
     private const float HeaderHeight = 30f;
-    private const float RowHeight = 30f;
+    private const float RowHeight = 24f;
     private const float VeilAlpha = 0.3f;
     private const string EmptySection = "NOCH KEINE EINTRÄGE";
     private const string Hints = "W/S WÄHLEN · A/D ÄNDERN · ENTER · F SCHLIESSEN";

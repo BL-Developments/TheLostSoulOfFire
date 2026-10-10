@@ -54,6 +54,11 @@ Mit `--strength`, `--ability-power` und `--armor` (je 0 bis 99, Standard 10)
 lassen sich die Charakterwerte des Spielers setzen, etwa
 `-- --dev --start arena --strength 20 --armor 0`. Stärke skaliert die Sense,
 Fähigkeitsstärke die Seelenkanone, Rüstung verringert erlittenen Schaden.
+Ebenso gibt es `--attack-speed` (Tempo: Sense und Kanonenladung), `--luck`
+(Glück: Glut und Geld), `--core-sharpness` (Kernschärfe: Kerntreffer),
+`--attunement` (Einklang: Resonance-Aufbau), `--agility` (Gewandtheit:
+Ausweichen und Laufen), `--focus` (Fokus: Abklingzeit der Fähigkeiten) und
+`--steadiness` (Standfestigkeit: weniger Rückstoß).
 
 In der Sandbox setzt `R` nach einer Niederlage (oder `F8`) den Spieler in der
 Mitte zurück und räumt das Feld. `F` öffnet dort das Dev-Menü; `F` oder `Escape`
